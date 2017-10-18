@@ -1,9 +1,4 @@
-                 sparselizard is copyright (C) 2017
-
-                          Alexandre Halbach
-                  <alexandre.halbach at ulg.ac.be>
-
-                       University of Liege
+Alexandre Halbach   <alexandre.halbach at ulg.ac.be>    University of Liege
 
 Sincere thanks to Maxime Spirlet for all his technical help for the first sparselizard version.
 
