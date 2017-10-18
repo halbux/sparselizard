@@ -13,6 +13,7 @@ void sparselizard(void)
 {	
     int vol = 1, sur = 2, top = 3;
     
+    // The mesh can be curved!
     mesh mymesh("circle.msh");
     
     field u("h1xyz");
