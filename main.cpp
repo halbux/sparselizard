@@ -33,7 +33,7 @@ void sparselizard(void)
     elasticity.generate();
 
     vec solu = solve(elasticity.A(), elasticity.b());
-    
+
 	u.getdata(vol, solu);
 	u.write(top, "u.pos", 5);
 }
