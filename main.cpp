@@ -15,7 +15,7 @@ void sparselizard(void)
     
     mesh mymesh("circle.msh");
     
-    field x("x"), y("y"), z("z"),  u("h1xyz");
+    field u("h1xyz");
 
     u.setorder(vol, 4);
     
