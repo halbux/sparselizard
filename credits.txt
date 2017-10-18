@@ -3,11 +3,6 @@
                           Alexandre Halbach
                   <alexandre.halbach at ulg.ac.be>
 
-                               and
-
-                       Christophe Geuzaine 
-                     <cgeuzaine at ulg.ac.be>
-
                        University of Liege
 
 Our sincere thanks to Maxime Spirlet for all his technical help for the first sparselizard version.
