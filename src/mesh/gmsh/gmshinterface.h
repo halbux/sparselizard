@@ -1,0 +1,45 @@
+#ifndef GMSHINTERFACE_H
+#define GMSHINTERFACE_H
+
+#include <string>
+#include "nodes.h"
+#include "elements.h"
+#include "physicalregions.h"
+#include "densematrix.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <list>   
+#include <iomanip>
+#include "wallclock.h"
+#include "physicalregion.h"
+#include "element.h"
+#include "mystring.h"
+#include "polynomial.h"
+
+namespace gmshinterface
+{
+    // Load the mesh to the 'nodes', 'elements' and 'physicalregions' objects .
+    void readfromfile(std::string name, nodes&, elements&, physicalregions&);
+    void writetofile(std::string name, nodes&, elements&, physicalregions&, disjointregions&);
+
+    // Write or append the header of a new view in the .pos file:
+    void openview(std::string name, std::string viewname, double timetag, bool overwrite);
+    // Write a scalar field to the current view in the .pos format:
+    void appendtoview(std::string name, int elementtypenumber, densematrix coordx, densematrix coordy, densematrix coordz, densematrix compxinterpolated);
+    // Write a vector field to the current view in the .pos format:
+    void appendtoview(std::string name, int elementtypenumber, densematrix coordx, densematrix coordy, densematrix coordz, densematrix compxinterpolated, densematrix compyinterpolated, densematrix compzinterpolated);
+    // Write poly.size() interpolation schemes in the current view in the .pos file:
+    void writeinterpolationscheme(std::string name, std::vector<std::vector<polynomial>> poly);
+    // Close the current view in the .pos file:
+    void closeview(std::string name);
+    
+    // GMSH comes with its own element type numbering: we translate it to and from ours:
+    int convertgmshelementtypenumber(int gmshtypenumber);
+    int converttogmshelementtypenumber(int ourtypenumber);
+    
+    char getelementidentifierinposformat(int ourtypenumber);
+};
+
+#endif

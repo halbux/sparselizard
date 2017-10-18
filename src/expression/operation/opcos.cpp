@@ -1,0 +1,70 @@
+#include "opcos.h"
+
+
+std::vector<std::vector<densematrix>> opcos::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+{
+    // Get the value from the universe if available and reuse is enabled:
+    if (reuse && universe::isreuseallowed)
+    {
+        int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
+        if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
+    }
+    
+	std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+	
+    if (argmat.size() == 2 && argmat[1].size() == 1)
+    {
+        argmat[1][0].cos();
+        
+        if (reuse && universe::isreuseallowed)
+            universe::setprecomputed(shared_from_this(), argmat);
+        
+        return argmat;
+    }
+
+    std::cout << "Error in 'opcos' object: without FFT cos() can only be computed for constant (harmonic 1) operations" << std::endl;
+    abort();
+}
+
+densematrix opcos::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+{
+    // Get the value from the universe if available and reuse is enabled:
+    if (reuse && universe::isreuseallowed)
+    {
+        int precomputedindex = universe::getindexofprecomputedvaluefft(shared_from_this());
+        if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
+    }
+    
+    densematrix output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    output.cos();
+            
+    if (reuse && universe::isreuseallowed)
+        universe::setprecomputedfft(shared_from_this(), output);
+    
+    return output;
+}
+
+std::shared_ptr<operation> opcos::simplify(std::vector<int> disjregs)
+{
+    myarg = myarg->simplify(disjregs);
+    
+    if (myarg->isconstant())
+        return std::shared_ptr<operation>(new opconstant(std::cos(myarg->getvalue())));
+    else
+        return shared_from_this();
+}
+
+std::shared_ptr<operation> opcos::copy(void)
+{
+    std::shared_ptr<opcos> op(new opcos(myarg));
+    *op = *this;
+    op->reuse = false;
+    return op;
+}
+
+void opcos::print(void)
+{
+    std::cout << "cos(";
+    myarg->print();
+    std::cout << ")";
+}

@@ -1,0 +1,219 @@
+#include "elementselector.h"
+
+
+elementselector::elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent)
+{
+    // Have a coherent disjoint region ordering:
+    std::sort(disjointregionnumbers.begin(), disjointregionnumbers.end());
+    
+	mydisjointregionnumbers = disjointregionnumbers;
+
+    // Get the total number of elements in all disjoint regions for preallocation.
+    int totalnumberofelements = 0;
+    for (int i = 0; i < mydisjointregionnumbers.size(); i++)
+        totalnumberofelements += universe::mymesh->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
+    
+    // Create 'disjointregions', 'totalorientations' and 'elems':
+    disjointregions.resize(totalnumberofelements);
+    totalorientations.resize(totalnumberofelements);
+    elems.resize(totalnumberofelements);
+    
+    int currentindex = 0;
+    elements* myelements = universe::mymesh->getelements();
+    for (int i = 0; i < mydisjointregionnumbers.size(); i++)
+    {
+        int numelemindisjreg = universe::mymesh->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
+        int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[i]);
+        int rangebegin = universe::mymesh->getdisjointregions()->getrangebegin(mydisjointregionnumbers[i]);
+        for (int j = 0; j < numelemindisjreg; j++)
+        {
+            disjointregions[currentindex+j] = mydisjointregionnumbers[i];
+            totalorientations[currentindex+j] = myelements->gettotalorientation(myelementtypenumber, rangebegin+j);
+            elems[currentindex+j] = rangebegin+j;
+        }
+        currentindex += numelemindisjreg;
+    }
+    
+    // Sort the elements according to their total orientation.
+    // Do it only if orientation dependent otherwise the disjoint
+    // regions will not be sorted according to the order defined in
+    // 'disjointregionnumbers'.
+    if (isorientationdependent == true)
+    {
+        std::vector<int> renumberingvector;
+        myalgorithm::stablesort(totalorientations, renumberingvector);
+
+        std::vector<int> totalorientationsbackup = totalorientations;
+        std::vector<int> disjointregionsbackup = disjointregions;
+        std::vector<int> elemsbackup = elems;
+        for (int i = 0; i < totalorientations.size(); i++)
+        {
+            totalorientations[i] = totalorientationsbackup[renumberingvector[i]];
+            disjointregions[i] = disjointregionsbackup[renumberingvector[i]];
+            elems[i] = elemsbackup[renumberingvector[i]];
+        }
+    }
+    
+    // Set the range begin and end:
+    currentrangebegin = 0;
+    currenttotalorientation = totalorientations[currentrangebegin];
+    
+    if (isorientationdependent == false)
+        currentrangeend = totalorientations.size() - 1;
+    else
+    {
+        while (currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
+            currentrangeend++;
+        currentrangeend--;
+    }   
+}	
+
+int elementselector::getelementdimension(void)
+{
+    return universe::mymesh->getdisjointregions()->getelementdimension(mydisjointregionnumbers[0]);
+}
+
+bool elementselector::next(void)
+{
+    currentrangebegin = currentrangeend+1;
+    currentrangeend++;
+    
+    if (currentrangebegin >= totalorientations.size())
+        return false;
+    
+    currenttotalorientation = totalorientations[currentrangebegin];
+    
+    while (currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
+        currentrangeend++;
+    currentrangeend--;
+    
+    return true;
+}	
+
+void elementselector::selectdisjointregions(std::vector<int> disjregs) 
+{ 
+    std::sort(disjregs.begin(), disjregs.end()); 
+    selecteddisjointregions = disjregs; 
+}
+
+int elementselector::countinselection(void)
+{
+    if (currentrangebegin >= totalorientations.size())
+        return 0;
+    else
+    {
+        // If all disjoint regions are requested:
+        if (selecteddisjointregions.size() == 0)
+            return currentrangeend - currentrangebegin + 1;
+        else
+        {
+            // 'isdisjregrequested[disjreg]' is true if disjreg is in 'selecteddisjointregions'.
+            std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end()), false);
+            for (int i = 0; i < selecteddisjointregions.size(); i++)
+                isdisjregrequested[selecteddisjointregions[i]] = true;
+            
+            int numinselection = 0;
+            for (int i = currentrangebegin; i <= currentrangeend; i++)
+            {
+                if (isdisjregrequested[disjointregions[i]])
+                    numinselection++;
+            }
+            return numinselection;
+        }
+    }
+}	
+
+std::vector<int> elementselector::getelementnumbers(void)
+{
+    int numinselection = countinselection();
+    std::vector<int> elementnumbers(numinselection);
+    
+    // If all disjoint regions are requested:
+    if (selecteddisjointregions.size() == 0)
+    {
+        for (int i = 0; i < countincurrentorientation(); i++)
+            elementnumbers[i] = elems[currentrangebegin+i];
+    }
+    else
+    {
+        // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
+        std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end()), false);
+        for (int i = 0; i < selecteddisjointregions.size(); i++)
+            isdisjregrequested[selecteddisjointregions[i]] = true;
+        
+        int index = 0;
+        for (int i = 0; i < countincurrentorientation(); i++)
+        {
+            if (isdisjregrequested[disjointregions[i]])
+            {
+                elementnumbers[index] = elems[currentrangebegin+i];
+                index++;
+            }
+        }
+    }
+    return elementnumbers;
+}	
+
+std::vector<int> elementselector::getelementindexes(void)
+{
+    int numinselection = countinselection();
+    std::vector<int> elementindexes(numinselection);
+    
+    // If all disjoint regions are requested:
+    if (selecteddisjointregions.size() == 0)
+    {
+        for (int i = 0; i < countincurrentorientation(); i++)
+            elementindexes[i] = i;
+    }
+    else
+    {
+        // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
+        std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end()), false);
+        for (int i = 0; i < selecteddisjointregions.size(); i++)
+            isdisjregrequested[selecteddisjointregions[i]] = true;
+        
+        int index = 0;
+        for (int i = 0; i < countincurrentorientation(); i++)
+        {
+            if (isdisjregrequested[disjointregions[i]])
+            {
+                elementindexes[index] = i;
+                index++;
+            }
+        }
+    }
+    return elementindexes;
+}	
+
+elementselector elementselector::extractselection(void)
+{
+    elementselector extracted;
+    
+    if (selecteddisjointregions.size() == 0)
+        extracted.mydisjointregionnumbers = mydisjointregionnumbers;
+    else
+        extracted.mydisjointregionnumbers = selecteddisjointregions;
+    extracted.currenttotalorientation = currenttotalorientation;
+    
+    // There is only a single orientation in 'extracted':
+    int numinselection = countinselection();
+    extracted.currentrangebegin = 0;
+    extracted.currentrangeend = numinselection-1;
+    
+    // Create the three containers in 'extracted':
+    extracted.elems.resize(numinselection);
+    extracted.totalorientations.resize(numinselection);
+    extracted.disjointregions.resize(numinselection);
+    
+    std::vector<int> selectedindexes = getelementindexes();
+    for (int i = 0; i < numinselection; i++)
+    {
+        extracted.elems[i] = elems[currentrangebegin+selectedindexes[i]];
+        extracted.totalorientations[i] = totalorientations[currentrangebegin+selectedindexes[i]];
+        extracted.disjointregions[i] = disjointregions[currentrangebegin+selectedindexes[i]];
+    }
+    
+    return extracted;
+}
+
+

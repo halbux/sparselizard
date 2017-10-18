@@ -1,0 +1,55 @@
+#ifndef RAWVEC_H
+#define RAWVEC_H
+
+#include <iostream>
+#include <string>
+#include "dofmanager.h"
+#include "intdensematrix.h"
+#include "densematrix.h"
+#include "vectorfieldselect.h"
+#include "rawfield.h"
+#include "memory.h"
+#include "petsc.h"
+#include "petscvec.h"
+#include "mathop.h"
+
+class vectorfieldselect;
+class dofmanager;
+class rawfield;
+
+class rawvec
+{
+	private:
+
+        Vec myvec;
+        shared_ptr<dofmanager> mydofmanager = NULL;
+	
+	public:
+        	
+        rawvec(shared_ptr<dofmanager> dofmngr);
+        rawvec(shared_ptr<dofmanager> dofmngr, Vec input) { mydofmanager = dofmngr; myvec = input; };
+        
+        ~rawvec(void);
+        
+        int size(void);
+        
+        // Update the indexes that correspond to constrained 
+        // values of a rawfield on given disjoint regions. 
+        void updateconstraints(shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
+     
+        // Negative adresses are ignored. 'op' can be 'add' or 'set'. 
+		void setvalues(intdensematrix adresses, densematrix valsmat, std::string op = "set");
+
+		densematrix getvalues(intdensematrix adresses);
+		densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
+        
+		void print(void);
+
+        shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
+        Vec getpetsc(void) { return myvec; };
+
+        void getdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield);
+        
+};
+
+#endif
