@@ -18,8 +18,8 @@ void sparselizard(void)
     field x("x"), y("y"), z("z"),  u("h1xyz");
 
     u.setorder(vol, 4);
-  
-	u.setconstraint(sur);
+    
+    u.setconstraint(sur);
   
     parameter E, nu;
     E|vol = 150e9;
@@ -29,9 +29,9 @@ void sparselizard(void)
 
     elasticity += integral(vol, predefinedelasticity(u, E, nu));
     elasticity += integral(vol, array1x3(0,0,-10)*tf(u));
-    
+
     elasticity.generate();
-    
+
     vec solu = solve(elasticity.A(), elasticity.b());
     
 	u.getdata(vol, solu);
