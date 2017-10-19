@@ -1,3 +1,9 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+
 // The following form functions have been derived in the PhD thesis
 // "High Order Finite Element Methods for Electromagnetic Field Computation" 
 // of Dr. Sabine Zaglmayr at JOHANNES KEPLER UNIVERSITAET LINZ, AUSTRIA

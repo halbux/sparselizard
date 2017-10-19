@@ -1,3 +1,9 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+
 // The hierarchical form functions used change with the edges and faces orientations.
 // This can lead to field discontinuity at the element interfaces if the orientations are not
 // computed in a coherent way. The coherent way used is described below.

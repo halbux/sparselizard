@@ -1,3 +1,9 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+
 // This object manages the data of a field, i.e. the coefficients in the
 // finite element discretisation of the field: requested entries that
 // are non existing are automatically added and filled with zeros.

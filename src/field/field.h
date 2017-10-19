@@ -1,3 +1,9 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+
 // This object is a wrapper of the actual field object 'rawfield' pointed
 // by 'rawfieldptr' and to which most of the functions are redirected.
 // The purpose of this object is to wrap the 'rawfield' object for a 

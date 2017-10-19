@@ -1,3 +1,10 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+// This code calls the FFTW library. See http://www.fftw.org/ for more information.
+
 #ifndef MYFFT_H
 #define MYFFT_H
 
@@ -7,9 +14,6 @@
 #include "densematrix.h"
 #include <vector>
 #include "harmonic.h"
-
-// COMPILE WITH: g++ -std=c++11 *.cpp -o main -l fftw3 -lm
-
 
 namespace myfft
 {

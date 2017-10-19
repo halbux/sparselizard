@@ -1,3 +1,9 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+
 // This object is a wrapper of the actual mat object 'rawmat' pointed
 // by 'rawmatptr' and to which all functions are redirected.
 

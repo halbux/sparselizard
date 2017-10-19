@@ -1,3 +1,9 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+
 // This function computes (at the given Gauss points) the Jacobian of the 
 // variable change bringing back the mesh element to the reference element.
 // If requested the calculations are carried out on the mesh deformed by

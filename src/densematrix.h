@@ -1,3 +1,10 @@
+// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+//
+// See the LICENSE.txt file for license information. Please report all
+// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+
+// This code calls BLAS. See http://www.netlib.org/blas/ for more information.
+
 // This object stores the ROW-MAJOR values of a dense matrix of doubles.
 // In other words the matrix is stored as [row1 row2 row3 ...].
 
