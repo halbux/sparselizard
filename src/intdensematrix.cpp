@@ -52,9 +52,7 @@ void intdensematrix::print(void)
     for (int i = 0; i < numrows; i++)
     {
         for (int j = 0; j < numcols; j++)
-        {
             std::cout << myvaluesptr[i*numcols+j] << " ";
-        }
         std::cout << std::endl;
     }
 }

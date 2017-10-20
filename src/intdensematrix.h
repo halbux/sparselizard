@@ -4,7 +4,7 @@
 // bugs and problems to <alexandre.halbach at ulg.ac.be>.
 
 
-// This object stores the ROW-MAJOR values of a dense matrix of ints.
+// This object stores the ROW-MAJOR values of a dense matrix of int.
 // In other words the matrix is stored as [row1 row2 row3 ...].
 
 #ifndef INTDENSEMATRIX_H
@@ -38,7 +38,7 @@ class intdensematrix
         int countrows(void) { return numrows; };
         int countcolumns(void) { return numcols; };
         
-        // Count the number of positive integer values:
+        // Count the number of positive or zero integer values:
         int countpositive(void);
 
         void print(void);
