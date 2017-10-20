@@ -1,3 +1,10 @@
+##### THESE ARE THE REQUIRED LIBRARIES:
+
+LIBS = -L /home/halbux/openblas/lib -l openblas -L /home/halbux/petsc/arch-linux2-c-debug/lib -l petsc -l fftw3 -fopenmp
+INCL = -I /home/halbux/petsc/include/ -I /home/halbux/petsc/arch-linux2-c-debug/include/
+
+
+
 # $@ is the filename representing the target.
 # $< is the filename of the first prerequisite.
 # $^ the filenames of all the prerequisites.
@@ -7,10 +14,8 @@
 CXX = g++
 CXX_FLAGS= -std=c++11 -O3
 
-# List of all libraries to use:
-LIBS= -L /home/halbux/openblas/lib -l openblas -L /home/halbux/petsc/arch-linux2-c-debug/lib -l petsc -l mpi -l mpifort -l fftw3 -lm  -fopenmp #############" -lm useless?
 # List of all directories containing the headers:
-INCLUDES= -I ./ -I src -I src/field -I src/expression -I src/expression/operation -I src/shapefunction -I src/formulation -I src/shapefunction/hierarchical -I src/shapefunction/hierarchical/h1 -I src/shapefunction/hierarchical/hcurl -I src/shapefunction/hierarchical/meca -I src/gausspoint -I src/shapefunction/lagrange -I src/mesh -I src/mesh/gmsh     -I /home/halbux/petsc/include/ -I /home/halbux/petsc/arch-linux2-c-debug/include/
+INCLUDES = -I ./ -I src -I src/field -I src/expression -I src/expression/operation -I src/shapefunction -I src/formulation -I src/shapefunction/hierarchical -I src/shapefunction/hierarchical/h1 -I src/shapefunction/hierarchical/hcurl -I src/shapefunction/hierarchical/meca -I src/gausspoint -I src/shapefunction/lagrange -I src/mesh -I src/mesh/gmsh
 # List of all .cpp source files:
 CPPS= $(wildcard *.cpp) $(wildcard src/*.cpp) $(wildcard src/field/*.cpp) $(wildcard src/expression/*.cpp) $(wildcard src/expression/operation/*.cpp) $(wildcard src/shapefunction/*.cpp) $(wildcard src/formulation/*.cpp) $(wildcard src/shapefunction/hierarchical/*.cpp) $(wildcard src/shapefunction/hierarchical/h1/*.cpp) $(wildcard src/shapefunction/hierarchical/meca/*.cpp) $(wildcard src/shapefunction/hierarchical/hcurl/*.cpp) $(wildcard src/gausspoint/*.cpp) $(wildcard src/shapefunction/lagrange/*.cpp) $(wildcard src/mesh/*.cpp) $(wildcard src/mesh/gmsh/*.cpp)
 # Final binary name:
@@ -37,7 +42,7 @@ $(BUILD_DIR)/%.o: %.cpp
 	# Create the folder of the current target in the build directory:
 	mkdir -p $(@D)
 	# Compile .cpp file. MMD creates the dependencies.
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCLUDES) -MMD -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
 	
 
 clean :
