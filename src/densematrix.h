@@ -25,7 +25,7 @@ class densematrix
         int numrows = 0;
         int numcols = 0;
         
-        // Cannot be used with all functions:
+        // This is only used in 'multiply':
         bool istransposed = false;
         
         std::shared_ptr<double> myvalues = NULL;
@@ -38,20 +38,24 @@ class densematrix
         densematrix(int numberofrows, int numberofcolumns);
         // Initialise to a double value. Use this to set a matrix with constant value.
         densematrix(int numberofrows, int numberofcolumns, double initvalue);
-        // Initialise to a row or column vector:
-        densematrix(int numberofrows, int numberofcolumns, std::vector<double>& valvec);
+        // Initialise with a vector (row major):
+        densematrix(int numberofrows, int numberofcolumns, const std::vector<double> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
-        // Usefull for debug purposes at least.
         densematrix(int numberofrows, int numberofcolumns, int init, int step);
         
         int countrows(void) { return numrows; };
         int countcolumns(void) { return numcols; };
 
         // Was it initialised?
-        bool isdefined(void) { return (numrows != 0 && numcols != 0); };
+        bool isdefined(void) { return (myvalues != NULL); };
         
-        // Set a given row number to a value.
-        void setrow(int, std::vector<double>); // REMOVE!
+        // Set the values of a given row.
+        void setrow(int rownumber, std::vector<double>);
+        
+        // Output a flattened matrix, i.e. put all rows one after the other.
+        // In practice this only requires to change 'numrows' and 'numcols'.
+        // Values are NOT copied!
+        densematrix flatten(void);
 
         // Insert a block in the matrix. Top left of block is at (row, col):
         void insert(int row, int col, densematrix toinsert);
@@ -59,46 +63,44 @@ class densematrix
         // Insert a matrix at given row numbers. The number of columns must be the same.
         void insertatrows(std::vector<int> selectedrows, densematrix toinsert);
         void insertatcolumns(std::vector<int> selectedcolumns, densematrix toinsert);
-        
-        // Output a flattened matrix, i.e. put all rows one after the other.
-        // In practice this only requires to change 'numrows' and 'numcols'.
-        densematrix flatten(void);
 
-        // For fast access take into account that the storage is 
-        // row-major for the not-transposed case.
+        // For fast access take into account that the storage is row-major.
+        // Getting the values pointer with 'getvalues' is a better choice!
         double getvalue(int rownumber, int columnnumber);
-        void setvalue(int rownumber, int columnnumber, double);
+        void setvalue(int rownumber, int columnnumber, double val);
         
-//         bool operator==(densematrix input);
-        
-        // Get a full copy, including the pointed values.
+        // Get a full copy (all values are copied).
         densematrix copy(void);
+        
         void print(void);
         void printsize(void);
-        void transpose(void);
         
         bool isallzero(void);
-        
-        // Multiply current object matrix by B:
-        densematrix multiply(densematrix);
+
+        // Transpose has an effect only on the 'multiply' function below.
+        // It does not actually transpose the matrix.
+        void transpose(void);
+
+        // Multiply current object matrix by B with BLAS:
+        densematrix multiply(densematrix B);
         
         // The matrix cannot get out of scope
         double* getvalues(void);
         
-        densematrix getcolumns(std::vector<int> cols);
-        
-        // Elementwise operations. They do not accept matrix transposition.
-        // Matrices must all have the same size.
-        void erroriftransposed(void);
-        void multiplyelementwise(densematrix);
-        void add(densematrix);
-        // Multiply by coef*B without changing B.
+        // Add coef*B without changing B.
         void addproduct(double coef, densematrix B);
+        // Return the product by 'coef' without modifying this object.
         densematrix returnproduct(double coef);
-        void subtractelementwise(densematrix);
-        void multiplyelementwise(double);
+        
+        // Elementwise operations below. 
+        // They do not accept matrix transposition.
+        // Matrices must all have the same size.
+        void multiplyelementwise(densematrix B);
+        void multiplyelementwise(double val);
+        void add(densematrix B);
+        void subtract(densematrix B);
         void minus(void);
-        void power(densematrix);
+        void power(densematrix exponent);
         // Compute 1/val for all values:
         void invert(void);
         void abs(void);
@@ -106,16 +108,18 @@ class densematrix
         void cos(void);
         void log10(void);
         
+        // Get the max absolute value:
         double maxabs(void);
-
+        // Sum all values:
         double sum(void);
         
-        void multiplycolumns(std::vector<double>);
+        // Multiply column i by input[i].
+        void multiplycolumns(std::vector<double> input);
         
-        // [Acol1*Bcol1  Acol1*Bcol2  ... Acol2*Bcol1...]
-        densematrix multiplyallrows(densematrix);
+        // [Arow1*Brow1  Arow1*Brow2  ... Arow2*Brow1...].
+        densematrix multiplyallrows(densematrix input);
         
-        // mat becomes [mat; mat; mat; ...] n times
+        // A becomes [A; A; A; ...] n times.
         densematrix duplicatevertically(int n);
 
 };

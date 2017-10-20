@@ -20,14 +20,8 @@ densematrix::densematrix(int numberofrows, int numberofcolumns, double initvalue
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
-densematrix::densematrix(int numberofrows, int numberofcolumns, std::vector<double>& valvec)
+densematrix::densematrix(int numberofrows, int numberofcolumns, const std::vector<double> valvec)
 {
-    if (numberofrows != 1 && numberofcolumns != 1)
-    {
-        std::cout << "Error in 'densematrix' object: requested matrix size does not correspond to a column/row vector." << std::endl;
-        abort();
-    }
-    
     numrows = numberofrows;
     numcols = numberofcolumns;
     double* myvaluesptr = new double[numcols*numrows];
@@ -50,6 +44,13 @@ densematrix::densematrix(int numberofrows, int numberofcolumns, int init, int st
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
+void densematrix::setrow(int rownumber, std::vector<double> rowvals)
+{
+    double* myvaluesptr = myvalues.get();
+    for (int i = 0; i < numcols; i++)
+        myvaluesptr[rownumber*numcols+i] = rowvals[i];
+}
+
 densematrix densematrix::flatten(void) 
 { 
     densematrix out = *this; 
@@ -58,12 +59,6 @@ densematrix densematrix::flatten(void)
     return out; 
 }
 
-void densematrix::setrow(int rownumber, std::vector<double> rowvals)
-{
-    double* myvaluesptr = myvalues.get();
-    for (int i = 0; i < numcols; i++)
-        myvaluesptr[rownumber*numcols+i] = rowvals[i];
-}
 
 void densematrix::insert(int row, int col, densematrix toinsert)
 {
@@ -104,19 +99,13 @@ void densematrix::insertatcolumns(std::vector<int> selectedcolumns, densematrix 
 double densematrix::getvalue(int rownumber, int columnnumber)
 {
     double* myvaluesptr = myvalues.get();
-    if (istransposed == false)  
-        return myvaluesptr[rownumber*numcols+columnnumber];
-    else
-        return myvaluesptr[columnnumber*numcols+rownumber];
+    return myvaluesptr[rownumber*numcols+columnnumber];
 }
 
 void densematrix::setvalue(int rownumber, int columnnumber, double val)
 {
     double* myvaluesptr = myvalues.get();
-    if (istransposed == false)  
-        myvaluesptr[rownumber*numcols+columnnumber] = val;
-    else
-        myvaluesptr[columnnumber*numcols+rownumber] = val;
+    myvaluesptr[rownumber*numcols+columnnumber] = val;
 }
 
 densematrix densematrix::copy(void)
@@ -139,42 +128,18 @@ densematrix densematrix::copy(void)
 void densematrix::print(void)
 {
     double* myvaluesptr = myvalues.get();
-    if (not(istransposed))
-    {
-        for (int i = 0; i < numrows; i++)
-        {
-            for (int j = 0; j < numcols; j++)
-            {
-                std::cout << myvaluesptr[i*numcols+j] << " ";
-            }
-            std::cout << std::endl;
-        }
-    }
-    else
+    for (int i = 0; i < numrows; i++)
     {
         for (int j = 0; j < numcols; j++)
-        {
-            for (int i = 0; i < numrows; i++)
-            {
-                std::cout << myvaluesptr[i*numcols+j] << " ";
-            }
-            std::cout << std::endl;
-        }
+            std::cout << myvaluesptr[i*numcols+j] << " ";
+        std::cout << std::endl;
     }
     std::cout << std::endl;
 }
 
 void densematrix::printsize(void)
 {
-    if (not(istransposed))
-        std::cout << "Matrix size is " << numrows << "x" << numcols << std::endl;
-    else
-        std::cout << "Matrix size is " << numcols << "x" << numrows << std::endl;
-}
-
-void densematrix::transpose(void)
-{
-    istransposed = not(istransposed);
+    std::cout << "Matrix size is " << numrows << "x" << numcols << std::endl;
 }
 
 bool densematrix::isallzero(void)
@@ -186,6 +151,11 @@ bool densematrix::isallzero(void)
             return false;
     }
     return true;
+}
+
+void densematrix::transpose(void)
+{
+    istransposed = not(istransposed);
 }
 
 densematrix densematrix::multiply(densematrix B)
@@ -272,75 +242,13 @@ densematrix densematrix::multiply(densematrix B)
     return C;
 }
 
-double* densematrix::getvalues(void)
-{
-    return myvalues.get();
-}
-
-densematrix densematrix::getcolumns(std::vector<int> cols)
-{
-    densematrix colsmatrix(numrows, cols.size());
-    
-    double* myvaluesptr = myvalues.get();
-    double* colsmyvaluesptr = colsmatrix.myvalues.get();
-    
-    for (int row = 0; row < numrows; row++)
-    {
-        for (int col = 0; col < cols.size(); col++)
-            colsmyvaluesptr[row*cols.size()+col] = myvaluesptr[row*numcols+cols[col]];
-    }
-    
-    return colsmatrix;
-}
-
-void densematrix::erroriftransposed(void)
-{
-    if (istransposed)
-    {
-        std::cout << "Error on 'densematrix' object: transposition is not accepted for the requested operation" << std::endl;
-        abort();
-    }
-}
-
-void densematrix::multiplyelementwise(densematrix B) // USE BLAS LEVEL 1 ON THE MATRIX USED AS A VECTOR OF DOUIBLES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-{
-    double* myvaluesptr = myvalues.get();
-    double* Bmyvaluesptr = B.myvalues.get();
-    
-    erroriftransposed();
-    B.erroriftransposed();
-    for (int i = 0; i < numrows; i++)
-    {
-        for (int j = 0; j < numcols; j++)
-        {
-            myvaluesptr[i*numcols+j] *= Bmyvaluesptr[i*numcols+j];
-        }
-    }
-}
-
-void densematrix::add(densematrix B)
-{
-    double* myvaluesptr = myvalues.get();
-    double* Bmyvaluesptr = B.myvalues.get();
-    
-    erroriftransposed();
-    B.erroriftransposed();
-    for (int i = 0; i < numrows; i++)
-    {
-        for (int j = 0; j < numcols; j++)
-        {
-            myvaluesptr[i*numcols+j] += Bmyvaluesptr[i*numcols+j];
-        }
-    }
-}
+double* densematrix::getvalues(void) { return myvalues.get(); }
 
 void densematrix::addproduct(double coef, densematrix B)
 {
     double* myvaluesptr = myvalues.get();
     double* Bmyvaluesptr = B.myvalues.get();
     
-    erroriftransposed();
-    B.erroriftransposed();
     if (coef == 1)
     {
         for (int i = 0; i < numrows*numcols; i++)
@@ -359,7 +267,6 @@ densematrix densematrix::returnproduct(double coef)
     double* myvaluesptr = myvalues.get();
     double* outputmyvaluesptr = output.myvalues.get();
     
-    erroriftransposed();
     if (coef == 1)
     {
         for (int i = 0; i < numrows*numcols; i++)
@@ -373,31 +280,45 @@ densematrix densematrix::returnproduct(double coef)
     return output;
 }
 
-void densematrix::subtractelementwise(densematrix B)
+void densematrix::multiplyelementwise(densematrix B)
 {
     double* myvaluesptr = myvalues.get();
     double* Bmyvaluesptr = B.myvalues.get();
     
-    erroriftransposed();
-    B.erroriftransposed();
     for (int i = 0; i < numrows*numcols; i++)
-        myvaluesptr[i] -= Bmyvaluesptr[i];
+        myvaluesptr[i] *= Bmyvaluesptr[i];
 }
 
 void densematrix::multiplyelementwise(double val)
 {
     double* myvaluesptr = myvalues.get();
     
-    erroriftransposed();
     for (int i = 0; i < numrows*numcols; i++)
         myvaluesptr[i] *= val;
+}
+
+void densematrix::add(densematrix B)
+{
+    double* myvaluesptr = myvalues.get();
+    double* Bmyvaluesptr = B.myvalues.get();
+    
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] += Bmyvaluesptr[i];
+}
+
+void densematrix::subtract(densematrix B)
+{
+    double* myvaluesptr = myvalues.get();
+    double* Bmyvaluesptr = B.myvalues.get();
+    
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] -= Bmyvaluesptr[i];
 }
 
 void densematrix::minus(void)
 {
     double* myvaluesptr = myvalues.get();
     
-    erroriftransposed();
     for (int i = 0; i < numrows*numcols; i++)
         myvaluesptr[i] = -myvaluesptr[i];
 }
@@ -407,7 +328,6 @@ void densematrix::power(densematrix exponent)
     double* myvaluesptr = myvalues.get();
     double* expmyvaluesptr = exponent.myvalues.get();
     
-    erroriftransposed();
     for (int i = 0; i < numrows*numcols; i++)
             myvaluesptr[i] = std::pow(myvaluesptr[i], expmyvaluesptr[i]);
 }
@@ -416,7 +336,6 @@ void densematrix::invert(void)
 {
     double* myvaluesptr = myvalues.get();
     
-    erroriftransposed();
     for (int i = 0; i < numrows*numcols; i++)
         myvaluesptr[i] = 1/myvaluesptr[i];
 }
@@ -425,7 +344,6 @@ void densematrix::abs(void)
 {
     double* myvaluesptr = myvalues.get();
 
-    erroriftransposed();
     for (int i = 0; i < numrows*numcols; i++)
         myvaluesptr[i] = std::abs(myvaluesptr[i]);
 }
@@ -434,19 +352,14 @@ void densematrix::sin(void)
 {
     double* myvaluesptr = myvalues.get();
 
-    erroriftransposed();
-    for (int i = 0; i < numrows; i++)
-    {
-        for (int j = 0; j < numcols; j++)
-            myvaluesptr[i*numcols+j] = std::sin(myvaluesptr[i*numcols+j]);
-    }
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] = std::sin(myvaluesptr[i]);
 }
 
 void densematrix::cos(void)
 {
     double* myvaluesptr = myvalues.get();
-    
-    erroriftransposed();
+
     for (int i = 0; i < numrows*numcols; i++)
         myvaluesptr[i] = std::cos(myvaluesptr[i]);
 }
@@ -454,8 +367,7 @@ void densematrix::cos(void)
 void densematrix::log10(void)
 {
     double* myvaluesptr = myvalues.get();
-    
-    erroriftransposed();
+
     for (int i = 0; i < numrows*numcols; i++)
         myvaluesptr[i] = std::log10(myvaluesptr[i]);
 }
@@ -477,7 +389,6 @@ double densematrix::maxabs(void)
 double densematrix::sum(void)
 {
     double* myvaluesptr = myvalues.get();
-    
     double val = 0;
 
     for (int i = 0; i < numrows*numcols; i++)
@@ -508,9 +419,8 @@ densematrix densematrix::multiplyallrows(densematrix input)
     {
         for (int j = 0; j < input.numrows; j++)
         {
-            for (int k = 0; k < numcols; k++){
+            for (int k = 0; k < numcols; k++)
                 outmyvaluesptr[(i*input.numrows + j)*numcols + k] = myvaluesptr[i*numcols+k] * inmyvaluesptr[j*input.numcols+k];
-            }
         }
     }
     return output;
