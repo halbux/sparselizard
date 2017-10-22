@@ -32,10 +32,8 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
                  
     
     ////////// Compute the FFT as described in the plan.
-    // Parallelise with openmp.
-    
-//#pragma omp parallel --> ONLY ON EXECUTE!!!!!!!!!!!!!!
-//{   http://www.fftw.org/fftw3_doc/Usage-of-Multi_002dthreaded-FFTW.html#Usage-of-Multi_002dthreaded-FFTW
+    // Parallelise with openmp if this is slow as explained in:
+    // http://www.fftw.org/fftw3_doc/Usage-of-Multi_002dthreaded-FFTW.html#Usage-of-Multi_002dthreaded-FFTW
     fftw_execute(myplan);
     
     
@@ -133,7 +131,7 @@ densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int 
     for(int i = 0; i < numtimevals; i++)
         timevals[i] = i*phasestep;
         
-    // The end results goes here. Initial value is 0.
+    // The end result goes here. Initial value is 0.
     densematrix output(numtimevals, mym*myn, 0);
     
     // Loop on all non zero harmonics:
@@ -183,7 +181,4 @@ densematrix myfft::toelementrowformat(densematrix timestepsinrows, int numberofe
     }
     return output;
 }
-
-
-
 

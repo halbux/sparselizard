@@ -2,15 +2,15 @@
 
 
 mesh* universe::mymesh = NULL;
-double universe::fundamentalfrequency = -1;
 
+double universe::fundamentalfrequency = -1;
 double universe::getfundamentalfrequency(void)
 {
     if (fundamentalfrequency > 0)
         return fundamentalfrequency;
     else
     {
-        std::cout << "Error in 'universe' object: the fundamental frequency canot be negative or 0 (did you set it with 'setfundamentalfrequency'?)" << std::endl;
+        std::cout << "Error in 'universe' object: the fundamental frequency cannot be negative or 0 (make sure it was set)" << std::endl;
         abort();
     }
 }
@@ -27,8 +27,6 @@ void universe::forbidreuse(void)
     isreuseallowed = false;
     
     computedjacobian = NULL;
-    delete computedhierarchicalformfunction;
-    computedhierarchicalformfunction = NULL;
     
     oppointers = {};
     oppointersfft = {};
@@ -37,7 +35,6 @@ void universe::forbidreuse(void)
 }
 
 shared_ptr<jacobian> universe::computedjacobian = NULL;
-hierarchicalformfunction* universe::computedhierarchicalformfunction = NULL;
 
 
 std::vector<shared_ptr<operation>> universe::oppointers = {};
