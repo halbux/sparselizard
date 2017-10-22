@@ -31,7 +31,7 @@
 // 15 --> Line 		  order 3
 // ...
 //
-// Only complete order elements are defined.
+// Only complete order curved elements are defined.
 //
 //
 // The node, edge and surface ordering in the reference elements is the same as for the GMSH software and is described below.
@@ -277,29 +277,29 @@ class element
 
 	private:
 	
-        int curvedtypenumber;
-        std::vector<int> curvednodelist;
+        int curvedtypenumber = -1;
+        std::vector<int> curvednodelist = {};
         
         // 'getnodesinsurface' does the actual work of 'getnodesintriangle' (below) if the
         // second argument is true and the third is false and of 'getnodesinquadrangle'
         // if the second is false and the third is true. No error check is performed here.
-        std::vector<int> getnodesinsurface(int, bool, bool);
+        std::vector<int> getnodesinsurface(int surfaceindex, bool faceistriangle, bool faceisquadrangle);
 
 	public:
 	
         // Set the element name:
-        element(std::string);
+        element(std::string elementname);
         // Set the curved type number:
-        element(int);
+        element(int number);
         // Set the type number and curvature order:
-        element(int, int);
+        element(int number, int curvatureorder);
         
-        void setnodes(std::vector<int>&);
+        void setnodes(std::vector<int>& nodelist);
         
         std::vector<int> getnodes(void);
         std::string gettypename(void);									
         // 'gettypenameconjugation' is singular for 0 or 1 as input, plural otherwise.
-        std::string gettypenameconjugation(int);				
+        std::string gettypenameconjugation(int numberofelements);				
         bool iscurved(void);										
         int getcurvatureorder(void);								
         // Get the straight type number corresponding to the curved element:
@@ -318,7 +318,7 @@ class element
         
         // 'istriangularface(i)' returns true if the ith face of the element is triangular
         // and false otherwise (e.g. when quadrangular). 
-        bool istriangularface(int);
+        bool istriangularface(int facenum);
         // For prisms, to know if the edge is horizontal or vertical:
         bool ishorizontaledge(int edgenum);
         
@@ -326,13 +326,13 @@ class element
         // forming the ith triangular face in the element object. 
         // An error is returned if none is found (e.g. for a line element).
         // The node, edge and surface ordering is defined at the top of this header.
-        std::vector<int> getnodesinline(int);
-        std::vector<int> getnodesintriangle(int);
-        std::vector<int> getnodesinquadrangle(int);
+        std::vector<int> getnodesinline(int lineindex);
+        std::vector<int> getnodesintriangle(int triangleindex);
+        std::vector<int> getnodesinquadrangle(int quadrangleindex);
 	
-        // 'getedgesdefinitionbasedonnodes[2*i+j]' gives the index of the jth node
+        // 'getedgesdefinitionbasedonnodes()[2*i+j]' gives the index of the jth node
         // in the ith edge [node1edgei node2edgei] in the element. The edges ordering 
-        // as described at the top of this file. Only the corner nodes are given,
+        // is as described at the top of this file. Only the corner nodes are given,
         // not the curvature-related inner nodes.
         std::vector<int> getedgesdefinitionsbasedonnodes(void);		
         // In 'getfacesdefinitionsbasedonnodes' first all triangular faces 

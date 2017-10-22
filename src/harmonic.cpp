@@ -36,7 +36,6 @@ int harmonic::getharmonicnumber(std::string input)
         int freqindex = std::stoi(input);
         
         return getharmonicnumber(freqindex, issine);
-        
     }
     std::cout << "Error in 'harmonic' namespace: '" << input << "' is not a valid harmonic name (correct form is cos0, sin1, cos1, sin2, cos2, ...)" << std::endl;
     abort();
@@ -152,8 +151,7 @@ std::vector<std::vector<densematrix>> harmonic::timederivative(int timederivativ
             input[h+1] = temp;
         }
     }
-    else
-        return input;
+    return input;
 }
 
 

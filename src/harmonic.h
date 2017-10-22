@@ -3,7 +3,6 @@
 // See the LICENSE.txt file for license information. Please report all
 // bugs and problems to <alexandre.halbach at ulg.ac.be>.
 
-
 #ifndef HARMONIC_H
 #define HARMONIC_H
 
@@ -24,6 +23,7 @@ namespace harmonic
     bool iscosine(int harmonicnumber);
     
     int getharmonicnumber(int frequency, bool issine);
+    // Get the number corresponding to e.g. cos0, sin1, cos1, ...
     int getharmonicnumber(std::string input);
     
     // Get all harmonic numbers (and multiplying coefficients) in the sum 
