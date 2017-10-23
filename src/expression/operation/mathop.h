@@ -25,6 +25,8 @@ namespace mathop
     int regionunion(const std::vector<int> physregs);
     int regionintersection(const std::vector<int> physregs);
     
+    // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
+    expression normal(int surfphysreg);
     
     void setfundamentalfrequency(double f);
     

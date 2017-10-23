@@ -10,6 +10,32 @@ int mathop::regionintersection(const std::vector<int> physregs)
 {
     return (universe::mymesh->getphysicalregions())->createintersection(physregs);
 }
+
+expression mathop::normal(int surfphysreg)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int elementdimension = universe::mymesh->getphysicalregions()->get(surfphysreg)->getelementdimension();
+    
+    if (problemdimension-1 != elementdimension || problemdimension == 1)
+    {
+        std::cout << "Error in 'mathop' namespace: can only compute the normal to a surface in 3D and to a line in 2D" << std::endl;
+        abort();
+    }
+    
+    expression expr;
+    if (problemdimension == 2)
+    {
+        expression mynorm = sqrt(expr.invjac(0,1)*expr.invjac(0,1)+expr.invjac(1,1)*expr.invjac(1,1));
+        mynorm.reuseit();
+        return array2x1(expr.invjac(0,1), expr.invjac(1,1))/mynorm;
+    }
+    if (problemdimension == 3)
+    {
+        expression mynorm = sqrt(expr.invjac(0,2)*expr.invjac(0,2)+expr.invjac(1,2)*expr.invjac(1,2)+expr.invjac(2,2)*expr.invjac(2,2));
+        mynorm.reuseit();
+        return array3x1(expr.invjac(0,2), expr.invjac(1,2), expr.invjac(2,2))/mynorm;
+    }
+}
     
     
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
