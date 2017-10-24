@@ -25,6 +25,14 @@ expression::expression(field input)
             myoperations[row] = op;
         }
     }
+    
+    // Project from the reference element to the physical 
+    // element any field with multiple form function components:
+    if (input.getpointer()->countformfunctioncomponents() > 1)
+    {
+        unprojectedfield = {*this};
+        myoperations = ( invjac()*(*this) ).myoperations;
+    }
 }
 
 expression::expression(double input) { myoperations = {std::shared_ptr<opconstant>(new opconstant(input))}; }
@@ -421,20 +429,28 @@ expression expression::spacederivative(int whichderivative)
 //     }
     
     expression derivated = *this;
-
+    if (unprojectedfield.size() == 1)
+        derivated = unprojectedfield[0];
+    
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
         if (whichderivative > problemdimension)
         {
-            std::shared_ptr<operation> op(new opconstant(0));
+            std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));
             derivated.myoperations[i] = op;
         }
         else
         {
-            std::shared_ptr<operation> op = myoperations[i]->copy();
+            std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
             op->setspacederivative(whichderivative);
             derivated.myoperations[i] = op;
         }
+    }
+    
+    if (unprojectedfield.size() == 1)        
+    {
+        derivated.unprojectedfield = {derivated};
+        derivated.myoperations = ( invjac()*(derivated) ).myoperations;
     }
     return derivated;
 }
@@ -442,12 +458,20 @@ expression expression::spacederivative(int whichderivative)
 expression expression::timederivative(int derivativeorder)
 {
     expression derivated = *this;
+    if (unprojectedfield.size() == 1)
+        derivated = unprojectedfield[0];
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-        std::shared_ptr<operation> op = myoperations[i]->copy();
+        std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
         op->increasetimederivativeorder(derivativeorder);
         derivated.myoperations[i] = op;
+    }
+    
+    if (unprojectedfield.size() == 1)        
+    {
+        derivated.unprojectedfield = {derivated};
+        derivated.myoperations = ( invjac()*(derivated) ).myoperations;
     }
     return derivated;
 }
@@ -592,19 +616,21 @@ expression expression::pow(expression input)
 expression expression::dof(int physreg)
 {
     expression doftag = *this;
+    if (unprojectedfield.size() == 1)
+        doftag = unprojectedfield[0];
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {            
-        if (myoperations[i]->isfield())
+        if (doftag.myoperations[i]->isfield())
         {
-            if (myoperations[i]->getspacederivative() != 0 || myoperations[i]->gettimederivative() != 0)
+            if (doftag.myoperations[i]->getspacederivative() != 0 || doftag.myoperations[i]->gettimederivative() != 0)
             {
                 std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the dof() field argument" << std::endl; 
                 abort();
             }   
-            std::shared_ptr<opdof> op(new opdof(myoperations[i]->getfieldpointer(), physreg));
-            op->selectformfunctioncomponent(myoperations[i]->getformfunctioncomponent());
-            op->setfieldcomponent(myoperations[i]->getfieldcomponent());
+            std::shared_ptr<opdof> op(new opdof(doftag.myoperations[i]->getfieldpointer(), physreg));
+            op->selectformfunctioncomponent(doftag.myoperations[i]->getformfunctioncomponent());
+            op->setfieldcomponent(doftag.myoperations[i]->getfieldcomponent());
             doftag.myoperations[i] = op;
         }
         else
@@ -613,25 +639,33 @@ expression expression::dof(int physreg)
             abort();
         }     
     }
+    
+    if (unprojectedfield.size() == 1)        
+    {
+        doftag.unprojectedfield = {doftag};
+        doftag.myoperations = ( invjac()*(doftag) ).myoperations;
+    }
     return doftag;
 }
 
 expression expression::tf(int physreg)
 {
     expression tftag = *this;
+    if (unprojectedfield.size() == 1)
+        tftag = unprojectedfield[0];
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {            
-        if (myoperations[i]->isfield())
+        if (tftag.myoperations[i]->isfield())
         {
-            if (myoperations[i]->getspacederivative() != 0 || myoperations[i]->gettimederivative() != 0)
+            if (tftag.myoperations[i]->getspacederivative() != 0 || tftag.myoperations[i]->gettimederivative() != 0)
             {
                 std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the tf() field argument" << std::endl; 
                 abort();
             }   
-            std::shared_ptr<optf> op(new optf(myoperations[i]->getfieldpointer(), physreg));
-            op->selectformfunctioncomponent(myoperations[i]->getformfunctioncomponent());
-            op->setfieldcomponent(myoperations[i]->getfieldcomponent());
+            std::shared_ptr<optf> op(new optf(tftag.myoperations[i]->getfieldpointer(), physreg));
+            op->selectformfunctioncomponent(tftag.myoperations[i]->getformfunctioncomponent());
+            op->setfieldcomponent(tftag.myoperations[i]->getfieldcomponent());
             tftag.myoperations[i] = op;
         }
         else
@@ -639,6 +673,12 @@ expression expression::tf(int physreg)
             std::cout << "Error in 'expression' object: the argument of tf() must be a field or field expression" << std::endl; 
             abort();
         }     
+    }
+    
+    if (unprojectedfield.size() == 1)        
+    {
+        tftag.unprojectedfield = {tftag};
+        tftag.myoperations = ( invjac()*(tftag) ).myoperations;
     }
     return tftag;
 }
@@ -697,6 +737,34 @@ expression expression::jac(int row, int col)
     exp.myoperations = {std::shared_ptr<opjac>(new opjac(row,col))};
     
     return exp;
+}
+
+expression expression::invjac(void)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    switch (problemdimension)
+    {
+        case 1:
+            return expression(3,3,{invjac(0,0),0,0,   0,0,0,   0,0,0});
+        case 2:
+            return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,0});
+        case 3:
+            return expression(3,3,{invjac(0,0),invjac(0,1),invjac(0,2),   invjac(1,0),invjac(1,1),invjac(1,2),   invjac(2,0),invjac(2,1),invjac(2,2)});
+    }
+}
+
+expression expression::jac(void)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    switch (problemdimension)
+    {
+        case 1:
+            return expression(3,3,{jac(0,0),0,0,   0,0,0,   0,0,0});
+        case 2:
+            return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,0});
+        case 3:
+            return expression(3,3,{jac(0,0),jac(0,1),jac(0,2),   jac(1,0),jac(1,1),jac(1,2),   jac(2,0),jac(2,1),jac(2,2)});
+    }
 }
 
 std::shared_ptr<operation> expression::getoperationinarray(int row, int col)

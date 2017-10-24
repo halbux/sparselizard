@@ -27,6 +27,7 @@
 #include "polynomial.h"
 #include "myfft.h"
 #include <cmath>
+#include "rawfield.h"
 #include "mystring.h"
 #include "wallclock.h"
 
@@ -46,6 +47,11 @@ class expression
         // myoperations[i*mynumcols+j] gives the 
         // expression operation defined at row i, column j.
         std::vector<std::shared_ptr<operation>> myoperations;
+        
+        // Is this expression the projection on the physical element of a 
+        // vector form function based-field defined in the reference element?
+        // If no then 'unprojectedfield' has size zero.
+        std::vector<expression> unprojectedfield = {};
         
         
         // FUNCTIONS TO BE CALLED BY THE PUBLIC FUNCTIONS:
@@ -115,8 +121,12 @@ class expression
         expression abs(void);
         expression log10(void);
         
-        expression invjac(int row, int col);/////// THESE 2 MIGHT CHANGE????????????????????????????????
+        expression invjac(int row, int col);
         expression jac(int row, int col);
+        // Get the whole 3x3 matrix (with zeros everywhere but on the 
+        // 1x1 submatrix in 1D and on the 2x2 submatrix in 2D). 
+        expression invjac(void);
+        expression jac(void);
         
         std::shared_ptr<operation> getoperationinarray(int row, int col);
         

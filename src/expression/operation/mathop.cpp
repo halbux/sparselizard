@@ -86,7 +86,7 @@ expression mathop::grad(expression input)
     for (int i = 0; i < problemdimension; i++)
     {
         for (int comp = 0; comp < input.countrows(); comp++)
-            myexprs.push_back(input.getarrayentry(comp,0).spacederivative(i+1));
+            myexprs.push_back(input.spacederivative(i+1).getarrayentry(comp,0));
     }
     
     return expression(problemdimension, input.countrows(), myexprs);
@@ -105,43 +105,9 @@ expression mathop::curl(expression input)
         case 1:
             return expression(3,1,{0, 0, 0});
         case 2:
-            return expression(3,1,{0, 0, dx(compy(input))-dy(compx(input))});
+            return expression(3,1,{0, 0, compy(dx(input))-compx(dy(input))});
         case 3:
-            return expression(3,1,{dy(compz(input))-dz(compy(input)), dz(compx(input))-dx(compz(input)), dx(compy(input))-dy(compx(input))});
-    }
-}
-
-expression mathop::invjac(void)
-{
-    int problemdimension = universe::mymesh->getmeshdimension();
-
-    expression temp;
-    
-    switch (problemdimension)
-    {
-        case 1:
-            return expression(1,1,{temp.invjac(0,0)});
-        case 2:
-            return expression(3,3,{temp.invjac(0,0), temp.invjac(0,1), 0, temp.invjac(1,0), temp.invjac(1,1), 0,0,0,0});
-        case 3:
-            return expression(3,3,{temp.invjac(0,0), temp.invjac(0,1), temp.invjac(0,2), temp.invjac(1,0), temp.invjac(1,1), temp.invjac(1,2), temp.invjac(2,0), temp.invjac(2,1), temp.invjac(2,2)});
-    }
-}
-
-expression mathop::jac(void)
-{
-    int problemdimension = universe::mymesh->getmeshdimension();
-
-expression temp;
-    
-    switch (problemdimension)
-    {
-        case 1:
-            return expression(1,1,{temp.jac(0,0)});
-        case 2:
-            return expression(3,3,{temp.jac(0,0), temp.jac(0,1), 0, temp.jac(1,0), temp.jac(1,1), 0,0,0,0});
-        case 3:
-            return expression(3,3,{temp.jac(0,0), temp.jac(0,1), temp.jac(0,2), temp.jac(1,0), temp.jac(1,1), temp.jac(1,2), temp.jac(2,0), temp.jac(2,1), temp.jac(2,2)});
+            return expression(3,1,{compz(dy(input))-compy(dz(input)), compx(dz(input))-compz(dx(input)), compy(dx(input))-compx(dy(input))});
     }
 }
 
