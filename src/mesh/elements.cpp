@@ -596,6 +596,73 @@ std::vector<bool> elements::iscornernode(void)
     return output;
 }
 
+void elements::tostandardorientation(void)
+{
+	// Only straight elements are supported for now:
+	if (getcurvatureorder() != 1)
+		return;
+
+	// Loop on all element types except the point element (type 0):
+	for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
+	{	
+		if (subelementsinelements[elementtypenumber][0].size() == 0)
+			continue;
+        
+        element myelement(elementtypenumber, mycurvatureorder);
+        
+        int numelemofcurrenttype = count(elementtypenumber);
+        
+        int numberofnodes = myelement.countnodes();
+        int numberofedges = myelement.countedges();
+        int numberoftriangularfaces = myelement.counttriangularfaces();
+        int numberofquadrangularfaces = myelement.countquadrangularfaces();
+        
+		// Loop on all elements:
+		std::vector<int> currentnodes(numberofnodes);
+		std::vector<int> currentedges(numberofedges);
+		std::vector<int> currenttriangularfaces(numberoftriangularfaces);
+		std::vector<int> currentquadrangularfaces(numberofquadrangularfaces);
+		
+		for (int i = 0; i < numelemofcurrenttype; i++)
+		{
+			for (int j = 0; j < numberofnodes; j++)
+				currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofnodes+j];
+			myelement.setnodes(currentnodes);
+            // This gives the corner nodes reordering:
+            std::vector<int> nodereordering = myelement.getstandardorientationreordering();
+			for (int j = 0; j < numberofnodes; j++)
+				subelementsinelements[elementtypenumber][0][i*numberofnodes+j] = currentnodes[nodereordering[j]];
+			// Reorder the edges:
+			if (numberofedges > 0 && elementtypenumber != 1)
+			{
+				for (int j = 0; j < numberofedges; j++)
+					currentedges[j] = subelementsinelements[elementtypenumber][1][i*numberofedges+j];
+				std::vector<int> edgereordering = myelement.getedgesreordering(nodereordering);
+				for (int j = 0; j < numberofedges; j++)
+					subelementsinelements[elementtypenumber][1][i*numberofedges+j] = currentedges[edgereordering[j]];
+			}
+			// Reorder the triangular faces:
+			if (numberoftriangularfaces > 0 && elementtypenumber != 2)
+			{
+				for (int j = 0; j < numberoftriangularfaces; j++)
+					currenttriangularfaces[j] = subelementsinelements[elementtypenumber][2][i*numberoftriangularfaces+j];
+				std::vector<int> triangularfacereordering = myelement.gettriangularfacesreordering(nodereordering);
+				for (int j = 0; j < numberoftriangularfaces; j++)
+					subelementsinelements[elementtypenumber][2][i*numberoftriangularfaces+j] = currenttriangularfaces[triangularfacereordering[j]];
+			}
+			// Reorder the quadrangular faces:
+			if (numberofquadrangularfaces > 0 && elementtypenumber != 3)
+			{
+				for (int j = 0; j < numberofquadrangularfaces; j++)
+					currentquadrangularfaces[j] = subelementsinelements[elementtypenumber][3][i*numberofquadrangularfaces+j];
+				std::vector<int> quadrangularfacereordering = myelement.getquadrangularfacesreordering(nodereordering);
+				for (int j = 0; j < numberofquadrangularfaces; j++)
+					subelementsinelements[elementtypenumber][3][i*numberofquadrangularfaces+j] = currentquadrangularfaces[quadrangularfacereordering[j]];
+			}
+		}
+	}
+}
+
 void elements::orient(void)
 {
 	// Loop on all element types except the point element (type 0):

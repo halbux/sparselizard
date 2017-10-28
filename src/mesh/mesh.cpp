@@ -139,8 +139,8 @@ void mesh::load(std::string name, int verbosity)
         currentphysicalregion->definewithdisjointregions();
     }
     
+    myelements.tostandardorientation();
 	myelements.orient();
-    
     
     if (verbosity > 0)
     {
