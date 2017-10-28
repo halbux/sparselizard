@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <algorithm>
+#include "myalgorithm.h"
 
 // Element type numbers are as follows:
 //
@@ -330,6 +332,18 @@ class element
         std::vector<int> getnodesintriangle(int triangleindex);
         std::vector<int> getnodesinquadrangle(int quadrangleindex);
 	
+        // This function outputs the reordered node INDEX numbers to 
+        // bring a STRAIGHT element to its standard orientation, i.e.
+        // the smallest node number is set as first then the smallest 
+        // connected one as second...
+        std::vector<int> getstandardorientationreordering(void);
+        
+        // 'getedgereordering' gives the new indexes of the edges when 
+        // the nodes in the element are reordered by 'nodereordering':
+		std::vector<int> getedgesreordering(std::vector<int> nodereordering);
+		std::vector<int> gettriangularfacesreordering(std::vector<int> nodereordering);
+		std::vector<int> getquadrangularfacesreordering(std::vector<int> nodereordering);
+		
         // 'getedgesdefinitionbasedonnodes()[2*i+j]' gives the index of the jth node
         // in the ith edge [node1edgei node2edgei] in the element. The edges ordering 
         // is as described at the top of this file. Only the corner nodes are given,

@@ -597,6 +597,223 @@ std::vector<int> element::getnodesinsurface(int surfaceindex, bool faceistriangl
 	return nodesinsurface;
 }
 
+std::vector<int> element::getstandardorientationreordering(void)
+{    
+    switch (getcurvedtypenumber())
+    {
+        // For points this is trivial:
+        case 0:
+            return {0};
+        // For lines this is trivial:
+        case 1:
+        {
+            if (curvednodelist[0] < curvednodelist[1])
+                return {0, 1};
+            else
+                return {1, 0};
+        }
+        // For triangles this is trivial:
+        case 2:
+        {
+            // Get the indexes corresponding to the node numbers sorted ascendingly:
+            std::vector<int> reorderingvector;
+            myalgorithm::stablesort(curvednodelist, reorderingvector);
+            return reorderingvector;
+        }
+        // For quadrangles make sure the numbering circles around the element:
+        case 3:
+        {
+            // Get the index of the min node number in the straight element:
+            int minnodenumindex = std::distance(curvednodelist.begin(), std::min_element(curvednodelist.begin(), curvednodelist.end()));
+    
+            if (curvednodelist[(minnodenumindex+1)%4] < curvednodelist[(minnodenumindex+3)%4])
+                return {minnodenumindex, (minnodenumindex+1)%4, (minnodenumindex+2)%4, (minnodenumindex+3)%4};
+            else
+                return {minnodenumindex, (minnodenumindex+3)%4, (minnodenumindex+2)%4, (minnodenumindex+1)%4};
+        }
+        // For tetrahedra this is trivial:
+        case 4:
+        {
+            // Get the indexes corresponding to the node numbers sorted ascendingly:
+            std::vector<int> reorderingvector;
+            myalgorithm::stablesort(curvednodelist, reorderingvector);
+            return reorderingvector;
+        }
+        // For hexahedra make sure the numbering scheme is respected:
+        case 5:
+        {
+            // Get the index of the min node number in the straight element:
+            int minnodenumindex = std::distance(curvednodelist.begin(), std::min_element(curvednodelist.begin(), curvednodelist.end()));
+    
+            // Create a vector whose ith entry gives the indexes of the nodes connected to the ith node:
+            std::vector<std::vector<int>> connectednodes = { {1,3,4},{2,0,5},{3,1,6},{0,2,7},{5,7,0},{6,4,1},{7,5,2},{4,6,3} };
+
+            std::vector<int> output(8);
+            // The first node is the smallest one:
+            output[0] = minnodenumindex;
+            // The second and third nodes are the smallest connected ones - but not the smallest node itself!
+            for (int i = 1; i < 3; i++)
+            {
+                int minneighbourindex = connectednodes[output[i-1]][0];
+                if (minneighbourindex == output[0])
+                    minneighbourindex = connectednodes[output[i-1]][1];
+                for (int j = 1; j < 3; j++)
+                {
+                    if (curvednodelist[connectednodes[output[i-1]][j]] < curvednodelist[minneighbourindex] && connectednodes[output[i-1]][j] != output[0])
+                        minneighbourindex = connectednodes[output[i-1]][j];
+                }
+                output[i] = minneighbourindex;
+            }
+            // Set true for all nodes in the front face:
+            std::vector<bool> isinfrontface(8,false);
+            for (int i = 0; i < 3; i++)
+                isinfrontface[output[i]] = true;
+            // The fourth node is the last one in the current quad face.
+            // For that it must be connected to the first and third nodes
+            // and cannot be a previous node.
+            for (int i = 0; i < 3; i++)
+            {
+                if (isinfrontface[connectednodes[output[0]][i]] == false)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (connectednodes[output[0]][i] == connectednodes[output[2]][j])
+                            output[3] = connectednodes[output[0]][i];
+                    }
+                }
+            }
+            isinfrontface[output[3]] = true;
+            // The last four nodes are on the opposite quad face:
+            for (int i = 4; i < 8; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (isinfrontface[connectednodes[output[i-4]][j]] == false)
+                        output[i] = connectednodes[output[i-4]][j];
+                }
+            }
+            return output;
+        }
+        // For prisms:
+        case 6:
+        {
+            // Get the index of the min node number in the straight element:
+            int minnodenumindex = std::distance(curvednodelist.begin(), std::min_element(curvednodelist.begin(), curvednodelist.end()));
+            // Give a 3 offset if the back face has the smallest node number:
+            int offset = 0; 
+            if (minnodenumindex > 2)
+                offset = 3;
+            
+            std::vector<int> output(6);
+            // Reorient the front or the back face:
+            std::vector<int> reorderingvector;
+            std::vector<int> trianglenodes = {curvednodelist[0+offset], curvednodelist[1+offset], curvednodelist[2+offset]};
+            myalgorithm::stablesort(trianglenodes, reorderingvector);
+            for (int i = 0; i < 3; i++)
+                output[i] = reorderingvector[i]+offset; 
+            for (int i = 3; i < 6; i++)
+                output[i] = reorderingvector[i-3]+(offset+3)%6; 
+            return output;
+        }
+        // For pyramids:
+        case 7:
+        {
+            // Get the index of the min node number in the straight quad face:
+            int minnodenumindex = std::distance(curvednodelist.begin(), std::min_element(curvednodelist.begin(), curvednodelist.begin()+4));
+    
+            if (curvednodelist[(minnodenumindex+1)%4] < curvednodelist[(minnodenumindex+3)%4])
+                return {minnodenumindex, (minnodenumindex+1)%4, (minnodenumindex+2)%4, (minnodenumindex+3)%4, 4};
+            else
+                return {minnodenumindex, (minnodenumindex+3)%4, (minnodenumindex+2)%4, (minnodenumindex+1)%4, 4};
+        }
+        default:
+            std::cout << "Error in 'element' object: element reordering is only defined for straight elements" << std::endl;
+            abort;
+    }
+}
+
+std::vector<int> element::getedgesreordering(std::vector<int> nodereordering)
+{    
+    std::vector<int> edges = getedgesdefinitionsbasedonnodes();
+    std::vector<int> edgesreordered(edges.size()/2);
+    
+    // Loop on all reordered edges:
+    for (int i = 0; i < edgesreordered.size(); i++)
+    {
+        std::vector<int> reorderededge = {nodereordering[edges[2*i]], nodereordering[edges[2*i+1]]};
+    	// Loop on all unreordered edges:
+        for (int j = 0; j < edges.size()/2; j++)
+        {
+            std::vector<int> unreorderededge = {edges[2*j], edges[2*j+1]};
+            if (reorderededge == unreorderededge || reorderededge[0] == unreorderededge[1] && reorderededge[1] == unreorderededge[0])
+            {
+                edgesreordered[i] = j;
+                break;
+            }
+        }
+    }
+    return edgesreordered;
+}
+
+std::vector<int> element::gettriangularfacesreordering(std::vector<int> nodereordering)
+{    
+	int numtriangularfaces = counttriangularfaces();
+
+    std::vector<int> faces = getfacesdefinitionsbasedonnodes();
+    std::vector<int> facesreordered(numtriangularfaces);
+    
+    // Loop on all reordered faces:
+    for (int i = 0; i < numtriangularfaces; i++)
+    {
+        std::vector<int> reorderedface = {nodereordering[faces[3*i]], nodereordering[faces[3*i+1]], nodereordering[faces[3*i+2]]};
+        std::sort(reorderedface.begin(), reorderedface.end());
+    	// Loop on all unreordered faces:
+        for (int j = 0; j < numtriangularfaces; j++)
+        {
+            std::vector<int> unreorderedface = {faces[3*j], faces[3*j+1], faces[3*j+2]};
+            std::sort(unreorderedface.begin(), unreorderedface.end());
+            if (reorderedface == unreorderedface)
+            {
+                facesreordered[i] = j;
+                break;
+            }
+        }
+    }
+    return facesreordered;
+}
+
+std::vector<int> element::getquadrangularfacesreordering(std::vector<int> nodereordering)
+{    
+	int numtriangularfaces = counttriangularfaces();
+	int numquadrangularfaces = countquadrangularfaces();
+
+    std::vector<int> faces = getfacesdefinitionsbasedonnodes();
+    // Remove any leading triangular face:
+    for (int i = 0; i < numquadrangularfaces*4; i++)
+    	faces[i] = faces[i+numtriangularfaces*3];
+	faces.resize(numquadrangularfaces*4);
+    std::vector<int> facesreordered(numquadrangularfaces);
+    
+    // Loop on all reordered faces:
+    for (int i = 0; i < numquadrangularfaces; i++)
+    {
+        std::vector<int> reorderedface = {nodereordering[faces[4*i]], nodereordering[faces[4*i+1]], nodereordering[faces[4*i+2]], nodereordering[faces[4*i+3]]};
+        std::sort(reorderedface.begin(), reorderedface.end());
+    	// Loop on all unreordered faces:
+        for (int j = 0; j < numquadrangularfaces; j++)
+        {
+            std::vector<int> unreorderedface = {faces[4*j], faces[4*j+1], faces[4*j+2], faces[4*j+3]};
+            std::sort(unreorderedface.begin(), unreorderedface.end());
+            if (reorderedface == unreorderedface)
+            {
+                facesreordered[i] = j;
+                break;
+            }
+        }
+    }
+    return facesreordered;
+}
+
 std::vector<int> element::getedgesdefinitionsbasedonnodes(void)
 {
 	switch (gettypenumber())
