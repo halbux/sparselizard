@@ -338,7 +338,7 @@ class element
         // connected one as second...
         std::vector<int> getstandardorientationreordering(void);
         
-        // 'getedgereordering' gives the new indexes of the edges when 
+        // 'getedgesreordering' gives the new indexes of the edges when 
         // the nodes in the element are reordered by 'nodereordering':
         std::vector<int> getedgesreordering(std::vector<int> nodereordering);
         std::vector<int> gettriangularfacesreordering(std::vector<int> nodereordering);
