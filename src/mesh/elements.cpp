@@ -600,7 +600,10 @@ void elements::tostandardorientation(void)
 {
 	// Only straight elements are supported for now:
 	if (getcurvatureorder() != 1)
+	{
+		std::cout << "Note: curved elements are not reoriented for now (some functions may thus perform slower)" << std::endl;
 		return;
+	}
 
 	// Loop on all element types except the point element (type 0):
 	for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
@@ -612,26 +615,26 @@ void elements::tostandardorientation(void)
         
         int numelemofcurrenttype = count(elementtypenumber);
         
-        int numberofnodes = myelement.countnodes();
+        int numberofcurvednodes = myelement.countcurvednodes();
         int numberofedges = myelement.countedges();
         int numberoftriangularfaces = myelement.counttriangularfaces();
         int numberofquadrangularfaces = myelement.countquadrangularfaces();
         
 		// Loop on all elements:
-		std::vector<int> currentnodes(numberofnodes);
+		std::vector<int> currentnodes(numberofcurvednodes);
 		std::vector<int> currentedges(numberofedges);
 		std::vector<int> currenttriangularfaces(numberoftriangularfaces);
 		std::vector<int> currentquadrangularfaces(numberofquadrangularfaces);
 		
 		for (int i = 0; i < numelemofcurrenttype; i++)
 		{
-			for (int j = 0; j < numberofnodes; j++)
-				currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofnodes+j];
+			for (int j = 0; j < numberofcurvednodes; j++)
+				currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
 			myelement.setnodes(currentnodes);
             // This gives the corner nodes reordering:
             std::vector<int> nodereordering = myelement.getstandardorientationreordering();
-			for (int j = 0; j < numberofnodes; j++)
-				subelementsinelements[elementtypenumber][0][i*numberofnodes+j] = currentnodes[nodereordering[j]];
+			for (int j = 0; j < numberofcurvednodes; j++)
+				subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j] = currentnodes[nodereordering[j]];
 			// Reorder the edges:
 			if (numberofedges > 0 && elementtypenumber != 1)
 			{
