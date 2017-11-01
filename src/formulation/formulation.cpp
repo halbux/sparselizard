@@ -167,6 +167,9 @@ mat formulation::M(bool keepfragments) { return getmatrix(2, keepfragments); }
 
 mat formulation::getmatrix(int KCM, bool keepfragments)
 {
+    if (mymat[KCM] == NULL)
+        mymat[KCM] = shared_ptr<rawmat>(new rawmat(mydofmanager));
+        
     bool eyematrixadded = false;
 
     // Add the constraint diagonal ones to the K matrix (if any):
