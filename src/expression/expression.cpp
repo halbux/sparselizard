@@ -229,6 +229,16 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         std::vector<double> lagrangecoords = mylagrange.getnodecoordinates();
         std::vector<polynomial> poly = mylagrange.getformfunctionpolynomials();
         
+        std::vector<double> lagrangecoordsxyz = lagrangecoords;
+        std::vector<polynomial> polyxyz = poly;
+        // The elements might not be curved:
+        if (universe::mymesh->getelements()->getcurvatureorder() == 1 && meshdeform == NULL)
+        {
+		    lagrangeformfunction mylagrangexyz(elementtypenumber,1, {});
+		    lagrangecoordsxyz = mylagrangexyz.getnodecoordinates();
+		    polyxyz = mylagrangexyz.getformfunctionpolynomials();
+	    }
+        
         std::vector<int> harms = {};
         std::vector<mystring> harmfilename = {};
         
@@ -240,12 +250,12 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         do 
         {
             // Compute the mesh coordinates. Initialise all coordinates to zero.
-            std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), lagrangecoords.size()/3,0));
+            std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), lagrangecoordsxyz.size()/3,0));
             for (int i = 0; i < problemdimension; i++)
             {
-                coords[i] = (xyz.myoperations[i]->interpolate(myselector, lagrangecoords, NULL))[1][0];
+                coords[i] = (xyz.myoperations[i]->interpolate(myselector, lagrangecoordsxyz, NULL))[1][0];
                 if (meshdeform != NULL)
-                    coords[i].add((meshdeform->myoperations[i]->interpolate(myselector, lagrangecoords, NULL))[1][0]);
+                    coords[i].add((meshdeform->myoperations[i]->interpolate(myselector, lagrangecoordsxyz, NULL))[1][0]);
             }
             // Interpolate the current expression:
             std::vector<  std::vector<std::vector<densematrix>>  > expr(countrows());
@@ -328,13 +338,13 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         {
             for (int h = 0; h < harms.size(); h++)
             {
-                gmshinterface::writeinterpolationscheme(harmfilename[h].getstring() + ".pos", {poly, poly});
+                gmshinterface::writeinterpolationscheme(harmfilename[h].getstring() + ".pos", {poly, polyxyz});
                 gmshinterface::closeview(harmfilename[h].getstring() + ".pos");
             }
         }
         else
         {
-            gmshinterface::writeinterpolationscheme(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", {poly, poly});
+            gmshinterface::writeinterpolationscheme(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", {poly, polyxyz});
             gmshinterface::closeview(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos");
         }
     }
