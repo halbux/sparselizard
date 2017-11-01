@@ -72,7 +72,9 @@ void rawmat::process(bool keepfragments)
     int* reorderingvector = myalgorithm::stablesortparallel({stitchedrowindices, stitchedcolindices}, veclen);
         
     // Get the number of nonzeros:
-    nnz = 1;
+    nnz = 0;
+    if (veclen > 0)
+    	nnz = 1;
     for (int i = 1; i < veclen; i++)
     {
         if (stitchedrowindices[reorderingvector[i]] != stitchedrowindices[reorderingvector[i-1]] || stitchedcolindices[reorderingvector[i]] != stitchedcolindices[reorderingvector[i-1]])
@@ -87,16 +89,12 @@ void rawmat::process(bool keepfragments)
     int* finalrowindices = petscrows.getvalues();
     int* finalcolindices = petsccols.getvalues();
     double* finalvals = petscvals.getvalues();
-        
-    finalrowindices[0] = 0;
-    finalcolindices[0] = stitchedcolindices[reorderingvector[0]];
-    finalvals[0] = stitchedvals[reorderingvector[0]];
 
-    ind = 0; int row = 0;
-    for (int i = 1; i < veclen; i++)
+	int row = -1; ind = -1;
+    for (int i = 0; i < veclen; i++)
     {
         // Same row:
-        if (stitchedrowindices[reorderingvector[i]] == stitchedrowindices[reorderingvector[i-1]])
+        if (i > 0 && stitchedrowindices[reorderingvector[i]] == stitchedrowindices[reorderingvector[i-1]])
         {
             // Same row and column:
             if (stitchedcolindices[reorderingvector[i]] == stitchedcolindices[reorderingvector[i-1]])
@@ -111,22 +109,19 @@ void rawmat::process(bool keepfragments)
         }
         else
         {
-            // New row:
-            ind++; row++;
-            
+        	// New row:
+        	row++; ind++;
+        
+            // If empty row move to the next not empty one:
+            int newrow = stitchedrowindices[reorderingvector[i]];
+            while (row < newrow) { finalrowindices[row] = ind; row++; }
+        	
             finalvals[ind] = stitchedvals[reorderingvector[i]];
             finalcolindices[ind] = stitchedcolindices[reorderingvector[i]];
             finalrowindices[row] = ind;
-            
-            // Make sure there is no all-zero row:
-            if (stitchedrowindices[reorderingvector[i]]-1 != stitchedrowindices[reorderingvector[i-1]])
-            {
-                std::cout << "Error in 'rawmat' object: detected an all zero row in the matrix (at least one equation is missing)" << std::endl;
-                abort();
-            }
         }
     }
-    finalrowindices[countrows()] = nnz;
+    while (row < countrows()) { row++; finalrowindices[row] = nnz; }
     
     delete[] stitchedrowindices;
     delete[] stitchedcolindices;
