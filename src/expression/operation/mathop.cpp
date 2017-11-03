@@ -40,6 +40,8 @@ expression mathop::normal(int surfphysreg)
     
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
 
+expression mathop::t(void) { expression exp; return exp.time(); }
+
 expression mathop::dx(expression input) { return input.spacederivative(1); }
 expression mathop::dy(expression input) { return input.spacederivative(2); }
 expression mathop::dz(expression input) { return input.spacederivative(3); }

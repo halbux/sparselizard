@@ -143,5 +143,6 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opsin.h"
 #include "opsum.h"
 #include "optf.h"
+#include "optime.h"
 
 #endif

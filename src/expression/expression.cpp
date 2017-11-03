@@ -733,6 +733,14 @@ expression expression::log10(void)
     return log10expr;
 }
 
+expression expression::time(void)
+{
+    expression exp;
+    exp.myoperations = {std::shared_ptr<optime>(new optime)};
+    
+    return exp;
+}
+
 expression expression::invjac(int row, int col)
 {
     expression exp;

@@ -63,6 +63,12 @@ class formulation
 		
         // Generate all blocks:
         void generate(void);
+        // Generate all contributions of K, C, M or rhs:
+        void generatestiffnessmatrix(void);
+        void generatedampingmatrix(void);
+        void generatemassmatrix(void);
+        void generaterhs(void);
+        
         void generate(std::vector<int> contributionnumbers);
 		void generate(int contributionnumber);
         

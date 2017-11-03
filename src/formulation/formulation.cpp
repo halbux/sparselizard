@@ -127,6 +127,35 @@ void formulation::generate(void)
     }
 }
 
+void formulation::generatestiffnessmatrix(void)
+{
+    int i = 1;
+    for (int j = 0; j < mycontributions[i].size(); j++)
+        generate(i, j);
+}
+
+void formulation::generatedampingmatrix(void)
+{
+    int i = 2;
+    for (int j = 0; j < mycontributions[i].size(); j++)
+        generate(i, j);
+}
+
+void formulation::generatemassmatrix(void)
+{
+    int i = 3;
+    for (int j = 0; j < mycontributions[i].size(); j++)
+        generate(i, j);
+}
+
+void formulation::generaterhs(void)
+{
+    int i = 0;
+    for (int j = 0; j < mycontributions[i].size(); j++)
+        generate(i, j);
+}
+
+
 void formulation::generate(std::vector<int> contributionnumbers)
 {
     for (int i = 0; i < mycontributions.size(); i++)

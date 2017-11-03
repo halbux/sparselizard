@@ -30,6 +30,9 @@ namespace mathop
     
     void setfundamentalfrequency(double f);
     
+    // The time variable:
+    expression t(void);
+    
     expression dx(expression input);
     expression dy(expression input);
     expression dz(expression input);

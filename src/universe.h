@@ -26,6 +26,8 @@ class universe
 
         static mesh* mymesh;
         
+        static double currenttimestep;
+        
         static double fundamentalfrequency;
         static double getfundamentalfrequency(void);
         

@@ -121,6 +121,9 @@ class expression
         expression abs(void);
         expression log10(void);
         
+        // The time variable:
+        expression time(void);
+        
         expression invjac(int row, int col);
         expression jac(int row, int col);
         // Get the whole 3x3 matrix (with zeros everywhere but on the 

@@ -3,6 +3,8 @@
 
 mesh* universe::mymesh = NULL;
 
+double universe::currenttimestep = 0;
+
 double universe::fundamentalfrequency = -1;
 double universe::getfundamentalfrequency(void)
 {
