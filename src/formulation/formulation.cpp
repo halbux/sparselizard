@@ -172,8 +172,8 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
         
     bool eyematrixadded = false;
 
-    // Add the constraint diagonal ones to the K matrix (if any):
-    if (KCM == 0 && isconstraintcomputation == false)
+    // Add the constraint diagonal ones to the matrix (if any):
+    if (isconstraintcomputation == false)
     {
         int numconstraineddofs = mydofmanager->countconstraineddofs();
         if (numconstraineddofs > 0)
