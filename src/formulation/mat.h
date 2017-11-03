@@ -42,6 +42,8 @@ class mat
         
         int countnnz(void);
         
+        void reuselu(void);
+        
         shared_ptr<rawmat> getpointer(void) { return rawmatptr; };
         
         Mat getpetsc(void);

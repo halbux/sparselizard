@@ -195,17 +195,31 @@ vec mathop::solve(mat A, vec b)
     vec sol = b;
     Vec solpetsc = sol.getpetsc();
 
-    KSP ksp;////////// USE PETSC COMPILED WITHOUT DEBUG OPTION--> FASTER!!!!!!!!!!!!!!!!!! AND PETSC COMPILE WITH LOND INT TYPE FOR LARGE NNZ NUM!!!!!!!!
-    PC pc;
-    KSPCreate(PETSC_COMM_WORLD, &ksp);
-    KSPSetOperators(ksp, Apetsc, Apetsc);
-    KSPSetFromOptions(ksp);
-
-    KSPGetPC(ksp,&pc);
-    PCSetType(pc,PCLU);
-    PCFactorSetMatSolverPackage(pc,MATSOLVERMUMPS);
+////////// USE PETSC COMPILED WITHOUT DEBUG OPTION--> FASTER!!!!!!!!!!!!!!!!!! AND PETSC COMPILE WITH LOND INT TYPE FOR LARGE NNZ NUM!!!!!!!!
     
-    KSPSolve(ksp, bpetsc, solpetsc);
+    KSP* ksp = A.getpointer()->getksp();
+    
+    if (A.getpointer()->isludefined() == false)
+    {
+        PC pc;
+        KSPCreate(PETSC_COMM_WORLD, ksp);
+        KSPSetOperators(*ksp, Apetsc, Apetsc);
+        KSPSetFromOptions(*ksp);
+
+        KSPGetPC(*ksp,&pc);
+        PCSetType(pc,PCLU);
+        PCFactorSetMatSolverPackage(pc,MATSOLVERMUMPS);
+    }
+    
+    KSPSolve(*ksp, bpetsc, solpetsc);
+   
+    A.getpointer()->isludefined(true);
+    
+    if (A.getpointer()->islutobereused() == false)
+    {
+        KSPDestroy(ksp);
+        A.getpointer()->isludefined(false);
+    }
     
     return sol;
 }

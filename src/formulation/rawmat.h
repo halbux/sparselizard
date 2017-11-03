@@ -38,6 +38,11 @@ class rawmat
 
         Mat mymat;
         
+        // 'myksp' will store the LU decomposition if it is to be reused:
+        KSP myksp;
+        bool lureuse = false;
+        bool ludefined = false;
+        
         shared_ptr<dofmanager> mydofmanager = NULL;
         	
 	public:
@@ -52,6 +57,11 @@ class rawmat
         
         int countnnz(void) { return nnz; };
         
+        void reuselu(void) { lureuse = true; };
+        bool islutobereused(void) { return lureuse; };
+        bool isludefined(void) { return ludefined; };
+        void isludefined(bool isdefined) { ludefined = isdefined; };
+    
         // Add a fragment to the matrix.
         void accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);   
         // Create the petsc matrix. Choose to keep the fragments for reuse or not.
@@ -63,6 +73,8 @@ class rawmat
 
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         Mat getpetsc(void) { return mymat; };
+        
+        KSP* getksp(void) { return &myksp; };
 
 };
 
