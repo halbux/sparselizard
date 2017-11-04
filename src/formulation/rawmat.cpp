@@ -1,7 +1,13 @@
 #include "rawmat.h"
 
 
-rawmat::~rawmat(void) { MatDestroy(&mymat); if (ludefined) { KSPDestroy(&myksp); }; }
+rawmat::~rawmat(void) 
+{ 
+	if (nnz >= 0) 
+		MatDestroy(&mymat);
+	if (ludefined) 
+		KSPDestroy(&myksp);
+}
 
 int rawmat::countrows(void) 
 { 
