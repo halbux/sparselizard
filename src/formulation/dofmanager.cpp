@@ -85,6 +85,25 @@ void dofmanager::selectfield(shared_ptr<rawfield> selectedfield)
     }
 }
 
+std::vector<int> dofmanager::getdisjointregionsofselectedfield(void)
+{
+    int totalnumdisjreg = universe::mymesh->getdisjointregions()->count();
+    
+    std::vector<int> output(totalnumdisjreg);
+    int index = 0;
+    for (int i = 0; i < totalnumdisjreg; i++)
+    {
+        if (rangebegin[selectedfieldnumber][i].size() > 0)
+        {
+            output[index] = i;
+            index++;
+        }
+    }
+    output.resize(index);
+    
+    return output;
+}
+
 int dofmanager::getrangebegin(int disjreg, int formfunc) { return rangebegin[selectedfieldnumber][disjreg][formfunc]; }
 int dofmanager::getrangeend(int disjreg, int formfunc) { return rangeend[selectedfieldnumber][disjreg][formfunc]; }
 

@@ -113,6 +113,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         shared_ptr<rawfield> getpointer(void) { return shared_from_this(); };
 
         // Transfer data from a solution vector to the field.
+        // Get from all regions with physreg set to -1.
         void getdata(int physreg, vectorfieldselect myvec);
                 
         // Select a component.

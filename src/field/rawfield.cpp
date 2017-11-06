@@ -303,7 +303,15 @@ void rawfield::getdata(int physreg, vectorfieldselect myvec)
     // Get the data for a single field.
     
     // Get ALL disjoint regions in the physical region:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    std::vector<int> selecteddisjregs;
+    if (physreg != -1)
+        selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    else
+    {
+        std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
+        dofmngr->selectfield(shared_from_this());
+        selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
+    }
 
     for (int i = 0; i < selecteddisjregs.size(); i++)
     {

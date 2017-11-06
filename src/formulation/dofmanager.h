@@ -56,7 +56,10 @@ class dofmanager
         void addtostructure(shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
         // Always select the field before accessing the dof structure.
 		void selectfield(shared_ptr<rawfield> selectedfield);
-
+        
+        // Get all disjoint regions on which the selected field has dofs:
+        std::vector<int> getdisjointregionsofselectedfield(void);
+   
         int getrangebegin(int disjreg, int formfunc);
         int getrangeend(int disjreg, int formfunc);
 
