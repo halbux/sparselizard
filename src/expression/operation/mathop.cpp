@@ -39,6 +39,8 @@ expression mathop::normal(int surfphysreg)
     
     
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
+void mathop::settime(double t) { universe::currenttimestep = t; }
+double mathop::gettime(void) { return universe::currenttimestep; }
 
 expression mathop::t(void) { expression exp; return exp.time(); }
 

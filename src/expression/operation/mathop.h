@@ -29,6 +29,8 @@ namespace mathop
     expression normal(int surfphysreg);
     
     void setfundamentalfrequency(double f);
+    void settime(double t);
+    double gettime(void);
     
     // The time variable:
     expression t(void);
