@@ -44,7 +44,10 @@ class jacobian
         jacobian(elementselector& elemselect, std::vector<double> evaluationcoordinates, expression* meshdeform);
 
         // The detjac and jac terms are computed in the constructor.
-        densematrix getdetjac(void) { return detjac; };	
+        
+    	// The Jacobian determinant should be positive irrespective of the node numbering.
+    	// For the invjac computation it must however keep its sign.
+        densematrix getdetjac(void) { densematrix out = detjac.copy(); out.abs(); return out; };	
         densematrix getjac(int row, int column) { return jac[3*row+column]; };
         // The invjac terms are only computed when 'getinvjac' is called.
         densematrix getinvjac(int row, int column);	

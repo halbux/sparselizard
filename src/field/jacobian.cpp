@@ -342,9 +342,6 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
             break;
             
     }
-    
-    // The Jacobian determinant should be positive irrespective of the node numbering:
-    detjac.abs();
 }
 
 densematrix jacobian::getinvjac(int row, int column)
