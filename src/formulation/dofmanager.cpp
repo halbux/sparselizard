@@ -200,11 +200,14 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
     for (int ff = 0; ff < myiterator.count(); ff++)
     {
         int associatedelementtype = myiterator.getassociatedelementtype();
+        int associatedelementdimension = myiterator.getdimension();
         int formfunctionindex = myiterator.getformfunctionindexinnodeedgefacevolume();
         int num = myiterator.getnodeedgefacevolumeindex();
         // For quad subelements in prisms and pyramids:
         if ((elementtypenumber == 6 || elementtypenumber == 7) && associatedelementtype == 3)
             num -= myelement.counttriangularfaces();
+        
+        std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, inputfield->gettypename());
         
         for (int i = 0; i < elementlist.size(); i++)
         {
@@ -213,8 +216,12 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
             int currentsubelem = myelements->getsubelement(associatedelementtype, elementtypenumber, elem, num);
             // Also get its disjoint region number:
             int currentdisjointregion = myelements->getdisjointregion(associatedelementtype, currentsubelem);
+            
+            // The current subelement might require less form functions:
+            int currentnumberofformfunctions = myformfunction->count(inputfield->getinterpolationorder(currentdisjointregion), associatedelementdimension, myiterator.getnodeedgefacevolumeindex());
+            
             // If not in a disjoint region on which the field is defined set -2 adress.
-            if (isfielddefinedondisjointregion[currentdisjointregion])
+            if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
