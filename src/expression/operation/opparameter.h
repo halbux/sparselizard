@@ -8,6 +8,7 @@
 #define OPPARAMETER_H
 
 #include "operation.h"
+#include "parameter.h"
 
 class parameter;
 
