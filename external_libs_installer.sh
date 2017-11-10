@@ -65,7 +65,7 @@ mkdir install;
 if [ "$(uname)" == "Linux" ]; then
 wget http://www.fftw.org/fftw-3.3.7.tar.gz;
 elif [ "$(uname)" == "Darwin"  ]; then
-curl http://www.fftw.org/fftw-3.3.7.tar.gz;
+curl http://www.fftw.org/fftw-3.3.7.tar.gz -o fftw-3.3.7.tar.gz;
 fi
 
 tar -xf *.tar.gz;
