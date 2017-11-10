@@ -13,6 +13,7 @@
 #include "formulation.h"
 #include <iostream>
 #include <string>
+#include <numeric>
 #include "petsc.h"
 #include "field.h"
 #include "vectorfieldselect.h"

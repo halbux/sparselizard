@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <iostream>
+#include <numeric>
 #include <cmath>
 #include <algorithm>
 //#include <parallel/algorithm> __gnu_parallel::sort instead of std::sort

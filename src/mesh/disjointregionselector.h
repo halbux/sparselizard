@@ -11,6 +11,7 @@
 #include "disjointregions.h"
 #include "universe.h"
 #include <vector>
+#include <numeric>
 
 class disjointregionselector
 {
