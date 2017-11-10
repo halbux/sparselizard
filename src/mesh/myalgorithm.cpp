@@ -94,7 +94,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
             int* tosort1 = tosort[0];
                 
             // The < operator is overloaded by a lambda function.
-            __gnu_parallel::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
+            std::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     if (tosort1[elem1] < tosort1[elem2])
                         return true;
@@ -112,7 +112,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
             int* tosort2 = tosort[1];
             
             // The < operator is overloaded by a lambda function.
-            __gnu_parallel::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
+            std::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     if (tosort1[elem1] < tosort1[elem2])
                         return true;
@@ -131,7 +131,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
         default:
             
             // The < operator is overloaded by a lambda function.
-            __gnu_parallel::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
+            std::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     for (int i = 0; i < tosort.size(); i++)
                     {

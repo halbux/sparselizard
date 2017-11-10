@@ -11,7 +11,7 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include <parallel/algorithm>
+//#include <parallel/algorithm> __gnu_parallel::sort instead of std::sort
 
 namespace myalgorithm
 {
