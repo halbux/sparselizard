@@ -21,17 +21,20 @@ git clone -b maint https://bitbucket.org/petsc/petsc petsc;
 echo '__________________________________________';
 echo 'CONFIGURING PETSC';
 cd petsc;
+
+if [ "$(uname)" == "Linux" ]; then
+PETSC_DIR=$(pwd);
+PETSC_ARCH=arch-linux2-c-opt;
+elif [ "$(uname)" == "Darwin"  ]; then
+PETSC_DIR=$(pwd);
+PETSC_ARCH=arch-darwin-c-opt;
+fi
+
 ./configure --download-mumps --download-scalapack --download-mpich=yes --with-debugging=0;
 echo '__________________________________________';
 echo 'COMPILING PETSC';
-
-if [ "$(uname)" == "Linux" ]; then
-make PETSC_DIR=$(pwd) PETSC_ARCH=arch-linux2-c-opt all;
-make PETSC_DIR=$(pwd) PETSC_ARCH=arch-linux2-c-opt test;    
-elif [ "$(uname)" == "Darwin"  ]; then
-make PETSC_DIR=$(pwd) PETSC_ARCH=arch-darwin-c-opt all;
-make PETSC_DIR=$(pwd) PETSC_ARCH=arch-darwin-c-opt test;
-fi
+make $PETSC_DIR $PETSC_ARCH all;
+make $PETSC_DIR $PETSC_ARCH test;    
 
 cd ..;
 
