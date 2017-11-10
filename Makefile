@@ -1,8 +1,15 @@
 ##### THESE ARE THE REQUIRED LIBRARIES:
 
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Linux)
 LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-linux2-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -fopenmp
 INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux2-c-opt/include/ -I ~/SLlibs/fftw/install/include
-
+endif
+ifeq ($(UNAME), Darwin)
+LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-darwin-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -fopenmp
+INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-darwin-c-opt/include/ -I ~/SLlibs/fftw/install/include
+endif
 
 
 # $@ is the filename representing the target.

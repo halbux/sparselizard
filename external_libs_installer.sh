@@ -24,8 +24,15 @@ cd petsc;
 ./configure --download-mumps --download-scalapack --download-mpich=yes --with-debugging=0;
 echo '__________________________________________';
 echo 'COMPILING PETSC';
+
+if [ "$(uname)" == "Linux" ]; then
 make PETSC_DIR=$(pwd) PETSC_ARCH=arch-linux2-c-opt all;
-make PETSC_DIR=$(pwd) PETSC_ARCH=arch-linux2-c-opt test;
+make PETSC_DIR=$(pwd) PETSC_ARCH=arch-linux2-c-opt test;    
+elif [ "$(uname)" == "Darwin"  ]; then
+make PETSC_DIR=$(pwd) PETSC_ARCH=arch-darwin-c-opt all;
+make PETSC_DIR=$(pwd) PETSC_ARCH=arch-darwin-c-opt test;
+fi
+
 cd ..;
 
 
