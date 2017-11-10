@@ -57,6 +57,7 @@ cd fftw*;
 echo '__________________________________________';
 echo 'CONFIGURING FFTW';
 ./configure --prefix $fftwdir/install;
+echo '__________________________________________';
 echo 'COMPILING FFTW';
 make -j4;
 make install;
