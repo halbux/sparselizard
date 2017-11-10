@@ -1,7 +1,7 @@
 ##### THESE ARE THE REQUIRED LIBRARIES:
 
-LIBS = -L /home/halbux/openblas/lib -l openblas -L /home/halbux/petsc/arch-linux2-c-debug/lib -l petsc -l fftw3 -fopenmp
-INCL = -I /home/halbux/petsc/include/ -I /home/halbux/petsc/arch-linux2-c-debug/include/
+LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-linux2-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -fopenmp
+INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux2-c-opt/include/ -I ~/SLlibs/fftw/install/include
 
 
 
