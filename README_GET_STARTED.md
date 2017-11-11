@@ -22,7 +22,6 @@ We hope you appreciate this library and wish you all the best with it!
 
 ##########################################
 FOLLOW THESE STEPS TO SET UP SPARSELIZARD :
-##########################################
 
 1. Download sparselizard on your computer from https://gitlab.onelab.info/halbux/sparselizard.git 
 	(e.g. run 'git clone https://gitlab.onelab.info/halbux/sparselizard.git' in a terminal).
