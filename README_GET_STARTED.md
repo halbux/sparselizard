@@ -48,16 +48,20 @@ We hope you appreciate this library and wish you all the best with it!
 	run a very simple test:
 	
 	a. Get the GMSH binary for your operating system and copy it to the sparselizard folder.
+
 	b. Mesh the 'circle.geo' geometry by running './gmsh circle.geo -3' (3 because it is a 3D problem) or
 		with 'gmsh circle.geo' to mesh graphically. This creates a 'circle.msh' file which contains the mesh.
+		
 	c. Run './run_sparselizard.sh' in the terminal. This runs the code in 'main.cpp' that was compiled at the 
 		previous step. When you edit 'main.cpp' you have to run again step 4 (but it will be much faster this time). 
+		
 	d. The previous step has created the 'u.pos' output file, which gives the displacement of the top surface
 		in the thin cylinder geometry when the sides are clamped and a volume force is applied downwards. 
 		Open it with 'gmsh u.pos'. 
 		You don't see anything or it looks weird? Don't worry, this is just because the simulation was performed 
 		using very few hexahedra in the mesh but with an order 4 interpolation! 
 		To visualise high order interpolations in GMSH do this: 
+		
 		- double click in the middle of the window then select 'All view options' at the bottom of the box that appeared
 		- go to the 'General' tab
 		- tick the 'Adapt visualisation grid' box
