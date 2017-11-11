@@ -1,7 +1,8 @@
-# THIS SCRIPT INSTALLS in ~/SLlibs ALL EXTERNAL LIBRARIES REQUIRED.
+# !!! THE GFORTRAN, GCC, AND G++ COMPILERS MUST BE AVAILABLE !!!
+#
+# THIS SCRIPT INSTALLS IN ~/SLlibs ALL EXTERNAL LIBRARIES REQUIRED.
 # AFTER A SUCCESSFULL RUN ALL WHAT NEEDS TO BE DONE IS WRITE YOUR 
 # main.cpp USING THE SPARSELIZARD LIBRARY THEN RUN make -j4.
-
 
 
 #!/bin/bash
@@ -9,11 +10,12 @@
 
 ########## ALL LIBRARIES REQUIRED BY SPARSELIZARD ARE PUT IN ~/SLlibs.
 
+rm -rf ~/SLlibs;
 mkdir ~/SLlibs;
 cd ~/SLlibs;
 
 
-########## COMPILING PETSC WITH OPTIONS --download-mumps --download-scalapack --download-mpich=yes --with-debugging=0 :
+########## COMPILING PETSC WITH OPTIONS --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0 :
 
 echo '__________________________________________';
 echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
@@ -30,7 +32,7 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-./configure --download-mumps --download-scalapack --download-mpich=yes --with-debugging=0;
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0;
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
