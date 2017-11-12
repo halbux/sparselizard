@@ -18,13 +18,12 @@ void sparselizard(void)
     
     field u("h1xyz");
 
-    u.setorder(vol, 4);
+    u.setorder(vol, 3);
     
     u.setconstraint(sur);
   
     parameter E, nu;
-    E|vol = 150e9;
-    nu|vol = 0.3;
+    E|vol = 150e9; nu|vol = 0.3;
   
     formulation elasticity;
 
@@ -36,7 +35,7 @@ void sparselizard(void)
     vec solu = solve(elasticity.A(), elasticity.b());
 
     u.getdata(vol, solu);
-    u.write(top, "u.pos", 5);
+    u.write(top, "u.pos", 3);
     
 }
 

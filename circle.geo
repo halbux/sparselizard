@@ -1,4 +1,7 @@
-c = 20;
+// Choose the mesh size:
+c = 0.5;
+
+// Number of extrude layers:
 n = 1;
 
 Point(1) = {0, 0, 0, c};
@@ -11,6 +14,7 @@ Circle(1) = {5, 1, 4};
 Circle(2) = {4, 1, 2};
 Circle(3) = {2, 1, 3};
 Circle(4) = {3, 1, 5};
+
 Line Loop(5) = {1, 2, 3, 4};
 Plane Surface(6) = {5};
 Recombine Surface{6};
