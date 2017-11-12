@@ -44,7 +44,7 @@ We hope you appreciate this library and wish you all the best with it!
 4. Now we are going to actually compile sparselizard. This should also be straightforward: just run 'make'
 	in the terminal (or 'make -j4' if you have 4 computing cores).
 	
-5. You're done! Follow the examples in the 'tutorial' folder to discover sparselizard! But let's first 
+5. You're done! Follow the examples in the 'examples' folder to discover sparselizard! But let's first 
 	run a very simple test:
 	
 - Get the GMSH binary for your operating system and copy it to the sparselizard folder.
