@@ -2,7 +2,7 @@ Welcome, new sparselizard user!
 
 Sparselizard (Copyright (C) 2017-2018 Alexandre Halbach and Christophe Geuzaine, University of Liege, Belgium)
 is an open source finite element library meant to be user friendly and decently fast & parallelised.
-It can handle a rather general set of problems such as mechanical, acoustic, thermal, electric and electromagnetic 
+It can handle a rather general set of problems in 1D, 2D and 3D such as mechanical, acoustic, thermal, electric and electromagnetic 
 problems. Multiphysics problems, nonlinear problems or nonlinear multiphysics problems can be simulated as well.
 The problems can be readily solved in time with a time-stepping resolution or with a user-friendly multiharmonic
 resolution method. In the latter case the steady-state solution of a time-periodic problem can be obtained 
