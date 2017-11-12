@@ -64,7 +64,7 @@ We hope you appreciate this library and wish you all the best with it!
     - tick the 'Adapt visualisation grid' box
     - Set 'Maximum recursion level' to 3 and 'Target visualization error' to the smallest possible value then 
         press enter. Now you have a finer solution! Since the solution is a mechanical displacement you might 
-        want to see the deflection in 3D by double clicking in the middle of the window then select 
+        want to see the deflection in 3D by double clicking in the middle of the window then selecting 
         'View vector display' >> 'Displacement' with factor 1.
 		
 		
