@@ -17,7 +17,7 @@ void sparselizard(void)
     // The mesh can be curved!
     mesh mymesh("circle.msh");
     
-    // Nodal shape functions with 3 components.
+    // Nodal shape functions 'h1' with 3 components.
     // Field u is the membrane deflection.
     field u("h1xyz");
 
