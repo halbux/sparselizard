@@ -56,7 +56,7 @@ We hope you appreciate this library and wish you all the best with it!
 		in the thin cylinder geometry when the sides are clamped and a volume force is applied downwards. 
 		Open it with './gmsh u.pos'. 
 		You don't see anything or it looks weird? Don't worry, this is just because the simulation was performed 
-		using very few hexahedra in the mesh but with an order 4 interpolation! 
+		using very few hexahedra in the mesh but with an order 3 interpolation! 
 		To visualise high order interpolations in GMSH do this: 
 		
     - double click in the middle of the window then select 'All view options' at the bottom of the box that appeared
