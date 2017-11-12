@@ -1,4 +1,4 @@
-sparselizard is provided under the terms of the GNU General Public License
+Sparselizard is provided under the terms of the GNU General Public License
 (GPL), Version 2 or later.
 
 		    GNU GENERAL PUBLIC LICENSE
