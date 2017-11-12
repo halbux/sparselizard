@@ -11,7 +11,7 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-    // The domain regions as defined in 'cirlce.geo':
+    // The domain regions as defined in 'circle.geo':
     int vol = 1, sur = 2, top = 3;
     
     // The mesh can be curved!
@@ -45,8 +45,8 @@ void sparselizard(void)
     // Transfer the data from the solution vector to the u field:
     u.getdata(vol, solu);
     // Write the deflection on the top surface of the membrane.
-    // Write with an order 3 interpolation.
-    u.write(top, "u.pos", 3);
+    // Write with an order 3 interpolation. Exagerate the deflection by a factor 1e9.
+    (1e9*u).write(top, "u.pos", 3);
     
 }
 
