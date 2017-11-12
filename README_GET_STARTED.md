@@ -62,7 +62,7 @@ We hope you appreciate this library and wish you all the best with it!
     - double click in the middle of the window then select 'All view options' at the bottom of the box that appeared
     - go to the 'General' tab
     - tick the 'Adapt visualisation grid' box
-    - Set 'Maximum recursion level' to 4 then press enter. Now you have a finer solution! Since the solution is a 
+    - Set 'Maximum recursion level' to 3 then press enter. Now you have a finer solution! Since the solution is a 
         mechanical displacement you might want to exagerate the deflection and see it in 3D by double clicking in 
         the middle of the window then select 'View vector display' >> 'Displacement' and magnify by a factor
 		
