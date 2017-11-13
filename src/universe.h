@@ -8,12 +8,17 @@
 #define UNIVERSE_H
 
 #include <vector>
+#include <string>
+#include <utility>
 #include "mesh.h"
 #include "field.h"
 #include "jacobian.h"
 #include "memory.h"
 #include "operation.h"
 #include "densematrix.h"
+#include "selector.h"
+#include "hierarchicalformfunction.h"
+#include "hierarchicalformfunctioncontainer.h"
 
 class mesh;
 class jacobian;
@@ -36,6 +41,17 @@ class universe
         static void allowreuse(void);
         // CLEANS::
         static void forbidreuse(void);
+        
+        // Store all !HIERARCHICAL! form function values that can be reused.
+        // 'computedformfuncs[i].first' gives the ith form function type name.
+        // 'computedformfuncs[i].second' gives a vector detailed below.
+        // 'computedformfuncs[i].second[elemtypenum][0].first' gives the order
+        // to which the form function has been interpolated and .second 
+        // gives the interpolated values.
+        static std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> computedformfuncs;
+        // This function returns the requested form function value. In case
+        // 'isreuseallowed' is true it reuses any already computed value.
+        static hierarchicalformfunctioncontainer interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates);
         
         static shared_ptr<jacobian> computedjacobian;
         

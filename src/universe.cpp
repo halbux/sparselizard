@@ -28,12 +28,48 @@ void universe::forbidreuse(void)
 {
     isreuseallowed = false;
     
+    computedformfuncs = {};
+    
     computedjacobian = NULL;
     
     oppointers = {};
     oppointersfft = {};
     opcomputed = {};
     opcomputedfft = {};
+}
+
+std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> universe::computedformfuncs = {};
+hierarchicalformfunctioncontainer universe::interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates)
+{
+    // Find the type name in the container:
+    int typenameindex = -1;
+    for (int i = 0; i < computedformfuncs.size(); i++)
+    {
+        if (computedformfuncs[i].first == fftypename)
+        {
+            typenameindex = i;
+            break;
+        }
+    }
+    
+    // In case the form function is available and we are allowed to reuse it:
+    if (isreuseallowed && typenameindex != -1 && computedformfuncs[typenameindex].second.size() > elementtypenumber && computedformfuncs[typenameindex].second[elementtypenumber].size() > 0 && computedformfuncs[typenameindex].second[elementtypenumber][0].first >= interpolorder)
+        return computedformfuncs[typenameindex].second[elementtypenumber][0].second;
+    
+    // Otherwise it must be computed:
+    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fftypename);
+    hierarchicalformfunctioncontainer val = myformfunction->evalat(interpolorder, evaluationcoordinates);
+    
+    // Store it for reuse if allowed:
+    if (isreuseallowed)
+    {
+        if (typenameindex == -1)
+            computedformfuncs.push_back( std::make_pair(fftypename, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >>(8,std::vector< std::pair<int,hierarchicalformfunctioncontainer> >(0))) );
+        typenameindex = computedformfuncs.size() - 1;
+        computedformfuncs[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, val)};
+    }
+    
+    return val;
 }
 
 shared_ptr<jacobian> universe::computedjacobian = NULL;
