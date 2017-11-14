@@ -11,7 +11,7 @@
 
 ########## ALL LIBRARIES REQUIRED BY SPARSELIZARD ARE PUT IN ~/SLlibs.
 
-
+rm -rf ~/SLlibs;
 mkdir ~/SLlibs;
 cd ~/SLlibs;
 
