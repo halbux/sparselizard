@@ -1,4 +1,4 @@
-# !!! THE GCC, AND G++ COMPILERS MUST BE AVAILABLE !!!
+# !!! THE GFORTRAN, GCC, AND G++ COMPILERS MUST BE AVAILABLE !!!
 #
 # THIS SCRIPT INSTALLS IN ~/SLlibs ALL EXTERNAL LIBRARIES REQUIRED.
 # AFTER A SUCCESSFULL RUN ALL WHAT NEEDS TO BE DONE IS WRITE YOUR 
@@ -73,7 +73,7 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-./configure --download-mumps --download-scalapack --download-mpich=yes --with-debugging=0;
+./configure --download-mumps --download-scalapack --download-openmpi --with-debugging=0 COPTFLAGS='-O3 CXXOPTFLAGS='-O3;
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
