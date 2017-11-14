@@ -56,7 +56,7 @@ make install;
 cd ../..;
 
 
-########## COMPILING PETSC WITH OPTIONS --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0 :
+########## COMPILING PETSC WITH OPTIONS --with-cc=gcc --with-cxx=g++ --with-fc=mpif90 --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0 :
 
 echo '__________________________________________';
 echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
