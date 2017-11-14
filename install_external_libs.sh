@@ -16,7 +16,6 @@ mkdir ~/SLlibs;
 cd ~/SLlibs;
 
 
-
 ########## COMPILING OPENBLAS :
 
 echo '__________________________________________';
