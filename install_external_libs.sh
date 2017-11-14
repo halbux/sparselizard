@@ -15,32 +15,6 @@ mkdir ~/SLlibs;
 cd ~/SLlibs;
 
 
-########## COMPILING PETSC WITH OPTIONS --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0 :
-
-echo '__________________________________________';
-echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
-git clone -b maint https://bitbucket.org/petsc/petsc petsc;
-echo '__________________________________________';
-echo 'CONFIGURING PETSC';
-cd petsc;
-
-if [ "$(uname)" == "Linux" ]; then
-PETSC_DIR=$(pwd);
-PETSC_ARCH=arch-linux2-c-opt;
-elif [ "$(uname)" == "Darwin"  ]; then
-PETSC_DIR=$(pwd);
-PETSC_ARCH=arch-darwin-c-opt;
-fi
-
-./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0;
-echo '__________________________________________';
-echo 'COMPILING PETSC';
-make $PETSC_DIR $PETSC_ARCH all;
-make $PETSC_DIR $PETSC_ARCH test;    
-
-cd ..;
-
-
 ########## COMPILING OPENBLAS :
 
 echo '__________________________________________';
@@ -81,3 +55,28 @@ make -j4;
 make install;
 cd ../..;
 
+
+########## COMPILING PETSC WITH OPTIONS --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0 :
+
+echo '__________________________________________';
+echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
+git clone -b maint https://bitbucket.org/petsc/petsc petsc;
+echo '__________________________________________';
+echo 'CONFIGURING PETSC';
+cd petsc;
+
+if [ "$(uname)" == "Linux" ]; then
+PETSC_DIR=$(pwd);
+PETSC_ARCH=arch-linux2-c-opt;
+elif [ "$(uname)" == "Darwin"  ]; then
+PETSC_DIR=$(pwd);
+PETSC_ARCH=arch-darwin-c-opt;
+fi
+
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0;
+echo '__________________________________________';
+echo 'COMPILING PETSC';
+make $PETSC_DIR $PETSC_ARCH all;
+make $PETSC_DIR $PETSC_ARCH test;    
+
+cd ..;
