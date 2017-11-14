@@ -73,7 +73,7 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-./configure --download-mumps --download-scalapack --download-openmpi --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3';
+./configure --download-mumps --download-scalapack --download-openmpi --with-blaslapack-dir=~/SLlibs/openblas/install --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3';
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
