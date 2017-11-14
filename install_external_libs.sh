@@ -57,7 +57,7 @@ make install;
 cd ../..;
 
 
-########## COMPILING PETSC WITH OPTIONS :
+########## COMPILING PETSC :
 
 echo '__________________________________________';
 echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
