@@ -5,7 +5,6 @@
 # main.cpp USING THE SPARSELIZARD LIBRARY THEN RUN make -j4.
 
 
-
 #!/bin/bash
 
 
@@ -74,7 +73,7 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-./configure --download-mumps --download-scalapack --download-openmpi --with-blaslapack-dir=~/SLlibs/openblas/install --with-debugging=0;
+./configure --download-mumps --download-scalapack --download-mpich=yes --with-debugging=0;
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
