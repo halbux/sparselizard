@@ -73,7 +73,7 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-./configure --with-cc=gcc --with-cxx=g++ --with-fc=gfortran --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0;
+./configure --with-cc=gcc --with-cxx=g++ --with-fc=mpif90 --download-mumps --download-scalapack --download-fblaslapack --download-mpich --with-debugging=0;
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
