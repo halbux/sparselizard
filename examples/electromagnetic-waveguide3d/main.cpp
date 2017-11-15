@@ -28,7 +28,7 @@ void sparselizard(void)
     // With this code and a fine enough mesh you will get the same value.
     double freq = 1.2e9, c = 3e8, pi = 3.14159, k = 2*pi*freq/c;
     
-    // The waveguide a perfect conductor. We thus force all
+    // The waveguide is a perfect conductor. We thus force all
     // tangential components of E to 0 on the waveguide skin.
     E.setconstraint(skin);
     // We force an electric field in the z direction on region 'left'
