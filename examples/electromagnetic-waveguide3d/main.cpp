@@ -25,6 +25,7 @@ void sparselizard(void)
     E.setorder(wholedomain, 2);
     
     // The cutoff frequency for 0.2x0.2 cross section is freq = 1.06 GHz in theory. 
+    // With this code and a fine enough mesh you will get the same value.
     double freq = 1.2e9, c = 3e8, pi = 3.14159, k = 2*pi*freq/c;
     
     // The waveguide a perfect conductor. We thus force all
