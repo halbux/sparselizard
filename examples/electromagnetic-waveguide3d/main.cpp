@@ -24,7 +24,7 @@ void sparselizard(void)
     // Use interpolation order 2 on the whole domain:
     E.setorder(wholedomain, 2);
     
-    // The cutoff frequency for 0.2x0.2 cross section is freq = 1.06 GHz in theory. 
+    // The cutoff frequency for a 0.2x0.2 m^2 cross section is freq = 1.06 GHz in theory. 
     // With this code and a fine enough mesh you will get the same value.
     double freq = 1.2e9, c = 3e8, pi = 3.14159, k = 2*pi*freq/c;
     
