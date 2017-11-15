@@ -12,7 +12,7 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-	// The domain regions as defined in 'circle.geo':
+    // The domain regions as defined in 'circle.geo':
     int left = 1, skin = 2, wholedomain = 3;
 
     mesh mymesh("waveguide3D.msh");
@@ -20,7 +20,7 @@ void sparselizard(void)
     // Edge shape functions 'hcurl' for the electric field E.
     field E("hcurl"), x("x"), y("y"), z("z");
 
-	// Use interpolation order 2 on the whole domain:
+    // Use interpolation order 2 on the whole domain:
     E.setorder(wholedomain, 2);
     
     // The cutoff frequency for 0.2x0.2 cross section is freq = 1.06 GHz in theory. 
