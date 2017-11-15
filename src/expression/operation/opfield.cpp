@@ -4,12 +4,23 @@
 void opfield::setspacederivative(int whichderivative)
 { 
     // Make sure a single space derivative is applied.
-    if (spacederivative != 0)
+    if (spacederivative != 0 || kietaphiderivative != 0)
     {
         std::cout << "Error in 'opfield' object: cannot apply more than one space derivative to a field" << std::endl;
         abort();
     }
     spacederivative = whichderivative; 
+}
+
+void opfield::setkietaphiderivative(int whichderivative)
+{ 
+    // Make sure a single space derivative is applied.
+    if (spacederivative != 0 || kietaphiderivative != 0)
+    {
+        std::cout << "Error in 'opfield' object: cannot apply more than one space derivative to a field" << std::endl;
+        abort();
+    }
+    kietaphiderivative = whichderivative; 
 }
 
 void opfield::increasetimederivativeorder(int amount)
@@ -60,57 +71,62 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     std::vector<std::vector<densematrix>> output;
     
     // In case there is no space derivative applied:
-    if (spacederivative == 0)
+    if (spacederivative == 0 && kietaphiderivative == 0)
         output = myfield->interpolate(0, formfunctioncomponent, elemselect, evaluationcoordinates);
     else
     {
-        // Otherwise compute the x, y or z field derivative using ki, eta, 
-        // phi derivatives in the reference element and invjac() terms.
-
-        // Compute the Jacobian terms or reuse if available in the universe.
-        shared_ptr<jacobian> myjac;
-        if (universe::isreuseallowed && universe::computedjacobian != NULL)
-            myjac = universe::computedjacobian;
+        if (kietaphiderivative != 0)
+            output = myfield->interpolate(kietaphiderivative, formfunctioncomponent, elemselect, evaluationcoordinates);
         else
-            myjac = shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
-
-        if (universe::isreuseallowed)
-            universe::computedjacobian = myjac;
-
-        // Compute the required ki, eta and phi derivatives:
-        std::vector<std::vector<densematrix>> dkiargmat, detaargmat, dphiargmat;
-
-        // Get the element dimension in the selected elements:
-        int elementdimension = elemselect.getelementdimension();  
-
-            dkiargmat = myfield->interpolate(1, formfunctioncomponent, elemselect, evaluationcoordinates);
-        if (elementdimension > 1)
-            detaargmat = myfield->interpolate(2, formfunctioncomponent, elemselect, evaluationcoordinates);
-        if (elementdimension > 2)
-            dphiargmat = myfield->interpolate(3, formfunctioncomponent, elemselect, evaluationcoordinates);
-
-        // Computing the x, y and z derivatives for all harmonics based on the
-        // Jacobian matrix and the computed ki, eta and phi derivatives.
-        // Skip the sin0 harmonic.
-        for (int harm = 1; harm < dkiargmat.size(); harm++)
         {
-            // Skip any non existent harmonic:
-            if (dkiargmat[harm].size() == 0)
-                continue;
+            // Otherwise compute the x, y or z field derivative using ki, eta, 
+            // phi derivatives in the reference element and invjac() terms.
 
-                dkiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,0));
+            // Compute the Jacobian terms or reuse if available in the universe.
+            shared_ptr<jacobian> myjac;
+            if (universe::isreuseallowed && universe::computedjacobian != NULL)
+                myjac = universe::computedjacobian;
+            else
+                myjac = shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
+
+            if (universe::isreuseallowed)
+                universe::computedjacobian = myjac;
+
+            // Compute the required ki, eta and phi derivatives:
+            std::vector<std::vector<densematrix>> dkiargmat, detaargmat, dphiargmat;
+
+            // Get the element dimension in the selected elements:
+            int elementdimension = elemselect.getelementdimension();  
+
+                dkiargmat = myfield->interpolate(1, formfunctioncomponent, elemselect, evaluationcoordinates);
             if (elementdimension > 1)
-            {
-                detaargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,1));
-                dkiargmat[harm][0].add(detaargmat[harm][0]);
-            }
+                detaargmat = myfield->interpolate(2, formfunctioncomponent, elemselect, evaluationcoordinates);
             if (elementdimension > 2)
+                dphiargmat = myfield->interpolate(3, formfunctioncomponent, elemselect, evaluationcoordinates);
+
+            // Computing the x, y and z derivatives for all harmonics based on the
+            // Jacobian matrix and the computed ki, eta and phi derivatives.
+            // Skip the sin0 harmonic.
+            for (int harm = 1; harm < dkiargmat.size(); harm++)
             {
-                dphiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,2));
-                dkiargmat[harm][0].add(dphiargmat[harm][0]);
+                // Skip any non existent harmonic:
+                if (dkiargmat[harm].size() == 0)
+                    continue;
+
+                    dkiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,0));
+                if (elementdimension > 1)
+                {
+                    detaargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,1));
+                    dkiargmat[harm][0].add(detaargmat[harm][0]);
+                }
+                if (elementdimension > 2)
+                {
+                    dphiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,2));
+                    dkiargmat[harm][0].add(dphiargmat[harm][0]);
+                }
             }
+            output = dkiargmat;
         }
-        output = dkiargmat;
     }
     
     if (timederivativeorder == 0)

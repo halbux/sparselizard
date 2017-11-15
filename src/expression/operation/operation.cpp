@@ -89,7 +89,15 @@ bool operation::isreused(void)
         
 void operation::setspacederivative(int whichderivative)
 {
-    std::cout << "Error in 'operation' object: can only apply space derivatives to fields, dof() and tf()" << std::endl;
+    std::cout << "Error in 'operation' object: either you are trying to apply a space derivative to something else than fields, dof() and tf() or the field does not allow this kind of space derivative" << std::endl;
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    abort();
+}   
+
+void operation::setkietaphiderivative(int whichderivative)
+{
+    std::cout << "Error in 'operation' object: can only apply reference-element space derivatives to fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     abort();

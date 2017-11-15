@@ -26,11 +26,11 @@ expression::expression(field input)
         }
     }
     
-    // Project from the reference element to the physical 
-    // element any field with multiple form function components:
+    // Project from the reference element to the physical one a 1 form (hcurl):
     if (input.getpointer()->countformfunctioncomponents() > 1)
     {
         unprojectedfield = {*this};
+        // A 1 form E is projected as invjac*E:
         myoperations = ( invjac()*(*this) ).myoperations;
     }
 }
@@ -439,8 +439,6 @@ expression expression::spacederivative(int whichderivative)
 //     }
     
     expression derivated = *this;
-    if (unprojectedfield.size() == 1)
-        derivated = unprojectedfield[0];
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
@@ -457,19 +455,26 @@ expression expression::spacederivative(int whichderivative)
         }
     }
     
-    if (unprojectedfield.size() == 1)        
+    return derivated;
+}
+
+expression expression::kietaphiderivative(int whichderivative)
+{
+    expression derivated = *this;
+    
+    for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-        derivated.unprojectedfield = {derivated};
-        derivated.myoperations = ( invjac()*(derivated) ).myoperations;
+        std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
+        op->setkietaphiderivative(whichderivative);
+        derivated.myoperations[i] = op;
     }
+    
     return derivated;
 }
 
 expression expression::timederivative(int derivativeorder)
 {
-    expression derivated = *this;
-    if (unprojectedfield.size() == 1)
-        derivated = unprojectedfield[0];
+    expression derivated = getunprojectedfield();
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
@@ -478,12 +483,22 @@ expression expression::timederivative(int derivativeorder)
         derivated.myoperations[i] = op;
     }
     
+    // Project from the reference element to the physical one a 1 form (hcurl):
     if (unprojectedfield.size() == 1)        
     {
         derivated.unprojectedfield = {derivated};
+        // A 1 form E is projected as invjac*E:
         derivated.myoperations = ( invjac()*(derivated) ).myoperations;
     }
     return derivated;
+}
+
+expression expression::getunprojectedfield(void)
+{
+    if (unprojectedfield.size() == 0)
+        return *this;
+    else
+        return unprojectedfield[0];
 }
 
 expression expression::transpose(void)
@@ -625,15 +640,13 @@ expression expression::pow(expression input)
 
 expression expression::dof(int physreg)
 {
-    expression doftag = *this;
-    if (unprojectedfield.size() == 1)
-        doftag = unprojectedfield[0];
+    expression doftag = getunprojectedfield();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {            
         if (doftag.myoperations[i]->isfield())
         {
-            if (doftag.myoperations[i]->getspacederivative() != 0 || doftag.myoperations[i]->gettimederivative() != 0)
+            if (doftag.myoperations[i]->getspacederivative() != 0 || doftag.myoperations[i]->getkietaphiderivative() != 0 || doftag.myoperations[i]->gettimederivative() != 0)
             {
                 std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the dof() field argument" << std::endl; 
                 abort();
@@ -650,9 +663,11 @@ expression expression::dof(int physreg)
         }     
     }
     
+    // Project from the reference element to the physical one a 1 form (hcurl):
     if (unprojectedfield.size() == 1)        
     {
         doftag.unprojectedfield = {doftag};
+        // A 1 form E is projected as invjac*E:
         doftag.myoperations = ( invjac()*(doftag) ).myoperations;
     }
     return doftag;
@@ -660,15 +675,13 @@ expression expression::dof(int physreg)
 
 expression expression::tf(int physreg)
 {
-    expression tftag = *this;
-    if (unprojectedfield.size() == 1)
-        tftag = unprojectedfield[0];
+    expression tftag = getunprojectedfield();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {            
         if (tftag.myoperations[i]->isfield())
         {
-            if (tftag.myoperations[i]->getspacederivative() != 0 || tftag.myoperations[i]->gettimederivative() != 0)
+            if (tftag.myoperations[i]->getspacederivative() != 0 || tftag.myoperations[i]->getkietaphiderivative() != 0 || tftag.myoperations[i]->gettimederivative() != 0)
             {
                 std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the tf() field argument" << std::endl; 
                 abort();
@@ -685,9 +698,11 @@ expression expression::tf(int physreg)
         }     
     }
     
+    // Project from the reference element to the physical one a 1 form (hcurl):
     if (unprojectedfield.size() == 1)        
     {
         tftag.unprojectedfield = {tftag};
+        // A 1 form E is projected as invjac*E:
         tftag.myoperations = ( invjac()*(tftag) ).myoperations;
     }
     return tftag;
@@ -757,15 +772,23 @@ expression expression::jac(int row, int col)
     return exp;
 }
 
+expression expression::detjac(void)
+{
+    expression exp;
+    exp.myoperations = {std::shared_ptr<opdetjac>(new opdetjac)};
+    
+    return exp;
+}
+
 expression expression::invjac(void)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     switch (problemdimension)
     {
         case 1:
-            return expression(3,3,{invjac(0,0),0,0,   0,0,0,   0,0,0});
+            return expression(3,3,{invjac(0,0),0,0,   0,1,0,   0,0,1});
         case 2:
-            return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,0});
+            return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,1});
         case 3:
             return expression(3,3,{invjac(0,0),invjac(0,1),invjac(0,2),   invjac(1,0),invjac(1,1),invjac(1,2),   invjac(2,0),invjac(2,1),invjac(2,2)});
     }
@@ -777,9 +800,9 @@ expression expression::jac(void)
     switch (problemdimension)
     {
         case 1:
-            return expression(3,3,{jac(0,0),0,0,   0,0,0,   0,0,0});
+            return expression(3,3,{jac(0,0),0,0,   0,1,0,   0,0,1});
         case 2:
-            return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,0});
+            return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,1});
         case 3:
             return expression(3,3,{jac(0,0),jac(0,1),jac(0,2),   jac(1,0),jac(1,1),jac(1,2),   jac(2,0),jac(2,1),jac(2,2)});
     }
@@ -911,7 +934,7 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                 tfs.push_back({});
             }
             
-            // Explode any space derivatived dof and tf into a sum of 
+            // Explode any x, y, z space derivatived dof and tf into a sum of 
             // products of invjac terms and ki, eta and phi derivatives.
             int numdofterms = 1, numtfterms = 1;
             if (currentdof->getspacederivative() > 0)

@@ -90,8 +90,8 @@ class operation : public std::enable_shared_from_this<operation>
         
         // Set derivatives for fields, dofs and tfs:
         virtual void setspacederivative(int whichderivative);
+        virtual void setkietaphiderivative(int whichderivative);
         virtual void increasetimederivativeorder(int derivativeorder);
-        virtual void setkietaphiderivative(int whichderivative) {};
         
         // Get info for fields, dofs and tfs:
         virtual int getphysicalregion(void) {};
@@ -131,6 +131,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opabs.h"
 #include "opconstant.h"
 #include "opcos.h"
+#include "opdetjac.h"
 #include "opdof.h"
 #include "opfield.h"
 #include "opinversion.h"

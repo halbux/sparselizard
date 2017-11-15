@@ -19,6 +19,8 @@ class opfield: public operation
         int timederivativeorder = 0;
         // 0 is no derivative, 1 is x, 2 is y and 3 is z.
         int spacederivative = 0;
+        // 0 is no derivative, 1 is ki, 2 is eta and 3 is phi.
+        int kietaphiderivative = 0;
         
         // The selected form function component in the field:
         int formfunctioncomponent = 0;
@@ -32,11 +34,12 @@ class opfield: public operation
         opfield(shared_ptr<rawfield> fieldin) { myfield = fieldin; };
         
         void setspacederivative(int whichderivative);
+        void setkietaphiderivative(int whichderivative);
         void increasetimederivativeorder(int amount);
         int selectformfunctioncomponent(int comp) { formfunctioncomponent = comp; };
 
         void setfieldcomponent(int comp) { fieldcomponent = comp; };
-        
+                
         bool isfield(void) { return true; };
         
         bool isharmonicone(std::vector<int> disjregs);
@@ -51,6 +54,7 @@ class opfield: public operation
         int getformfunctioncomponent(void) { return formfunctioncomponent; };
         int getfieldcomponent(void) { return fieldcomponent; };
         int getspacederivative(void) { return spacederivative; };
+        int getkietaphiderivative(void) { return kietaphiderivative; };
         int gettimederivative(void) { return timederivativeorder; };
 
         bool isvalueorientationdependent(std::vector<int> disjregs);

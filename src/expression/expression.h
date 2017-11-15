@@ -103,7 +103,13 @@ class expression
         
         // 'whichderivative' is 1 for x, 2 for y and 3 for z.
         expression spacederivative(int whichderivative);
+        // Now the derivative in the reference element.
+        // 'whichderivative' is 1 for ki, 2 for eta and 3 for phi.
+        expression kietaphiderivative(int whichderivative);
         expression timederivative(int derivativeorder);
+        
+        bool isprojectedfield(void) { return (unprojectedfield.size() > 0); };
+        expression getunprojectedfield(void);
         
         expression transpose(void);
         // Get the submatrix obtained by removing a row and a column:
@@ -126,6 +132,7 @@ class expression
         
         expression invjac(int row, int col);
         expression jac(int row, int col);
+        expression detjac(void);
         // Get the whole 3x3 matrix (with zeros everywhere but on the 
         // 1x1 submatrix in 1D and on the 2x2 submatrix in 2D). 
         expression invjac(void);

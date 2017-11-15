@@ -98,20 +98,39 @@ expression mathop::grad(expression input)
 
 expression mathop::curl(expression input)
 {
-    if (input.countcolumns() > 1)
+    bool ishcurlfield = input.isprojectedfield();
+    input = input.getunprojectedfield();
+    
+    if (input.countcolumns() > 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'mathop' namespace: can only take the curl of a column vector" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only take the curl of an up to length 3 column vector" << std::endl;
         abort();
     }
 
-    switch (input.countrows())
+    // The curl of a hcurl type field is computed in a special way:
+    if (ishcurlfield == false)
     {
-        case 1:
-            return expression(3,1,{0, 0, 0});
-        case 2:
-            return expression(3,1,{0, 0, compy(dx(input))-compx(dy(input))});
-        case 3:
-            return expression(3,1,{compz(dy(input))-compy(dz(input)), compx(dz(input))-compz(dx(input)), compy(dx(input))-compx(dy(input))});
+        switch (input.countrows())
+        {
+            case 1:
+                return expression(3,1,{0, 0, 0});
+            case 2:
+                return expression(3,1,{0, 0, dx(compy(input))-dy(compx(input))});
+            case 3:
+                return expression(3,1,{dy(compz(input))-dz(compy(input)), dz(compx(input))-dx(compz(input)), dx(compy(input))-dy(compx(input))});
+        }
+    }
+    else
+    {
+        expression expr;
+        // We should always have 3 components.
+        // This is the curl in the reference element:
+        expr = expression(3,1,{compz(input.kietaphiderivative(2))-compy(input.kietaphiderivative(3)), compx(input.kietaphiderivative(3))-compz(input.kietaphiderivative(1)), compy(input.kietaphiderivative(1))-compx(input.kietaphiderivative(2))});
+
+        // The curl of a 1 form (i.e. hcurl type field) is brought back 
+        // from the reference element with the following transformation:
+        expr = transpose(expr.jac())*expr/expr.detjac();
+        return expr;
     }
 }
 
