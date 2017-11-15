@@ -34,8 +34,8 @@ void sparselizard(void)
     E.setconstraint(left, cos(y/0.2*pi)* cos(z/0.2*pi)* array3x1(0,0,1));
 
     formulation maxwell;
-	
-	// This is the weak formulation for electromagnetic waves:
+    
+    // This is the weak formulation for electromagnetic waves:
     maxwell += integral(wholedomain, -curl(dof(E))*curl(tf(E)) + k*k*dof(E)*tf(E));
     
     // The operations below take about a minutes on my laptop... be patient!
