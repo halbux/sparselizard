@@ -12,7 +12,7 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-    // The domain regions as defined in 'circle.geo':
+    // The domain regions as defined in 'waveguide3D.geo':
     int left = 1, skin = 2, wholedomain = 3;
 
     mesh mymesh("waveguide3D.msh");
