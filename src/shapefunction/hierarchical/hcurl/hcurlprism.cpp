@@ -15,8 +15,6 @@ int hcurlprism::count(int order, int dim, int num)
 {
     
     // The 'num' input argument is required here!
-    
-    
     if (order <= 0)
         return 0;
     
@@ -45,6 +43,12 @@ int hcurlprism::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
+	if (maxorder > 1)
+	{
+		std::cout << "Error in 'hcurlprism' object: prism hcurl form functions at order 2 and above are implemented but not provided at the moment due to some missing in the reference paper used" << std::endl;
+		abort();
+	}
+
 	element prism("prism");
     hierarchicalformfunctioncontainer val("hcurl", prism.gettypenumber(), evaluationpoints);
 
