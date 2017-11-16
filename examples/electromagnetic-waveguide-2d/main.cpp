@@ -32,7 +32,7 @@ void sparselizard(void)
     // tangential components of E to 0 on the waveguide skin.
     E.setconstraint(skin);
     // We force an electric field in the y direction on region 'left'
-    // that is 0 on the exterior of 'left' and 1 in the center.
+    // that is 0 on the exterior of 'left' and one sine period inside.
     E.setconstraint(left, sin(y/0.1*pi)* array3x1(0,1,0));
 
     formulation maxwell;
