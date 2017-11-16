@@ -18,7 +18,7 @@ void sparselizard(void)
     mesh mymesh("waveguide2D.msh");
 
     // Edge shape functions 'hcurl' for the electric field E.
-    // Fields x, y and z are the x, y and z coordinate fields.
+    // Fields x and y are the x and y coordinate fields.
     field E("hcurl"), x("x"), y("y");
 
     // Use interpolation order 2 on the whole domain:
