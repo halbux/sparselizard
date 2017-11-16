@@ -19,7 +19,7 @@ void sparselizard(void)
     mesh mymesh("waveguide2D.msh");
 
     // Edge shape functions 'hcurl' for the electric field E.
-    // Fields x, y and z are the x, y and z coordinate fields.
+    // Fields x and y are the x and y coordinate fields.
     field E("hcurl"), x("x"), y("y");
 
     // Use interpolation order 2 on the whole domain:
@@ -33,8 +33,8 @@ void sparselizard(void)
     // tangential components of E to 0 on the waveguide skin.
     E.setconstraint(skin);
     // We force an electric field in the y direction on region 'left'
-    // that is 0 on the exterior of 'left' and 1 in the center.
-    // Th electric field varies in time at frequency freq.
+    // that is 0 on the exterior of 'left' and one sine period inside.
+    // The electric field varies in time at frequency freq.
     E.setconstraint(left, sin(y/0.1*pi)* sin(2*pi*freq*t()) *array3x1(0,1,0));
 
     formulation maxwell;
