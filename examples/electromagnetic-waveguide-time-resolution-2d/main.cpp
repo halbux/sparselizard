@@ -67,7 +67,7 @@ void sparselizard(void)
     // only one every n timesteps is added to the output vector.
     std::vector<vec> solvec = nm.runlinear(0, 0.05*1.0/freq, 20*1.0/freq, 2);
     
-    // Now save all data in the 'solvec' vector which contains the solution at every nth timestep.
+    // Now save all data in the 'solvec' vector (which contains the solution at every nth timestep).
     for (int ts = 0; ts < solvec.size(); ts++)
     {
         std::cout << ts << " ";
