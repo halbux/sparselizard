@@ -35,7 +35,7 @@ void sparselizard(void)
     // We force an electric field in the z direction on region 'left'
     // that is 0 on the exterior of 'left' and one in the center.
     // The electric field varies in time at frequency freq.
-	E.setconstraint(left, cos(y/0.2*pi)* cos(z/0.2*pi)* sin(2*pi*freq*t()) *array3x1(0,0,1));
+    E.setconstraint(left, cos(y/0.2*pi)* cos(z/0.2*pi)* sin(2*pi*freq*t()) *array3x1(0,0,1));
 
     formulation maxwell;
     
