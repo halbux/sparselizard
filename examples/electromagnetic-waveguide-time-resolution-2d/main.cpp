@@ -42,7 +42,7 @@ void sparselizard(void)
     // This is the weak formulation for electromagnetic waves in time:
     maxwell += integral(wholedomain, -curl(dof(E))*curl(tf(E)) - 1/(c*c)*dtdt(dof(E))*tf(E));
     
-    // Define the Maxwell object to time-solve formulation 'maxwell' 
+    // Define the Newmark object to time-solve formulation 'maxwell' 
     // with initial all zero solution vectors 'vec(maxwell)'.
     // The general system to solve with Newmark is M*dtdtx + C*dtx + K*x = b.
     //
