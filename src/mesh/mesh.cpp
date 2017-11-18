@@ -139,8 +139,7 @@ void mesh::load(std::string name, int verbosity)
         currentphysicalregion->definewithdisjointregions();
     }
     
-    // Not used for now: creates problems in e.g. normal or curl(E) computation due to sign flip...
-    // myelements.tostandardorientation();
+    myelements.tostandardorientation();
 	myelements.orient();
     
     if (verbosity > 0)

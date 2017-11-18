@@ -601,35 +601,25 @@ std::vector<int> element::getstandardorientationreordering(void)
 {    
     switch (getcurvedtypenumber())
     {
-        // For points this is trivial:
+        // Nothing changes for points:
         case 0:
             return {0};
-        // For lines this is trivial:
+        // Lines stay untouched to avoid e.g. flip problems for the normal in 2D:
         case 1:
-        {
-            if (curvednodelist[0] < curvednodelist[1])
-                return {0, 1};
-            else
-                return {1, 0};
-        }
-        // For triangles this is trivial:
+        	return {0, 1};
+        // For triangles and quadrangles make sure to circle around in the same 
+        // direction to avoid e.g. flip problems for the normal:
         case 2:
         {
-            // Get the indexes corresponding to the node numbers sorted ascendingly:
-            std::vector<int> reorderingvector;
-            myalgorithm::stablesort(curvednodelist, reorderingvector);
-            return reorderingvector;
+            // Get the index of the min node number in the straight element:
+            int minnodenumindex = std::distance(curvednodelist.begin(), std::min_element(curvednodelist.begin(), curvednodelist.end()));
+            return {minnodenumindex, (minnodenumindex+1)%3, (minnodenumindex+2)%3};
         }
-        // For quadrangles make sure the numbering circles around the element:
         case 3:
         {
             // Get the index of the min node number in the straight element:
             int minnodenumindex = std::distance(curvednodelist.begin(), std::min_element(curvednodelist.begin(), curvednodelist.end()));
-    
-            if (curvednodelist[(minnodenumindex+1)%4] < curvednodelist[(minnodenumindex+3)%4])
-                return {minnodenumindex, (minnodenumindex+1)%4, (minnodenumindex+2)%4, (minnodenumindex+3)%4};
-            else
-                return {minnodenumindex, (minnodenumindex+3)%4, (minnodenumindex+2)%4, (minnodenumindex+1)%4};
+            return {minnodenumindex, (minnodenumindex+1)%4, (minnodenumindex+2)%4, (minnodenumindex+3)%4};
         }
         // For tetrahedra this is trivial:
         case 4:
