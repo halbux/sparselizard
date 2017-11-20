@@ -295,10 +295,13 @@ void rawfield::getdata(int physreg, vectorfieldselect myvec)
         for (int h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
-                myharmonics[h][0]->getdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->myharmonics[h][0]) );
+                myharmonics[h][0]->getdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)) );
         }
         return;
     }
+    // Extract the actual field from non-multiharmonic fields:
+    if (selectedrawfield->multiharmonic == false)
+        selectedrawfield = selectedrawfield->harmonic(1);
     
     // Get the data for a single field.
     
