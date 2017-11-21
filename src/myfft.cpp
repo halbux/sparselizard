@@ -77,8 +77,9 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
         }
         else
         {
+        	// Sign flip required for the sines:
             for (int i = 0; i < mym*myn; i++)
-                currentvals[i] = transformed[currentfreq*mym*myn+i][1] * scalingfactor;
+                currentvals[i] = transformed[currentfreq*mym*myn+i][1] * (-scalingfactor);
         }
         output[harm] = {currentmat};
     }
