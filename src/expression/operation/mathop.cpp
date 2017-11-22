@@ -206,6 +206,12 @@ expression mathop::array3x3(expression term11, expression term12, expression ter
  
 vec mathop::solve(mat A, vec b)
 {
+    if (A.countrows() != b.size())
+    {
+        std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
+        abort();
+    }
+    
     if (A.getpointer() == NULL || b.getpointer() == NULL)
     {
         std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
@@ -218,8 +224,6 @@ vec mathop::solve(mat A, vec b)
     vec sol = b;
     Vec solpetsc = sol.getpetsc();
 
-////////// USE PETSC COMPILED WITHOUT DEBUG OPTION--> FASTER!!!!!!!!!!!!!!!!!! AND PETSC COMPILE WITH LOND INT TYPE FOR LARGE NNZ NUM!!!!!!!!
-    
     KSP* ksp = A.getpointer()->getksp();
     
     if (A.getpointer()->isludefined() == false)
