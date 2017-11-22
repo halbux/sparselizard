@@ -15,6 +15,8 @@ int mat::countcolumns(void) { errorifpointerisnull(); return rawmatptr->countcol
         
 int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->countnnz(); }
 
+void mat::removeconstraints(void) { errorifpointerisnull(); rawmatptr->removeconstraints(); };
+
 void mat::reuselu(void) { errorifpointerisnull(); rawmatptr->reuselu(); }
 
 Mat mat::getpetsc(void) { errorifpointerisnull(); return rawmatptr->getpetsc(); }   

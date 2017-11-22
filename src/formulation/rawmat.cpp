@@ -25,6 +25,52 @@ int rawmat::countcolumns(void)
         return mydofmanager->countdofs();
 }
 
+void rawmat::removeconstraints(void)
+{
+    if (mydofmanager->countconstraineddofs() == 0)
+        return;
+    
+    if (ludefined)
+    {
+        std::cout << "Error in 'rawmat' object: cannot remove the constraints when an LU decomposition is associated" << std::endl;
+        abort();
+    }
+    if (petscrows.getvalues() == NULL)
+    {
+        std::cout << "Error in 'rawmat' object: cannot remove the constraints for this matrix (make sure you got the matrix directly from the formulation and it is not a copy)" << std::endl;
+        abort();
+    }
+    
+    // Bring 'petscrows' from CSR to ijk format:
+    intdensematrix ijkpetscrows(petscvals.countrows()*petscvals.countcolumns(),1);
+    myalgorithm::csrtoijk(mydofmanager->countdofs(), petscrows.getvalues(), ijkpetscrows.getvalues());
+    petscrows = ijkpetscrows;
+    
+    // Remove the constrained dofs from the dof manager and get the dof renumbering:
+    int* dofrenumbering = new int[mydofmanager->countdofs()];
+    mydofmanager = mydofmanager->removeconstraints(dofrenumbering);
+
+    
+    // Rebuild the petsc matrix:
+    
+    accumulatedrowindices = {petscrows};
+    accumulatedcolindices = {petsccols};
+    accumulatedvals = {petscvals};
+    
+    int* myrows = petscrows.getvalues();
+    int* mycols = petsccols.getvalues();
+    
+    for (int i = 0; i < petscrows.countrows()*petscrows.countcolumns(); i++)
+    {
+        myrows[i] = dofrenumbering[myrows[i]];
+        mycols[i] = dofrenumbering[mycols[i]];
+    }
+    
+    delete[] dofrenumbering;
+    
+    process(false);
+}
+
 void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
     accumulatedrowindices.push_back(rowadresses);

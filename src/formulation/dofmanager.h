@@ -68,6 +68,11 @@ class dofmanager
         int countconstraineddofs(void);
         intdensematrix getconstrainedindexes(void);
         
+        // Return a new dofmanager object that does not include the Dirichlet constraints.
+        // 'dofrenumbering' must have a size equal to the number of dofs before the call.
+        // Removed dofs are renumbered as -1.
+        shared_ptr<dofmanager> removeconstraints(int* dofrenumbering);
+        
         std::vector<shared_ptr<rawfield>> getfields(void) { return myfields; };
         
         int countdofs(void) { return numberofdofs; };

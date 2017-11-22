@@ -42,6 +42,9 @@ class mat
         
         int countnnz(void);
         
+        // Remove the rows and columns associated to Dirichlet constraints:
+        void removeconstraints(void);
+        
         void reuselu(void);
         
         shared_ptr<rawmat> getpointer(void) { return rawmatptr; };

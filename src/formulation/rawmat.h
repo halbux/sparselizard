@@ -57,6 +57,9 @@ class rawmat
         
         int countnnz(void) { return nnz; };
         
+        // Remove the rows and columns associated to Dirichlet constraints:
+        void removeconstraints(void);
+        
         void reuselu(void) { lureuse = true; };
         bool islutobereused(void) { return lureuse; };
         bool isludefined(void) { return ludefined; };

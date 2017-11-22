@@ -41,6 +41,11 @@ namespace myalgorithm
     int* stablesortparallel(std::vector<int*> tosort, int numentries);
     
     std::vector<int> intersect(std::vector<int> a, std::vector<int> b);
+    
+    // Compressed sparse row to ijk format converter for sparse matrices.
+    // 'csrrows' is in CSR format. The ijk row format is output in 'ijkrows'.
+    // 'ijkrows' must be preallocated with a size equal to the nnz.
+    void csrtoijk(int numberofrows, int* csrrows, int* ijkrows);
 };
 
 #endif

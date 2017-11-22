@@ -167,7 +167,20 @@ std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
     return output;
 }
 
-
+void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
+{
+    // Loop on all rows:
+    int index = 0;
+    for (int i = 0; i < numberofrows; i++)
+    {
+        // Loop on all columns:
+        for (int j = csrrows[i]; j < csrrows[i+1]; j++)
+        {
+            ijkrows[index] = i;
+            index++;
+        }
+    }
+}
 
 
 
