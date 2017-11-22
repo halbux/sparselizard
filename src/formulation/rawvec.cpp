@@ -151,10 +151,11 @@ densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointre
 {
     mydofmanager->selectfield(selectedfield);
     
+    // Return an empty matrix if the entries are not in the vector:
     if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
     {
-    	std::cout << "Error in 'rawvec' object: cannot get the values (the vector is undefined on the requested region)" << std::endl;
-    	abort();
+    	densematrix vals;
+    	return vals;
     }
     
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
