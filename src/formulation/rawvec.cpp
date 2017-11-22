@@ -20,6 +20,49 @@ int rawvec::size(void)
         return mydofmanager->countdofs(); 
 }
 
+void rawvec::removeconstraints(void)
+{
+    int numdofs = mydofmanager->countdofs();
+    int numconstraineddofs = mydofmanager->countconstraineddofs();
+    if (numconstraineddofs == 0)
+        return;
+    
+    // Remove the constrained dofs from the dof manager and get the dof renumbering:
+    int* dofrenumbering = new int[numdofs];
+    mydofmanager = mydofmanager->removeconstraints(dofrenumbering);
+
+    // Rebuild the petsc vector:
+    intdensematrix oldadresses(mydofmanager->countdofs(),1);
+    intdensematrix newadresses(mydofmanager->countdofs(),1);
+    int* oldads = oldadresses.getvalues();
+    int* newads = newadresses.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < numdofs; i++)
+    {
+        if (dofrenumbering[i] >= 0)
+        {
+            oldads[index] = i;
+            newads[index] = dofrenumbering[i];
+            index++;
+        }
+    }
+    
+    densematrix vals = getvalues(oldadresses);
+    
+    // Destroy the vector since it will be replaced:
+    VecDestroy(&myvec);
+    Vec newvec; myvec = newvec;
+    
+    VecCreate(PETSC_COMM_SELF, &myvec);
+    VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
+    VecSetFromOptions(myvec);   
+    
+    setvalues(newadresses, vals, "set");
+    
+    delete[] dofrenumbering;
+}
+
 void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
 {    
     mydofmanager->selectfield(constrainedfield);

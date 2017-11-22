@@ -14,6 +14,8 @@ void vec::errorifpointerisnull(void)
 
 int vec::size(void) { errorifpointerisnull(); return rawvecptr->size(); }
 
+void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
+        
 void vec::updateconstraints(void)
 {
     errorifpointerisnull();

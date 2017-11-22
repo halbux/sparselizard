@@ -41,6 +41,13 @@ void rawmat::removeconstraints(void)
         abort();
     }
     
+    // Free the matrix since it will be replaced:
+    if (nnz >= 0) 
+    {
+        MatDestroy(&mymat);
+        Mat newmat; mymat = newmat;
+    }
+        
     // Bring 'petscrows' from CSR to ijk format:
     intdensematrix ijkpetscrows(petscvals.countrows()*petscvals.countcolumns(),1);
     myalgorithm::csrtoijk(mydofmanager->countdofs(), petscrows.getvalues(), ijkpetscrows.getvalues());

@@ -42,6 +42,9 @@ class vec
      
         int size(void);
         
+        // Remove the entries associated to Dirichlet constraints:
+        void removeconstraints(void);
+        
         void updateconstraints(void);
 //         void updateconstraints(field inputfield);
 //         void updateconstraints(int physreg);
