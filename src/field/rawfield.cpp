@@ -342,13 +342,13 @@ void rawfield::getdata(int physreg, vectorfieldselect myvec)
         {
             densematrix values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
             double* vals = values.getvalues();
-
-			// Transfer nothing if 'values' is empty:
-			if (vals != NULL)
-			{
-		        for (int elem = 0; elem < numelem; elem++)
-		            mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
-        	}
+            
+            // Transfer nothing if 'values' is empty:
+            if (vals != NULL)
+            {
+                for (int elem = 0; elem < numelem; elem++)
+                    mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
+            }
         }
     }
 }
