@@ -6,6 +6,7 @@
 #include "petsc.h"
 #include "wallclock.h"
 #include "mat.h"
+#include "resolution.h"
 
 
 using namespace mathop;
