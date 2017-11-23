@@ -40,7 +40,7 @@ void sparselizard(void)
     // This is the weak formulation for electromagnetic waves:
     maxwell += integral(wholedomain, -curl(dof(E))*curl(tf(E)) + k*k*dof(E)*tf(E));
     
-    // The operations below take about a minutes on my laptop... be patient!
+    // The operations below take about a minute on my laptop... be patient!
     maxwell.generate();
     vec solE = solve(maxwell.A(), maxwell.b());
     
