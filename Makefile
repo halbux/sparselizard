@@ -3,12 +3,12 @@
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-linux2-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -L ~/SLlibs/slepc/slepc/arch-linux2-c-opt/lib -l slepc
-INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux2-c-opt/include/ -I ~/SLlibs/fftw/install/include -I ~/SLlibs/slepc/slepc/include -I ~/SLlibs/slepc/slepc/arch-linux2-c-opt/include
+LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-linux2-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -L ~/SLlibs/slepc/arch-linux2-c-opt/lib -l slepc
+INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux2-c-opt/include/ -I ~/SLlibs/fftw/install/include -I ~/SLlibs/slepc/include -I ~/SLlibs/slepc/arch-linux2-c-opt/include
 endif
 ifeq ($(UNAME), Darwin)
-LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-darwin-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -L ~/SLlibs/slepc/slepc/arch-darwin-c-opt/lib -l slepc
-INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-darwin-c-opt/include/ -I ~/SLlibs/fftw/install/include -I ~/SLlibs/slepc/slepc/include -I ~/SLlibs/slepc/slepc/arch-darwin-c-opt/include
+LIBS = -L ~/SLlibs/openblas/install/lib -l openblas -L ~/SLlibs/petsc/arch-darwin-c-opt/lib -l petsc -L ~/SLlibs/fftw/install/lib -l fftw3 -L ~/SLlibs/slepc/arch-darwin-c-opt/lib -l slepc
+INCL = -I ~/SLlibs/openblas/install/include -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-darwin-c-opt/include/ -I ~/SLlibs/fftw/install/include -I ~/SLlibs/slepc/include -I ~/SLlibs/slepc/arch-darwin-c-opt/include
 endif
 
 

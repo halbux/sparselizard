@@ -91,15 +91,13 @@ echo '__________________________________________';
 
 echo '__________________________________________';
 echo 'FETCHING SLEPC';
-mkdir slepc;
-cd slepc;
 if [ "$(uname)" == "Linux" ]; then
 wget http://slepc.upv.es/download/distrib/slepc-3.8.1.tar.gz;
 elif [ "$(uname)" == "Darwin"  ]; then
 curl http://slepc.upv.es/download/distrib/slepc-3.8.1.tar.gz -o slepc.tar.gz;
 fi
-tar -xf *.tar.gz;
-rm *.tar.gz;
+tar -xf slepc*.tar.gz;
+rm slepc*.tar.gz;
 mv slepc* slepc;
 cd slepc;
 
