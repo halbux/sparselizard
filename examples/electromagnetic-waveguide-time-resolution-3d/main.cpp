@@ -80,11 +80,11 @@ void sparselizard(void)
 
 int main(void)
 {	
-    PetscInitialize(0,{},0,0);
+    SlepcInitialize(0,{},0,0);
 
     sparselizard();
 
-    PetscFinalize();
+    SlepcFinalize();
 
     return 0;
 }
