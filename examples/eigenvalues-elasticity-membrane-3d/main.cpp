@@ -50,7 +50,7 @@ void sparselizard(void)
     K.removeconstraints();
     M.removeconstraints();
     
-    // Create the object to solve the generalised eigenvalue problem A*x = lambda*B*x :
+    // Create the object to solve the generalised eigenvalue problem K*x = lambda*M*x :
     eigenvalue eig(K, M);
     
     // Compute the 10 eigenvalues closest to the target magnitude 0.0 (i.e. the 10 first ones):
