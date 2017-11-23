@@ -7,6 +7,7 @@
 #define RESOLUTION_H
 
 #include "newmark.h"
+#include "eigenvalue.h"
 
 class resolution
 {

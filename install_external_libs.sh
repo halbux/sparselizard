@@ -81,3 +81,47 @@ make $PETSC_DIR $PETSC_ARCH test;
 
 cd ..;
 
+echo '__________________________________________';
+echo '';
+read -p "PRESS ENTER IF PETSC WAS SUCCESSFULLY INSTALLED";
+echo '__________________________________________';
+
+
+########## COMPILING SLEPC :
+
+echo '__________________________________________';
+echo 'FETCHING SLEPC';
+mkdir slepc;
+cd slepc;
+if [ "$(uname)" == "Linux" ]; then
+wget http://slepc.upv.es/download/distrib/slepc-3.8.1.tar.gz;
+elif [ "$(uname)" == "Darwin"  ]; then
+curl http://slepc.upv.es/download/distrib/slepc-3.8.1.tar.gz -o slepc.tar.gz;
+fi
+tar -xf *.tar.gz;
+rm *.tar.gz;
+mv slepc* slepc;
+cd slepc;
+
+echo '__________________________________________';
+echo 'CONFIGURING SLEPC';
+
+export SLEPC_DIR=$(pwd);
+if [ "$(uname)" == "Linux" ]; then
+export PETSC_DIR=~/SLlibs/petsc;
+export PETSC_ARCH=arch-linux2-c-opt;
+elif [ "$(uname)" == "Darwin"  ]; then
+export PETSC_DIR=~/SLlibs/petsc;
+export PETSC_ARCH=arch-darwin-c-opt;
+fi
+
+./configure;
+echo '__________________________________________';
+echo 'COMPILING SLEPC';
+make SLEPC_DIR=$PWD;
+make test; 
+
+cd ..;
+
+
+
