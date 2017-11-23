@@ -46,7 +46,7 @@ void sparselizard(void)
     mat K = elasticity.K();
     mat M = elasticity.M();
 
-	// Remove the rows and columns corresponding to the 0 constraints:
+    // Remove the rows and columns corresponding to the 0 constraints:
     K.removeconstraints();
     M.removeconstraints();
     
