@@ -33,7 +33,7 @@ We hope you appreciate this library and wish you all the best with it!
 	- sudo apt-get install g++
 	if not already there.
 
-3. In the downloaded folder go to folder 'install_external/libs' and run all scripts in the numbered order.
+3. In the downloaded folder go to folder 'install_external_libs' and run all scripts in the numbered order.
 	This installs in your home directory all third party libraries that are required for sparselizard
 	(i.e. the widely-used petsc, slepc, openblas and fftw libraries). This may take some time and requires
 	a working internet connection.
