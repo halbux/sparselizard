@@ -31,7 +31,7 @@ void sparselizard(void)
   
     // E is Young's modulus. nu is Poisson's ratio. rho is the volumic mass.
     parameter E, nu, rho;
-    E|vol = 150e9; nu|vol = 0.3, rho|vol = 2330;
+    E|vol = 150e9; nu|vol = 0.3; rho|vol = 2330;
   
     formulation elasticity;
 
