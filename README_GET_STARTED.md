@@ -37,7 +37,7 @@ We hope you appreciate this library and wish you all the best with it!
 	This installs in your home directory all third party libraries that are required for sparselizard
 	(i.e. the widely-used petsc, slepc, openblas and fftw libraries). This may take some time and requires
 	a working internet connection.
-	If this step fails or if you wish to do it yourself follow the steps in the bash script,
+	If this step fails or if you wish to do it yourself follow the steps in the bash scripts,
 	it should be quite easy to follow. If you do so do not forget to change the library path accordingly
 	in the makefile and in 'run_sparselizard.sh'.
 
