@@ -56,8 +56,8 @@ void sparselizard(void)
     // Compute the 10 eigenvalues closest to the target magnitude 0.0 (i.e. the 10 first ones):
     eig.compute(10, 0.0);
     
-    // Print the eigenvalues, i.e. the square of the modes frequencies:
-    eig.print();
+    // Print the eigenfrequencies:
+    eig.printeigenfrequencies();
     
     // The eigenvectors are real thus we only need the real part:
     std::vector<vec> myeigenvectors = eig.geteigenvectorrealpart();
