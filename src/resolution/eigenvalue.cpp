@@ -115,12 +115,21 @@ std::vector<double> eigenvalue::geteigenvalueimaginarypart(void) { return eigenv
 std::vector<vec> eigenvalue::geteigenvectorrealpart(void) { return eigenvectorreal; }
 std::vector<vec> eigenvalue::geteigenvectorimaginarypart(void) { return eigenvectorimaginary; }
 
-void eigenvalue::print(void)
+void eigenvalue::printeigenvalues(void)
 {
     std::cout << std::endl << "Printing the " << count() << " eigenvalues in format real part imaginary part:" << std::endl << std::endl;
     
     for (int i = 0; i < count(); i++)
         std::cout << "#" << std::left << std::setw(7) << i << std::left << std::setw(18) << eigenvaluereal[i] << std::left << std::setw(18) << eigenvalueimaginary[i] << std::endl;
+    std::cout << std::endl;
+}
+
+void eigenvalue::printeigenfrequencies(void)
+{
+    std::cout << std::endl << "Printing the " << count() << " eigenfrequencies:" << std::endl << std::endl;
+    
+    for (int i = 0; i < count(); i++)
+        std::cout << "#" << std::left << std::setw(7) << i << std::left << std::setw(18) << std::sqrt(eigenvaluereal[i])/(2*3.14159265359) << " Hz" << std::endl;
     std::cout << std::endl;
 }
 

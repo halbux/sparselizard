@@ -51,7 +51,9 @@ class eigenvalue
         std::vector<vec> geteigenvectorimaginarypart();
         
         // Print the eigenvalues:
-        void print(void);
+        void printeigenvalues(void);
+        // In case the eigenvalues are real and correspond to the square of the angular frequency:
+        void printeigenfrequencies(void);
         
 };
 
