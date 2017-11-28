@@ -130,7 +130,8 @@ void sparselizard(void)
     // The inputs are the gradient of the test function of u defined on the mechanical domain,
     // the gradient of the previously computed electric potential field and the electric permittivity.
     //
-    // The electrostatic forces are computed on the mesh deformed by field umesh.
+    // The electrostatic forces must be computed on the mesh deformed by field umesh.
+    // The calculations are brought back to the undeformed configuration.
     elastoacoustic += integral(electricdomain, 20, predefinedelectrostaticforce(invjac*grad(tf(u,solid)), invjac*grad(v), epsilon) * detjac );
     
     // The wave equation is solved in the fluid:
