@@ -2,7 +2,7 @@
 l = 50e-6;
 // Electrode length is 10 microns:
 lelectrode = 10e-6;
-// Pillar length is  10 microns:
+// Pillar length is 10 microns:
 lp = 10e-6;
 // Insulator thickness is 600 nanometers:
 hinsulator = 6e-7;
