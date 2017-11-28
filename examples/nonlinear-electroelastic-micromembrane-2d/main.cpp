@@ -95,9 +95,9 @@ void sparselizard(void)
 
     formulation laplacian;
     laplacian += integral(vacuumgap, grad(dof(compx(umesh)))*grad(tf(compx(umesh))) + grad(dof(compy(umesh)))*grad(tf(compy(umesh))) );
-  
-  
-  	// NONLINEAR ITERATION TO GET THE STATIC DEFLECTION:
+    
+    
+    // NONLINEAR ITERATION TO GET THE STATIC DEFLECTION:
   	
     // Start with an all-zero solution vector for the elasticity formulation:
     vec solu(elasticity);
