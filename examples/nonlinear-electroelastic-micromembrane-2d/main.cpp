@@ -89,7 +89,7 @@ void sparselizard(void)
     elasticity += integral(electricdomain, umesh, predefinedelectrostaticforce(grad(tf(u,solid)), grad(v), epsilon));
     
     
-    // Solve the laplace equation in the vacuum gap to smoothly deform the mesh.
+    // Solve the Laplace equation in the vacuum gap to smoothly deform the mesh.
     // umesh is forced to field u on region solid:
     umesh.setconstraint(solid, u);
 
