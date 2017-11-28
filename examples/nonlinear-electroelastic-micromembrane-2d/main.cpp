@@ -75,7 +75,6 @@ void sparselizard(void)
     // Weak electrostatic formulation, computed on the mesh deformed by field umesh:
     electrostatics += integral(electricdomain, umesh, epsilon*grad(dof(v))*grad(tf(v)));
     
-    // Weak elasticity formulation.
     // The linear elasticity formulation is classical and thus predefined:
     elasticity += integral(solid, predefinedelasticity(u, E, nu));
     
