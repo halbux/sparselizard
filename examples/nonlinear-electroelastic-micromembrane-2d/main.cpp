@@ -110,8 +110,8 @@ void sparselizard(void)
         // Transfer the data from the solution vector to the v field:
         v.getdata(electricdomain, solv);
         // Write the electric field with an order 1 interpolation (default).
-        // The electric field is computed and saved on the geometry deformed by u.
-        (-grad(v)).write(electricdomain, u, "E.pos");
+        // The electric field is computed and saved on the geometry deformed by umesh.
+        (-grad(v)).write(electricdomain, umesh, "E.pos");
         
         // Use the now known electric potential v to compute the membrane deflection:
         elasticity.generate();
