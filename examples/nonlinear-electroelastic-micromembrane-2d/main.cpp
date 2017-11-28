@@ -53,7 +53,7 @@ void sparselizard(void)
     //
     // The membrane is polysilicon, the insulator is silicon dioxyde.
     
-    parameter E, nu, rho, epsilon;
+    parameter E, nu, epsilon;
     
     E|insulator =		70e9;
     E|pillars =			150e9;
