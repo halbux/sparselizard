@@ -68,8 +68,8 @@ void sparselizard(void)
     epsilon|pillars =	11.7*8.854e-12;
     epsilon|membrane =	11.7*8.854e-12;
     
-	
-	// An electrostatic formulation is used for the electric problem.
+    
+    // An electrostatic formulation is used for the electric problem.
 	// An elasticity-acoustic formulation is used for the 
 	formulation electrostatics, elasticity;
 	
