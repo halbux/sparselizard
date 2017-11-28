@@ -63,7 +63,7 @@ void sparselizard(void)
     nu|pillars =		0.3;
     nu|membrane =		0.3;
     
-	epsilon|vacuumgap =	8.854e-12;
+    epsilon|vacuumgap =	8.854e-12;
     epsilon|insulator =	3.9*8.854e-12;
     epsilon|pillars =	11.7*8.854e-12;
     epsilon|membrane =	11.7*8.854e-12;
