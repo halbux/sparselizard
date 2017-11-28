@@ -46,9 +46,9 @@ void sparselizard(void)
     setfundamentalfrequency(6e6);
     
     // Since this is a multiharmonic resolution on a mesh deformed by a multiharmonic 
-	// displacement field the calculations must be brought back on the undeformed 
-	// configuration with a variable change [x y z]deformed = [x y z]undeformed + umesh. 
-	//
+    // displacement field the calculations must be brought back on the undeformed 
+    // configuration with a variable change [x y z]deformed = [x y z]undeformed + umesh. 
+    //
     // This is the Jacobian matrix for the change of variable:
     //
     expression jac = array2x2(1+dx(compx(umesh)),dx(compy(umesh)),  dy(compx(umesh)),1+dy(compy(umesh)));
