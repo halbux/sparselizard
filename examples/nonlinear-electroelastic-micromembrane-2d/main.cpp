@@ -109,16 +109,16 @@ void sparselizard(void)
         vec solv = solve(electrostatics.A(), electrostatics.b());
         // Transfer the data from the solution vector to the v field:
         v.getdata(electricdomain, solv);
-   		// Write the electric field with an order 1 interpolation (default).
-   		// The electric field is computed and saved on the geometry deformed by u.
-		(-grad(v)).write(electricdomain, u, "E.pos");
-			
-		// Use the now known electric potential v to compute the membrane deflection:
+        // Write the electric field with an order 1 interpolation (default).
+        // The electric field is computed and saved on the geometry deformed by u.
+        (-grad(v)).write(electricdomain, u, "E.pos");
+        
+        // Use the now known electric potential v to compute the membrane deflection:
         elasticity.generate();
-
-		vec b = elasticity.b();
-		mat A = elasticity.A();
-		// Compute the norm of the relative residual:
+        
+        vec b = elasticity.b();
+        mat A = elasticity.A();
+        // Compute the norm of the relative residual:
         relresnorm = (b-A*solu).norm()/b.norm();
 
         solu = solve(A,b);
