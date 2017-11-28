@@ -35,8 +35,6 @@ void sparselizard(void)
     // - 2 for u on the pillars
     // - 1 elsewhere
     //
-    // - 2 for the pressure field
-    //
     // - 1 for the electric potential
     //
     // Default order is 1.
