@@ -41,11 +41,11 @@ void sparselizard(void)
     // u = u1 + u4*sin(2 * 2pi*f0*t) + u5*cos(2 * 2pi*f0*t) while in the pressure field the constant is removed.
     //
     field u("h1xy",{1,4,5}), umesh("h1xy",{1,4,5}), v("h1",{2,3}), p("h1",{4,5});
-
-	// Set the fundamental frequency f0 to 6 MHz:
-	setfundamentalfrequency(6e6);
-	
-	// Since this is a multiharmonic resolution on a mesh deformed by a multiharmonic 
+    
+    // Set the fundamental frequency f0 to 6 MHz:
+    setfundamentalfrequency(6e6);
+    
+    // Since this is a multiharmonic resolution on a mesh deformed by a multiharmonic 
 	// displacement field the calculations must be brought back on the undeformed 
 	// configuration with a variable change [x y z]deformed = [x y z]undeformed + umesh. 
 	//
