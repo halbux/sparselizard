@@ -84,6 +84,8 @@ void sparselizard(void)
     // The electrostatic forces often appear in MEMS simulations and are thus predefined.
     // The inputs are the gradient of the test function of u defined on the mechanical domain,
     // the gradient of the previously computed electric potential field and the electric permittivity.
+    //
+    // The electrostatic forces are computed on the mesh deformed by field umesh.
     elasticity += integral(electricdomain, umesh, predefinedelectrostaticforce(grad(tf(u,solid)), grad(v), epsilon));
     
     
