@@ -46,7 +46,7 @@ void sparselizard(void)
     u.setconstraint(clamp);
     v.setconstraint(ground);
     // Force the electric potential on the electrode to a close-to-pull-in voltage:
-  	v.setconstraint(electrode, 250);
+    v.setconstraint(electrode, 250);
   
     // E is Young's modulus. nu is Poisson's ratio. rho is the volumic mass.
     // epsilon is the electric permittivity. 
