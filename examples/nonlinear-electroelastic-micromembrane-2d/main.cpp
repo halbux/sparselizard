@@ -9,7 +9,6 @@
 #include "resolution.h"
 
 
-
 using namespace mathop;
 
 void sparselizard(void)
