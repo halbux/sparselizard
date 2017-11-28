@@ -69,7 +69,7 @@ void sparselizard(void)
     epsilon|membrane =	11.7*8.854e-12;
     
     // An electrostatic formulation is used for the electric problem.
-    // An elasticity-acoustic formulation is used for the mechanical problem.
+    // An elasticity formulation is used for the mechanical problem.
     formulation electrostatics, elasticity;
 	
     // Weak electrostatic formulation, computed on the mesh deformed by field umesh:
