@@ -136,7 +136,7 @@ void sparselizard(void)
     
     // The wave equation is solved in the fluid:
     elastoacoustic += integral(fluid, -grad(dof(p))*grad(tf(p)) -1/pow(c,2)*dtdt(dof(p))*tf(p));
-	// A Sommerfeld condition is used on the fluid boundary to have outgoing waves:
+    // A Sommerfeld condition is used on the fluid boundary to have outgoing waves:
     elastoacoustic += integral(fluidboundary, -1/c*dt(dof(p))*tf(p));
     
     // Elastoacoustic coupling terms.
