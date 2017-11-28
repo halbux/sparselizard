@@ -186,7 +186,7 @@ void sparselizard(void)
         
         // Smooth the mesh on the vacuum gap:
         laplacian.generate();
-        vec solumesh = solve(laplacian A(), laplacian.b());
+        vec solumesh = solve(laplacian.A(), laplacian.b());
         umesh.getdata(vacuumgap, solumesh);
 
         // Also save the u field on region solid to umesh.
