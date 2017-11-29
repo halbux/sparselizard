@@ -1,5 +1,5 @@
-// This code gives the eigenfrequencies and eigenmodes of a 3D disk that is 
-// clamped at its circular face.
+// This code gives the mechanical vibration eigenfrequencies and eigenmodes of a 
+// 3D disk that is clamped at its circular face.
 
 
 #include "mesh.h"
