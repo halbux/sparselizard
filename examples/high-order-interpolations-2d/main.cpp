@@ -62,8 +62,8 @@ void sparselizard(void)
     // Transfer the data from the solution vector to the v field:
     v.getdata(face, solv);
     
-    // Compute the relative L2 norm of the error, i.e. the square root of the integral 
-    // of the error squared divided by the expression squared.
+    // Compute the relative L2 norm of the error, i.e. the square root of 
+    // the integral of the error squared divided by the expression squared.
     // The integration is exact for up to order 20 polynomials.
     double relativel2normoferror = sqrt( pow( v - toproject , 2).integrate(face, 20) / pow( toproject , 2).integrate(face, 20) );
     
