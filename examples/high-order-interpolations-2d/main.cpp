@@ -44,8 +44,8 @@ void sparselizard(void)
     v.setorder(face, interpolationorder);
     
 
-	// A finite element approximation of this expression is computed:
-	expression toproject = sin(10*x)*sin(13*y);
+    // A finite element approximation of this expression is computed:
+    expression toproject = sin(10*x)*sin(13*y);
     
     // This formulation computes integral( v*v' ) = integral( toproject*v' ) : 
     formulation projection;
