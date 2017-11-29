@@ -1,3 +1,8 @@
+// This code simulates the electromagnetic wave propagation in a cross-shaped 3D
+// waveguide made of a perfect conductor. A time simulation is performed with
+// initial all-zero conditions.
+
+
 #include "mesh.h"
 #include "field.h"
 #include "expression.h"
