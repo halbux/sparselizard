@@ -1,3 +1,7 @@
+// This code simulates the steady-state electromagnetic waves in a cross-shaped 
+// 3D waveguide made of a perfect conductor.
+
+
 #include "mesh.h"
 #include "field.h"
 #include "expression.h"
