@@ -1,3 +1,17 @@
+// This code simulates the steady-state vibration of a 2D CMUT (capacitive micromachined
+// ultrasonic transducer). A CMUT is a micromembrane, actuated with an electrostatic 
+// force, that vibrates in a fluid (water here). Due to the small dimensions at play
+// the electric excitation frequency is in the megahertz range.
+// 
+// In this code the electric excitation is a sine wave so that the vibration is
+// periodic. Due to the electroelastic nonlinearity however the membrane vibration
+// and the pressure field includes new harmonics. These harmonics are computed 
+// with the multiharmonic resolution method in which all calculations are brought 
+// back to the undeformed configuration as detailed in the paper
+// "Steady-State, Nonlinear Analysis of Large Arrays of Electrically Actuated 
+// Micromembranes Vibrating in a Fluid" (A Halbach, C Geuzaine).
+
+
 #include "mesh.h"
 #include "field.h"
 #include "expression.h"
