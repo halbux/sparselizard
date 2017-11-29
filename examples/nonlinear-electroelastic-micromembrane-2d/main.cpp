@@ -1,3 +1,14 @@
+// This code simulates the static deflection of an electrically actuated 2D micromembrane.
+// The problem is nonlinear because of the electrostatic-elastic coupling.
+//
+// The electrostatic problem and the electrostatic forces are computed on a mesh 
+// deformed by the mechanical displacement. The mesh in the vacuum gap below the membrane 
+// is deformed smoothly by solving an additional Laplace problem.
+//
+// The interpolation order for the electric potential field and mechanical displacement
+// is adapted to every geometrical region.
+
+
 #include "mesh.h"
 #include "field.h"
 #include "expression.h"
