@@ -1,3 +1,7 @@
+// This code gives the eigenfrequencies and eigenmodes of a 3D disk that is 
+// clamped at its circular face.
+
+
 #include "mesh.h"
 #include "field.h"
 #include "expression.h"
