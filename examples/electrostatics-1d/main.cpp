@@ -46,7 +46,6 @@ void sparselizard(void)
     v.getdata(line, solv);
     // Write v:
     v.write(line, "v.pos");
-    
 }
 
 int main(void)
