@@ -207,7 +207,7 @@ void sparselizard(void)
     // Also write it at 50 timesteps for a time view.
     u.write(solid, "u.pos", 3, 50);
     // Do the same with p (remember to multiply it by the scaling factor to get the actual pressure):
-    abs(scaling*p).write(fluid, "p.pos", 3, 50);
+    (scaling*p).write(fluid, "p.pos", 3, 50);
 }
 
 int main(void)

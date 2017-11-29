@@ -73,8 +73,13 @@ Plane Surface(5) = {27};
 Line Loop(29) = {7, -20, -19, -21, 5, 6};
 Plane Surface(6) = {29};
 
-// Recombine the membrane triangles into quadrangles:
+// Recombine as much as possible the triangles into quadrangles:
+Recombine Surface(1);
+Recombine Surface(2);
+Recombine Surface(3);
+Recombine Surface(4);
 Recombine Surface(5);
+Recombine Surface(6);
 
 
 // The insulator:
