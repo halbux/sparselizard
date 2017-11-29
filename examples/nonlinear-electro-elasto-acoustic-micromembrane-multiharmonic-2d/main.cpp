@@ -77,7 +77,8 @@ void sparselizard(void)
     // Clamp and ground all harmonics (i.e. 0 valued-Dirichlet conditions for u and v):
     u.setconstraint(clamp);
     v.setconstraint(ground);
-    // Force the electric potential on the electrode to 250*sin(2pi*f0*t) :
+    // Force the electric potential on the electrode to 250*sin(2pi*f0*t).
+    // First set all v harmonics to 0 then set harmonic 2 to 250:
     v.setconstraint(electrode);
     v.harmonic(2).setconstraint(electrode, 250);
   
