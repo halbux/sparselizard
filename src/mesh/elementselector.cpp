@@ -144,7 +144,7 @@ std::vector<int> elementselector::getelementnumbers(void)
         int index = 0;
         for (int i = 0; i < countincurrentorientation(); i++)
         {
-            if (isdisjregrequested[disjointregions[i]])
+            if (isdisjregrequested[disjointregions[currentrangebegin+i]])
             {
                 elementnumbers[index] = elems[currentrangebegin+i];
                 index++;
@@ -175,7 +175,7 @@ std::vector<int> elementselector::getelementindexes(void)
         int index = 0;
         for (int i = 0; i < countincurrentorientation(); i++)
         {
-            if (isdisjregrequested[disjointregions[i]])
+            if (isdisjregrequested[disjointregions[currentrangebegin+i]])
             {
                 elementindexes[index] = i;
                 index++;
