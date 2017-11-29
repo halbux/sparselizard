@@ -30,9 +30,9 @@ void sparselizard(void)
     // Force 10 V on the left and 2 V on the right:
     v.setconstraint(left, 10);
     v.setconstraint(right, 2);
-  
-  	// epsilon is the electric permittivity:
-  	double epsilon = 8.854e-12;
+    
+    // epsilon is the electric permittivity:
+    double epsilon = 8.854e-12;
   
     formulation electrostatics;
 
