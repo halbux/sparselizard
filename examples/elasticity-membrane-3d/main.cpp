@@ -1,5 +1,5 @@
 // This code simulates the static mechanical deflection of a 3D disk when a volume
-// force is applied. The disk is clamped at its circular face.
+// force is applied. The disk is clamped at its outer face.
 
 
 #include "mesh.h"
