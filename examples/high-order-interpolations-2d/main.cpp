@@ -24,11 +24,11 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-
-	// CHANGE THE INTERPOLATION ORDER HERE TO SEE THE IMPACT ON THE ERROR
-	// Recommended order range is 1 to 6 here. Note that when 
-	// you reach machine precision the error stops decreasing.
-	int interpolationorder = 5;
+    
+    // CHANGE THE INTERPOLATION ORDER HERE TO SEE THE IMPACT ON THE ERROR
+    // Recommended order range is 1 to 6 here. Note that when 
+    // you reach machine precision the error stops decreasing.
+    int interpolationorder = 5;
 	
 
     // The domain region as defined in 'quad.geo':
