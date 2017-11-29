@@ -1,5 +1,5 @@
 // This code computes on a 1D line the electrostatic potential when 
-// the left side is forced at 10 V and the right side is at 2 V.
+// the left point is forced at 10 V and the right point is at 2 V.
 
 
 #include "mesh.h"
