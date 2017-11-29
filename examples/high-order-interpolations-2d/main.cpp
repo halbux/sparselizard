@@ -50,7 +50,7 @@ void sparselizard(void)
     // This formulation computes integral( v*v' ) = integral( toproject*v' ) : 
     formulation projection;
     
-    // A last int argument is added. The 20 mean the term below will be
+    // A last int argument is added. The 20 means the term below will be
     // assembled using an integration order +20 compared to the default
     // order (which is order of the dof + order of the tf + 2). 
     projection += integral(face, dof(v)*tf(v) - toproject*tf(v), +20 );
