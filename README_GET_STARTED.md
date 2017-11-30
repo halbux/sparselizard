@@ -4,7 +4,7 @@ Sparselizard (Copyright (C) 2017-2018 Alexandre Halbach and Christophe Geuzaine,
 is an open source C++ finite element library meant to be user friendly and decently fast & parallelised.
 It can handle a rather general set of problems in 1D, 2D and 3D such as mechanical, acoustic, thermal, electric and electromagnetic 
 problems. Multiphysics problems, nonlinear problems or nonlinear multiphysics problems can be simulated as well.
-The problems can be readily solved in time with a time-stepping resolution or with a user-friendly multiharmonic
+The problems can be readily solved in time with a time-stepping resolution or with the natively supported multiharmonic
 resolution method. In the latter case the steady-state solution of a time-periodic problem can be obtained 
 in a single step, for linear as well as for general nonlinear problems.
 The library comes with hierarchical high order shape functions so that high order interpolations can be 
