@@ -66,6 +66,8 @@ We hope you appreciate this library and wish you all the best with it!
         press enter. Now you have a finer solution! Since the solution is a mechanical displacement you might 
         want to see the deflection in 3D by double clicking in the middle of the window then selecting 
         'View vector display' >> 'Displacement' with factor 1.
+    - In case you see strange lighting effects double click in the middle of the window then select 'All view options' 
+        at the bottom of the box that appeared, go to the 'Color' tab and untick the 'Enable lighting' box.
 		
 		
 		
