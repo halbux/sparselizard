@@ -50,6 +50,10 @@ class vec
 //         void updateconstraints(int physreg);
 //         void updateconstraints(field inputfield, int physreg);
         
+        // Negative adresses are ignored. 'op' can be 'add' or 'set'. 
+		void setvalues(intdensematrix adresses, densematrix valsmat, std::string op = "set");
+		densematrix getvalues(intdensematrix adresses);
+        
         vectorfieldselect operator|(field selectedfield);
         
         shared_ptr<rawvec> getpointer(void) { return rawvecptr; };

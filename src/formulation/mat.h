@@ -19,9 +19,13 @@
 #include "petscmat.h"
 #include "vec.h"
 #include "rawvec.h"
+#include "formulation.h"
+#include "intdensematrix.h"
+#include "densematrix.h"
 
 class vec;
 class rawmat;
+class formulation;
 
 class mat
 {
@@ -36,6 +40,9 @@ class mat
                 	
         mat(void) {};
         mat(shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
+     
+    	// Create a matrix with structure based on a formulation and with initial values:
+        mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
      
         int countrows(void);
         int countcolumns(void);
