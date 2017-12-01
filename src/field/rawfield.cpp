@@ -200,6 +200,65 @@ void rawfield::setorder(int physreg, int interpolorder)
     }
 }
 
+void rawfield::setvalue(int physreg, expression input, int extraintegrationdegree)
+{
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z")
+    {
+        std::cout << "Error in 'rawfield' object: cannot set the value for the x, y or z coordinate" << std::endl;
+        abort();
+    }
+	if (input.countcolumns() != 1 || input.countrows() != countcomponents())
+    {
+        std::cout << "Error in 'rawfield' object: the rawfield value must be set with a " << countcomponents() << "x1 expression" << std::endl;
+        abort();
+    }
+    
+    // Set the values on the sub fields:
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setvalue(physreg, input.getarrayentry(i,0));
+    // Set the values on the harmonics:
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setvalue(physreg, input);
+    }
+    
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+    	field thisfield(getpointer());
+    
+    	// Compute the projection of the expression (skip for a zero expression):
+    	formulation projectedvalue;
+    	projectedvalue += integration(physreg, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
+    	
+    	// Define an all-zero vector:
+    	vec solvec(projectedvalue);
+		if (input.iszero() == false)
+		{
+			projectedvalue.generate();
+			solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
+		}
+    	
+    	thisfield.getdata(physreg, solvec);
+    }
+}
+
+void rawfield::setvalue(int physreg)
+{
+    switch (countcomponents())
+    {
+        case 1:
+            setvalue(physreg, 0);
+            break;
+        case 2:
+            setvalue(physreg, expression(2,1,{0,0}));
+            break;
+        case 3:
+            setvalue(physreg, expression(3,1,{0,0,0}));
+            break;
+    }
+}
+
 void rawfield::setconstraint(int physreg, expression input, int extraintegrationdegree)
 {
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
