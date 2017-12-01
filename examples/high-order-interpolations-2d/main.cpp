@@ -9,15 +9,7 @@
 // All standard shape functions in sparselizard follow this asymptotic decrease rate.
 
 
-#include "mesh.h"
-#include "field.h"
-#include "expression.h"
-#include "formulation.h"
-#include "vec.h"
-#include "petsc.h"
-#include "wallclock.h"
-#include "mat.h"
-#include "resolution.h"
+#include "sparselizardbase.h"
 
 
 using namespace mathop;

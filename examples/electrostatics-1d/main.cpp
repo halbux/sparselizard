@@ -2,15 +2,7 @@
 // the left point is forced at 10 V and the right point is at 2 V.
 
 
-#include "mesh.h"
-#include "field.h"
-#include "expression.h"
-#include "formulation.h"
-#include "vec.h"
-#include "petsc.h"
-#include "wallclock.h"
-#include "mat.h"
-#include "resolution.h"
+#include "sparselizardbase.h"
 
 
 using namespace mathop;
