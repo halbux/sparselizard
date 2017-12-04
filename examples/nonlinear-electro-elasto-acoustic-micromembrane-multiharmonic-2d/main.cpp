@@ -166,7 +166,7 @@ void sparselizard(void)
     laplacian += integral(vacuumgap, grad(dof(compx(umesh)))*grad(tf(compx(umesh))) + grad(dof(compy(umesh)))*grad(tf(compy(umesh))) );
     
     
-    // NONLINEAR ITERATION TO GET THE DEFLECTION IN TIME:
+    // NONLINEAR ITERATION TO GET THE DEFLECTION:
   	
     // Start with an all-zero solution vector for the elastoacoustic formulation:
     vec solup(elastoacoustic);
