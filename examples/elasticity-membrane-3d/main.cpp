@@ -44,7 +44,7 @@ void sparselizard(void)
     u.getdata(vol, solu);
     // Write the deflection on the top surface of the membrane.
     // Write with an order 3 interpolation. Exagerate the deflection by a factor 1e9.
-    (1e9*u).write(top, "u.pos", 3);
+    (0.5e9*u).write(top, "u.pos", 3);
     
 }
 
