@@ -91,6 +91,11 @@ void formulation::operator+=(integration integrationobject)
     }
 }
 
+int formulation::countdofs(void)
+{
+	return mydofmanager->countdofs(); 
+}
+
 void formulation::generate(int m, int contributionnumber)
 {
     if (contributionnumber < 0)

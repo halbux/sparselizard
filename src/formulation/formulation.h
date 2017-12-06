@@ -61,6 +61,8 @@ class formulation
 		// The following adds the contribution defined in the integration object.
 		void operator+=(integration integrationobject);
 		
+		int countdofs(void);
+		
         // Generate all blocks:
         void generate(void);
         // Generate all contributions of K, C, M or rhs:
