@@ -20,6 +20,18 @@ intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, int initva
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
+intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, const std::vector<int> valvec)
+{
+    numrows = numberofrows;
+    numcols = numberofcolumns;
+    int* myvaluesptr = new int[numcols*numrows];
+    
+    for (int i = 0; i < numcols*numrows; i++)
+        myvaluesptr[i] = valvec[i];
+    
+    myvalues = std::shared_ptr<int>(myvaluesptr);
+}
+
 intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, int init, int step)
 {
     numrows = numberofrows;

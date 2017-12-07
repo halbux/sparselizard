@@ -32,6 +32,8 @@ class intdensematrix
         intdensematrix(int numberofrows, int numberofcolumns);
         // Initialise to a value:
         intdensematrix(int numberofrows, int numberofcolumns, int initvalue);
+        // Initialise with a vector (row major):
+        intdensematrix(int numberofrows, int numberofcolumns, const std::vector<int> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
         intdensematrix(int numberofrows, int numberofcolumns, int init, int step);
         
