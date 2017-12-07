@@ -215,12 +215,12 @@ void rawfield::setvalue(int physreg, expression input, int extraintegrationdegre
     
     // Set the values on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setvalue(physreg, input.getarrayentry(i,0));
+        mysubfields[i][0]->setvalue(physreg, input.getarrayentry(i,0), extraintegrationdegree);
     // Set the values on the harmonics:
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setvalue(physreg, input);
+            myharmonics[i][0]->setvalue(physreg, input, extraintegrationdegree);
     }
     
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
@@ -274,12 +274,12 @@ void rawfield::setconstraint(int physreg, expression input, int extraintegration
         
     // Set the constraints on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setconstraint(physreg, input.getarrayentry(i,0));
+        mysubfields[i][0]->setconstraint(physreg, input.getarrayentry(i,0), extraintegrationdegree);
     // Set the constraints on the harmonics:
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setconstraint(physreg, input);
+            myharmonics[i][0]->setconstraint(physreg, input, extraintegrationdegree);
     }
     
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
