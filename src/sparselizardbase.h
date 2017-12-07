@@ -10,6 +10,7 @@
 #include "field.h"
 #include "expression.h"
 #include "formulation.h"
+#include "parameter.h"
 #include "vec.h"
 #include "petsc.h"
 #include "wallclock.h"
