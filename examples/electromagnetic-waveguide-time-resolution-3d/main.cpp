@@ -69,7 +69,7 @@ void sparselizard(void)
     {
         std::cout << ts << " ";
         // Transfer the data to the electric field:
-        E.getdata(wholedomain, solvec[ts]);
+        E.setdata(wholedomain, solvec[ts]);
         // Write with an order 2 interpolation and with the name of your choice:
         E.write(wholedomain, "E"+std::to_string(ts+100)+".pos",2); 
     }
