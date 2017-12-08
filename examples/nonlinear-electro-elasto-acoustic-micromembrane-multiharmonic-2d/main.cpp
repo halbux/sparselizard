@@ -177,7 +177,7 @@ void sparselizard(void)
         electrostatics.generate();
         vec solv = solve(electrostatics.A(), electrostatics.b());
         // Transfer the data from the solution vector to the v field:
-        v.getdata(electricdomain, solv);
+        v.setdata(electricdomain, solv);
         
         // Use the now known electric potential v to compute the membrane deflection:
         elastoacoustic.generate();
@@ -188,17 +188,17 @@ void sparselizard(void)
         relresnorm = (b-A*solup).norm()/b.norm();
 
         solup = solve(A,b);
-        u.getdata(solid, solup);
-        p.getdata(fluid, solup);
+        u.setdata(solid, solup);
+        p.setdata(fluid, solup);
         
         // Smooth the mesh on the vacuum gap:
         laplacian.generate();
         vec solumesh = solve(laplacian.A(), laplacian.b());
-        umesh.getdata(vacuumgap, solumesh);
+        umesh.setdata(vacuumgap, solumesh);
 
         // Also save the u field on region solid to umesh.
         // This is done by selecting field u with |u on the solu vector.
-        umesh.getdata(solid, solup|u);
+        umesh.setdata(solid, solup|u);
         
         // Print the iteration number and relative residual norm:
         std::cout << "Relative residual norm @iteration " << iter << " is " << relresnorm << std::endl;
