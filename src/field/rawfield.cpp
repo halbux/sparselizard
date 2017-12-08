@@ -239,7 +239,7 @@ void rawfield::setvalue(int physreg, expression input, int extraintegrationdegre
 			solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
 		}
     	
-    	thisfield.getdata(physreg, solvec);
+    	thisfield.setdata(physreg, solvec);
     }
 }
 
@@ -314,7 +314,7 @@ void rawfield::setconstraint(int physreg)
     }
 }
 
-void rawfield::getdata(int physreg, vectorfieldselect myvec)
+void rawfield::setdata(int physreg, vectorfieldselect myvec)
 {
     // Extract the info from the vector with selected field:
     shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
@@ -323,13 +323,13 @@ void rawfield::getdata(int physreg, vectorfieldselect myvec)
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
     {
-        std::cout << "Error in 'rawfield' object: .getdata can only transfer data between fields of same type" << std::endl;
+        std::cout << "Error in 'rawfield' object: .setdata can only transfer data between fields of same type" << std::endl;
         abort();
     }
     // The raw fields must have a same number of subfields:
     if (mysubfields.size() != selectedrawfield->mysubfields.size())
     {
-        std::cout << "Error in 'rawfield' object: .getdata can only transfer data from fields with same number of subfields" << std::endl;
+        std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same number of subfields" << std::endl;
         abort();
     }
     
@@ -337,14 +337,14 @@ void rawfield::getdata(int physreg, vectorfieldselect myvec)
     if (mysubfields.size() > 0)
     {
         for (int i = 0; i < mysubfields.size(); i++)
-            mysubfields[i][0]->getdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0] ));
+            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0] ));
         return;
     }
     
     // The raw fields must include the same harmonic numbers:
     if (getharmonics() != selectedrawfield->getharmonics())
     {
-        std::cout << "Error in 'rawfield' object: .getdata can only transfer data from fields with same harmonic numbers" << std::endl;
+        std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" << std::endl;
         abort();
     }
     
@@ -354,7 +354,7 @@ void rawfield::getdata(int physreg, vectorfieldselect myvec)
         for (int h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
-                myharmonics[h][0]->getdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)) );
+                myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)) );
         }
         return;
     }
