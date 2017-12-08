@@ -41,7 +41,7 @@ void sparselizard(void)
     maxwell.generate();
     vec solE = solve(maxwell.A(), maxwell.b());
     
-    E.getdata(wholedomain, solE);    
+    E.setdata(wholedomain, solE);    
     // Save the electric field E and magnetic field H with an order 2 interpolation:
     curl(E).write(wholedomain, "H.pos", 2);
     E.write(wholedomain, "E.pos", 2);
