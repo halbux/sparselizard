@@ -52,7 +52,7 @@ void sparselizard(void)
     vec solv = solve(projection.A(), projection.b());
 
     // Transfer the data from the solution vector to the v field:
-    v.getdata(face, solv);
+    v.setdata(face, solv);
     
     // Compute the relative L2 norm of the error, i.e. the square root of 
     // the integral of the error squared divided by the expression squared.
