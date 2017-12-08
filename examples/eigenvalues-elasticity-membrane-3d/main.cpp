@@ -62,7 +62,7 @@ void sparselizard(void)
     for (int i = 0; i < myeigenvectors.size(); i++)
     {
     	// Transfer the data from the ith eigenvector to field u:
-        u.getdata(top, myeigenvectors[i]);
+        u.setdata(top, myeigenvectors[i]);
         // Write the deflection on the top surface of the membrane with an order 3 interpolation:
         u.write(top, "u"+std::to_string(i)+".pos", 3);
     }
