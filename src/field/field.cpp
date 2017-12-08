@@ -46,11 +46,11 @@ void field::setvalue(int physreg) { rawfieldptr->setvalue(physreg); }
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, input, extraintegrationdegree); }
 void field::setconstraint(int physreg) { rawfieldptr->setconstraint(physreg); }
 
-void field::getdata(int physreg, vectorfieldselect myvec) { rawfieldptr->getdata(physreg, myvec); }
-void field::getdata(int physreg, vec myvec) 
+void field::setdata(int physreg, vectorfieldselect myvec) { rawfieldptr->setdata(physreg, myvec); }
+void field::setdata(int physreg, vec myvec) 
 {  
     field thisfield = *this;
-    getdata(physreg, myvec|thisfield); 
+    setdata(physreg, myvec|thisfield); 
 }
 
 field field::comp(int component) 
