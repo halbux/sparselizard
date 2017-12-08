@@ -58,9 +58,9 @@ class vec
         
         shared_ptr<rawvec> getpointer(void) { return rawvecptr; };
         
-//         Also write other .getdata functions. Only if dofmanager is defined.
-//         void getdata(int physreg, field myfield);
-//         void getdata(int physreg, vectorfieldselect myvec);
+//         Also write other .setdata functions. Only if dofmanager is defined.
+//         void setdata(int physreg, field myfield);
+//         void setdata(int physreg, vectorfieldselect myvec);
         
         Vec getpetsc(void);
         
