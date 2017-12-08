@@ -111,7 +111,7 @@ void sparselizard(void)
         electrostatics.generate();
         vec solv = solve(electrostatics.A(), electrostatics.b());
         // Transfer the data from the solution vector to the v field:
-        v.getdata(electricdomain, solv);
+        v.setdata(electricdomain, solv);
         // Write the electric field with an order 1 interpolation (default).
         // The electric field is computed and saved on the geometry deformed by umesh.
         (-grad(v)).write(electricdomain, umesh, "E.pos");
@@ -125,7 +125,7 @@ void sparselizard(void)
         relresnorm = (b-A*solu).norm()/b.norm();
 
         solu = solve(A,b);
-        u.getdata(solid, solu);
+        u.setdata(solid, solu);
         // Write the deflection u with an order 3 interpolation:
         u.write(solid, "u.pos", 3); 
         
@@ -133,10 +133,10 @@ void sparselizard(void)
         laplacian.generate();
         vec solumesh = solve(laplacian.A(), laplacian.b());
         // Save the smoothed mesh on the vacuum region:
-        umesh.getdata(vacuumgap, solumesh);
+        umesh.setdata(vacuumgap, solumesh);
         // Also save the u field on region solid to umesh.
         // This is done by selecting field u with |u on the solu vector.
-        umesh.getdata(solid, solu|u);
+        umesh.setdata(solid, solu|u);
         umesh.write(electricdomain, "umesh.pos", 3);
         
         // Print the iteration number and relative residual norm:
