@@ -28,6 +28,9 @@ int oneconstant::count(int order, int dim, int num)
     if (order <= 0)
         return 0;
     
+    element myelement(myelementtypenumber);
+    int elemdim = myelement.getelementdimension();
+    
 	int problemdimension = universe::mymesh->getmeshdimension();
     
     if (elemdim == problemdimension && dim == problemdimension)
