@@ -49,8 +49,8 @@ We hope you appreciate this library and wish you all the best with it!
 	run a very simple test:
 	
 - Get the GMSH binary for your operating system and copy it to the sparselizard folder.
-- Mesh the 'circle.geo' geometry by running './gmsh circle.geo -3' (3 because it is a 3D problem) or
-		with './gmsh circle.geo' to mesh graphically. This creates a 'circle.msh' file which contains the mesh.
+- Mesh the 'disk.geo' geometry by running './gmsh disk.geo -3' (3 because it is a 3D problem) or
+		with './gmsh disk.geo' to mesh graphically. This creates a 'disk.msh' file which contains the mesh.
 - Run './run_sparselizard.sh' in the terminal. This runs the code in 'main.cpp' that was compiled at the 
 		previous step. When you edit 'main.cpp' you have to run again step 4 (but it will be much faster this time). 
 - The previous step has created the 'u.pos' output file, which gives the exaggerated displacement of the top 
