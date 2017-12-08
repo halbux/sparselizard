@@ -59,7 +59,7 @@ class rawvec
         Vec getpetsc(void) { return myvec; };
 
 		// Tranfer data between the 'inputvec' vector and this vector:
-        void getdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield);
+        void setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield);
         
 };
 
