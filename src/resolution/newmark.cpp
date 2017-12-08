@@ -51,7 +51,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     std::vector<shared_ptr<rawfield>> allfields = dofmngr->getfields();
     // Set all fields in the formulation to the initial displacement:
     for (int i = 0; i < allfields.size(); i++)
-        allfields[i]->getdata(-1, u|field(allfields[i]));
+        allfields[i]->setdata(-1, u|field(allfields[i]));
     
     // Get all indexes at which the fields are constrained:
     intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
@@ -159,7 +159,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             
             // Update all fields in the formulation:
             for (int i = 0; i < allfields.size(); i++)
-                allfields[i]->getdata(-1, unext|field(allfields[i]));
+                allfields[i]->setdata(-1, unext|field(allfields[i]));
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
