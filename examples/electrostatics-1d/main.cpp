@@ -35,7 +35,7 @@ void sparselizard(void)
     vec solv = solve(electrostatics.A(), electrostatics.b());
 
     // Transfer the data from the solution vector to the v field:
-    v.getdata(line, solv);
+    v.setdata(line, solv);
     // Write v:
     v.write(line, "v.pos");
 }
