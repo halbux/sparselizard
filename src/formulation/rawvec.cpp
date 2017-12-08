@@ -97,7 +97,7 @@ void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vecto
                 if (fieldconstraints[disjregs[i]] == currentconstraint)
                 {
                     // Transfer the data from 'constraintvalvec' to 'myvec' on disjoint region disjregs[i]:
-                    getdata(constraintvalvec.getpointer(), disjregs[i], constrainedfield);
+                    setdata(constraintvalvec.getpointer(), disjregs[i], constrainedfield);
                     // Clear the fieldconstraints pointer since it was treated:
                     fieldconstraints[disjregs[i]] = NULL;
                 }
@@ -185,7 +185,7 @@ void rawvec::print(void)
     std::cout << std::endl;
 }
 
-void rawvec::getdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield)
+void rawvec::setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield)
 {
     mydofmanager->selectfield(inputfield);
     inputvec->mydofmanager->selectfield(inputfield);
