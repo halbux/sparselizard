@@ -5,7 +5,7 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-    // The domain regions as defined in 'circle.geo':
+    // The domain regions as defined in 'disk.geo':
     int vol = 1, sur = 2, top = 3;
     
     // The mesh can be curved!
