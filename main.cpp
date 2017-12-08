@@ -9,7 +9,7 @@ void sparselizard(void)
     int vol = 1, sur = 2, top = 3;
     
     // The mesh can be curved!
-    mesh mymesh("circle.msh");
+    mesh mymesh("disk.msh");
     
     // Nodal shape functions 'h1' with 3 components.
     // Field u is the membrane deflection.
