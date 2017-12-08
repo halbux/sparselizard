@@ -24,6 +24,29 @@ int orientation::gettotalorientation(int elementtypenumber, std::vector<int>& no
     return totalorientation;
 }
 
+int orientation::countorientations(int elemtypenum)
+{
+    switch (elemtypenum)
+    {
+        case 0:
+            return 1;
+        case 1:
+            return 2;
+        case 2:
+            return 6;
+        case 3:
+            return 8;
+        case 4:
+            return 1;
+        case 5:
+            return 1;
+        case 6:
+            return 1;
+        case 7:
+            return 1;
+    }
+}
+
 std::vector<int> orientation::getedgesorientationsfromtotalorientation(int totalorientation, int elementtypenumber)
 {
 	element myelement(elementtypenumber);

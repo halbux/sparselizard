@@ -94,6 +94,11 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
                 return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
         }
 	}
+	
+    if (formfunctiontypename.compare("one") == 0)
+	{
+		return std::shared_ptr<hierarchicalformfunction>(new oneconstant(elementtypenumber));
+	}
     
     
     // If we arrive here it means the form function type name was incorrect:
