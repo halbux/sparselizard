@@ -77,9 +77,9 @@ class field
         // Transfer data from a field in the solution vector to this field.
         // Only the data corresponding to the physical region is transferred.
         // Transfer data from field 'a' in 'vector|a' to the current field:
-        void getdata(int physreg, vectorfieldselect myvec);
+        void setdata(int physreg, vectorfieldselect myvec);
         // Transfer data from and to the current field:
-        void getdata(int physreg, vec myvec);
+        void setdata(int physreg, vec myvec);
         
         shared_ptr<rawfield> getpointer(void) { return rawfieldptr; };
         
