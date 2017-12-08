@@ -30,7 +30,7 @@ int oneconstant::count(int order, int dim, int num)
     
 	int problemdimension = universe::mymesh->getmeshdimension();
     
-    if (dim == problemdimension)
+    if (elemdim == problemdimension && dim == problemdimension)
     	return 1;
 	else
 		return 0;
