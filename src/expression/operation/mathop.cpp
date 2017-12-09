@@ -134,6 +134,12 @@ expression mathop::curl(expression input)
     }
 }
 
+expression mathop::detjac(void) 
+{ 
+	expression expr;
+	return expr.detjac(); 
+}
+
 integration mathop::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     return integration(physreg, tointegrate, integrationorderdelta, blocknumber);

@@ -63,6 +63,9 @@ namespace mathop
     expression grad(expression input);
     expression curl(expression input);
     
+    // Get the determinant of the physical to reference element variable change:
+    expression detjac(void);
+    
     integration integral(int physreg, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
     integration integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
     // For the multiharmonic resolution an extra integer is required 
