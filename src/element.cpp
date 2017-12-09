@@ -394,6 +394,9 @@ double element::measurereferenceelement(void)
 {
 	switch (gettypenumber())
 	{
+	    // Point:
+	    case 0:
+	        return 1.0;
 		// Line:
 		case 1:
 			return 2.0;
