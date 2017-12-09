@@ -73,6 +73,11 @@ int elementselector::getelementdimension(void)
     return universe::mymesh->getdisjointregions()->getelementdimension(mydisjointregionnumbers[0]);
 }
 
+int elementselector::getelementtypenumber(void)
+{
+    return universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
+}
+
 bool elementselector::next(void)
 {
     currentrangebegin = currentrangeend+1;

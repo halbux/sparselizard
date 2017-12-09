@@ -50,6 +50,7 @@ class elementselector
 		elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent = true);
         
         int getelementdimension(void);
+        int getelementtypenumber(void);
         std::vector<int> getdisjointregions(void) { return mydisjointregionnumbers; };
         int gettotalorientation(void) { return currenttotalorientation; };
         

@@ -756,6 +756,14 @@ expression expression::time(void)
     return exp;
 }
 
+expression expression::refelemmeasure(void)
+{
+    expression exp;
+    exp.myoperations = {std::shared_ptr<oprefelemmeasure>(new oprefelemmeasure)};
+    
+    return exp;
+}
+
 expression expression::invjac(int row, int col)
 {
     expression exp;

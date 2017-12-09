@@ -130,6 +130,10 @@ class expression
         // The time variable:
         expression time(void);
         
+        // Get the length of the reference line, surface of the reference 
+        // triangle/quadrangle and volume of the reference volume elements.
+        expression refelemmeasure(void);
+        
         expression invjac(int row, int col);
         expression jac(int row, int col);
         expression detjac(void);
