@@ -318,8 +318,8 @@ class element
         // Number of subelements of dimension dim:
         int count(int dim);
         
-        // Do not call it for points! Gives the length of the reference line, surface of 
-        // the reference triangle/quadrangle and volume of the reference volume elements.
+        // Gives the length of the reference line, surface of the reference 
+        // triangle/quadrangle and volume of the reference volume elements.
         double measurereferenceelement(void);
         
         // 'istriangularface(i)' returns true if the ith face of the element is triangular
