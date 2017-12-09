@@ -63,7 +63,7 @@ namespace mathop
     expression grad(expression input);
     expression curl(expression input);
     
-    // Get the determinant of the physical to reference element variable change:
+    // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);
     
     integration integral(int physreg, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
