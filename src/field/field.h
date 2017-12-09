@@ -64,6 +64,9 @@ class field
         // Use the default order + 'extraintegrationdegree' to 
         // compute the finite element discretisation of 'input'.
         void setvalue(int physreg, expression input, int extraintegrationdegree = 0);
+        // Set the value of a field("one") to the value of the expression 
+        // at the barycenter with 'option' set to "barycenter":
+        void setvalue(int physreg, expression input, std::string option);
         // Set a zero value:
         void setvalue(int physreg);
         

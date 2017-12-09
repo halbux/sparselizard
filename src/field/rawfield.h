@@ -107,6 +107,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
 
         void setorder(int physreg, int interpolorder);
         void setvalue(int physreg, expression input, int extraintegrationdegree = 0);
+        void setvalue(int physreg, expression input, std::string option);
         // Set a zero value:
         void setvalue(int physreg);
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);

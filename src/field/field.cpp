@@ -41,6 +41,7 @@ void field::setorder(int physreg, int interpolorder)
 }
 
 void field::setvalue(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, input, extraintegrationdegree); }
+void field::setvalue(int physreg, expression input, std::string option) { rawfieldptr->setvalue(physreg, input, option); };
 void field::setvalue(int physreg) { rawfieldptr->setvalue(physreg); }
 
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, input, extraintegrationdegree); }

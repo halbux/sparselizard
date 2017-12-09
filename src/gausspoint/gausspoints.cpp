@@ -7,10 +7,7 @@ gausspoints::gausspoints(int elementtypenumber, int integrationorder)
     myintegrationorder = integrationorder;
     
     if (integrationorder < 0)
-    {
-        std::cout << "Error in 'gausspoints' object: cannot get the Gauss points for negative integration order " << integrationorder << std::endl;
-        abort();
-    }
+		integrationorder = 0;
     
 	switch (elementtypenumber)
 	{
