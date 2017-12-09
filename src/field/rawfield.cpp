@@ -247,7 +247,7 @@ void rawfield::setvalue(int physreg, expression input, std::string option)
 {
 	if (option != "barycenter")
     {
-        std::cout << "Error in 'rawfield' object: setvalue option can only be 'barycenter'" << std::endl;
+        std::cout << "Error in 'rawfield' object: .setvalue option can only be 'barycenter'" << std::endl;
         abort();
     }
     // The field must be a "one" type:
