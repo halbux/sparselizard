@@ -390,6 +390,34 @@ int element::count(int dim)
     }
 }
 
+double element::measurereferenceelement(void)
+{
+	switch (gettypenumber())
+	{
+		// Line:
+		case 1:
+			return 2.0;
+		// Triangle:
+		case 2:
+			return 0.5;
+		// Quadrangle:
+		case 3:
+			return 4.0;
+		// Tetrahedron:
+		case 4:
+			return 1.0/6.0;
+		// Hexahedron:
+		case 5:
+			return 8.0;
+		// Prism:
+		case 6:
+			return 1.0;
+		// Pyramid:
+		case 7:
+			return 4.0/3.0;
+	}
+}
+
 bool element::istriangularface(int facenum)
 {
 	switch (gettypenumber())
