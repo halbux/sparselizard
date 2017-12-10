@@ -62,7 +62,7 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
         if (doffield != NULL)
             dofinterpolationorder = doffield->harmonic(dofharms[0])->getinterpolationorder(mydisjregs[0]);
         
-        // Compute the integration order, throw an error if negative.
+        // Compute the integration order, set it to zero if negative.
         // Adding an extra +2 generally gives a good integration in practice.
         int integrationorder = dofinterpolationorder + tfinterpolationorder + 2 + integrationorderdelta;
         if (integrationorder < 0)
