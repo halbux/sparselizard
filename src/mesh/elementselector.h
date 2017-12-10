@@ -46,7 +46,7 @@ class elementselector
         
 	public:
 	
-        // All disjoint region numbers must correspond to a same element dimension.
+        // All disjoint region numbers must correspond to a same element type.
 		elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent = true);
         
         int getelementdimension(void);
