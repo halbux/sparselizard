@@ -243,53 +243,6 @@ void rawfield::setvalue(int physreg, expression input, int extraintegrationdegre
     }
 }
 
-void rawfield::setvalue(int physreg, expression input, std::string option)
-{
-	if (option != "barycenter")
-    {
-        std::cout << "Error in 'rawfield' object: .setvalue option string can only be 'barycenter'" << std::endl;
-        abort();
-    }
-    // The field must be a "one" type:
-	if (mytypename != "one")
-    {
-        std::cout << "Error in 'rawfield' object: can only set a barycenter value for fields of type 'one'" << std::endl;
-        abort();
-    }
-	if (input.countcolumns() != 1 || input.countrows() != countcomponents())
-    {
-        std::cout << "Error in 'rawfield' object: the rawfield value must be set with a " << countcomponents() << "x1 expression" << std::endl;
-        abort();
-    }
-    
-    // Set the values on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setvalue(physreg, input.getarrayentry(i,0), option);
-    // Set the values on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
-    {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setvalue(physreg, input, option);
-    }
-    
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-    {
-    	field thisfield(getpointer());
-    
-    	// Compute the expression at the barycenter.
-    	// When there is a single Gauss point it is at the barycenter --> set integration 
-    	// order to 0. By adding a large enough negative integration order delta (-1e6) the
-    	// actual integration order will be negative and reset automatically to zero.
-    	expression expr;
-    	formulation formul;
-    	formul += integration(physreg, - mathop::transpose(mathop::tf(thisfield))*input / expr.refelemmeasure()/mathop::detjac(), -1e6);
-    	
-		formul.generate();
-    	
-    	thisfield.setdata(physreg, formul.rhs());
-    }
-}
-
 void rawfield::setvalue(int physreg)
 {
     switch (countcomponents())

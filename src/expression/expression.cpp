@@ -394,6 +394,32 @@ bool expression::iszero(void)
     return true;
 }
 
+vec expression::atbarycenter(int physreg, field onefield)
+{
+    // The field must be a "one" type:
+	if (onefield.getpointer()->gettypename() != "one")
+    {
+        std::cout << "Error in 'expression' object: .atbarycenter requires a 'one' type field" << std::endl;
+        abort();
+    }
+	if (countcolumns() != 1 || onefield.countcomponents() != countrows())
+    {
+        std::cout << "Error in 'expression' object: the size of the expression and of the argument field must match" << std::endl;
+        abort();
+    }
+    
+	// Compute the expression at the barycenter.
+	// When there is a single Gauss point it is at the barycenter --> set integration 
+	// order to 0. By adding a large enough negative integration order delta (-1e5) the
+	// actual integration order will be negative and reset automatically to zero.
+	formulation formul;
+	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / refelemmeasure()/mathop::detjac(), -1e5);
+	
+	formul.generate();
+	
+	return formul.rhs();
+}
+
 void expression::print(void)
 {
     std::cout << std::endl;

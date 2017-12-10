@@ -212,6 +212,8 @@ void parameter::print(void)
 
 
 
+vec parameter::atbarycenter(int physreg, field onefield) { return ((expression)*this).atbarycenter(physreg, onefield); }
+
 double parameter::integrate(int physreg, expression meshdeform, int integrationorder) { return ((expression)*this).integrate(physreg, meshdeform, integrationorder); }
 double parameter::integrate(int physreg, int integrationorder) { return ((expression)*this).integrate(physreg, integrationorder); }
 

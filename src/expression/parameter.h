@@ -17,7 +17,11 @@
 #include "parameterselectedregion.h"
 #include "disjointregionselector.h"
 #include "expression.h"
+#include "field.h"
+#include "vec.h"
 
+class field;
+class vec;
 class operation;
 class expression;
 class parameterselectedregion;
@@ -74,7 +78,9 @@ class parameter
 
         
         
-        
+                
+
+        vec atbarycenter(int physreg, field onefield);
         
         double integrate(int physreg, expression meshdeform, int integrationorder);
         double integrate(int physreg, int integrationorder);

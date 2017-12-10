@@ -93,6 +93,9 @@ class expression
         bool isvalueorientationdependent(std::vector<int> disjregs);
         bool iszero(void);
         
+        // Output a vector based on field 'onefield' that stores the barycenter values of the expression.
+        vec atbarycenter(int physreg, field onefield);
+        
         // Print the expression:
         void print(void);
         
