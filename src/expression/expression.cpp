@@ -404,7 +404,7 @@ vec expression::atbarycenter(int physreg, field onefield)
     }
 	if (countcolumns() != 1 || onefield.countcomponents() != countrows())
     {
-        std::cout << "Error in 'expression' object: the size of the expression and of the argument field must match" << std::endl;
+        std::cout << "Error in 'expression' object: in .atbarycenter the size of the expression and of the argument field must match" << std::endl;
         abort();
     }
     
@@ -418,6 +418,22 @@ vec expression::atbarycenter(int physreg, field onefield)
 	universe::skipgausspointweightproduct = true;
 	formul.generate();
 	universe::skipgausspointweightproduct = false;
+	
+	return formul.rhs();
+}
+
+vec expression::integrateonelements(int physreg, field onefield, int extraintegrationorder)
+{
+    // The expression must be scalar and the field must be a scalar "one" type:
+	if (onefield.getpointer()->gettypename() != "one" || onefield.countcomponents() != 1 || isscalar() == false)
+    {
+        std::cout << "Error in 'expression' object: .integrateonelements requires a scalar expression and a scalar 'one' type field" << std::endl;
+        abort();
+    }
+    
+	formulation formul;
+	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this), extraintegrationorder);
+	formul.generate();
 	
 	return formul.rhs();
 }
