@@ -43,7 +43,7 @@ int hcurlprism::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
-	element prism("prism");
+    element prism("prism");
     hierarchicalformfunctioncontainer val("hcurl", prism.gettypenumber(), evaluationpoints);
 
     // Get the node list in every edge and face:
@@ -273,12 +273,12 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double
                                 }
                                 if (j == 0)
                                 {
-									if (f2 == f2star)
-										formfunc = (mu[f1]-mu[f4]).derivative(comp)*ui;
-									else
-										formfunc = (mu[f1]-mu[f2]).derivative(comp)*ui;
+                                    if (f2 == f2star)
+                                        formfunc = (mu[f1]-mu[f4]).derivative(comp)*ui;
+                                    else
+                                        formfunc = (mu[f1]-mu[f2]).derivative(comp)*ui;
                                     val.set(order,2,face,orientation,ffindex,comp,formfunc);
-
+                                    
                                     ffindex = ffindex + 1;
                                 }
                             }
