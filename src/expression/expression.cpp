@@ -413,9 +413,11 @@ vec expression::atbarycenter(int physreg, field onefield)
 	// order to 0. By adding a large enough negative integration order delta (-1e5) the
 	// actual integration order will be negative and reset automatically to zero.
 	formulation formul;
-	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / refelemmeasure()/mathop::detjac(), -1e5);
+	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / detjac(), -1e5);
 	
+	universe::skipgausspointweightproduct = true;
 	formul.generate();
+	universe::skipgausspointweightproduct = false;
 	
 	return formul.rhs();
 }
@@ -778,14 +780,6 @@ expression expression::time(void)
 {
     expression exp;
     exp.myoperations = {std::shared_ptr<optime>(new optime)};
-    
-    return exp;
-}
-
-expression expression::refelemmeasure(void)
-{
-    expression exp;
-    exp.myoperations = {std::shared_ptr<oprefelemmeasure>(new oprefelemmeasure)};
     
     return exp;
 }

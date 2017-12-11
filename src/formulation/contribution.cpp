@@ -137,7 +137,8 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                 tfformfunctionvalue = tfval.tomatrix(myselector.gettotalorientation(), tfinterpolationorder, mytfs[term]->getkietaphiderivative(), mytfs[term]->getformfunctioncomponent());
                         
                 // Multiply by the weights:
-                tfformfunctionvalue.multiplycolumns(weights);
+                if (universe::skipgausspointweightproduct == false)
+                	tfformfunctionvalue.multiplycolumns(weights);
                 if (doffield != NULL)
                 {
                     dofformfunctionvalue = dofval.tomatrix(myselector.gettotalorientation(), dofinterpolationorder, mydofs[term]->getkietaphiderivative(), mydofs[term]->getformfunctioncomponent());

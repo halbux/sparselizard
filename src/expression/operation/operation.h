@@ -141,7 +141,6 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opparameter.h"
 #include "oppower.h"
 #include "opproduct.h"
-#include "oprefelemmeasure.h"
 #include "opsin.h"
 #include "opsum.h"
 #include "optf.h"

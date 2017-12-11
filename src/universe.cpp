@@ -133,6 +133,7 @@ void universe::setprecomputedfft(shared_ptr<operation> op, densematrix val)
     opcomputedfft.push_back(val.copy());
 }
         
+bool universe::skipgausspointweightproduct = false;
         
         
 

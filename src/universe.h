@@ -71,6 +71,9 @@ class universe
         // Sets a copy to avoid any modification of the data stored here:
         static void setprecomputed(shared_ptr<operation> op, std::vector<std::vector<densematrix>> val);
         static void setprecomputedfft(shared_ptr<operation> op, densematrix val);
+        
+        // If set to true the Gauss points weights product is not performed when assembling a formulation:
+        static bool skipgausspointweightproduct;
 
 };
 
