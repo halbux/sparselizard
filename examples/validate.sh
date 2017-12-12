@@ -16,6 +16,11 @@ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH
 fi
 
 
+# COMPILE SPARSELIZARD:
+
+make -j4;
+
+
 # LOOP ON ALL EXAMPLES:
 
 echo ''; 
