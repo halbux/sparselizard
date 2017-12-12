@@ -45,6 +45,9 @@ void sparselizard(void)
     // Save the electric field E and magnetic field H with an order 2 interpolation:
     curl(E).write(wholedomain, "H.pos", 2);
     E.write(wholedomain, "E.pos", 2);
+    
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)

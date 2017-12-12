@@ -46,6 +46,8 @@ void sparselizard(void)
     // Write with an order 3 interpolation. Exagerate the deflection by a factor 1e9.
     (0.5e9*u).write(top, "u.pos", 3);
     
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)

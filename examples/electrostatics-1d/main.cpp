@@ -38,6 +38,9 @@ void sparselizard(void)
     v.setdata(line, solv);
     // Write v:
     v.write(line, "v.pos");
+    
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)

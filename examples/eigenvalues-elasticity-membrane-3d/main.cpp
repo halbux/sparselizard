@@ -66,6 +66,9 @@ void sparselizard(void)
         // Write the deflection on the top surface of the membrane with an order 3 interpolation:
         u.write(top, "u"+std::to_string(i)+".pos", 3);
     }
+    
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)

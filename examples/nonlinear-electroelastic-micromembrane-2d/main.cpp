@@ -143,6 +143,9 @@ void sparselizard(void)
         std::cout << "Relative residual norm @iteration " << iter << " is " << relresnorm << std::endl;
         iter++;
     }
+    
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)

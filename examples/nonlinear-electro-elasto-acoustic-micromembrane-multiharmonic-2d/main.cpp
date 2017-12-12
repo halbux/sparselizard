@@ -214,6 +214,9 @@ void sparselizard(void)
     u.write(solid, "u.pos", 3, 50);
     // Do the same with p (remember to multiply it by the scaling factor to get the actual pressure):
     (scaling*p).write(fluid, "p.pos", 3, 50);
+    
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)

@@ -63,6 +63,9 @@ void sparselizard(void)
     
     // Write with an order 4 interpolation:
     v.write(face, "v.pos", 4);
+    
+    // Code validation line. Can be removed.
+    std::cout << 1;
 }
 
 int main(void)
