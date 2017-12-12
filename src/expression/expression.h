@@ -95,10 +95,9 @@ class expression
         
         // Output a vector based on field 'onefield' that stores the barycenter values of the expression.
         vec atbarycenter(int physreg, field onefield);
-        // Output a vector based on field 'onefield' that stores the value 
-        // of the expression integrated on every element in region 'physreg'.
-        // The default integration order (order of the tf + 2) can be increased.
-        vec integrateonelements(int physreg, field onefield, int extraintegrationorder = 0);
+        // Output a vector based on field 'onefield' that stores the value of the 
+        // expression integrated on every element separately in region 'physreg'.
+        vec integrateonelements(int physreg, field onefield, int integrationorder);
         
         // Print the expression:
         void print(void);

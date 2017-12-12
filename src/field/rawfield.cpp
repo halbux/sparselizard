@@ -172,9 +172,9 @@ void rawfield::print(void)
 
 void rawfield::setorder(int physreg, int interpolorder)
 {
-    if (mytypename == "x" || mytypename == "y" || mytypename == "z")
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
     {
-        std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y or z coordinate" << std::endl;
+        std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
         abort();
     }
         

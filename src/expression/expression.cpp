@@ -409,11 +409,10 @@ vec expression::atbarycenter(int physreg, field onefield)
     }
     
 	// Compute the expression at the barycenter.
-	// When there is a single Gauss point it is at the barycenter --> set integration 
-	// order to 0. By adding a large enough negative integration order delta (-1e5) the
-	// actual integration order will be negative and reset automatically to zero.
+	// When there is a single Gauss point it is at the barycenter --> set integration order to 0. 
+	// The default integration order is 1 (order of a 'one' field) + 2 :
 	formulation formul;
-	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / detjac(), -1e5);
+	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / detjac(), -3);
 	
 	universe::skipgausspointweightproduct = true;
 	formul.generate();
@@ -422,7 +421,7 @@ vec expression::atbarycenter(int physreg, field onefield)
 	return formul.rhs();
 }
 
-vec expression::integrateonelements(int physreg, field onefield, int extraintegrationorder)
+vec expression::integrateonelements(int physreg, field onefield, int integrationorder)
 {
     // The expression must be scalar and the field must be a scalar "one" type:
 	if (onefield.getpointer()->gettypename() != "one" || onefield.countcomponents() != 1 || isscalar() == false)
@@ -432,7 +431,8 @@ vec expression::integrateonelements(int physreg, field onefield, int extraintegr
     }
     
 	formulation formul;
-	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this), extraintegrationorder);
+	// The default integration order is 1 (order of a 'one' field) + 2 :
+	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this), -3+integrationorder);
 	formul.generate();
 	
 	return formul.rhs();

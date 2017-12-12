@@ -66,7 +66,10 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
         // Adding an extra +2 generally gives a good integration in practice.
         int integrationorder = dofinterpolationorder + tfinterpolationorder + 2 + integrationorderdelta;
         if (integrationorder < 0)
-        	integrationorder == 0;
+        {
+            std::cout << "Error in 'contribution' object: trying to integrate at negative order " << integrationorder << std::endl;
+            abort();
+        }
             
         // Get the Gauss points and their weight:
         gausspoints mygausspoints(elementtypenumber, integrationorder);
