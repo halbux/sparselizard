@@ -1,0 +1,5 @@
+If you like this library do not hesitate to cite the following reference:
+
+"Sparselizard - the user friendly finite element c++ library", Alexandre Halbach, University of Liege, Belgium
+
+available at "http://hdl.handle.net/2268/216780".
