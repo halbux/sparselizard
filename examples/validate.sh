@@ -18,6 +18,7 @@ fi
 
 # LOOP ON ALL EXAMPLES:
 
+echo ''; 
 for i in $(ls examples); 
 do 
 
@@ -28,11 +29,11 @@ fi
 
 # Copy the example to the main directory: 
 cp examples/$i/main.cpp ./;
-gmsh examples/$i/*.geo -3;
+gmshout=$(gmsh examples/$i/*.geo -3);
 mv examples/$i/*.msh ./;
 
 # Compile the current example
-make -j4;
+makeout=$(make -j4);
 
 # Run the current example:
 out=$(./sparselizard);
@@ -43,11 +44,9 @@ out="${out:$((${#out}-1)):1}"
 # If the last character is 1 the current example was run successfully:
 if [ $out == "1" ]
 then
-echo '______________________________________________________';
 echo 'SUCCESS AT' $i;
 sleep 2;
 else
-echo '______________________________________________________';
 echo 'FAILED AT' $i;
 echo '';
 exit 1;
