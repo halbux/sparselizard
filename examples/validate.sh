@@ -27,7 +27,7 @@ echo '';
 for i in $(ls examples); 
 do 
 
-# Skip this script as well as all too heavy examples
+# Skip this script as well as all too heavy examples:
 if [ $i == "validate.sh" ] || [ $i == "electromagnetic-waveguide-time-resolution-3d" ]
 then
 continue
