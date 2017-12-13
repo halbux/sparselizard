@@ -65,7 +65,7 @@ void sparselizard(void)
     v.write(face, "v.pos", 4);
     
     // Code validation line. Can be removed.
-    std::cout << 1;
+    std::cout << (relativel2normoferror < 1e-5);
 }
 
 int main(void)

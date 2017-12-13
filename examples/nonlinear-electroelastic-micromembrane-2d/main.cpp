@@ -49,7 +49,7 @@ void sparselizard(void)
     u.setconstraint(clamp);
     v.setconstraint(ground);
     // Force the electric potential on the electrode to a close-to-pull-in voltage:
-    v.setconstraint(electrode, 250);
+    v.setconstraint(electrode, 200);
   
     // E is Young's modulus. nu is Poisson's ratio.
     // epsilon is the electric permittivity. 
@@ -145,7 +145,7 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << 1;
+    std::cout << (compy(grad(v)).integrate(vacuumgap, u, 4) < 0.0022774 && compy(grad(v)).integrate(vacuumgap, u, 4) > 0.0022773);
 }
 
 int main(void)

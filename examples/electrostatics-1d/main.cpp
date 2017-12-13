@@ -40,7 +40,7 @@ void sparselizard(void)
     v.write(line, "v.pos");
     
     // Code validation line. Can be removed.
-    std::cout << 1;
+    std::cout << (solv.norm() < 21.5964 && solv.norm() > 21.5962);
 }
 
 int main(void)

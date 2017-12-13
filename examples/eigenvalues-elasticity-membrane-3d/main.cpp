@@ -68,7 +68,7 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << 1;
+    std::cout << (eig.geteigenvaluerealpart()[0] > 1.4564e+10 && eig.geteigenvaluerealpart()[0] < 1.4565e+10);
 }
 
 int main(void)

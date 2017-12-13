@@ -47,7 +47,7 @@ void sparselizard(void)
     E.write(wholedomain, "E.pos", 2);
     
     // Code validation line. Can be removed.
-    std::cout << 1;
+    std::cout << ((E*curl(E)).integrate(wholedomain, 5) < -7.1042e-08 && (E*curl(E)).integrate(wholedomain, 5) > -7.1043e-08);
 }
 
 int main(void)
