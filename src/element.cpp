@@ -43,13 +43,13 @@ element::element(int number, int curvatureorder)
 	if (number < 0)
 	{
 		std::cout << "Error in 'element' object: can not define a negative element type number" << std::endl;
-		std::cout << "Element type number is " << number << ", curvature order is " << curvatureorder << std::endl;
+		std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
 		abort();
 	}
 	if (curvatureorder <= 0)
 	{
 		std::cout << "Error in 'element' object: can not define a negative or 0 curvature order" << std::endl;
-		std::cout << "Element type number is " << number << ", curvature order is " << curvatureorder << std::endl;
+		std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
 		abort();
 	}
 	// The point element can only have number 0:
