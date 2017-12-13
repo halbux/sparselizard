@@ -35,7 +35,7 @@ fi
 
 # Copy the example to the main directory: 
 cp examples/$i/main.cpp ./;
-gmshout=$(gmsh examples/$i/*.geo -3);
+gmshout=$(gmsh examples/$i/*.geo -v 0 -3);
 mv examples/$i/*.msh ./;
 
 # Compile the current example
