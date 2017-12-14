@@ -226,7 +226,11 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
     if (keepfragments == true && eyematrixadded)
         mymat[KCM]->removelastfragment();
     
-    return mymat[KCM];
+    mat output(mymat[KCM]);
+    if (keepfragments == false)
+    	mymat[KCM] = NULL;
+    
+    return output;
 }
 
 
