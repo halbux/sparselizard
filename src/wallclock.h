@@ -29,8 +29,9 @@ class wallclock
 		// Returns time since previous tic or object creation in nanoseconds.
         // Takes into account any accumulated time via pause/resume.
 		double toc(void);
-		// Prints the time since previous tic or object creation in an adapted unit:
-		void print(void);
+		// Prints the time since previous tic or object creation in an adapted unit.
+		// Also prints the message in the argument string (if any).
+		void print(std::string toprint = "");
         
         // Pause the clock:
         void pause(void);

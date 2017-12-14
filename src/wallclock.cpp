@@ -20,8 +20,11 @@ double wallclock::toc(void)
         return accumulator;
 }
 
-void wallclock::print(void)
+void wallclock::print(std::string toprint)
 {
+	if (toprint.size() > 0)
+		std::cout << toprint << std::endl;
+
 	double elapsedtime = toc();
 	
 	// If in the nanoseconds range:
