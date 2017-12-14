@@ -227,9 +227,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
         mymat[KCM]->removelastfragment();
     
     mat output(mymat[KCM]);
-    if (keepfragments == false)
-    	mymat[KCM] = NULL;
-    
+    mymat[KCM] = mymat[KCM]->extractaccumulated();
     return output;
 }
 

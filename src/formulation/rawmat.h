@@ -74,6 +74,9 @@ class rawmat
         
 		void print(void);
 
+    	// Extract a new initialised rawmat that has all accumulated data. 
+    	shared_ptr<rawmat> extractaccumulated(void);
+    	
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         Mat getpetsc(void) { return mymat; };
         
