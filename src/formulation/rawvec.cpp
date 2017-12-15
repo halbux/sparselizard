@@ -32,10 +32,10 @@ void rawvec::removeconstraints(void)
     mydofmanager = mydofmanager->removeconstraints(dofrenumbering);
 
     // Rebuild the petsc vector:
-    intdensematrix oldadresses(mydofmanager->countdofs(),1);
-    intdensematrix newadresses(mydofmanager->countdofs(),1);
-    int* oldads = oldadresses.getvalues();
-    int* newads = newadresses.getvalues();
+    intdensematrix oldaddresses(mydofmanager->countdofs(),1);
+    intdensematrix newaddresses(mydofmanager->countdofs(),1);
+    int* oldads = oldaddresses.getvalues();
+    int* newads = newaddresses.getvalues();
     
     int index = 0;
     for (int i = 0; i < numdofs; i++)
@@ -48,7 +48,7 @@ void rawvec::removeconstraints(void)
         }
     }
     
-    densematrix vals = getvalues(oldadresses);
+    densematrix vals = getvalues(oldaddresses);
     
     // Destroy the vector since it will be replaced:
     VecDestroy(&myvec);
@@ -58,7 +58,7 @@ void rawvec::removeconstraints(void)
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
     VecSetFromOptions(myvec);   
     
-    setvalues(newadresses, vals, "set");
+    setvalues(newaddresses, vals, "set");
     
     delete[] dofrenumbering;
 }
@@ -106,15 +106,15 @@ void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vecto
     }
 }
 
-void rawvec::setvalues(intdensematrix adresses, densematrix valsmat, std::string op)
+void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op)
 {            
     double* myval = valsmat.getvalues();
-    int* myad = adresses.getvalues();
+    int* myad = addresses.getvalues();
 
-    int numentries = adresses.countrows()*adresses.countcolumns();
+    int numentries = addresses.countrows()*addresses.countcolumns();
 
-    // Remove the negative adresses:
-    int numpositiveentries = adresses.countpositive();
+    // Remove the negative addresses:
+    int numpositiveentries = addresses.countpositive();
 
     intdensematrix filteredad(numpositiveentries,1);
     densematrix filteredval(numpositiveentries,1);
@@ -138,13 +138,30 @@ void rawvec::setvalues(intdensematrix adresses, densematrix valsmat, std::string
         VecSetValues(myvec, numpositiveentries, filteredads, filteredvals, INSERT_VALUES);
 }
 
-densematrix rawvec::getvalues(intdensematrix adresses)
+void rawvec::setvalue(int address, double value, std::string op)
+{            
+    if (op == "add")
+        VecSetValue(myvec, address, value, ADD_VALUES);
+    if (op == "set")
+        VecSetValue(myvec, address, value, INSERT_VALUES);
+}
+
+densematrix rawvec::getvalues(intdensematrix addresses)
 {
-    int numentries = adresses.countrows()*adresses.countcolumns();
+    int numentries = addresses.countrows()*addresses.countcolumns();
     densematrix valmat(numentries,1);
-    VecGetValues(myvec, numentries, adresses.getvalues(), valmat.getvalues());
+    VecGetValues(myvec, numentries, addresses.getvalues(), valmat.getvalues());
     
     return valmat;
+}
+
+double rawvec::getvalue(int address)
+{
+	int ads[1] = {address};
+	double outval[1];
+	VecGetValues(myvec, 1, ads, outval);
+	
+	return outval[0];
 }
 
 densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
@@ -164,8 +181,8 @@ densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointre
     int numentries = rangeend-rangebegin+1;
     
     densematrix vals(numentries, 1);
-    intdensematrix adressestoget(numentries, 1, rangebegin, 1);
-    VecGetValues(myvec, numentries, adressestoget.getvalues(), vals.getvalues());
+    intdensematrix addressestoget(numentries, 1, rangebegin, 1);
+    VecGetValues(myvec, numentries, addressestoget.getvalues(), vals.getvalues());
     
     return vals;
 }
@@ -200,11 +217,11 @@ void rawvec::setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfie
         
         int numdofs = myrangeend-myrangebegin+1;
         
-        intdensematrix myadresses(numdofs, 1, myrangebegin, 1);
-        intdensematrix inputadresses(numdofs, 1, inputrangebegin, 1);
+        intdensematrix myaddresses(numdofs, 1, myrangebegin, 1);
+        intdensematrix inputaddresses(numdofs, 1, inputrangebegin, 1);
         
-        densematrix inputval = inputvec->getvalues(inputadresses);
-        setvalues(myadresses, inputval, "set");
+        densematrix inputval = inputvec->getvalues(inputaddresses);
+        setvalues(myaddresses, inputval, "set");
         
         ff++;
     }
@@ -217,10 +234,10 @@ void rawvec::setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfie
                 
         int numdofs = myrangeend-myrangebegin+1;
         
-        intdensematrix myadresses(numdofs, 1, myrangebegin, 1);
+        intdensematrix myaddresses(numdofs, 1, myrangebegin, 1);
         
         densematrix zerovals(numdofs,1, 0);
-        setvalues(myadresses, zerovals, "set");
+        setvalues(myaddresses, zerovals, "set");
         
         ff++;
     }

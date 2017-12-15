@@ -29,11 +29,21 @@ void vec::updateconstraints(void)
         rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
 }
 
-void vec::setvalues(intdensematrix adresses, densematrix valsmat, std::string op) 
+void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
 { 
-	errorifpointerisnull(); rawvecptr->setvalues(adresses, valsmat, op); 
+	errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
-densematrix vec::getvalues(intdensematrix adresses) { errorifpointerisnull(); return rawvecptr->getvalues(adresses); }
+densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
+
+void vec::setvalue(int address, double value, std::string op)
+{
+	errorifpointerisnull(); rawvecptr->setvalue(address, value, op); 
+}
+
+double vec::getvalue(int address)
+{
+	errorifpointerisnull(); return rawvecptr->getvalue(address); 
+}
 
 vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); return vectorfieldselect(rawvecptr, selectedfield.getpointer()); }
 

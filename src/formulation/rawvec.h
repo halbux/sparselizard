@@ -47,10 +47,14 @@ class rawvec
         // values of a rawfield on given disjoint regions. 
         void updateconstraints(shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
      
-        // Negative adresses are ignored. 'op' can be 'add' or 'set'. 
-		void setvalues(intdensematrix adresses, densematrix valsmat, std::string op = "set");
+        // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
+		void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+		// Set value at a single index:
+		void setvalue(int address, double value, std::string op = "set");
 
-		densematrix getvalues(intdensematrix adresses);
+		densematrix getvalues(intdensematrix addresses);
+		// Get value at a single index:
+		double getvalue(int address);
 		densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
         
 		void print(void);
