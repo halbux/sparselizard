@@ -75,7 +75,7 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << (solvec[solvec.size()-1].norm() < 0.33712 && solvec[solvec.size()-1].norm() > 0.33710);
+    std::cout << (solvec[solvec.size()-1].norm() < 0.60872 && solvec[solvec.size()-1].norm() > 0.60870);
 }
 
 int main(void)
