@@ -24,7 +24,7 @@ void sparselizard(void)
     
     // The cutoff frequency for a 0.2 m width is freq = 0.75 GHz in theory. 
     // With this code and a fine enough mesh you will get the same value.
-    double freq = 0.7e9, c = 3e8, pi = 3.14159;
+    double freq = 0.9e9, c = 3e8, pi = 3.14159;
     
     // The waveguide is a perfect conductor. We thus force all
     // tangential components of E to 0 on the waveguide skin.
