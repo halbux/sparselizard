@@ -44,6 +44,33 @@ double mathop::gettime(void) { return universe::currenttimestep; }
 
 expression mathop::t(void) { expression exp; return exp.time(); }
 
+field mathop::measureelements(int physreg)
+{
+	int problemdimension = universe::mymesh->getmeshdimension();
+	int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
+
+	if (problemdimension != elementdimension)
+	{
+		std::cout << "Error in 'mathop' namespace: trying to measure a " << elementdimension << "D element in a " << problemdimension << "D problem (dimensions must be equal)" << std::endl;
+		abort();
+	}
+
+	// Create a 'one' type field that stores the element volume/area/length:
+	field one("one");
+	
+	// Create a formulation to integrate a constant one and get the measure:
+	formulation formul;
+	formul += integration(physreg, -tf(one));
+	formul.generate();
+	
+	vec rhs = formul.rhs();
+	
+	// Save to the one field:
+	one.setdata(physreg, rhs);
+	
+	return one;
+}
+
 expression mathop::dx(expression input) { return input.spacederivative(1); }
 expression mathop::dy(expression input) { return input.spacederivative(2); }
 expression mathop::dz(expression input) { return input.spacederivative(3); }
