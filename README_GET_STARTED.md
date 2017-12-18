@@ -1,3 +1,3 @@
 Welcome, new sparselizard user!
 
-Please get all required information at www.sparselizard.org 
+You will find all information you need at www.sparselizard.org .
