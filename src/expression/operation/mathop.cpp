@@ -51,7 +51,7 @@ field mathop::elementsize(int physreg)
 
 	if (problemdimension != elementdimension)
 	{
-		std::cout << "Error in 'mathop' namespace: trying to measure a " << elementdimension << "D element in a " << problemdimension << "D problem (dimensions must be equal)" << std::endl;
+		std::cout << "Error in 'mathop' namespace: trying to get the size of a " << elementdimension << "D element in a " << problemdimension << "D problem (dimensions must be equal)" << std::endl;
 		abort();
 	}
 
