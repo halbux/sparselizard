@@ -58,7 +58,7 @@ field mathop::elementsize(int physreg)
 	// Create a 'one' type field that stores the element volume/area/length:
 	field one("one");
 	
-	// Create a formulation to integrate a constant one and get the measure:
+	// Create a formulation to integrate a constant one and get the size:
 	formulation formul;
 	formul += integration(physreg, -tf(one));
 	formul.generate();
