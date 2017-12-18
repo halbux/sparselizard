@@ -44,7 +44,7 @@ double mathop::gettime(void) { return universe::currenttimestep; }
 
 expression mathop::t(void) { expression exp; return exp.time(); }
 
-field mathop::measureelements(int physreg)
+field mathop::elementsize(int physreg)
 {
 	int problemdimension = universe::mymesh->getmeshdimension();
 	int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();

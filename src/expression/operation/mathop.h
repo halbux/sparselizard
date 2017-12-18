@@ -39,7 +39,7 @@ namespace mathop
     // Get the measure of every element in the region, i.e. the 
     // volume, surface and line in respectively a 3D, 2D and 1D problem.
     // The output field is of 'one' type.
-    field measureelements(int physreg);
+    field elementsize(int physreg);
     
     expression dx(expression input);
     expression dy(expression input);
