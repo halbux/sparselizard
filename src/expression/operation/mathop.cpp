@@ -227,7 +227,7 @@ vec mathop::solve(mat A, vec b)
     Vec bpetsc = b.getpetsc();
     Mat Apetsc = A.getpetsc();
 
-    vec sol = b;
+    vec sol(shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
