@@ -25,9 +25,8 @@ void sparselizard(void)
     // Specific weight of air under some circumstances:
     double gamma = 1.4;
     
-    // Define the air density 'rho':
+    // Define the air density 'rho' and the Mac number:
     expression rho = pow(1 + (gamma-1)/2.0 * 0.7 * 0.7 * (1-grad(phi)*grad(phi)), 1.0/(gamma-1));
-    
     expression macnumber = sqrt(grad(phi)*grad(phi)) / sqrt(1.0/(0.7*0.7) + 0.5*(gamma-1) * (1-grad(phi)*grad(phi)));
     
     // We suppose outside the air domain a uniform speed of 1 with direction left to right.
