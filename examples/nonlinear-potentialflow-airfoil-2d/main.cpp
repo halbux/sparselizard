@@ -25,9 +25,9 @@ void sparselizard(void)
     // Specific weight of air under some circumstances:
     double gamma = 1.4;
     
-    // Define the air density 'rho' and the Mac number:
+    // Define the air density 'rho' and the Mach number:
     expression rho = pow(1 + (gamma-1)/2.0 * 0.7 * 0.7 * (1-grad(phi)*grad(phi)), 1.0/(gamma-1));
-    expression macnumber = sqrt(grad(phi)*grad(phi)) / sqrt(1.0/(0.7*0.7) + 0.5*(gamma-1) * (1-grad(phi)*grad(phi)));
+    expression machnumber = sqrt(grad(phi)*grad(phi)) / sqrt(1.0/(0.7*0.7) + 0.5*(gamma-1) * (1-grad(phi)*grad(phi)));
     
     // We suppose outside the air domain a uniform speed of 1 with direction left to right.
     // Since grad(phi) is the speed we have that grad(x) indeed gives us what we want.
@@ -65,12 +65,12 @@ void sparselizard(void)
         std::cout << "Current iteration has relative residual: " << relres << std::endl;
     }
     
-    // Write the fluid speed (i.e. grad(phi)) and the Mac number:
+    // Write the fluid speed (i.e. grad(phi)) and the Mach number:
     grad(phi).write(air, "flowspeed.pos");
-    macnumber.write(air, "macnumber.pos");
+    machnumber.write(air, "machnumber.pos");
     
     // Code validation line. Can be removed.
-    std::cout << (macnumber.integrate(air, 3) < 62.4149 && macnumber.integrate(air, 3) > 62.4145);
+    std::cout << (machnumber.integrate(air, 3) < 62.4149 && machnumber.integrate(air, 3) > 62.4145);
 }
 
 int main(void)
