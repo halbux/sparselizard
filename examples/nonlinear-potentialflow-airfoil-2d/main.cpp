@@ -39,15 +39,15 @@ void sparselizard(void)
     
     // On the airfoil boundary the default Neumann condition dphi/dnormal = 0 
     // automatically ensures that there is no fluid entering the airfoil.
-	// We thus do not need anything else than this:
-	pf += integral(air, rho * grad(dof(phi)) * grad(tf(phi)) );
-	
-	// Start the nonlinear iteration with an all zero guess:
-	vec sol(pf);
-	
-	double relres = 1;
-	while (relres > 1e-7)
-	{
+    // We thus do not need anything else than this:
+    pf += integral(air, rho * grad(dof(phi)) * grad(tf(phi)) );
+    
+    // Start the nonlinear iteration with an all zero guess:
+    vec sol(pf);
+    
+    double relres = 1;
+    while (relres > 1e-7)
+    {
 		// Generate the formulation:
 		pf.generate();
 		// Get A and b to solve Ax = b:
