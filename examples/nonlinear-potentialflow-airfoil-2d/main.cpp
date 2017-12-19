@@ -70,8 +70,8 @@ void sparselizard(void)
 	grad(phi).write(air, "flowspeed.pos");
 	macnumber.write(air, "macnumber.pos");
 	
-    // Code validation line. Can be removed.
-    std::cout << (macnumber.integrate(air, 3) < 62.4149 && macnumber.integrate(air, 3) > 62.4145);
+	// Code validation line. Can be removed.
+	std::cout << (macnumber.integrate(air, 3) < 62.4149 && macnumber.integrate(air, 3) > 62.4145);
 }
 
 int main(void)
