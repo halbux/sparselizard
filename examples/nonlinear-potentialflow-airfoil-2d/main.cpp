@@ -48,30 +48,30 @@ void sparselizard(void)
     double relres = 1;
     while (relres > 1e-7)
     {
-		// Generate the formulation:
-		pf.generate();
-		// Get A and b to solve Ax = b:
-		mat A = pf.A();
-		vec b = pf.b();
-		
-		// Compute a relative residual:
-		relres = (b - A*sol).norm() / b.norm();
-		
-		// Solve Ax = b:
-		sol = solve(A, b);
-		
-		// Transfer the data from the solution vector to field 'phi' on the whole 'air' region:
-		phi.setdata(air, sol);
-	
-		std::cout << "Current iteration has relative residual: " << relres << std::endl;
-	}
-	
-	// Write the fluid speed (i.e. grad(phi)) and the Mac number:
-	grad(phi).write(air, "flowspeed.pos");
-	macnumber.write(air, "macnumber.pos");
-	
-	// Code validation line. Can be removed.
-	std::cout << (macnumber.integrate(air, 3) < 62.4149 && macnumber.integrate(air, 3) > 62.4145);
+        // Generate the formulation:
+        pf.generate();
+        // Get A and b to solve Ax = b:
+        mat A = pf.A();
+        vec b = pf.b();
+        
+        // Compute a relative residual:
+        relres = (b - A*sol).norm() / b.norm();
+        
+        // Solve Ax = b:
+        sol = solve(A, b);
+        
+        // Transfer the data from the solution vector to field 'phi' on the whole 'air' region:
+        phi.setdata(air, sol);
+        
+        std::cout << "Current iteration has relative residual: " << relres << std::endl;
+    }
+    
+    // Write the fluid speed (i.e. grad(phi)) and the Mac number:
+    grad(phi).write(air, "flowspeed.pos");
+    macnumber.write(air, "macnumber.pos");
+    
+    // Code validation line. Can be removed.
+    std::cout << (macnumber.integrate(air, 3) < 62.4149 && macnumber.integrate(air, 3) > 62.4145);
 }
 
 int main(void)
