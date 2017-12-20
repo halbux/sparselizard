@@ -77,7 +77,7 @@ class universe
 
         // If set to true the individual right handside contribution addresses and values are stored in 'rhsterms' when generating a formulation:
         static bool keeptrackofrhsassembly;
-        // Every row in a given (int)densematrix corresponds to a given mesh element and every column to a shape function.
+        // Every row in a given (int)densematrix corresponds to a shape function and every column to a given mesh element.
         // Do not forget to clear 'rhsterms' when you don't want to keep track anymore!
         static std::vector<std::pair<intdensematrix, densematrix>> rhsterms;
 
