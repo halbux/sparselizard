@@ -80,6 +80,13 @@ void mesh::printcount(void)
 	{
 		if (myelements.count(elementtypenumber) == 0)
 			continue;
+			
+		// Sparselizard does not support pyramids for the moment:
+		if (elementtypenumber == 7)
+		{
+			std::cout << "Error in 'mesh' object: sparselizard does not support pyramid elements for the moment" << std::endl;
+			abort();
+		}
         
 		element elementobject(elementtypenumber);
 		std::string elementname = elementobject.gettypenameconjugation(myelements.count(elementtypenumber));
