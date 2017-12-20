@@ -75,6 +75,12 @@ class universe
         // If set to true the Gauss points weights product is not performed when assembling a formulation:
         static bool skipgausspointweightproduct;
 
+        // If set to true the individual right handside contribution addresses and values are stored in 'rhsterms' when generating a formulation:
+        static bool keeptrackofrhsassembly;
+        // Every row in a given (int)densematrix corresponds to a given mesh element and every column to a shape function.
+        // Do not forget to clear 'rhsterms' when you don't want to keep track anymore!
+        static std::vector<std::pair<intdensematrix, densematrix>> rhsterms;
+
 };
 
 #endif

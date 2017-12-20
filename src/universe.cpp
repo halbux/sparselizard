@@ -134,6 +134,9 @@ void universe::setprecomputedfft(shared_ptr<operation> op, densematrix val)
 }
         
 bool universe::skipgausspointweightproduct = false;
+
+bool universe::keeptrackofrhsassembly = false;
+std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 
         
         
 

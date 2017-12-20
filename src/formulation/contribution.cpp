@@ -233,6 +233,10 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                         // Bring back to the right hand side with a minus:
                         stiffnesses[currenttfharm][1][0].minus();
                         myvec->setvalues(testfunadresses, stiffnesses[currenttfharm][1][0], "add");
+                        
+                        // Keep track of how the rhs was assembled if requested:
+                        if (universe::keeptrackofrhsassembly)
+                        	universe::rhsterms.push_back(std::make_pair(testfunadresses, stiffnesses[currenttfharm][1][0]));
                     }
                 }
             }
