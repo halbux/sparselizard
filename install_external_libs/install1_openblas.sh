@@ -24,5 +24,15 @@ cd openblas;
 make -j4;
 mkdir install;
 make PREFIX=$(pwd)/install install;
-cd ..;
+# Create symlink in case libblas is called instead of libopenblas:
+cd install/lib;
+ln -s libopenblas.so libblas.so;
+ln -s libopenblas.so libblas.so.0;
+ln -s libopenblas.so libblas.so.1;
+ln -s libopenblas.so libblas.so.2;
+ln -s libopenblas.so libblas.so.3;
+ln -s libopenblas.so libblas.so.4;
+ln -s libopenblas.so libblas.so.5;
+ln -s libopenblas.a libblas.a;
+cd ../../..;
 
