@@ -140,6 +140,9 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
 
 void rawvec::setvalue(int address, double value, std::string op)
 {            
+    if (address < 0)
+        return;
+    
     if (op == "add")
         VecSetValue(myvec, address, value, ADD_VALUES);
     if (op == "set")
