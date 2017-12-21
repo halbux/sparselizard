@@ -12,7 +12,10 @@
 #include <numeric>
 #include <cmath>
 #include <algorithm>
-//#include <parallel/algorithm> __gnu_parallel::sort instead of std::sort
+
+#if defined(__linux__)
+#include <parallel/algorithm>
+#endif
 
 namespace myalgorithm
 {
