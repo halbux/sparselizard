@@ -13,10 +13,6 @@
 #include <cmath>
 #include <algorithm>
 
-#if defined(__linux__)
-#include <parallel/algorithm>
-#endif
-
 namespace myalgorithm
 {
     // 'stablecoordinatesort' takes as input a vector of node coordinates 
