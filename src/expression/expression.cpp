@@ -886,6 +886,9 @@ void expression::expand(void)
 
 std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftfpolynomial(int elementdimension)
 {
+	// Simplify the operation:
+	myoperations[0]->simplify({});
+
     // To make sure the format of the expression is ok.
     // Otherwise an error is thrown at the end.
     bool isformatok = true;
@@ -952,7 +955,7 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             if (isproductzero)
                 continue;
             
-            // A coef with 0 factors actually has value 1:
+            // A coef without factors actually has value 1:
             if (currentcoef->count() == 0)
                 currentcoef = std::shared_ptr<opconstant>(new opconstant(1));
             
