@@ -930,16 +930,9 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             std::shared_ptr<operation> currentcoef = sumterms[i]->copy();
             
             std::vector<std::shared_ptr<operation>> productterms = sumterms[i]->getarguments();
-            // Skip below any 0 valued term:
-            bool isproductzero = false;
+
             for (int j = productterms.size()-1; j >= 0; j--)
             {
-                if (productterms[j]->iszero())
-                {
-                    isproductzero = true;
-                    break;
-                }
-                
                 // Remove the dof and tf terms to get the coefficient:
                 if (productterms[j]->isdof())
                 {
@@ -952,8 +945,6 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                     currentcoef->removeterm(j);
                 }
             }
-            if (isproductzero)
-                continue;
             
             // A coef without factors actually has value 1:
             if (currentcoef->count() == 0)
