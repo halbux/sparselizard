@@ -486,17 +486,22 @@ expression expression::spacederivative(int whichderivative)
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-        if (whichderivative > problemdimension)
-        {
-            std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));
-            derivated.myoperations[i] = op;
-        }
+        if (derivated.myoperations[i]->isconstant())
+            derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
         else
         {
-            std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
-            op->setspacederivative(whichderivative);
-            derivated.myoperations[i] = op;
-        }
+		    if (whichderivative > problemdimension)
+		    {
+		        std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));
+		        derivated.myoperations[i] = op;
+		    }
+		    else
+		    {
+		        std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
+		        op->setspacederivative(whichderivative);
+		        derivated.myoperations[i] = op;
+		    }
+	    }
     }
     
     return derivated;
@@ -522,9 +527,14 @@ expression expression::timederivative(int derivativeorder)
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-        std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
-        op->increasetimederivativeorder(derivativeorder);
-        derivated.myoperations[i] = op;
+        if (derivated.myoperations[i]->isconstant())
+            derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
+        else
+        {
+		    std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
+		    op->increasetimederivativeorder(derivativeorder);
+		    derivated.myoperations[i] = op;
+	    }
     }
     
     // Project from the reference element to the physical one a 1 form (hcurl):
