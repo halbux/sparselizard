@@ -46,7 +46,7 @@ void sparselizard(void)
     E.write(wholedomain, "E.pos", 2);
 
     // Code validation line. Can be removed.
-    std::cout << (solE.norm() < 0.6767 && solE.norm() > 0.6766);
+    std::cout << (solE.norm() < 0.6826 && solE.norm() > 0.6825);
 }
 
 int main(void)
