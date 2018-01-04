@@ -34,7 +34,7 @@ void sparselizard(void)
     // The linear elasticity formulation is classical and thus predefined:
     elasticity += integral(vol, predefinedelasticity(u, E, nu));
     // Add the inertia terms:
-    elasticity += integral(vol, -dtdt(dof(u))*tf(u));
+    elasticity += integral(vol, -rho*dtdt(dof(u))*tf(u));
 
     elasticity.generate();
     
@@ -68,7 +68,7 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << (eig.geteigenvaluerealpart()[0] < 1.4570e+10 && eig.geteigenvaluerealpart()[0] > 1.4566e+10);
+    std::cout << (eig.geteigenvaluerealpart()[0] < 6.25240e+06 && eig.geteigenvaluerealpart()[0] > 6.25235e+06);
 }
 
 int main(void)
