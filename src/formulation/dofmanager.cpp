@@ -253,7 +253,8 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
             num -= myelement.counttriangularfaces();
         
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, inputfield->gettypename());
-        
+	int currentnumberofformfunctions, previousdisjreg;       
+
         for (int i = 0; i < elementlist.size(); i++)
         {
             int elem = elementlist[i];
@@ -263,7 +264,10 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
             int currentdisjointregion = myelements->getdisjointregion(associatedelementtype, currentsubelem);
             
             // The current subelement might require less form functions:
-            int currentnumberofformfunctions = myformfunction->count(inputfield->getinterpolationorder(currentdisjointregion), associatedelementdimension, myiterator.getnodeedgefacevolumeindex());
+	    if (i == 0 || currentdisjointregion != previousdisjreg)
+                currentnumberofformfunctions = myformfunction->count(inputfield->getinterpolationorder(currentdisjointregion), associatedelementdimension, myiterator.getnodeedgefacevolumeindex());
+
+	    previousdisjreg = currentdisjointregion;
             
             // If not in a disjoint region on which the field is defined set -2 adress.
             if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)
