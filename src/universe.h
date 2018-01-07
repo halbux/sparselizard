@@ -41,6 +41,8 @@ class universe
         static void allowreuse(void);
         // CLEANS::
         static void forbidreuse(void);
+
+	static bool forcejacobianreuse;
         
         // Store all !HIERARCHICAL! form function values that can be reused.
         // 'computedformfuncs[i].first' gives the ith form function type name.

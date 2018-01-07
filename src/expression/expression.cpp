@@ -127,7 +127,13 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         elementselector myselector(mydisjregs, isorientationdependent);
         do 
         {
-            shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeform));
+	    shared_ptr<jacobian> myjacobian;
+
+	    if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
+		myjacobian = universe::computedjacobian;
+	    else
+                myjacobian = shared_ptr<jacobian>(new jacobian(myselector, evaluationpoints, meshdeform));
+
             densematrix detjac = myjacobian->getdetjac();
             // Store it in the universe for reuse.
             universe::computedjacobian = myjacobian;

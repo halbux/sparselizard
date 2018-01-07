@@ -30,13 +30,16 @@ void universe::forbidreuse(void)
     
     computedformfuncs = {};
     
-    computedjacobian = NULL;
+    if (forcejacobianreuse == false)
+    	computedjacobian = NULL;
     
     oppointers = {};
     oppointersfft = {};
     opcomputed = {};
     opcomputedfft = {};
 }
+
+bool universe::forcejacobianreuse = false;
 
 std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> universe::computedformfuncs = {};
 hierarchicalformfunctioncontainer universe::interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates)
