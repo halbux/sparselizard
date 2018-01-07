@@ -18,8 +18,8 @@ endif
 # $(@D) is the file path of the target file. 
 # D can be added to all of the above.
 
-CXX = g++
-CXX_FLAGS= -std=c++11 -O3 -fopenmp
+CXX = g++ -fopenmp
+CXX_FLAGS= -std=c++11 -O3
 
 # List of all directories containing the headers:
 INCLUDES = -I src -I src/field -I src/expression -I src/expression/operation -I src/shapefunction -I src/formulation -I src/shapefunction/hierarchical -I src/shapefunction/hierarchical/h1 -I src/shapefunction/hierarchical/hcurl -I src/shapefunction/hierarchical/meca -I src/gausspoint -I src/shapefunction/lagrange -I src/mesh -I src/mesh/gmsh -I src/resolution
