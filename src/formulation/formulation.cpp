@@ -188,9 +188,14 @@ vec formulation::rhs(bool keepvector)
     if (isconstraintcomputation == false)
         vec(myvec).updateconstraints();   
     
-    vec output = vec(myvec).copy();    
+    vec output;   
     if (keepvector == false)
+    {
+        output = vec(myvec);
         myvec = NULL;
+    }
+    else
+        output = vec(myvec).copy();
     
     return output; 
 }
