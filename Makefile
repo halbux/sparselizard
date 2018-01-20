@@ -18,7 +18,7 @@ endif
 # $(@D) is the file path of the target file. 
 # D can be added to all of the above.
 
-CXX = g++ -fopenmp
+CXX = g++ # -fopenmp
 CXX_FLAGS= -std=c++11 -O3
 
 # List of all directories containing the headers:
