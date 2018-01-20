@@ -6,7 +6,6 @@
 #ifndef SPARSELIZARDBASE_H
 #define SPARSELIZARDBASE_H
 
-#include <omp.h>
 #include "mesh.h"
 #include "field.h"
 #include "expression.h"
