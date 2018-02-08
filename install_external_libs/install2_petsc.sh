@@ -30,7 +30,7 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-./configure --download-mumps --download-scalapack --download-mpich --download-openblas --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
+./configure --with-mpi=0 --with-mumps-serial=1 --download-mumps=1 --download-openblas --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
