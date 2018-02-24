@@ -36,6 +36,49 @@ expression mathop::normal(int surfphysreg)
         return array3x1(expr.invjac(0,2), expr.invjac(1,2), expr.invjac(2,2))/mynorm;
     }
 }
+
+void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals, std::vector<double> compzevals)
+{
+    int n = xcoords.size();
+
+    if (n == 0)
+        return;
+
+    // Is the data to write scalar or a vector:
+    bool isscalar = (compxevals.size() > 0 && compyevals.size() == 0 && compzevals.size() == 0);
+
+    if (isscalar == false && compxevals.size() == 0)
+        compxevals = std::vector<double>(n,0);
+    if (isscalar == false && compyevals.size() == 0)
+        compyevals = std::vector<double>(n,0);
+    if (isscalar == false && compzevals.size() == 0)
+        compzevals = std::vector<double>(n,0);
+
+    if (xcoords.size() != n || ycoords.size() != n || zcoords.size() != n || compxevals.size() != n || (isscalar == false && (compyevals.size() != n || compzevals.size() != n)))
+    {
+        std::cout << "Error in 'mathop' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
+        abort();
+    }
+
+    // Make sure the filename includes the extension:
+    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
+    {
+        std::cout << "Error in 'mathop' namespace: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
+        abort();
+    }
+    // Remove the extension:
+    filename = filename.substr(0, filename.size()-4);
+
+    // Write the header:
+    gmshinterface::openview(filename + ".pos", filename, 0, true);
+    // Write the data:
+    if (isscalar)
+        gmshinterface::appendtoview(filename + ".pos", 0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords), densematrix(n,1,compxevals));
+    else
+        gmshinterface::appendtoview(filename + ".pos", 0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords), densematrix(n,1,compxevals), densematrix(n,1,compyevals), densematrix(n,1,compzevals));
+    // Close view:
+    gmshinterface::closeview(filename + ".pos");
+}
     
     
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }

@@ -11,6 +11,7 @@
 #include "expression.h"
 #include "integration.h"
 #include "universe.h"
+#include "gmshinterface.h"
 #include "vec.h"
 #include "mat.h"
 
@@ -28,6 +29,9 @@ namespace mathop
     
     // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
     expression normal(int surfphysreg);
+
+    // Write scalar or vector values at given coordinates to a .pos file:
+    void scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals = {}, std::vector<double> compzevals = {});
     
     void setfundamentalfrequency(double f);
     void settime(double t);
