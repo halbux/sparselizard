@@ -1,5 +1,5 @@
 // This code simulates a potential flow (subsonic flow) around a horizontal NACA0012 airfoil.
-// The problem is nonlinear because the air density depends on the the air speed.
+// The problem is nonlinear because the air density depends on the air speed.
 
 
 #include "sparselizardbase.h"
