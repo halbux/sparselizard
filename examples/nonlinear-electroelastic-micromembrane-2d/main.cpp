@@ -145,7 +145,7 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << (compy(grad(v)).integrate(vacuumgap, u, 4) < 0.0022774 && compy(grad(v)).integrate(vacuumgap, u, 4) > 0.0022773);
+    std::cout << (compy(grad(v)).integrate(vacuumgap, u, 4) < 0.0022901 && compy(grad(v)).integrate(vacuumgap, u, 4) > 0.0022900);
 }
 
 int main(void)
