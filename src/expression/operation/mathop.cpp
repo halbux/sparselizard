@@ -376,7 +376,7 @@ expression mathop::predefinedelasticity(expression u, expression E, expression n
 		if (myoption.length() == 0)
 		{
 			std::cout << "Error in 'mathop' namespace: for a 2D problem a last string argument is needed in 'predefinedelasticity'" << std::endl;
-			std::cout << "Available choices are: 'planestrain', 'planestress', axisymmetry" << std::endl;
+			std::cout << "Available choices are: 'planestrain', 'planestress', 'axisymmetry'" << std::endl;
 			abort();
 		}
  
