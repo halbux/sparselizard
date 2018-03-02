@@ -375,7 +375,7 @@ expression mathop::predefinedelasticity(expression u, expression E, expression n
 		// There must be an option in 2D:
 		if (myoption.length() == 0)
 		{
-			std::cout << "Error in 'mathop' namespace: for a 2D mesh a last string argument is needed in 'predefinedelasticity'" << std::endl;
+			std::cout << "Error in 'mathop' namespace: for a 2D problem a last string argument is needed in 'predefinedelasticity'" << std::endl;
 			std::cout << "Available choices are: 'planestrain', 'planestress', axisymmetry" << std::endl;
 			abort();
 		}
@@ -401,7 +401,14 @@ expression mathop::predefinedelasticity(expression u, expression E, expression n
 		}
 	}
     if (u.countrows() == 3)
+    {
+		if (myoption.length() > 0)
+		{
+			std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
+			abort();
+		}
         return - transpose(E/(1+nu)/(1-2*nu)*array3x3(1-nu,nu,nu,nu,1-nu,nu,nu,nu,1-nu)*m3dn(dof(u)))*m3dn(tf(u)) - transpose(E/(1+nu)/(1-2*nu)*array3x3(0.5*(1-2*nu),0,0,0,0.5*(1-2*nu),0,0,0,0.5*(1-2*nu))*m3ds(dof(u)))*m3ds(tf(u));
+    }
 }
 
 expression mathop::predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon)
