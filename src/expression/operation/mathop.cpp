@@ -363,7 +363,7 @@ expression mathop::m3ds(expression input)
 
 ////////// PREDEFINED FORMULATIONS
 
-expression mathop::predefinedelasticity(expression u, expression E, expression nu)
+expression mathop::predefinedelasticity(expression u, expression E, expression nu, std::string myoption)
 {
     if (u.countrows() == 1)
     {
@@ -371,7 +371,35 @@ expression mathop::predefinedelasticity(expression u, expression E, expression n
         abort();
     }
     if (u.countrows() == 2)
-        return - transpose(E/(1-pow(nu,2))*array3x3(1,nu,0,nu,1,0,0,0,0.5*(1-nu))*m2d(dof(u)))*m2d(tf(u));
+	{
+		// There must be an option in 2D:
+		if (myoption.length() == 0)
+		{
+			std::cout << "Error in 'mathop' namespace: for a 2D mesh a last string argument is needed in 'predefinedelasticity'" << std::endl;
+			std::cout << "Available choices are: 'planestrain', 'planestress', axisymmetry" << std::endl;
+			abort();
+		}
+ 
+		if (myoption == "planestrain")
+			return - transpose(E/(1+nu)/(1-2*nu)*array3x3(1-nu,nu,0,nu,1-nu,0,0,0,0.5*(1-2*nu))*m2d(dof(u)))*m2d(tf(u));
+
+		if (myoption == "planestress")
+			return - transpose(E/(1-pow(nu,2))*array3x3(1,nu,0,nu,1,0,0,0,0.5*(1-nu))*m2d(dof(u)))*m2d(tf(u));
+
+		if (myoption == "axisymmetry")
+		{
+			// The radius in cylindrical coordinates:
+			field x("x");
+
+			expression H = E/(1+nu)/(1-2*nu) * expression(4,4,{1-nu,nu,0,0, nu,1-nu,0,0, 0,0,1-nu,0, 0,0,0,0.5-nu});
+
+			expression dofexpr = expression(4,1,{dx(compx(dof(u))),dy(compy(dof(u))),1/x*compx(dof(u)),dx(compy(dof(u)))+dy(compx(dof(u)))});
+			expression tfexpr = expression(4,1, {dx(compx(tf(u))), dy(compy(tf(u))), 1/x*compx(tf(u)), dx(compy(tf(u))) +dy(compx(tf(u)))});
+
+			// Also multiply by the coordinate change Jacobian determinant, i.e. by the radius (x here):
+			return - transpose(H*dofexpr)*tfexpr * x;
+		}
+	}
     if (u.countrows() == 3)
         return - transpose(E/(1+nu)/(1-2*nu)*array3x3(1-nu,nu,nu,nu,1-nu,nu,nu,nu,1-nu)*m3dn(dof(u)))*m3dn(tf(u)) - transpose(E/(1+nu)/(1-2*nu)*array3x3(0.5*(1-2*nu),0,0,0,0.5*(1-2*nu),0,0,0,0.5*(1-2*nu))*m3ds(dof(u)))*m3ds(tf(u));
 }

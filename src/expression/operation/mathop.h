@@ -8,6 +8,7 @@
 #define MATHOP_H
 
 #include <iostream>
+#include <string>
 #include "expression.h"
 #include "integration.h"
 #include "universe.h"
@@ -103,7 +104,7 @@ namespace mathop
     expression array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33);
     
     // Direct resolution:
-    vec solve(mat A, vec b);/////////// CHECK AGAIN!!!!!!!!!!!!!!!!!!!
+    vec solve(mat A, vec b);
     
     
     
@@ -115,7 +116,7 @@ namespace mathop
     
     ////////// PREDEFINED FORMULATIONS
     
-    expression predefinedelasticity(expression u, expression Eyoung, expression nupoisson);
+    expression predefinedelasticity(expression u, expression Eyoung, expression nupoisson, std::string myoption = "");
     expression predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon);
 
 };

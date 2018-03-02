@@ -79,7 +79,7 @@ void sparselizard(void)
     electrostatics += integral(electricdomain, umesh, epsilon*grad(dof(v))*grad(tf(v)));
     
     // The linear elasticity formulation is classical and thus predefined:
-    elasticity += integral(solid, predefinedelasticity(u, E, nu));
+    elasticity += integral(solid, predefinedelasticity(u, E, nu, "planestrain"));
     
     // Electrostatic forces, computed on the elements of the whole electric domain
     // but with mechanical deflection test functions tf(u) only on solid.
