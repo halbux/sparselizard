@@ -391,7 +391,7 @@ expression mathop::predefinedelasticity(expression u, expression E, expression n
 			// The radius in cylindrical coordinates:
 			field x("x");
 
-			expression H = E/(1+nu)/(1-2*nu) * expression(4,4,{1-nu,nu,0,0, nu,1-nu,0,0, 0,0,1-nu,0, 0,0,0,0.5-nu});
+			expression H = E/(1+nu)/(1-2*nu) * expression(4,4,{1-nu,nu,nu,0, nu,1-nu,nu,0, nu,nu,1-nu,0, 0,0,0,0.5-nu});
 
 			expression dofexpr = expression(4,1,{dx(compx(dof(u))),dy(compy(dof(u))),1/x*compx(dof(u)),dx(compy(dof(u)))+dy(compx(dof(u)))});
 			expression tfexpr = expression(4,1, {dx(compx(tf(u))), dy(compy(tf(u))), 1/x*compx(tf(u)), dx(compy(tf(u))) +dy(compx(tf(u)))});
