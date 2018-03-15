@@ -126,7 +126,7 @@ void sparselizard(void)
     electrostatics += integral(electricdomain, 20, epsilon*transpose(invjac*grad(dof(v)))*invjac*grad(tf(v)) * detjac );
     
     // The linear elasticity formulation is classical and thus predefined:
-    elastoacoustic += integral(solid, predefinedelasticity(u, E, nu, "planestrain"));
+    elastoacoustic += integral(solid, predefinedelasticity(dof(u), tf(u), E, nu, "planestrain"));
     // Add the inertia terms:
     elastoacoustic += integral(solid, -rho*dtdt(dof(u))*tf(u));
     

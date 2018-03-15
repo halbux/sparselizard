@@ -111,12 +111,15 @@ namespace mathop
     ////////// PREDEFINED OPERATORS
     
     expression m2d(expression input);
-    expression m3dn(expression input);
-    expression m3ds(expression input);
+    expression m3d(expression input);
     
     ////////// PREDEFINED FORMULATIONS
     
-    expression predefinedelasticity(expression u, expression Eyoung, expression nupoisson, std::string myoption = "");
+	// Isotropic linear elasticity:
+    expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
+	// General anisotropic linear elasticity:
+    expression predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption = "");
+
     expression predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon);
 
 };

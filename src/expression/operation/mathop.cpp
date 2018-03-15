@@ -341,73 +341,57 @@ expression mathop::m2d(expression input)
     return expression(3,1,{dx(compx(input)), dy(compy(input)), dy(compx(input)) + dx(compy(input))});
 }
 
-expression mathop::m3dn(expression input)
+expression mathop::m3d(expression input)
 {
     if (input.countrows() != 3 || input.countcolumns() != 1)
     {
-        std::cout << "Error in 'mathop' namespace: can only compute m3dn of a 3x1 column vector" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only compute m3d of a 3x1 column vector" << std::endl;
         abort();
     }
-    return expression(3,1,{dx(compx(input)), dy(compy(input)), dz(compz(input))});
-}
-
-expression mathop::m3ds(expression input)
-{
-    if (input.countrows() != 3 || input.countcolumns() != 1)
-    {
-        std::cout << "Error in 'mathop' namespace: can only compute m3ds of a 3x1 column vector" << std::endl;
-        abort();
-    }
-    return expression(3,1,{dx(compy(input)) + dy(compx(input)), dz(compy(input)) + dy(compz(input)), dx(compz(input)) + dz(compx(input))});
+	return expression(6,1,{dx(compx(input)), dy(compy(input)), dz(compz(input)), dz(compy(input)) + dy(compz(input)), dx(compz(input)) + dz(compx(input)), dx(compy(input)) + dy(compx(input))});
 }
 
 ////////// PREDEFINED FORMULATIONS
 
-expression mathop::predefinedelasticity(expression u, expression E, expression nu, std::string myoption)
+expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
 {
-    if (u.countrows() == 1)
+	expression hookesmatrix(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
+	hookesmatrix = E/(1+nu)/(1-2*nu) * hookesmatrix;
+	return predefinedelasticity(dofu, tfu, hookesmatrix, myoption);
+}
+
+expression mathop::predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption)
+{
+    if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: 'predefinedelasticity' is undefined in 1D" << std::endl;
+        std::cout << "Error in 'mathop' namespace: first two arguments in 'predefinedelasticity' must be both either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
-    if (u.countrows() == 2)
+    if (dofu.countrows() == 2)
 	{
-		// There must be an option in 2D:
-		if (myoption.length() == 0)
-		{
-			std::cout << "Error in 'mathop' namespace: for a 2D problem a last string argument is needed in 'predefinedelasticity'" << std::endl;
-			std::cout << "Available choices are: 'planestrain', 'planestress', 'axisymmetry'" << std::endl;
-			abort();
-		}
- 
 		if (myoption == "planestrain")
-			return - transpose(E/(1+nu)/(1-2*nu)*array3x3(1-nu,nu,0,nu,1-nu,0,0,0,0.5*(1-2*nu))*m2d(dof(u)))*m2d(tf(u));
-
-		if (myoption == "planestress")
-			return - transpose(E/(1-pow(nu,2))*array3x3(1,nu,0,nu,1,0,0,0,0.5*(1-nu))*m2d(dof(u)))*m2d(tf(u));
-
-		if (myoption == "axisymmetry")
 		{
-			// The radius in cylindrical coordinates:
-			field x("x");
+			expression H = expression(3,3, {
+			hookesmatrix.getarrayentry(0,0),hookesmatrix.getarrayentry(0,1),hookesmatrix.getarrayentry(0,5),  
+			hookesmatrix.getarrayentry(1,0),hookesmatrix.getarrayentry(1,1),hookesmatrix.getarrayentry(1,5),  
+			hookesmatrix.getarrayentry(5,0),hookesmatrix.getarrayentry(5,1),hookesmatrix.getarrayentry(5,5) });
 
-			expression H = E/(1+nu)/(1-2*nu) * expression(4,4,{1-nu,nu,nu,0, nu,1-nu,nu,0, nu,nu,1-nu,0, 0,0,0,0.5-nu});
-
-			expression dofexpr = expression(4,1,{dx(compx(dof(u))),dy(compy(dof(u))),1/x*compx(dof(u)),dx(compy(dof(u)))+dy(compx(dof(u)))});
-			expression tfexpr = expression(4,1, {dx(compx(tf(u))), dy(compy(tf(u))), 1/x*compx(tf(u)), dx(compy(tf(u))) +dy(compx(tf(u)))});
-
-			// Also multiply by the coordinate change Jacobian determinant, i.e. by the radius (x here):
-			return - transpose(H*dofexpr)*tfexpr * x;
+			return -transpose( H *m2d(dofu) )*m2d(tfu);
 		}
+		
+		// If the option is not valid:
+		std::cout << "Error in 'mathop' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
+		std::cout << "Available choices are: 'planestrain'" << std::endl;
+		abort();
 	}
-    if (u.countrows() == 3)
+    if (dofu.countrows() == 3)
     {
         if (myoption.length() > 0)
         {
             std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
             abort();
         }
-        return - transpose(E/(1+nu)/(1-2*nu)*array3x3(1-nu,nu,nu,nu,1-nu,nu,nu,nu,1-nu)*m3dn(dof(u)))*m3dn(tf(u)) - transpose(E/(1+nu)/(1-2*nu)*array3x3(0.5*(1-2*nu),0,0,0,0.5*(1-2*nu),0,0,0,0.5*(1-2*nu))*m3ds(dof(u)))*m3ds(tf(u));
+        return -transpose( hookesmatrix*m3d(dofu) ) * m3d(tfu);
     }
 }
 

@@ -32,7 +32,7 @@ void sparselizard(void)
     formulation elasticity;
 
     // The linear elasticity formulation is classical and thus predefined:
-    elasticity += integral(vol, predefinedelasticity(u, E, nu));
+    elasticity += integral(vol, predefinedelasticity(dof(u), tf(u), E, nu));
     // Add the inertia terms:
     elasticity += integral(vol, -rho*dtdt(dof(u))*tf(u));
 
