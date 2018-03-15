@@ -115,9 +115,9 @@ namespace mathop
     
     ////////// PREDEFINED FORMULATIONS
     
-	// Isotropic linear elasticity:
+    // Isotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
-	// General anisotropic linear elasticity:
+    // General anisotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption = "");
 
     expression predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon);
