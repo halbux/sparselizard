@@ -55,6 +55,29 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     mynumrows = numrows;
     mynumcols = numcols;
     
+	// In case the user provides only the lower triangular part of a square symmetric matrix:
+    if (mynumrows == mynumcols && input.size() == mynumrows*(mynumcols+1)/2)
+    {
+		std::vector<expression> fullinput(mynumrows*mynumcols);
+		int index = 0;
+		for (int i = 0; i < mynumrows; i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				if (i == j)
+					fullinput[i*mynumcols+j] = input[index];
+				else
+				{
+					fullinput[i*mynumcols+j] = input[index];
+					fullinput[j*mynumcols+i] = input[index];
+				}
+	
+				index++;
+			}
+		}
+		input = fullinput;
+	}
+
     if (mynumrows*mynumcols != input.size())
     {
         std::cout << "Error in 'expression' object: a vector of length " << mynumrows*mynumcols << " is required" << std::endl;
