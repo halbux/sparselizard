@@ -102,7 +102,7 @@ class expression
         // Print the expression:
         void print(void);
         
-        expression getarrayentry(int row, int col);
+        expression at(int row, int col);
            
         
         // THE FUNCTIONS BELOW ARE NOT MEANT TO BE CALLED BY THE USER!

@@ -132,7 +132,7 @@ expression mathop::comp(int selectedcomp, expression input)
 { 
     std::vector<expression> mycomp(input.countcolumns());
     for (int i = 0; i < input.countcolumns(); i++)
-        mycomp[i] = input.getarrayentry(selectedcomp,i);
+        mycomp[i] = input.at(selectedcomp,i);
     return expression(1, input.countcolumns(), mycomp);
 }
 
@@ -140,7 +140,7 @@ expression mathop::compx(expression input) { return comp(0,input); }
 expression mathop::compy(expression input) { return comp(1,input); }
 expression mathop::compz(expression input) { return comp(2,input); }
 
-expression mathop::entry(int row, int col, expression input) { return input.getarrayentry(row,col); }
+expression mathop::entry(int row, int col, expression input) { return input.at(row,col); }
 
 expression mathop::transpose(expression input) { return input.transpose(); }
 expression mathop::inverse(expression input) { return input.invert(); }
@@ -160,7 +160,7 @@ expression mathop::grad(expression input)
     for (int i = 0; i < problemdimension; i++)
     {
         for (int comp = 0; comp < input.countrows(); comp++)
-            myexprs.push_back(input.spacederivative(i+1).getarrayentry(comp,0));
+            myexprs.push_back(input.spacederivative(i+1).at(comp,0));
     }
     
     return expression(problemdimension, input.countrows(), myexprs);
@@ -355,12 +355,15 @@ expression mathop::m3d(expression input)
 
 expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
 {
-	expression hookesmatrix(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
-	hookesmatrix = E/(1+nu)/(1-2*nu) * hookesmatrix;
-	return predefinedelasticity(dofu, tfu, hookesmatrix, myoption);
+	// Hooke's matrix:
+	expression H(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
+	expression coef = E/(1+nu)/(1-2*nu);
+	coef.reuseit();
+	H = coef * H;
+	return predefinedelasticity(dofu, tfu, H, myoption);
 }
 
-expression mathop::predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption)
+expression mathop::predefinedelasticity(expression dofu, expression tfu, expression H, std::string myoption)
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
@@ -371,17 +374,51 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 	{
 		if (myoption == "planestrain")
 		{
-			expression H = expression(3,3, {
-			hookesmatrix.getarrayentry(0,0),hookesmatrix.getarrayentry(0,1),hookesmatrix.getarrayentry(0,5),  
-			hookesmatrix.getarrayentry(1,0),hookesmatrix.getarrayentry(1,1),hookesmatrix.getarrayentry(1,5),  
-			hookesmatrix.getarrayentry(5,0),hookesmatrix.getarrayentry(5,1),hookesmatrix.getarrayentry(5,5) });
+			expression Hplanestrain = expression(3,3, {H.at(0,0),H.at(0,1),H.at(0,5), H.at(1,0),H.at(1,1),H.at(1,5), H.at(5,0),H.at(5,1),H.at(5,5) });
+			return -transpose( Hplanestrain *m2d(dofu) )*m2d(tfu);
+		}
+		if (myoption == "planestress")
+		{
+			expression subdet,ezztoexx,ezztoeyy,ezztog12,g23toexx,g23toeyy,g23tog12,g13toexx,g13toeyy,g13tog12;
 
-			return -transpose( H *m2d(dofu) )*m2d(tfu);
+			subdet = H.at(2,2)*H.at(3,3)*H.at(4,4)-H.at(2,2)*H.at(3,4)*H.at(4,3)-H.at(2,3)*H.at(3,2)*H.at(4,4)+H.at(2,3)*H.at(3,4)*H.at(4,2)+H.at(2,4)*H.at(3,2)*H.at(4,3)-H.at(2,4)*H.at(3,3)*H.at(4,2);
+			subdet.reuseit();
+
+			// This is the extra contribution of ezz: 
+			ezztoexx = ( H.at(3,0)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,0)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,0)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
+			ezztoeyy = ( H.at(3,1)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,1)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,1)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
+			ezztog12 = ( H.at(3,5)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,5)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,5)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
+			// This is the extra contribution of g23:
+			g23toexx = ( H.at(4,0)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,0)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,0)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
+			g23toeyy = ( H.at(4,1)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,1)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,1)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
+			g23tog12 = ( H.at(4,5)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,5)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,5)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
+			// This is the extra contribution of g13: 
+			g13toexx = ( H.at(3,0)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,0)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,0)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
+			g13toeyy = ( H.at(3,1)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,1)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,1)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
+			g13tog12 = ( H.at(3,5)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,5)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,5)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
+
+			ezztoexx.reuseit(); ezztoeyy.reuseit(); ezztog12.reuseit(); g23toexx.reuseit(); g23toeyy.reuseit(); g23tog12.reuseit(); g13toexx.reuseit(); g13toeyy.reuseit(); g13tog12.reuseit();
+
+			expression Hplanestress(3,3,{  
+			H.at(0,0) + H.at(0,2)*ezztoexx+H.at(0,3)*g23toexx+H.at(0,4)*g13toexx,
+			H.at(0,1) + H.at(0,2)*ezztoeyy+H.at(0,3)*g23toeyy+H.at(0,4)*g13toeyy,
+			H.at(0,5) + H.at(0,2)*ezztog12+H.at(0,3)*g23tog12+H.at(0,4)*g13tog12,
+
+			H.at(1,0) + H.at(1,2)*ezztoexx+H.at(1,3)*g23toexx+H.at(1,4)*g13toexx,
+			H.at(1,1) + H.at(1,2)*ezztoeyy+H.at(1,3)*g23toeyy+H.at(1,4)*g13toeyy,
+			H.at(1,5) + H.at(1,2)*ezztog12+H.at(1,3)*g23tog12+H.at(1,4)*g13tog12,
+
+			H.at(5,0) + H.at(5,2)*ezztoexx+H.at(5,3)*g23toexx+H.at(5,4)*g13toexx,
+			H.at(5,1) + H.at(5,2)*ezztoeyy+H.at(5,3)*g23toeyy+H.at(5,4)*g13toeyy,
+			H.at(5,5) + H.at(5,2)*ezztog12+H.at(5,3)*g23tog12+H.at(5,4)*g13tog12
+			});
+
+			return -transpose( Hplanestress *m2d(dofu) )*m2d(tfu);
 		}
 		
 		// If the option is not valid:
 		std::cout << "Error in 'mathop' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
-		std::cout << "Available choices are: 'planestrain'" << std::endl;
+		std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
 		abort();
 	}
     if (dofu.countrows() == 3)
@@ -391,7 +428,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
             std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
             abort();
         }
-        return -transpose( hookesmatrix*m3d(dofu) ) * m3d(tfu);
+        return -transpose( H*m3d(dofu) ) * m3d(tfu);
     }
 }
 

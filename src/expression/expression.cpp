@@ -483,7 +483,7 @@ void expression::print(void)
     std::cout << std::endl;
 }
 
-expression expression::getarrayentry(int row, int col)
+expression expression::at(int row, int col)
 {
     expression arrayentry;
 
