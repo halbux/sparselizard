@@ -93,7 +93,7 @@ void sparselizard(void)
 	v.write(elecbox, "vtime.pos", 1, 50);
     
     // Code validation line. Can be removed.
-    //std::cout << (compz(u).integrate(wholedomain, u, 5) < -1.14693e-10 && compz(u).integrate(wholedomain, u, 5) > -1.14697e-10);
+    std::cout << (compz(u.harmonic(2)).integrate(wholedomain, 5) < -1.3622e-15 && compz(u.harmonic(2)).integrate(wholedomain, 5) > -1.3623e-15);
 }
 
 int main(void)
