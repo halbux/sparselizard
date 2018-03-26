@@ -110,8 +110,8 @@ namespace mathop
     
     ////////// PREDEFINED OPERATORS
     
-    expression m2d(expression input);
-    expression m3d(expression input);
+	// Gives the strains of a 2D or 3D mechanical displacement vector (Voigt form):
+    expression strain(expression input);
     
     ////////// PREDEFINED FORMULATIONS
     

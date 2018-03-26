@@ -331,24 +331,17 @@ vec mathop::solve(mat A, vec b)
 
 ////////// PREDEFINED OPERATORS
 
-expression mathop::m2d(expression input)
+expression mathop::strain(expression input)
 {
-    if (input.countrows() != 2 || input.countcolumns() != 1)
+    if ((input.countrows() != 2 && input.countrows() != 3) || input.countcolumns() != 1)
     {
-        std::cout << "Error in 'mathop' namespace: can only compute m2d of a 2x1 column vector" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only compute the strains of a 2x1 or 3x1 column vector" << std::endl;
         abort();
     }
-    return expression(3,1,{dx(compx(input)), dy(compy(input)), dy(compx(input)) + dx(compy(input))});
-}
-
-expression mathop::m3d(expression input)
-{
-    if (input.countrows() != 3 || input.countcolumns() != 1)
-    {
-        std::cout << "Error in 'mathop' namespace: can only compute m3d of a 3x1 column vector" << std::endl;
-        abort();
-    }
-	return expression(6,1,{dx(compx(input)), dy(compy(input)), dz(compz(input)), dz(compy(input)) + dy(compz(input)), dx(compz(input)) + dz(compx(input)), dx(compy(input)) + dy(compx(input))});
+	if (input.countrows() == 2)
+		return expression(3,1,{dx(compx(input)), dy(compy(input)), dy(compx(input)) + dx(compy(input))});
+	if (input.countrows() == 3)
+		return expression(6,1,{dx(compx(input)), dy(compy(input)), dz(compz(input)), dz(compy(input)) + dy(compz(input)), dx(compz(input)) + dz(compx(input)), dx(compy(input)) + dy(compx(input))});
 }
 
 ////////// PREDEFINED FORMULATIONS
@@ -375,7 +368,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 		if (myoption == "planestrain")
 		{
 			expression Hplanestrain = expression(3,3, {H.at(0,0),H.at(0,1),H.at(0,5), H.at(1,0),H.at(1,1),H.at(1,5), H.at(5,0),H.at(5,1),H.at(5,5) });
-			return -transpose( Hplanestrain *m2d(dofu) )*m2d(tfu);
+			return -transpose( Hplanestrain *strain(dofu) )*strain(tfu);
 		}
 		if (myoption == "planestress")
 		{
@@ -413,7 +406,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 			H.at(5,5) + H.at(5,2)*ezztog12+H.at(5,3)*g23tog12+H.at(5,4)*g13tog12
 			});
 
-			return -transpose( Hplanestress *m2d(dofu) )*m2d(tfu);
+			return -transpose( Hplanestress *strain(dofu) )*strain(tfu);
 		}
 		
 		// If the option is not valid:
@@ -428,7 +421,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
             std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
             abort();
         }
-        return -transpose( H*m3d(dofu) ) * m3d(tfu);
+        return -transpose( H*strain(dofu) ) * strain(tfu);
     }
 }
 

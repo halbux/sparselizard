@@ -70,12 +70,12 @@ void sparselizard(void)
     // "A new fnite-element formulation for electromechanical boundary value problems"
     
     // Define the mechanical equations of the problem in the piezo.
-    // m3d(u) returns the strain vector [exx,eyy,ezz,gyz,gxz,gxy] of u.
-    piezo += integral(pztlayer, -( H*m3d(dof(u)) )*m3d(tf(u)) - ( C*grad(dof(v)) )*m3d(tf(u)) );
+    // strain(u) returns the strain vector [exx,eyy,ezz,gyz,gxz,gxy] of u.
+    piezo += integral(pztlayer, -( H*strain(dof(u)) )*strain(tf(u)) - ( C*grad(dof(v)) )*strain(tf(u)) );
     // Inertia term for PZT:
     piezo += integral(pztlayer, -rhopzt*dtdt(dof(u))*tf(u) );
     // Define the electrical equations of the problem in the piezo:
-    piezo += integral(pztlayer, ( transpose(C)*m3d(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
+    piezo += integral(pztlayer, ( transpose(C)*strain(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
     
     piezo.generate();
     
