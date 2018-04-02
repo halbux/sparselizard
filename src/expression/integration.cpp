@@ -11,6 +11,15 @@ integration::integration(int physreg, expression tointegrate, int integrationord
 
 integration::integration(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    // Get only the disjoint regions with highest dimension elements:
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+
+    if (not(meshdeform.isharmonicone(selecteddisjregs)))
+    {
+        std::cout << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+
     myexpression = {tointegrate};
     myintegrationorderdelta = integrationorderdelta;
     myblocknumber = blocknumber;
@@ -29,6 +38,15 @@ integration::integration(int physreg, int numcoefharms, expression tointegrate, 
 
 integration::integration(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    // Get only the disjoint regions with highest dimension elements:
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+
+    if (not(meshdeform.isharmonicone(selecteddisjregs)))
+    {
+        std::cout << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+
     myexpression = {tointegrate};
     myintegrationorderdelta = integrationorderdelta;
     myblocknumber = blocknumber;
