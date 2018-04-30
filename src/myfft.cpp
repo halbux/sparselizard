@@ -11,7 +11,7 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
 
     double pi = 3.141592653589793238;
 
-	double* inputvals = input.getvalues();
+    double* inputvals = input.getvalues();
     
     // Create the output. There are numtimeevals harmonics + the sin0 entry at the begining.
     std::vector<std::vector<densematrix>> output(numtimeevals + 1, std::vector<densematrix> {});
