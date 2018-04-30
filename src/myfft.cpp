@@ -47,7 +47,7 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
         }
 
 		output[harm] = {currentmat};
-	}
+    }
 
     removeroundoffnoise(output);
 
