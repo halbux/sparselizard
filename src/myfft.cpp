@@ -8,90 +8,50 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
     // Number of 1D transforms to perform:
     int numtransforms = input.countcolumns();
 
+
+    double pi = 3.141592653589793238;
+
+	double* inputvals = input.getvalues();
     
-    ////////// Prepare the 'plan' to compute the FFT. 
-    // We are computing the fft on every column (1D transforms):
-    int transformdim = 1;
-    // Length of every 1D transform:
-    int n[] = {numtimeevals};
-    // The data is in consecutive memory adresses:
-    int idist = 1;
-    int odist = 1;
-    // Distance between two consecutive column entries:
-    int istride = numtransforms;
-    int ostride = numtransforms;
-    // Additional inputs required by fftw:
-    int* inembed = n;
-    int* onembed = n;
-    
-    fftw_complex* transformed = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * numtimeevals * numtransforms);
-     
-    // The input data is real, We thus use 
-    // 'fftw_plan_many_dft_r2c' to save half the memory.
-    fftw_plan myplan = fftw_plan_many_dft_r2c(transformdim, n, numtransforms, input.getvalues(), inembed, istride, idist, transformed, onembed, ostride, odist, FFTW_ESTIMATE);
-                 
-    
-    ////////// Compute the FFT as described in the plan.
-    // Parallelise with openmp if this is slow as explained in:
-    // http://www.fftw.org/fftw3_doc/Usage-of-Multi_002dthreaded-FFTW.html#Usage-of-Multi_002dthreaded-FFTW
-    fftw_execute(myplan);
-    
-    
-    ////////// Destroy the plan:
-    fftw_destroy_plan(myplan);  
-    
-    
-    ////////// Create the output.
-    // There are numtimeevals harmonics + the sin0 entry at the begining.
+    // Create the output. There are numtimeevals harmonics + the sin0 entry at the begining.
     std::vector<std::vector<densematrix>> output(numtimeevals + 1, std::vector<densematrix> {});
-    
-    // All harmonics still have to be scaled. 
-    // The constant term has an extra 0.5 scaling factor.
-    double scalingfactor = 2.0 / numtimeevals;
-    double constantscalingfactor = 1.0 / numtimeevals;
-    
+
+	// Loop on all output harmonics:
     for (int h = 0; h < numtimeevals; h++)
     {
         // Our harmonic number is at +1 because of the sin0 term.
         int harm = h+1;
-        
+
         // The current harmonic has a frequency currentfreq*f0.
         int currentfreq = harmonic::getfrequency(harm);
         
-        densematrix currentmat(mym, myn);
+		// Initialise to all zero:
+        densematrix currentmat(mym, myn, 0);
         double* currentvals = currentmat.getvalues();
         
-        if (harmonic::iscosine(harm))
-        {
-            // Constant term:
-            if (currentfreq == 0)
-            {
-                for (int i = 0; i < mym*myn; i++)
-                 currentvals[i] = transformed[currentfreq*mym*myn+i][0] * constantscalingfactor;
-            }
-            else
-            {
-                for (int i = 0; i < mym*myn; i++)
-                    currentvals[i] = transformed[currentfreq*mym*myn+i][0] * scalingfactor;
-            }
-        }
-        else
-        {
-        	// Sign flip required for the sines:
-            for (int i = 0; i < mym*myn; i++)
-                currentvals[i] = transformed[currentfreq*mym*myn+i][1] * (-scalingfactor);
-        }
-        output[harm] = {currentmat};
-    }
-    
+		// Loop on every time step in the input matrix:
+		for (int i = 0; i < numtimeevals; i++)
+		{
+			// Real part then imaginary part.
+			double coef;
+			if (harm%2 == 1)
+				coef = std::cos(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
+			else
+				coef = std::sin(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
+			// Correct the missing factor 2 for everything but the constant:
+			if (currentfreq > 0)
+				coef *= 2;
 
-    ////////// Free the fftw data.
-    fftw_free(transformed);
-    
-    
+			for (int j = 0; j < numtransforms; j++)
+				currentvals[j] += inputvals[i*numtransforms+j] * coef;
+		}
+
+		output[harm] = {currentmat};
+	}
+
     removeroundoffnoise(output);
-    
-    return output;
+
+	return output;
 }
 
 void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, double threshold)
