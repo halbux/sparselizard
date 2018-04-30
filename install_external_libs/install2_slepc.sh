@@ -17,10 +17,17 @@ cd ~/SLlibs;
 
 echo '__________________________________________';
 echo 'FETCHING SLEPC';
-git clone https://bitbucket.org/slepc/slepc;
+if [ "$(uname)" == "Linux" ]; then
+wget http://slepc.upv.es/download/distrib/slepc-3.9.0.tar.gz;
+elif [ "$(uname)" == "Darwin"  ]; then
+curl http://slepc.upv.es/download/distrib/slepc-3.9.0.tar.gz -o slepc.tar.gz;
+fi
+tar -xf slepc*.tar.gz;
+rm slepc*.tar.gz;
+mv slepc* slepc;
+cd slepc;
 echo '__________________________________________';
 echo 'CONFIGURING SLEPC';
-cd slepc;
 
 export SLEPC_DIR=$(pwd);
 if [ "$(uname)" == "Linux" ]; then
