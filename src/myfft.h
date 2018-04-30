@@ -3,14 +3,11 @@
 // See the LICENSE.txt file for license information. Please report all
 // bugs and problems to <alexandre.halbach at ulg.ac.be>.
 
-// This code calls the FFTW library. See http://www.fftw.org/ for more information.
-
 #ifndef MYFFT_H
 #define MYFFT_H
 
 #include <iostream>
 #include <cmath>
-#include <fftw3.h>
 #include "densematrix.h"
 #include <vector>
 #include "harmonic.h"
