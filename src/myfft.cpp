@@ -25,26 +25,26 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
         // The current harmonic has a frequency currentfreq*f0.
         int currentfreq = harmonic::getfrequency(harm);
         
-		// Initialise to all zero:
+        // Initialise to all zero:
         densematrix currentmat(mym, myn, 0);
         double* currentvals = currentmat.getvalues();
         
-		// Loop on every time step in the input matrix:
-		for (int i = 0; i < numtimeevals; i++)
-		{
-			// Real part then imaginary part.
-			double coef;
-			if (harm%2 == 1)
-				coef = std::cos(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
-			else
-				coef = std::sin(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
-			// Correct the missing factor 2 for everything but the constant:
-			if (currentfreq > 0)
-				coef *= 2;
-
-			for (int j = 0; j < numtransforms; j++)
-				currentvals[j] += inputvals[i*numtransforms+j] * coef;
-		}
+        // Loop on every time step in the input matrix:
+        for (int i = 0; i < numtimeevals; i++)
+        {
+        	// Real part then imaginary part.
+        	double coef;
+        	if (harm%2 == 1)
+        		coef = std::cos(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
+        	else
+        		coef = std::sin(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
+        	// Correct the missing factor 2 for everything but the constant:
+        	if (currentfreq > 0)
+        		coef *= 2;
+        
+        	for (int j = 0; j < numtransforms; j++)
+        		currentvals[j] += inputvals[i*numtransforms+j] * coef;
+        }
 
 		output[harm] = {currentmat};
 	}
