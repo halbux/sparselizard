@@ -14,7 +14,7 @@ cd ~/SLlibs;
 
 
 ########## COMPILING SLEPC :
-# If this fails try to replace the version with the lastest one (on http://slepc.upv.es/download)
+# If this fails try to replace the version with the latest one (on http://slepc.upv.es/download)
 
 echo '__________________________________________';
 echo 'FETCHING SLEPC';
