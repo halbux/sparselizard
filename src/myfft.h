@@ -14,7 +14,6 @@
 
 namespace myfft
 {
-    
     // The fft is computed on every column of the input matrix.
     // Every input matrix row corresponds to a time evaluation 
     // of a flattened mym x myn matrix (rows concatenated).
