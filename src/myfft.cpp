@@ -16,7 +16,7 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
     // Create the output. There are numtimeevals harmonics + the sin0 entry at the begining.
     std::vector<std::vector<densematrix>> output(numtimeevals + 1, std::vector<densematrix> {});
 
-	// Loop on all output harmonics:
+    // Loop on all output harmonics:
     for (int h = 0; h < numtimeevals; h++)
     {
         // Our harmonic number is at +1 because of the sin0 term.
