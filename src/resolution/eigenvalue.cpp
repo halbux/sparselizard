@@ -75,7 +75,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
     PC pc;
     KSPGetPC(ksp, &pc);
     PCSetType(pc, PCLU);
-    PCFactorSetMatSolverPackage(pc, MATSOLVERMUMPS);
+    PCFactorSetMatSolverType(pc, MATSOLVERMUMPS);
     
     
     // DO THE ACTUAL RESOLUTION:
