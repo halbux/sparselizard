@@ -24,9 +24,10 @@ class field;
 
 namespace mathop
 {
-    // Perform operations (union, intersection,...) on physical regions:
+    // Perform operations (union, intersection, exclusion) on physical regions:
     int regionunion(const std::vector<int> physregs);
     int regionintersection(const std::vector<int> physregs);
+	int regionexclusion(int physreg, int toexclude);
     
     // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
     expression normal(int surfphysreg);

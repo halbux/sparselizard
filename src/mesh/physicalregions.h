@@ -28,9 +28,10 @@ class physicalregions
         
         physicalregions(disjointregions&);
                 
-        // Create a new physical region that is the union of all regions.
+        // Create a new physical region that is the union of all regions:
         int createunion(const std::vector<int> input);
         int createintersection(const std::vector<int> input);
+		int createexclusion(int input, int toexclude);
         
         int getmaxphysicalregionnumber(void);
         

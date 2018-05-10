@@ -11,6 +11,11 @@ int mathop::regionintersection(const std::vector<int> physregs)
     return (universe::mymesh->getphysicalregions())->createintersection(physregs);
 }
 
+int mathop::regionexclusion(int physreg, int toexclude)
+{
+    return (universe::mymesh->getphysicalregions())->createexclusion(physreg, toexclude);
+}
+
 expression mathop::normal(int surfphysreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();

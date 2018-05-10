@@ -45,6 +45,39 @@ int physicalregions::createintersection(const std::vector<int> input)
     return newphysregnum;
 }
 
+int physicalregions::createexclusion(int input, int toexclude)
+{
+	// Get all input disjoint regions:
+	std::vector<int> inputdisjregs = get(input)->getdisjointregions(-1);
+
+	// Get all disjoint regions to exclude:
+    std::vector<int> toexcludedisjregs = get(toexclude)->getdisjointregions(-1);
+
+	// Remove the disjoint regions to exclude from the list of input disjoint regions:
+	std::vector<int> disjregs = {};
+	for (int i = 0; i < inputdisjregs.size(); i++)
+	{
+		bool toinclude = true;
+		for (int j = 0; j < toexcludedisjregs.size(); j++)
+		{
+			if (inputdisjregs[i] == toexcludedisjregs[j])
+			{
+				toinclude = false;
+				break;			
+			}
+		}
+		if (toinclude)
+			disjregs.push_back(inputdisjregs[i]);
+	}
+
+    int newphysregnum = getmaxphysicalregionnumber() + 1;
+    
+    physicalregion* newphysreg = get(newphysregnum);
+    newphysreg->setdisjointregions(disjregs);
+    
+    return newphysregnum;
+}
+
 int physicalregions::getmaxphysicalregionnumber(void)
 {
     return *std::max_element(myphysicalregionnumbers.begin(), myphysicalregionnumbers.end());
