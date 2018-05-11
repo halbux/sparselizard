@@ -1,6 +1,15 @@
 #include "densematrix.h"
 
 
+void densematrix::errorifempty(void)
+{
+	if (numrows*numcols == 0)
+	{
+		std::cout << "Error in 'densematrix' object: cannot perform operation on empty matrix" << std::endl;
+		abort();
+	}
+}
+
 densematrix::densematrix(int numberofrows, int numberofcolumns)
 {
     numrows = numberofrows;
@@ -372,13 +381,51 @@ void densematrix::log10(void)
         myvaluesptr[i] = std::log10(myvaluesptr[i]);
 }
 
-double densematrix::maxabs(void)
+double densematrix::max(void)
 {
+	errorifempty();
+
     double* myvaluesptr = myvalues.get();
     
-    double val = 0;
+    double val = myvaluesptr[0];
 
-    for (int i = 0; i < numrows*numcols; i++)
+    for (int i = 1; i < numrows*numcols; i++)
+    {
+        if (myvaluesptr[i] > val)
+            val = myvaluesptr[i];
+    }
+    return val;
+}
+
+int densematrix::maxindex(void)
+{
+	errorifempty();
+
+    double* myvaluesptr = myvalues.get();
+    
+	int index = 0;
+    double val = myvaluesptr[0];
+
+    for (int i = 1; i < numrows*numcols; i++)
+    {
+        if (myvaluesptr[i] > val)
+		{
+            val = myvaluesptr[i];
+			index = i;
+		}
+    }
+    return index;
+}
+
+double densematrix::maxabs(void)
+{
+	errorifempty();
+
+    double* myvaluesptr = myvalues.get();
+    
+    double val = std::abs(myvaluesptr[0]);
+
+    for (int i = 1; i < numrows*numcols; i++)
     {
         if (std::abs(myvaluesptr[i]) > val)
             val = std::abs(myvaluesptr[i]);

@@ -29,6 +29,9 @@ class densematrix
         bool istransposed = false;
         
         std::shared_ptr<double> myvalues = NULL;
+
+		// Throws an error if matrix is empty:
+		void errorifempty(void);
         
 	public:
         
@@ -108,8 +111,14 @@ class densematrix
         void cos(void);
         void log10(void);
         
+        // Get the max value:
+        double max(void);
+		// Get the index of the max value:
+		int maxindex(void);
+
         // Get the max absolute value:
         double maxabs(void);
+
         // Sum all values:
         double sum(void);
         
