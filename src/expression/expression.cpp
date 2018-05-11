@@ -115,6 +115,108 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 }
 
 
+std::vector<double> expression::max(int physreg, int refinement) { return max(physreg, NULL, refinement); }
+std::vector<double> expression::max(int physreg, expression meshdeform, int refinement) { return max(physreg, &meshdeform, refinement); }
+std::vector<double> expression::min(int physreg, int refinement) { return (-(*this)).max(physreg, NULL, refinement); }
+std::vector<double> expression::min(int physreg, expression meshdeform, int refinement) { return (-(*this)).max(physreg, &meshdeform, refinement); }
+
+std::vector<double> expression::max(int physreg, expression* meshdeform, int refinement)
+{        
+	field x("x"), y("y"), z("z");
+
+    // Minimum refinement order is 1!
+    if (refinement < 1)
+        refinement = 1;
+
+    // Make sure this expression is scalar and the mesh 
+    // deformation expression has the right size. 
+    if (not(isscalar()))
+    {
+        std::cout << "Error in 'expression' object: cannot get the max/min of a nonscalar expression" << std::endl;
+        abort();
+    }
+    int problemdimension = universe::mymesh->getmeshdimension();
+    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() != problemdimension))
+    {
+        std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        abort();
+    }
+    
+    // Get only the disjoint regions with highest dimension elements:
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+
+    // Multiharmonic expressions are not allowed.
+    if (not(isharmonicone(selecteddisjregs)))
+    {
+        std::cout << "Error in 'expression' object: cannot get the max/min of a multiharmonic expression (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+    if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
+    {
+        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+    
+	// This will be the output:
+	std::vector<double> maxval = {};
+
+    // Send the disjoint regions with same element type numbers together:
+    disjointregionselector mydisjregselector(selecteddisjregs, {});
+    for (int i = 0; i < mydisjregselector.countgroups(); i++)
+    {
+        std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
+        
+        // Get the Lagrange points:
+        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+		lagrangeformfunction mylagrange(elementtypenumber,refinement,{});
+        std::vector<double> evaluationpoints = mylagrange.getnodecoordinates();
+      
+        // Loop on all total orientations (if required):
+        bool isorientationdependent = isvalueorientationdependent(mydisjregs) || (meshdeform != NULL && meshdeform->isvalueorientationdependent(mydisjregs));
+        elementselector myselector(mydisjregs, isorientationdependent);
+        do 
+        {
+            universe::allowreuse();
+            densematrix compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
+            universe::forbidreuse();
+            
+			int numevalpts = evaluationpoints.size()/3;
+
+			// Find current max:
+			int currentmaxindex = compxinterpolated.maxindex();	
+			// Get the corresponding row (elem) and column (evalpt):
+			int evalpt = currentmaxindex%numevalpts;	
+			int elem = (currentmaxindex-evalpt)/numevalpts;
+
+			double currentmax = compxinterpolated.getvalues()[currentmaxindex];
+			// Get the evaluation point leading to the max:
+			std::vector<double> evalptofmax = {evaluationpoints[3*evalpt+0], evaluationpoints[3*evalpt+1], evaluationpoints[3*evalpt+2]};
+
+			// Update max if required:
+			if (maxval.size() == 0 || maxval[0] < currentmax)	
+			{			
+				universe::allowreuse();
+	       		densematrix xinterpolated = expression(x).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
+	       		densematrix yinterpolated = expression(y).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
+				densematrix zinterpolated = expression(z).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];     
+				universe::forbidreuse();  
+
+				maxval = {currentmax, xinterpolated.getvalues()[elem], yinterpolated.getvalues()[elem], zinterpolated.getvalues()[elem]};
+			}
+        } 
+        while (myselector.next());
+    }
+
+	if (maxval.size() == 4)
+    	return maxval;
+	else
+	{
+		std::cout << "Error in 'expression' object: no data point to compute max/min value" << std::endl;
+		abort();
+	}
+}
+
+
 double expression::integrate(int physreg, int integrationorder) { return integrate(physreg, NULL, integrationorder); }
 double expression::integrate(int physreg, expression meshdeform, int integrationorder) { return integrate(physreg, &meshdeform, integrationorder); }
 
