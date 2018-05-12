@@ -55,7 +55,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     mynumrows = numrows;
     mynumcols = numcols;
     
-	// In case the user provides only the diagonal part of a square diagonal matrix:
+    // In case the user provides only the diagonal part of a square diagonal matrix:
     if (mynumrows == mynumcols && input.size() == mynumrows)
     {
 		std::vector<expression> fullinput(mynumrows*mynumcols);
@@ -72,7 +72,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 		input = fullinput;
 	}
 
-	// In case the user provides only the lower triangular part of a square symmetric matrix:
+    // In case the user provides only the lower triangular part of a square symmetric matrix:
     if (mynumrows == mynumcols && input.size() == mynumrows*(mynumcols+1)/2)
     {
 		std::vector<expression> fullinput(mynumrows*mynumcols);
