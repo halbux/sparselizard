@@ -122,7 +122,7 @@ std::vector<double> expression::min(int physreg, expression meshdeform, int refi
 
 std::vector<double> expression::max(int physreg, expression* meshdeform, int refinement)
 {        
-	field x("x"), y("y"), z("z");
+    field x("x"), y("y"), z("z");
 
     // Minimum refinement order is 1!
     if (refinement < 1)
@@ -157,8 +157,8 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         abort();
     }
     
-	// This will be the output:
-	std::vector<double> maxval = {};
+    // This will be the output:
+    std::vector<double> maxval = {};
 
     // Send the disjoint regions with same element type numbers together:
     disjointregionselector mydisjregselector(selecteddisjregs, {});
@@ -180,40 +180,40 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
             densematrix compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
             universe::forbidreuse();
             
-			int numevalpts = evaluationpoints.size()/3;
-
-			// Find current max:
-			int currentmaxindex = compxinterpolated.maxindex();	
-			// Get the corresponding row (elem) and column (evalpt):
-			int evalpt = currentmaxindex%numevalpts;	
-			int elem = (currentmaxindex-evalpt)/numevalpts;
-
-			double currentmax = compxinterpolated.getvalues()[currentmaxindex];
-			// Get the evaluation point leading to the max:
-			std::vector<double> evalptofmax = {evaluationpoints[3*evalpt+0], evaluationpoints[3*evalpt+1], evaluationpoints[3*evalpt+2]};
-
-			// Update max if required:
-			if (maxval.size() == 0 || maxval[0] < currentmax)	
-			{			
-				universe::allowreuse();
-	       		densematrix xinterpolated = expression(x).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
-	       		densematrix yinterpolated = expression(y).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
-				densematrix zinterpolated = expression(z).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];     
-				universe::forbidreuse();  
-
-				maxval = {currentmax, xinterpolated.getvalues()[elem], yinterpolated.getvalues()[elem], zinterpolated.getvalues()[elem]};
-			}
+            int numevalpts = evaluationpoints.size()/3;
+            
+            // Find current max:
+            int currentmaxindex = compxinterpolated.maxindex();	
+            // Get the corresponding row (elem) and column (evalpt):
+            int evalpt = currentmaxindex%numevalpts;	
+            int elem = (currentmaxindex-evalpt)/numevalpts;
+            
+            double currentmax = compxinterpolated.getvalues()[currentmaxindex];
+            // Get the evaluation point leading to the max:
+            std::vector<double> evalptofmax = {evaluationpoints[3*evalpt+0], evaluationpoints[3*evalpt+1], evaluationpoints[3*evalpt+2]};
+            
+            // Update max if required:
+            if (maxval.size() == 0 || maxval[0] < currentmax)	
+            {			
+                universe::allowreuse();
+                densematrix xinterpolated = expression(x).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
+                densematrix yinterpolated = expression(y).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
+                densematrix zinterpolated = expression(z).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];     
+                universe::forbidreuse();  
+                
+                maxval = {currentmax, xinterpolated.getvalues()[elem], yinterpolated.getvalues()[elem], zinterpolated.getvalues()[elem]};
+            }
         } 
         while (myselector.next());
     }
 
-	if (maxval.size() == 4)
-    	return maxval;
-	else
-	{
-		std::cout << "Error in 'expression' object: no data point to compute max/min value" << std::endl;
-		abort();
-	}
+    if (maxval.size() == 4)
+        return maxval;
+    else
+    {
+        std::cout << "Error in 'expression' object: no data point to compute max/min value" << std::endl;
+        abort();
+    }
 }
 
 
