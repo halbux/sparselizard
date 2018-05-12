@@ -168,7 +168,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         
         // Get the Lagrange points:
         int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
-		lagrangeformfunction mylagrange(elementtypenumber,refinement,{});
+        lagrangeformfunction mylagrange(elementtypenumber,refinement,{});
         std::vector<double> evaluationpoints = mylagrange.getnodecoordinates();
       
         // Loop on all total orientations (if required):
