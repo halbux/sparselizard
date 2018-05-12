@@ -3,11 +3,11 @@
 
 void densematrix::errorifempty(void)
 {
-	if (numrows*numcols == 0)
-	{
-		std::cout << "Error in 'densematrix' object: cannot perform operation on empty matrix" << std::endl;
-		abort();
-	}
+    if (numrows*numcols == 0)
+    {
+    	std::cout << "Error in 'densematrix' object: cannot perform operation on empty matrix" << std::endl;
+    	abort();
+    }
 }
 
 densematrix::densematrix(int numberofrows, int numberofcolumns)
