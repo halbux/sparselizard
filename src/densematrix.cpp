@@ -383,7 +383,7 @@ void densematrix::log10(void)
 
 double densematrix::max(void)
 {
-	errorifempty();
+    errorifempty();
 
     double* myvaluesptr = myvalues.get();
     
@@ -399,7 +399,7 @@ double densematrix::max(void)
 
 int densematrix::maxindex(void)
 {
-	errorifempty();
+    errorifempty();
 
     double* myvaluesptr = myvalues.get();
     
@@ -409,17 +409,17 @@ int densematrix::maxindex(void)
     for (int i = 1; i < numrows*numcols; i++)
     {
         if (myvaluesptr[i] > val)
-		{
+        {
             val = myvaluesptr[i];
-			index = i;
-		}
+            index = i;
+        }
     }
     return index;
 }
 
 double densematrix::maxabs(void)
 {
-	errorifempty();
+    errorifempty();
 
     double* myvaluesptr = myvalues.get();
     
