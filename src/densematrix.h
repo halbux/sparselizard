@@ -30,8 +30,8 @@ class densematrix
         
         std::shared_ptr<double> myvalues = NULL;
 
-		// Throws an error if matrix is empty:
-		void errorifempty(void);
+        // Throws an error if matrix is empty:
+        void errorifempty(void);
         
 	public:
         
@@ -113,8 +113,8 @@ class densematrix
         
         // Get the max value:
         double max(void);
-		// Get the index of the max value:
-		int maxindex(void);
+        // Get the index of the max value:
+        int maxindex(void);
 
         // Get the max absolute value:
         double maxabs(void);
