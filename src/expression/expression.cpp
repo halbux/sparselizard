@@ -115,24 +115,32 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 }
 
 
-std::vector<double> expression::max(int physreg, int refinement) { return max(physreg, NULL, refinement); }
-std::vector<double> expression::max(int physreg, expression meshdeform, int refinement) { return max(physreg, &meshdeform, refinement); }
-std::vector<double> expression::min(int physreg, int refinement) 
+std::vector<double> expression::max(int physreg, int refinement, std::vector<double> xrange, std::vector<double> yrange, std::vector<double> zrange) 
+{ 
+	return max(physreg, NULL, refinement, xrange, yrange, zrange); 
+}
+
+std::vector<double> expression::max(int physreg, expression meshdeform, int refinement, std::vector<double> xrange, std::vector<double> yrange, std::vector<double> zrange) 
+{ 
+	return max(physreg, &meshdeform, refinement, xrange, yrange, zrange); 
+}
+
+std::vector<double> expression::min(int physreg, int refinement, std::vector<double> xrange, std::vector<double> yrange, std::vector<double> zrange)
 { 
     // The actual min value is minus the max value found:
-    std::vector<double> output = (-(*this)).max(physreg, NULL, refinement); 
+    std::vector<double> output = (-(*this)).max(physreg, NULL, refinement, xrange, yrange, zrange); 
     output[0] = -output[0];
     return output;
 }
-std::vector<double> expression::min(int physreg, expression meshdeform, int refinement) 
+std::vector<double> expression::min(int physreg, expression meshdeform, int refinement, std::vector<double> xrange, std::vector<double> yrange, std::vector<double> zrange) 
 { 
     // The actual min value is minus the max value found:
-    std::vector<double> output =  (-(*this)).max(physreg, &meshdeform, refinement); 
+    std::vector<double> output =  (-(*this)).max(physreg, &meshdeform, refinement, xrange, yrange, zrange); 
     output[0] = -output[0];
     return output;
 }
 
-std::vector<double> expression::max(int physreg, expression* meshdeform, int refinement)
+std::vector<double> expression::max(int physreg, expression* meshdeform, int refinement, std::vector<double> xrange, std::vector<double> yrange, std::vector<double> zrange)
 {        
     field x("x"), y("y"), z("z");
 
