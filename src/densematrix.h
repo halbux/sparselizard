@@ -33,7 +33,7 @@ class densematrix
         // Throws an error if matrix is empty:
         void errorifempty(void);
         
-	public:
+    public:
         
         // Set empty matrix:
         densematrix(void) {};
