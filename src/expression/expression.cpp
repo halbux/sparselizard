@@ -117,8 +117,20 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 
 std::vector<double> expression::max(int physreg, int refinement) { return max(physreg, NULL, refinement); }
 std::vector<double> expression::max(int physreg, expression meshdeform, int refinement) { return max(physreg, &meshdeform, refinement); }
-std::vector<double> expression::min(int physreg, int refinement) { return (-(*this)).max(physreg, NULL, refinement); }
-std::vector<double> expression::min(int physreg, expression meshdeform, int refinement) { return (-(*this)).max(physreg, &meshdeform, refinement); }
+std::vector<double> expression::min(int physreg, int refinement) 
+{ 
+    // The actual min value is minus the max value found:
+    std::vector<double> output = (-(*this)).max(physreg, NULL, refinement); 
+    output[0] = -output[0];
+    return output;
+}
+std::vector<double> expression::min(int physreg, expression meshdeform, int refinement) 
+{ 
+    // The actual min value is minus the max value found:
+    std::vector<double> output =  (-(*this)).max(physreg, &meshdeform, refinement); 
+    output[0] = -output[0];
+    return output;
+}
 
 std::vector<double> expression::max(int physreg, expression* meshdeform, int refinement)
 {        
