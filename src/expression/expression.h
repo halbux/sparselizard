@@ -73,9 +73,9 @@ class expression
         int countrows(void) { return mynumrows; };
         int countcolumns(void) { return mynumcols; };
 
-		// Get the max/min value. All elements will be split 'refinement' times in each direction 
-		// to approximate the max/min value and position. Increase 'refinement' for more accuracy.
-		// The output is {maxvalue, xcoord, ycoord, zcoord}.
+        // Get the max/min value. All elements will be split 'refinement' times in each direction 
+        // to approximate the max/min value and position. Increase 'refinement' for more accuracy.
+        // The output is {maxvalue, xcoord, ycoord, zcoord}.
         std::vector<double> max(int physreg, int refinement);
         std::vector<double> max(int physreg, expression meshdeform, int refinement);
         std::vector<double> min(int physreg, int refinement);
