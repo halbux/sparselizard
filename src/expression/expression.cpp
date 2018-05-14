@@ -129,14 +129,16 @@ std::vector<double> expression::min(int physreg, int refinement, std::vector<dou
 { 
     // The actual min value is minus the max value found:
     std::vector<double> output = (-(*this)).max(physreg, NULL, refinement, xyzrange); 
-    output[0] = -output[0];
+    if (output.size() > 0)
+        output[0] = -output[0];
     return output;
 }
 std::vector<double> expression::min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange) 
 { 
     // The actual min value is minus the max value found:
     std::vector<double> output =  (-(*this)).max(physreg, &meshdeform, refinement, xyzrange); 
-    output[0] = -output[0];
+    if (output.size() > 0)
+        output[0] = -output[0];
     return output;
 }
 
