@@ -200,9 +200,9 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         {
             universe::allowreuse();
 
-			// Compute the expression at the evaluation points:
+            // Compute the expression at the evaluation points:
             densematrix compxval = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];  
-			// Get the coordinates corresponding to the interpolated values:
+            // Get the coordinates corresponding to the interpolated values:
             densematrix xval = expression(x).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
             densematrix yval = expression(y).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
             densematrix zval = expression(z).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0]; 
