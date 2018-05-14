@@ -113,9 +113,6 @@ class densematrix
         
         // Get the max value:
         double max(void);
-        // Get the index of the max value:
-        int maxindex(void);
-
         // Get the max absolute value:
         double maxabs(void);
 

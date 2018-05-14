@@ -397,26 +397,6 @@ double densematrix::max(void)
     return val;
 }
 
-int densematrix::maxindex(void)
-{
-    errorifempty();
-
-    double* myvaluesptr = myvalues.get();
-    
-	int index = 0;
-    double val = myvaluesptr[0];
-
-    for (int i = 1; i < numrows*numcols; i++)
-    {
-        if (myvaluesptr[i] > val)
-        {
-            val = myvaluesptr[i];
-            index = i;
-        }
-    }
-    return index;
-}
-
 double densematrix::maxabs(void)
 {
     errorifempty();
