@@ -215,25 +215,15 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
             double* zvalptr = zval.getvalues();
             
             // Loop on all data points.
-            // In case the x, y and z coordinates are not bounded:
+            bool isinboundedregion = true;
             if (xyzrange.size() == 0)
-            {
-            	for (int d = 0; d < compxval.countrows() * compxval.countcolumns(); d++)
-            	{
-            		if (maxval.size() == 0 || maxval[0] < valuesptr[d])	
-            			    maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
-            	}
-            }
-            else
-            {
-            	bool isinboundedregion;
-            	for (int d = 0; d < compxval.countrows() * compxval.countcolumns(); d++)
-            	{
-            		isinboundedregion = xyzrange[0] < xvalptr[d] && xyzrange[1] > xvalptr[d] && xyzrange[2] < yvalptr[d] && xyzrange[3] > yvalptr[d] && xyzrange[4] < zvalptr[d] && xyzrange[5] > zvalptr[d];
-            		if ( isinboundedregion && (maxval.size() == 0 || maxval[0] < valuesptr[d]) )	
-            			    maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
-            	}
-            }
+                isinboundedregion = xyzrange[0] < xvalptr[d] && xyzrange[1] > xvalptr[d] && xyzrange[2] < yvalptr[d] && xyzrange[3] > yvalptr[d] && xyzrange[4] < zvalptr[d] && xyzrange[5] > zvalptr[d];
+
+        	for (int d = 0; d < compxval.countrows() * compxval.countcolumns(); d++)
+        	{
+        		if ( isinboundedregion && (maxval.size() == 0 || maxval[0] < valuesptr[d]) )	
+        			    maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
+        	}
         } 
         while (myselector.next());
     }
