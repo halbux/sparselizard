@@ -76,7 +76,7 @@ class expression
         // Get the max/min value. All elements will be split 'refinement' times in each direction 
         // to approximate the max/min value and position. Increase 'refinement' for more accuracy.
         // Set {xrangemin, xrangemax, yrangemin, yrangemax, zrangemin, zrangemax} to get the 
-        // max/min in a x, y and/or z bounded domain (optional).
+        // max/min in a x, y and z bounded domain (optional).
         // The output is {maxvalue, maxxcoord, maxycoord, maxzcoord}.
         std::vector<double> max(int physreg, int refinement, std::vector<double> xyzrange = {});
         std::vector<double> max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange = {});
