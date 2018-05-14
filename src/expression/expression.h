@@ -56,7 +56,7 @@ class expression
         
         // FUNCTIONS TO BE CALLED BY THE PUBLIC FUNCTIONS:
         
-        std::vector<double> max(int physreg, expression* meshdeform, int refinement, std::vector<double> xrange, std::vector<double> yrange, std::vector<double> zrange);
+        std::vector<double> max(int physreg, expression* meshdeform, int refinement, std::vector<double> xyzrange);
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
         
@@ -75,12 +75,13 @@ class expression
 
         // Get the max/min value. All elements will be split 'refinement' times in each direction 
         // to approximate the max/min value and position. Increase 'refinement' for more accuracy.
-        // Set {rangemin, rangemax} to find the max/min in a x, y and/or z bounded domain (optional).
-        // The output is {maxvalue, xcoord, ycoord, zcoord}.
-        std::vector<double> max(int physreg, int refinement, std::vector<double> xrange = {}, std::vector<double> yrange = {}, std::vector<double> zrange = {});
-        std::vector<double> max(int physreg, expression meshdeform, int refinement, std::vector<double> xrange = {}, std::vector<double> yrange = {}, std::vector<double> zrange = {});
-        std::vector<double> min(int physreg, int refinement, std::vector<double> xrange = {}, std::vector<double> yrange = {}, std::vector<double> zrange = {});
-        std::vector<double> min(int physreg, expression meshdeform, int refinement, std::vector<double> xrange = {}, std::vector<double> yrange = {}, std::vector<double> zrange = {});
+		// Set {xrangemin, xrangemax, yrangemin, yrangemax, zrangemin, zrangemax} to get the 
+		// max/min in a x, y and/or z bounded domain (optional).
+        // The output is {maxvalue, maxxcoord, maxycoord, maxzcoord}.
+        std::vector<double> max(int physreg, int refinement, std::vector<double> xyzrange = {});
+        std::vector<double> max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange = {});
+        std::vector<double> min(int physreg, int refinement, std::vector<double> xyzrange = {});
+        std::vector<double> min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange = {});
 
         double integrate(int physreg, int integrationorder);
         double integrate(int physreg, expression meshdeform, int integrationorder);
