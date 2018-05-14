@@ -190,50 +190,53 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         lagrangeformfunction mylagrange(elementtypenumber,refinement,{});
         std::vector<double> evaluationpoints = mylagrange.getnodecoordinates();
-      
+
         // Loop on all total orientations (if required):
         bool isorientationdependent = isvalueorientationdependent(mydisjregs) || (meshdeform != NULL && meshdeform->isvalueorientationdependent(mydisjregs));
         elementselector myselector(mydisjregs, isorientationdependent);
         do 
         {
             universe::allowreuse();
-            densematrix compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
+
+			// Compute the expression at the evaluation points:
+            densematrix compxval = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];  
+			// Get the coordinates corresponding to the interpolated values:
+            densematrix xval = expression(x).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
+            densematrix yval = expression(y).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];       
+            densematrix zval = expression(z).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0]; 
+      
             universe::forbidreuse();
             
-            int numevalpts = evaluationpoints.size()/3;
-            
-            // Find current max:
-            int currentmaxindex = compxinterpolated.maxindex();	
-            // Get the corresponding row (elem) and column (evalpt):
-            int evalpt = currentmaxindex%numevalpts;	
-            int elem = (currentmaxindex-evalpt)/numevalpts;
-            
-            double currentmax = compxinterpolated.getvalues()[currentmaxindex];
-            // Get the evaluation point leading to the max:
-            std::vector<double> evalptofmax = {evaluationpoints[3*evalpt+0], evaluationpoints[3*evalpt+1], evaluationpoints[3*evalpt+2]};
-            
-            // Update max if required:
-            if (maxval.size() == 0 || maxval[0] < currentmax)	
-            {			
-                universe::allowreuse();
-                densematrix xinterpolated = expression(x).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
-                densematrix yinterpolated = expression(y).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];       
-                densematrix zinterpolated = expression(z).myoperations[0]->interpolate(myselector, evalptofmax, meshdeform)[1][0];     
-                universe::forbidreuse();  
-                
-                maxval = {currentmax, xinterpolated.getvalues()[elem], yinterpolated.getvalues()[elem], zinterpolated.getvalues()[elem]};
-            }
+            double* valuesptr = compxval.getvalues();
+			double* xvalptr = xval.getvalues();
+			double* yvalptr = yval.getvalues();
+			double* zvalptr = zval.getvalues();
+
+			// Loop on all data points.
+			// In case the x, y and z coordinates are not bounded:
+			if (xyzrange.size() == 0)
+			{
+				for (int d = 0; d < compxval.countrows() * compxval.countcolumns(); d++)
+				{
+					if (maxval.size() == 0 || maxval[0] < valuesptr[d])	
+						    maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
+				}
+			}
+			else
+			{
+				bool isinboundedregion;
+				for (int d = 0; d < compxval.countrows() * compxval.countcolumns(); d++)
+				{
+					isinboundedregion = xyzrange[0] < xvalptr[d] && xyzrange[1] > xvalptr[d] && xyzrange[2] < yvalptr[d] && xyzrange[3] > yvalptr[d] && xyzrange[4] < zvalptr[d] && xyzrange[5] > zvalptr[d];
+					if ( isinboundedregion && (maxval.size() == 0 || maxval[0] < valuesptr[d]) )	
+						    maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
+				}
+			}
         } 
         while (myselector.next());
     }
 
-    if (maxval.size() == 4)
-        return maxval;
-    else
-    {
-        std::cout << "Error in 'expression' object: no data point to compute max/min value" << std::endl;
-        abort();
-    }
+    return maxval;
 }
 
 
