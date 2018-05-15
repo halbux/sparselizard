@@ -935,3 +935,109 @@ bool element::iselementedgeorface(void)
 	return (straighttypenumber == 1 || straighttypenumber == 2 || straighttypenumber == 3);
 }
 
+std::vector<double> element::listnodecoordinates(void)
+{
+	std::vector<double> output(3*countcurvednodes(), 0.0);
+
+	int numnodesinline = getcurvatureorder() + 1;
+ 
+ 	int index = 0;
+
+	switch (gettypenumber())
+	{
+		// Point:
+		case 0:
+			output = {0.0,0.0,0.0};
+			break;
+		// Line:
+		case 1:
+			for (int i = 0; i < numnodesinline; i++)
+				output[3*i+0] = -1.0+2.0/(numnodesinline-1)*i;
+			break;
+		// Triangle:
+		case 2:
+			for (int i = 0; i < numnodesinline; i++)
+			{
+				for (int j = 0; j < numnodesinline-i; j++)
+				{
+					output[3*index+0] = 1.0/(numnodesinline-1)*j;
+					output[3*index+1] = 1.0/(numnodesinline-1)*i;
+					index++;
+				}
+			}
+			break;
+		// Quadrangle:
+		case 3:
+			for (int i = 0; i < numnodesinline; i++)
+			{
+				for (int j = 0; j < numnodesinline; j++)
+				{
+					output[3*index+0] = -1.0+2.0/(numnodesinline-1)*j;
+					output[3*index+1] = -1.0+2.0/(numnodesinline-1)*i;
+					index++;
+				}
+			}
+			break;
+		// Tetrahedron:
+		case 4:
+			for (int i = 0; i < numnodesinline; i++)
+			{
+				for (int j = 0; j < numnodesinline-i; j++)
+				{
+					for (int k = 0; k < numnodesinline-i-j; k++)
+					{
+						output[3*index+0] = 1.0/(numnodesinline-1)*k;
+						output[3*index+1] = 1.0/(numnodesinline-1)*j;
+						output[3*index+2] = 1.0/(numnodesinline-1)*i;
+						index++;
+					}
+				}
+			}
+			break;
+		// Hexahedron:
+		case 5:
+			for (int i = 0; i < numnodesinline; i++)
+			{
+				for (int j = 0; j < numnodesinline; j++)
+				{
+					for (int k = 0; k < numnodesinline; k++)
+					{
+						output[3*index+0] = -1.0+2.0/(numnodesinline-1)*k;
+						output[3*index+1] = -1.0+2.0/(numnodesinline-1)*j;
+						output[3*index+2] = -1.0+2.0/(numnodesinline-1)*i;
+						index++;
+					}
+				}
+			}
+			break;
+		// Prism:
+		case 6:
+			for (int i = 0; i < numnodesinline; i++)
+			{
+				for (int j = 0; j < numnodesinline; j++)
+				{
+					for (int k = 0; k < numnodesinline-j; k++)
+					{
+						output[3*index+0] = 1.0/(numnodesinline-1)*k;
+						output[3*index+1] = 1.0/(numnodesinline-1)*j;
+						output[3*index+2] = -1.0+2.0/(numnodesinline-1)*i;
+						index++;
+					}
+				}
+			}
+			break;
+        //Pyramid:
+		case 7:
+			output = {-1.0, -1.0, 0, 1.0, -1.0, 0, -1.0, 1.0, 0.0, 1.0, 1.0, 0, 0.0, 0.0, 1.0};
+			if (getcurvatureorder() > 1)
+			{             
+				std::cout << "Error in 'element' object: coordinates of order 2 and above not defined for pyramids" << std::endl;
+				abort();
+			}
+			break;
+	}
+
+	return output;
+}
+
+

@@ -16,6 +16,22 @@ int mathop::regionexclusion(int physreg, int toexclude)
     return (universe::mymesh->getphysicalregions())->createexclusion(physreg, toexclude);
 }
 
+void mathop::printvector(std::vector<double> input)
+{
+	std::cout << "Vector size is " << input.size() << std::endl;
+	for (int i = 0; i < input.size(); i++)
+		std::cout << input[i] << " ";
+	std::cout << std::endl;
+}
+
+void mathop::printvector(std::vector<int> input)
+{
+	std::cout << "Vector size is " << input.size() << std::endl;
+	for (int i = 0; i < input.size(); i++)
+		std::cout << input[i] << " ";
+	std::cout << std::endl;
+}
+
 expression mathop::normal(int surfphysreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
