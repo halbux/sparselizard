@@ -360,9 +360,9 @@ class element
 
         bool iselementedgeorface(void);		
 
-		// This function outputs the coordinates in format {x1,y1,z1,x2,y2,z2,x3,...}
-		// of the x then y then z coordinate-ordered nodes in the curved element.
-		std::vector<double> listnodecoordinates(void);
+        // This function outputs the coordinates in format {x1,y1,z1,x2,y2,z2,x3,...}
+        // of the x then y then z coordinate-ordered nodes in the curved element.
+        std::vector<double> listnodecoordinates(void);
 };
 
 #endif
