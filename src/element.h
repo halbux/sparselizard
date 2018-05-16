@@ -361,7 +361,7 @@ class element
         bool iselementedgeorface(void);		
 
         // This function outputs the coordinates in format {x1,y1,z1,x2,y2,z2,x3,...}
-        // of the ki then eta then phi coordinate-ordered nodes in the curved element.
+        // of the phi then eta then ki coordinate-ordered nodes in the curved element.
         std::vector<double> listnodecoordinates(void);
 };
 
