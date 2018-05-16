@@ -29,11 +29,11 @@ namespace mathop
     int regionintersection(const std::vector<int> physregs);
     int regionexclusion(int physreg, int toexclude);
     
-    // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
-    expression normal(int surfphysreg);
-
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);
+    
+    // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
+    expression normal(int surfphysreg);
 
     // Write scalar or vector values at given coordinates to a .pos file:
     void scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals = {}, std::vector<double> compzevals = {});
