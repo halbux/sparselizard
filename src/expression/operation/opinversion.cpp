@@ -62,6 +62,14 @@ std::shared_ptr<operation> opinversion::copy(void)
     return op;
 }
 
+std::vector<double> opinversion::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
+	for (int i = 0; i < evaluated.size(); i++)
+		evaluated[i] = 1.0/evaluated[i];
+	return evaluated;
+}
+
 void opinversion::print(void)
 {
     std::cout << "1/(";

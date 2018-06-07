@@ -185,6 +185,25 @@ std::shared_ptr<operation> opfield::copy(void)
     return op;
 }
 
+std::vector<double> opfield::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::string mytype = myfield->gettypename();
+	if (timederivativeorder != 0 || spacederivative != 0 || kietaphiderivative != 0)
+	{
+		std::cout << "Error in 'opfield' object: evaluate does not allow derivatives" << std::endl;
+		abort();
+	}
+	if (mytype == "x")
+		return xcoords;
+	if (mytype == "y")
+		return ycoords;
+	if (mytype == "z")
+		return zcoords;
+
+	std::cout << "Error in 'opfield' object: evaluate only allows the x, y and z field" << std::endl;
+	abort();
+}
+
 void opfield::print(void)
 {
     for (int i = 0; i < timederivativeorder; i++)

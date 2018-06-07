@@ -152,6 +152,18 @@ std::shared_ptr<operation> opsum::copy(void)
     return op;
 }
 
+std::vector<double> opsum::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::vector<double> evaluated(xcoords.size(), 0);
+	for (int i = 0; i < sumterms.size(); i++)
+	{
+		std::vector<double> current = sumterms[i]->evaluate(xcoords, ycoords, zcoords);
+		for (int j = 0; j < xcoords.size(); j++)
+			evaluated[j] += current[j];
+	}
+	return evaluated;
+}
+
 void opsum::print(void)
 {
     std::cout << "(";

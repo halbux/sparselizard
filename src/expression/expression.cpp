@@ -630,6 +630,30 @@ expression expression::at(int row, int col)
     return arrayentry;
 }
 
+std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	if (isscalar())
+	{
+		if (xcoords.size() == ycoords.size() && xcoords.size() == zcoords.size())
+		{
+			if (xcoords.size() == 0)
+				return std::vector<double>(0);
+			else		
+				return myoperations[0]->evaluate(xcoords, ycoords, zcoords);
+		}
+		else
+		{
+			std::cout << "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" << std::endl;
+			abort();
+		}	
+	}
+	else
+	{
+		std::cout << "Error in 'expression' object: 'evaluate' can only be called on a scalar expression" << std::endl;
+		abort();
+	}
+}
+
 
 expression expression::spacederivative(int whichderivative)
 {

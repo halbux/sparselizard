@@ -205,6 +205,18 @@ std::shared_ptr<operation> opproduct::copy(void)
     return op;
 }
 
+std::vector<double> opproduct::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::vector<double> evaluated(xcoords.size(), 1);
+	for (int i = 0; i < productterms.size(); i++)
+	{
+		std::vector<double> current = productterms[i]->evaluate(xcoords, ycoords, zcoords);
+		for (int j = 0; j < xcoords.size(); j++)
+			evaluated[j] *= current[j];
+	}
+	return evaluated;
+}
+
 void opproduct::print(void)
 {
     for (int i = 0; i < productterms.size(); i++)

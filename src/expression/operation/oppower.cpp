@@ -66,6 +66,16 @@ std::shared_ptr<operation> oppower::copy(void)
     return op;
 }
 
+std::vector<double> oppower::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::vector<double> evaluatedbase = mybase->evaluate(xcoords, ycoords, zcoords);
+	std::vector<double> evaluatedexponent = myexponent->evaluate(xcoords, ycoords, zcoords);
+
+	for (int i = 0; i < xcoords.size(); i++)
+		evaluatedbase[i] = std::pow(evaluatedbase[i], evaluatedexponent[i]);
+	return evaluatedbase;
+}
+
 void oppower::print(void)
 {
     std::cout << "(";

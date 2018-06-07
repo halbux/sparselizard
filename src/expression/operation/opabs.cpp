@@ -62,6 +62,14 @@ std::shared_ptr<operation> opabs::copy(void)
     return op;
 }
 
+std::vector<double> opabs::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
+	for (int i = 0; i < evaluated.size(); i++)
+		evaluated[i] = std::abs(evaluated[i]);
+	return evaluated;
+}
+
 void opabs::print(void)
 {
     std::cout << "abs(";

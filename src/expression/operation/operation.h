@@ -126,6 +126,8 @@ class operation : public std::enable_shared_from_this<operation>
         // Simplify the operation as it is on the disjoint regions:
         virtual std::shared_ptr<operation> simplify(std::vector<int> disjregs) { return shared_from_this(); };
      
+		// Evaluate an operation that only contains x, y and/or z fields without derivatives.
+		virtual std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 };
 
 #include "opabs.h"

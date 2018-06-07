@@ -24,4 +24,10 @@ std::shared_ptr<operation> opconstant::copy(void)
     return op;
 }
 
+std::vector<double> opconstant::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+	std::vector<double> evaluated(xcoords.size(), constantvalue);
+	return evaluated;
+}
+
 void opconstant::print(void) { std::cout << constantvalue; }
