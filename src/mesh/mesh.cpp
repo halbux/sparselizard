@@ -109,12 +109,12 @@ disjointregions* mesh::getdisjointregions(void) {return &mydisjointregions;}
 
 void mesh::load(std::string name, int verbosity)
 {
-	///// Reset all memory of the mesh object:
-	mynodes = nodes();
-	mydisjointregions = disjointregions();
-	myphysicalregions = physicalregions(mydisjointregions);
- 	myelements = elements(mynodes, myphysicalregions, mydisjointregions);
-	///// Memory is reset
+    ///// Reset all memory of the mesh object:
+    mynodes = nodes();
+    mydisjointregions = disjointregions();
+    myphysicalregions = physicalregions(mydisjointregions);
+    myelements = elements(mynodes, myphysicalregions, mydisjointregions);
+    ///// Memory is reset
 
 
     if (verbosity > 0)
