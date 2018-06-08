@@ -30,7 +30,7 @@ class mesh
         
         nodes mynodes;
         elements myelements;
- 		physicalregions myphysicalregions;
+        physicalregions myphysicalregions;
         disjointregions mydisjointregions;
 
         std::string filename = "";
@@ -53,7 +53,7 @@ class mesh
 	
 	public:
         
-		mesh(void);
+        mesh(void);
         mesh(std::string filename, int verbosity = 1);
         
         nodes* getnodes(void);
@@ -61,9 +61,9 @@ class mesh
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
 
-		// Load from file name:
+        // Load from file name:
         void load(std::string name, int verbosity = 1);	
-		// Write to file name:
+        // Write to file name:
         void write(std::string name, int verbosity = 1);		
         
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
