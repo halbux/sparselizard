@@ -1,15 +1,8 @@
 #include "mesh.h"
 
 
-mesh::mesh(std::string filename) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions)
-{
-    universe::mymesh = this;
-    load(filename,1);
-}
-
 void mesh::readfromfile(std::string name)
 {
-    
 	filename = name;
 
 	if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
@@ -103,30 +96,31 @@ mesh::mesh(void) : myelements(mynodes, myphysicalregions, mydisjointregions), my
     universe::mymesh = this;
 }
 
+mesh::mesh(std::string filename, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions)
+{
+    universe::mymesh = this;
+    load(filename, verbosity);
+}
+
 nodes* mesh::getnodes(void) {return &mynodes;}
 elements* mesh::getelements(void) {return &myelements;}
 physicalregions* mesh::getphysicalregions(void) {return &myphysicalregions;}
 disjointregions* mesh::getdisjointregions(void) {return &mydisjointregions;}
 
-void mesh::load(std::string name)
-{
-    mesh::load(name, 0);
-}
-
 void mesh::load(std::string name, int verbosity)
 {
-    // Make sure load is not called more than once:
-    if (filename.size() != 0)
-    {
-        std::cout << "Error in 'mesh' object: loading more than once is not allowed." << std::endl;
-        abort();
-    }
-    
+	///// Reset all memory of the mesh object:
+	mynodes = nodes();
+	mydisjointregions = disjointregions();
+	myphysicalregions = physicalregions(mydisjointregions);
+ 	myelements = elements(mynodes, myphysicalregions, mydisjointregions);
+	///// Memory is reset
+
+
     if (verbosity > 0)
         std::cout << "Loading mesh from file '" << name << "'" << std::endl;
     
 	wallclock loadtime;
-    
     
     readfromfile(name);
 	myelements.explode();
@@ -152,14 +146,8 @@ void mesh::load(std::string name, int verbosity)
     if (verbosity > 0)
     {
         printcount();
-        std::cout << "Time to read the mesh: "; 
-        loadtime.print();
+        loadtime.print("Time to read the mesh: ");
     }
-}
-
-void mesh::write(std::string name)
-{
-	mesh::write(name, 0);
 }
 
 void mesh::write(std::string name, int verbosity)

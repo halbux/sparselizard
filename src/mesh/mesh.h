@@ -53,19 +53,18 @@ class mesh
 	
 	public:
         
-        mesh(void);
-        mesh(std::string filename);
+		mesh(void);
+        mesh(std::string filename, int verbosity = 1);
         
         nodes* getnodes(void);
         elements* getelements(void);
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
 
-        
-        void load(std::string);	
-        void load(std::string, int verbosity);	
-        void write(std::string);
-        void write(std::string, int verbosity);		
+		// Load from file name:
+        void load(std::string name, int verbosity = 1);	
+		// Write to file name:
+        void write(std::string name, int verbosity = 1);		
         
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
         void shift(double x, double y, double z);

@@ -59,8 +59,6 @@ class elements
         
 	public:
         
-///////// REWRITE ALL FUNCTIONS THAT ARE SPECIIFIE DFOR NODES LINES TRIANG QUAD IN A LOOP -> MORE COMPACT LESS ERROR PRONE
-        
         elements(nodes&, physicalregions&, disjointregions&);
         
         // Add an element defined by its element type number, curvature order and 
