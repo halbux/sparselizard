@@ -160,10 +160,7 @@ void mesh::write(std::string name, int verbosity)
     writetofile(name);
 
     if (verbosity > 0)
-    {
-        std::cout << "Time to write the mesh: ";
-        writetime.print();
-    }
+        writetime.print("Time to write the mesh: ");
 }
 
 void mesh::shift(double x, double y, double z)
