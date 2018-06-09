@@ -146,7 +146,7 @@ void mesh::load(std::string name, int verbosity)
     if (verbosity > 0)
     {
         printcount();
-        loadtime.print("Time to read the mesh: ");
+        loadtime.print("Time to load the mesh: ");
     }
 }
 
