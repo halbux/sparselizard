@@ -52,6 +52,7 @@ class vectorfieldselect;
 class coefmanager;
 class rawvec;
 class expression;
+class elementselector;
 
 class rawfield : public std::enable_shared_from_this<rawfield>
 {

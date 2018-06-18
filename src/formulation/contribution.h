@@ -30,9 +30,12 @@
 #include "rawvec.h"
 #include "rawmat.h"
 #include "wallclock.h"
+#include "operation.h"
 
 class rawvec;
 class rawmat;
+class operation;
+class rawfield;
 
 class contribution
 {

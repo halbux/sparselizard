@@ -25,6 +25,7 @@
 #include "rawfield.h"
 #include "vectorfieldselect.h"
 
+class parameter;
 class rawfield;
 
 class field

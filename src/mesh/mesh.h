@@ -4,8 +4,8 @@
 // bugs and problems to <alexandre.halbach at ulg.ac.be>.
 
 
-#ifndef MESHHEADER_H
-#define MESHHEADER_H
+#ifndef MESH_H
+#define MESH_H
 
 #include <string>
 #include "nodes.h"
@@ -20,9 +20,13 @@
 #include "physicalregion.h"
 #include "gmshinterface.h"
 #include "element.h"
+#include <memory>
+#include "shape.h"
+#include "rawshape.h"
 
 class nodes;
 class elements;
+class shape;
 
 class mesh
 {
@@ -55,6 +59,7 @@ class mesh
         
         mesh(void);
         mesh(std::string filename, int verbosity = 1);
+		mesh(std::vector<shape> inputshapes, int verbosity = 1);
         
         nodes* getnodes(void);
         elements* getelements(void);
@@ -63,6 +68,9 @@ class mesh
 
         // Load from file name:
         void load(std::string name, int verbosity = 1);	
+        // Load from shape vector:
+		void load(std::vector<shape> inputshapes, int verbosity = 1);	
+
         // Write to file name:
         void write(std::string name, int verbosity = 1);		
         

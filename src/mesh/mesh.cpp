@@ -3,8 +3,6 @@
 
 void mesh::readfromfile(std::string name)
 {
-	filename = name;
-
 	if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
 		gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
     else
@@ -102,6 +100,12 @@ mesh::mesh(std::string filename, int verbosity) : myelements(mynodes, myphysical
     load(filename, verbosity);
 }
 
+mesh::mesh(std::vector<shape> inputshapes, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions)
+{
+    universe::mymesh = this;
+    load(inputshapes, verbosity);
+}
+
 nodes* mesh::getnodes(void) {return &mynodes;}
 elements* mesh::getelements(void) {return &myelements;}
 physicalregions* mesh::getphysicalregions(void) {return &myphysicalregions;}
@@ -116,6 +120,8 @@ void mesh::load(std::string name, int verbosity)
     myelements = elements(mynodes, myphysicalregions, mydisjointregions);
     ///// Memory is reset
 
+
+	filename = name;
 
     if (verbosity > 0)
         std::cout << "Loading mesh from file '" << name << "'" << std::endl;
@@ -149,6 +155,117 @@ void mesh::load(std::string name, int verbosity)
         loadtime.print("Time to load the mesh: ");
     }
 }
+
+void mesh::load(std::vector<shape> inputshapes, int verbosity)
+{
+    ///// Reset all memory of the mesh object:
+    mynodes = nodes();
+    mydisjointregions = disjointregions();
+    myphysicalregions = physicalregions(mydisjointregions);
+    myelements = elements(mynodes, myphysicalregions, mydisjointregions);
+	filename = "";
+ 	///// Memory is reset
+
+
+    if (verbosity > 0)
+        std::cout << "Loading mesh from " << inputshapes.size() << " shapes" << std::endl;
+    
+	wallclock loadtime;
+    
+
+	///// Transfer the mesh from every shape to the corresponding objects:
+	// Curvature order for shapes is 1 for now:
+	int curvatureorder = 1;
+
+	if (inputshapes.size() == 0)
+	{
+		std::cout << "Error in 'mesh' object: provided an empty vector of shapes" << std::endl;
+		abort();
+	}
+
+	// Make sure all shapes have a valid physical region number:
+	for (int i = 0; i < inputshapes.size(); i++)
+	{
+		if (inputshapes[i].getphysicalregion() <= 0)
+		{
+			std::cout << "Error in 'mesh' object: physical region number was negative or zero for a shape" << std::endl;
+			abort();
+		}
+	}
+
+	// Get the number of nodes for preallocation:
+	int numberofnodes = 0;
+	for (int i = 0; i < inputshapes.size(); i++)
+		numberofnodes += ( inputshapes[i].getpointer()->getcoords() )->size()/3;
+	mynodes.setnumber(numberofnodes);
+	std::vector<double>* nodecoordinates = mynodes.getcoordinates();
+
+
+	// The node numbers must be shifted from a shape to the other to avoid same numbers:
+	int offset = 0;
+	// Loop on every input shape:
+	for (int i = 0; i < inputshapes.size(); i++)
+	{
+		// Append the nodes:
+		std::vector<double>* nodecoords = inputshapes[i].getpointer()->getcoords();
+		for (int j = 0; j < nodecoords->size(); j++)
+			nodecoordinates->at(3*offset+j) = nodecoords->at(j);
+
+		// Append the elements:
+		int physreg = inputshapes[i].getpointer()->getphysicalregion();
+		physicalregion* currentphysicalregion = myphysicalregions.get(physreg);
+		std::vector<std::vector<int>>* elems = inputshapes[i].getpointer()->getelems();
+		// Loop on all element types:
+		for (int typenum = 0; typenum < elems->size(); typenum++)
+		{
+			element currentelem(typenum, curvatureorder);
+			// Number of nodes in every element of current type number:
+			int numnodesinelem = currentelem.countcurvednodes();
+
+			std::vector<int> nodesincurrentelement(numnodesinelem);
+
+			for (int e = 0; e < (elems->at(typenum)).size()/numnodesinelem; e++)
+			{
+				for (int m = 0; m < numnodesinelem; m++)
+					nodesincurrentelement[m] = (elems->at(typenum))[e*numnodesinelem+m] + offset;
+
+				int elementindexincurrenttype = myelements.add(typenum, curvatureorder, nodesincurrentelement);
+				currentphysicalregion->addelement(typenum, elementindexincurrenttype);
+			}
+		}
+
+		offset += nodecoords->size()/3;
+	}
+	///// Mesh is transferred
+
+
+	myelements.explode();
+	sortbybarycenters();
+	removeduplicates();
+    
+    myelements.definedisjointregions();
+    // The reordering is stable and the elements are thus still ordered 
+    // by barycenter coordinates in every disjoint region!
+    myelements.reorderbydisjointregions();
+    myelements.definedisjointregionsranges();
+    
+    // Define the physical regions based on the disjoint regions they contain:
+    for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
+    {
+        physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
+        currentphysicalregion->definewithdisjointregions();
+    }
+    
+    myelements.tostandardorientation();
+	myelements.orient();
+    
+    if (verbosity > 0)
+    {
+        printcount();
+        loadtime.print("Time to load the mesh: ");
+    }
+}
+
 
 void mesh::write(std::string name, int verbosity)
 {
