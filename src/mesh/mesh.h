@@ -59,7 +59,7 @@ class mesh
         
         mesh(void);
         mesh(std::string filename, int verbosity = 1);
-		mesh(std::vector<shape> inputshapes, int verbosity = 1);
+        mesh(std::vector<shape> inputshapes, int verbosity = 1);
         
         nodes* getnodes(void);
         elements* getelements(void);
@@ -69,7 +69,7 @@ class mesh
         // Load from file name:
         void load(std::string name, int verbosity = 1);	
         // Load from shape vector:
-		void load(std::vector<shape> inputshapes, int verbosity = 1);	
+        void load(std::vector<shape> inputshapes, int verbosity = 1);	
 
         // Write to file name:
         void write(std::string name, int verbosity = 1);		
