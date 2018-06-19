@@ -44,7 +44,6 @@ std::shared_ptr<rawshape> rawdisk::duplicate(void)
 {
     std::shared_ptr<rawdisk> out(new rawdisk);
     *out = *this;
-	out->myphysicalregion = -1;
 
 	out->sons = geotools::duplicate(sons);
 	out->mycenterpoint = mycenterpoint->duplicate();

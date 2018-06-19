@@ -26,7 +26,6 @@ std::shared_ptr<rawshape> rawpoint::duplicate(void)
 {
     std::shared_ptr<rawpoint> out(new rawpoint);
     *out = *this;
-	out->myphysicalregion = -1;
 
 	out->sons = geotools::duplicate(sons);
 

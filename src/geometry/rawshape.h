@@ -46,6 +46,9 @@ class rawshape : public std::enable_shared_from_this<rawshape>
 
 		virtual std::vector<std::shared_ptr<rawshape>> getsons(void);
 
+		// Get ALL subshapes (sons are included):
+		virtual std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
+
 		// Get the mesh info of the shape:
 		virtual int getphysicalregion(void);
 		virtual std::vector<double>* getcoords(void);

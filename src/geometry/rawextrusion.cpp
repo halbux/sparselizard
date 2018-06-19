@@ -25,7 +25,6 @@ std::shared_ptr<rawshape> rawextrusion::duplicate(void)
 { 
 	std::shared_ptr<rawextrusion> out(new rawextrusion);
 	*out = *this;
-	out->myphysicalregion = -1;
 
 	out->sons = geotools::duplicate(sons);
 	out->myunextrudedregions = geotools::duplicate(myunextrudedregions);

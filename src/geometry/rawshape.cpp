@@ -142,6 +142,12 @@ std::vector<std::shared_ptr<rawshape>> rawshape::getsons(void)
 	abort(); 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapes(void)
+{
+	std::cout << "Error in 'rawshape' object: 'getsubshapes' has not been defined for this shape" << std::endl;
+	abort(); 
+}
+
 int rawshape::getphysicalregion(void)
 {
 	std::cout << "Error in 'rawshape' object: 'getphysicalregion' has not been defined for this shape" << std::endl;

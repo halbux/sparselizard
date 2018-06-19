@@ -34,7 +34,6 @@ std::shared_ptr<rawshape> rawarc::duplicate(void)
 {
     std::shared_ptr<rawarc> out(new rawarc);
     *out = *this;
-	out->myphysicalregion = -1;
 
 	out->sons = geotools::duplicate(sons);
 

@@ -54,7 +54,6 @@ std::shared_ptr<rawshape> rawquadrangle::duplicate(void)
 {
     std::shared_ptr<rawquadrangle> out(new rawquadrangle);
     *out = *this;
-	out->myphysicalregion = -1;
 
 	out->sons = geotools::duplicate(sons);
 

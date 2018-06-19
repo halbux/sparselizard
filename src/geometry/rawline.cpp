@@ -64,7 +64,6 @@ std::shared_ptr<rawshape> rawline::duplicate(void)
 {
     std::shared_ptr<rawline> out(new rawline);
     *out = *this;
-	out->myphysicalregion = -1;
 
 	out->sons = geotools::duplicate(sons);
 
