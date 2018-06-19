@@ -49,6 +49,9 @@ class rawpoint: public rawshape
 		std::string getname(void);
 
 		std::vector<std::shared_ptr<rawshape>> getsons(void);
+
+		// Get ALL subshapes (sons are included):
+		std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
 		
 		// Get the mesh info of the shape:
 		int getphysicalregion(void);

@@ -53,6 +53,11 @@ std::vector<std::shared_ptr<rawshape>> rawpoint::getsons(void)
 	return sons; 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawpoint::getsubshapes(void)
+{
+	return sons;
+}
+
 int rawpoint::getphysicalregion(void) 
 { 
 	return myphysicalregion; 

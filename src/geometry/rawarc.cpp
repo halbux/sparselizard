@@ -75,6 +75,11 @@ std::vector<std::shared_ptr<rawshape>> rawarc::getsons(void)
 	return sons; 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawarc::getsubshapes(void)
+{
+	return sons;
+}
+
 int rawarc::getphysicalregion(void) 
 { 
 	return myphysicalregion; 

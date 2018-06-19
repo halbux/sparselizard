@@ -105,6 +105,11 @@ std::vector<std::shared_ptr<rawshape>> rawline::getsons(void)
 	return sons; 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawline::getsubshapes(void)
+{
+	return sons;
+}
+
 int rawline::getphysicalregion(void) 
 { 
 	return myphysicalregion; 

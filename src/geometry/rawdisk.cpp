@@ -72,6 +72,11 @@ std::vector<std::shared_ptr<rawshape>> rawdisk::getsons(void)
 	return sons; 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawdisk::getsubshapes(void)
+{
+	return sons;
+}
+
 int rawdisk::getphysicalregion(void) 
 { 
 	return myphysicalregion; 

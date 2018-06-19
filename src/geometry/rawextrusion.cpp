@@ -54,6 +54,11 @@ std::vector<std::shared_ptr<rawshape>> rawextrusion::getsons(void)
 	return sons; 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawextrusion::getsubshapes(void)
+{
+	return sons;
+}
+
 int rawextrusion::getphysicalregion(void) 
 { 
 	return myphysicalregion; 

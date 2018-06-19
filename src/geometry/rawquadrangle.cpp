@@ -81,6 +81,11 @@ std::vector<std::shared_ptr<rawshape>> rawquadrangle::getsons(void)
 	return sons; 
 }
 
+std::vector<std::shared_ptr<rawshape>> rawquadrangle::getsubshapes(void)
+{
+	return sons;
+}
+
 int rawquadrangle::getphysicalregion(void) 
 { 
 	return myphysicalregion; 
