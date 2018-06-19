@@ -30,10 +30,10 @@ void rawshape::deform(expression xdeform, expression ydeform, expression zdeform
 	}
 
 	
-	// Also deform the sons:
-	std::vector<std::shared_ptr<rawshape>> sons = getsons();
-	for (int i = 0; i < sons.size(); i++)
-		sons[i]->deform(xdeform, ydeform, zdeform);
+	// Also deform the sub shapes:
+	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
+	for (int i = 0; i < subshapes.size(); i++)
+		subshapes[i]->deform(xdeform, ydeform, zdeform);
 }
 
 void rawshape::shift(double shiftx, double shifty, double shiftz)
@@ -50,10 +50,10 @@ void rawshape::shift(double shiftx, double shifty, double shiftz)
 	}
 
 
-	// Also shift the sons:
-	std::vector<std::shared_ptr<rawshape>> sons = getsons();
-	for (int i = 0; i < sons.size(); i++)
-		sons[i]->shift(shiftx, shifty, shiftz);
+	// Also shift the sub shapes:
+	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
+	for (int i = 0; i < subshapes.size(); i++)
+		subshapes[i]->shift(shiftx, shifty, shiftz);
 }
 
 void rawshape::rotate(double alphax, double alphay, double alphaz)
@@ -93,10 +93,10 @@ void rawshape::rotate(double alphax, double alphay, double alphaz)
 	}
 
 
-	// Also rotate the sons:
-	std::vector<std::shared_ptr<rawshape>> sons = getsons();
-	for (int i = 0; i < sons.size(); i++)
-		sons[i]->rotate(alphax, alphay, alphaz);
+	// Also rotate the sub shapes:
+	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
+	for (int i = 0; i < subshapes.size(); i++)
+		subshapes[i]->rotate(alphax, alphay, alphaz);
 }
 
 
