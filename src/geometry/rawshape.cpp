@@ -65,20 +65,20 @@ void rawshape::rotate(double alphax, double alphay, double alphaz)
 
     // Convert input degrees to radians:
     double pi = 3.1415926535897932384;
-    alphax = alphax*2*pi/360;
-    alphay = alphay*2*pi/360;
-    alphaz = alphaz*2*pi/360;
+    double ax = alphax*2*pi/360;
+    double ay = alphay*2*pi/360;
+    double az = alphaz*2*pi/360;
     
 	// Define the rotation matrix R = Rx*Ry*Rz:
-	double Rxx = std::cos(alphay)*std::cos(alphaz); 
-	double Rxy = -std::cos(alphay)*std::sin(alphaz); 
-	double Rxz = std::sin(alphay); 
-	double Ryx = std::cos(alphax)*std::sin(alphaz) + std::cos(alphaz)*std::sin(alphax)*std::sin(alphay); 
-	double Ryy = std::cos(alphax)*std::cos(alphaz) - std::sin(alphax)*std::sin(alphay)*std::sin(alphaz); 
-	double Ryz = -std::cos(alphay)*std::sin(alphax); 
-	double Rzx = std::sin(alphax)*std::sin(alphaz) - std::cos(alphax)*std::cos(alphaz)*std::sin(alphay); 
-	double Rzy = std::cos(alphaz)*std::sin(alphax) + std::cos(alphax)*std::sin(alphay)*std::sin(alphaz); 
-	double Rzz = std::cos(alphax)*std::cos(alphay); 
+	double Rxx = std::cos(ay)*std::cos(az); 
+	double Rxy = -std::cos(ay)*std::sin(az); 
+	double Rxz = std::sin(ay); 
+	double Ryx = std::cos(ax)*std::sin(az) + std::cos(az)*std::sin(ax)*std::sin(ay); 
+	double Ryy = std::cos(ax)*std::cos(az) - std::sin(ax)*std::sin(ay)*std::sin(az); 
+	double Ryz = -std::cos(ay)*std::sin(ax); 
+	double Rzx = std::sin(ax)*std::sin(az) - std::cos(ax)*std::cos(az)*std::sin(ay); 
+	double Rzy = std::cos(az)*std::sin(ax) + std::cos(ax)*std::sin(ay)*std::sin(az); 
+	double Rzz = std::cos(ax)*std::cos(ay); 
 
 	// Compute R*[coordx; coordy; coordz]:
 	for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
@@ -96,7 +96,7 @@ void rawshape::rotate(double alphax, double alphay, double alphaz)
 	// Also rotate the sub shapes:
 	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
 	for (int i = 0; i < subshapes.size(); i++)
-		subshapes[i]->rotate(alphax*360/2/pi, alphay*360/2/pi, alphaz*360/2/pi);
+		subshapes[i]->rotate(alphax, alphay, alphaz);
 }
 
 
