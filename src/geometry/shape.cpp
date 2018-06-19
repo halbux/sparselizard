@@ -183,9 +183,9 @@ shape shape::extrude(int physreg, double height, int numlayers)
 {
 	errornullpointer();
 
-	if (numlayers < 1)
+	if (numlayers < 2)
 	{
-		std::cout << "Error in 'shape' object: cannot extrude with " << numlayers << "layers (at least one is needed)" << std::endl;
+		std::cout << "Error in 'shape' object: cannot extrude with " << numlayers << " node layers (at least two are needed)" << std::endl;
 		abort();
 	}
 	return shape(rawshapeptr->extrude(physreg, height, numlayers));
