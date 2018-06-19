@@ -194,20 +194,19 @@ shape shape::extrude(int physreg, double height, int numlayers)
 shape shape::duplicate(void)
 {
 	errornullpointer();
-
 	return shape(rawshapeptr->duplicate());
 }
 
 int shape::getdimension(void)
 {
 	errornullpointer();
-	rawshapeptr->getdimension(); 
+	return rawshapeptr->getdimension(); 
 }
 
 std::string shape::getname(void)
 {
 	errornullpointer();
-	rawshapeptr->getname(); 
+	return rawshapeptr->getname(); 
 }
 
 std::vector<shape> shape::getsons(void)
