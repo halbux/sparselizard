@@ -96,7 +96,7 @@ void rawshape::rotate(double alphax, double alphay, double alphaz)
 	// Also rotate the sub shapes:
 	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
 	for (int i = 0; i < subshapes.size(); i++)
-		subshapes[i]->rotate(alphax, alphay, alphaz);
+		subshapes[i]->rotate(alphax*360/2/pi, alphay*360/2/pi, alphaz*360/2/pi);
 }
 
 
