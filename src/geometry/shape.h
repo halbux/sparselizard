@@ -71,7 +71,7 @@ class shape
 
 		shape extrude(int physreg, double height, int numlayers);
 
-		// Duplicates the shape and all subshapes but not the physical region number. 
+		// Duplicate the shape and all subshapes but not the physical region number. 
 		shape duplicate(void);
 
 		// Return the dimension of the shape (0D, 1D, 2D or 3D):
