@@ -74,14 +74,7 @@ void rawline::flip(void)
 {
 	sons = {sons[1],sons[0]};
 
-	int numlines = myelems[1].size()/2;
-
-	std::vector<int> flippedlines(2*numlines);
-
-	for (int i = 0; i < 2*numlines; i++)
-		flippedlines[i] = myelems[1][2*numlines-1-i];
-		
-	myelems[1] = flippedlines;
+	mycoords = geotools::flipcoords(mycoords);
 }
 
 void rawline::setphysicalregion(int physreg)
