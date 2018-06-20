@@ -23,6 +23,9 @@ namespace geotools
 	// Convert a list of point coordinates into point objects:
 	std::vector<std::shared_ptr<rawshape>> coordstopoints(std::vector<double> coords);
 
+	// Flip the nodes in a coordinate vector (3 coordinates per node):
+	std::vector<double> flipcoords(std::vector<double>& input);
+
 	// Orient a list of line shapes to have them all pointing to the next one:
 	std::vector<std::shared_ptr<rawshape>> orient(std::vector<std::shared_ptr<rawshape>> input);
 

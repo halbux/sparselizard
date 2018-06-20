@@ -18,7 +18,22 @@ std::vector<std::shared_ptr<rawshape>> geotools::coordstopoints(std::vector<doub
 		std::cout << "Error in 'geotool' namespace: length of coordinate vector should be a multiple of three" << std::endl;
 		abort();
 	}
+}
 
+std::vector<double> geotools::flipcoords(std::vector<double>& input)
+{
+	int numnodes = input.size()/3;
+
+	std::vector<int> output(3*numnodes);
+
+	for (int i = 0; i < numnodes; i++)
+	{
+		output[3*i+0] = input[3*(numnodes-1-i)+0];
+		output[3*i+1] = input[3*(numnodes-1-i)+1];
+		output[3*i+2] = input[3*(numnodes-1-i)+2];
+	}
+	
+	return output;
 }
 
 std::vector<std::shared_ptr<rawshape>> geotools::orient(std::vector<std::shared_ptr<rawshape>> input)
