@@ -23,7 +23,7 @@ rawline::rawline(int physreg, std::vector<double> allcoords)
 	mycoords = allcoords;
 
 	// Here the mesh is provided by the user:
-	myelems[1].resize(numelems);
+	myelems[1].resize(2*numelems);
 	for (int i = 0; i < numelems; i++)
 	{
 		myelems[1][2*i+0] = i;
