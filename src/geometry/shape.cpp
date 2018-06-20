@@ -104,6 +104,21 @@ shape::shape(std::string shapename, int physreg, std::vector<shape> subshapes, i
 	abort();
 }
 
+shape::shape(std::string shapename, int physreg, std::vector<shape> subshapes, std::vector<int> nummeshpts)
+{
+	// Get the rawshape pointer from all shapes:
+	std::vector<std::shared_ptr<rawshape>> subrawshapes = geotools::getrawshapes(subshapes);
+
+	if (shapename == "quadrangle")
+	{
+		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, subrawshapes, nummeshpts));
+		return;
+	}
+
+	std::cout << "Error in 'shape' object: shape " << shapename << " does not accept this constructor or is unknown (try lower case)" << std::endl;
+	abort();
+}
+
 shape::shape(std::string shapename, int physreg, std::vector<shape> subshapes)
 {
 	// Get the rawshape pointer from all shapes:

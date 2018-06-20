@@ -51,6 +51,7 @@ class shape
 
 		// Constructor based on sub-shapes (not for point shapes):
 		shape(std::string shapename, int physreg, std::vector<shape> subshapes, int nummeshpts);
+		shape(std::string shapename, int physreg, std::vector<shape> subshapes, std::vector<int> nummeshpts);
 		shape(std::string shapename, int physreg, std::vector<shape> subshapes);
 
 		// Define a disk:
