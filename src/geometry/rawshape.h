@@ -35,7 +35,7 @@ class rawshape : public std::enable_shared_from_this<rawshape>
 
 		virtual std::shared_ptr<rawshape> duplicate(void);
 
-		// Flip a rawline direction:
+		// Flip a line direction:
 		virtual void flip(void);
 
 		virtual void setphysicalregion(int physreg);
