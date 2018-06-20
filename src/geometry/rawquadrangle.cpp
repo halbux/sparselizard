@@ -38,7 +38,7 @@ rawquadrangle::rawquadrangle(int physreg, std::vector<std::shared_ptr<rawshape>>
 
 	myphysicalregion = physreg;
 
-	sons = inputlines;
+	sons = geotools::orient(inputlines);
 
 	mesh();
 }
