@@ -42,7 +42,7 @@ std::shared_ptr<rawshape> rawarc::duplicate(void)
 
 void rawarc::flip(void)
 {
-	sons = {sons[1],sons[0],sons[2]};
+	sons = {sons[1],sons[0],sons[2]};////!!! extra rotationdir in private otherwise problem with flip: rot dir changes
 
     mycoords = geotools::flipcoords(mycoords);
 }
