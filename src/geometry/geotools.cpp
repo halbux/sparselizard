@@ -24,7 +24,7 @@ std::vector<double> geotools::flipcoords(std::vector<double>& input)
 {
 	int numnodes = input.size()/3;
 
-	std::vector<int> output(3*numnodes);
+	std::vector<double> output(3*numnodes);
 
 	for (int i = 0; i < numnodes; i++)
 	{
