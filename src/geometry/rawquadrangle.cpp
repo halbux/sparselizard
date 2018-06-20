@@ -18,7 +18,7 @@ rawquadrangle::rawquadrangle(int physreg, std::vector<std::shared_ptr<rawshape>>
 	std::vector<std::shared_ptr<rawshape>> lns(4);
 	
 	for (int i = 0; i < 4; i++)
-		lns[i] = std::shared_ptr<rawline>(new rawline(physreg, {inputpoints[i], inputpoints[(i+1)%4]}, nummeshpoints[i]));
+		lns[i] = std::shared_ptr<rawline>(new rawline(-1, {inputpoints[i], inputpoints[(i+1)%4]}, nummeshpoints[i]));
 
 
 	myphysicalregion = physreg;
