@@ -76,16 +76,7 @@ shape::shape(std::string shapename, int physreg, std::vector<double> coords, std
 
 	if (shapename == "quadrangle")
 	{
-        if (cornerpts.size() != 4)
-        {
-        	std::cout << "Error in 'shape' object: expected four nodes in definition of shape " << shapename << std::endl;
-        	abort();
-        }
-		std::vector<std::shared_ptr<rawshape>> lns(4);
-		for (int i = 0; i < 4; i++)
-			lns[i] = std::shared_ptr<rawline>(new rawline(-1, {cornerpts[i], cornerpts[(i+1)%4]}, {nummeshpts[i]}));
-
-		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, lns));
+		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, cornerpts, nummeshpts));
 		return;
 	}
 
