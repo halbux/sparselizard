@@ -27,7 +27,7 @@ rawline::rawline(int physreg, std::vector<double> allcoords)
 	for (int i = 0; i < numelems; i++)
 	{
 		myelems[1][2*i+0] = i;
-		myelems[1][2*i+1] = (i+1)%mynummeshpoints;
+		myelems[1][2*i+1] = i+1;
 	}
 }
 
