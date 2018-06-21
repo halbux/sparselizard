@@ -104,6 +104,8 @@ std::shared_ptr<rawshape> rawarc::getpointer(void)
 
 void rawarc::mesh(void)
 {
+    double pi = 3.1415926535897932384;
+
 	int numelems = mynummeshpoints-1;
 
 	mycoords.resize(3*mynummeshpoints);
@@ -134,6 +136,8 @@ void rawarc::mesh(void)
 		angle2 = -angle2;
 	// Angle between two consecutive points in the mesh:
 	double deltaangle = (angle2-angle1)/numelems;
+	if (angle2-angle1 < 0)
+		deltaangle = (2*pi+angle2-angle1)/numelems;
 
 	for (int i = 0; i < mynummeshpoints; i++)
 	{
