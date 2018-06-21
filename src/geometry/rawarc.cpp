@@ -130,7 +130,7 @@ void rawarc::mesh(void)
 	for (int i = 0; i < mynummeshpoints; i++)
 	{
 		mycoords[3*i+0] = p3coords->at(0) + radius*cos(angle1+i*deltaangle);
-		mycoords[3*i+1] = p3coords->at(1) + radius*sin(angle1+i*deltaangle);;
+		mycoords[3*i+1] = p3coords->at(1) + radius*sin(angle1+i*deltaangle);
 		mycoords[3*i+2] = p3coords->at(2);
 	}
 
