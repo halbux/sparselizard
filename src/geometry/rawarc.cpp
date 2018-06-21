@@ -15,6 +15,14 @@ rawarc::rawarc(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, 
 		abort();
 	}
 
+	// Make sure the arc is in the xy-plane at zero z:
+	if (inputpoints[0]->getcoords()->at(2) != 0.0 || inputpoints[1]->getcoords()->at(2) != 0.0 || inputpoints[2]->getcoords()->at(2) != 0.0)
+	{
+		std::cout << "Error in 'rawarc' object: arc must be in xy-plane at zero z" << std::endl;
+		abort();
+	}
+
+
 	myphysicalregion = physreg;
 
 	mynummeshpoints = nummeshpoints;
