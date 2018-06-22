@@ -23,6 +23,12 @@ namespace geotools
 	// Convert a list of point coordinates into point objects:
 	std::vector<std::shared_ptr<rawshape>> coordstopoints(std::vector<double> coords);
 
+	// Get the distance between two points:
+	double getdistance(std::vector<double> pt1coords, std::vector<double> pt2coords);
+
+	// Get the angle (in degrees) with the x and y axis of the plane defined by the 3 input points
+	std::vector<double> getplaneangles(std::vector<double> p1, std::vector<double> p2, std::vector<double> p3);
+
 	// Flip the nodes in a coordinate vector (3 coordinates per node):
 	std::vector<double> flipcoords(std::vector<double>& input);
 

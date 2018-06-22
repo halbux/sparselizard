@@ -20,6 +20,44 @@ std::vector<std::shared_ptr<rawshape>> geotools::coordstopoints(std::vector<doub
 	}
 }
 
+double geotools::getdistance(std::vector<double> pt1coords, std::vector<double> pt2coords)
+{
+	return std::sqrt( std::pow(pt1coords[0]-pt2coords[0],2) + std::pow(pt1coords[1]-pt2coords[1],2) + std::pow(pt1coords[2]-pt2coords[2],2) );
+}
+
+std::vector<double> geotools::getplaneangles(std::vector<double> p1, std::vector<double> p2, std::vector<double> p3)
+{
+    double pi = 3.1415926535897932384;
+
+	// Roundoff noise threshold:
+	double threshold = 1e-10;
+
+	// Vector between two points:
+	std::vector<double> v12 = {p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]};
+	std::vector<double> v13 = {p3[0]-p1[0], p3[1]-p1[1], p3[2]-p1[2]};
+	double v12norm = std::sqrt(v12[0]*v12[0]+v12[1]*v12[1]+v12[2]*v12[2]);
+
+	// Shortcut if all points are in a plane parallel to the xy plane.
+	// This allows colinear points in 2D.
+	if (std::abs(v12[2])/v12norm < threshold && std::abs(v13[2])/v12norm < threshold)
+		return std::vector<double>{0.0,0.0};
+
+	// Normal [a b c] to the plane is the cross product:
+	std::vector<double> vnormal = {v12[1]*v13[2]-v12[2]*v13[1], v12[2]*v13[0]-v12[0]*v13[2], v12[0]*v13[1]-v12[1]*v13[0]};
+	double normalnorm = std::sqrt(vnormal[0]*vnormal[0]+vnormal[1]*vnormal[1]+vnormal[2]*vnormal[2]);
+
+	// If in the xz plane:
+	if (vnormal[0]/normalnorm < threshold && vnormal[2]/normalnorm < threshold)
+		return std::vector<double>{0.0,90.0};
+	// If in the yz plane:
+	if (vnormal[1]/normalnorm < threshold && vnormal[2]/normalnorm < threshold)
+		return std::vector<double>{90.0,0.0};
+
+	// Plane equation is ax + by + cz = d.
+	// Setting x then y to zero gives the angles we need:
+	return std::vector<double>{360/2/pi*std::atan(-vnormal[0]/vnormal[2]), 360/2/pi*std::atan(-vnormal[1]/vnormal[2])};
+}
+
 std::vector<double> geotools::flipcoords(std::vector<double>& input)
 {
 	int numnodes = input.size()/3;
