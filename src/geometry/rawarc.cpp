@@ -99,7 +99,7 @@ std::shared_ptr<rawshape> rawarc::getpointer(void)
 void rawarc::mesh(void)
 {
     double pi = 3.1415926535897932384;
-
+    
 	int numelems = mynummeshpoints-1;
 
 	mycoords.resize(3*mynummeshpoints);
