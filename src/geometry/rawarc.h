@@ -6,8 +6,8 @@
 
 // This object holds a geometrical shape.
 
-#ifndef rawarc_H
-#define rawarc_H
+#ifndef RAWARC_H
+#define RAWARC_H
 
 #include <iostream>
 #include <vector>
@@ -29,6 +29,8 @@ class rawarc: public rawshape
 
 		// Son shapes:
 		std::vector<std::shared_ptr<rawshape>> sons = {};
+		// Arc center point:
+		std::shared_ptr<rawshape> mycenterpoint;
 
 		// Coordinates of the nodes in the mesh:
 		std::vector<double> mycoords = {};
@@ -69,7 +71,7 @@ class rawarc: public rawshape
 
 		std::shared_ptr<rawshape> getpointer(void);
 
-		void mesh(void); // REWRITE TO WORK IN 3D!!!!!!!!!!!!!!!!!!
+		void mesh(void);
 
 };
 

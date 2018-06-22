@@ -47,10 +47,10 @@ std::vector<double> geotools::getplaneangles(std::vector<double> p1, std::vector
 	double normalnorm = std::sqrt(vnormal[0]*vnormal[0]+vnormal[1]*vnormal[1]+vnormal[2]*vnormal[2]);
 
 	// If in the xz plane:
-	if (vnormal[0]/normalnorm < threshold && vnormal[2]/normalnorm < threshold)
+	if (std::abs(vnormal[0])/normalnorm < threshold && std::abs(vnormal[2])/normalnorm < threshold)
 		return std::vector<double>{0.0,90.0};
 	// If in the yz plane:
-	if (vnormal[1]/normalnorm < threshold && vnormal[2]/normalnorm < threshold)
+	if (std::abs(vnormal[1])/normalnorm < threshold && std::abs(vnormal[2])/normalnorm < threshold)
 		return std::vector<double>{90.0,0.0};
 
 	// Plane equation is ax + by + cz = d.

@@ -15,19 +15,12 @@ rawarc::rawarc(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, 
 		abort();
 	}
 
-	// Make sure the arc is in the xy-plane at zero z:
-	if (inputpoints[0]->getcoords()->at(2) != 0.0 || inputpoints[1]->getcoords()->at(2) != 0.0 || inputpoints[2]->getcoords()->at(2) != 0.0)
-	{
-		std::cout << "Error in 'rawarc' object: arc must be in xy-plane at zero z" << std::endl;
-		abort();
-	}
-
-
 	myphysicalregion = physreg;
 
 	mynummeshpoints = nummeshpoints;
 
-	sons = inputpoints;
+	sons = {inputpoints[0], inputpoints[1]};
+	mycenterpoint = inputpoints[2];
 
 	mesh();
 }
@@ -44,13 +37,14 @@ std::shared_ptr<rawshape> rawarc::duplicate(void)
     *out = *this;
 
 	out->sons = geotools::duplicate(sons);
+	out->mycenterpoint = geotools::duplicate({mycenterpoint})[0];
 
     return out;	
 }
 
 void rawarc::flip(void)
 {
-	sons = {sons[1],sons[0],sons[2]};////!!! extra rotationdir in private otherwise problem with flip: rot dir changes
+	sons = {sons[1],sons[0]};
 
     mycoords = geotools::flipcoords(mycoords);
 }
@@ -78,7 +72,7 @@ std::vector<std::shared_ptr<rawshape>> rawarc::getsons(void)
 
 std::vector<std::shared_ptr<rawshape>> rawarc::getsubshapes(void)
 {
-	return sons;
+	return geotools::concatenate({sons,{mycenterpoint}});
 }
 
 int rawarc::getphysicalregion(void) 
@@ -111,46 +105,67 @@ void rawarc::mesh(void)
 	mycoords.resize(3*mynummeshpoints);
 	myelems[1].resize(2*numelems);
 
-	// p1 is the first point, p2 the last one and p3 the center point:
-	std::vector<double>* p1coords = sons[0]->getcoords();
-	std::vector<double>* p2coords = sons[1]->getcoords();
-	std::vector<double>* p3coords = sons[2]->getcoords();
+	// p1 is the first point, p2 the last one and pc the center point:
+	std::vector<double> p1coords = *(sons[0]->getcoords());
+	std::vector<double> p2coords = *(sons[1]->getcoords());
+	std::vector<double> pccoords = *(mycenterpoint->getcoords());
 
 	// Give an error if not in a circle:
-	double radius1 = std::sqrt(std::pow(p1coords->at(0)-p3coords->at(0),2.0)+std::pow(p1coords->at(1)-p3coords->at(1),2.0));
-	double radius2 = std::sqrt(std::pow(p2coords->at(0)-p3coords->at(0),2.0)+std::pow(p2coords->at(1)-p3coords->at(1),2.0));
+	double radius1 = geotools::getdistance(p1coords, pccoords);
+	double radius2 = geotools::getdistance(p2coords, pccoords);
 
-	if (radius1 == 0 || std::abs((radius1-radius2)/radius1) > 1e-10)
+	if (radius1 == 0.0 || std::abs((radius1-radius2)/radius1) > 1e-10)
 	{
 		std::cout << "Error in 'rawarc' object: rawpoints 1 and 2 provided for arc should be on a circle with center rawpoint 3" << std::endl;
 		abort();
 	}
 	double radius = radius1;
 
+
+	///// Rotate the arc plane to have it parallel to the xy plane:
+	std::vector<double> xyrot = geotools::getplaneangles(pccoords, p1coords, p2coords);
+
+	sons[0]->rotate(-xyrot[1],-xyrot[0],0);
+	sons[1]->rotate(-xyrot[1],-xyrot[0],0);
+	mycenterpoint->rotate(-xyrot[1],-xyrot[0],0);
+
+	p1coords = *(sons[0]->getcoords());
+	p2coords = *(sons[1]->getcoords());
+	pccoords = *(mycenterpoint->getcoords());
+	///// Rotated
+
+
 	// Get the angle with the x axis of the first and last point on the arc:
-	double angle1 = std::acos((p1coords->at(0)-p3coords->at(0))/radius);
-	double angle2 = std::acos((p2coords->at(0)-p3coords->at(0))/radius);
-	if (p1coords->at(1) < p3coords->at(1))
+	double angle1 = std::acos((p1coords[0]-pccoords[0])/radius);
+	double angle2 = std::acos((p2coords[0]-pccoords[0])/radius);
+	if (p1coords[1] < pccoords[1])
 		angle1 = -angle1;
-	if (p2coords->at(1) < p3coords->at(1))
+	if (p2coords[1] < pccoords[1])
 		angle2 = -angle2;
 	// Angle between two consecutive points in the mesh:
 	double deltaangle = (angle2-angle1)/numelems;
 	if (angle2-angle1 < 0)
 		deltaangle = (2*pi+angle2-angle1)/numelems;
+	// Create a circle if the angle is close enough to zero:
+	if (deltaangle < 1e-10)
+		deltaangle = 2*pi/numelems;
 
 	for (int i = 0; i < mynummeshpoints; i++)
 	{
-		mycoords[3*i+0] = p3coords->at(0) + radius*cos(angle1+i*deltaangle);
-		mycoords[3*i+1] = p3coords->at(1) + radius*sin(angle1+i*deltaangle);
-		mycoords[3*i+2] = p3coords->at(2);
+		mycoords[3*i+0] = pccoords[0] + radius*cos(angle1+i*deltaangle);
+		mycoords[3*i+1] = pccoords[1] + radius*sin(angle1+i*deltaangle);
+		mycoords[3*i+2] = pccoords[2];
 	}
 
 
 	for (int i = 0; i < numelems; i++)
 	{
 		myelems[1][2*i+0] = i;
-		myelems[1][2*i+1] = (i+1)%mynummeshpoints;
+		myelems[1][2*i+1] = i+1;
 	}
+
+
+	///// Rotate everything back:
+	rotate(xyrot[1],xyrot[0],0);
 }
 
