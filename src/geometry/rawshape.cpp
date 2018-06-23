@@ -1,4 +1,5 @@
 #include "rawshape.h"
+#include "geotools.h"
 
 
 void rawshape::deform(expression xdeform, expression ydeform, expression zdeform)
@@ -61,36 +62,7 @@ void rawshape::rotate(double alphax, double alphay, double alphaz)
 	// Get the coordinates of the shape to rotate:
 	std::vector<double>* mycoords = getcoords();
 
-    int numberofnodes = mycoords->size()/3;
-
-    // Convert input degrees to radians:
-    double pi = 3.1415926535897932384;
-    double ax = alphax*2*pi/360;
-    double ay = alphay*2*pi/360;
-    double az = alphaz*2*pi/360;
-    
-	// Define the rotation matrix R = Rx*Ry*Rz:
-	double Rxx = std::cos(ay)*std::cos(az); 
-	double Rxy = -std::cos(ay)*std::sin(az); 
-	double Rxz = std::sin(ay); 
-	double Ryx = std::cos(ax)*std::sin(az) + std::cos(az)*std::sin(ax)*std::sin(ay); 
-	double Ryy = std::cos(ax)*std::cos(az) - std::sin(ax)*std::sin(ay)*std::sin(az); 
-	double Ryz = -std::cos(ay)*std::sin(ax); 
-	double Rzx = std::sin(ax)*std::sin(az) - std::cos(ax)*std::cos(az)*std::sin(ay); 
-	double Rzy = std::cos(az)*std::sin(ax) + std::cos(ax)*std::sin(ay)*std::sin(az); 
-	double Rzz = std::cos(ax)*std::cos(ay); 
-
-	// Compute R*[coordx; coordy; coordz]:
-	for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
-	{
-		double xcoord = mycoords->at(3*nodenumber+0);
-		double ycoord = mycoords->at(3*nodenumber+1);
-		double zcoord = mycoords->at(3*nodenumber+2);
-		
-		mycoords->at(3*nodenumber+0) = Rxx * xcoord + Rxy * ycoord + Rxz * zcoord;
-		mycoords->at(3*nodenumber+1) = Ryx * xcoord + Ryy * ycoord + Ryz * zcoord;
-		mycoords->at(3*nodenumber+2) = Rzx * xcoord + Rzy * ycoord + Rzz * zcoord;
-	}
+    geotools::rotate(alphax, alphay, alphaz, mycoords);
 
 
 	// Also rotate the sub shapes:

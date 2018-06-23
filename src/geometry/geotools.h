@@ -32,6 +32,9 @@ namespace geotools
 	// Get the angle (in degrees) with the x and y axis of the plane defined by the 3 input points
 	std::vector<double> getplaneangles(std::vector<double> p1, std::vector<double> p2, std::vector<double> p3);
 
+	// Rotate a vector of coordinates by alphax, alphay and alphaz degrees around the x, y and z axis respectively:
+	void rotate(double alphax, double alphay, double alphaz, std::vector<double>* coords);
+
 	// Flip the nodes in a coordinate vector (3 coordinates per node):
 	std::vector<double> flipcoords(std::vector<double>& input);
 

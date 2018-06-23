@@ -70,6 +70,40 @@ std::vector<double> geotools::getplaneangles(std::vector<double> p1, std::vector
 	return std::vector<double>{360/2/pi*std::atan(-vnormal[0]/vnormal[2]), 360/2/pi*std::atan(-vnormal[1]/vnormal[2])};
 }
 
+void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<double>* coords)
+{
+    int numberofnodes = coords->size()/3;
+
+    // Convert input degrees to radians:
+    double pi = 3.1415926535897932384;
+    double ax = alphax*2*pi/360;
+    double ay = alphay*2*pi/360;
+    double az = alphaz*2*pi/360;
+    
+	// Define the rotation matrix R = Rx*Ry*Rz:
+	double Rxx = std::cos(ay)*std::cos(az); 
+	double Rxy = -std::cos(ay)*std::sin(az); 
+	double Rxz = std::sin(ay); 
+	double Ryx = std::cos(ax)*std::sin(az) + std::cos(az)*std::sin(ax)*std::sin(ay); 
+	double Ryy = std::cos(ax)*std::cos(az) - std::sin(ax)*std::sin(ay)*std::sin(az); 
+	double Ryz = -std::cos(ay)*std::sin(ax); 
+	double Rzx = std::sin(ax)*std::sin(az) - std::cos(ax)*std::cos(az)*std::sin(ay); 
+	double Rzy = std::cos(az)*std::sin(ax) + std::cos(ax)*std::sin(ay)*std::sin(az); 
+	double Rzz = std::cos(ax)*std::cos(ay); 
+
+	// Compute R*[coordx; coordy; coordz]:
+	for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
+	{
+		double xcoord = coords->at(3*nodenumber+0);
+		double ycoord = coords->at(3*nodenumber+1);
+		double zcoord = coords->at(3*nodenumber+2);
+		
+		coords->at(3*nodenumber+0) = Rxx * xcoord + Rxy * ycoord + Rxz * zcoord;
+		coords->at(3*nodenumber+1) = Ryx * xcoord + Ryy * ycoord + Ryz * zcoord;
+		coords->at(3*nodenumber+2) = Rzx * xcoord + Rzy * ycoord + Rzz * zcoord;
+	}
+}
+
 std::vector<double> geotools::flipcoords(std::vector<double>& input)
 {
 	int numnodes = input.size()/3;
