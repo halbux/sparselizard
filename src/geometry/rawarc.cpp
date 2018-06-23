@@ -144,11 +144,8 @@ void rawarc::mesh(void)
 		angle2 = -angle2;
 	// Angle between two consecutive points in the mesh:
 	double deltaangle = (angle2-angle1)/numelems;
-	if (angle2-angle1 < 0)
+	if (angle2-angle1 < 1e-10)
 		deltaangle = (2*pi+angle2-angle1)/numelems;
-	// Create a circle if the angle is close enough to zero:
-	if (deltaangle < 1e-10)
-		deltaangle = 2*pi/numelems;
 
 	for (int i = 0; i < mynummeshpoints; i++)
 	{
