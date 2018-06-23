@@ -37,7 +37,7 @@ double geotools::getdistance(std::vector<double> pt1coords, std::vector<double> 
 	return std::sqrt( std::pow(pt1coords[0]-pt2coords[0],2) + std::pow(pt1coords[1]-pt2coords[1],2) + std::pow(pt1coords[2]-pt2coords[2],2) );
 }
 
-std::vector<double> geotools::getplaneangles(std::vector<double> p1, std::vector<double> p2, std::vector<double> p3)
+double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::vector<double> p2, std::vector<double> p3)
 {
     double pi = 3.1415926535897932384;
 
@@ -52,7 +52,7 @@ std::vector<double> geotools::getplaneangles(std::vector<double> p1, std::vector
 	// Shortcut if all points are in a plane parallel to the xy plane.
 	// This allows colinear points in 2D.
 	if (std::abs(v12[2])/v12norm < threshold && std::abs(v13[2])/v12norm < threshold)
-		return std::vector<double>{0.0,0.0};
+		return 0.0;
 
 	// Normal [a b c] to the plane is the cross product:
 	std::vector<double> vnormal = {v12[1]*v13[2]-v12[2]*v13[1], v12[2]*v13[0]-v12[0]*v13[2], v12[0]*v13[1]-v12[1]*v13[0]};
@@ -60,14 +60,17 @@ std::vector<double> geotools::getplaneangles(std::vector<double> p1, std::vector
 
 	// If in the xz plane:
 	if (std::abs(vnormal[0])/normalnorm < threshold && std::abs(vnormal[2])/normalnorm < threshold)
-		return std::vector<double>{0.0,90.0};
+		return 90;
 	// If in the yz plane:
 	if (std::abs(vnormal[1])/normalnorm < threshold && std::abs(vnormal[2])/normalnorm < threshold)
-		return std::vector<double>{90.0,0.0};
+		return 90;
 
 	// Plane equation is ax + by + cz = d.
 	// Setting x then y to zero gives the angles we need:
-	return std::vector<double>{360/2/pi*std::atan(-vnormal[0]/vnormal[2]), 360/2/pi*std::atan(-vnormal[1]/vnormal[2])};
+	if (xy == "xrot")
+		return -360/2/pi*std::atan(-vnormal[1]/vnormal[2]);
+	if (xy == "yrot")
+		return 360/2/pi*std::atan(-vnormal[0]/vnormal[2]);
 }
 
 void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<double>* coords)
