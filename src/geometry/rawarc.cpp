@@ -125,9 +125,9 @@ void rawarc::mesh(void)
 	///// Rotate the arc plane to have it parallel to the xy plane:
 	std::vector<double> xyrot = geotools::getplaneangles(pccoords, p1coords, p2coords);
 
-	sons[0]->rotate(-xyrot[1],-xyrot[0],0);
-	sons[1]->rotate(-xyrot[1],-xyrot[0],0);
-	mycenterpoint->rotate(-xyrot[1],-xyrot[0],0);
+	sons[0]->rotate(xyrot[1],xyrot[0],0);
+	sons[1]->rotate(xyrot[1],xyrot[0],0);
+	mycenterpoint->rotate(xyrot[1],xyrot[0],0);
 
 	p1coords = *(sons[0]->getcoords());
 	p2coords = *(sons[1]->getcoords());
@@ -163,6 +163,6 @@ void rawarc::mesh(void)
 
 
 	///// Rotate everything back:
-	rotate(xyrot[1],xyrot[0],0);
+	rotate(-xyrot[1],-xyrot[0],0);
 }
 
