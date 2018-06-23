@@ -20,6 +20,9 @@
 
 namespace geotools
 {
+	// An implementation of acos that is safe with respect to roundoff noise on the argument:
+	double acos(double arg);
+
 	// Convert a list of point coordinates into point objects:
 	std::vector<std::shared_ptr<rawshape>> coordstopoints(std::vector<double> coords);
 

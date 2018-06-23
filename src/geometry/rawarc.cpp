@@ -136,8 +136,8 @@ void rawarc::mesh(void)
 
 
 	// Get the angle with the x axis of the first and last point on the arc:
-	double angle1 = std::acos((p1coords[0]-pccoords[0])/radius);
-	double angle2 = std::acos((p2coords[0]-pccoords[0])/radius);
+	double angle1 = geotools::acos((p1coords[0]-pccoords[0])/radius);
+	double angle2 = geotools::acos((p2coords[0]-pccoords[0])/radius);
 	if (p1coords[1] < pccoords[1])
 		angle1 = -angle1;
 	if (p2coords[1] < pccoords[1])
