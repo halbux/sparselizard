@@ -310,14 +310,15 @@ std::vector<std::vector<int>> geotools::appendelems(std::vector<std::shared_ptr<
 
 		output[e] = std::vector<int>(totallen);
 
-		int index = 0;
+		int index = 0, nodenumshift = 0;
 		for (int i = 0; i < elemsptrs.size(); i++)
 		{
 			for (int j = 0; j < elemsptrs[i]->at(e).size(); j++)
 			{
-				output[e][index] = elemsptrs[i]->at(e)[j];
+				output[e][index] = elemsptrs[i]->at(e)[j] + nodenumshift;
 				index++;
 			}
+			nodenumshift += rawshapes[i]->getcoords()->size()/3;
 		}
 	}
 	return output;
