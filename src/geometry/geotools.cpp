@@ -58,7 +58,7 @@ double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::v
 	std::vector<double> vnormal = {v12[1]*v13[2]-v12[2]*v13[1], v12[2]*v13[0]-v12[0]*v13[2], v12[0]*v13[1]-v12[1]*v13[0]};
 	double normalnorm = std::sqrt(vnormal[0]*vnormal[0]+vnormal[1]*vnormal[1]+vnormal[2]*vnormal[2]);
 
-	// If the points are colinear (but not in 2D):
+	// If the points are colinear:
 	if (normalnorm/v12norm < threshold)
 	{
 		std::cout << "Error in 'geotools' namespace: points provided are colinear (only allowed in 2D)";
@@ -66,7 +66,7 @@ double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::v
 	}
 
 	// If the normal is perpendicular to the z axis (i.e. it has a 0 z component):
-	if (std::abs(vnormal[2])/normalnorm < threshold)
+	if (std::abs(vnormal[2])/v12norm < threshold)
 		return 90;
 
 	// Plane equation is ax + by + cz = d.
@@ -139,10 +139,10 @@ std::vector<std::shared_ptr<rawshape>> geotools::orient(std::vector<std::shared_
 	std::vector<double> p4coord = *(input[1]->getsons()[1]->getcoords());
 
 	// Find which pair between the two lines is the closest in distance:
-	double d13 = std::sqrt( std::pow(p1coord[0]-p3coord[0],2) + std::pow(p1coord[1]-p3coord[1],2) + std::pow(p1coord[2]-p3coord[2],2) );
-	double d14 = std::sqrt( std::pow(p1coord[0]-p4coord[0],2) + std::pow(p1coord[1]-p4coord[1],2) + std::pow(p1coord[2]-p4coord[2],2) );
-	double d23 = std::sqrt( std::pow(p2coord[0]-p3coord[0],2) + std::pow(p2coord[1]-p3coord[1],2) + std::pow(p2coord[2]-p3coord[2],2) );
-	double d24 = std::sqrt( std::pow(p2coord[0]-p4coord[0],2) + std::pow(p2coord[1]-p4coord[1],2) + std::pow(p2coord[2]-p4coord[2],2) );
+	double d13 = getdistance(p1coord,p3coord);
+	double d14 = getdistance(p1coord,p4coord);
+	double d23 = getdistance(p2coord,p3coord);
+	double d24 = getdistance(p2coord,p4coord);
 
 	// This will tell which lines must be flipped:
 	std::vector<bool> flipline(input.size(), false);
@@ -168,8 +168,8 @@ std::vector<std::shared_ptr<rawshape>> geotools::orient(std::vector<std::shared_
 		std::vector<double> p2c = *(input[i]->getsons()[1]->getcoords());
 
 		// Find which point is closest to the previous one:
-		double d1 = std::sqrt( std::pow(p1c[0]-prevnodecoord[0],2) + std::pow(p1c[1]-prevnodecoord[1],2) + std::pow(p1c[2]-prevnodecoord[2],2) );
-		double d2 = std::sqrt( std::pow(p2c[0]-prevnodecoord[0],2) + std::pow(p2c[1]-prevnodecoord[1],2) + std::pow(p2c[2]-prevnodecoord[2],2) );
+		double d1 = getdistance(p1c,prevnodecoord);
+		double d2 = getdistance(p2c,prevnodecoord);
 			
 		if (d1 < d2)
 			prevnodecoord = p2c;
@@ -182,15 +182,13 @@ std::vector<std::shared_ptr<rawshape>> geotools::orient(std::vector<std::shared_
 
 
 	// Flip the lines that must be flipped:
-	std::vector<std::shared_ptr<rawshape>> output = geotools::duplicate(input);
-
-	for (int i = 0; i < output.size(); i++)
+	for (int i = 0; i < input.size(); i++)
 	{
 		if (flipline[i] == true)
-			output[i]->flip();
+			input[i]->flip();
 	}
 
-	return output;
+	return input;
 }
 
 std::vector< std::shared_ptr<rawshape> > geotools::getrawshapes(std::vector<shape> shapes)
