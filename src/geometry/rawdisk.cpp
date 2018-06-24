@@ -103,6 +103,9 @@ void rawdisk::mesh(void)
 	// Get the coordinates of the center point:
 	std::vector<double> centercoords = *(mycenterpoint->getcoords());
 
+	// Define the center point:
+	std::shared_ptr<rawshape> pc = std::shared_ptr<rawpoint>(new rawpoint(-1, {centercoords[0], centercoords[1], centercoords[2]}));
+
 	// Define the points for the 4 outer arcs:
 	std::shared_ptr<rawshape> p1 = std::shared_ptr<rawpoint>(new rawpoint(-1, {centercoords[0]+myradius, centercoords[1], centercoords[2]}));
 	std::shared_ptr<rawshape> p2 = std::shared_ptr<rawpoint>(new rawpoint(-1, {centercoords[0], centercoords[1]+myradius, centercoords[2]}));
@@ -119,10 +122,10 @@ void rawdisk::mesh(void)
 
 
 	// Create the disk contour (4 arcs):
-	std::shared_ptr<rawshape> arc1 = std::shared_ptr<rawarc>(new rawarc(-1, {p1,p2}, mynummeshpoints/4+1));
-	std::shared_ptr<rawshape> arc2 = std::shared_ptr<rawarc>(new rawarc(-1, {p2,p3}, mynummeshpoints/4+1));
-	std::shared_ptr<rawshape> arc3 = std::shared_ptr<rawarc>(new rawarc(-1, {p3,p4}, mynummeshpoints/4+1));
-	std::shared_ptr<rawshape> arc4 = std::shared_ptr<rawarc>(new rawarc(-1, {p4,p1}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc1 = std::shared_ptr<rawarc>(new rawarc(-1, {p1,p2,pc}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc2 = std::shared_ptr<rawarc>(new rawarc(-1, {p2,p3,pc}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc3 = std::shared_ptr<rawarc>(new rawarc(-1, {p3,p4,pc}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc4 = std::shared_ptr<rawarc>(new rawarc(-1, {p4,p1,pc}, mynummeshpoints/4+1));
 
 	// Create the remaining lines:
 	std::shared_ptr<rawshape> l1 = std::shared_ptr<rawline>(new rawline(-1, {p1,p5}, mynummeshpoints/4+1));
