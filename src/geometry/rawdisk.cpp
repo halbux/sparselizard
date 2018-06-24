@@ -9,9 +9,9 @@ rawdisk::rawdisk(int physreg, std::shared_ptr<rawshape> centerpoint, double radi
 		abort();
 	}
 
-	if (nummeshpts%4 != 0)
+	if (nummeshpts%4 != 0 || nummeshpts <= 0)
 	{
-		std::cout << "Error in 'rawdisk' object: the structured disk meshing requires a number of mesh nodes multiple of four" << std::endl;
+		std::cout << "Error in 'rawdisk' object: the structured disk meshing code requires a number of mesh nodes multiple of 4" << std::endl;
 		abort();
 	}
 
@@ -74,7 +74,7 @@ std::vector<std::shared_ptr<rawshape>> rawdisk::getsons(void)
 
 std::vector<std::shared_ptr<rawshape>> rawdisk::getsubshapes(void)
 {
-	return sons;
+	return geotools::concatenate({sons,{mycenterpoint}});
 }
 
 int rawdisk::getphysicalregion(void) 
@@ -100,15 +100,9 @@ std::shared_ptr<rawshape> rawdisk::getpointer(void)
 
 void rawdisk::mesh(void)
 {
-	// Get the coordinates of the center node:
+	// Get the coordinates of the center point:
 	std::vector<double> centercoords = *(mycenterpoint->getcoords());
 
-	if (centercoords[2] != 0.0)
-	{
-		std::cout << "Error in 'rawdisk' object: disk must be defined in xy plane at zero z" << std::endl;
-		abort();
-	}
-	
 	// Define the points for the 4 outer arcs:
 	std::shared_ptr<rawshape> p1 = std::shared_ptr<rawpoint>(new rawpoint(-1, {centercoords[0]+myradius, centercoords[1], centercoords[2]}));
 	std::shared_ptr<rawshape> p2 = std::shared_ptr<rawpoint>(new rawpoint(-1, {centercoords[0], centercoords[1]+myradius, centercoords[2]}));
@@ -125,28 +119,28 @@ void rawdisk::mesh(void)
 
 
 	// Create the disk contour (4 arcs):
-	std::shared_ptr<rawshape> arc1 = std::shared_ptr<rawarc>(new rawarc(-1, {p1,p2}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> arc2 = std::shared_ptr<rawarc>(new rawarc(-1, {p2,p3}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> arc3 = std::shared_ptr<rawarc>(new rawarc(-1, {p3,p4}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> arc4 = std::shared_ptr<rawarc>(new rawarc(-1, {p4,p1}, mynummeshpoints/4));
+	std::shared_ptr<rawshape> arc1 = std::shared_ptr<rawarc>(new rawarc(-1, {p1,p2}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc2 = std::shared_ptr<rawarc>(new rawarc(-1, {p2,p3}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc3 = std::shared_ptr<rawarc>(new rawarc(-1, {p3,p4}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> arc4 = std::shared_ptr<rawarc>(new rawarc(-1, {p4,p1}, mynummeshpoints/4+1));
 
 	// Create the remaining lines:
-	std::shared_ptr<rawshape> l1 = std::shared_ptr<rawline>(new rawline(-1, {p1,p5}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> l2 = std::shared_ptr<rawline>(new rawline(-1, {p2,p6}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> l3 = std::shared_ptr<rawline>(new rawline(-1, {p3,p7}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> l4 = std::shared_ptr<rawline>(new rawline(-1, {p4,p8}, mynummeshpoints/4));
+	std::shared_ptr<rawshape> l1 = std::shared_ptr<rawline>(new rawline(-1, {p1,p5}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> l2 = std::shared_ptr<rawline>(new rawline(-1, {p2,p6}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> l3 = std::shared_ptr<rawline>(new rawline(-1, {p3,p7}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> l4 = std::shared_ptr<rawline>(new rawline(-1, {p4,p8}, mynummeshpoints/4+1));
 
-	std::shared_ptr<rawshape> l5 = std::shared_ptr<rawline>(new rawline(-1, {p5,p6}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> l6 = std::shared_ptr<rawline>(new rawline(-1, {p6,p7}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> l7 = std::shared_ptr<rawline>(new rawline(-1, {p7,p8}, mynummeshpoints/4));
-	std::shared_ptr<rawshape> l8 = std::shared_ptr<rawline>(new rawline(-1, {p8,p5}, mynummeshpoints/4));
+	std::shared_ptr<rawshape> l5 = std::shared_ptr<rawline>(new rawline(-1, {p5,p6}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> l6 = std::shared_ptr<rawline>(new rawline(-1, {p6,p7}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> l7 = std::shared_ptr<rawline>(new rawline(-1, {p7,p8}, mynummeshpoints/4+1));
+	std::shared_ptr<rawshape> l8 = std::shared_ptr<rawline>(new rawline(-1, {p8,p5}, mynummeshpoints/4+1));
 
 	// Create the 5 quadrangles that make the disk:
-	std::shared_ptr<rawshape> q1 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, geotools::orient({arc1,l2,l5,l1})));
-	std::shared_ptr<rawshape> q2 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, geotools::orient({arc2,l3,l6,l2})));
-	std::shared_ptr<rawshape> q3 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, geotools::orient({arc3,l4,l7,l3})));
-	std::shared_ptr<rawshape> q4 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, geotools::orient({arc4,l1,l8,l4})));
-	std::shared_ptr<rawshape> q5 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, geotools::orient({l5,l6,l7,l8})));
+	std::shared_ptr<rawshape> q1 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, {arc1,l2,l5,l1}));
+	std::shared_ptr<rawshape> q2 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, {arc2,l3,l6,l2}));
+	std::shared_ptr<rawshape> q3 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, {arc3,l4,l7,l3}));
+	std::shared_ptr<rawshape> q4 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, {arc4,l1,l8,l4}));
+	std::shared_ptr<rawshape> q5 = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, {l5,l6,l7,l8}));
 
 
 
