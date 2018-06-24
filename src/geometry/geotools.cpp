@@ -58,15 +58,19 @@ double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::v
 	std::vector<double> vnormal = {v12[1]*v13[2]-v12[2]*v13[1], v12[2]*v13[0]-v12[0]*v13[2], v12[0]*v13[1]-v12[1]*v13[0]};
 	double normalnorm = std::sqrt(vnormal[0]*vnormal[0]+vnormal[1]*vnormal[1]+vnormal[2]*vnormal[2]);
 
-	// If in the xz plane:
-	if (std::abs(vnormal[0])/normalnorm < threshold && std::abs(vnormal[2])/normalnorm < threshold)
-		return 90;
-	// If in the yz plane:
-	if (std::abs(vnormal[1])/normalnorm < threshold && std::abs(vnormal[2])/normalnorm < threshold)
+	// If the points are colinear (but not in 2D):
+	if (normalnorm/v12norm < threshold)
+	{
+		std::cout << "Error in 'geotools' namespace: points provided are colinear (only allowed in 2D)";
+		abort();
+	}
+
+	// If the normal is perpendicular to the z axis (i.e. it has a 0 z component):
+	if (std::abs(vnormal[2])/normalnorm < threshold)
 		return 90;
 
 	// Plane equation is ax + by + cz = d.
-	// Setting x then y to zero gives the angles we need:
+	// Setting x or y to zero gives the angle we need:
 	if (xy == "xrot")
 		return -360/2/pi*std::atan(-vnormal[1]/vnormal[2]);
 	if (xy == "yrot")
