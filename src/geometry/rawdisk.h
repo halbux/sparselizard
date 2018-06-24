@@ -34,15 +34,15 @@ class rawdisk: public rawshape
 
 		// Son shapes (lines defining the contour of the surface).
 		std::vector<std::shared_ptr<rawshape>> sons = {};
+		// Disk center point:
+		std::shared_ptr<rawshape> mycenterpoint;
+
+		double myradius;
 
 		// Coordinates of the nodes in the mesh:
 		std::vector<double> mycoords = {};
 		// Elements in the mesh:
 		std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
-
-		std::shared_ptr<rawshape> mycenterpoint;
-
-		double myradius;
         
 	public:
 
