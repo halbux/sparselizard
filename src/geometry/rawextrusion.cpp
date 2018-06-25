@@ -56,7 +56,7 @@ std::vector<std::shared_ptr<rawshape>> rawextrusion::getsons(void)
 
 std::vector<std::shared_ptr<rawshape>> rawextrusion::getsubshapes(void)
 {
-	return sons;
+	return geotools::concatenate({sons,myunextrudedregions,mycontourregions});
 }
 
 int rawextrusion::getphysicalregion(void) 

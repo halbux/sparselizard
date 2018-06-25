@@ -59,7 +59,7 @@ class rawextrusion: public rawshape
 
 		std::shared_ptr<rawshape> duplicate(void);
 
-		void setphysicalregion(int physreg);// + WRITE GETCONTOUR + GETBASE + GETTOP
+		void setphysicalregion(int physreg);
 	
 		int getdimension(void);
 
