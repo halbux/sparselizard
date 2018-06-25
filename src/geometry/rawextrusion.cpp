@@ -103,6 +103,8 @@ void rawextrusion::mesh(void)
 	// The extrusion of a 1D shape is a quadrangle:
 	if (mydimension-1 == 1)
 	{
+		myunextrudedregions = geotools::orient(myunextrudedregions);
+
 		// Create the line at the top side of the extrusion:
 		std::vector<std::shared_ptr<rawshape>> toplines = geotools::duplicate(myunextrudedregions);
 		for (int i = 0; i < toplines.size(); i++)	
