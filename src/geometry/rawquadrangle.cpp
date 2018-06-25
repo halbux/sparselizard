@@ -47,7 +47,7 @@ rawquadrangle::rawquadrangle(int physreg, std::vector<std::shared_ptr<rawshape>>
 
 std::shared_ptr<rawshape> rawquadrangle::extrude(int physreg, double height, int numlayers)
 {
-	return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, sons, {shared_from_this()}, height, numlayers));
+	return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
 }
 
 std::shared_ptr<rawshape> rawquadrangle::duplicate(void)

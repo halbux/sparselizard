@@ -28,7 +28,7 @@ rawarc::rawarc(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, 
 
 std::shared_ptr<rawshape> rawarc::extrude(int physreg, double height, int numlayers)
 {
-	return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, sons, {shared_from_this()}, height, numlayers));
+	return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
 }
 
 std::shared_ptr<rawshape> rawarc::duplicate(void)

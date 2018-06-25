@@ -15,6 +15,7 @@
 #include "expression.h"
 
 #include "rawshape.h"
+#include "rawquadrangle.h"
 #include "rawline.h"
 #include "rawpoint.h"
 #include "geotools.h"
@@ -41,21 +42,14 @@ class rawextrusion: public rawshape
 		// Extrusion length:
 		double myheight;
 
-		// Dimension of the extruded shape:
-		int mydimension;
-
-
-		// Unextruded shapes:
-		std::vector<std::shared_ptr<rawshape>> myunextrudedregions = {};
-
-		// Lines that are the contour of the unextruded shape: 
-		std::vector<std::shared_ptr<rawshape>> mycontourregions = {};
+		// Unextruded rawshape:
+		std::shared_ptr<rawshape> mybaseshape;
         
 	public:
 
 		rawextrusion(void) {};
 
-		rawextrusion(int physreg, std::vector<std::shared_ptr<rawshape>> contour, std::vector<std::shared_ptr<rawshape>> innerregions, double height, int numlayers);
+		rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers);
 
 		std::shared_ptr<rawshape> duplicate(void);
 
