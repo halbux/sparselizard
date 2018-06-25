@@ -88,6 +88,7 @@ void rawextrusion::mesh(void)
 	{
 		// Create the point at the top side of the extrusion:
 		std::shared_ptr<rawshape> toppoint = myunextrudedregions[0]->duplicate();
+		toppoint->setphysicalregion(-1);
 		toppoint->shift(0, 0, myheight);
 
 		sons = {myunextrudedregions[0], toppoint};
@@ -104,8 +105,11 @@ void rawextrusion::mesh(void)
 	{
 		// Create the line at the top side of the extrusion:
 		std::vector<std::shared_ptr<rawshape>> toplines = geotools::duplicate(myunextrudedregions);
-		for (int i = 0; i < toplines.size(); i++)		
+		for (int i = 0; i < toplines.size(); i++)	
+		{	
+			toplines[i]->setphysicalregion(-1);
 			toplines[i]->shift(0, 0, myheight);
+		}
 
 		// Create the lines at both sides of the quadrangle (if any):
 		if (mycontourregions.size() > 0)
@@ -188,8 +192,11 @@ void rawextrusion::mesh(void)
 	{
 		// Create the face at the top side of the extrusion:
 		std::vector<std::shared_ptr<rawshape>> topfaces = geotools::duplicate(myunextrudedregions);
-		for (int i = 0; i < topfaces.size(); i++)		
+		for (int i = 0; i < topfaces.size(); i++)	
+		{	
+			topfaces[i]->setphysicalregion(-1);
 			topfaces[i]->shift(0, 0, myheight);
+		}
 
 		// Create the contour faces:
 		std::shared_ptr<rawshape> contourface(new rawextrusion(-1, {}, mycontourregions, myheight, mynumlayers));
