@@ -201,9 +201,11 @@ void rawextrusion::mesh(void)
 		}
 
 		// Create the contour faces:
-		std::shared_ptr<rawshape> contourface(new rawextrusion(-1, {}, mycontourregions, myheight, mynumlayers));
+		std::vector<std::shared_ptr<rawshape>> contourfaces(mycontourregions.size());
+		for (int i = 0; i < mycontourregions.size(); i++)
+			contourfaces[i] = std::shared_ptr<rawshape>(new rawextrusion(-1, {mycontourregions[i]->getsons()[0],mycontourregions[i]->getsons()[1]}, {mycontourregions[i]}, myheight, mynumlayers));
 
-		sons = geotools::concatenate({myunextrudedregions, {contourface}, topfaces});
+		sons = geotools::concatenate({myunextrudedregions, contourfaces, topfaces});
 
 
 		// Count total number of nodes, triangles and quadrangles in the unextruded mesh:
