@@ -50,7 +50,7 @@ std::vector<std::shared_ptr<rawshape>> rawextrusion::getsons(void)
 
 std::vector<std::shared_ptr<rawshape>> rawextrusion::getsubshapes(void)
 {
-	return geotools::concatenate({sons,{mybaseshape}});
+	return sons;
 }
 
 int rawextrusion::getphysicalregion(void) 
