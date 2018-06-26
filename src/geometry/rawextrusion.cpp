@@ -34,7 +34,7 @@ void rawextrusion::setphysicalregion(int physreg)
 
 int rawextrusion::getdimension(void)
 {
-	return mybaseshape->getdimension() + 1;;
+	return mybaseshape->getdimension() + 1;
 }
 
 std::string rawextrusion::getname(void)
