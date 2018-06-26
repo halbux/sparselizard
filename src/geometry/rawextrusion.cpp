@@ -143,11 +143,11 @@ void rawextrusion::mesh(void)
 
 
 		// Get total number of nodes, triangles and quadrangles in the unextruded mesh:
-		int numnodes = mybaseshape->getcoords()->size()/3;
+		int numnodesperlayer = mybaseshape->getcoords()->size()/3;
 		int numtriangles = mybaseshape->getelems()->at(2).size()/3;
 		int numquadrangles = mybaseshape->getelems()->at(3).size()/4;
 
-		mycoords.resize(3*numnodes*mynumlayers);
+		mycoords.resize(3*numnodesperlayer*mynumlayers);
 		// Extruded triangles are prisms (element number 6):
 		myelems[6].resize(6*numtriangles*(mynumlayers-1));
 		// Extruded quadrangles are hexahedra (element number 5):
@@ -156,11 +156,12 @@ void rawextrusion::mesh(void)
 
 		// Place the nodes.
 		int index = 0;
+		
+		std::vector<double>* currentcoords = mybaseshape->getcoords();
+
 		for (int l = 0; l < mynumlayers; l++)
 		{
-			std::vector<double>* currentcoords = mybaseshape->getcoords();
-
-			for (int j = 0; j < currentcoords->size()/3; j++)
+			for (int j = 0; j < numnodesperlayer; j++)
 			{
 				mycoords[3*index+0] = currentcoords->at(3*j+0);
 				mycoords[3*index+1] = currentcoords->at(3*j+1);
@@ -169,17 +170,16 @@ void rawextrusion::mesh(void)
 			}
 		}
 
-		int numnodesperlayer = mycoords.size()/3/mynumlayers;
 
 		// Place the elements:
 		int prismindex = 0, hexindex = 0;
 
 		std::vector<std::vector<int>>* currentelems = mybaseshape->getelems();
 
-		// Extrude all triangles:
-		for (int tri = 0; tri < currentelems->at(2).size()/3; tri++)
+		for (int l = 0; l < mynumlayers-1; l++)
 		{
-			for (int l = 0; l < mynumlayers-1; l++)
+			// Extrude all triangles:
+			for (int tri = 0; tri < numtriangles; tri++)
 			{
 				myelems[6][6*prismindex+0] = currentelems->at(2)[3*tri+0] + l*numnodesperlayer;
 				myelems[6][6*prismindex+1] = currentelems->at(2)[3*tri+1] + l*numnodesperlayer;
@@ -189,12 +189,9 @@ void rawextrusion::mesh(void)
 				myelems[6][6*prismindex+5] = currentelems->at(2)[3*tri+2] + (l+1)*numnodesperlayer;
 				prismindex++;
 			}
-		}
 
-		// Extrude all quadrangles:
-		for (int quad = 0; quad < currentelems->at(3).size()/4; quad++)
-		{
-			for (int l = 0; l < mynumlayers-1; l++)
+			// Extrude all quadrangles:
+			for (int quad = 0; quad < numquadrangles; quad++)
 			{
 				myelems[5][8*hexindex+0] = currentelems->at(3)[4*quad+0] + l*numnodesperlayer;
 				myelems[5][8*hexindex+1] = currentelems->at(3)[4*quad+1] + l*numnodesperlayer;
