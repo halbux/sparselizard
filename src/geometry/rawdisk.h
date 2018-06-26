@@ -50,6 +50,8 @@ class rawdisk: public rawshape
 
 		rawdisk(int physreg, std::shared_ptr<rawshape> centerpoint, double radius, int nummeshpts);
 
+		std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+
 		std::shared_ptr<rawshape> duplicate(void);
 
 		void setphysicalregion(int physreg);

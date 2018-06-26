@@ -35,6 +35,11 @@ rawdisk::rawdisk(int physreg, std::shared_ptr<rawshape> centerpoint, double radi
 }
 
 
+std::shared_ptr<rawshape> rawdisk::extrude(int physreg, double height, int numlayers)
+{
+	return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
+}
+
 std::shared_ptr<rawshape> rawdisk::duplicate(void)
 {
     std::shared_ptr<rawdisk> out(new rawdisk);
