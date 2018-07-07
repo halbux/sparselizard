@@ -188,7 +188,7 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
 	{
 		if (inputshapes[i].getphysicalregion() <= 0)
 		{
-			std::cout << "Error in 'mesh' object: physical region number was negative or zero for shape '" << inputshapes[i].getname() << "'" << std::endl;
+			std::cout << "Error in 'mesh' object: physical region number was undefined (negative or zero) for shape '" << inputshapes[i].getname() << "'" << std::endl;
 			abort();
 		}
 	}
