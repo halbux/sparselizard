@@ -221,6 +221,15 @@ std::vector<shape> geotools::getshapes(std::vector< std::shared_ptr<rawshape> > 
 	return shapes;
 }
 
+std::vector<rawshape*> geotools::getpointers(std::vector< std::shared_ptr<rawshape> > sharedptrs)
+{
+	std::vector<rawshape*> output(sharedptrs.size());
+	for (int i = 0; i < output.size(); i++)
+		output[i] = sharedptrs[i].get();
+
+	return output;
+}
+
 std::vector< std::shared_ptr<rawshape> > geotools::flip(std::vector< std::shared_ptr<rawshape> > input)
 {
 	std::vector< std::shared_ptr<rawshape> > output(input.size());
@@ -229,6 +238,14 @@ std::vector< std::shared_ptr<rawshape> > geotools::flip(std::vector< std::shared
 		output[i] = input[input.size()-1-i];	
 
 	return output;
+}
+
+std::vector<rawshape*> geotools::unique(std::vector<rawshape*> ptrs)
+{
+	std::sort(ptrs.begin(), ptrs.end());
+	ptrs.erase( std::unique(ptrs.begin(), ptrs.end()), ptrs.end());
+
+	return ptrs;
 }
 
 std::vector<std::shared_ptr<rawshape>> geotools::duplicate(std::vector<std::shared_ptr<rawshape>> input)

@@ -2,7 +2,7 @@
 #include "geotools.h"
 
 
-void rawshape::deform(expression xdeform, expression ydeform, expression zdeform)
+void rawshape::deform(expression xdeform, expression ydeform, expression zdeform, bool recursively)
 {
 	std::vector<double>* mycoords = getcoords();
 
@@ -31,13 +31,16 @@ void rawshape::deform(expression xdeform, expression ydeform, expression zdeform
 	}
 
 	
-	// Also deform the sub shapes:
-	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
-	for (int i = 0; i < subshapes.size(); i++)
-		subshapes[i]->deform(xdeform, ydeform, zdeform);
+	// Also deform (only once) every sub shape:
+	if (recursively)
+	{
+		std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
+		for (int i = 0; i < subshapes.size(); i++)
+			subshapes[i]->deform(xdeform, ydeform, zdeform, false);
+	}
 }
 
-void rawshape::shift(double shiftx, double shifty, double shiftz)
+void rawshape::shift(double shiftx, double shifty, double shiftz, bool recursively)
 {
 	std::vector<double>* mycoords = getcoords();
 
@@ -51,13 +54,16 @@ void rawshape::shift(double shiftx, double shifty, double shiftz)
 	}
 
 
-	// Also shift the sub shapes:
-	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
-	for (int i = 0; i < subshapes.size(); i++)
-		subshapes[i]->shift(shiftx, shifty, shiftz);
+	// Also shift (only once) every sub shape:
+	if (recursively)
+	{
+		std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
+		for (int i = 0; i < subshapes.size(); i++)
+			subshapes[i]->shift(shiftx, shifty, shiftz, false);
+	}
 }
 
-void rawshape::rotate(double alphax, double alphay, double alphaz)
+void rawshape::rotate(double alphax, double alphay, double alphaz, bool recursively)
 {
 	// Get the coordinates of the shape to rotate:
 	std::vector<double>* mycoords = getcoords();
@@ -65,10 +71,13 @@ void rawshape::rotate(double alphax, double alphay, double alphaz)
     geotools::rotate(alphax, alphay, alphaz, mycoords);
 
 
-	// Also rotate the sub shapes:
-	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
-	for (int i = 0; i < subshapes.size(); i++)
-		subshapes[i]->rotate(alphax, alphay, alphaz);
+	// Also rotate (only once) every sub shape:
+	if (recursively)
+	{
+		std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
+		for (int i = 0; i < subshapes.size(); i++)
+			subshapes[i]->rotate(alphax, alphay, alphaz, false);
+	}
 }
 
 
@@ -118,6 +127,27 @@ std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapes(void)
 {
 	std::cout << "Error in 'rawshape' object: 'getsubshapes' has not been defined for this shape" << std::endl;
 	abort(); 
+}
+
+std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapesrecursively(void)
+{
+	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
+
+	if (subshapes.size() == 0)
+		return subshapes;
+
+	std::vector<std::shared_ptr<rawshape>> output = {};
+
+	for (int i = 0; i < subshapes.size(); i++)
+	{
+		output.push_back(subshapes[i]);
+
+		std::vector<std::shared_ptr<rawshape>> toappend = subshapes[i]->getsubshapesrecursively();
+		for (int j = 0; j < toappend.size(); j++)
+			output.push_back(toappend[j]);
+	}
+
+	return output;
 }
 
 int rawshape::getphysicalregion(void)

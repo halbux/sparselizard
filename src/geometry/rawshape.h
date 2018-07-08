@@ -25,10 +25,10 @@ class rawshape : public std::enable_shared_from_this<rawshape>
         
 	public:
 
-		virtual void deform(expression xdeform, expression ydeform, expression zdeform);
+		virtual void deform(expression xdeform, expression ydeform, expression zdeform, bool recursively = true);
 
-		virtual void shift(double shiftx, double shifty, double shiftz);
-		virtual void rotate(double alphax, double alphay, double alphaz);
+		virtual void shift(double shiftx, double shifty, double shiftz, bool recursively = true);
+		virtual void rotate(double alphax, double alphay, double alphaz, bool recursively = true);
 
 
 		virtual std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
@@ -46,8 +46,10 @@ class rawshape : public std::enable_shared_from_this<rawshape>
 
 		virtual std::vector<std::shared_ptr<rawshape>> getsons(void);
 
-		// Get ALL subshapes (sons are included):
+		// Get subshapes (sons are included):
 		virtual std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
+		// Get all subshapes recursively:
+		virtual std::vector<std::shared_ptr<rawshape>> getsubshapesrecursively(void);
 
 		// Get the mesh info of the shape:
 		virtual int getphysicalregion(void);

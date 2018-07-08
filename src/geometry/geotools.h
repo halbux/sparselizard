@@ -13,6 +13,7 @@
 #include <iostream>
 #include <numeric>
 #include <cmath>
+#include <algorithm>
 #include <memory>
 #include "shape.h"
 #include "rawshape.h"
@@ -49,8 +50,14 @@ namespace geotools
 	// Transform a vector of rawshapes into a vector of shapes:
 	std::vector<shape> getshapes(std::vector< std::shared_ptr<rawshape> > rawshapes);
 
+	// Transform a vector of rawshape shared pointers to a vector of rawshape pointers:
+	std::vector<rawshape*> getpointers(std::vector< std::shared_ptr<rawshape> > sharedptrs);
+
 	// Flip the rawshape vector direction:
 	std::vector< std::shared_ptr<rawshape> > flip(std::vector< std::shared_ptr<rawshape> > input);
+
+	// Unique a list of rawshape pointers:
+	std::vector<rawshape*> unique(std::vector<rawshape*> ptrs);
 
 	// Duplicate a list of rawshapes:
 	std::vector<std::shared_ptr<rawshape>> duplicate(std::vector<std::shared_ptr<rawshape>> input);
