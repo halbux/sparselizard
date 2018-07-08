@@ -1,4 +1,5 @@
 #include "nodes.h"
+#include "geotools.h"
 
 
 nodes::nodes(void) {}
@@ -37,36 +38,7 @@ void nodes::shift(double xshift, double yshift, double zshift)
 
 void nodes::rotate(double alphax, double alphay, double alphaz)
 {
-    int numberofnodes = count();
-
-    // Convert input degrees to radians:
-    double pi = 3.1415926535897932384;
-    alphax = alphax*2*pi/360;
-    alphay = alphay*2*pi/360;
-    alphaz = alphaz*2*pi/360;
-    
-	// Define the rotation matrix R = Rx*Ry*Rz:
-	double Rxx = cos(alphay)*cos(alphaz); 
-	double Rxy = -cos(alphay)*sin(alphaz); 
-	double Rxz = sin(alphay); 
-	double Ryx = cos(alphax)*sin(alphaz) + cos(alphaz)*sin(alphax)*sin(alphay); 
-	double Ryy = cos(alphax)*cos(alphaz) - sin(alphax)*sin(alphay)*sin(alphaz); 
-	double Ryz = -cos(alphay)*sin(alphax); 
-	double Rzx = sin(alphax)*sin(alphaz) - cos(alphax)*cos(alphaz)*sin(alphay); 
-	double Rzy = cos(alphaz)*sin(alphax) + cos(alphax)*sin(alphay)*sin(alphaz); 
-	double Rzz = cos(alphax)*cos(alphay); 
-
-	// Compute R*[coordx; coory; coordz]:
-	for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
-	{
-		double xcoord = mycoordinates[3*nodenumber+0];
-		double ycoord = mycoordinates[3*nodenumber+1];
-		double zcoord = mycoordinates[3*nodenumber+2];
-		
-		mycoordinates[3*nodenumber+0] = Rxx * xcoord + Rxy * ycoord + Rxz * zcoord;
-		mycoordinates[3*nodenumber+1] = Ryx * xcoord + Ryy * ycoord + Ryz * zcoord;
-		mycoordinates[3*nodenumber+2] = Rzx * xcoord + Rzy * ycoord + Rzz * zcoord;
-	}
+	geotools::rotate(alphax, alphay, alphaz, &mycoordinates);
 }
 
 void nodes::print(void)
