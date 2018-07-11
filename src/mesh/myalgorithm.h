@@ -32,7 +32,7 @@ namespace myalgorithm
     
     // 'stablesort' is like 'stablecoordinatesort' but instead of sorting 
     // according to coordinates it sorts according to 'tosort', a vector of ints.
-    void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector); /// REMOVE AND USE THE ONE BELOW?
+    void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
     
     // 'stablesortparallel' sorts in parallel according to tosort[0] then 
     // according to tosrt[1],... ALL int* arrays have size 'numentries'.
