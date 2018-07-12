@@ -57,6 +57,8 @@ std::shared_ptr<rawshape> rawquadrangle::duplicate(void)
 
 	out->sons = geotools::duplicate(sons);
 
+	out->replicatelinks(shared_from_this());
+
     return out;	
 }
 
@@ -84,6 +86,11 @@ std::vector<std::shared_ptr<rawshape>> rawquadrangle::getsons(void)
 std::vector<std::shared_ptr<rawshape>> rawquadrangle::getsubshapes(void)
 {
 	return sons;
+}
+
+void rawquadrangle::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
+{
+	sons = subshapes;
 }
 
 int rawquadrangle::getphysicalregion(void) 

@@ -67,6 +67,8 @@ std::shared_ptr<rawshape> rawline::duplicate(void)
 
 	out->sons = geotools::duplicate(sons);
 
+	out->replicatelinks(shared_from_this());
+
     return out;	
 }
 
@@ -101,6 +103,11 @@ std::vector<std::shared_ptr<rawshape>> rawline::getsons(void)
 std::vector<std::shared_ptr<rawshape>> rawline::getsubshapes(void)
 {
 	return sons;
+}
+
+void rawline::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
+{
+	sons = subshapes;
 }
 
 int rawline::getphysicalregion(void) 

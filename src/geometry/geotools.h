@@ -65,6 +65,9 @@ namespace geotools
 	// Concatenate lists of rawshapes:
 	std::vector<std::shared_ptr<rawshape>> concatenate(std::vector<std::vector<std::shared_ptr<rawshape>>> input);
 
+	// Get an int vector to sort a vector of rawshape pointers:
+	void sortrawshapepointers(std::vector<rawshape*>& tosort, std::vector<int>& reorderingvector);
+
 	// Append the coordinate of multiple rawshapes:
     std::vector<double> appendcoords(std::vector<std::shared_ptr<rawshape>> rawshapes);
 	// Append the elements of multiple rawshapes:

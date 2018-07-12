@@ -51,6 +51,14 @@ class rawshape : public std::enable_shared_from_this<rawshape>
 		// Get all subshapes recursively:
 		virtual std::vector<std::shared_ptr<rawshape>> getsubshapesrecursively(void);
 
+		virtual void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
+		virtual void setsubshapesrecursively(std::vector<std::shared_ptr<rawshape>> subshapes);
+
+		virtual int countsubshapesrecursively(void);
+
+		// With this the pointer equalities between subshapes in the origin are replicated in this rawshape:
+		void replicatelinks(std::shared_ptr<rawshape> origin);
+
 		// Get the mesh info of the shape:
 		virtual int getphysicalregion(void);
 		virtual std::vector<double>* getcoords(void);

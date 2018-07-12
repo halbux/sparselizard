@@ -131,23 +131,98 @@ std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapes(void)
 
 std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapesrecursively(void)
 {
+	std::vector<std::shared_ptr<rawshape>> output(countsubshapesrecursively());
+
 	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
 
-	if (subshapes.size() == 0)
-		return subshapes;
-
-	std::vector<std::shared_ptr<rawshape>> output = {};
-
+	int index = 0;
 	for (int i = 0; i < subshapes.size(); i++)
 	{
-		output.push_back(subshapes[i]);
+		output[index] = subshapes[i];
+		index++;
 
 		std::vector<std::shared_ptr<rawshape>> toappend = subshapes[i]->getsubshapesrecursively();
 		for (int j = 0; j < toappend.size(); j++)
-			output.push_back(toappend[j]);
+			output[index+j] = toappend[j];
+		index += toappend.size();
 	}
 
 	return output;
+}
+
+void rawshape::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
+{
+	std::cout << "Error in 'rawshape' object: 'setsubshapes' has not been defined for this shape" << std::endl;
+	abort(); 
+}
+
+void rawshape::setsubshapesrecursively(std::vector<std::shared_ptr<rawshape>> subshapes)
+{
+	// Prepare to store the direct subshapes of this raw shape:
+	int numberofdirectsubshapes = (getsubshapes()).size();
+	std::vector<std::shared_ptr<rawshape>> directsubshapes(numberofdirectsubshapes);
+
+	int subshapeindex = 0;
+	for (int n = 0; n < numberofdirectsubshapes; n++)
+	{
+		directsubshapes[n] = subshapes[subshapeindex];
+		subshapeindex++;
+	
+		// Count the number of subshapes recursively in the current direct subshape:
+		int numberoflowerlevelsubshapes = directsubshapes[n]->countsubshapesrecursively();
+
+		// Get all subshapes of lower levels:
+		std::vector<std::shared_ptr<rawshape>> lowerlevelsubshapes(numberoflowerlevelsubshapes);
+		for (int i = 0; i < numberoflowerlevelsubshapes; i++)
+			lowerlevelsubshapes[i] = subshapes[subshapeindex+i];
+		directsubshapes[n]->setsubshapesrecursively(lowerlevelsubshapes);
+		
+		subshapeindex += numberoflowerlevelsubshapes;
+	}
+
+	setsubshapes(directsubshapes);
+}
+
+int rawshape::countsubshapesrecursively(void)
+{
+	std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
+
+	int numsubshapes = subshapes.size();
+
+	for (int i = 0; i < subshapes.size(); i++)
+		numsubshapes += subshapes[i]->countsubshapesrecursively();
+
+	return numsubshapes;
+}
+
+void rawshape::replicatelinks(std::shared_ptr<rawshape> origin)
+{
+	// Get the rawshape pointers of all subshapes in the origin:
+	std::vector<rawshape*> originsubshapes = geotools::getpointers(origin->getsubshapesrecursively());
+
+	if (originsubshapes.size() <= 1)
+		return;
+
+	// Get all subshapes in this rawshape:
+	std::vector<std::shared_ptr<rawshape>> subshapes = this->getsubshapesrecursively();
+
+	// Copy the equality relations from the origin to 'subshapes':
+	std::vector<int> reorderingvector;
+	geotools::sortrawshapepointers(originsubshapes, reorderingvector);
+
+	std::vector<std::shared_ptr<rawshape>> linkedsubshapes(reorderingvector.size());
+
+	linkedsubshapes[reorderingvector[0]] = subshapes[reorderingvector[0]];
+	for (int i = 1; i < reorderingvector.size(); i++)
+	{
+		if (originsubshapes[reorderingvector[i]] != originsubshapes[reorderingvector[i-1]])
+			linkedsubshapes[reorderingvector[i]] = subshapes[reorderingvector[i]];
+		else
+			linkedsubshapes[reorderingvector[i]] = linkedsubshapes[reorderingvector[i-1]];
+	}
+
+	// Transfer linked subshapes to this rawshape:
+	setsubshapesrecursively(linkedsubshapes);
 }
 
 int rawshape::getphysicalregion(void)

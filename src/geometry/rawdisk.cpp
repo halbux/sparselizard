@@ -48,6 +48,8 @@ std::shared_ptr<rawshape> rawdisk::duplicate(void)
 	out->sons = geotools::duplicate(sons);
 	out->mycenterpoint = mycenterpoint->duplicate();
 
+	out->replicatelinks(shared_from_this());
+
     return out;	
 }
 
@@ -75,6 +77,13 @@ std::vector<std::shared_ptr<rawshape>> rawdisk::getsons(void)
 std::vector<std::shared_ptr<rawshape>> rawdisk::getsubshapes(void)
 {
 	return geotools::concatenate({sons,{mycenterpoint}});
+}
+
+void rawdisk::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
+{
+	mycenterpoint = subshapes[subshapes.size()-1];
+	subshapes.pop_back();
+	sons = subshapes;
 }
 
 int rawdisk::getphysicalregion(void) 

@@ -61,9 +61,10 @@ class rawextrusion: public rawshape
 
 		std::vector<std::shared_ptr<rawshape>> getsons(void);
 
-		// Get ALL subshapes (sons are included):
+		// Get subshapes (sons are included):
 		std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
-		
+		void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
+
 		// Get the mesh info of the shape:
 		int getphysicalregion(void);
 		std::vector<double>* getcoords(void); 

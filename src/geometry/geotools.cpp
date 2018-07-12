@@ -280,6 +280,26 @@ std::vector<std::shared_ptr<rawshape>> geotools::concatenate(std::vector<std::ve
 	return output;
 }
 
+void geotools::sortrawshapepointers(std::vector<rawshape*>& tosort, std::vector<int>& reorderingvector)
+{
+    if (reorderingvector.size() != tosort.size())
+        reorderingvector.resize(tosort.size());
+    
+    // Set 'reorderingvector' to [0 1 2 ...]:
+    std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
+    // Sort 'reorderingvector' according to 'tosort':
+    // The < operator is overloaded by a lambda function.
+    std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+        { 
+            if (tosort[elem1] < tosort[elem2])
+                return true;
+            if (tosort[elem1] > tosort[elem2])
+                return false;
+            // For identical entries make a COHERENT decision for a stable sorting.
+            return elem1 < elem2;
+        });
+}
+
 std::vector<double> geotools::appendcoords(std::vector<std::shared_ptr<rawshape>> rawshapes)
 {
 	std::vector< std::vector<double>* > coordsptrs(rawshapes.size());

@@ -24,6 +24,8 @@ std::shared_ptr<rawshape> rawextrusion::duplicate(void)
 	out->sons = geotools::duplicate(sons);
 	out->mybaseshape = mybaseshape->duplicate();
 
+	out->replicatelinks(shared_from_this());
+
 	return out;	
 }
 
@@ -51,6 +53,11 @@ std::vector<std::shared_ptr<rawshape>> rawextrusion::getsons(void)
 std::vector<std::shared_ptr<rawshape>> rawextrusion::getsubshapes(void)
 {
 	return sons;
+}
+
+void rawextrusion::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
+{
+	sons = subshapes;
 }
 
 int rawextrusion::getphysicalregion(void) 
