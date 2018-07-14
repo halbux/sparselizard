@@ -35,7 +35,7 @@ fi
 
 # Copy the example to the main directory: 
 cp examples/$i/main.cpp ./;
-cp examples/$i/*.msh ./;
+cp examples/$i/*.msh ./ 2>/dev/null;
 
 # Compile the current example
 makeout=$(make -j4);

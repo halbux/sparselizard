@@ -197,6 +197,9 @@ void sparselizard(void)
     u.setdata(vol, solu);
     // Write the deflection with an order 2 interpolation. Exagerate the deflection by a large factor.
     (0.3e10*u).write(vol, "u.pos", 2);
+
+    // Code validation line. Can be removed.
+    std::cout << (abs(compz(u)).max(vol, 2)[0] < 4.24272e-12 && abs(compz(u)).max(vol, 2)[0] > 4.2427e-12);
 }
 
 int main(void)
