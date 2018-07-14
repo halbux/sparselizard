@@ -24,6 +24,8 @@ class field;
 
 namespace mathop
 {
+	double getpi(void);
+
     // Perform operations (union, intersection, exclusion) on physical regions:
     int regionunion(const std::vector<int> physregs);
     int regionintersection(const std::vector<int> physregs);
