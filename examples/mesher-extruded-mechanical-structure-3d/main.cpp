@@ -114,7 +114,7 @@ void sparselizard(void)
     shape v4 = q2.extrude(vol, centralthickness, 6);
     
     // Create the top volume part.
-    // Extrude it from the top face of v3 ad v4.
+    // Extrude it from the top face of v3 and v4.
     shape v3topface = v3.getsons()[5];
     shape v4topface = v4.getsons()[5];
     
