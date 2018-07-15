@@ -56,7 +56,7 @@ void sparselizard(void)
     shape l1("line", -1, {p2,p4}, 3);
     shape l2("line", -1, {p3,p5}, 3);
     
-    // Define the 2 quadrangle surfaces at the small cylinder base.
+    // Define the 2 quadrangle surfaces for the small cylinder.
     // Inputs are the contour lines (following the contour clockwise or counter-clockwise).
     shape q1("quadrangle", -1, {a1,l1,a2,l2});
     shape q2("quadrangle", -1, {a3,l2,a4,l1});
@@ -83,7 +83,7 @@ void sparselizard(void)
     shape l3("line", -1, {p7,p9}, 5);
     shape l4("line", -1, {p8,p10}, 5);
     
-    // Define the 2 quadrangle surfaces at the big cylinder base.
+    // Define the 2 quadrangle surfaces for the big cylinder.
     shape q3("quadrangle", -1, {a5,l3,a6,l4});
     shape q4("quadrangle", -1, {a7,l4,a8,l3});
     
@@ -105,7 +105,7 @@ void sparselizard(void)
     // The central part in the small cylinder is 10mm thick and the two above and below 5mm.
     double centralthickness = 0.01, thicknessaboveandbelow = 0.005;
     
-    // Creat the bottom volume part:
+    // Create the bottom volume part:
     shape v1 = q1.extrude(vol, -thicknessaboveandbelow, 3);
     shape v2 = q2.extrude(vol, -thicknessaboveandbelow, 3);
     
