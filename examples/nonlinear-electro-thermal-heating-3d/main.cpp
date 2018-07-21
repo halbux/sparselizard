@@ -164,7 +164,7 @@ void sparselizard(void)
     
     
     // Compute the current I and the electric resistance R between input and output:
-    double I = jx.integrate(input, 4);;
+    double I = jx.integrate(input, 4);
     double R = appliedvoltage/I;
     
     std::cout << std::endl << "Resistance is " << R << " Ohm. Current is " << I << " A" << std::endl;
