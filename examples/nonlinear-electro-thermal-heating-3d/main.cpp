@@ -61,17 +61,17 @@ void sparselizard(void)
     
     
     ///// START THE FINITE ELEMENT SIMULATION:
-
-	// Voltage [V] applied between the input and output faces:
-	double appliedvoltage = 0.2;
-
-	// Create the electric potential field v and temperature field T (both with nodal shape functions h1):
-	field v("h1"), T("h1");
-
-	// Use an order 2 interpolation for both fields:
-	v.setorder(volume,2);
-	T.setorder(volume,2);
-
+    
+    // Voltage [V] applied between the input and output faces:
+    double appliedvoltage = 0.2;
+    
+    // Create the electric potential field v and temperature field T (both with nodal shape functions h1):
+    field v("h1"), T("h1");
+    
+    // Use an order 2 interpolation for both fields:
+    v.setorder(volume,2);
+    T.setorder(volume,2);
+    
     // Apply the requested voltage to the input and ground the output:
     v.setconstraint(input, appliedvoltage);
     v.setconstraint(output);
