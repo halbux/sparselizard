@@ -72,70 +72,70 @@ void sparselizard(void)
 	v.setorder(volume,2);
 	T.setorder(volume,2);
 
-	// Apply the requested voltage to the input and ground the output:
-	v.setconstraint(input, appliedvoltage);
-	v.setconstraint(output);
-	// Assume the temperature is fixed to 293 K on the input and output faces:
-	T.setconstraint(input, 293);
-	T.setconstraint(output, 293);
-
-	// The tungsten resistivity 'rho' [Ohm*m] is a function of the temperature (5.60e-8 at 293 K with a 0.0045 [K^-1] temperature coefficient): 
-	parameter rho, k;
-	rho|volume = 5.6e-8*(1+0.0045*(T-293));
-	// Its thermal condutivity varies from 173 to 118 [W/(m*K)] between 293 and 1000 K: 
-	k|volume = 173-(173-118)*(T-293)/(1000-293);
-
-	// Expression for the electric field E [V/m] and current density j [A/m^2]:
-	expression E = -grad(v);
-	expression j = 1/rho * E;
-
-
-	// Define the weak formulation for the static current flow.
-	//
-	// The strong form is:
-	//
-	// div(1/rho * grad(v)) = 0
-	//	
-	// with v = -grad(E)
-	//	
-	formulation electrokinetics;
-
-    electrokinetics += integral(volume, grad(tf(v))*1/rho*grad(dof(v)));
-
-	// Define the weak formulation for the heat equation.
-	//
-	// Can be found at https://en.wikiversity.org/wiki/Nonlinear_finite_elements/Weak_form_of_heat_equation
-	//
-	// Strong form is r*cp*dT/dt - div(k*grad(T)) = volumic heat sources [W/m^3]
-	//
-	// where r [kg/m^3] is the density and cp [J/(kg*K)] is the specific heat capacity.
-	//
-	formulation heatequation;
-	
-	// Here the time derivative is zero (static simulation):
-	// heatequation += integral(volume, r*cp*dt(dof(T))*tf(T));
-	heatequation += integral(volume, grad(tf(T))*k*grad(dof(T)));
-	// Add the current heating source:
-	heatequation += integral(volume, -j*E*tf(T));
-
-
-
-	// Start with a uniform 293 K temperature everywhere:
-	T.setvalue(volume, 293);
+    // Apply the requested voltage to the input and ground the output:
+    v.setconstraint(input, appliedvoltage);
+    v.setconstraint(output);
+    // Assume the temperature is fixed to 293 K on the input and output faces:
+    T.setconstraint(input, 293);
+    T.setconstraint(output, 293);
     
-	// Initial all-zero solution vector for the heat equation:
-    vec solheat(heatequation);
+    // The tungsten resistivity 'rho' [Ohm*m] is a function of the temperature (5.60e-8 at 293 K with a 0.0045 [K^-1] temperature coefficient): 
+    parameter rho, k;
+    rho|volume = 5.6e-8*(1+0.0045*(T-293));
+    // Its thermal condutivity varies from 173 to 118 [W/(m*K)] between 293 and 1000 K: 
+    k|volume = 173-(173-118)*(T-293)/(1000-293);
+    
+    // Expression for the electric field E [V/m] and current density j [A/m^2]:
+    expression E = -grad(v);
+    expression j = 1/rho * E;
 
+    
+    // Define the weak formulation for the static current flow.
+    //
+    // The strong form is:
+    //
+    // div(1/rho * grad(v)) = 0
+    //	
+    // with v = -grad(E)
+    //	
+    formulation electrokinetics;
+    
+    electrokinetics += integral(volume, grad(tf(v))*1/rho*grad(dof(v)));
+    
+    // Define the weak formulation for the heat equation.
+    //
+    // Can be found at https://en.wikiversity.org/wiki/Nonlinear_finite_elements/Weak_form_of_heat_equation
+    //
+    // Strong form is r*cp*dT/dt - div(k*grad(T)) = volumic heat sources [W/m^3]
+    //
+    // where r [kg/m^3] is the density and cp [J/(kg*K)] is the specific heat capacity.
+    //
+    formulation heatequation;
+    
+    // Here the time derivative is zero (static simulation):
+    // heatequation += integral(volume, r*cp*dt(dof(T))*tf(T));
+    heatequation += integral(volume, grad(tf(T))*k*grad(dof(T)));
+    // Add the current heating source:
+    heatequation += integral(volume, -j*E*tf(T));
+
+
+    
+    // Start with a uniform 293 K temperature everywhere:
+    T.setvalue(volume, 293);
+    
+    // Initial all-zero solution vector for the heat equation:
+    vec solheat(heatequation);
+    
     double relres = 1;
     while (relres > 1e-7)
     {
-		// Compute the static current everywhere:
-		electrokinetics.generate();
+        // Compute the static current everywhere:
+        electrokinetics.generate();
         // Get A and b to solve Ax = b:
-		vec solv = solve(electrokinetics.A(), electrokinetics.b());
-		// Transfer the data from the solution vector to the v field to be used for the heat equation below:
-		v.setdata(volume, solv);
-
+        vec solv = solve(electrokinetics.A(), electrokinetics.b());
+        // Transfer the data from the solution vector to the v field to be used for the heat equation below:
+        v.setdata(volume, solv);
+        
         // Deduce the temperature field everywhere:
         heatequation.generate();
         // Get A and b to solve Ax = b:
@@ -148,36 +148,36 @@ void sparselizard(void)
         // Solve Ax = b:
         solheat = solve(Aheat, bheat);
         
-		// Transfer the data from the solution vector to the T field to be used for the electrokinetics above:
+        // Transfer the data from the solution vector to the T field to be used for the electrokinetics above:
         T.setdata(volume, solheat);
         
         std::cout << "Current iteration has relative residual: " << relres << std::endl;
     }
 
-	// Compute the total current flowing trough the input face.
-	// Since the computation involves a gradient that has to be 
-	// calculated in the volume (and not on the inout face) 
-	// one can not simply call (normal(input)*j).integrate(input,4)
-	// since with this a surface gradient will be calculated.
-	field jx("h1");
-	jx.setvalue(volume, compx(j));
-
-
-	// Compute the current I and the electric resistance R between input and output:
-	double I = jx.integrate(input, 4);;
-	double R = appliedvoltage/I;
-
-	std::cout << std::endl << "Resistance is " << R << " Ohm. Current is " << I << " A" << std::endl;
-
-	// Compute the peak temperature on the whole volume:
-	double peaktemperature = expression(T).max(volume,2)[0];
-	std::cout << "Peak temperature is " << peaktemperature << " K" << std::endl << std::endl;
-
-	// Write v, j and T:
-	v.write(volume, "v.pos");
-	j.write(volume, "j.pos");
-	T.write(volume, "T.pos");
-
+    // Compute the total current flowing trough the input face.
+    // Since the computation involves a gradient that has to be 
+    // calculated in the volume (and not on the inout face) 
+    // one can not simply call (normal(input)*j).integrate(input,4)
+    // since with this a surface gradient will be calculated.
+    field jx("h1");
+    jx.setvalue(volume, compx(j));
+    
+    
+    // Compute the current I and the electric resistance R between input and output:
+    double I = jx.integrate(input, 4);;
+    double R = appliedvoltage/I;
+    
+    std::cout << std::endl << "Resistance is " << R << " Ohm. Current is " << I << " A" << std::endl;
+    
+    // Compute the peak temperature on the whole volume:
+    double peaktemperature = expression(T).max(volume,2)[0];
+    std::cout << "Peak temperature is " << peaktemperature << " K" << std::endl << std::endl;
+    
+    // Write v, j and T:
+    v.write(volume, "v.pos");
+    j.write(volume, "j.pos");
+    T.write(volume, "T.pos");
+    
     // Code validation line. Can be removed.
     std::cout << (peaktemperature < 618.446 && peaktemperature > 618.444);
 }
