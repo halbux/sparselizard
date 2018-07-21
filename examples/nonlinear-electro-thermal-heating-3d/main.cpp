@@ -16,51 +16,51 @@ using namespace mathop;
 void sparselizard(void)
 {	
 
-	///// CREATE THE GEOMETRY AND THE MESH:
+    ///// CREATE THE GEOMETRY AND THE MESH:
+    
+    // Define the x, y and z coordinate fields:
+    field x("x"), y("y"), z("z");
+    
+    // Region number 
+    // - 1 corresponds to the whole volume
+    // - 2 to the left face (input, electrically actuated)
+    // - 3 to the right face (output, grounded)
+    //
+    int volume = 1, input = 2, output = 3;
+    
+    double length = 0.2, thickness = 0.01, width = 0.05;
+    
+    // Define the 2D base to be extruded:
+    shape leftquad("quadrangle", -1, {-length/2,-width/2,-thickness/2, -0.5*length/2,-width/2,-thickness/2, -0.5*length/2,width/2,-thickness/2, -length/2,width/2,-thickness/2}, {8,8,8,8});
+    shape rightquad("quadrangle", -1, {0.5*length/2,-width/2,-thickness/2, length/2,-width/2,-thickness/2, length/2,width/2,-thickness/2, 0.5*length/2,width/2,-thickness/2}, {8,8,8,8});
+    shape centralquad("quadrangle", -1, {-0.5*length/2,-width/2,-thickness/2, 0.5*length/2,-width/2,-thickness/2, 0.5*length/2,width/2,-thickness/2, -0.5*length/2,width/2,-thickness/2}, {16,8,16,8});
+    
+    // Extrude the 2D base:
+    shape leftblock = leftquad.extrude(volume, thickness, 3);
+    shape rightblock = rightquad.extrude(volume, thickness, 3);
+    shape centralblock = centralquad.extrude(volume, thickness, 3);
 
-	// Define the x, y and z coordinate fields:
-	field x("x"), y("y"), z("z");
-
-	// Region number 
-	// - 1 corresponds to the whole volume
-	// - 2 to the left face (input, electrically actuated)
-	// - 3 to the right face (output, grounded)
-	//
-	int volume = 1, input = 2, output = 3;
-
-	double length = 0.2, thickness = 0.01, width = 0.05;
-
-	// Define the 2D base to be extruded:
-	shape leftquad("quadrangle", -1, {-length/2,-width/2,-thickness/2, -0.5*length/2,-width/2,-thickness/2, -0.5*length/2,width/2,-thickness/2, -length/2,width/2,-thickness/2}, {8,8,8,8});
-	shape rightquad("quadrangle", -1, {0.5*length/2,-width/2,-thickness/2, length/2,-width/2,-thickness/2, length/2,width/2,-thickness/2, 0.5*length/2,width/2,-thickness/2}, {8,8,8,8});
-	shape centralquad("quadrangle", -1, {-0.5*length/2,-width/2,-thickness/2, 0.5*length/2,-width/2,-thickness/2, 0.5*length/2,width/2,-thickness/2, -0.5*length/2,width/2,-thickness/2}, {16,8,16,8});
-
-	// Extrude the 2D base:
-	shape leftblock = leftquad.extrude(volume, thickness, 3);
-	shape rightblock = rightquad.extrude(volume, thickness, 3);
-	shape centralblock = centralquad.extrude(volume, thickness, 3);
-
-	// Make the central block less large in the middle:
-	centralblock.deform(0, 15*(abs(x)-0.5*length/2)*y, 0);
-	// Make it also a little thinner (in the z direction) in the middle:
-	centralblock.deform(0, 0, 15*(abs(x)-0.5*length/2)*z);
-
-	// Get the input and output faces:
-	shape inputface = leftblock.getsons()[4];
-	shape outputface = rightblock.getsons()[2];
-
-	// Assign the physical region numbers as detailed above:
-	inputface.setphysicalregion(input);
-	outputface.setphysicalregion(output);
-
-	// Load to the mesh all shapes important for the finite element simulation:
-	mesh mymesh({leftblock,rightblock,centralblock,inputface,outputface});
-
-	// The mesh can be written at any time to have a feedback while creating the geometry!
-	mymesh.write("meshed.msh");
-
-
-	///// START THE FINITE ELEMENT SIMULATION:
+    // Make the central block less large in the middle:
+    centralblock.deform(0, 15*(abs(x)-0.5*length/2)*y, 0);
+    // Make it also a little thinner (in the z direction) in the middle:
+    centralblock.deform(0, 0, 15*(abs(x)-0.5*length/2)*z);
+    
+    // Get the input and output faces:
+    shape inputface = leftblock.getsons()[4];
+    shape outputface = rightblock.getsons()[2];
+    
+    // Assign the physical region numbers as detailed above:
+    inputface.setphysicalregion(input);
+    outputface.setphysicalregion(output);
+    
+    // Load to the mesh all shapes important for the finite element simulation:
+    mesh mymesh({leftblock,rightblock,centralblock,inputface,outputface});
+    
+    // The mesh can be written at any time to have a feedback while creating the geometry!
+    mymesh.write("meshed.msh");
+    
+    
+    ///// START THE FINITE ELEMENT SIMULATION:
 
 	// Voltage [V] applied between the input and output faces:
 	double appliedvoltage = 0.2;
