@@ -156,7 +156,7 @@ void sparselizard(void)
 
     // Compute the total current flowing trough the input face.
     // Since the computation involves a gradient that has to be 
-    // calculated in the volume (and not on the inout face) 
+    // calculated in the volume (and not on the input face) 
     // one can not simply call (normal(input)*j).integrate(input,4)
     // since with this a surface gradient will be calculated.
     field jx("h1");
