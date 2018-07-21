@@ -82,7 +82,7 @@ void sparselizard(void)
     // The tungsten resistivity 'rho' [Ohm*m] is a function of the temperature (5.60e-8 at 293 K with a 0.0045 [K^-1] temperature coefficient): 
     parameter rho, k;
     rho|volume = 5.6e-8*(1+0.0045*(T-293));
-    // Its thermal condutivity varies from 173 to 118 [W/(m*K)] between 293 and 1000 K: 
+    // Its thermal conductivity varies from 173 to 118 [W/(m*K)] between 293 and 1000 K: 
     k|volume = 173-(173-118)*(T-293)/(1000-293);
     
     // Expression for the electric field E [V/m] and current density j [A/m^2]:
