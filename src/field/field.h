@@ -114,23 +114,23 @@ class field
         void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
         
         
-		// Defining the +, -, * and / operators:
+        // Defining the +, -, * and / operators:
         expression operator+(void);
         expression operator-(void);
         
-		expression operator+(field);
+        expression operator+(field);
         expression operator-(field);
-		expression operator*(field);
+        expression operator*(field);
         expression operator/(field);
         
-		expression operator+(double);
+        expression operator+(double);
         expression operator-(double);
-		expression operator*(double);
+        expression operator*(double);
         expression operator/(double);
         
-		expression operator+(parameter&);
+        expression operator+(parameter&);
         expression operator-(parameter&);
-		expression operator*(parameter&);
+        expression operator*(parameter&);
         expression operator/(parameter&);
         
 };
