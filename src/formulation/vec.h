@@ -51,11 +51,11 @@ class vec
 //         void updateconstraints(field inputfield, int physreg);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
-		void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
-		densematrix getvalues(intdensematrix addresses);
-		// Set and get value at a single index:
-		void setvalue(int address, double value, std::string op = "set");
-		double getvalue(int address);
+        void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+        densematrix getvalues(intdensematrix addresses);
+        // Set and get value at a single index:
+        void setvalue(int address, double value, std::string op = "set");
+        double getvalue(int address);
         
         vectorfieldselect operator|(field selectedfield);
         
@@ -67,8 +67,8 @@ class vec
         
         Vec getpetsc(void);
         
-		void print(void);
-
+        void print(void);
+        
         vec copy(void);
         double norm(std::string type = "2");
         
