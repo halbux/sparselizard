@@ -46,23 +46,23 @@ class rawvec
         // Update the indexes that correspond to constrained 
         // values of a rawfield on given disjoint regions. 
         void updateconstraints(shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
-     
-        // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
-		void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
-		// Set value at a single index:
-		void setvalue(int address, double value, std::string op = "set");
-
-		densematrix getvalues(intdensematrix addresses);
-		// Get value at a single index:
-		double getvalue(int address);
-		densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
         
-		void print(void);
-
+        // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
+        void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+        // Set value at a single index:
+        void setvalue(int address, double value, std::string op = "set");
+        
+        densematrix getvalues(intdensematrix addresses);
+        // Get value at a single index:
+        double getvalue(int address);
+        densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
+        
+        void print(void);
+        
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         Vec getpetsc(void) { return myvec; };
-
-		// Tranfer data between the 'inputvec' vector and this vector:
+        
+        // Transfer data between the 'inputvec' vector and this vector:
         void setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield);
         
 };
