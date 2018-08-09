@@ -1,4 +1,3 @@
 Welcome, new sparselizard user!
 
-You will find all information you need at www.sparselizard.org .
-A forum has been created for any question you might have.
+You will find all information you need at www.sparselizard.org (visit the forum if you have any question).
