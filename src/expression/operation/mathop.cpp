@@ -200,12 +200,16 @@ expression mathop::div(expression input)
         abort();
     }
 
-	if (input.countrows() == 1)
-		return dx(input);
-	if (input.countrows() == 2)
-		return dx(compx(input))+dy(compy(input));
-	if (input.countrows() == 3)
-		return dx(compx(input))+dy(compy(input))+dz(compz(input));
+	switch (input.countrows())
+	{
+		case 1:
+		    return dx(input);
+		case 2:
+		    return dx(compx(input))+dy(compy(input));
+		case 3:
+		    return dx(compx(input))+dy(compy(input))+dz(compz(input));
+	}
+
 }
 
 expression mathop::curl(expression input)
