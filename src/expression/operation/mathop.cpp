@@ -192,6 +192,22 @@ expression mathop::grad(expression input)
     return expression(problemdimension, input.countrows(), myexprs);
 }
 
+expression mathop::div(expression input)
+{
+    if (input.countcolumns() != 1 || input.countrows() > 3)
+    {
+        std::cout << "Error in 'mathop' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
+        abort();
+    }
+
+	if (input.countrows() == 1)
+		return dx(input);
+	if (input.countrows() == 2)
+		return dx(compx(input))+dy(compy(input));
+	if (input.countrows() == 3)
+		return dx(compx(input))+dy(compy(input))+dz(compz(input));
+}
+
 expression mathop::curl(expression input)
 {
     bool ishcurlfield = input.isprojectedfield();
