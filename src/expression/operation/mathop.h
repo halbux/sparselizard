@@ -76,9 +76,9 @@ namespace mathop
     expression transpose(expression input);
     expression inverse(expression input);
     expression determinant(expression input);
-
+    
     expression grad(expression input);
-	expression div(expression input);
+    expression div(expression input);
     expression curl(expression input);
     
     // Get the determinant of the physical to reference element variable change Jacobian:
