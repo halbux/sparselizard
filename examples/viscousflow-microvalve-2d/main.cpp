@@ -55,7 +55,7 @@ void sparselizard(void)
 	l2.setphysicalregion(outlet);
 
 	// Provide to the mesh all shapes of interest:
-    mesh mymesh({q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,l1,l2});
+	mesh mymesh({q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,l1,l2});
     
 	// Write the mesh for display:
 	mymesh.write("microvalve.msh");
