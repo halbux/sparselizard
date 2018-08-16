@@ -106,7 +106,7 @@ void sparselizard(void)
     p.write(fluid, "p.pos");
     v.write(fluid, "v.pos", 2);
     
-    // Output the flowrate for a unith width:
+    // Output the flowrate for a unit width:
     double flowrate = (normal(inlet)*v).integrate(inlet, 4);
     std::cout << std::endl << "Flowrate for a unit width: " << flowrate << " m^3/s" << std::endl;
     
