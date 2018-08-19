@@ -78,7 +78,7 @@ void sparselizard(void)
 
 mesh createmesh(void)
 {
-	// Give names to the physical region numbers:
+    // Give names to the physical region numbers:
     int support = 1, fluid = 2, pillar = 3, membrane = 4, inlet = 7, outlet = 8;
 
     // Define the x and y geometrical dimensions:
