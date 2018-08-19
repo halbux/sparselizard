@@ -22,12 +22,12 @@ void sparselizard(void)
     //
     int volume = 1, input = 2, output = 3;
     
-	// Create the geometry and the mesh:    
-	mesh mymesh = createmesh();
-
-	// Write to file for visualization:
-	mymesh.write("meshed.msh");
+    // Create the geometry and the mesh:    
+    mesh mymesh = createmesh();
     
+    // Write to file for visualization:
+    mymesh.write("meshed.msh");
+
     // Voltage [V] applied between the input and output faces:
     double appliedvoltage = 0.2;
     
@@ -187,7 +187,7 @@ mesh createmesh(void)
     // The mesh can be written at any time to have a feedback while creating the geometry!
     // mymesh.write("meshed.msh");
 
-	return mymesh;
+    return mymesh;
 }
 
 int main(void)
