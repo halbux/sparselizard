@@ -150,7 +150,7 @@ void sparselizard(void)
 
 mesh createmesh(void)
 {
-	// Give names to the physical region numbers:
+    // Give names to the physical region numbers:
     int volume = 1, input = 2, output = 3;
     
     // Define the x, y and z coordinate fields:
