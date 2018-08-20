@@ -1,4 +1,4 @@
-// This code simulates the 2D flow of a viscous fluid (water) in a microvalve.
+// This code simulates the Stokes flow of a viscous fluid (water) in a microvalve.
 // Reynold's number rho*v*L/mu is very low so that the inertia terms can be neglected.
 // Since the velocities involved are very low the fluid can be considered incompressible.
 //
