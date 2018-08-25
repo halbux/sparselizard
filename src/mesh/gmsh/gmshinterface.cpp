@@ -9,6 +9,27 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
 	std::ifstream meshfile (name.c_str());
 	if (meshfile.is_open())
 	{
+		// Move to the mesh version section:
+		double formatversion;
+		while (std::getline(meshfile, currentline))
+		{
+			if (currentline == "$MeshFormat")
+			{
+				std::getline(meshfile, currentline);
+				// Get version number:
+				mystring stringobject(currentline);
+				formatversion = std::stod(stringobject.getstringtonextwhitespace());
+				break;
+			}
+		}
+		// Give an error if version is not supported:
+		if (formatversion >= 4)
+		{
+			std::cout << "Error in 'gmshinterface': GMSH format " << formatversion << " is not supported yet (might still be experimental)." << std::endl;
+			std::cout << "Use GMSH 3 instead or the built-in mesher." << std::endl;
+			abort();
+		}
+
 		// Move to the node section and read the number of nodes:
 		int numberofnodes;
 		while (std::getline(meshfile, currentline))
