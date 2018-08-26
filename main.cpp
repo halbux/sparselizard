@@ -15,8 +15,8 @@ void sparselizard(void)
     // Field u is the membrane deflection.
     field u("h1xyz");
 
-    // Use interpolation order 3 on 'vol', the whole domain:
-    u.setorder(vol, 3);
+    // Use interpolation order 2 on 'vol', the whole domain:
+    u.setorder(vol, 2);
     
     // Clamp on surface 'sur' (i.e. 0 valued-Dirichlet conditions):
     u.setconstraint(sur);
@@ -39,8 +39,8 @@ void sparselizard(void)
     // Transfer the data from the solution vector to the u field:
     u.setdata(vol, solu);
     // Write the deflection on the top surface of the membrane.
-    // Write with an order 3 interpolation. Exagerate the deflection by a factor 1e9.
-    (0.5e9*u).write(top, "u.pos", 3);
+    // Write with an order 2 interpolation. Exagerate the deflection by a factor 1e9.
+    (0.5e9*u).write(top, "u.pos", 2);
     
 }
 
