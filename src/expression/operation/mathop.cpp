@@ -37,6 +37,21 @@ void mathop::printvector(std::vector<int> input)
     std::cout << std::endl;
 }
 
+expression mathop::norm(expression expr)
+{
+    if (expr.countcolumns() > 1)
+    {
+        std::cout << "Error in 'mathop' namespace: can only compute the norm of column vectors" << std::endl;
+        abort();
+    }
+
+    expression mynorm = pow(expr.at(0,0),2);
+    for (int i = 1; i < expr.countrows(); i++)
+		mynorm = mynorm + pow(expr.at(i,0),2);
+
+	return sqrt(mynorm);
+}
+
 expression mathop::normal(int surfphysreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();

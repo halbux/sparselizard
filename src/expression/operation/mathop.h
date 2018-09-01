@@ -33,6 +33,9 @@ namespace mathop
     
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);
+
+	// Compute the L2 norm of a vector expression:
+	expression norm(expression expr);
     
     // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
     expression normal(int surfphysreg);
