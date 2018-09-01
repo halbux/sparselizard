@@ -120,8 +120,8 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                 myjacobian = shared_ptr<jacobian>(new jacobian(myselector, evaluationpoints, meshdeformationptr));
 
             densematrix detjac = myjacobian->getdetjac();
-    		// The Jacobian determinant should be positive irrespective of the node numbering:
-			detjac.abs();
+            // The Jacobian determinant should be positive irrespective of the node numbering:
+            detjac.abs();
             // Store it in the universe for reuse.
             universe::computedjacobian = myjacobian;
             universe::allowreuse();
