@@ -32,9 +32,14 @@ void field::print(void) { rawfieldptr->print(); }
 
 void field::setorder(int physreg, int interpolorder) 
 { 
-    if (interpolorder <= 0)
+    if (interpolorder < 0)
     {
-        std::cout << "Error in 'field' object: cannot use negative or zero interpolation order " << interpolorder << std::endl;
+        std::cout << "Error in 'field' object: cannot use negative interpolation order " << interpolorder << std::endl;
+        abort();   
+    }
+    if (interpolorder == 0 && rawfieldptr->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'field' object: cannot use interpolation order 0 for shape function " << rawfieldptr->gettypename() << std::endl;
         abort();   
     }
     rawfieldptr->setorder(physreg, interpolorder); 

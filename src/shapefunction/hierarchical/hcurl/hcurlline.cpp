@@ -5,7 +5,7 @@ using namespace std;
 
 int hcurlline::count(int order)
 {
-    if (order <= 0)
+    if (order < 0)
         return 0;
     
     return order+1;
@@ -17,7 +17,7 @@ int hcurlline::count(int order, int dim, int num)
     // edges and faces have the same number of form functions. It is
     // however required for prisms and pyramids.
     
-    if (order <= 0)
+    if (order < 0)
         return 0;
     
     switch (dim)
@@ -88,9 +88,8 @@ hierarchicalformfunctioncontainer hcurlline::evalat(int maxorder, vector<double>
             for (int comp = 0; comp < 3; comp++)
             {
                 polynomial formfunc = 0.5*(sigma[e1]-sigma[e2]).derivative(comp)*(lambda[e1]+lambda[e2]);
-                val.set(1,1,edge,orientation,0,comp,formfunc);
+                val.set(0,1,edge,orientation,0,comp,formfunc);
             }
-            int ffindex = 1;
 
             // Defining the Legendre polynomials L for all required orders:
             vector<polynomial> L = legendre::L(maxorder+1, sigma[e1]-sigma[e2]);
@@ -100,9 +99,8 @@ hierarchicalformfunctioncontainer hcurlline::evalat(int maxorder, vector<double>
                 for (int comp = 0; comp < 3; comp++)
                 { 
                     polynomial formfunc = (L[i+2]*(lambda[e1]+lambda[e2])).derivative(comp);
-                    val.set(i+1,1,edge,orientation,ffindex,comp,formfunc);
+                    val.set(i+1,1,edge,orientation,0,comp,formfunc);
                 }
-                ffindex = 0;
             }
         }
     }

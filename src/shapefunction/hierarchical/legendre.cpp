@@ -16,6 +16,9 @@ std::vector<polynomial> legendre::l(int maxn, polynomial x)
 
 std::vector<polynomial> legendre::L(int maxn, polynomial x)
 {
+	if (maxn == 0)
+		return std::vector<polynomial>(0);
+
 	std::vector<polynomial> L(maxn+1);
 	// L[1] is x, L[2] is 1/2(x^2-1):
 	L[1] = x;
@@ -44,6 +47,9 @@ std::vector<polynomial> legendre::ls(int maxn, polynomial x, polynomial t)
 
 std::vector<polynomial> legendre::Ls(int maxn, polynomial x, polynomial t)
 {
+	if (maxn == 0)
+		return std::vector<polynomial>(0);
+
 	std::vector<polynomial> Ls(maxn+1);
 	// Ls[1] is x, Ls[2] is 1/2(x^2-t^2):
 	Ls[1] = x;

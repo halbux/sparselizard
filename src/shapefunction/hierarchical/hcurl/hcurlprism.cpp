@@ -5,8 +5,10 @@ using namespace std;
 
 int hcurlprism::count(int order)
 {
-    if (order <= 0)
+    if (order < 0)
         return 0;
+    if (order == 0)
+        return 9;
     
     return 1.5*(order+1)*order*(order-1) + 2*(order-1)*(order+1) + 3*2*order*(order+1) + 9*(order+1);
 }
@@ -15,8 +17,15 @@ int hcurlprism::count(int order, int dim, int num)
 {
     
     // The 'num' input argument is required here!
-    if (order <= 0)
+    if (order < 0)
         return 0;
+	if (order == 0)
+	{
+		if (dim == 1)
+			return 1;
+		else
+			return 0;
+	}
     
     switch (dim)
     {
@@ -109,9 +118,8 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double
                 else
                     formfunc = lambda[e1]*mu[e1].derivative(comp);
                 
-                val.set(1,1,edge,orientation,0,comp,formfunc);
+                val.set(0,1,edge,orientation,0,comp,formfunc);
             }
-            int ffindex = 1;
 
             // Defining the Legendre polynomials Ls and L for all required orders:
             vector<polynomial> Ls = legendre::Ls(maxorder+1, lambda[e1]-lambda[e2], lambda[e1]+lambda[e2]);
@@ -127,9 +135,8 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double
                     else
                         formfunc = (L[i+2]*lambda[e1]).derivative(comp);
 
-                    val.set(i+1,1,edge,orientation,ffindex,comp,formfunc);
+                    val.set(i+1,1,edge,orientation,0,comp,formfunc);
                 }
-                ffindex = 0;
             }
         }
     }

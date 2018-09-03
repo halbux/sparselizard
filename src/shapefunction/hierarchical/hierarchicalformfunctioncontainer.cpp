@@ -9,11 +9,8 @@ hierarchicalformfunctioncontainer::hierarchicalformfunctioncontainer(std::string
     myevaluationpoints = evaluationpoints;
 }
 
-void hierarchicalformfunctioncontainer::set(int order, int i, int j, int k, int l, int n, polynomial& poly)
-{
-    // The order numbering starts at 0 (i.e. order 1 is at h equal zero):
-    int h = order-1;
-    
+void hierarchicalformfunctioncontainer::set(int h, int i, int j, int k, int l, int n, polynomial& poly)
+{   
     // Compute without derivative as well as with ki, eta and phi derivative:
     for (int m = 0; m < 4; m++)
     {
@@ -53,7 +50,7 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, in
     
     for (int ff = 0; ff < myiterator.count(); ff++)
     {
-        int h = myiterator.getformfunctionorder() - 1;
+        int h = myiterator.getformfunctionorder();
         int i = myiterator.getdimension();
         int j = myiterator.getnodeedgefacevolumeindex();
         int l = myiterator.getformfunctionindexincurrentorderinnodeedgefacevolume();
@@ -94,7 +91,7 @@ void hierarchicalformfunctioncontainer::print(bool printallderivatives)
                             
                             for (int n = 0; n < val[h][i][j][k][l][m].size(); n++)
                             {
-                                std::cout << "order " << h+1 << "; dim " << i << "; sub elem index " << j << "; orientation " << k << "; number " << l << "; derivative " << m << "; comp " << n << ": ";
+                                std::cout << "order " << h << "; dim " << i << "; sub elem index " << j << "; orientation " << k << "; number " << l << "; derivative " << m << "; comp " << n << ": ";
                                 for (int o = 0; o < val[h][i][j][k][l][m][n].size(); o++)
                                     std::cout << val[h][i][j][k][l][m][n][o] << " ";
                                 std::cout << std::endl;

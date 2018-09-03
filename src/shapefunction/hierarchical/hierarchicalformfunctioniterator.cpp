@@ -70,7 +70,7 @@ int hierarchicalformfunctioniterator::getformfunctionorder(void)
 {
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(myelementtypenumber, myformfunctiontypename);
     
-    for (int i = 1; i <= myorder; i++)
+    for (int i = 0; i <= myorder; i++)
     {
         if (currentformfunctionindexinnodeedgefacevolume < myformfunction->count(i, currentdimension, currentnodeedgefacevolumeindex) )
             return i;

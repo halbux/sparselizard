@@ -41,11 +41,11 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
     std::vector<int> dofinterpolorders(selectedelemdisjregs.size(),0);
     // All harmonics must have the same interpolation order!
     for (int i = 0; i < selectedelemdisjregs.size(); i++)
-        tfinterpolorders[i] = tffield->harmonic(tfharms[0])->getinterpolationorder(selectedelemdisjregs[i]);
+        tfinterpolorders[i] = tffield->getinterpolationorder(selectedelemdisjregs[i]);
     if (doffield != NULL)
     {
         for (int i = 0; i < selectedelemdisjregs.size(); i++)
-            dofinterpolorders[i] = doffield->harmonic(dofharms[0])->getinterpolationorder(selectedelemdisjregs[i]);
+            dofinterpolorders[i] = doffield->getinterpolationorder(selectedelemdisjregs[i]);
     }
     
     // Group disj. regs. with same element types and same tf and dof interpolation order.
@@ -57,10 +57,10 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
         int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);        
         
         // Get the interpolation order of the dof and tf fields:
-        int tfinterpolationorder = tffield->harmonic(tfharms[0])->getinterpolationorder(mydisjregs[0]);
+        int tfinterpolationorder = tffield->getinterpolationorder(mydisjregs[0]);
         int dofinterpolationorder = 0;
         if (doffield != NULL)
-            dofinterpolationorder = doffield->harmonic(dofharms[0])->getinterpolationorder(mydisjregs[0]);
+            dofinterpolationorder = doffield->getinterpolationorder(mydisjregs[0]);
         
         // Compute the integration order, set it to zero if negative.
         // Adding an extra +2 generally gives a good integration in practice.
