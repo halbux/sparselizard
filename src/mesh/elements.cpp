@@ -126,15 +126,13 @@ void elements::populateedgesatnodes(void)
 
 int elements::countedgesonnode(int nodenumber)
 {
-	if (edgesatnodes.size() > 0)
-	{
-		if (nodenumber+1 < adressedgesatnodes.size())
-			return adressedgesatnodes[nodenumber+1]-adressedgesatnodes[nodenumber];
-		else
-			return edgesatnodes.size()-adressedgesatnodes[nodenumber];
-	}
-	else
+	if (edgesatnodes.size() == 0)
 		populateedgesatnodes();
+
+	if (nodenumber+1 < adressedgesatnodes.size())
+		return adressedgesatnodes[nodenumber+1]-adressedgesatnodes[nodenumber];
+	else
+		return edgesatnodes.size()-adressedgesatnodes[nodenumber];
 }
 
 std::vector<int> elements::getedgesonnode(int nodenumber)
