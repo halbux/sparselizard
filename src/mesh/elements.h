@@ -57,6 +57,13 @@ class elements
         // totalorientations[typenum] is empty if not applicable.
         std::vector<std::vector<int>> totalorientations = std::vector<std::vector<int>>(8, std::vector<int>(0));
         
+		// Entries in 'edgesatnodes' from index 'adressedgesatnodes[i]' to 'adressedgesatnodes[i+1]-1' are all 
+		// edges touching node i. Only the edge corner nodes (not the curvature nodes) have touching edges.
+		std::vector<int> adressedgesatnodes = {};
+		std::vector<int> edgesatnodes = {};
+		// Create the two vectors above:
+		void populateedgesatnodes(void);
+
 	public:
         
         elements(nodes&, physicalregions&, disjointregions&);
@@ -79,6 +86,11 @@ class elements
         int count(int elementtypenumber);
         // Return the curvature order:
         int getcurvatureorder(void);
+
+		// Get a vector containing all edges touching node 'nodenumber'.
+		// For curvature nodes an empty vector is returned. 
+		int countedgesonnode(int nodenumber);
+		std::vector<int> getedgesonnode(int nodenumber);
         
         // Print elements data for debug:
         void printnumber(void);

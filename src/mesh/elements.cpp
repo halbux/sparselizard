@@ -78,6 +78,76 @@ int elements::getcurvatureorder(void)
     return mycurvatureorder;
 }
 
+void elements::populateedgesatnodes(void)
+{
+	// Get the number of nodes:
+	int numnodes = count(0);
+	// Get the number of edges:
+	int numedges = count(1);
+	// Get the number of curved nodes per edge:
+	int numcurvednodes = subelementsinelements[1][0].size()/numedges;
+
+
+	// Preallocate vectors:
+	adressedgesatnodes = std::vector<int>(numnodes,0);
+	edgesatnodes = std::vector<int>(numedges*2);
+
+
+	// Vector to count the number of edges touching every node:
+	std::vector<int> numedgesonnode(numnodes,0);
+
+	// Loop on all edges:
+	for (int e = 0; e < numedges; e++)
+	{
+		// Corner nodes in current edge:
+		int edgefirstnode = subelementsinelements[1][0][e*numcurvednodes+0];
+		int edgelastnode = subelementsinelements[1][0][e*numcurvednodes+1];
+
+		numedgesonnode[edgefirstnode]++;
+		numedgesonnode[edgelastnode]++;
+	}
+
+	for (int n = 1; n < numnodes; n++)
+		adressedgesatnodes[n] = adressedgesatnodes[n-1] + numedgesonnode[n-1];
+
+	std::vector<int> currentedgeinnode(numnodes,0);	
+	for (int e = 0; e < numedges; e++)
+	{
+		// Corner nodes in current edge:
+		int edgefirstnode = subelementsinelements[1][0][e*numcurvednodes+0];
+		int edgelastnode = subelementsinelements[1][0][e*numcurvednodes+1];
+
+		edgesatnodes[adressedgesatnodes[edgefirstnode]+currentedgeinnode[edgefirstnode]] = e;
+		currentedgeinnode[edgefirstnode]++;
+		edgesatnodes[adressedgesatnodes[edgelastnode]+currentedgeinnode[edgelastnode]] = e;
+		currentedgeinnode[edgelastnode]++;
+	}
+}
+
+int elements::countedgesonnode(int nodenumber)
+{
+	if (edgesatnodes.size() > 0)
+	{
+		if (nodenumber+1 < adressedgesatnodes.size())
+			return adressedgesatnodes[nodenumber+1]-adressedgesatnodes[nodenumber];
+		else
+			return edgesatnodes.size()-adressedgesatnodes[nodenumber];
+	}
+	else
+		populateedgesatnodes();
+}
+
+std::vector<int> elements::getedgesonnode(int nodenumber)
+{
+	int numedgesatnode = countedgesonnode(nodenumber);
+
+	std::vector<int> output(numedgesatnode);
+	for (int i = 0; i < numedgesatnode; i++)
+		output[i] = edgesatnodes[adressedgesatnodes[nodenumber]+i];
+
+	return output;
+}
+
 void elements::printnumber(void)
 {
     std::cout << std::endl;
