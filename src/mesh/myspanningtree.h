@@ -73,7 +73,7 @@ class myspanningtree
 
 		// Count edges in the tree:
 		int countedgesintree(void);
-		// Get all edges in the tree (ordering does not follow tree):
+        // Get all edges in the tree (ordering does not follow tree):
         std::vector<int> getedgesintree(void);
 
 		// Write to .pos file for debugging purposes:
