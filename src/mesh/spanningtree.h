@@ -44,14 +44,14 @@ class spanningtree
 
 
 
-		// First phase of the tree creation. All (unconnected) subtrees are created
-		// with a priority given by the ordering of the disjoint edge region vector above.
+		// First phase of the tree creation. All (unconnected) subtrees 
+		// are created on the priority disjoint edge regions.
 		// Subtrees are not allowed to share nodes or edges with each other.
 		void growsubtrees(void);
-		// Grow the subtree that has edges only on a given edge disjoint region and 
+		// Grow the subtree that has edges only on the priority edge disjoint regions and 
 		// starting at node 'nodenumber'. Give it subtree number 'subtreenumber'. 
 		// This can only be called if at least one edge can be added to the subtree.
-		void growsubtree(int edgedisjreg, int nodenumber, int subtreenumber);
+		void growsubtree(int nodenumber, int subtreenumber);
 
 		// Create the final tree by connecting all subtrees together:
 		void connectsubtrees(void);

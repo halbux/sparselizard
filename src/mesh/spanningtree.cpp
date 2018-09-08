@@ -22,14 +22,14 @@ void spanningtree::growsubtrees(void)
 			// If at least the current edge can be added to the subtree:
 			if (isnodeintree[startnode] == false && isnodeintree[endnode] == false)
 			{
-				growsubtree(i, startnode, numberofsubtrees);
+				growsubtree(startnode, numberofsubtrees);
 				numberofsubtrees++;
 			}
 		}
 	}
 }
 
-void spanningtree::growsubtree(int edgedisjreg, int nodenumber, int subtreenumber)
+void spanningtree::growsubtree(int nodenumber, int subtreenumber)
 {
 	isnodeintree[nodenumber] = true;
 
@@ -44,8 +44,8 @@ void spanningtree::growsubtree(int edgedisjreg, int nodenumber, int subtreenumbe
 		// Get the disjoint edge region number of the current candidate:
         int currentder = myelements->getdisjointregion(1, currentedge);
 
-		// Skip edge if not in the requested disjoint region:
-		if (currentder != edgedisjreg)
+		// Skip edge if not in the priority disjoint edge regions:
+		if (isprioritydisjointregion[currentder] == false)
 			continue;
 
 		// Get the other node in the current edge:
@@ -58,7 +58,7 @@ void spanningtree::growsubtree(int edgedisjreg, int nodenumber, int subtreenumbe
 		{
 			isnodeintree[nextnode] = true;
 			insubtree[currentedge] = subtreenumber;
-			growsubtree(edgedisjreg, nextnode, subtreenumber);
+			growsubtree(nextnode, subtreenumber);
 		}
 	}
 }
