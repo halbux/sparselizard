@@ -66,7 +66,12 @@ void spanningtree::growsubtree(int nodenumber, int subtreenumber)
 void spanningtree::connectsubtrees(void)
 {
 	isnodeintree = std::vector<bool>(myelements->count(0),false);
-	isedgeintree = std::vector<bool>(myelements->count(1),false);
+
+	isedgeintree = std::shared_ptr<bool>(new bool[myelements->count(1)]);
+	isedgeintreeptr = isedgeintree.get();
+	// Initialise to all false:
+	for (int i = 0; i < myelements->count(1); i++)
+		isedgeintreeptr[i] = false;
 
 
 	///// Group the edges of each subtree in a vector:
@@ -139,7 +144,7 @@ void spanningtree::growtree(int nodenumber)
 				isnodeintree[node1] = true;
 				isnodeintree[node2] = true;
 
-				isedgeintree[edgesinsubtree[currentsubtree][i]] = true;
+				isedgeintreeptr[edgesinsubtree[currentsubtree][i]] = true;
 				numberofedgesintree++;
 			}
 
@@ -165,7 +170,7 @@ void spanningtree::growtree(int nodenumber)
 		// Get the disjoint edge region number of the current candidate:
         int currentdisjreg = myelements->getdisjointregion(1, currentedge);
 
-		if (isedgeintree[currentedge])
+		if (isedgeintreeptr[currentedge])
 			continue;
 
 		// Get the other node in the current edge:
@@ -177,7 +182,7 @@ void spanningtree::growtree(int nodenumber)
 		if (isnodeintree[nextnode] == false)
 		{
 			isnodeintree[nextnode] = true;
-			isedgeintree[currentedge] = true;
+			isedgeintreeptr[currentedge] = true;
 			numberofedgesintree++;
 			
 			growtree(nextnode);
@@ -213,7 +218,7 @@ bool spanningtree::isintree(int index, int disjreg)
 {
 	bool output = false;
 	if (mydisjointregions->getelementtypenumber(disjreg) == 1)
-		output = isedgeintree[mydisjointregions->getrangebegin(disjreg)+index];
+		output = isedgeintreeptr[mydisjointregions->getrangebegin(disjreg)+index];
 
 	return output;
 }
@@ -228,7 +233,7 @@ int spanningtree::countedgesintree(int disjreg)
 
 		for (int i = derstartindex; i <= derendindex; i++)
 		{
-			if (isedgeintree[i])
+			if (isedgeintreeptr[i])
 				output++;
 		}
 	}
@@ -246,9 +251,9 @@ std::vector<int> spanningtree::getedgesintree(void)
 	std::vector<int> output(numberofedgesintree);
 
 	int index = 0;
-	for (int i = 0; i < isedgeintree.size(); i++)
+	for (int i = 0; i < myelements->count(1); i++)
 	{
-		if (isedgeintree[i])
+		if (isedgeintreeptr[i])
 		{
 			output[index] = i;
 			index++;
@@ -277,9 +282,9 @@ void spanningtree::write(std::string filename)
 	double* zvals = zcoords.getvalues();		
 
 	int index = 0;
-	for (int i = 0; i < isedgeintree.size(); i++)
+	for (int i = 0; i < myelements->count(1); i++)
 	{
-		if (isedgeintree[i])
+		if (isedgeintreeptr[i])
 		{
 			int node1 = myelements->getsubelement(0, 1, i, 0);
 			int node2 = myelements->getsubelement(0, 1, i, 1);

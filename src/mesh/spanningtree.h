@@ -12,6 +12,7 @@
 #include <vector>
 #include "mesh.h"
 #include "elements.h"
+#include <memory>
 
 class spanningtree
 {
@@ -22,7 +23,9 @@ class spanningtree
 		disjointregions* mydisjointregions;
 
 		// Vector whose ith entry tells whether the edge number i is in the tree or not:
-		std::vector<bool> isedgeintree;
+		std::shared_ptr<bool> isedgeintree = NULL;
+		// The pointer to which the shared pointer points:
+		bool* isedgeintreeptr;
 
 		// Number of edges that are in the tree:
 		int numberofedgesintree = 0;
