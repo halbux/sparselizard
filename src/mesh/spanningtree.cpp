@@ -1,7 +1,7 @@
-#include "myspanningtree.h"
+#include "spanningtree.h"
 
 
-void myspanningtree::growsubtrees(void)
+void spanningtree::growsubtrees(void)
 {
 	// Initialise:
 	insubtree = std::vector<int>(myelements->count(1), -1);
@@ -27,7 +27,7 @@ void myspanningtree::growsubtrees(void)
 	}
 }
 
-void myspanningtree::growsubtree(int edgedisjreg, int nodenumber, int subtreenumber)
+void spanningtree::growsubtree(int edgedisjreg, int nodenumber, int subtreenumber)
 {
 	isnodeintree[nodenumber] = true;
 
@@ -61,7 +61,7 @@ void myspanningtree::growsubtree(int edgedisjreg, int nodenumber, int subtreenum
 	}
 }
 
-void myspanningtree::connectsubtrees(void)
+void spanningtree::connectsubtrees(void)
 {
 	isnodeintree = std::vector<bool>(myelements->count(0),false);
 	isedgeintree = std::vector<bool>(myelements->count(1),false);
@@ -114,7 +114,7 @@ void myspanningtree::connectsubtrees(void)
 }
 
 
-void myspanningtree::growtree(int nodenumber)
+void spanningtree::growtree(int nodenumber)
 {
 	isnodeintree[nodenumber] = true;
 
@@ -183,7 +183,7 @@ void myspanningtree::growtree(int nodenumber)
 	}
 }
 
-myspanningtree::myspanningtree(void)
+spanningtree::spanningtree(void)
 {
 	myelements = universe::mymesh->getelements();
 	mydisjointregions = universe::mymesh->getdisjointregions();
@@ -248,7 +248,7 @@ myspanningtree::myspanningtree(void)
 	connectsubtrees();
 }
 
-bool myspanningtree::isintree(int index, int disjreg)
+bool spanningtree::isintree(int index, int disjreg)
 {
 	bool output = false;
 	if (mydisjointregions->getelementtypenumber(disjreg) == 1)
@@ -257,7 +257,7 @@ bool myspanningtree::isintree(int index, int disjreg)
 	return output;
 }
 
-int myspanningtree::countedgesintree(int disjreg)
+int spanningtree::countedgesintree(int disjreg)
 {
 	int output = 0;
 	if (mydisjointregions->getelementtypenumber(disjreg) == 1)
@@ -275,12 +275,12 @@ int myspanningtree::countedgesintree(int disjreg)
 	return output;
 }
 
-int myspanningtree::countedgesintree(void)
+int spanningtree::countedgesintree(void)
 {
 	return numberofedgesintree;
 }
 
-std::vector<int> myspanningtree::getedgesintree(void)
+std::vector<int> spanningtree::getedgesintree(void)
 {
 	std::vector<int> output(numberofedgesintree);
 
@@ -297,8 +297,15 @@ std::vector<int> myspanningtree::getedgesintree(void)
 	return output;
 }
 
-void myspanningtree::write(std::string filename)
+void spanningtree::write(std::string filename)
 {
+    // Make sure the filename includes the extension:
+    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
+    {
+        std::cout << "Error in 'spanningtree' object: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
+        abort();
+    }
+
 	nodes* mynodes = universe::mymesh->getnodes();
 	std::vector<double>* nodecoords = mynodes->getcoordinates();
 	

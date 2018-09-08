@@ -5,15 +5,15 @@
 
 
 
-#ifndef MYSPANNINGTREE_H
-#define MYSPANNINGTREE_H
+#ifndef SPANNINGTREE_H
+#define SPANNINGTREE_H
 
 #include <iostream>
 #include <vector>
 #include "mesh.h"
 #include "elements.h"
 
-class myspanningtree
+class spanningtree
 {
 
 	private:
@@ -63,7 +63,7 @@ class myspanningtree
 
 		// Create a spanning tree on the whole mesh.
 		// The tree is first created on all lines, then on all faces and finally on all volumes.
-		myspanningtree(void);
+		spanningtree(void);
 
 		// Is the index th element of the disjoint region in the tree? Always false if not an edge.
 		bool isintree(int index, int disjreg);
@@ -76,7 +76,7 @@ class myspanningtree
 		// Get all edges in the tree (ordering does not follow tree):
 		std::vector<int> getedgesintree(void);
 
-		// Write to .pos file for debugging purposes:
+		// Write to .pos file to see the tree:
 		void write(std::string filename);
 	
 };

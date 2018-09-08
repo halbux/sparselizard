@@ -308,26 +308,6 @@ int mesh::getmeshdimension(void)
 	return maxelementdimension;
 }
 
-myspanningtree* mesh::getspanningtree(void)
-{
-	// First create the spanning tree if not yet created:
-	if (myspantree.size() == 0)
-		myspantree = {myspanningtree()};
-
-	return &(myspantree[0]);
-}
-
-void mesh::writespanningtree(std::string filename)
-{
-    // Make sure the filename includes the extension:
-    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
-    {
-        std::cout << "Error in 'mesh' object: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
-        abort();
-    }
-	getspanningtree()->write(filename);
-}
-
 
 void mesh::writewithdisjointregions(std::string name)
 {

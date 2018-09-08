@@ -23,12 +23,10 @@
 #include <memory>
 #include "shape.h"
 #include "rawshape.h"
-#include "myspanningtree.h"
 
 class nodes;
 class elements;
 class shape;
-class myspanningtree;
 
 class mesh
 {
@@ -40,11 +38,6 @@ class mesh
         disjointregions mydisjointregions;
 
         std::string filename = "";
-
-        // The spanning tree is not yet defined if the vector is empty.
-        // If not empty the spanning tree is at vector index [0].
-        std::vector<myspanningtree> myspantree = {};
-        
 
         // 'readfromfile' hands over to the function reading the format of the mesh file.
         void readfromfile(std::string);
@@ -87,11 +80,6 @@ class mesh
         
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
         int getmeshdimension(void);
-
-        // Get a pointer to the tree spanning the whole mesh:
-        myspanningtree* getspanningtree(void);     
-        
-        void writespanningtree(std::string filename);
         
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
