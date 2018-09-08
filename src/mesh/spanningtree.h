@@ -27,8 +27,8 @@ class spanningtree
 		// Number of edges that are in the tree:
 		int numberofedgesintree = 0;
 
-		// All disjoint edge regions in the mesh (ordered from lowest to highest dimension).
-		std::vector<int> ordereddisjointedgeregions;
+		// True at index i if disjoint (edge) region i has priority in the tree construction:
+		std::vector<bool> isprioritydisjointregion;
 
 
 		// TEMPORARY CONTAINERS used during the tree construction.
@@ -62,8 +62,8 @@ class spanningtree
 	public:
 
 		// Create a spanning tree on the whole mesh.
-		// The tree is first created on all lines, then on all faces and finally on all volumes.
-		spanningtree(void);
+		// The tree is first created on the physical regions provided.
+		spanningtree(std::vector<int> physregs);
 
 		// Is the index th element of the disjoint region in the tree? Always false if not an edge.
 		bool isintree(int index, int disjreg);

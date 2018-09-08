@@ -8,11 +8,13 @@ void spanningtree::growsubtrees(void)
 	isnodeintree = std::vector<bool>(myelements->count(0),false);
 
 	numberofsubtrees = 0;
-	for (int i = 0; i < ordereddisjointedgeregions.size(); i++)
+	for (int i = 0; i < isprioritydisjointregion.size(); i++)
 	{
-		int currentder = ordereddisjointedgeregions[i];
-		int edgerangebegin = mydisjointregions->getrangebegin(currentder);
-		for (int j = 0; j < mydisjointregions->countelements(currentder); j++)
+		if (isprioritydisjointregion[i] == false)
+			continue;
+
+		int edgerangebegin = mydisjointregions->getrangebegin(i);
+		for (int j = 0; j < mydisjointregions->countelements(i); j++)
 		{
 			int startnode = myelements->getsubelement(0, 1, edgerangebegin+j, 0);
 			int endnode = myelements->getsubelement(0, 1, edgerangebegin+j, 1);
@@ -20,7 +22,7 @@ void spanningtree::growsubtrees(void)
 			// If at least the current edge can be added to the subtree:
 			if (isnodeintree[startnode] == false && isnodeintree[endnode] == false)
 			{
-				growsubtree(currentder, startnode, numberofsubtrees);
+				growsubtree(i, startnode, numberofsubtrees);
 				numberofsubtrees++;
 			}
 		}
@@ -183,64 +185,23 @@ void spanningtree::growtree(int nodenumber)
 	}
 }
 
-spanningtree::spanningtree(void)
+spanningtree::spanningtree(std::vector<int> physregs)
 {
 	myelements = universe::mymesh->getelements();
 	mydisjointregions = universe::mymesh->getdisjointregions();
 
 
-	// Get all disjoint edge regions in the mesh:
-	std::vector<int> alledgedisjregs = mydisjointregions->get(1);
-	int numedgedisjregs = alledgedisjregs.size();
+	// Get a vector with all disjoint edge regions in the physical regions provided:
+	isprioritydisjointregion = std::vector<bool>(mydisjointregions->count(), false);
 
-
-	// Create a vector with the dimension of the geometrical shape in which every disjoint edge region is (1D, 2D, 3D).
-	// For that take the intersection of all physical regions defining a disjoint edge region.
-	std::vector<int> derdims(numedgedisjregs, 0);
-
-	for (int e = 0; e < numedgedisjregs; e++)
+	for (int i = 0; i < physregs.size(); i++)
 	{
-		// Get the physical regions defining the current disjoint edge region:
-		std::vector<int> physregsdefiningder = mydisjointregions->getphysicalregions(alledgedisjregs[e]);
+		// Get all disjoint edge regions in the current physical region:
+		std::vector<int> edgedisjregs = ((universe::mymesh->getphysicalregions())->get(physregs[i]))->getdisjointregions(1);
 
-		// Take the intersection of all disjoint regions in the physregs defining the current disjoint edge region:
-		std::vector<int> disjregs = {};
-		for (int i = 0; i < physregsdefiningder.size(); i++)
-		{
-		    // Get all disjoint regions with -1:
-		    std::vector<int> disjregsinthisphysreg = universe::mymesh->getphysicalregions()->get(physregsdefiningder[i])->getdisjointregions(-1);
-		    
-		    if (i > 0)
-		        disjregs = myalgorithm::intersect(disjregs, disjregsinthisphysreg);
-		    else
-		        disjregs = disjregsinthisphysreg;
-		}
-
-		// The dim we are looking for is the max dim of any disjoint region in the intersected list:
-		for (int i = 0; i < disjregs.size(); i++)
-		{
-			if (derdims[e] < mydisjointregions->getelementdimension(disjregs[i]))
-				derdims[e] = mydisjointregions->getelementdimension(disjregs[i]);
-		}
-    }
-	
-
-	// Sort the disjoint edge regions with increasing dimension (can only be 1D, 2D or 3D):
-	ordereddisjointedgeregions = std::vector<int>(numedgedisjregs);
-
-	int index = 0;
-	for (int d = 1; d <= 3; d++)
-	{
-		for (int i = 0; i < numedgedisjregs; i++)
-		{
-			if (derdims[i] == d)
-			{
-				ordereddisjointedgeregions[index] = alledgedisjregs[i];
-				index++;
-			}
-		}
+		for (int j = 0; j < edgedisjregs.size(); j++)
+			isprioritydisjointregion[edgedisjregs[j]] = true;
 	}
-
 
 	// Grow all subtrees (they share no node and no edge):
 	growsubtrees();

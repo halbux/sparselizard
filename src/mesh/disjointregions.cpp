@@ -1,5 +1,4 @@
 #include "disjointregions.h"
-#include "universe.h"
 
 
 int disjointregions::count(void)
@@ -70,53 +69,6 @@ int disjointregions::getelementdimension(int disjointregionnumber)
 bool disjointregions::isinphysicalregion(int disjointregionnumber, int physicalregionindex)
 {
     return disjointregionsdefinition[disjointregionnumber][physicalregionindex];
-}
-
-std::vector<int> disjointregions::get(int dim)
-{
-	int numdisjregs = 0;
-	for (int i = 0; i < count(); i++)
-	{
-		if (getelementdimension(i) == dim)
-			numdisjregs++;
-	}
-	std::vector<int> disjregs(numdisjregs);
-
-	int index = 0;
-	for (int i = 0; i < count(); i++)
-	{
-		if (getelementdimension(i) == dim)
-		{
-			disjregs[index] = i;
-			index++;
-		}
-	}	
-	return disjregs;
-}
-
-std::vector<int> disjointregions::getphysicalregions(int disjreg)
-{
-	std::vector<int> physregtranslation = universe::mymesh->getphysicalregions()->getallnumbers();
-
-	int numphysregs = 0;
-	for (int i = 0; i < disjointregionsdefinition[disjreg].size(); i++)
-	{
-		if (disjointregionsdefinition[disjreg][i])
-			numphysregs++;
-	}
-
-	std::vector<int> physregs(numphysregs);
-
-	int index = 0;
-	for (int i = 0; i < disjointregionsdefinition[disjreg].size(); i++)
-	{
-		if (disjointregionsdefinition[disjreg][i])
-		{
-			physregs[index] = physregtranslation[i];
-			index++;
-		}
-	}	
-	return physregs;
 }
 
 
