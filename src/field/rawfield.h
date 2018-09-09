@@ -75,7 +75,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // field data in the containers below.
         // In this case the harmonic is said to be equal 1.
 
-		shared_ptr<coefmanager> mycoefmanager = NULL;
+        shared_ptr<coefmanager> mycoefmanager = NULL;
         
         // interpolationorder[disjreg] gives the interpolation 
         // order of the field on disjoint region 'disjreg'.
@@ -84,8 +84,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // constraint value on the disjoint region. NULL means unconstrained.
         std::vector<shared_ptr<integration>> myconstraints = {};
     
-		// The spanning tree used for gauging fields (empty vector if none):
-		std::vector<spanningtree> myspanningtree = {};
+        // The spanning tree used for gauging fields (empty vector if none):
+        std::vector<spanningtree> myspanningtree = {};
 
             
 	public:
@@ -120,9 +120,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
 
-		void setspanningtree(spanningtree spantree);
-		// This should only be called on a field without subfields or harmonics:
-		spanningtree* getspanningtree(void);
+        void setspanningtree(spanningtree spantree);
+        // This should only be called on a field without subfields or harmonics:
+        spanningtree* getspanningtree(void);
         
         shared_ptr<rawfield> getpointer(void) { return shared_from_this(); };
 
