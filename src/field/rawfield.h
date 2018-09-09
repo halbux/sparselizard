@@ -47,12 +47,14 @@
 #include "selector.h"
 #include "field.h"
 #include "vectorfieldselect.h"
+#include "spanningtree.h"
 
 class vectorfieldselect;
 class coefmanager;
 class rawvec;
 class expression;
 class elementselector;
+class spanningtree;
 
 class rawfield : public std::enable_shared_from_this<rawfield>
 {
@@ -81,7 +83,11 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // myconstraints[disjreg] gives the integration object to compute the 
         // constraint value on the disjoint region. NULL means unconstrained.
         std::vector<shared_ptr<integration>> myconstraints = {};
-                
+    
+		// The spanning tree used for gauging fields (empty vector if none):
+		std::vector<spanningtree> myspanningtree = {};
+
+            
 	public:
         
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
@@ -113,6 +119,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
+
+		void setspanningtree(spanningtree spantree);
+		// This should only be called on a field without subfields or harmonics:
+		spanningtree* getspanningtree(void);
         
         shared_ptr<rawfield> getpointer(void) { return shared_from_this(); };
 

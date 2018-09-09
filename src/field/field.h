@@ -24,6 +24,7 @@
 #include "parameter.h"
 #include "rawfield.h"
 #include "vectorfieldselect.h"
+#include "spanningtree.h"
 
 class parameter;
 class rawfield;
@@ -38,11 +39,14 @@ class field
         
 	public:
 
-	field(void) {};
+		field(void) {};
         // Provide the form function type name for the field.
         field(std::string fieldtypename);
         // Also provide the harmonics for a multiharmonic field:
         field(std::string fieldtypename, const std::vector<int> harmonicnumbers);
+		// Also provide the spanning tree used for gauging fields:
+		field(std::string fieldtypename, spanningtree spantree);
+		field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree);
         // The constructor below should not be used by the user:
         field(shared_ptr<rawfield> rawfieldpointer) { rawfieldptr = rawfieldpointer; };
         

@@ -321,6 +321,33 @@ void rawfield::setconstraint(int physreg)
     }
 }
 
+void rawfield::setspanningtree(spanningtree spantree)
+{
+    // Set the spanning tree on the sub fields:
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setspanningtree(spantree);
+    // Set the spanning tree on the harmonics:
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setspanningtree(spantree);
+    }
+    
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    	myspanningtree = {spantree};
+}
+
+spanningtree* rawfield::getspanningtree(void)
+{
+	if (myspanningtree.size() == 1)
+		return &myspanningtree[0];
+	else
+	{
+		std::cout << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;
+		abort();
+	}
+}
+
 void rawfield::setdata(int physreg, vectorfieldselect myvec)
 {
     // Extract the info from the vector with selected field:

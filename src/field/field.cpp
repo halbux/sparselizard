@@ -21,6 +21,32 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
         abort();
     } 
 }
+field::field(std::string fieldtypename, spanningtree spantree)
+{
+	rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
+	rawfieldptr->setspanningtree(spantree);
+}
+
+field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree)
+{
+    // Make sure all harmonic numbers are positive and non zero:
+    for (int i = 0; i < harmonicnumbers.size(); i++)
+    {
+        if (harmonicnumbers[i] <= 0)
+        {
+            std::cout << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
+            abort();
+        }
+    }
+    if (harmonicnumbers.size() > 0)
+        rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
+    else
+    {
+        std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
+        abort();
+    } 
+	rawfieldptr->setspanningtree(spantree);
+}
 
 int field::countcomponents(void) { return rawfieldptr->countcomponents(); }
 
