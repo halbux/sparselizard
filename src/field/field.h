@@ -39,7 +39,7 @@ class field
         
 	public:
 	
-	    field(void) {};
+        field(void) {};
         // Provide the form function type name for the field.
         field(std::string fieldtypename);
         // Also provide the harmonics for a multiharmonic field:
