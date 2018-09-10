@@ -143,7 +143,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         shared_ptr<rawfield> harmonic(int harmonicnumber) { return harmonic(std::vector<int>{harmonicnumber}); };
         shared_ptr<rawfield> harmonic(const std::vector<int> harmonicnumbers);
         
-		// Only valid for fields without subfields.
+        // Only valid for fields without subfields.
         bool isconstrained(int disjreg) { return not(myconstraints[disjreg] == NULL); };
         std::vector<shared_ptr<integration>> getconstraints(void) { return myconstraints; };
 
