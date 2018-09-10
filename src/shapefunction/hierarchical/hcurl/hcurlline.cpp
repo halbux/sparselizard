@@ -107,3 +107,12 @@ hierarchicalformfunctioncontainer hcurlline::evalat(int maxorder, vector<double>
     
 	return val;
 }
+
+std::vector<bool> hcurlline::isgradienttype(int maxorder)
+{
+	std::vector<bool> output(count(maxorder,1,0), true);
+	// Only the first one is not of grad type:
+	output[0] = false;
+
+	return output;
+}

@@ -191,3 +191,35 @@ hierarchicalformfunctioncontainer hcurlquadrangle::evalat(int maxorder, vector<d
     
 	return val;
 }
+
+std::vector<bool> hcurlquadrangle::isgradienttype(int maxorder)
+{
+	std::vector<bool> output(count(maxorder,2,0), false);
+
+    int ffindex = 0;
+    for (int order = 1; order <= maxorder; order++)
+    {
+        int ffindex = 0;
+        for (int i = 0; i <= order-1; i++)
+        {
+            for (int j = 0; j <= order-1; j++)
+            {
+                // Skip the part corresponding to a different order:
+                if (i != order-1 && j != order-1)
+                    continue;
+
+                // "Type 1":
+                output[ffindex] = true; ffindex++;
+                // "Type 2":
+                ffindex++;
+                // "Type 3":
+                if (i == 0)
+                	ffindex++;
+                if (j == 0)
+                	ffindex++;
+            }
+        }
+    }
+
+	return output;
+}

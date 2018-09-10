@@ -296,3 +296,41 @@ hierarchicalformfunctioncontainer hcurlhexahedron::evalat(int maxorder, vector<d
 
 	return val;
 }
+
+std::vector<bool> hcurlhexahedron::isgradienttype(int maxorder)
+{
+	std::vector<bool> output(count(maxorder,3,0), false);
+
+    int ffindex = 0;
+    for (int order = 1; order <= maxorder; order++)
+    {
+        for (int i = 0; i <= order-1; i++)
+        {
+            for (int j = 0; j <= order-1; j++)
+            {
+                for (int k = 0; k <= order-1; k++)
+                {
+                    // Skip the part corresponding to a lower order:
+                    if (i != order-1 && j != order-1 && k != order-1)
+                        continue;
+
+					// "Type 1":
+					output[ffindex] = true; ffindex++;
+                    // "Type 2":
+                    ffindex++;
+                    // "Type 3":
+                    if (i == 0)
+                    	ffindex++;
+                    if (j == 0)
+                    	ffindex++;
+                    if (k == 0)
+                    	ffindex++;
+                }
+            }
+        }
+    }
+
+	return output;
+}
+
+

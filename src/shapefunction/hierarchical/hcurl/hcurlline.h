@@ -36,6 +36,10 @@ class hcurlline: public hierarchicalformfunction
         // as an integer giving the highest order up to which to output the form 
         // function polynomials.
         hierarchicalformfunctioncontainer evalat(int maxorder, std::vector<double> evaluationpoints);
+
+		// Return a vector whose index i is true if the ith form function
+		// associated to highest dimension elements is of gradient type.
+		std::vector<bool> isgradienttype(int order);
 };
 
 #endif
