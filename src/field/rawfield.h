@@ -87,8 +87,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // The spanning tree used for gauging fields (empty vector if none):
         std::vector<spanningtree> myspanningtree = {};
 
-		// isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
-		std::vector<bool> isitgauged;
+        // isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
+        std::vector<bool> isitgauged;
 
             
 	public:
@@ -123,8 +123,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
 
-		// Set a gauge condition:
-		void setgauge(int physreg);
+        // Set a gauge condition:
+        void setgauge(int physreg);
 
         void setspanningtree(spanningtree spantree);
         // This should only be called on a field without subfields or harmonics:
