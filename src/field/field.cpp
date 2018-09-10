@@ -77,6 +77,17 @@ void field::setvalue(int physreg) { rawfieldptr->setvalue(physreg); }
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, input, extraintegrationdegree); }
 void field::setconstraint(int physreg) { rawfieldptr->setconstraint(physreg); }
 
+void field::setgauge(int physreg) 
+{ 
+    if (rawfieldptr->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'field' object: cannot gauge shape function " << rawfieldptr->gettypename() << " (only hcurl)" << std::endl;
+        abort();   
+    }
+
+	rawfieldptr->setgauge(physreg);
+}
+
 void field::setdata(int physreg, vectorfieldselect myvec) { rawfieldptr->setdata(physreg, myvec); }
 void field::setdata(int physreg, vec myvec) 
 {  

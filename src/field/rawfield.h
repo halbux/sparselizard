@@ -87,6 +87,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // The spanning tree used for gauging fields (empty vector if none):
         std::vector<spanningtree> myspanningtree = {};
 
+		// isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
+		std::vector<bool> isitgauged;
+
             
 	public:
         
@@ -120,6 +123,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
 
+		// Set a gauge condition:
+		void setgauge(int physreg);
+
         void setspanningtree(spanningtree spantree);
         // This should only be called on a field without subfields or harmonics:
         spanningtree* getspanningtree(void);
@@ -137,8 +143,12 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         shared_ptr<rawfield> harmonic(int harmonicnumber) { return harmonic(std::vector<int>{harmonicnumber}); };
         shared_ptr<rawfield> harmonic(const std::vector<int> harmonicnumbers);
         
+		// Only valid for fields without subfields.
         bool isconstrained(int disjreg) { return not(myconstraints[disjreg] == NULL); };
         std::vector<shared_ptr<integration>> getconstraints(void) { return myconstraints; };
+
+        bool isgauged(int disjreg);
+
         // Get the interpolation order on a disjoint region.
         // Only valid for fields without subfields.
         int getinterpolationorder(int disjreg);

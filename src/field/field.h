@@ -79,6 +79,9 @@ class field
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
         // Set an homogeneous Dirichlet constraint.
         void setconstraint(int physreg);
+
+		// Set a gauge condition on a given physical region:
+		void setgauge(int physreg);
         
         // Transfer data from a field in the solution vector to this field.
         // Only the data corresponding to the physical region is transferred.

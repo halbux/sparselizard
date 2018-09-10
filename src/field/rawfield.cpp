@@ -321,6 +321,28 @@ void rawfield::setconstraint(int physreg)
     }
 }
 
+void rawfield::setgauge(int physreg)
+{
+    // Set the gauge on the subfields (if any):
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setgauge(physreg);
+    // Set the gauge on the harmonics:
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setgauge(physreg);
+    }
+    
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+        // Get ALL disjoint regions in the physical region (not only ders, to remove grad type form functions).
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+
+		for (int i = 0; i < selecteddisjregs.size(); i++)
+			isitgauged[i] = true;
+    }
+}
+
 void rawfield::setspanningtree(spanningtree spantree)
 {
     // Set the spanning tree on the sub fields:
@@ -522,6 +544,11 @@ shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
         std::cout << "Error in 'rawfield' object: in .harmonic cannot get harmonic in constant field (does not exist)" << std::endl; 
         abort();
     }
+}
+
+bool rawfield::isgauged(int disjreg) 
+{ 
+	return isitgauged[disjreg];
 }
 
 int rawfield::getinterpolationorder(int disjreg) 
