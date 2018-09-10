@@ -68,6 +68,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
             // Set all unconstrained by default:
             myconstraints = std::vector<shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
 
+            isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+
             mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename));
         }
     }
