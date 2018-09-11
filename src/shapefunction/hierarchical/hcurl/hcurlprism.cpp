@@ -394,6 +394,7 @@ std::vector<bool> hcurlprism::isgradienttype(int maxorder)
                     output[ffindex] = true; ffindex++;
                     // "Type 2":
                     ffindex++;
+                    ffindex++;
                     // "Type 3":
                     if (k == 0)
                     	ffindex++;
