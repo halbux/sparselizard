@@ -318,6 +318,7 @@ std::vector<bool> hcurlhexahedron::isgradienttype(int maxorder)
 					output[ffindex] = true; ffindex++;
                     // "Type 2":
                     ffindex++;
+                    ffindex++;
                     // "Type 3":
                     if (i == 0)
                     	ffindex++;
