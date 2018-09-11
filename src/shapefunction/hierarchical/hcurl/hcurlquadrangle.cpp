@@ -199,7 +199,6 @@ std::vector<bool> hcurlquadrangle::isgradienttype(int maxorder)
     int ffindex = 0;
     for (int order = 1; order <= maxorder; order++)
     {
-        int ffindex = 0;
         for (int i = 0; i <= order-1; i++)
         {
             for (int j = 0; j <= order-1; j++)
