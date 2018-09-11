@@ -185,6 +185,12 @@ vec formulation::rhs(bool keepvector)
     if (myvec == NULL)
         myvec = shared_ptr<rawvec>(new rawvec(mydofmanager));
     
+	// Set the gauged indexes to zero:
+	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+	int numgaugedindexes = gaugedindexes.countrows()*gaugedindexes.countcolumns();
+	if (numgaugedindexes > 0)
+		myvec->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
+
     if (isconstraintcomputation == false)
         vec(myvec).updateconstraints();   
     
@@ -209,7 +215,10 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
     if (mymat[KCM] == NULL)
         mymat[KCM] = shared_ptr<rawmat>(new rawmat(mydofmanager));
         
-    bool eyematrixadded = false;
+	// Set the gauged indexes to all zero:
+	mymat[KCM]->gauge();
+
+    bool constrainteyematrixadded = false, gaugeeyematrixadded = false;
 
     // Add the constraint diagonal ones to the matrix (if any):
     if (isconstraintcomputation == false)
@@ -222,22 +231,31 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
             densematrix ones(1, numconstraineddofs, 1);
 
             mymat[KCM]->accumulate(constrainedindexes, constrainedindexes, ones);  
-            eyematrixadded = true;
+            constrainteyematrixadded = true;
         }
+    }
+    // Add the gauge diagonal ones to the matrix (if any):
+    int numgaugeddofs = mydofmanager->countgaugeddofs();
+    if (numgaugeddofs > 0)
+    {
+        intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+        // Create a vector of same length full of double ones:
+        densematrix ones(1, numgaugeddofs, 1);
+
+        mymat[KCM]->accumulate(gaugedindexes, gaugedindexes, ones);  
+        gaugeeyematrixadded = true;
     }
 
     mymat[KCM]->process(keepfragments); 
     // To avoid duplicated eye blocks to be added:
-    if (keepfragments == true && eyematrixadded)
+    if (keepfragments == true && gaugeeyematrixadded)
+        mymat[KCM]->removelastfragment();
+    if (keepfragments == true && constrainteyematrixadded)
         mymat[KCM]->removelastfragment();
     
     mat output(mymat[KCM]);
     mymat[KCM] = mymat[KCM]->extractaccumulated();
     return output;
 }
-
-
-
-
 
 

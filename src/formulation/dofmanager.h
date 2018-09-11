@@ -67,6 +67,9 @@ class dofmanager
         
         int countconstraineddofs(void);
         intdensematrix getconstrainedindexes(void);
+
+        int countgaugeddofs(void);
+        intdensematrix getgaugedindexes(void);
         
         // Return a new dofmanager object that does not include the Dirichlet constraints.
         // 'dofrenumbering' must have a size equal to the number of dofs before the call.

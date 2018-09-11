@@ -151,6 +151,82 @@ intdensematrix dofmanager::getconstrainedindexes(void)
     return output;
 }
 
+int dofmanager::countgaugeddofs(void)
+{
+    int numgaugeddofs = 0;
+    
+    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    {
+	    for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+	    {
+			// Constraints have priority over the gauge!
+			if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+			{
+				spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+
+				int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+				int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
+				std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
+				std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
+	   
+				for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+				{
+					// The lowest order hcurl form function is gauged only on the spanning tree:
+					if (elementtype == 1 && ff == 0)
+						numgaugeddofs += myspantree->countedgesintree(disjreg);
+					else
+					{
+						// All other form functions are gauged on all dofs in the disjoint region:
+						if (isitgradienttype[ff])
+							numgaugeddofs += rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
+					}
+				}
+		    }
+		}
+    }
+    return numgaugeddofs;
+}
+
+intdensematrix dofmanager::getgaugedindexes(void)
+{
+    intdensematrix output(1,countgaugeddofs());
+    int* myval = output.getvalues();
+    
+    int currentindex = 0;
+    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    {
+        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        {
+			// Constraints have priority over the gauge!
+			if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+			{
+				spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+
+				int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+				int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
+				std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
+				std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
+	   
+				for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+				{
+					// The lowest order hcurl form function is gauged only on the spanning tree.
+					// All other form functions are gauged on all dofs in the disjoint region.
+			        int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
+			        for (int i = 0; i < numdofshere; i++)
+					{
+						if ((elementtype != 1 || ff != 0) && isitgradienttype[ff] || elementtype == 1 && ff == 0 && myspantree->isintree(i, disjreg))
+						{
+			            	myval[currentindex] = rangebegin[fieldindex][disjreg][ff] + i;
+			            	currentindex++;
+						}
+					}
+				}
+		    }
+        }
+    }
+    return output;
+}
+
 shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
 {
     // Set a default -1 renumbering:

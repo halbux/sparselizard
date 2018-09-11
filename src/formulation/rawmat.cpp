@@ -25,6 +25,43 @@ int rawmat::countcolumns(void)
         return mydofmanager->countdofs();
 }
 
+void rawmat::gauge(void)
+{
+	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+	int* gaugedindexesptr = gaugedindexes.getvalues();
+
+	int numgaugedindexes = gaugedindexes.countrows()*gaugedindexes.countcolumns();
+	if (numgaugedindexes > 0)
+	{
+		// First build a vector for direct access:
+		std::vector<bool> isgauged(mydofmanager->countdofs(), false);
+
+		for (int i = 0; i < numgaugedindexes; i++)
+			isgauged[gaugedindexesptr[i]] = true;
+
+		// Now set to -1 all gauged adresses:
+		for (int i = 0; i < accumulatedrowindices.size(); i++)
+		{
+        	int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
+	        for (int j = 0; j < accumulatedrowindices[i].countrows()*accumulatedrowindices[i].countcolumns(); j++)
+			{
+				if (accumulatedrowindicesptr[j] >= 0 && isgauged[accumulatedrowindicesptr[j]])
+					accumulatedrowindicesptr[j] = -1;
+			}
+		}
+		for (int i = 0; i < accumulatedcolindices.size(); i++)
+		{
+        	int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
+	        for (int j = 0; j < accumulatedcolindices[i].countrows()*accumulatedcolindices[i].countcolumns(); j++)
+			{
+				if (accumulatedcolindicesptr[j] >= 0 && isgauged[accumulatedcolindicesptr[j]])
+					accumulatedcolindicesptr[j] = -1;
+			}
+		}
+	}
+}
+
+
 void rawmat::removeconstraints(void)
 {
     if (mydofmanager->countconstraineddofs() == 0)

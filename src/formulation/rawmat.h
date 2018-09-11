@@ -56,6 +56,9 @@ class rawmat
         int countcolumns(void);
         
         int countnnz(void) { return nnz; };
+
+		// Set the gauged indexes to all zero:
+		void gauge(void);  
         
         // Remove the rows and columns associated to Dirichlet constraints:
         void removeconstraints(void);
