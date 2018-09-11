@@ -45,9 +45,9 @@ class hierarchicalformfunction
         // This provides an assembly speedup. By default it is not used.
         virtual bool isorientationdependent(int order) { return true; };
         
-		// Return a vector whose index i is true if the ith form function
-		// associated to highest dimension elements is of gradient type.
-		virtual std::vector<bool> isgradienttype(int order) { return std::vector<bool>(0); };
+        // Return a vector whose index i is true if the ith form function
+        // associated to highest dimension elements is of gradient type.
+        virtual std::vector<bool> isgradienttype(int order) { return std::vector<bool>(0); };
 };
 
 #endif
