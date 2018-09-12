@@ -341,7 +341,7 @@ void rawfield::setgauge(int physreg)
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
 		for (int i = 0; i < selecteddisjregs.size(); i++)
-			isitgauged[i] = true;
+			isitgauged[selecteddisjregs[i]] = true;
     }
 }
 
