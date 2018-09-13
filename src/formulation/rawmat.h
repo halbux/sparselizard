@@ -57,8 +57,8 @@ class rawmat
         
         int countnnz(void) { return nnz; };
 
-		// Set the gauged indexes to all zero:
-		void gauge(void);  
+        // Set the gauged indices to -1:
+        void gauge(void);  
         
         // Remove the rows and columns associated to Dirichlet constraints:
         void removeconstraints(void);
@@ -75,7 +75,7 @@ class rawmat
         // Remove the last added fragment:
         void removelastfragment(void);
         
-		void print(void);
+        void print(void);
 
     	// Extract a new initialised rawmat that has all accumulated data. 
     	shared_ptr<rawmat> extractaccumulated(void);
