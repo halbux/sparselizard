@@ -79,9 +79,9 @@ void sparselizard(void)
 	
 	// Write the magnetic induction field b = curl(a) [T]:
 	curl(a).write(wholedomain, "b.pos");
-
-    // Code validation line. Can be removed.
-    std::cout << (norm(a).max(wholedomain,4)[0] < 1.96437e-08 && norm(a).max(wholedomain,4)[0] > 1.96435e-08);
+	
+	// Code validation line. Can be removed:
+	std::cout << (norm(a).max(wholedomain,4)[0] < 1.96437e-08 && norm(a).max(wholedomain,4)[0] > 1.96435e-08);
 }
 
 int main(void)
