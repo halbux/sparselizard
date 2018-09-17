@@ -225,14 +225,9 @@ void rawfield::setvalue(int physreg, expression input, int extraintegrationdegre
     // Set the values on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setvalue(physreg, input.at(i,0), extraintegrationdegree);
-    // Set the values on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
-    {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setvalue(physreg, input, extraintegrationdegree);
-    }
+    // Set the values on the harmonics all together (extracted harmonic is constant!).
     
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    if (mysubfields.size() == 0)
     {
     	field thisfield(getpointer());
     
