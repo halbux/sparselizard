@@ -1,4 +1,4 @@
-// This example shows the resolution of a 3D magnetodynamic problem of electric induction using the
+// This example shows the resolution of a 3D magnetodynamic problem of magnetic induction using the
 // so called a-v formulation. An aluminium tube is surrounded by 5 turns of a thick copper wire (1cm radius).
 // Because of the alternating voltage (50 Hz) applied to the ends of the wire, eddy currents appear
 // in the conducting aluminium tube. In this example the skin effect in the thick wire can also be observed.
