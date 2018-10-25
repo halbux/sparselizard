@@ -125,21 +125,7 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
 }
     
     
-void mathop::setaxisymmetry(void) 
-{ 
-	if (universe::mymesh == NULL)
-	{
-        std::cout << "Error in 'mathop' namespace: .setaxisymmetry should be called right after loading the mesh" << std::endl;
-        abort();
-	}
-    int problemdimension = universe::mymesh->getmeshdimension();
-	if (problemdimension != 2)
-	{
-        std::cout << "Error in 'mathop' namespace: axisymmetry is only allowed for 2D problems" << std::endl;
-        abort();
-	}
-	universe::isaxisymmetric = true; 
-}
+void mathop::setaxisymmetry(void) { universe::isaxisymmetric = true; }
 
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
 void mathop::settime(double t) { universe::currenttimestep = t; }

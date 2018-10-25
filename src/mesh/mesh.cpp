@@ -154,6 +154,13 @@ void mesh::load(std::string name, int verbosity)
         printcount();
         loadtime.print("Time to load the mesh: ");
     }
+
+	// Make sure axisymmetry is valid for this mesh:	
+	if (universe::isaxisymmetric && getmeshdimension() != 2)
+	{
+        std::cout << "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" << std::endl;
+        abort();
+	}
 }
 
 void mesh::load(std::vector<shape> inputshapes, int verbosity)
@@ -264,6 +271,13 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
         printcount();
         loadtime.print("Time to load the mesh: ");
     }
+
+	// Make sure axisymmetry is valid for this mesh:	
+	if (universe::isaxisymmetric && getmeshdimension() != 2)
+	{
+        std::cout << "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" << std::endl;
+        abort();
+	}
 }
 
 
