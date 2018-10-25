@@ -659,16 +659,13 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
 
 expression expression::spacederivative(int whichderivative)
 {
+	if (mynumrows > 3 || mynumcols != 1)
+	{
+		std::cout << "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" << std::endl;
+		abort();
+	}
+
     int problemdimension = universe::mymesh->getmeshdimension();
-    
-    // No error is given: the derivative is set to 0 instead.
-    
-//     if (whichderivative > problemdimension)
-//     {
-//         std::string xyz = " xyz";
-//         std::cout << "Error in 'expression' object: cannot take the " << xyz[whichderivative] << " derivative in a " << problemdimension << "D problem" << std::endl;
-//         abort();
-//     }
     
     expression derivated = *this;
     
@@ -678,6 +675,15 @@ expression expression::spacederivative(int whichderivative)
             derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
         else
         {
+			// In case the problem is axisymmetric the z derivatives of 'h1xyz' field u are all 0 
+			// except for the z component uz for which it is 1/x*ux. dx and dy are unchanged.
+			if (universe::isaxisymmetric && whichderivative == 3 && i == 2)
+			{ 
+					field x("x");
+					derivated.myoperations[i] = (1/x*mathop::compx(*this)).myoperations[0]; 
+					continue;
+			}
+
 		    if (whichderivative > problemdimension)
 		    {
 		        std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));

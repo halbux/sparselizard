@@ -33,7 +33,7 @@ class jacobian
 
 	private:
         
-        densematrix detjac;
+        densematrix detjac, xcoord;
         std::vector<densematrix> jac = std::vector<densematrix>(3*3);
         std::vector<densematrix> invjac = {};
 
@@ -44,8 +44,8 @@ class jacobian
         jacobian(elementselector& elemselect, std::vector<double> evaluationcoordinates, expression* meshdeform);
 
         // The detjac and jac terms are computed in the constructor.
-        densematrix getdetjac(void) { return detjac.copy(); };	
-        densematrix getjac(int row, int column) { return jac[3*row+column]; };
+        densematrix getdetjac(void);	
+        densematrix getjac(int row, int column);
         // The invjac terms are only computed when 'getinvjac' is called.
         densematrix getinvjac(int row, int column);	
 

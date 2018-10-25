@@ -43,6 +43,8 @@ namespace mathop
     // Write scalar or vector values at given coordinates to a .pos file:
     void scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals = {}, std::vector<double> compzevals = {});
     
+	void setaxisymmetry(void);
+
     void setfundamentalfrequency(double f);
     void settime(double t);
     double gettime(void);

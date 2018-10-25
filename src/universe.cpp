@@ -3,6 +3,8 @@
 
 mesh* universe::mymesh = NULL;
 
+bool universe::isaxisymmetric = false;
+
 double universe::currenttimestep = 0;
 
 double universe::fundamentalfrequency = -1;

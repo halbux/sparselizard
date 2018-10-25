@@ -68,7 +68,10 @@ expression mathop::normal(int surfphysreg)
     {
         expression mynorm = sqrt(expr.invjac(0,1)*expr.invjac(0,1)+expr.invjac(1,1)*expr.invjac(1,1));
         mynorm.reuseit();
-        return array2x1(expr.invjac(0,1), expr.invjac(1,1))/mynorm;
+		if (universe::isaxisymmetric)
+        	return array3x1(expr.invjac(0,1), expr.invjac(1,1), 0)/mynorm;
+		else
+			return array2x1(expr.invjac(0,1), expr.invjac(1,1))/mynorm;
     }
     if (problemdimension == 3)
     {
@@ -122,6 +125,22 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
 }
     
     
+void mathop::setaxisymmetry(void) 
+{ 
+	if (universe::mymesh == NULL)
+	{
+        std::cout << "Error in 'mathop' namespace: .setaxisymmetry should be called right after loading the mesh" << std::endl;
+        abort();
+	}
+    int problemdimension = universe::mymesh->getmeshdimension();
+	if (problemdimension != 2)
+	{
+        std::cout << "Error in 'mathop' namespace: axisymmetry is only allowed for 2D problems" << std::endl;
+        abort();
+	}
+	universe::isaxisymmetric = true; 
+}
+
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
 void mathop::settime(double t) { universe::currenttimestep = t; }
 double mathop::gettime(void) { return universe::currenttimestep; }
@@ -196,6 +215,8 @@ expression mathop::grad(expression input)
     }
 
     int problemdimension = universe::mymesh->getmeshdimension();
+	if (universe::isaxisymmetric)
+		problemdimension++;
 
     std::vector<expression> myexprs = {};
     for (int i = 0; i < problemdimension; i++)
@@ -400,9 +421,9 @@ expression mathop::strain(expression input)
         abort();
     }
 	if (input.countrows() == 2)
-		return expression(3,1,{dx(compx(input)), dy(compy(input)), dy(compx(input)) + dx(compy(input))});
+		return expression(3,1,{compx(dx(input)), compy(dy(input)), compx(dy(input)) + compy(dx(input))});
 	if (input.countrows() == 3)
-		return expression(6,1,{dx(compx(input)), dy(compy(input)), dz(compz(input)), dz(compy(input)) + dy(compz(input)), dx(compz(input)) + dz(compx(input)), dx(compy(input)) + dy(compx(input))});
+		return expression(6,1,{compx(dx(input)), compy(dy(input)), compz(dz(input)), compy(dz(input)) + compz(dy(input)), compz(dx(input)) + compx(dz(input)), compy(dx(input)) + compx(dy(input))});
 }
 
 ////////// PREDEFINED FORMULATIONS

@@ -30,6 +30,8 @@ class universe
     public:
 
         static mesh* mymesh;
+
+        static bool isaxisymmetric;
         
         static double currenttimestep;
         
@@ -42,7 +44,7 @@ class universe
         // CLEANS::
         static void forbidreuse(void);
 
-	static bool forcejacobianreuse;
+		static bool forcejacobianreuse;
         
         // Store all !HIERARCHICAL! form function values that can be reused.
         // 'computedformfuncs[i].first' gives the ith form function type name.
