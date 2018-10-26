@@ -73,8 +73,8 @@ class expression
         int countrows(void) { return mynumrows; };
         int countcolumns(void) { return mynumcols; };
 
-		void reorderrows(std::vector<int> neworder);
-		void reordercolumns(std::vector<int> neworder);
+        void reorderrows(std::vector<int> neworder);
+        void reordercolumns(std::vector<int> neworder);
 
         // Get the max/min value. All elements will be split 'refinement' times in each direction 
         // to approximate the max/min value and position. Increase 'refinement' for more accuracy.
