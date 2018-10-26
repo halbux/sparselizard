@@ -227,9 +227,9 @@ expression mathop::div(expression input)
 		case 1:
 		    return dx(input);
 		case 2:
-		    return dx(compx(input))+dy(compy(input));
+		    return compx(dx(input))+compy(dy(input));
 		case 3:
-		    return dx(compx(input))+dy(compy(input))+dz(compz(input));
+		    return compx(dx(input))+compy(dy(input))+compz(dz(input));
 	}
 
 }
@@ -253,9 +253,9 @@ expression mathop::curl(expression input)
             case 1:
                 return expression(3,1,{0, 0, 0});
             case 2:
-                return expression(3,1,{0, 0, dx(compy(input))-dy(compx(input))});
+                return expression(3,1,{0, 0, compy(dx(input))-compx(dy(input))});
             case 3:
-                return expression(3,1,{dy(compz(input))-dz(compy(input)), dz(compx(input))-dx(compz(input)), dx(compy(input))-dy(compx(input))});
+                return expression(3,1,{compz(dy(input))-compy(dz(input)), compx(dz(input))-compz(dx(input)), compy(dx(input))-compx(dy(input))});
         }
     }
     else
