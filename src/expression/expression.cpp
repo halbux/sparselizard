@@ -114,6 +114,58 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     }
 }
 
+void expression::reorderrows(std::vector<int> neworder)
+{
+	if (mynumrows != neworder.size())
+	{
+		std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
+		abort();
+	}
+
+	int minval = *min_element(neworder.begin(), neworder.end());
+	int maxval = *max_element(neworder.begin(), neworder.end());
+	
+	if (minval < 0 || maxval >= neworder.size())
+	{
+		std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (out of range integers)" << std::endl;
+		abort();
+	}
+
+	std::vector<std::shared_ptr<operation>> ops = myoperations;
+
+    for (int i = 0; i < mynumrows; i++)
+    {
+		for (int j = 0; j < mynumcols; j++)
+			myoperations[i*mynumcols+j] = ops[neworder[i]*mynumcols+j];
+	}
+}
+
+void expression::reordercolumns(std::vector<int> neworder)
+{
+	if (mynumcols != neworder.size())
+	{
+		std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
+		abort();
+	}
+
+	int minval = *min_element(neworder.begin(), neworder.end());
+	int maxval = *max_element(neworder.begin(), neworder.end());
+	
+	if (minval < 0 || maxval >= neworder.size())
+	{
+		std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (out of range integers)" << std::endl;
+		abort();
+	}
+
+	std::vector<std::shared_ptr<operation>> ops = myoperations;
+
+    for (int i = 0; i < mynumrows; i++)
+    {
+		for (int j = 0; j < mynumcols; j++)
+			myoperations[i*mynumcols+j] = ops[i*mynumcols+neworder[j]];
+	}
+}
+
 
 std::vector<double> expression::max(int physreg, int refinement, std::vector<double> xyzrange) 
 { 
