@@ -19,7 +19,7 @@
 // "Display Compatible pMUT Device for Mid Air Ultrasound Gesture Recognition", C.H. Huang et al.
 //
 // Please note that since this PMUT is being fabricated the materials have been modified for confidentiality reasons.
-// For the materials disclosed in the paper below standard literature properties or arbitrary values have been considered here.
+// Standard literature properties or arbitrary values have been considered for the material properties.
 // It should thus be no surprise that the resonance frequencies and deflections do not match the paper values.
 
 
