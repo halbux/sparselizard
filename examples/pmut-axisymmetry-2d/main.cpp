@@ -14,13 +14,13 @@
 // - a top metal layer
 // - a fluid
 //
-// Please note that since this PMUT is being fabricated the materials have been modified for confidentiality reasons.
-// For the materials disclosed in the paper below standard literature properties or arbitrary values have been considered here.
-// It should thus be no surprise that the resonance frequencies and deflections do not match the paper values.
-//
 // Refer to the following paper for more detail:
 //
 // "Display Compatible pMUT Device for Mid Air Ultrasound Gesture Recognition", C.H. Huang et al.
+//
+// Please note that since this PMUT is being fabricated the materials have been modified for confidentiality reasons.
+// For the materials disclosed in the paper below standard literature properties or arbitrary values have been considered here.
+// It should thus be no surprise that the resonance frequencies and deflections do not match the paper values.
 
 
 #include "sparselizardbase.h"
