@@ -367,7 +367,7 @@ spanningtree* rawfield::getspanningtree(void)
 	}
 }
 
-void rawfield::setdata(int physreg, vectorfieldselect myvec)
+void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 {
     // Extract the info from the vector with selected field:
     shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
@@ -390,7 +390,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec)
     if (mysubfields.size() > 0)
     {
         for (int i = 0; i < mysubfields.size(); i++)
-            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0] ));
+            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op);
         return;
     }
     
@@ -407,7 +407,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec)
         for (int h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
-                myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)) );
+                myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op);
         }
         return;
     }
@@ -434,7 +434,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec)
 
         // In case the order of this raw field is higher than the order of 
         // the selected raw field we have to set to zero the higher orders.
-        if (interpolationorder[disjreg] > selectedrawfield->interpolationorder[disjreg])
+        if (op == "set" && interpolationorder[disjreg] > selectedrawfield->interpolationorder[disjreg])
         {
             // Decrease the order to forget the higher orders...
             mycoefmanager->fitinterpolationorder(disjreg, selectedrawfield->interpolationorder[disjreg]);
@@ -458,8 +458,16 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec)
             // Transfer nothing if 'values' is empty:
             if (vals != NULL)
             {
-                for (int elem = 0; elem < numelem; elem++)
-                    mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
+				if (op == "set")
+				{
+		            for (int elem = 0; elem < numelem; elem++)
+		                mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
+				}
+				if (op == "add")
+				{
+		            for (int elem = 0; elem < numelem; elem++)
+		                mycoefmanager->setcoef(disjreg, ff, elem, mycoefmanager->getcoef(disjreg, ff, elem) + vals[elem]);
+				}
             }
         }
     }
