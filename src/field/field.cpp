@@ -101,12 +101,6 @@ void field::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
 void field::setdata(int physreg, vec myvec, std::string op)
 {  
-	if (op != "set" && op != "add")
-	{
-		std::cout << "Error in 'field' object: operation " << op << " is unknown in .setdata (use 'set' or 'add')" << std::endl;
-		abort();
-	}
-
     field thisfield = *this;
     setdata(physreg, myvec|thisfield, op); 
 }
