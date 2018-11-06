@@ -85,7 +85,7 @@ class field
         
         // Transfer data from a field in the solution vector to this field.
         // Only the data corresponding to the physical region is transferred.
-		// 'op' can be 'add' or 'set'.
+        // 'op' can be 'add' or 'set'.
         // Transfer data from field 'a' in 'vector|a' to the current field:
         void setdata(int physreg, vectorfieldselect myvec, std::string op = "set");
         // Transfer data from and to the current field:
