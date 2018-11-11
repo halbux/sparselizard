@@ -28,17 +28,17 @@ newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, std::v
     }
 }
 
-std::vector<vec> newmark::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep)
+std::vector<vec> newmark::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
-    return run(true, starttime, timestep, endtime, outputeverynthtimestep);
+    return run(true, starttime, timestep, endtime, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> newmark::runnonlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep)
+std::vector<vec> newmark::runnonlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
-    return run(false, starttime, timestep, endtime, outputeverynthtimestep);
+    return run(false, starttime, timestep, endtime, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep)
+std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
     if (starttime > endtime)
         return {};
@@ -81,7 +81,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     
     
     // Start the Newmark iteration:
-    std::cout << "Newmark (beta " << beta << ", gamma " << gamma << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " s:" << std::endl;
+    std::cout << "Newmark (beta " << beta << ", gamma " << gamma << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
     std::vector<vec> output(outputsize);
     output[0] = u;
     
@@ -89,7 +89,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     int timestepindex = 1;
     for (double t = starttime + timestep; t <= endtime; t = t + timestep)
     {        
-        std::cout << timestepindex << "@" << t << "s";
+        std::cout << timestepindex << "@" << t << "sec" << std::flush;;
 
         mathop::settime(t);
         
@@ -163,6 +163,9 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
+			if (islinear == false && verbosity > 0)
+				std::cout << " " << relchange << std::flush;
+
             nlit++; 
             
             if (islinear)
@@ -172,9 +175,9 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
         u = unext; v = vnext; a = anext;
         
         if (islinear == false)
-            std::cout << " (" << nlit << "NL it)";
+            std::cout << " (" << nlit << "NL it)" << std::flush;
         if (timestepindex < numtimesteps-1)
-        std::cout << " -> ";
+        std::cout << " -> " << std::flush;
         
         // Only one every 'outputeverynthtimestep' solutions is output:
         if (timestepindex%outputeverynthtimestep == 0)

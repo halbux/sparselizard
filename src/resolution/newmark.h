@@ -49,7 +49,7 @@ class newmark
         vec u, v;
         
         
-        std::vector<vec> run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep);
+        std::vector<vec> run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity);
         
     public:
 
@@ -62,8 +62,8 @@ class newmark
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
         // seconds. One solution every 'outputeverynthtimestep' time steps is output.
-        std::vector<vec> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1);
-        std::vector<vec> runnonlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1);
+        std::vector<vec> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
+        std::vector<vec> runnonlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
         
 };
 
