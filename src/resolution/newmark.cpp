@@ -89,7 +89,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     int timestepindex = 1;
     for (double t = starttime + timestep; t <= endtime; t = t + timestep)
     {        
-        std::cout << timestepindex << "@" << t << "sec" << std::flush;;
+        std::cout << timestepindex << "@" << t << "sec" << std::flush;
 
         mathop::settime(t);
         
@@ -163,8 +163,8 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
-			if (islinear == false && verbosity > 0)
-				std::cout << " " << relchange << std::flush;
+            if (islinear == false && verbosity > 0)
+                std::cout << " " << relchange << std::flush;
 
             nlit++; 
             
