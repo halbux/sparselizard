@@ -36,10 +36,10 @@ class rawmat
         intdensematrix petscrows, petsccols;
         densematrix petscvals;
 
-        Mat mymat;
+        Mat mymat = PETSC_NULL;
         
         // 'myksp' will store the LU decomposition if it is to be reused:
-        KSP myksp;
+        KSP myksp = PETSC_NULL;
         bool lureuse = false;
         bool ludefined = false;
         

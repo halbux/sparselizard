@@ -3,8 +3,7 @@
 
 rawmat::~rawmat(void) 
 { 
-	if (nnz >= 0) 
-		MatDestroy(&mymat);
+	MatDestroy(&mymat);
 	if (ludefined) 
 		KSPDestroy(&myksp);
 }

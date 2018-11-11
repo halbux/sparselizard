@@ -28,7 +28,7 @@ class rawvec
 {
 	private:
 
-        Vec myvec;
+        Vec myvec = PETSC_NULL;
         shared_ptr<dofmanager> mydofmanager = NULL;
 	
 	public:
