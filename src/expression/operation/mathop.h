@@ -122,7 +122,7 @@ namespace mathop
     
     ////////// PREDEFINED OPERATORS
     
-    // Gives the strains of a 2D or 3D mechanical displacement vector (Voigt form):
+    // Gives the engineering strains of a 2D or 3D mechanical displacement vector (Voigt form):
     expression strain(expression input);
     // Gives the Green-Lagrange strains of a 2D or 3D mechanical displacement vector (Voigt form):
     expression greenlagrangestrain(expression gradu);  
