@@ -124,6 +124,8 @@ namespace mathop
     
 	// Gives the strains of a 2D or 3D mechanical displacement vector (Voigt form):
     expression strain(expression input);
+	// Gives the Green-Lagrange strains of a 2D or 3D mechanical displacement vector (Voigt form):
+	expression greenlagrangestrain(expression gradu);  
     
     ////////// PREDEFINED FORMULATIONS
     
@@ -131,6 +133,11 @@ namespace mathop
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
     // General anisotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption = "");
+
+    // Isotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
+    expression predefinedelasticity(expression dofu, expression tfu, field u, expression Eyoung, expression nupoisson, expression prestress, std::string myoption = "");
+    // General anisotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
+    expression predefinedelasticity(expression dofu, expression tfu, field u, expression hookesmatrix, expression prestress, std::string myoption = "");
 
     expression predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon);
 

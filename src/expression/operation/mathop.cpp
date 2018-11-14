@@ -412,6 +412,44 @@ expression mathop::strain(expression input)
 		return expression(6,1,{compx(dx(input)), compy(dy(input)), compz(dz(input)), compy(dz(input)) + compz(dy(input)), compz(dx(input)) + compx(dz(input)), compy(dx(input)) + compx(dy(input))});
 }
 
+expression mathop::greenlagrangestrain(expression gradu)
+{
+	// This can be called since gradu is nonlinear in u and can thus not include a dof or tf:
+	gradu.reuseit();
+
+	if (gradu.countrows() == 2 && gradu.countcolumns() == 2)
+	{
+		expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(0,1,gradu);
+		expression dycompxu = entry(1,0,gradu), dycompyu = entry(1,1,gradu);
+
+		expression output = expression(3,1, {
+								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2)), 
+								dycompyu + 0.5*(pow(dycompxu,2) + pow(dycompyu,2)), 
+								dycompxu + dxcompyu + dxcompxu * dycompxu + dxcompyu * dycompyu});
+		output.reuseit();
+		return output;
+	}
+	if (gradu.countrows() == 3 && gradu.countcolumns() == 3)
+	{
+		expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(0,1,gradu), dxcompzu = entry(0,2,gradu);
+		expression dycompxu = entry(1,0,gradu), dycompyu = entry(1,1,gradu), dycompzu = entry(1,2,gradu);
+		expression dzcompxu = entry(2,0,gradu), dzcompyu = entry(2,1,gradu), dzcompzu = entry(2,2,gradu);
+
+		expression output = expression(6,1, {
+								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2) + pow(dxcompzu,2)), 
+								dycompyu + 0.5*(pow(dycompxu,2) + pow(dycompyu,2) + pow(dycompzu,2)), 
+								dzcompzu + 0.5*(pow(dzcompxu,2) + pow(dzcompyu,2) + pow(dzcompzu,2)), 
+								dzcompyu + dycompzu + dycompxu * dzcompxu + dycompyu * dzcompyu + dycompzu * dzcompzu, 
+								dzcompxu + dxcompzu + dxcompxu * dzcompxu + dxcompyu * dzcompyu + dxcompzu * dzcompzu, 
+								dycompxu + dxcompyu + dxcompxu * dycompxu + dxcompyu * dycompyu + dxcompzu * dycompzu});
+		output.reuseit();
+		return output;
+	}
+
+    std::cout << "Error in 'mathop' namespace: expected a 2x2 or 3x3 matrix as input for greenlagrangestrain()" << std::endl;
+    abort();
+}
+
 ////////// PREDEFINED FORMULATIONS
 
 expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
@@ -428,16 +466,13 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: first two arguments in 'predefinedelasticity' must be both either 2x1 or 3x1 vectors" << std::endl;
+        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be both either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
     if (dofu.countrows() == 2)
 	{
 		if (myoption == "planestrain")
-		{
-			expression Hplanestrain = expression(3,3, {H.at(0,0),H.at(0,1),H.at(0,5), H.at(1,0),H.at(1,1),H.at(1,5), H.at(5,0),H.at(5,1),H.at(5,5) });
-			return -transpose( Hplanestrain *strain(dofu) )*strain(tfu);
-		}
+			H = expression(3,3, {H.at(0,0),H.at(0,1),H.at(0,5), H.at(1,0),H.at(1,1),H.at(1,5), H.at(5,0),H.at(5,1),H.at(5,5) });
 		if (myoption == "planestress")
 		{
 			expression subdet,ezztoexx,ezztoeyy,ezztog12,g23toexx,g23toeyy,g23tog12,g13toexx,g13toeyy,g13tog12;
@@ -460,7 +495,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 
 			ezztoexx.reuseit(); ezztoeyy.reuseit(); ezztog12.reuseit(); g23toexx.reuseit(); g23toeyy.reuseit(); g23tog12.reuseit(); g13toexx.reuseit(); g13toeyy.reuseit(); g13tog12.reuseit();
 
-			expression Hplanestress(3,3,{  
+			H = expression(3,3,{  
 			H.at(0,0) + H.at(0,2)*ezztoexx+H.at(0,3)*g23toexx+H.at(0,4)*g13toexx,
 			H.at(0,1) + H.at(0,2)*ezztoeyy+H.at(0,3)*g23toeyy+H.at(0,4)*g13toeyy,
 			H.at(0,5) + H.at(0,2)*ezztog12+H.at(0,3)*g23tog12+H.at(0,4)*g13tog12,
@@ -473,10 +508,11 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 			H.at(5,1) + H.at(5,2)*ezztoeyy+H.at(5,3)*g23toeyy+H.at(5,4)*g13toeyy,
 			H.at(5,5) + H.at(5,2)*ezztog12+H.at(5,3)*g23tog12+H.at(5,4)*g13tog12
 			});
-
-			return -transpose( Hplanestress *strain(dofu) )*strain(tfu);
 		}
 		
+		if (myoption == "planestrain" || myoption == "planestress")
+			return -( H *strain(dofu) )*strain(tfu);
+
 		// If the option is not valid:
 		std::cout << "Error in 'mathop' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
 		std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
@@ -489,7 +525,157 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
             std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
             abort();
         }
-        return -transpose( H*strain(dofu) ) * strain(tfu);
+        return -( H*strain(dofu) ) * strain(tfu);
+    }
+}
+
+expression mathop::predefinedelasticity(expression dofu, expression tfu, field u, expression E, expression nu, expression prestress, std::string myoption)
+{
+	// Hooke's matrix:
+	expression H(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
+	expression coef = E/(1+nu)/(1-2*nu);
+	coef.reuseit();
+	H = coef * H;
+	return predefinedelasticity(dofu, tfu, u, H, prestress, myoption);
+}
+
+expression mathop::predefinedelasticity(expression dofu, expression tfu, field u, expression H, expression prestress, std::string myoption)
+{
+    if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
+    {
+        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be both either 2x1 or 3x1 vectors" << std::endl;
+        abort();
+    }
+    if (dofu.countrows() == 2)
+	{
+		if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 3))
+		{
+		    std::cout << "Error in 'mathop' namespace: expected a 3x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
+		    abort();
+		}
+
+		if (myoption == "planestrain")
+			H = expression(3,3, {H.at(0,0),H.at(0,1),H.at(0,5), H.at(1,0),H.at(1,1),H.at(1,5), H.at(5,0),H.at(5,1),H.at(5,5) });
+		if (myoption == "planestress")
+		{
+			expression subdet,ezztoexx,ezztoeyy,ezztog12,g23toexx,g23toeyy,g23tog12,g13toexx,g13toeyy,g13tog12;
+
+			subdet = H.at(2,2)*H.at(3,3)*H.at(4,4)-H.at(2,2)*H.at(3,4)*H.at(4,3)-H.at(2,3)*H.at(3,2)*H.at(4,4)+H.at(2,3)*H.at(3,4)*H.at(4,2)+H.at(2,4)*H.at(3,2)*H.at(4,3)-H.at(2,4)*H.at(3,3)*H.at(4,2);
+			subdet.reuseit();
+
+			// This is the extra contribution of ezz: 
+			ezztoexx = ( H.at(3,0)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,0)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,0)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
+			ezztoeyy = ( H.at(3,1)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,1)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,1)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
+			ezztog12 = ( H.at(3,5)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,5)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,5)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
+			// This is the extra contribution of g23:
+			g23toexx = ( H.at(4,0)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,0)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,0)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
+			g23toeyy = ( H.at(4,1)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,1)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,1)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
+			g23tog12 = ( H.at(4,5)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,5)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,5)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
+			// This is the extra contribution of g13: 
+			g13toexx = ( H.at(3,0)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,0)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,0)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
+			g13toeyy = ( H.at(3,1)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,1)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,1)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
+			g13tog12 = ( H.at(3,5)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,5)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,5)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
+
+			ezztoexx.reuseit(); ezztoeyy.reuseit(); ezztog12.reuseit(); g23toexx.reuseit(); g23toeyy.reuseit(); g23tog12.reuseit(); g13toexx.reuseit(); g13toeyy.reuseit(); g13tog12.reuseit();
+
+			H = expression(3,3,{  
+			H.at(0,0) + H.at(0,2)*ezztoexx+H.at(0,3)*g23toexx+H.at(0,4)*g13toexx,
+			H.at(0,1) + H.at(0,2)*ezztoeyy+H.at(0,3)*g23toeyy+H.at(0,4)*g13toeyy,
+			H.at(0,5) + H.at(0,2)*ezztog12+H.at(0,3)*g23tog12+H.at(0,4)*g13tog12,
+
+			H.at(1,0) + H.at(1,2)*ezztoexx+H.at(1,3)*g23toexx+H.at(1,4)*g13toexx,
+			H.at(1,1) + H.at(1,2)*ezztoeyy+H.at(1,3)*g23toeyy+H.at(1,4)*g13toeyy,
+			H.at(1,5) + H.at(1,2)*ezztog12+H.at(1,3)*g23tog12+H.at(1,4)*g13tog12,
+
+			H.at(5,0) + H.at(5,2)*ezztoexx+H.at(5,3)*g23toexx+H.at(5,4)*g13toexx,
+			H.at(5,1) + H.at(5,2)*ezztoeyy+H.at(5,3)*g23toeyy+H.at(5,4)*g13toeyy,
+			H.at(5,5) + H.at(5,2)*ezztog12+H.at(5,3)*g23tog12+H.at(5,4)*g13tog12
+			});
+		}
+		
+		if (myoption == "planestrain" || myoption == "planestress")
+		{
+			// NOTE: All vector gradients are transposed compared to standard notations!
+			H.reuseit();
+			
+			expression gradu = grad(u);
+			gradu.reuseit();
+
+			expression Ei = greenlagrangestrain(gradu);
+			Ei.reuseit();
+
+			expression Si = H*Ei; 
+			Si.reuseit();
+
+			expression graddofdu = grad(dof(u))-gradu;
+			expression gradtfdu = grad(tf(u));
+
+			expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
+			ei = expression(3,1, { entry(0,0,ei),entry(1,1,ei),2*entry(0,1,ei) });
+
+			expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + gradtfdu*transpose(gradu) );
+			deltae = expression(3,1, { entry(0,0,deltae),entry(1,1,deltae),2*entry(0,1,deltae) });
+
+			expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + gradtfdu * transpose(graddofdu) );
+			deltaeta = expression(3,1, { entry(0,0,deltaeta),entry(1,1,deltaeta),2*entry(0,1,deltaeta) });
+
+			prestress.reuseit();
+
+			if (prestress.iszero())
+				return -(H*ei)*deltae - Si*deltaeta - Si*deltae;
+			else
+				return -(H*ei)*deltae - (Si+prestress)*deltaeta - (Si+prestress)*deltae;
+		}
+
+		// If the option is not valid:
+		std::cout << "Error in 'mathop' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
+		std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
+		abort();
+	}
+    if (dofu.countrows() == 3)
+    {
+		if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 6))
+		{
+		    std::cout << "Error in 'mathop' namespace: expected a 6x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
+		    abort();
+		}
+
+        if (myoption.length() > 0)
+        {
+            std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
+            abort();
+        }
+
+		// NOTE: All vector gradients are transposed compared to standard notations!
+		H.reuseit();
+
+		expression gradu = grad(u);
+		gradu.reuseit();
+
+		expression Ei = greenlagrangestrain(gradu);
+		Ei.reuseit();
+
+		expression Si = H*Ei; 
+		Si.reuseit();
+
+		expression graddofdu = grad(dof(u))-gradu;
+		expression gradtfdu = grad(tf(u));
+
+		expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
+		ei = expression(6,1, { entry(0,0,ei),entry(1,1,ei),entry(2,2,ei),2*entry(1,2,ei),2*entry(0,2,ei),2*entry(0,1,ei) });
+
+		expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + gradtfdu*transpose(gradu) );
+		deltae = expression(6,1, { entry(0,0,deltae),entry(1,1,deltae),entry(2,2,deltae),2*entry(1,2,deltae),2*entry(0,2,deltae),2*entry(0,1,deltae) });
+
+		expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + gradtfdu * transpose(graddofdu) );
+		deltaeta = expression(6,1, { entry(0,0,deltaeta),entry(1,1,deltaeta),entry(2,2,deltaeta),2*entry(1,2,deltaeta),2*entry(0,2,deltaeta),2*entry(0,1,deltaeta) });
+
+		prestress.reuseit();
+
+		if (prestress.iszero())
+			return -(H*ei)*deltae - Si*deltaeta - Si*deltae;
+		else
+			return -(H*ei)*deltae - (Si+prestress)*deltaeta - (Si+prestress)*deltae;
     }
 }
 
