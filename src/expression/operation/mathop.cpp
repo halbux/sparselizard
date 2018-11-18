@@ -466,7 +466,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be both either 2x1 or 3x1 vectors" << std::endl;
+        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
     if (dofu.countrows() == 2)
@@ -543,7 +543,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be both either 2x1 or 3x1 vectors" << std::endl;
+        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
     if (dofu.countrows() == 2)
