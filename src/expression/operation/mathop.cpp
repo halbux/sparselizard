@@ -610,13 +610,13 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 			expression graddofdu = grad(dof(u))-gradu;
 			expression gradtfdu = grad(tf(u));
 
-			expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
+			expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + transpose(gradu)*graddofdu );
 			ei = expression(3,1, { entry(0,0,ei),entry(1,1,ei),2*entry(0,1,ei) });
 
-			expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + gradtfdu*transpose(gradu) );
+			expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + transpose(gradu)*gradtfdu );
 			deltae = expression(3,1, { entry(0,0,deltae),entry(1,1,deltae),2*entry(0,1,deltae) });
 
-			expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + gradtfdu * transpose(graddofdu) );
+			expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + transpose(graddofdu)*gradtfdu );
 			deltaeta = expression(3,1, { entry(0,0,deltaeta),entry(1,1,deltaeta),2*entry(0,1,deltaeta) });
 
 			prestress.reuseit();
@@ -661,13 +661,13 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 		expression graddofdu = grad(dof(u))-gradu;
 		expression gradtfdu = grad(tf(u));
 
-		expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
+		expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + transpose(gradu)*graddofdu );
 		ei = expression(6,1, { entry(0,0,ei),entry(1,1,ei),entry(2,2,ei),2*entry(1,2,ei),2*entry(0,2,ei),2*entry(0,1,ei) });
 
-		expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + gradtfdu*transpose(gradu) );
+		expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + transpose(gradu)*gradtfdu );
 		deltae = expression(6,1, { entry(0,0,deltae),entry(1,1,deltae),entry(2,2,deltae),2*entry(1,2,deltae),2*entry(0,2,deltae),2*entry(0,1,deltae) });
 
-		expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + gradtfdu * transpose(graddofdu) );
+		expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + transpose(graddofdu)*gradtfdu );
 		deltaeta = expression(6,1, { entry(0,0,deltaeta),entry(1,1,deltaeta),entry(2,2,deltaeta),2*entry(1,2,deltaeta),2*entry(0,2,deltaeta),2*entry(0,1,deltaeta) });
 
 		prestress.reuseit();
