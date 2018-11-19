@@ -1304,7 +1304,7 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
 
     if (not(isformatok))
     {
-        std::cout << "Error in 'expression' object: don't known what to do with the expression provided to the formulation" << std::endl;
+        std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
         std::cout << "The expression should be rewritable into a sum of products of the form coef*dof*tf (derivatives allowed)" << std::endl;
         abort();
     }
