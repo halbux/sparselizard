@@ -42,7 +42,7 @@ void sparselizard(void)
     
     formulation elasticity;
     
-    // The linear elasticity formulation with geometrical nonlinearity for small strains is predefined:
+    // The linear elasticity formulation with geometric nonlinearity for small strains is predefined:
     elasticity += integral(botlayer, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0));
     // The top layer is prestressed with 10 MPa in the x and y direction (sigma xx and yy):
     expression prestress(6,1,{10e6,10e6,0,0,0,0});
