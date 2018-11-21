@@ -2,7 +2,7 @@
 // around that static deflection for a 3D bilayer disk (800um diameter, 10um thick) whose top layer is prestressed,
 // whose bottom layer is clamped at its external boundary and on top of which the atmospheric pressure is pushing.
 //
-// Small-strain GEOMETRIC NONLINEARITY is used for this prestressed membrane.
+// Small-strain GEOMETRIC NONLINEARITY is used to simulate this prestressed membrane.
 //
 // With minimal extra effort the buckling of the membrane can be simulated with the Newmark time 
 // resolution available in sparselizard.
