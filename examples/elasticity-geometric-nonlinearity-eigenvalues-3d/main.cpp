@@ -1,6 +1,6 @@
 // This code gives the static deflection and mechanical vibration eigenfrequencies and eigenmodes 
-// around that static deflection for a bilayer disk whose top layer is prestressed, whose bottom layer
-// is clamped at its external boundary and on top of which the atmosperic pressure pushes.
+// around that static deflection for a bilayer disk (800 um diameter, 10um thick) whose top layer is prestressed,
+// whose bottom layer is clamped at its external boundary and on top of which the atmosperic pressure pushes.
 // 3D disk that is clamped at its outer face.
 //
 // Small-strain GEOMETRIC NONLINEARITY is used for this prestressed membrane.
