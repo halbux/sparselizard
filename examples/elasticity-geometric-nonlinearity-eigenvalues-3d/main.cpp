@@ -54,7 +54,7 @@ void sparselizard(void)
     elasticity += integral(top, u, -pressure*normal(top)*tf(u));
     
     
-    ///// STEP 1: GET THE STATIC DEFLECTION WITH A NONLINEAR LOOP
+    ///// STEP 1: GET THE STATIC DEFLECTION WITH A NONLINEAR LOOP:
     
     // Start with an all-zero deflection:
     vec solu(elasticity);
