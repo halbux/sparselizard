@@ -94,32 +94,34 @@ std::shared_ptr<operation> opproduct::expand(void)
         
     // Everything is first put in form of a sum, possibly with a single sum term.
     // If there is no dof or tf this leads to treating a sum as a monolithic block.
+	std::vector<std::shared_ptr<operation>> prodtrms(productterms.size());
     for (int i = 0; i < productterms.size(); i++)
     {
+		prodtrms[i] = productterms[i];
         if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()))
         {
             std::shared_ptr<opsum> op(new opsum);
             op->addterm(productterms[i]);
-            productterms[i] = op;
+            prodtrms[i] = op;
         }
     }
     
-    std::shared_ptr<operation> expanded = productterms[0];
+    std::shared_ptr<operation> expanded = prodtrms[0];
     
     // Multiply 'expanded' by all other factors, one at a time:
-    for (int i = 1; i < productterms.size(); i++)
+    for (int i = 1; i < prodtrms.size(); i++)
     {
         // Use the sum*sum expansion rule since we have only sums:
         std::shared_ptr<opsum> opersum(new opsum);
         
         for (int j = 0; j < expanded->count(); j++)
         {
-            for (int k = 0; k < productterms[i]->count(); k++)
+            for (int k = 0; k < prodtrms[i]->count(); k++)
             {
                 std::shared_ptr<opproduct> prod(new opproduct);
 
                 prod->multiplybyterm(expanded->getargument(j));
-                prod->multiplybyterm(productterms[i]->getargument(k));
+                prod->multiplybyterm(prodtrms[i]->getargument(k));
                 
                 prod->group();
                 
