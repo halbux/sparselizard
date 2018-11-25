@@ -211,7 +211,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         abort();
     }
     int problemdimension = universe::mymesh->getmeshdimension();
-    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() != problemdimension))
+    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
@@ -296,7 +296,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         abort();
     }
     int problemdimension = universe::mymesh->getmeshdimension();
-    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() != problemdimension))
+    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
@@ -403,7 +403,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         abort();
     }
     int problemdimension = universe::mymesh->getmeshdimension();
-    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() != problemdimension))
+    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
