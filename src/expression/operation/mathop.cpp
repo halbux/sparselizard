@@ -607,8 +607,8 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 			expression Si = H*Ei; 
 			Si.reuseit();
 
-			expression graddofdu = grad(dof(u))-gradu;
-			expression gradtfdu = grad(tf(u));
+			expression graddofdu = grad(dofu)-gradu;
+			expression gradtfdu = grad(tfu);
 
 			expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
 			ei = expression(3,1, { entry(0,0,ei),entry(1,1,ei),2*entry(0,1,ei) });
@@ -658,8 +658,8 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 		expression Si = H*Ei; 
 		Si.reuseit();
 
-		expression graddofdu = grad(dof(u))-gradu;
-		expression gradtfdu = grad(tf(u));
+		expression graddofdu = grad(dofu)-gradu;
+		expression gradtfdu = grad(tfu);
 
 		expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
 		ei = expression(6,1, { entry(0,0,ei),entry(1,1,ei),entry(2,2,ei),2*entry(1,2,ei),2*entry(0,2,ei),2*entry(0,1,ei) });
