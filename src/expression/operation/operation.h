@@ -131,6 +131,9 @@ class operation : public std::enable_shared_from_this<operation>
 };
 
 #include "opabs.h"
+#include "opacos.h"
+#include "opasin.h"
+#include "opatan.h"
 #include "opconstant.h"
 #include "opcos.h"
 #include "opdetjac.h"
@@ -145,6 +148,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opproduct.h"
 #include "opsin.h"
 #include "opsum.h"
+#include "optan.h"
 #include "optf.h"
 #include "optime.h"
 

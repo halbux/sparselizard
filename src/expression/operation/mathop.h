@@ -66,6 +66,10 @@ namespace mathop
     
     expression sin(expression input);
     expression cos(expression input);
+	expression tan(expression input);
+    expression asin(expression input);
+    expression acos(expression input);
+	expression atan(expression input);
     expression abs(expression input);
     expression sqrt(expression input);
     expression log10(expression input);

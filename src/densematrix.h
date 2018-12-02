@@ -109,6 +109,10 @@ class densematrix
         void abs(void);
         void sin(void);
         void cos(void);
+		void tan(void);
+        void asin(void);
+        void acos(void);
+		void atan(void);
         void log10(void);
         
         // Get the max value:

@@ -373,6 +373,38 @@ void densematrix::cos(void)
         myvaluesptr[i] = std::cos(myvaluesptr[i]);
 }
 
+void densematrix::tan(void)
+{
+    double* myvaluesptr = myvalues.get();
+
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] = std::tan(myvaluesptr[i]);
+}
+
+void densematrix::asin(void)
+{
+    double* myvaluesptr = myvalues.get();
+
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] = std::asin(myvaluesptr[i]);
+}
+
+void densematrix::acos(void)
+{
+    double* myvaluesptr = myvalues.get();
+
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] = std::acos(myvaluesptr[i]);
+}
+
+void densematrix::atan(void)
+{
+    double* myvaluesptr = myvalues.get();
+
+    for (int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] = std::atan(myvaluesptr[i]);
+}
+
 void densematrix::log10(void)
 {
     double* myvaluesptr = myvalues.get();

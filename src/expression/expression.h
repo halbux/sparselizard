@@ -148,6 +148,10 @@ class expression
         expression tf(int physreg);
         expression sin(void);
         expression cos(void);
+		expression tan(void);
+        expression asin(void);
+        expression acos(void);
+		expression atan(void);
         expression abs(void);
         expression log10(void);
         

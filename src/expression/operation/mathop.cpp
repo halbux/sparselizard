@@ -169,6 +169,10 @@ expression mathop::dtdt(expression input) { return input.timederivative(2); }
 
 expression mathop::sin(expression input) { return input.sin(); }
 expression mathop::cos(expression input) { return input.cos(); }
+expression mathop::tan(expression input) { return input.tan(); }
+expression mathop::asin(expression input) { return input.asin(); }
+expression mathop::acos(expression input) { return input.acos(); }
+expression mathop::atan(expression input) { return input.atan(); }
 expression mathop::abs(expression input) { return input.abs(); }
 expression mathop::sqrt(expression input) { return pow(input, 0.5); }
 expression mathop::log10(expression input) { return input.log10(); }

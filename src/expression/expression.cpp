@@ -1028,6 +1028,46 @@ expression expression::cos(void)
     return cosexpr;
 }
 
+expression expression::tan(void)
+{
+    expression tanexpr = *this;
+
+    for (int i = 0; i < mynumrows*mynumcols; i++)
+        tanexpr.myoperations[i] = std::shared_ptr<optan>(new optan(myoperations[i]));
+    
+    return tanexpr;
+}
+
+expression expression::asin(void)
+{
+    expression asinexpr = *this;
+
+    for (int i = 0; i < mynumrows*mynumcols; i++)
+        asinexpr.myoperations[i] = std::shared_ptr<opasin>(new opasin(myoperations[i]));
+    
+    return asinexpr;
+}
+
+expression expression::acos(void)
+{
+    expression acosexpr = *this;
+
+    for (int i = 0; i < mynumrows*mynumcols; i++)
+        acosexpr.myoperations[i] = std::shared_ptr<opacos>(new opacos(myoperations[i]));
+    
+    return acosexpr;
+}
+
+expression expression::atan(void)
+{
+    expression atanexpr = *this;
+
+    for (int i = 0; i < mynumrows*mynumcols; i++)
+        atanexpr.myoperations[i] = std::shared_ptr<opatan>(new opatan(myoperations[i]));
+    
+    return atanexpr;
+}
+
 expression expression::abs(void)
 {
     expression absexpr = *this;
