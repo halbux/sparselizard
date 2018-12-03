@@ -114,6 +114,42 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     }
 }
 
+expression::expression(expression condexpr, expression exprtrue, expression exprfalse)
+{
+	// Make sure the conditional expression is a scalar:
+	if (condexpr.countrows() != 1 || condexpr.countcolumns() != 1)
+	{
+		std::cout << "Error in 'expression' object: expected a scalar condition expression (first argument)" << std::endl;
+		abort();
+	}
+	// Make sure the two other expressions have the same size:
+	if (exprtrue.countrows() != exprfalse.countrows() || exprtrue.countcolumns() != exprfalse.countcolumns())
+	{
+		std::cout << "Error in 'expression' object: expected same sized expressions in last two arguments" << std::endl;
+		abort();
+	}
+
+    if (condexpr.myoperations[0]->isdofincluded() || condexpr.myoperations[0]->istfincluded())
+    {
+        std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
+        abort();
+	}
+
+	// Break into scalars:
+	mynumrows = exprtrue.countrows(); mynumcols = exprtrue.countcolumns();
+
+    myoperations.resize(exprtrue.countrows()*exprtrue.countcolumns());
+    for (int i = 0; i < exprtrue.countrows()*exprtrue.countcolumns(); i++)
+	{
+		if (exprtrue.myoperations[i]->isdofincluded() || exprtrue.myoperations[i]->istfincluded() || exprfalse.myoperations[i]->isdofincluded() || exprfalse.myoperations[i]->istfincluded())
+		{
+		    std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
+		    abort();
+		}
+    	myoperations[i] = std::shared_ptr<opcondition>(new opcondition(condexpr.myoperations[0], exprtrue.myoperations[i], exprfalse.myoperations[i]));
+	}
+}
+
 void expression::reorderrows(std::vector<int> neworder)
 {
 	if (mynumrows != neworder.size())

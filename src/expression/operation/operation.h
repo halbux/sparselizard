@@ -132,6 +132,7 @@ class operation : public std::enable_shared_from_this<operation>
 
 #include "opabs.h"
 #include "opacos.h"
+#include "opcondition.h"
 #include "opasin.h"
 #include "opatan.h"
 #include "opconstant.h"

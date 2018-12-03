@@ -69,6 +69,10 @@ class expression
         expression(double);
         expression(parameter&);
         expression(int numrows, int numcols, std::vector<expression>);
+		// Expression whose value depends on if the first argument is greater or equal to zero.
+		// If true the expression value is the expression as second argument, if false it is the 
+		// expression provided as third argument.
+		expression(expression condexpr, expression exprtrue, expression exprfalse);
         
         int countrows(void) { return mynumrows; };
         int countcolumns(void) { return mynumcols; };
