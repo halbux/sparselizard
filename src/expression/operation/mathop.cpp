@@ -264,13 +264,6 @@ expression mathop::curl(expression input)
     }
     else
     {
-    	if (universe::isaxisymmetric)
-    	{
-			std::cout << "Error in 'mathop' namespace: curl for 'hcurl' (edge) shape functions is not defined in case of axisymmetry." << std::endl;
-			std::cout << "Consider using an alternative formulation with 'h1' (nodal) shape functions." << std::endl;
-			abort();
-    	}
-    
         expression expr;
         // We should always have 3 components.
         // This is the curl in the reference element:
