@@ -318,6 +318,9 @@ class element
         // Number of subelements of dimension dim:
         int count(int dim);
         
+        // Returns true if point with coordinates (ki, eta, phi) is inside the reference element:
+        bool isinsideelement(double ki, double eta, double phi);
+        
         // Gives the length of the reference line, surface of the reference 
         // triangle/quadrangle and volume of the reference volume elements.
         double measurereferenceelement(void);

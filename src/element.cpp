@@ -390,6 +390,39 @@ int element::count(int dim)
     }
 }
 
+bool element::isinsideelement(double ki, double eta, double phi)
+{
+	double roundoffnoise = 1e-10;
+
+	switch (gettypenumber())
+	{
+		// Point:
+		case 0:
+			return (std::abs(ki) < roundoffnoise && std::abs(eta) < roundoffnoise && std::abs(phi) < roundoffnoise);
+		// Line:
+		case 1:
+			return (std::abs(ki) < 1+roundoffnoise && std::abs(eta) < roundoffnoise && std::abs(phi) < roundoffnoise);
+		// Triangle:
+		case 2:
+			return (ki+eta < 1+roundoffnoise && ki > -roundoffnoise && eta > -roundoffnoise && std::abs(phi) < roundoffnoise);
+		// Quadrangle:
+		case 3:
+			return (std::abs(ki) < 1+roundoffnoise && std::abs(eta) < 1+roundoffnoise && std::abs(phi) < roundoffnoise);
+		// Tetrahedron:
+		case 4:
+			return (ki+eta+phi < 1+roundoffnoise && ki > -roundoffnoise && eta > -roundoffnoise && phi > -roundoffnoise);
+		// Hexahedron:
+		case 5:
+			return (std::abs(ki) < 1+roundoffnoise && std::abs(eta) < 1+roundoffnoise && std::abs(phi) < 1+roundoffnoise);
+		// Prism:
+		case 6:
+			return (ki+eta < 1+roundoffnoise && ki > -roundoffnoise && eta > -roundoffnoise && std::abs(phi) < 1+roundoffnoise);
+		// Pyramid:
+		case 7:
+			return (std::abs(ki) < 1-phi+roundoffnoise && std::abs(eta) < 1-phi+roundoffnoise && phi > -roundoffnoise && phi < 1+roundoffnoise);
+	}
+}
+
 double element::measurereferenceelement(void)
 {
 	switch (gettypenumber())
