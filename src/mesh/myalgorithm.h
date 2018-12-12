@@ -12,6 +12,7 @@
 #include <numeric>
 #include <cmath>
 #include <algorithm>
+#include "polynomial.h"
 
 namespace myalgorithm
 {
@@ -45,6 +46,10 @@ namespace myalgorithm
     // 'csrrows' is in CSR format. The ijk row format is output in 'ijkrows'.
     // 'ijkrows' must be preallocated with a size equal to the nnz.
     void csrtoijk(int numberofrows, int* csrrows, int* ijkrows);
+    
+    // Get one solution {ki,eta,phi} of a system of one to three polynomials {poly1,poly2,...} equaled to 0.
+    // After convergence the solution {ki,eta,phi} is placed in 'initialguess'.
+    void getroot(std::vector<polynomial>& poly, std::vector<double>& initialguess, double tol = 1e-12);
 };
 
 #endif
