@@ -191,17 +191,16 @@ void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
     }
 }
 
-void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& guess, double tol)
+std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double boxsize, double tol, int maxit)
 {
-    // Maximum number of iterations before error:
-    int maxit = 100, it = 0;
+    int it = 0;
+    double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
+    std::vector<double> guess = {0,0,0};
 
     switch (poly.size())
     {
         case 1:
         {
-            double deltaki = 1;
-            // This is not a mathematically valid criterion but it is robust:
             while (std::abs(deltaki) > tol)
             {
                 if (it < maxit)
@@ -211,6 +210,9 @@ void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
                     
                     deltaki = -1.0/jac11 * f;
                     guess[0] += deltaki;
+                    
+                    if (std::abs(guess[0]) > boxsize)
+                    	return {};
                 }
                 else
                 {
@@ -219,12 +221,9 @@ void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
                 }
                 it++;
             }
-            return;
         }
         case 2:
         {
-            double deltaki = 1, deltaeta = 1;
-            // This is not a mathematically valid criterion but it is robust:
             while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol)
             {
                 if (it < maxit)
@@ -244,6 +243,9 @@ void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
                     
                     guess[0] += deltaki;
                     guess[1] += deltaeta;
+                    
+                    if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize)
+                    	return {};
                 }
                 else
                 {
@@ -252,12 +254,9 @@ void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
                 }
                 it++;
             }
-            return;
         }
         case 3:
         {
-            double deltaki = 1, deltaeta = 1, deltaphi = 1;
-            // This is not a mathematically valid criterion but it is robust:
             while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol || std::abs(deltaphi) > tol)
             {
                 if (it < maxit)
@@ -285,6 +284,9 @@ void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
                     guess[0] += deltaki;
                     guess[1] += deltaeta;
                     guess[2] += deltaphi;
+                    
+                    if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize || std::abs(guess[2]) > boxsize)
+                    	return {};
                 }
                 else
                 {
@@ -293,8 +295,8 @@ void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
                 }
                 it++;
             }
-            return;
         }
     }
+    return guess;
 }
 
