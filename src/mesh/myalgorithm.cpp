@@ -193,105 +193,105 @@ void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
 
 void myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& guess, double tol)
 {
-	// Maximum number of iterations before error:
-	int maxit = 100, it = 0;
+    // Maximum number of iterations before error:
+    int maxit = 100, it = 0;
 
     switch (poly.size())
     {
         case 1:
         {
-        	double deltaki = 1;
-        	// This is not a mathematically valid criterion but it is robust:
-        	while (std::abs(deltaki) > tol)
-        	{
-        		if (it < maxit)
-    			{
-					double f = poly[0].evalat(guess, 0)[0];
-					double jac11 = poly[0].evalat(guess, 1)[0];
-					
-					deltaki = -1.0/jac11 * f;
-					guess[0] += deltaki;
-				}
-				else
-				{
-					std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
-					abort();
-				}
-				it++;
+            double deltaki = 1;
+            // This is not a mathematically valid criterion but it is robust:
+            while (std::abs(deltaki) > tol)
+            {
+                if (it < maxit)
+                {
+                    double f = poly[0].evalat(guess, 0)[0];
+                    double jac11 = poly[0].evalat(guess, 1)[0];
+                    
+                    deltaki = -1.0/jac11 * f;
+                    guess[0] += deltaki;
+                }
+                else
+                {
+                    std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
+                    abort();
+                }
+                it++;
             }
             return;
         }
         case 2:
         {
-        	double deltaki = 1, deltaeta = 1;
-        	// This is not a mathematically valid criterion but it is robust:
-        	while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol)
-        	{
-        		if (it < maxit)
-    			{
-					double f = poly[0].evalat(guess, 0)[0];
-					double g = poly[1].evalat(guess, 0)[0];
-					
-					double jac11 = poly[0].evalat(guess, 1)[0];
-					double jac12 = poly[0].evalat(guess, 2)[0];
-					double jac21 = poly[1].evalat(guess, 1)[0];
-					double jac22 = poly[1].evalat(guess, 2)[0];
-					
-					double invdet = 1.0/(jac11*jac22 - jac12*jac21);
-					
-					deltaki = -invdet * (jac22*f - jac12*g);
-					deltaeta = -invdet * (-jac21*f + jac11*g);
-				
-					guess[0] += deltaki;
-					guess[1] += deltaeta;
-				}
-				else
-				{
-					std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
-					abort();
-				}
-				it++;
+            double deltaki = 1, deltaeta = 1;
+            // This is not a mathematically valid criterion but it is robust:
+            while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol)
+            {
+                if (it < maxit)
+                {
+                    double f = poly[0].evalat(guess, 0)[0];
+                    double g = poly[1].evalat(guess, 0)[0];
+                    
+                    double jac11 = poly[0].evalat(guess, 1)[0];
+                    double jac12 = poly[0].evalat(guess, 2)[0];
+                    double jac21 = poly[1].evalat(guess, 1)[0];
+                    double jac22 = poly[1].evalat(guess, 2)[0];
+                    
+                    double invdet = 1.0/(jac11*jac22 - jac12*jac21);
+                    
+                    deltaki = -invdet * (jac22*f - jac12*g);
+                    deltaeta = -invdet * (-jac21*f + jac11*g);
+                    
+                    guess[0] += deltaki;
+                    guess[1] += deltaeta;
+                }
+                else
+                {
+                    std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
+                    abort();
+                }
+                it++;
             }
             return;
         }
         case 3:
         {
-        	double deltaki = 1, deltaeta = 1, deltaphi = 1;
-        	// This is not a mathematically valid criterion but it is robust:
-        	while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol || std::abs(deltaphi) > tol)
-        	{
-        		if (it < maxit)
-    			{
-					double f = poly[0].evalat(guess, 0)[0];
-					double g = poly[1].evalat(guess, 0)[0];
-					double h = poly[2].evalat(guess, 0)[0];
-					
-					double jac11 = poly[0].evalat(guess, 1)[0];
-					double jac12 = poly[0].evalat(guess, 2)[0];
-					double jac13 = poly[0].evalat(guess, 3)[0];
-					double jac21 = poly[1].evalat(guess, 1)[0];
-					double jac22 = poly[1].evalat(guess, 2)[0];
-					double jac23 = poly[1].evalat(guess, 3)[0];
-					double jac31 = poly[2].evalat(guess, 1)[0];
-					double jac32 = poly[2].evalat(guess, 2)[0];
-					double jac33 = poly[2].evalat(guess, 3)[0];
-					
-					double invdet = 1.0/(jac11*jac22*jac33 - jac11*jac23*jac32 - jac12*jac21*jac33 + jac12*jac23*jac31 + jac13*jac21*jac32 - jac13*jac22*jac31);
-					
-					deltaki = -invdet * ((jac22*jac33 - jac23*jac32)*f - (jac12*jac33 - jac13*jac32)*g + (jac12*jac23 - jac13*jac22)*h);
-					deltaeta = -invdet * (-(jac21*jac33 - jac23*jac31)*f + (jac11*jac33 - jac13*jac31)*g - (jac11*jac23 - jac13*jac21)*h);
-					deltaphi = -invdet * ((jac21*jac32 - jac22*jac31)*f - (jac11*jac32 - jac12*jac31)*g + (jac11*jac22 - jac12*jac21)*h);
-				
-					guess[0] += deltaki;
-					guess[1] += deltaeta;
-					guess[2] += deltaphi;
-				}
-				else
-				{
-					std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
-					abort();
-				}
-				it++;
+            double deltaki = 1, deltaeta = 1, deltaphi = 1;
+            // This is not a mathematically valid criterion but it is robust:
+            while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol || std::abs(deltaphi) > tol)
+            {
+                if (it < maxit)
+                {
+                    double f = poly[0].evalat(guess, 0)[0];
+                    double g = poly[1].evalat(guess, 0)[0];
+                    double h = poly[2].evalat(guess, 0)[0];
+                    
+                    double jac11 = poly[0].evalat(guess, 1)[0];
+                    double jac12 = poly[0].evalat(guess, 2)[0];
+                    double jac13 = poly[0].evalat(guess, 3)[0];
+                    double jac21 = poly[1].evalat(guess, 1)[0];
+                    double jac22 = poly[1].evalat(guess, 2)[0];
+                    double jac23 = poly[1].evalat(guess, 3)[0];
+                    double jac31 = poly[2].evalat(guess, 1)[0];
+                    double jac32 = poly[2].evalat(guess, 2)[0];
+                    double jac33 = poly[2].evalat(guess, 3)[0];
+                    
+                    double invdet = 1.0/(jac11*jac22*jac33 - jac11*jac23*jac32 - jac12*jac21*jac33 + jac12*jac23*jac31 + jac13*jac21*jac32 - jac13*jac22*jac31);
+                    
+                    deltaki = -invdet * ((jac22*jac33 - jac23*jac32)*f - (jac12*jac33 - jac13*jac32)*g + (jac12*jac23 - jac13*jac22)*h);
+                    deltaeta = -invdet * (-(jac21*jac33 - jac23*jac31)*f + (jac11*jac33 - jac13*jac31)*g - (jac11*jac23 - jac13*jac21)*h);
+                    deltaphi = -invdet * ((jac21*jac32 - jac22*jac31)*f - (jac11*jac32 - jac12*jac31)*g + (jac11*jac22 - jac12*jac21)*h);
+                    
+                    guess[0] += deltaki;
+                    guess[1] += deltaeta;
+                    guess[2] += deltaphi;
+                }
+                else
+                {
+                    std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
+                    abort();
+                }
+                it++;
             }
             return;
         }
