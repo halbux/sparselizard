@@ -221,6 +221,7 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
                 }
                 it++;
             }
+            break;
         }
         case 2:
         {
@@ -254,6 +255,7 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
                 }
                 it++;
             }
+            break;
         }
         case 3:
         {
@@ -295,6 +297,7 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
                 }
                 it++;
             }
+            break;
         }
     }
     return guess;
