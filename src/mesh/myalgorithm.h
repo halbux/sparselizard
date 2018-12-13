@@ -49,7 +49,7 @@ namespace myalgorithm
     
     // Get a single solution {ki,eta,phi} of a system of one up to three polynomials {poly1,poly2,...} equaled to 0.
     // The initial guess is {0,0,0}. If at any iteration either ki, eta or phi
-    // is farther away that 'boxsize' from the origin then an empty vector is returned.
+    // is farther away than 'boxsize' from the origin then an empty vector is returned.
     std::vector<double> getroot(std::vector<polynomial>& poly, double boxsize = 3, double tol = 1e-12, int maxit = 50);
 };
 
