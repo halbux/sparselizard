@@ -63,6 +63,19 @@ densematrix lagrangeformfunction::getderivative(int whichderivative)
     return evaluated[whichderivative].copy();
 }
 
+polynomial lagrangeformfunction::getinterpolationpolynomial(const std::vector<double>& interpol)
+{
+	polynomial poly;
+	
+	for (int i = 0; i < myformfunctionpolynomials.size(); i++)
+	{
+		if (interpol[i] != 0.0)
+			poly = poly + interpol[i]*myformfunctionpolynomials[i];
+	}
+
+	return poly;
+}
+
 void lagrangeformfunction::print(void)
 {
     element myelement(myelementtypenumber, myorder);
