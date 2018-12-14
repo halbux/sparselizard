@@ -191,11 +191,10 @@ void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
     }
 }
 
-std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double boxsize, double tol, int maxit)
+bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& guess, double boxsize, double tol, int maxit)
 {
     int it = 0;
     double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
-    std::vector<double> guess = {0,0,0};
 
     switch (poly.size())
     {
@@ -212,7 +211,7 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
                     guess[0] += deltaki;
                     
                     if (std::abs(guess[0]) > boxsize)
-                    	return {};
+                    	return false;
                 }
                 else
                 {
@@ -246,7 +245,7 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
                     guess[1] += deltaeta;
                     
                     if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize)
-                    	return {};
+                    	return false;
                 }
                 else
                 {
@@ -288,7 +287,7 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
                     guess[2] += deltaphi;
                     
                     if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize || std::abs(guess[2]) > boxsize)
-                    	return {};
+                    	return false;
                 }
                 else
                 {
@@ -300,6 +299,6 @@ std::vector<double> myalgorithm::getroot(std::vector<polynomial>& poly, double b
             break;
         }
     }
-    return guess;
+    return true;
 }
 

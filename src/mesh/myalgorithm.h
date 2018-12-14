@@ -48,9 +48,10 @@ namespace myalgorithm
     void csrtoijk(int numberofrows, int* csrrows, int* ijkrows);
     
     // Get a single solution {ki,eta,phi} of a system of one up to three polynomials {poly1,poly2,...} equaled to 0.
-    // The initial guess is {0,0,0}. If at any iteration either ki, eta or phi
-    // is farther away than 'boxsize' from the origin then an empty vector is returned.
-    std::vector<double> getroot(std::vector<polynomial>& poly, double boxsize = 3, double tol = 1e-12, int maxit = 50);
+    // The converged solution is placed in 'initialguess'. If at any iteration either ki, eta or phi
+    // is farther away than 'boxsize' from the origin then the function stops and returns false (true otherwise).
+    // The initial guess is supposed to be inside the box.
+    bool getroot(std::vector<polynomial>& poly, std::vector<double>& initialguess, double boxsize = 3, double tol = 1e-12, int maxit = 50);
 };
 
 #endif
