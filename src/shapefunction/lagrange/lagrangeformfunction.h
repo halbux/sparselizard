@@ -27,11 +27,11 @@
 class lagrangeformfunction
 {
 	private:
-	
+        
         int myorder;
         int myelementtypenumber;
-		std::vector<double> myevaluationpoints;
-		
+        std::vector<double> myevaluationpoints;
+        
         std::vector<double> mynodecoordinates;
         std::vector<polynomial> myformfunctionpolynomials;
         
@@ -42,24 +42,24 @@ class lagrangeformfunction
         // - with ki  derivative for i = 1
         // - with eta derivative for i = 2
         // - with phi derivative for i = 3
-		std::vector<densematrix> evaluated = std::vector<densematrix>(4);
+        std::vector<densematrix> evaluated = std::vector<densematrix>(4);
         
 	public:
-	
-		// The constructor takes the element type number, the form function
+        
+        // The constructor takes the element type number, the form function
         // order and the coordinates of the evaluation points as input. 
         // They are set once and for all for a given object. 
         // Format is [ki1 eta1 phi1 ki2 eta2 phi2 ki3 ...].
-		lagrangeformfunction(int elementtypenumber, int order, const std::vector<double> evaluationpoints);
-	
-		// getderivative gives the value of the Lagrange form functions:
+        lagrangeformfunction(int elementtypenumber, int order, const std::vector<double> evaluationpoints);
+        
+        // getderivative gives the value of the Lagrange form functions:
         // - without  derivative for whichderivative = 0
         // - with ki  derivative for whichderivative = 1
         // - with eta derivative for whichderivative = 2
         // - with phi derivative for whichderivative = 3
         //
         // It outputs a copy of evaluated[whichderivative] if available.
-		densematrix getderivative(int whichderivative);
+        densematrix getderivative(int whichderivative);
         
         std::vector<double> getnodecoordinates(void) { return mynodecoordinates; };
         std::vector<polynomial> getformfunctionpolynomials(void) { return myformfunctionpolynomials; };
