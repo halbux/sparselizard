@@ -48,6 +48,8 @@ class elementselector
 	
         // All disjoint region numbers must correspond to a same element type.
 		elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent = true);
+		// Select a single element:
+        elementselector(int disjointregionnumber, int elemindex);
         
         int getelementdimension(void);
         int getelementtypenumber(void);

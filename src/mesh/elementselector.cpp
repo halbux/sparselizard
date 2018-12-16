@@ -68,6 +68,22 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
     }   
 }	
 
+elementselector::elementselector(int disjointregionnumber, int elemindex)
+{
+    elements* myelements = universe::mymesh->getelements();
+    
+    int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(disjointregionnumber);
+    int rangebegin = universe::mymesh->getdisjointregions()->getrangebegin(disjointregionnumber);
+    
+	mydisjointregionnumbers = {disjointregionnumber};
+	
+	currenttotalorientation = myelements->gettotalorientation(myelementtypenumber, rangebegin+elemindex);
+ 
+    disjointregions = {disjointregionnumber};
+    totalorientations = {currenttotalorientation};
+    elems = {rangebegin+elemindex};
+}
+
 int elementselector::getelementdimension(void)
 {
     return universe::mymesh->getdisjointregions()->getelementdimension(mydisjointregionnumbers[0]);
