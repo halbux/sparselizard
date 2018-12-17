@@ -68,7 +68,7 @@ class expression
         expression(field);
         expression(double);
         expression(parameter&);
-        expression(int numrows, int numcols, const std::vector<expression>);
+        expression(int numrows, int numcols, std::vector<expression>);
 		// Expression whose value depends on if the first argument is greater or equal to zero.
 		// If true the expression value is the expression as second argument, if false it is the 
 		// expression provided as third argument.
