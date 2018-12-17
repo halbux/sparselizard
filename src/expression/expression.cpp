@@ -50,15 +50,17 @@ expression::expression(parameter& input)
     }
 }
 
-expression::expression(int numrows, int numcols, std::vector<expression> input)
+expression::expression(int numrows, int numcols, const std::vector<expression> input)
 {
     mynumrows = numrows;
     mynumcols = numcols;
     
+    std::vector<expression> fullinput = input;
+    
     // In case the user provides only the diagonal part of a square diagonal matrix:
     if (mynumrows == mynumcols && input.size() == mynumrows)
     {
-		std::vector<expression> fullinput(mynumrows*mynumcols);
+		fullinput.resize(mynumrows*mynumcols);
 		for (int i = 0; i < mynumrows; i++)
 		{
 			for (int j = 0; j < mynumcols; j++)
@@ -69,13 +71,12 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 					fullinput[i*mynumcols+j] = expression(0); 
 			}
 		}
-		input = fullinput;
 	}
 
     // In case the user provides only the lower triangular part of a square symmetric matrix:
     if (mynumrows == mynumcols && input.size() == mynumrows*(mynumcols+1)/2)
     {
-		std::vector<expression> fullinput(mynumrows*mynumcols);
+		fullinput.resize(mynumrows*mynumcols);
 		int index = 0;
 		for (int i = 0; i < mynumrows; i++)
 		{
@@ -92,10 +93,9 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 				index++;
 			}
 		}
-		input = fullinput;
 	}
 
-    if (mynumrows*mynumcols != input.size())
+    if (mynumrows*mynumcols != fullinput.size())
     {
         std::cout << "Error in 'expression' object: a vector of length " << mynumrows*mynumcols << " is required" << std::endl;
         abort();
@@ -104,8 +104,8 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     myoperations.resize(mynumrows*mynumcols);
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-        if (input[i].isscalar())
-            myoperations[i] = input[i].myoperations[0];
+        if (fullinput[i].isscalar())
+            myoperations[i] = fullinput[i].myoperations[0];
         else
         {
             std::cout << "Error in 'expression' object: expressions provided in vector must all be scalar" << std::endl;
