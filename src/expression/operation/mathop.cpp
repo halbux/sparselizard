@@ -309,7 +309,8 @@ expression mathop::tf(expression input, int physreg) { return input.tf(physreg);
 
 expression mathop::array1x1(expression term11) 
 {
-    return expression(1,1, {term11});
+	std::vector<expression> terms = {term11};
+    return expression(1,1, terms);
 }
 
 expression mathop::array1x2(expression term11, expression term12) 
