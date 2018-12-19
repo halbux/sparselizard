@@ -150,6 +150,9 @@ std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elem
 {
 	std::vector<double>* nodecoordinates = mynodes->getcoordinates();
 	
+    if (elementtypenumber == 0)
+        return {nodecoordinates->at(3*elementnumber+xyz)};
+	
     element myelement(elementtypenumber, mycurvatureorder);
     int curvednumberofnodes = myelement.countcurvednodes();
     
