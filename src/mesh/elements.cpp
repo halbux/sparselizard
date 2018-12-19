@@ -1,4 +1,5 @@
 #include "elements.h"
+#include "geotools.h"
 
 
 elements::elements(nodes& inputnodes, physicalregions& inputphysicalregions, disjointregions& inputdisjointregions)
@@ -38,6 +39,28 @@ int elements::add(int elementtypenumber, int curvatureorder, std::vector<int>& n
         
     subelementsinelements[elementtypenumber][0].insert(subelementsinelements[elementtypenumber][0].end(), nodelist.begin(), nodelist.end());
     return subelementsinelements[elementtypenumber][0].size()/nodelist.size() - 1;
+}
+
+void elements::shift(double xshift, double yshift, double zshift)
+{
+    for (int i = 0; i < barycenters.size(); i++)
+    {
+    	for (int j = 0; j < barycenters[i].size()/3; j++)
+    	{
+    		barycenters[i][3*j+0] += xshift;
+    		barycenters[i][3*j+1] += yshift;
+    		barycenters[i][3*j+2] += zshift;
+    	}
+    }
+}
+
+void elements::rotate(double alphax, double alphay, double alphaz)
+{
+    for (int i = 0; i < barycenters.size(); i++)
+    {
+    	if (barycenters[i].size() > 0)
+    		geotools::rotate(alphax, alphay, alphaz, &barycenters[i]);
+	}
 }
 
 int elements::getsubelement(int subelementtypenumber, int elementtypenumber, int elementnumber, int subelementindex)
@@ -162,6 +185,46 @@ std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elem
         nodecoords[node] = nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elementnumber*curvednumberofnodes+node]+xyz);
 
     return nodecoords;
+}
+
+std::vector<double>* elements::getbarycenters(int elementtypenumber)
+{
+	// If not yet populated for the element type:
+	if (barycenters[elementtypenumber].size() == 0)
+		barycenters[elementtypenumber] = computebarycenters(elementtypenumber);
+	
+	return &(barycenters[elementtypenumber]);
+}
+
+std::vector<double>* elements::getsphereradius(int elementtypenumber)
+{
+	std::vector<double>* mybarys = getbarycenters(elementtypenumber);
+
+	// If not yet populated for the element type:
+	if (sphereradius[elementtypenumber].size() == 0)
+	{
+		sphereradius[elementtypenumber].resize(count(elementtypenumber));
+	
+		for (int i = 0; i < count(elementtypenumber); i++)
+		{
+			double maxdist = 0;
+		
+			std::vector<double> xnodes = getnodecoordinates(elementtypenumber, i, 0);
+			std::vector<double> ynodes = getnodecoordinates(elementtypenumber, i, 1);
+			std::vector<double> znodes = getnodecoordinates(elementtypenumber, i, 2);
+			
+			for (int j = 0; j < xnodes.size(); j++)
+			{
+				double curdist = std::sqrt( std::pow(mybarys->at(3*i+0)-xnodes[j], 2) + std::pow(mybarys->at(3*i+1)-ynodes[j], 2) + std::pow(mybarys->at(3*i+2)-znodes[j], 2) );
+				if (curdist > maxdist)
+					maxdist = curdist;
+			}
+			
+			sphereradius[elementtypenumber][i] = maxdist;
+		}
+	}
+	
+	return &(sphereradius[elementtypenumber]);
 }
 
 void elements::printnumber(void)

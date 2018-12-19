@@ -297,11 +297,13 @@ void mesh::write(std::string name, int verbosity)
 void mesh::shift(double x, double y, double z)
 {
     mynodes.shift(x, y, z);
+    myelements.shift(x, y, z);
 }
 
 void mesh::rotate(double ax, double ay, double az)
 {
     mynodes.rotate(ax, ay, az);
+    myelements.rotate(ax, ay, az);
 }
 
 int mesh::getmeshdimension(void)

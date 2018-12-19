@@ -57,6 +57,16 @@ class elements
         // totalorientations[typenum] is empty if not applicable.
         std::vector<std::vector<int>> totalorientations = std::vector<std::vector<int>>(8, std::vector<int>(0));
         
+        // barycenters[typenum][3*i] stores the x, y and z coordinates 
+        // of the barycenter for the ith element of type 'typenum'.
+        // The x, y and z coordinates are concatenated one after the other.
+        std::vector<std::vector<double>> barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
+        
+        // sphereradius[typenum][i] gives the smallest radius of the sphere (centered on 
+        // the barycenter) that surrounds all nodes of the ith element of type 'typenum'.
+        // All nodes of the curved element are considered (but the barycenter is the one of the straight element).
+        std::vector<std::vector<double>> sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
+        
         // Entries in 'edgesatnodes' from index 'adressedgesatnodes[i]' to 'adressedgesatnodes[i+1]-1' are all 
         // edges touching node i. Only the edge corner nodes (not the curvature nodes) have touching edges.
         std::vector<int> adressedgesatnodes = {};
@@ -72,6 +82,9 @@ class elements
         // curved nodes. Return the created element number. Only 'pointsinelements' 
         // is changed. 'elementtypenumber' is the UNCURVED element type number.
         int add(int elementtypenumber, int curvatureorder, std::vector<int>& nodelist);
+        
+        void shift(double xshift, double yshift, double zshift);
+        void rotate(double alphax, double alphay, double alphaz);
         
         // 'getsubelement' returns the number of the 'subelementindex'th 
         // subelement of type 'subelementtypenumber' in element number 
@@ -95,6 +108,13 @@ class elements
         // Get the x, y or z coordinate of all nodes in the element 
         // (for xyz respectively set to 0, 1 or 2).
         std::vector<double> getnodecoordinates(int elementtypenumber, int elementnumber, int xyz);
+        
+        // Get a pointer to the barycenters[elementtypenumber] vector.
+        // The 'barycenters' container is populated for the element type if empty. 
+        std::vector<double>* getbarycenters(int elementtypenumber);
+        // Get a pointer to the sphereradius[elementtypenumber] vector.
+        // The 'sphereradius' container is populated for the element type if empty. 
+        std::vector<double>* getsphereradius(int elementtypenumber);
         
         // Print elements data for debug:
         void printnumber(void);

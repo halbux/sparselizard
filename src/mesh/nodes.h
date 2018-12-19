@@ -46,7 +46,7 @@ class nodes
         // z coordinates with highest sorting priority for x then y and then z. 
         // 'mycoordinates' is updated accordingly.
         // The output vector v is such that sortedcoordinates(v,:) = coordinates.
-        std::vector<int> sortbycoordinates(void);                                               // REMOVE AND DO IT IN ELEMENTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        std::vector<int> sortbycoordinates(void);
         // 'removeduplicates' removes the duplicated nodes in 'mycoordinates'.
         // NOTE: 'mycoordinates' must be sorted before the call.
         // The output vector v is such that sortedcoordinates(v,:) = coordinates.
