@@ -146,6 +146,21 @@ std::vector<int> elements::getedgesonnode(int nodenumber)
 	return output;
 }
 
+std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elementnumber, int xyz)
+{
+	std::vector<double>* nodecoordinates = mynodes->getcoordinates();
+	
+    element myelement(elementtypenumber, mycurvatureorder);
+    int curvednumberofnodes = myelement.countcurvednodes();
+    
+    std::vector<double> nodecoords(curvednumberofnodes);
+
+    for (int node = 0; node < curvednumberofnodes; node++)
+        nodecoords[node] = nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elementnumber*curvednumberofnodes+node]+xyz);
+
+    return nodecoords;
+}
+
 void elements::printnumber(void)
 {
     std::cout << std::endl;

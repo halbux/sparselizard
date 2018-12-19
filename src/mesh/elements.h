@@ -92,6 +92,10 @@ class elements
         int countedgesonnode(int nodenumber);
         std::vector<int> getedgesonnode(int nodenumber);
         
+        // Get the x, y or z coordinate of all nodes in the element 
+        // (for xyz respectively set to 0, 1 or 2).
+        std::vector<double> getnodecoordinates(int elementtypenumber, int elementnumber, int xyz);
+        
         // Print elements data for debug:
         void printnumber(void);
         void printsubelements(void);
