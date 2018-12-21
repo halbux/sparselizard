@@ -191,7 +191,7 @@ void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
     }
 }
 
-bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& guess, double boxsize, double tol, int maxit)
+bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& guess, double boxsize, double tol, int maxit)
 {
     int it = 0;
     double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
@@ -204,7 +204,7 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
             {
                 if (it < maxit)
                 {
-                    double f = poly[0].evalat(guess, 0)[0];
+                    double f = poly[0].evalat(guess, 0)[0] - rhs[0];
                     double jac11 = poly[0].evalat(guess, 1)[0];
                     
                     deltaki = -1.0/jac11 * f;
@@ -228,8 +228,8 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
             {
                 if (it < maxit)
                 {
-                    double f = poly[0].evalat(guess, 0)[0];
-                    double g = poly[1].evalat(guess, 0)[0];
+                    double f = poly[0].evalat(guess, 0)[0] - rhs[0];
+                    double g = poly[1].evalat(guess, 0)[0] - rhs[1];
                     
                     double jac11 = poly[0].evalat(guess, 1)[0];
                     double jac12 = poly[0].evalat(guess, 2)[0];
@@ -262,9 +262,9 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& gu
             {
                 if (it < maxit)
                 {
-                    double f = poly[0].evalat(guess, 0)[0];
-                    double g = poly[1].evalat(guess, 0)[0];
-                    double h = poly[2].evalat(guess, 0)[0];
+                    double f = poly[0].evalat(guess, 0)[0] - rhs[0];
+                    double g = poly[1].evalat(guess, 0)[0] - rhs[1];
+                    double h = poly[2].evalat(guess, 0)[0] - rhs[2];
                     
                     double jac11 = poly[0].evalat(guess, 1)[0];
                     double jac12 = poly[0].evalat(guess, 2)[0];

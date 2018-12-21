@@ -458,6 +458,8 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     		double maxelemsize = alpha*sphereradius->at(current);
     		double xbary = barycenters->at(3*current+0), ybary = barycenters->at(3*current+1), zbary = barycenters->at(3*current+2);
 
+			std::vector<polynomial> poly = {};
+			
 			// Get the index of the coordinate whose x is closest to the barycenter of the current element (using bisection):
 			int first = 0, last = numcoords-1;
 			int startindex;
@@ -492,12 +494,17 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 					{    			
 						// Reset to initial guess:
 						std::vector<double> kietaphi = {0,0,0};
+						std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
-						std::vector<polynomial> poly(elemdim);
-						for (int j = 0; j < elemdim; j++)
-							poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j)) - xyz[3*coordindex+j];
+						// Only create once for all coordinates the polynomials and only for the required elements:
+						if (poly.size() == 0)
+						{
+							poly.resize(elemdim);
+							for (int j = 0; j < elemdim; j++)
+								poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
+						}
 				
-						if (myalgorithm::getroot(poly, kietaphi))
+						if (myalgorithm::getroot(poly, rhs, kietaphi))
 						{
 							// Check if the (ki,eta,phi) coordinates are inside the element:
 							if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
@@ -532,12 +539,17 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 					{    			
 						// Reset to initial guess:
 						std::vector<double> kietaphi = {0,0,0};
+						std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
-						std::vector<polynomial> poly(elemdim);
-						for (int j = 0; j < elemdim; j++)
-							poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j)) - xyz[3*coordindex+j];
+						// Only create once for all coordinates the polynomials and only for the required elements:
+						if (poly.size() == 0)
+						{
+							poly.resize(elemdim);
+							for (int j = 0; j < elemdim; j++)
+								poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
+						}
 				
-						if (myalgorithm::getroot(poly, kietaphi))
+						if (myalgorithm::getroot(poly, rhs, kietaphi))
 						{
 							// Check if the (ki,eta,phi) coordinates are inside the element:
 							if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
