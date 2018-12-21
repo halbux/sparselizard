@@ -57,9 +57,9 @@ class expression
         // FUNCTIONS TO BE CALLED BY THE PUBLIC FUNCTIONS:
         
         std::vector<double> max(int physreg, expression* meshdeform, int refinement, std::vector<double> xyzrange);
+        void interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
         double integrate(int physreg, expression* meshdeform, int integrationorder);
-        void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
-        
+        void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);    
         
 	public:
         
@@ -89,7 +89,21 @@ class expression
         std::vector<double> max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange = {});
         std::vector<double> min(int physreg, int refinement, std::vector<double> xyzrange = {});
         std::vector<double> min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange = {});
-
+        
+        // Interpolate the expression at N (x,y,z) coordinates (provided in 'xyzcoord' in format
+        // {x1,y1,z1, x2,y2,z2,...}). After the call the interpolated values of the expression 
+        // are in 'interpolated' (non-scalar expressions are flattened and their interpolated 
+        // values concatenated one after the other).
+        // Only the highest dimension elements in physical region 'physreg' are considered. 
+        // In case the ith coordinate is not in the physical region or there was any other 
+        // issue then 'isfound[i]' is false. 
+        void interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
+        void interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
+        // These two functions are added for convenience and work only to interpolate at a single (x,y,z) coordinate.
+        // In case the coordinate is not in the physical region or there was any other issue the returned vector is empty.
+        std::vector<double> interpolate(int physreg, std::vector<double>& xyzcoord);
+        std::vector<double> interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord);
+        
         double integrate(int physreg, int integrationorder);
         double integrate(int physreg, expression meshdeform, int integrationorder);
         
