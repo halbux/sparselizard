@@ -101,8 +101,8 @@ class expression
         void interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
         // These two functions are added for convenience and work only to interpolate at a single (x,y,z) coordinate.
         // In case the coordinate is not in the physical region or there was any other issue the returned vector is empty.
-        std::vector<double> interpolate(int physreg, std::vector<double>& xyzcoord);
-        std::vector<double> interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord);
+        std::vector<double> interpolate(int physreg, const std::vector<double> xyzcoord);
+        std::vector<double> interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord);
         
         double integrate(int physreg, int integrationorder);
         double integrate(int physreg, expression meshdeform, int integrationorder);

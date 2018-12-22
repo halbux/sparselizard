@@ -328,9 +328,11 @@ void expression::interpolate(int physreg, expression meshdeform, std::vector<dou
 	interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
 }
 
-std::vector<double> expression::interpolate(int physreg, std::vector<double>& xyzcoord)
+std::vector<double> expression::interpolate(int physreg, const std::vector<double> xyzcoord)
 {
-	if (xyzcoord.size() != 3)
+	std::vector<double> xyz = xyzcoord;
+
+	if (xyz.size() != 3)
 	{
         std::cout << "Error in 'expression' object: expected a coordinate vector of length 3" << std::endl;
         abort();
@@ -339,7 +341,7 @@ std::vector<double> expression::interpolate(int physreg, std::vector<double>& xy
 	std::vector<double> interpolated = {};
 	std::vector<bool> isfound = {};
 	
-	interpolate(physreg, NULL, xyzcoord, interpolated, isfound);
+	interpolate(physreg, NULL, xyz, interpolated, isfound);
 	
 	if (isfound[0])
 		return interpolated;
@@ -347,9 +349,11 @@ std::vector<double> expression::interpolate(int physreg, std::vector<double>& xy
 		return {};
 }
 
-std::vector<double> expression::interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord)
+std::vector<double> expression::interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord)
 {
-	if (xyzcoord.size() != 3)
+	std::vector<double> xyz = xyzcoord;
+	
+	if (xyz.size() != 3)
 	{
         std::cout << "Error in 'expression' object: expected a coordinate vector of length 3" << std::endl;
         abort();
@@ -358,7 +362,7 @@ std::vector<double> expression::interpolate(int physreg, expression meshdeform, 
 	std::vector<double> interpolated = {};
 	std::vector<bool> isfound = {};
 	
-	interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
+	interpolate(physreg, &meshdeform, xyz, interpolated, isfound);
 	
 	if (isfound[0])
 		return interpolated;
