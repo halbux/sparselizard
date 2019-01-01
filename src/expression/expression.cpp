@@ -922,7 +922,7 @@ std::vector<double> expression::shapecut(int physreg, expression* meshdeform, sh
 	
 	// Write to disk if a filename is provided. The filename validity is checked in 'scatterwrite'.
 	if (filename.size() > 0)
-		mathop::scatterwrite(filename, xyzcoord, interpolated, exprlen);
+		mathop::scatterwrite(filename, output, exprlen);
 	
 	return output;
 }

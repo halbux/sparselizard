@@ -124,16 +124,11 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
     gmshinterface::closeview(filename + ".pos");
 }
 
-void mathop::scatterwrite(std::string filename, std::vector<double> xyzcoords, std::vector<double> evals, int numcomps)
+void mathop::scatterwrite(std::string filename, std::vector<double> data, int numcomps)
 {
-	int numdata = xyzcoords.size()/3;
+	int blocklen = 3+numcomps;
+	int numdata = data.size()/blocklen;
 
-	if (numcomps <= 0 || numcomps > 3)
-	{
-        std::cout << "Error in 'mathop' namespace: cannot write data with " << numcomps << " components to file (must be 1, 2 or 3)" << std::endl;
-        abort();
-	}
-	
 	std::vector<double> xcoords(numdata), ycoords(numdata), zcoords(numdata);
 	std::vector<std::vector<double>> evalscomps(3,std::vector<double>(0));
 	
@@ -142,12 +137,12 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xyzcoords, s
 	
 	for (int i = 0; i < numdata; i++)
 	{
-		xcoords[i] = xyzcoords[3*i+0];
-		ycoords[i] = xyzcoords[3*i+1];
-		zcoords[i] = xyzcoords[3*i+2];
+		xcoords[i] = data[i*blocklen+0];
+		ycoords[i] = data[i*blocklen+1];
+		zcoords[i] = data[i*blocklen+2];
 		
 		for (int j = 0; j < numcomps; j++)
-			evalscomps[j][i] = evals[numcomps*i+j];
+			evalscomps[j][i] = data[i*blocklen+3+j];
 	}
 	
 	scatterwrite(filename, xcoords, ycoords, zcoords, evalscomps[0], evalscomps[1], evalscomps[2]);
