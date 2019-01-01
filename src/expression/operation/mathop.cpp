@@ -135,7 +135,10 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xyzcoords, s
 	}
 	
 	std::vector<double> xcoords(numdata), ycoords(numdata), zcoords(numdata);
-	std::vector<std::vector<double>> evalscomps(3,std::vector<double>(numdata,0));
+	std::vector<std::vector<double>> evalscomps(3,std::vector<double>(0));
+	
+	for (int j = 0; j < numcomps; j++)
+		evalscomps[j].resize(numdata);
 	
 	for (int i = 0; i < numdata; i++)
 	{
