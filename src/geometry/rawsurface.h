@@ -1,7 +1,7 @@
-// sparselizard - Copyright (C) 2017-2018 A. Halbach
+// sparselizard - Copyright (C) 2017- A. Halbach
 //
 // See the LICENSE.txt file for license information. Please report all
-// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+// bugs and problems to <alexandre.halbach at gmail.com>.
 
 
 // This object holds a geometrical shape.

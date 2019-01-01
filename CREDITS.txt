@@ -1,4 +1,4 @@
-Alexandre Halbach   <alexandre.halbach at ulg.ac.be>    University of Liege, Belgium
+Alexandre Halbach   <alexandre.halbach at gmail.com>    University of Liege, Belgium
 
 Sincere thanks to Maxime Spirlet for all his technical help and to 
 Christophe Geuzaine for his very broad knowledge of numerical methods.

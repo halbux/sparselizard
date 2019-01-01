@@ -1,7 +1,7 @@
-// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+// sparselizard - Copyright (C) 2017- A. Halbach and C. Geuzaine, University of Liege
 //
 // See the LICENSE.txt file for license information. Please report all
-// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+// bugs and problems to <alexandre.halbach at gmail.com>.
 
 // This object uses the SLEPc library to get the eigenvalues and eigenvectors.
 // More information on SLEPc can be found at http://slepc.upv.es

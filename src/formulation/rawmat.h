@@ -1,7 +1,7 @@
-// sparselizard - Copyright (C) 2017-2018 A. Halbach and C. Geuzaine, University of Liege
+// sparselizard - Copyright (C) 2017- A. Halbach and C. Geuzaine, University of Liege
 //
 // See the LICENSE.txt file for license information. Please report all
-// bugs and problems to <alexandre.halbach at ulg.ac.be>.
+// bugs and problems to <alexandre.halbach at gmail.com>.
 
 // This code calls the PETSc library. See https://www.mcs.anl.gov/petsc/ for more information.
 
