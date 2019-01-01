@@ -872,6 +872,61 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     }
 }
 
+std::vector<double> expression::shapecut(int physreg, shape myshape, std::string filename)
+{
+	return shapecut(physreg, NULL, myshape, filename);
+}
+
+std::vector<double> expression::shapecut(int physreg, expression meshdeform, shape myshape, std::string filename)
+{
+	return shapecut(physreg, meshdeform, myshape, filename);
+}
+
+std::vector<double> expression::shapecut(int physreg, expression* meshdeform, shape myshape, std::string filename)
+{
+	int exprlen = mynumrows*mynumcols;
+	
+	// Get the mesh node coordinates of the shape:
+	std::vector<double> xyzcoord = *(myshape.getpointer()->getcoords());
+	
+	// Interpolate at the mesh nodes:
+	std::vector<double> interpolated;
+	std::vector<bool> isfound;
+	
+    interpolate(physreg, meshdeform, xyzcoord, interpolated, isfound);
+	
+	// Filter out the nodes outside the physical region:
+	int numfound = 0;
+	for (int i = 0; i < isfound.size(); i++)
+	{
+		if (isfound[i])
+			numfound++;
+	}
+	
+	int blocklen = 3+exprlen, index = 0;
+	std::vector<double> output(numfound*blocklen);
+	for (int i = 0; i < isfound.size(); i++)
+	{
+		if (isfound[i])
+		{
+			output[index*blocklen+0] = xyzcoord[3*i+0];
+			output[index*blocklen+1] = xyzcoord[3*i+1];
+			output[index*blocklen+2] = xyzcoord[3*i+2];
+		
+			for (int j = 0; j < exprlen; j++)
+				output[index*blocklen+3+j] = interpolated[i*exprlen+j];
+		
+			index++;
+		}
+	}
+	
+	// Write to disk if a filename is provided. The filename validity is checked in 'scatterwrite'.
+	if (filename.size() > 0)
+		mathop::scatterwrite(filename, xyzcoord, interpolated, exprlen);
+	
+	return output;
+}
+
 void expression::reuseit(bool istobereused)
 {
     for (int i = 0; i < myoperations.size(); i++)
