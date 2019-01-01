@@ -126,6 +126,12 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
 
 void mathop::scatterwrite(std::string filename, std::vector<double> data, int numcomps)
 {
+	if (numcomps <= 0 || numcomps > 3)
+	{
+        std::cout << "Error in 'mathop' namespace: cannot write to disk data with " << numcomps << " components" << std::endl;
+        abort();
+	}
+
 	int blocklen = 3+numcomps;
 	int numdata = data.size()/blocklen;
 
