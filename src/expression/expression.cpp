@@ -879,7 +879,7 @@ std::vector<double> expression::shapecut(int physreg, shape myshape, std::string
 
 std::vector<double> expression::shapecut(int physreg, expression meshdeform, shape myshape, std::string filename)
 {
-	return shapecut(physreg, meshdeform, myshape, filename);
+	return shapecut(physreg, &meshdeform, myshape, filename);
 }
 
 std::vector<double> expression::shapecut(int physreg, expression* meshdeform, shape myshape, std::string filename)
