@@ -929,12 +929,13 @@ std::vector<double> expression::shapecut(int physreg, expression* meshdeform, sh
 		    abort();
 		}
 		
+		std::vector<double> outputcopy = output;
+			
 		// Save on the deformed mesh if requested:
 		if (meshdeform != NULL)
 		{
 			int meshexprlen = meshdeform->countrows()*meshdeform->countcolumns();
 			std::vector<double> interpolmesh;
-			std::vector<double> outputcopy = output;
 			meshdeform->interpolate(physreg, NULL, xyzcoord, interpolmesh, isfound);
 			int index = 0;
 			for (int i = 0; i < isfound.size(); i++)
