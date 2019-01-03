@@ -52,6 +52,9 @@ namespace myalgorithm
     // is farther away than 'boxsize' from the origin then the function stops and returns false (true otherwise).
     // The initial guess is supposed to be inside the box.
     bool getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 3, double tol = 1e-12, int maxit = 50);
+    
+    // Split the 'tosplit' vector into 'blocklen' vectors of length tosplit.size()/blocklen.
+    std::vector<std::vector<double>> splitvector(std::vector<double>& tosplit, int blocklen);
 };
 
 #endif

@@ -302,3 +302,19 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
     return true;
 }
 
+std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& tosplit, int blocklen)
+{
+	int numdata = tosplit.size()/blocklen;
+
+	std::vector<std::vector<double>> output(blocklen, std::vector<double>(numdata,0));
+	
+	for (int i = 0; i < numdata; i++)
+	{
+		for (int j = 0; j < blocklen; j++)
+			output[j][i] = tosplit[i*blocklen+j];
+	}
+	
+	return output;
+}
+
+
