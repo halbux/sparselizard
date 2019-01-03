@@ -922,7 +922,35 @@ std::vector<double> expression::shapecut(int physreg, expression* meshdeform, sh
 	
 	// Write to disk if a filename is provided. The filename validity is checked in 'scatterwrite'.
 	if (filename.size() > 0)
-		mathop::scatterwrite(filename, output, exprlen);
+	{
+		if (mynumrows > 3 || mynumcols != 1)
+		{
+		    std::cout << "Error in 'expression' object: writing a shape cut to file is only allowed for up to length 3 column vector expressions" << std::endl;
+		    abort();
+		}
+		
+		// Save on the deformed mesh if requested:
+		if (meshdeform != NULL)
+		{
+			int meshexprlen = meshdeform->countrows()*meshdeform->countcolumns();
+			std::vector<double> interpolmesh;
+			meshdeform->interpolate(physreg, NULL, xyzcoord, interpolmesh, isfound);
+			for (int i = 0; i < isfound.size(); i++)
+			{
+				if (isfound[i])
+				{
+					for (int j = 0; j < meshexprlen; j++)
+						xyzcoord[3*i+j] += interpolmesh[i*meshexprlen+j];
+				}
+			}
+		}
+		
+		std::vector<std::vector<double>> xyzsplit = myalgorithm::splitvector(xyzcoord, 3);
+		std::vector<std::vector<double>> interpolsplit = myalgorithm::splitvector(interpolated, exprlen);
+		interpolsplit.resize(3);
+
+		mathop::scatterwrite(filename, xyzsplit[0], xyzsplit[1], xyzsplit[2], interpolsplit[0], interpolsplit[1], interpolsplit[2]);
+	}
 	
 	return output;
 }

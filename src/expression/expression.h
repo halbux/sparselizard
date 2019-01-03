@@ -31,6 +31,7 @@
 #include "mystring.h"
 #include "wallclock.h"
 #include "shape.h"
+#include "myalgorithm.h"
 
 
 class vec;

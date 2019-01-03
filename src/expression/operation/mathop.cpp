@@ -123,36 +123,6 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
     // Close view:
     gmshinterface::closeview(filename + ".pos");
 }
-
-void mathop::scatterwrite(std::string filename, std::vector<double> data, int numcomps)
-{
-	if (numcomps <= 0 || numcomps > 3)
-	{
-        std::cout << "Error in 'mathop' namespace: cannot write to disk data with " << numcomps << " components" << std::endl;
-        abort();
-	}
-
-	int blocklen = 3+numcomps;
-	int numdata = data.size()/blocklen;
-
-	std::vector<double> xcoords(numdata), ycoords(numdata), zcoords(numdata);
-	std::vector<std::vector<double>> evalscomps(3,std::vector<double>(0));
-	
-	for (int j = 0; j < numcomps; j++)
-		evalscomps[j].resize(numdata);
-	
-	for (int i = 0; i < numdata; i++)
-	{
-		xcoords[i] = data[i*blocklen+0];
-		ycoords[i] = data[i*blocklen+1];
-		zcoords[i] = data[i*blocklen+2];
-		
-		for (int j = 0; j < numcomps; j++)
-			evalscomps[j][i] = data[i*blocklen+3+j];
-	}
-	
-	scatterwrite(filename, xcoords, ycoords, zcoords, evalscomps[0], evalscomps[1], evalscomps[2]);
-}
     
     
 void mathop::setaxisymmetry(void) { universe::isaxisymmetric = true; }
