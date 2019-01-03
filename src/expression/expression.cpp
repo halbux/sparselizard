@@ -934,6 +934,7 @@ std::vector<double> expression::shapecut(int physreg, expression* meshdeform, sh
 		{
 			int meshexprlen = meshdeform->countrows()*meshdeform->countcolumns();
 			std::vector<double> interpolmesh;
+			std::vector<double> outputcopy = output;
 			meshdeform->interpolate(physreg, NULL, xyzcoord, interpolmesh, isfound);
 			int index = 0;
 			for (int i = 0; i < isfound.size(); i++)
@@ -941,13 +942,13 @@ std::vector<double> expression::shapecut(int physreg, expression* meshdeform, sh
 				if (isfound[i])
 				{
 					for (int j = 0; j < meshexprlen; j++)
-						output[index*blocklen+j] += interpolmesh[i*meshexprlen+j];
+						outputcopy[index*blocklen+j] += interpolmesh[i*meshexprlen+j];
 					index++;
 				}
 			}
 		}
 		
-		std::vector<std::vector<double>> outputsplit = myalgorithm::splitvector(output, blocklen);
+		std::vector<std::vector<double>> outputsplit = myalgorithm::splitvector(outputcopy, blocklen);
 		outputsplit.resize(3+3);
 
 		mathop::scatterwrite(filename, outputsplit[0], outputsplit[1], outputsplit[2], outputsplit[3], outputsplit[4], outputsplit[5]);
