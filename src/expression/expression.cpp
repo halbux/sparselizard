@@ -970,7 +970,7 @@ void expression::streamline(int physreg, expression* meshdeform, std::string fil
 	{
 		// Calculate the mesh deformation expression:
 		if (meshdeform != NULL)
-			interpolate(physreg, NULL, curcoords, meshdeforminterpol, isfound);
+			meshdeform->interpolate(physreg, NULL, curcoords, meshdeforminterpol, isfound);
 			
 		// Calculate the Runge-Kutta parameter k1:
 		interpolate(physreg, meshdeform, curcoords, k1, isfound);
