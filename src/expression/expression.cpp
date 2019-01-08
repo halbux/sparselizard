@@ -872,6 +872,194 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     }
 }
 
+void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
+{
+	streamline(physreg, NULL, filename, startcoords, stepsize, downstreamonly);
+}
+
+void expression::streamline(int physreg, expression meshdeform, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
+{
+	streamline(physreg, &meshdeform, filename, startcoords, stepsize, downstreamonly);
+}
+
+void expression::streamline(int physreg, expression* meshdeform, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
+{
+    // Make sure the filename includes the extension:
+    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
+    {
+        std::cout << "Error in 'expression' object: cannot write stream lines to file '" << filename << "' (unknown or missing file extension)" << std::endl;
+        abort();
+    }
+    // Remove the extension:
+    std::string filenamenoextension = filename.substr(0, filename.size()-4);
+
+	// Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
+	int problemdimension = universe::mymesh->getmeshdimension();
+    if (mynumrows < problemdimension || mynumrows > 3 || mynumcols != 1)
+    {
+        std::cout << "Error in 'expression' object: expected a column vector expression with " << problemdimension << " to 3 components to get the stream lines" << std::endl;
+        abort();
+    }
+    // For simplicity the code below is written only for 3x1 expressions:
+    if (mynumrows == 1)
+    {
+    	expression(3,1,{*this,0,0}).streamline(physreg, meshdeform, filename, startcoords, stepsize, downstreamonly);
+    	return;
+    }
+    if (mynumrows == 2)
+    {
+    	expression(3,1,{this->at(0,0),this->at(1,0),0}).streamline(physreg, meshdeform, filename, startcoords, stepsize, downstreamonly);
+    	return;
+    }
+    
+    int meshexprlen = 0;
+    if (meshdeform != NULL)
+    	meshexprlen = meshdeform->mynumrows*meshdeform->mynumcols;
+    
+    if (startcoords.size()%3 != 0)
+    {
+        std::cout << "Error in 'expression' object: expected a vector with a length multiple of 3 for the stream line starting coordinates" << std::endl;
+        abort();
+    }
+	
+	int numnodes = startcoords.size()/3;
+	
+	// If upstream AND downstream calculation there are double the amount of starting coords:
+	int factortwo = 2;
+	if (downstreamonly)
+		factortwo = 1;
+		
+	std::vector<std::vector<double>> xcoords(factortwo*numnodes), ycoords(factortwo*numnodes), zcoords(factortwo*numnodes), magnitude(factortwo*numnodes);
+
+	// Current coordinates:
+	std::vector<double> curcoords(factortwo* 3*numnodes);
+	// Know which stream line is still active:
+	std::vector<bool> isactive(factortwo*numnodes, true);
+	
+	// Stepsize vector for every starting point:
+	std::vector<double> h(factortwo*numnodes);
+	
+	
+	for (int i = 0; i < numnodes; i++)
+	{
+		curcoords[factortwo*3*i+0] = startcoords[3*i+0];
+		curcoords[factortwo*3*i+1] = startcoords[3*i+1];
+		curcoords[factortwo*3*i+2] = startcoords[3*i+2];
+		
+		h[factortwo*i+0] = stepsize;
+		
+		if (downstreamonly == false)
+		{
+			curcoords[factortwo*3*i+3] = startcoords[3*i+0];
+			curcoords[factortwo*3*i+4] = startcoords[3*i+1];
+			curcoords[factortwo*3*i+5] = startcoords[3*i+2];
+		
+			h[factortwo*i+1] = -stepsize;
+		}
+	}
+	std::vector<double> originalh = h;
+	
+
+	std::vector<double> k1, k2, k3, k4, meshdeforminterpol;
+	std::vector<bool> isfound;
+	
+	double maxflowspeed = (mathop::norm(*this)).max(physreg, 1)[0];
+
+	bool isdone = false;
+	while (isdone == false)
+	{
+		// Calculate the mesh deformation expression:
+		if (meshdeform != NULL)
+			interpolate(physreg, NULL, curcoords, meshdeforminterpol, isfound);
+			
+		// Calculate the Runge-Kutta parameter k1:
+		interpolate(physreg, meshdeform, curcoords, k1, isfound);
+		
+		// Normalize the stepsize according to the flow velocity:
+		double curflowspeed;
+		for (int i = 0; i < h.size(); i++)
+		{
+			curflowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
+			
+			if (curflowspeed > 0)
+				h[i] = originalh[i] * maxflowspeed/curflowspeed;
+		}
+		
+		// Calculate the Runge-Kutta parameters k2, k3 and k4:
+		std::vector<double> ynplushk1over2 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1[i];
+		interpolate(physreg, meshdeform, ynplushk1over2, k2, isfound);
+		std::vector<double> ynplushk2over2 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2[i];
+		interpolate(physreg, meshdeform, ynplushk2over2, k3, isfound);
+		std::vector<double> ynplushk3 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk3[i] += h[(i-i%3)/3]*k3[i];
+		interpolate(physreg, meshdeform, ynplushk3, k4, isfound);
+		
+		// Append data to write to disk:
+		for (int i = 0; i < isactive.size(); i++)
+		{
+			if (isactive[i])
+			{
+				std::vector<double> meshdefinterpol(3,0);
+				if (meshdeform != NULL)
+				{
+					for (int j = 0; j < meshexprlen; j++)
+						meshdefinterpol[j] = meshdeforminterpol[meshexprlen*i+j];
+				}
+			
+				xcoords[i].push_back(curcoords[3*i+0] + meshdefinterpol[0]);
+				ycoords[i].push_back(curcoords[3*i+1] + meshdefinterpol[1]);
+				zcoords[i].push_back(curcoords[3*i+2] + meshdefinterpol[2]);
+		
+				double flowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
+				
+				magnitude[i].push_back(flowspeed);
+			}
+		}
+		
+		// Update the coordinates:
+		for (int i = 0; i < curcoords.size(); i++)
+			curcoords[i] += h[(i-i%3)/3]/6.0*( k1[i]+2.0*k2[i]+2.0*k3[i]+k4[i] );
+		
+		
+		isdone = true;
+		for (int i = 0; i < isfound.size(); i++)
+		{
+			if (isfound[i] == false)
+				isactive[i] = false;
+			if (isactive[i])
+				isdone = false;
+		}
+	}
+	
+	
+	// Write to file:
+	gmshinterface::openview(filename, filenamenoextension, 0, true);
+	for (int m = 0; m < xcoords.size(); m++)
+	{
+		int numlines = xcoords[m].size();
+		densematrix xcoordsmat(numlines,2, 0), ycoordsmat(numlines,2, 0), zcoordsmat(numlines,2, 0), flowspeedmat(numlines,2, 0);
+		double* xptr = xcoordsmat.getvalues(); double* yptr = ycoordsmat.getvalues(); double* zptr = zcoordsmat.getvalues();
+		double* fsptr = flowspeedmat.getvalues();
+	
+		for (int i = 0; i < numlines-1; i++)
+		{
+			xptr[2*i+0] = xcoords[m][i%numlines]; xptr[2*i+1] = xcoords[m][(i+1)%numlines];
+			yptr[2*i+0] = ycoords[m][i%numlines]; yptr[2*i+1] = ycoords[m][(i+1)%numlines];
+			zptr[2*i+0] = zcoords[m][i%numlines]; zptr[2*i+1] = zcoords[m][(i+1)%numlines];
+		
+			fsptr[2*i+0] = magnitude[m][i%numlines]; fsptr[2*i+1] = magnitude[m][(i+1)%numlines];
+		}
+	
+		gmshinterface::appendtoview(filename, 1, xcoordsmat, ycoordsmat, zcoordsmat, flowspeedmat);
+	}
+	gmshinterface::closeview(filename);
+}
+
 std::vector<double> expression::shapecut(int physreg, shape myshape, std::string filename)
 {
 	return shapecut(physreg, NULL, myshape, filename);
