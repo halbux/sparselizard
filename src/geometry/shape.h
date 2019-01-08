@@ -77,6 +77,9 @@ class shape
 
 		// Return the dimension of the shape (0D, 1D, 2D or 3D):
 		int getdimension(void);
+		
+		// Return the coordinates of the shape mesh nodes:
+		std::vector<double> getcoords(void);
 
 		std::string getname(void);
 

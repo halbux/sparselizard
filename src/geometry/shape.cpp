@@ -214,6 +214,12 @@ int shape::getdimension(void)
 	return rawshapeptr->getdimension(); 
 }
 
+std::vector<double> shape::getcoords(void)
+{
+	errornullpointer();
+	return *(rawshapeptr->getcoords()); 
+}
+
 std::string shape::getname(void)
 {
 	errornullpointer();
