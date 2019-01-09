@@ -959,8 +959,6 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 	std::vector<double> k1, k2, k3, k4;
 	std::vector<bool> isfound;
 	
-	double maxflowspeed = (mathop::norm(*this)).max(physreg, 1)[0];
-
 	bool isdone = false;
 	while (isdone == false)
 	{
@@ -974,7 +972,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 			curflowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
 			
 			if (curflowspeed > 0)
-				h[i] = originalh[i] * maxflowspeed/curflowspeed;
+				h[i] = originalh[i] / curflowspeed;
 		}
 		
 		// Calculate the Runge-Kutta parameters k2, k3 and k4:
