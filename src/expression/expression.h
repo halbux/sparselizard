@@ -63,7 +63,6 @@ class expression
         void interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
-        void streamline(int physreg, expression* meshdeform, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly);
         std::vector<double> shapecut(int physreg, expression* meshdeform, shape myshape, std::string filename);     
         
 	public:
@@ -123,7 +122,6 @@ class expression
         // The stream lines are grown (upstream and downstream) starting from 'startcoords'.
         // 'stepsize' is related to the distance between stream direction updates (decrease for more accuracy).
         void streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly = false);
-        void streamline(int physreg, expression meshdeform, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly = false);
         
         // Interpolate the expression on the mesh nodes of a shape. 
         // The output provides the coordinates of the interpolation nodes and 

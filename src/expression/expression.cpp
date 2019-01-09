@@ -874,16 +874,6 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
-	streamline(physreg, NULL, filename, startcoords, stepsize, downstreamonly);
-}
-
-void expression::streamline(int physreg, expression meshdeform, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
-{
-	streamline(physreg, &meshdeform, filename, startcoords, stepsize, downstreamonly);
-}
-
-void expression::streamline(int physreg, expression* meshdeform, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
-{
     // Make sure the filename includes the extension:
     if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
     {
@@ -903,18 +893,14 @@ void expression::streamline(int physreg, expression* meshdeform, std::string fil
     // For simplicity the code below is written only for 3x1 expressions:
     if (mynumrows == 1)
     {
-    	expression(3,1,{*this,0,0}).streamline(physreg, meshdeform, filename, startcoords, stepsize, downstreamonly);
+    	expression(3,1,{*this,0,0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
     	return;
     }
     if (mynumrows == 2)
     {
-    	expression(3,1,{this->at(0,0),this->at(1,0),0}).streamline(physreg, meshdeform, filename, startcoords, stepsize, downstreamonly);
+    	expression(3,1,{this->at(0,0),this->at(1,0),0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
     	return;
     }
-    
-    int meshexprlen = 0;
-    if (meshdeform != NULL)
-    	meshexprlen = meshdeform->mynumrows*meshdeform->mynumcols;
     
     if (startcoords.size()%3 != 0)
     {
@@ -960,7 +946,7 @@ void expression::streamline(int physreg, expression* meshdeform, std::string fil
 	std::vector<double> originalh = h;
 	
 
-	std::vector<double> k1, k2, k3, k4, meshdeforminterpol;
+	std::vector<double> k1, k2, k3, k4;
 	std::vector<bool> isfound;
 	
 	double maxflowspeed = (mathop::norm(*this)).max(physreg, 1)[0];
@@ -968,12 +954,8 @@ void expression::streamline(int physreg, expression* meshdeform, std::string fil
 	bool isdone = false;
 	while (isdone == false)
 	{
-		// Calculate the mesh deformation expression:
-		if (meshdeform != NULL)
-			meshdeform->interpolate(physreg, NULL, curcoords, meshdeforminterpol, isfound);
-			
 		// Calculate the Runge-Kutta parameter k1:
-		interpolate(physreg, meshdeform, curcoords, k1, isfound);
+		interpolate(physreg, NULL, curcoords, k1, isfound);
 		
 		// Normalize the stepsize according to the flow velocity:
 		double curflowspeed;
@@ -989,31 +971,24 @@ void expression::streamline(int physreg, expression* meshdeform, std::string fil
 		std::vector<double> ynplushk1over2 = curcoords;
 		for (int i = 0; i < curcoords.size(); i++)
 			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1[i];
-		interpolate(physreg, meshdeform, ynplushk1over2, k2, isfound);
+		interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
 		std::vector<double> ynplushk2over2 = curcoords;
 		for (int i = 0; i < curcoords.size(); i++)
 			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2[i];
-		interpolate(physreg, meshdeform, ynplushk2over2, k3, isfound);
+		interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
 		std::vector<double> ynplushk3 = curcoords;
 		for (int i = 0; i < curcoords.size(); i++)
 			ynplushk3[i] += h[(i-i%3)/3]*k3[i];
-		interpolate(physreg, meshdeform, ynplushk3, k4, isfound);
+		interpolate(physreg, NULL, ynplushk3, k4, isfound);
 		
 		// Append data to write to disk:
 		for (int i = 0; i < isactive.size(); i++)
 		{
 			if (isactive[i])
 			{
-				std::vector<double> meshdefinterpol(3,0);
-				if (meshdeform != NULL)
-				{
-					for (int j = 0; j < meshexprlen; j++)
-						meshdefinterpol[j] = meshdeforminterpol[meshexprlen*i+j];
-				}
-			
-				xcoords[i].push_back(curcoords[3*i+0] + meshdefinterpol[0]);
-				ycoords[i].push_back(curcoords[3*i+1] + meshdefinterpol[1]);
-				zcoords[i].push_back(curcoords[3*i+2] + meshdefinterpol[2]);
+				xcoords[i].push_back(curcoords[3*i+0]);
+				ycoords[i].push_back(curcoords[3*i+1]);
+				zcoords[i].push_back(curcoords[3*i+2]);
 		
 				double flowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
 				
