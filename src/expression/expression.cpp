@@ -874,6 +874,9 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
+	if (startcoords.size() == 0)
+		return;
+		
     // Make sure the filename includes the extension:
     if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
     {
