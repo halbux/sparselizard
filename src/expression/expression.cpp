@@ -877,6 +877,13 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 	if (startcoords.size() == 0)
 		return;
 		
+	// This can happen with int divisions:
+	if (stepsize == 0)
+	{
+        std::cout << "Error in 'expression' object: step size for streamline cannot be zero" << std::endl;
+        abort();
+	}
+		
     // Make sure the filename includes the extension:
     if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
     {
