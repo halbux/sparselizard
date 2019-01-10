@@ -975,19 +975,15 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 				h[i] = originalh[i] / curflowspeed;
 		}
 		
-		// Calculate the Runge-Kutta parameters k2, k3 and k4:
-		std::vector<double> ynplushk1over2 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1[i];
-		interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
-		std::vector<double> ynplushk2over2 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2[i];
-		interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
-		std::vector<double> ynplushk3 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk3[i] += h[(i-i%3)/3]*k3[i];
-		interpolate(physreg, NULL, ynplushk3, k4, isfound);
+		
+		isdone = true;
+		for (int i = 0; i < isfound.size(); i++)
+		{
+			if (isfound[i] == false)
+				isactive[i] = false;
+			if (isactive[i])
+				isdone = false;
+		}
 		
 		// Append data to write to disk:
 		for (int i = 0; i < isactive.size(); i++)
@@ -1004,19 +1000,24 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 			}
 		}
 		
+		
+		// Calculate the Runge-Kutta parameters k2, k3 and k4:
+		std::vector<double> ynplushk1over2 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1[i];
+		interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
+		std::vector<double> ynplushk2over2 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2[i];
+		interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
+		std::vector<double> ynplushk3 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk3[i] += h[(i-i%3)/3]*k3[i];
+		interpolate(physreg, NULL, ynplushk3, k4, isfound);
+		
 		// Update the coordinates:
 		for (int i = 0; i < curcoords.size(); i++)
 			curcoords[i] += h[(i-i%3)/3]/6.0*( k1[i]+2.0*k2[i]+2.0*k3[i]+k4[i] );
-		
-		
-		isdone = true;
-		for (int i = 0; i < isfound.size(); i++)
-		{
-			if (isfound[i] == false)
-				isactive[i] = false;
-			if (isactive[i])
-				isdone = false;
-		}
 	}
 	
 	
