@@ -1026,7 +1026,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 	for (int m = 0; m < xcoords.size(); m++)
 	{
 		int numlines = xcoords[m].size();
-		densematrix xcoordsmat(numlines,2, 0), ycoordsmat(numlines,2, 0), zcoordsmat(numlines,2, 0), flowspeedmat(numlines,2, 0);
+		densematrix xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
 		double* xptr = xcoordsmat.getvalues(); double* yptr = ycoordsmat.getvalues(); double* zptr = zcoordsmat.getvalues();
 		double* fsptr = flowspeedmat.getvalues();
 	
