@@ -72,6 +72,10 @@ void sparselizard(void)
     double flowrate = (normal(inlet)*v).integrate(inlet, 4);
     std::cout << std::endl << "Flowrate for a unit width: " << flowrate << " m^3/s" << std::endl;
     
+    // Output the stream lines starting on the mesh nodes of the shape below:
+    shape lin("line", -1, {-45e-6,0,0, -30e-6,0,0}, 10);
+    expression(v).streamline(fluid, "streamlines.pos", lin.getcoords(), 2e-6);
+    
     // Code validation line. Can be removed.
     std::cout << (flowrate < 1.4845e-7 && flowrate > 1.4844e-7);
 }
