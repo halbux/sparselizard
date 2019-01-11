@@ -384,7 +384,7 @@ vec mathop::solve(mat A, vec b)
 
         KSPGetPC(*ksp,&pc);
         PCSetType(pc,PCLU);
-        PCFactorSetMatSolverPackage(pc,MATSOLVERMUMPS);
+        PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
     }
     
     KSPSolve(*ksp, bpetsc, solpetsc);
