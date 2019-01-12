@@ -953,27 +953,31 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 			h[factortwo*i+1] = -stepsize;
 		}
 	}
-	std::vector<double> originalh = h;
-	
 
-	std::vector<double> k1, k2, k3, k4;
+	std::vector<double> k1, k2, k3, k4, k1scaled, k2scaled, k3scaled, k4scaled;
 	std::vector<bool> isfound;
 	
 	bool isdone = false;
 	while (isdone == false)
 	{
-		// Calculate the Runge-Kutta parameter k1:
+		// Calculate the Runge-Kutta parameters k1, k2, k3 and k4:
 		interpolate(physreg, NULL, curcoords, k1, isfound);
-		
-		// Normalize the stepsize according to the flow velocity:
-		double curflowspeed;
-		for (int i = 0; i < h.size(); i++)
-		{
-			curflowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
-			
-			if (curflowspeed > 0)
-				h[i] = originalh[i] / curflowspeed;
-		}
+		k1scaled = myalgorithm::normblocks(k1,3);
+		std::vector<double> ynplushk1over2 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1scaled[i];
+		interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
+		k2scaled = myalgorithm::normblocks(k2,3);
+		std::vector<double> ynplushk2over2 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2scaled[i];
+		interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
+		k3scaled = myalgorithm::normblocks(k3,3);
+		std::vector<double> ynplushk3 = curcoords;
+		for (int i = 0; i < curcoords.size(); i++)
+			ynplushk3[i] += h[(i-i%3)/3]*k3scaled[i];
+		interpolate(physreg, NULL, ynplushk3, k4, isfound);
+		k4scaled = myalgorithm::normblocks(k4,3);
 		
 		
 		isdone = true;
@@ -1000,24 +1004,9 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 			}
 		}
 		
-		
-		// Calculate the Runge-Kutta parameters k2, k3 and k4:
-		std::vector<double> ynplushk1over2 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1[i];
-		interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
-		std::vector<double> ynplushk2over2 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2[i];
-		interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
-		std::vector<double> ynplushk3 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk3[i] += h[(i-i%3)/3]*k3[i];
-		interpolate(physreg, NULL, ynplushk3, k4, isfound);
-		
 		// Update the coordinates:
 		for (int i = 0; i < curcoords.size(); i++)
-			curcoords[i] += h[(i-i%3)/3]/6.0*( k1[i]+2.0*k2[i]+2.0*k3[i]+k4[i] );
+			curcoords[i] += h[(i-i%3)/3]/6.0*( k1scaled[i]+2.0*k2scaled[i]+2.0*k3scaled[i]+k4scaled[i] );
 	}
 	
 	
