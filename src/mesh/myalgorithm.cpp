@@ -317,4 +317,24 @@ std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& t
 	return output;
 }
 
+std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blocklen)
+{
+	int numblocks = tonorm.size()/blocklen;
+
+	std::vector<double> output = tonorm;
+	
+	for (int i = 0; i < numblocks; i++)
+	{
+		double curnorm = 0;
+		for (int j = 0; j < blocklen; j++)
+			curnorm += tonorm[blocklen*i+j]*tonorm[blocklen*i+j];
+		curnorm = std::sqrt(curnorm);
+	
+		for (int j = 0; j < blocklen; j++)
+			output[blocklen*i+j] = tonorm[blocklen*i+j]/curnorm;
+	}
+	
+	return output;
+}
+
 

@@ -55,6 +55,9 @@ namespace myalgorithm
     
     // Split the 'tosplit' vector into 'blocklen' vectors of length tosplit.size()/blocklen.
     std::vector<std::vector<double>> splitvector(std::vector<double>& tosplit, int blocklen);
+    
+    // Norm each block in the vector:
+    std::vector<double> normblocks(std::vector<double>& tonorm, int blocklen);
 };
 
 #endif
