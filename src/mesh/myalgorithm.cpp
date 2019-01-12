@@ -329,9 +329,12 @@ std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blo
 		for (int j = 0; j < blocklen; j++)
 			curnorm += tonorm[blocklen*i+j]*tonorm[blocklen*i+j];
 		curnorm = std::sqrt(curnorm);
-	
-		for (int j = 0; j < blocklen; j++)
-			output[blocklen*i+j] = tonorm[blocklen*i+j]/curnorm;
+		
+		if (curnorm > 0)
+		{
+			for (int j = 0; j < blocklen; j++)
+				output[blocklen*i+j] = tonorm[blocklen*i+j]/curnorm;
+		}
 	}
 	
 	return output;
