@@ -684,19 +684,23 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
     }
 }
 
-expression mathop::predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon)
+expression mathop::predefinedelectrostaticforce(expression gradtfu, expression E, expression epsilon)
 {
-    expression E = gradv;
     E.reuseit();
     
     if (gradtfu.countcolumns() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: 'predefinedelectrostaticforce' is undefined for 1D displacements" << std::endl;
+        std::cout << "Error in 'mathop' namespace: force formula is undefined for 1D displacements" << std::endl;
         abort();
     }
     if (gradtfu.countcolumns() == 2)
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu)) );
     if (gradtfu.countcolumns() == 3)
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) - pow(compz(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu) + 2 * compx(E) * compz(E) * entry(2,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) - pow(compz(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu) + 2 * compy(E) * compz(E) * entry(2,1,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(2,2,gradtfu) - pow(compy(E),2) * entry(2,2,gradtfu) + pow(compz(E),2) * entry(2,2,gradtfu) + 2 * compz(E) * compx(E) * entry(0,2,gradtfu) + 2 * compz(E) * compy(E) * entry(1,2,gradtfu)) );
+}
+
+expression mathop::predefinedmagnetostaticforce(expression gradtfu, expression H, expression mu)
+{
+	return predefinedelectrostaticforce(gradtfu, H, mu);
 }
 

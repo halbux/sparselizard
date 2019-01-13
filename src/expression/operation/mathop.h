@@ -143,7 +143,8 @@ namespace mathop
     // General anisotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
     expression predefinedelasticity(expression dofu, expression tfu, field u, expression hookesmatrix, expression prestress, std::string myoption = "");
 
-    expression predefinedelectrostaticforce(expression gradtfu, expression gradv, expression epsilon);
+    expression predefinedelectrostaticforce(expression gradtfu, expression E, expression epsilon);
+    expression predefinedmagnetostaticforce(expression gradtfu, expression H, expression mu);
 
 };
 
