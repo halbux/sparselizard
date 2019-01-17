@@ -95,11 +95,34 @@ void sparselizard(void)
 		
 	// Evaluate the magnetic field 1cm above the center of the magnet array:
 	std::vector<double> magfieldnorm = norm(-grad(phi)).interpolate(wholedomain, {0,0.02,0});
-	std::cout << "Magnetic field 1cm above the array center: " << magfieldnorm[0] << " A/m" << std::endl << std::endl;
+	std::cout << "Magnetic field 1cm above the array center: " << magfieldnorm[0] << " A/m" << std::endl;
 
 	// Write 20 magnetic field lines starting on the top side of the magnet array:
 	shape ln("line", -1, {-0.025,0.01,0, 0.025,0.01,0}, 20);
 	(-grad(phi)).streamline(regionexclusion(wholedomain, magnets), "magneticfieldline.pos", ln.getcoords(), 0.01/5);
+
+
+
+	// The MAGNETOSTATIC FORCE acting on the steel disk is computed below.
+	
+	// This field will hold the x and y component of the magnetic forces:
+	field magforce("h1xy");
+
+	// The magnetic force is projected on field 'magforce' on the steel region.
+	// This is done with a formulation of the type dof*tf - force calculation = 0.
+	formulation forceprojection;
+
+	forceprojection += integral(steel, dof(magforce)*tf(magforce));
+	// The force term integral must be performed on all elements in the steel region AND in the ELEMENT LAYER AROUND.
+	// This is obtained by considering the elements on the whole domain 'wholedomain'. Since the force must only be
+	// calculated on the steel disk, the test functions are only selected on in the steel (this is done with tf(..., steel)). 
+	forceprojection += integral(wholedomain, - predefinedmagnetostaticforce(grad(tf(magforce, steel)), -grad(phi), mu));
+
+	forceprojection.generate();
+	vec solf = solve(forceprojection.A(), forceprojection.b());
+	magforce.setdata(wholedomain, solf);
+
+	std::cout << "Force acting on the steel disk (fx, fy) = (" << compx(magforce).integrate(steel, 5) << ", " << compy(magforce).integrate(steel, 5) << ") N per unit depth" << std::endl;
 
 	// Code validation line. Can be removed.
 	std::cout << (magfieldnorm[0] < 64963.8 && magfieldnorm[0] > 64963.6);
