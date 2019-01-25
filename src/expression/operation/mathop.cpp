@@ -37,6 +37,31 @@ void mathop::printvector(std::vector<int> input)
     std::cout << std::endl;
 }
 
+void mathop::writevector(std::string filename, std::vector<double>& towrite)
+{
+	if (towrite.size() == 0)
+		return;
+
+	// 'file' cannot take a std::string argument --> filename.c_str():
+	std::ofstream name (filename.c_str());
+	if (name.is_open())
+	{
+		// To write all doubles with enough digits to the file:
+		name << std::setprecision(17);
+		
+		for (int i = 0; i < towrite.size()-1; i++)
+			name << towrite[i] << ",";
+		name << towrite[towrite.size()-1];
+		
+		name.close();
+	}
+	else 
+	{
+		std::cout << "Unable to write to file " << filename << " or file not found" << std::endl;
+		abort();
+	}
+}
+
 expression mathop::norm(expression expr)
 {
     if (expr.countcolumns() > 1)

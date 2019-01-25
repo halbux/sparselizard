@@ -33,6 +33,8 @@ namespace mathop
     
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);
+    
+    void writevector(std::string filename, std::vector<double>& towrite);
 
     // Compute the L2 norm of a vector expression:
     expression norm(expression expr);
