@@ -91,6 +91,10 @@ namespace mathop
     expression grad(expression input);
     expression div(expression input);
     expression curl(expression input);
+
+	// Crossproduct between vector a and vector b.
+	// Any argument that does not have 3 components will be filled with zeros.
+	expression crossproduct(expression a, expression b);
     
     // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);

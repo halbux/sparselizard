@@ -156,6 +156,9 @@ class expression
 		// Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
 		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
+		// Output the resized expression (filled with zero if larger):
+		expression resize(int numrows, int numcols);
+
            
         
         // THE FUNCTIONS BELOW ARE NOT MEANT TO BE CALLED BY THE USER!

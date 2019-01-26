@@ -301,6 +301,25 @@ expression mathop::curl(expression input)
     }
 }
 
+expression mathop::crossproduct(expression a, expression b)
+{
+    if (a.countcolumns() != 1 || b.countcolumns() != 1 || a.countrows() > 3 || b.countrows() > 3)
+    {
+        std::cout << "Error in 'mathop' namespace: can only take the cross product of up to length 3 column vectors" << std::endl;
+        abort();
+    }
+
+	a = a.resize(3,1);
+	b = b.resize(3,1);
+
+	expression a1 = compx(a), a2 = compy(a), a3 = compz(a);
+	expression b1 = compx(b), b2 = compy(b), b3 = compz(b);
+
+	expression crossprodexpr = expression(3,1, { a2*b3-a3*b2,a3*b1-a1*b3,a1*b2-a2*b1 });
+
+	return crossprodexpr;
+}
+
 expression mathop::detjac(void) 
 { 
 	expression expr;

@@ -1264,6 +1264,24 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
 	}
 }
 
+expression expression::resize(int numrows, int numcols)
+{
+	std::vector<expression> args(numrows*numcols);
+	for (int i = 0; i < numrows; i++)
+	{
+		for (int j = 0; j < numcols; j++)
+		{
+			if (i < mynumrows && j < mynumcols)
+				args[i*numcols+j] = at(i,j);
+			else
+				args[i*numcols+j] = expression(0);
+		}
+	}
+
+	expression output(numrows,numcols,args);
+	return output;
+}
+
 
 expression expression::spacederivative(int whichderivative)
 {
