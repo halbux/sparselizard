@@ -92,7 +92,7 @@ namespace mathop
     expression div(expression input);
     expression curl(expression input);
     
-    // Crossproduct between vector a and vector b.
+    // Cross product between vector a and vector b.
     // Any argument that does not have 3 components will be filled with zeros.
     expression crossproduct(expression a, expression b);
     
