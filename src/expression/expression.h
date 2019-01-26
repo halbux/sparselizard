@@ -42,7 +42,7 @@ class shape;
 
 class expression
 {    
-	private:
+    private:
         
         int mynumrows = 1;
         int mynumcols = 1;
@@ -64,8 +64,8 @@ class expression
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
         std::vector<double> shapecut(int physreg, expression* meshdeform, shape myshape, std::string filename);     
-
-	public:
+        
+    public:
         
         expression(void) {};
         // Implicit conversion from field, double and parameter to expression:
