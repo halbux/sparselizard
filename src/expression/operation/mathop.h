@@ -25,7 +25,7 @@ class field;
 namespace mathop
 {
     double getpi(void);
-
+    
     // Perform operations (union, intersection, exclusion) on physical regions:
     int regionunion(const std::vector<int> physregs);
     int regionintersection(const std::vector<int> physregs);
@@ -35,13 +35,13 @@ namespace mathop
     void printvector(std::vector<int> input);
     
     void writevector(std::string filename, std::vector<double>& towrite);
-
+    
     // Compute the L2 norm of a vector expression:
     expression norm(expression expr);
     
     // Define the (unit norm) vector normal to a surface in 3D (or to a line in 2D). 
     expression normal(int surfphysreg);
-
+    
     // Write scalar or vector values at given coordinates to a .pos file:
     void scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals = {}, std::vector<double> compzevals = {});
     
@@ -68,22 +68,22 @@ namespace mathop
     
     expression sin(expression input);
     expression cos(expression input);
-	expression tan(expression input);
+    expression tan(expression input);
     expression asin(expression input);
     expression acos(expression input);
-	expression atan(expression input);
+    expression atan(expression input);
     expression abs(expression input);
     expression sqrt(expression input);
     expression log10(expression input);
     expression pow(expression base, expression exponent);
-
+    
     expression comp(int selectedcomp, expression input);
     expression compx(expression input);
     expression compy(expression input);
     expression compz(expression input);
-
+    
     expression entry(int row, int col, expression input);
-
+    
     expression transpose(expression input);
     expression inverse(expression input);
     expression determinant(expression input);
@@ -91,10 +91,10 @@ namespace mathop
     expression grad(expression input);
     expression div(expression input);
     expression curl(expression input);
-
-	// Crossproduct between vector a and vector b.
-	// Any argument that does not have 3 components will be filled with zeros.
-	expression crossproduct(expression a, expression b);
+    
+    // Crossproduct between vector a and vector b.
+    // Any argument that does not have 3 components will be filled with zeros.
+    expression crossproduct(expression a, expression b);
     
     // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);
@@ -143,15 +143,14 @@ namespace mathop
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
     // General anisotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption = "");
-
+    
     // Isotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
     expression predefinedelasticity(expression dofu, expression tfu, field u, expression Eyoung, expression nupoisson, expression prestress, std::string myoption = "");
     // General anisotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
     expression predefinedelasticity(expression dofu, expression tfu, field u, expression hookesmatrix, expression prestress, std::string myoption = "");
-
+    
     expression predefinedelectrostaticforce(expression gradtfu, expression E, expression epsilon);
     expression predefinedmagnetostaticforce(expression gradtfu, expression H, expression mu);
-
 };
 
 #endif
