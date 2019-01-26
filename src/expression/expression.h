@@ -43,7 +43,7 @@ class shape;
 class expression
 {    
 	private:
-                
+        
         int mynumrows = 1;
         int mynumcols = 1;
         
@@ -64,7 +64,7 @@ class expression
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
         std::vector<double> shapecut(int physreg, expression* meshdeform, shape myshape, std::string filename);     
-        
+
 	public:
         
         expression(void) {};
@@ -73,17 +73,17 @@ class expression
         expression(double);
         expression(parameter&);
         expression(int numrows, int numcols, std::vector<expression>);
-		// Expression whose value depends on if the first argument is greater or equal to zero.
-		// If true the expression value is the expression as second argument, if false it is the 
-		// expression provided as third argument.
-		expression(expression condexpr, expression exprtrue, expression exprfalse);
+        // Expression whose value depends on if the first argument is greater or equal to zero.
+        // If true the expression value is the expression as second argument, if false it is the 
+        // expression provided as third argument.
+        expression(expression condexpr, expression exprtrue, expression exprfalse);
         
         int countrows(void) { return mynumrows; };
         int countcolumns(void) { return mynumcols; };
-
+        
         void reorderrows(std::vector<int> neworder);
         void reordercolumns(std::vector<int> neworder);
-
+        
         // Get the max/min value. All elements will be split 'refinement' times in each direction 
         // to approximate the max/min value and position. Increase 'refinement' for more accuracy.
         // Set {xrangemin, xrangemax, yrangemin, yrangemax, zrangemin, zrangemax} to get the 
@@ -152,14 +152,14 @@ class expression
         void print(void);
         
         expression at(int row, int col);
-
-		// Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
-
-		// Output the resized expression (filled with zero if larger):
-		expression resize(int numrows, int numcols);
-
-           
+        
+        // Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        
+        // Output the resized expression (filled with zero if larger):
+        expression resize(int numrows, int numcols);
+        
+        
         
         // THE FUNCTIONS BELOW ARE NOT MEANT TO BE CALLED BY THE USER!
         
@@ -186,10 +186,10 @@ class expression
         expression tf(int physreg);
         expression sin(void);
         expression cos(void);
-		expression tan(void);
+        expression tan(void);
         expression asin(void);
         expression acos(void);
-		expression atan(void);
+        expression atan(void);
         expression abs(void);
         expression log10(void);
         
@@ -224,30 +224,30 @@ class expression
         //
         // The expression must be scalar!
         std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftfpolynomial(int elementdimension);
-
-
+        
+        
         // Defining the +, -, * and / operators:
         expression operator+(void);
         expression operator-(void);
         
-		expression operator+(expression);
+        expression operator+(expression);
         expression operator-(expression);
-		expression operator*(expression);
+        expression operator*(expression);
         expression operator/(expression);
         
-		expression operator+(field);
+        expression operator+(field);
         expression operator-(field);
-		expression operator*(field);
+        expression operator*(field);
         expression operator/(field);
         
-		expression operator+(double);
+        expression operator+(double);
         expression operator-(double);
-		expression operator*(double);
+        expression operator*(double);
         expression operator/(double);
         
-		expression operator+(parameter&);
+        expression operator+(parameter&);
         expression operator-(parameter&);
-		expression operator*(parameter&);
+        expression operator*(parameter&);
         expression operator/(parameter&);
 };
 
