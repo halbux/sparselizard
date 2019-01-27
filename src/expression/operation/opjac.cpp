@@ -31,7 +31,7 @@ densematrix opjac::multiharmonicinterpolate(int numtimeevals, elementselector& e
     
     densematrix computedjac = (myjac->getjac(myrow,mycol)).copy();
     
-    computedjac.flatten();
+    computedjac = computedjac.flatten();
     return computedjac.duplicatevertically(numtimeevals);
 }
 

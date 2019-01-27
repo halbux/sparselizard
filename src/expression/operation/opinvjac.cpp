@@ -31,7 +31,7 @@ densematrix opinvjac::multiharmonicinterpolate(int numtimeevals, elementselector
     
     densematrix computedinvjac = (myjac->getinvjac(myrow,mycol)).copy();
     
-    computedinvjac.flatten();
+    computedinvjac = computedinvjac.flatten();
     return computedinvjac.duplicatevertically(numtimeevals);
 }
 
