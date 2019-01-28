@@ -43,7 +43,6 @@ void sparselizard(void)
     
     E.setdata(wholedomain, solE);    
     // Save the electric field E with an order 2 interpolation:
-    curl(E).write(wholedomain, "curlE.pos", 2);
     E.write(wholedomain, "E.pos", 2);
     
     // Code validation line. Can be removed.
