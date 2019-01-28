@@ -41,6 +41,7 @@ void sparselizard(void)
     maxwell.generate();
     vec solE = solve(maxwell.A(), maxwell.b());
     
+    // Transfer the data from the solution vector to field E:
     E.setdata(wholedomain, solE);    
     // Save the electric field E with an order 2 interpolation:
     E.write(wholedomain, "E.pos", 2);
