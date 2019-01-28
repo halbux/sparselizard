@@ -26,7 +26,7 @@ void sparselizard(void)
     
     // Edge shape functions 'hcurl' for the electric field E.
     // Because of the propagating EM waves the electric field has an 
-    // in-phase and quadrature component (thus harmonics 2 and 3 are used)
+    // in-phase and quadrature component (thus harmonics 2 and 3 are used):
     // E = E2 * sin(2*pi*1GHz*t) + E3 * cos(2*pi*1GHz*t).
     field E("hcurl", {2,3});
     field Es = E.harmonic(2), Ec = E.harmonic(3);
