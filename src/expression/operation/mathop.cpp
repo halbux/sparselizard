@@ -499,6 +499,23 @@ expression mathop::greenlagrangestrain(expression gradu)
     abort();
 }
 
+expression mathop::vonmises(expression stress)
+{
+	if (stress.countcolumns() != 1 || (stress.countrows() != 1 && stress.countrows() != 3 && stress.countrows() != 6))
+	{
+		std::cout << "Error in 'mathop' namespace: expected the stress tensor in Voigt notation (column vector)" << std::endl;
+		abort();
+	}
+	
+	stress.resize(6,1);
+
+	expression s11 = stress.at(0,0), s22 = stress.at(1,0), s33 = stress.at(2,0), s23 = stress.at(3,0), s13 = stress.at(4,0), s12 = stress.at(5,0);
+	s11.reuseit(); s22.reuseit(); s33.reuseit();
+
+	return sqrt( 0.5*( pow(s11-s22,2)+pow(s22-s33,2)+pow(s33-s11,2) ) + 3.0*( pow(s12,2)+pow(s23,2)+pow(s13,2) ) );
+}
+
+
 ////////// PREDEFINED FORMULATIONS
 
 expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
