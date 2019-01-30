@@ -8,6 +8,7 @@
 #include "rawsurface.h"
 #include "rawextrusion.h"
 #include "rawvolume.h"
+#include "rawunion.h"
 
 
 void shape::errornullpointer(void)
@@ -127,6 +128,11 @@ shape::shape(std::string shapename, int physreg, std::vector<shape> subshapes)
 	if (shapename == "quadrangle")
 	{
 		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, subrawshapes));
+		return;
+	}
+	if (shapename == "union")
+	{
+		rawshapeptr = std::shared_ptr<rawunion>(new rawunion(physreg, subrawshapes));
 		return;
 	}
 
