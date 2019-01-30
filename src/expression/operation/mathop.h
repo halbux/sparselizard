@@ -136,7 +136,7 @@ namespace mathop
     expression strain(expression input);
     // Gives the Green-Lagrange strains of a 2D or 3D mechanical displacement vector (Voigt form):
     expression greenlagrangestrain(expression gradu);
-    // Get the von Mises stress (Voigt notation expected for the argument):
+    // Gives the von Mises stress (Voigt notation expected for the argument):
     expression vonmises(expression stress);
     
     ////////// PREDEFINED FORMULATIONS
