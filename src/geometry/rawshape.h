@@ -28,6 +28,7 @@ class rawshape : public std::enable_shared_from_this<rawshape>
 		virtual void deform(expression xdeform, expression ydeform, expression zdeform, bool recursively = true);
 
 		virtual void shift(double shiftx, double shifty, double shiftz, bool recursively = true);
+		virtual void scale(double scalex, double scaley, double scalez, bool recursively = true);
 		virtual void rotate(double alphax, double alphay, double alphaz, bool recursively = true);
 
 

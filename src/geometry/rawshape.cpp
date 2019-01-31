@@ -63,6 +63,29 @@ void rawshape::shift(double shiftx, double shifty, double shiftz, bool recursive
 	}
 }
 
+void rawshape::scale(double scalex, double scaley, double scalez, bool recursively)
+{
+	std::vector<double>* mycoords = getcoords();
+
+	int numnodes = mycoords->size()/3;
+
+	for (int i = 0; i < numnodes; i++)
+	{
+		mycoords->at(3*i+0) = scalex*mycoords->at(3*i+0);
+		mycoords->at(3*i+1) = scaley*mycoords->at(3*i+1);
+		mycoords->at(3*i+2) = scalez*mycoords->at(3*i+2);
+	}
+
+
+	// Also scale (only once) every sub shape:
+	if (recursively)
+	{
+		std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
+		for (int i = 0; i < subshapes.size(); i++)
+			subshapes[i]->scale(scalex, scaley, scalez, false);
+	}
+}
+
 void rawshape::rotate(double alphax, double alphay, double alphaz, bool recursively)
 {
 	// Get the coordinates of the shape to rotate:

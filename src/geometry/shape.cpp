@@ -190,6 +190,12 @@ void shape::shift(double shiftx, double shifty, double shiftz)
 	rawshapeptr->shift(shiftx, shifty, shiftz); 
 }
 
+void shape::scale(double scalex, double scaley, double scalez)
+{
+	errornullpointer();
+	rawshapeptr->scale(scalex, scaley, scalez); 
+}
+
 void shape::rotate(double alphax, double alphay, double alphaz)
 {
 	errornullpointer();

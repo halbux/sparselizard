@@ -67,6 +67,8 @@ class shape
 
 		// Shift the shape in the x, y and z direction.
 		void shift(double shiftx, double shifty, double shiftz);
+		// Scale the shape in the x, y and z direction.
+		void scale(double scalex, double scaley, double scalez);
 		// Rotate the mesh by alphax, alphay and alphaz degrees around the x, y and z axis respectively:
 		void rotate(double alphax, double alphay, double alphaz);
 
