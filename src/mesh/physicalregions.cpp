@@ -139,14 +139,15 @@ int physicalregions::getindex(int physicalregionnumber)
 	return -1;
 }
 
-void physicalregions::errorundefined(int physreg)
+void physicalregions::errorundefined(std::vector<int> physregs)
 {
-	if (getindex(physreg) != -1)
-		return;
-	else
+	for (int i = 0; i < physregs.size(); i++)
 	{
-		std::cout << "Error in 'physicalregions' object: physical region number " << physreg << " is not defined" << std::endl;
-		abort();
+		if (getindex(physregs[i]) == -1)
+		{
+			std::cout << "Error in 'physicalregions' object: physical region number " << physregs[i] << " is not defined" << std::endl;
+			abort();
+		}
 	}
 }
 
