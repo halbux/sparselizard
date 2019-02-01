@@ -129,3 +129,24 @@ int physicalregions::getnumber(int physicalregionindex)
     return myphysicalregionnumbers[physicalregionindex];
 }
 
+int physicalregions::getindex(int physicalregionnumber)
+{
+	for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+	{
+		if (myphysicalregionnumbers[i] == physicalregionnumber)
+			return i;
+	}
+	return -1;
+}
+
+void physicalregions::errorundefined(int physreg)
+{
+	if (getindex(physreg) != -1)
+		return;
+	else
+	{
+		std::cout << "Error in 'physicalregions' object: physical region number " << physreg << " is not defined" << std::endl;
+		abort();
+	}
+}
+

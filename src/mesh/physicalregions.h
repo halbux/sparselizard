@@ -47,7 +47,11 @@ class physicalregions
         std::vector<int> getallnumbers(void);
         // Get the physical region number of the physicalregionindex th physical region:
         int getnumber(int physicalregionindex);
-
+        // Get the index of the physical region number (-1 if undefined):
+        int getindex(int physicalregionnumber);
+        
+        // Give an error if the physical region is not defined:
+        void errorundefined(int physreg);
 };
 
 #endif
