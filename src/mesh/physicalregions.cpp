@@ -8,6 +8,8 @@ physicalregions::physicalregions(disjointregions& inputdisjointregions)
 
 int physicalregions::createunion(const std::vector<int> input)
 {
+	errorundefined(input);
+
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
     {
@@ -26,6 +28,8 @@ int physicalregions::createunion(const std::vector<int> input)
 
 int physicalregions::createintersection(const std::vector<int> input)
 {
+	errorundefined(input);
+
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
     {
@@ -47,6 +51,8 @@ int physicalregions::createintersection(const std::vector<int> input)
 
 int physicalregions::createexclusion(int input, int toexclude)
 {
+	errorundefined({input,toexclude});
+
 	// Get all input disjoint regions:
 	std::vector<int> inputdisjregs = get(input)->getdisjointregions(-1);
 
