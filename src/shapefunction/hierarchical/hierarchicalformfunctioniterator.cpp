@@ -29,7 +29,7 @@ void hierarchicalformfunctioniterator::next()
     {
         // Otherwise go to the next node/edge/face/volume, if any:
         element myelement(myelementtypenumber);
-        if (currentnodeedgefacevolumeindex < myelement.count(currentdimension) - 1)
+        if (currentnodeedgefacevolumeindex < myelement.countdim(currentdimension) - 1)
         {
             currentnodeedgefacevolumeindex++;
             currentformfunctionindexinnodeedgefacevolume = 0;

@@ -308,15 +308,18 @@ class element
         int gettypenumber(void);						
         int getcurvedtypenumber(void);									
         int countcurvednodes(void);			
-        int getelementdimension(void);					
+        int getelementdimension(void);	
+        
+        // Number of elements of type typenum/of dimension dim in the element. The curvature nodes are not counted.
+        int counttype(int typenum);
+        int countdim(int dim);
+        				
         int countnodes(void);						
         int countedges(void);	
         int countfaces(void);										
         int counttriangularfaces(void);					
         int countquadrangularfaces(void);				
         int countvolumes(void);
-        // Number of subelements of dimension dim:
-        int count(int dim);
         
         // Returns true if point with coordinates (ki, eta, phi) is inside the reference element:
         bool isinsideelement(double ki, double eta, double phi);

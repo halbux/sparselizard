@@ -215,180 +215,215 @@ int element::getelementdimension(void)
 		return 3;
 }
 
-int element::countnodes(void)
+
+int element::counttype(int typenum)
 {
-	switch (gettypenumber())
+	switch (typenum)
 	{
 		// Point:
 		case 0:
-			return 1;
+		{
+			switch (gettypenumber())
+			{
+				// Point:
+				case 0:
+					return 1;
+				// Line:
+				case 1:
+					return 2;
+				// Triangle:
+				case 2:
+					return 3;
+				// Quadrangle:
+				case 3:
+					return 4;
+				// Tetrahedron:
+				case 4:
+					return 4;
+				// Hexahedron:
+				case 5:
+					return 8;
+				// Prism:
+				case 6:
+					return 6;
+				// Pyramid:
+				case 7:
+					return 5;
+			}
+		}
 		// Line:
 		case 1:
-			return 2;
+		{
+			switch (gettypenumber())
+			{
+				// Point:
+				case 0:
+					return 0;
+				// Line:
+				case 1:
+					return 1;
+				// Triangle:
+				case 2:
+					return 3;
+				// Quadrangle:
+				case 3:
+					return 4;
+				// Tetrahedron:
+				case 4:
+					return 6;
+				// Hexahedron:
+				case 5:
+					return 12;
+				// Prism:
+				case 6:
+					return 9;
+				// Pyramid:
+				case 7:
+					return 8;
+			}
+		}
 		// Triangle:
 		case 2:
-			return 3;
+		{
+			switch (gettypenumber())
+			{
+				// Point:
+				case 0:
+					return 0;
+				// Line:
+				case 1:
+					return 0;
+				// Triangle:
+				case 2:
+					return 1;
+				// Quadrangle:
+				case 3:
+					return 0;
+				// Tetrahedron:
+				case 4:
+					return 4;
+				// Hexahedron:
+				case 5:
+					return 0;
+				// Prism:
+				case 6:
+					return 2;
+				// Pyramid:
+				case 7:
+					return 4;
+			}
+		}
 		// Quadrangle:
 		case 3:
-			return 4;
+		{
+			switch (gettypenumber())
+			{
+				// Point:
+				case 0:
+					return 0;
+				// Line:
+				case 1:
+					return 0;
+				// Triangle:
+				case 2:
+					return 0;
+				// Quadrangle:
+				case 3:
+					return 1;
+				// Tetrahedron:
+				case 4:
+					return 0;
+				// Hexahedron:
+				case 5:
+					return 6;
+				// Prism:
+				case 6:
+					return 3;
+				// Pyramid:
+				case 7:
+					return 1;
+			}
+		}
 		// Tetrahedron:
 		case 4:
-			return 4;
+		{
+			if (gettypenumber() == 4)
+				return 1;
+			else
+				return 0;
+		}
 		// Hexahedron:
 		case 5:
-			return 8;
+		{
+			if (gettypenumber() == 5)
+				return 1;
+			else
+				return 0;
+		}
 		// Prism:
 		case 6:
-			return 6;
+		{
+			if (gettypenumber() == 6)
+				return 1;
+			else
+				return 0;
+		}
 		// Pyramid:
 		case 7:
-			return 5;
+		{
+			if (gettypenumber() == 7)
+				return 1;
+			else
+				return 0;
+		}
 	}
 }
 
-int element::countedges(void)
-{
-	switch (gettypenumber())
-	{
-		// Point:
-		case 0:
-			return 0;
-		// Line:
-		case 1:
-			return 1;
-		// Triangle:
-		case 2:
-			return 3;
-		// Quadrangle:
-		case 3:
-			return 4;
-		// Tetrahedron:
-		case 4:
-			return 6;
-		// Hexahedron:
-		case 5:
-			return 12;
-		// Prism:
-		case 6:
-			return 9;
-		// Pyramid:
-		case 7:
-			return 8;
-	}
-}
-
-int element::countfaces(void)
-{
-	return counttriangularfaces() + countquadrangularfaces();
-}
-
-int element::counttriangularfaces(void)
-{
-	switch (gettypenumber())
-	{
-		// Point:
-		case 0:
-			return 0;
-		// Line:
-		case 1:
-			return 0;
-		// Triangle:
-		case 2:
-			return 1;
-		// Quadrangle:
-		case 3:
-			return 0;
-		// Tetrahedron:
-		case 4:
-			return 4;
-		// Hexahedron:
-		case 5:
-			return 0;
-		// Prism:
-		case 6:
-			return 2;
-		// Pyramid:
-		case 7:
-			return 4;
-	}
-}
-
-int element::countquadrangularfaces(void)
-{
-	switch (gettypenumber())
-	{
-		// Point:
-		case 0:
-			return 0;
-		// Line:
-		case 1:
-			return 0;
-		// Triangle:
-		case 2:
-			return 0;
-		// Quadrangle:
-		case 3:
-			return 1;
-		// Tetrahedron:
-		case 4:
-			return 0;
-		// Hexahedron:
-		case 5:
-			return 6;
-		// Prism:
-		case 6:
-			return 3;
-		// Pyramid:
-		case 7:
-			return 1;
-	}
-}
-
-int element::countvolumes(void)
-{
-	switch (gettypenumber())
-	{
-		// Point:
-		case 0:
-			return 0;
-		// Line:
-		case 1:
-			return 0;
-		// Triangle:
-		case 2:
-			return 0;
-		// Quadrangle:
-		case 3:
-			return 0;
-		// Tetrahedron:
-		case 4:
-			return 1;
-		// Hexahedron:
-		case 5:
-			return 1;
-		// Prism:
-		case 6:
-			return 1;
-		// Pyramid:
-		case 7:
-			return 1;
-	}
-}
-
-int element::count(int dim)
+int element::countdim(int dim)
 {
     switch (dim)
     {
 		case 0:
-			return countnodes();
+			return counttype(0);
 		case 1:
-			return countedges();
+			return counttype(1);
 		case 2:
-			return countfaces();
+			return counttype(2)+counttype(3);
 		case 3:
-			return countvolumes();
+			return counttype(4)+counttype(5)+counttype(6)+counttype(7);
     }
 }
+
+int element::countnodes(void)
+{
+	return counttype(0);
+}
+
+int element::countedges(void)
+{
+	return counttype(1);
+}
+
+int element::countfaces(void)
+{
+	return countdim(2);
+}
+
+int element::counttriangularfaces(void)
+{
+	return counttype(2);
+}
+
+int element::countquadrangularfaces(void)
+{
+	return counttype(3);
+}
+
+int element::countvolumes(void)
+{
+	return countdim(3);
+}
+
 
 bool element::isinsideelement(double ki, double eta, double phi)
 {
