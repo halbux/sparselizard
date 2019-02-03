@@ -89,18 +89,18 @@ void mesh::printcount(void)
 	}
 }
 
-mesh::mesh(void) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions)
+mesh::mesh(void) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
 {
     universe::mymesh = this;
 }
 
-mesh::mesh(std::string filename, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions)
+mesh::mesh(std::string filename, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
 {
     universe::mymesh = this;
     load(filename, verbosity);
 }
 
-mesh::mesh(std::vector<shape> inputshapes, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions)
+mesh::mesh(std::vector<shape> inputshapes, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
 {
     universe::mymesh = this;
     load(inputshapes, verbosity);
@@ -132,6 +132,7 @@ void mesh::load(std::string name, int verbosity)
 	myelements.explode();
 	sortbybarycenters();
 	removeduplicates();
+	myregiondefiner.defineregions();
     
     myelements.definedisjointregions();
     // The reordering is stable and the elements are thus still ordered 
@@ -249,6 +250,7 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
 	myelements.explode();
 	sortbybarycenters();
 	removeduplicates();
+	myregiondefiner.defineregions();
     
     myelements.definedisjointregions();
     // The reordering is stable and the elements are thus still ordered 
@@ -322,6 +324,16 @@ int mesh::getmeshdimension(void)
 			maxelementdimension = elementobject.getelementdimension();
 	}
 	return maxelementdimension;
+}
+
+void mesh::requestregionskin(int newphysreg, int physregtoskin)
+{
+	myregiondefiner.regionskin(newphysreg, physregtoskin);
+}
+
+void mesh::requestboxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox)
+{
+	myregiondefiner.boxselection(newphysreg, selecteddim, boxlimit, physregtobox);
 }
 
 

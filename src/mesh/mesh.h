@@ -23,6 +23,7 @@
 #include <memory>
 #include "shape.h"
 #include "rawshape.h"
+#include "regiondefiner.h"
 
 class nodes;
 class elements;
@@ -36,6 +37,9 @@ class mesh
         elements myelements;
         physicalregions myphysicalregions;
         disjointregions mydisjointregions;
+        
+        regiondefiner myregiondefiner;
+        
 
         std::string filename = "";
 
@@ -80,6 +84,10 @@ class mesh
         
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
         int getmeshdimension(void);
+        
+        // Additional region selection tools. Will become effective only after loading the mesh.
+        void requestregionskin(int newphysreg, int physregtoskin);
+        void requestboxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
         
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
