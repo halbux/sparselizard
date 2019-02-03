@@ -16,10 +16,9 @@
 
 class regiondefiner
 {
-
-	private:
+    private:
 	
-		double roundoffnoise = 1e-10;
+	    double roundoffnoise = 1e-10;
         
         nodes* mynodes;
         elements* myelements;
@@ -46,8 +45,8 @@ class regiondefiner
         
         void defineskinregions(void);
         void defineboxregions(void);
-         
-	public:
+
+    public:
         
         regiondefiner(nodes& inputnodes, elements& inputelems, physicalregions& inputphysregs);
         
