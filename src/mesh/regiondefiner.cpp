@@ -5,8 +5,6 @@ void regiondefiner::defineskinregions(void)
 {
 	myphysicalregions->errorundefined(toskin);
 
-	std::vector<double>* nodecoords = mynodes->getcoordinates();
-
 	// Loop on all skin requests:
 	for (int i = 0; i < toskin.size(); i++)
 	{
