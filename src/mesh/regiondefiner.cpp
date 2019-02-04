@@ -47,6 +47,8 @@ void regiondefiner::defineskinregions(void)
 				element myelement(elemtype);
 				
 				int numsubtypeelems = myelement.counttype(skinelemtype);
+				if (numsubtypeelems == 0)
+				    continue;
 				
 				// Loop on all elements:
 				for (int elem = 0; elem < numelems; elem++)
@@ -65,7 +67,6 @@ void regiondefiner::defineskinregions(void)
 					newphysreg->addelement(skinelemtype, j);
 			}
 		}
-		newphysreg->removeduplicatedelements();
 	}
 }
 
