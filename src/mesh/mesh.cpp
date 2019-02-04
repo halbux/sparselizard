@@ -331,7 +331,7 @@ void mesh::regionskin(int newphysreg, int physregtoskin)
 	myregiondefiner.regionskin(newphysreg, physregtoskin);
 }
 
-void mesh::boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox)
+void mesh::boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
 {
 	myregiondefiner.boxselection(newphysreg, selecteddim, boxlimit, physregtobox);
 }
