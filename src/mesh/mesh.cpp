@@ -326,12 +326,12 @@ int mesh::getmeshdimension(void)
 	return maxelementdimension;
 }
 
-void mesh::requestregionskin(int newphysreg, int physregtoskin)
+void mesh::regionskin(int newphysreg, int physregtoskin)
 {
 	myregiondefiner.regionskin(newphysreg, physregtoskin);
 }
 
-void mesh::requestboxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox)
+void mesh::boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox)
 {
 	myregiondefiner.boxselection(newphysreg, selecteddim, boxlimit, physregtobox);
 }

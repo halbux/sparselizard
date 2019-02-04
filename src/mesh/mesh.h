@@ -86,8 +86,8 @@ class mesh
         int getmeshdimension(void);
         
         // Additional region selection tools. Will become effective only after loading the mesh.
-        void requestregionskin(int newphysreg, int physregtoskin);
-        void requestboxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
+        void regionskin(int newphysreg, int physregtoskin);
+        void boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
         
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
