@@ -65,6 +65,7 @@ void regiondefiner::defineskinregions(void)
 					newphysreg->addelement(skinelemtype, j);
 			}
 		}
+		newphysreg->removeduplicatedelements();
 	}
 }
 
