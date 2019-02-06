@@ -233,8 +233,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
     // Set the values on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
-    // Set the values on the harmonics all together (extracted harmonic is constant!).
-    
+
     if (mysubfields.size() == 0)
     {
     	field thisfield(getpointer());
