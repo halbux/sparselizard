@@ -71,7 +71,10 @@ void field::setorder(int physreg, int interpolorder)
     rawfieldptr->setorder(physreg, interpolorder); 
 }
 
-void field::setvalue(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, input, extraintegrationdegree); }
+void field::setvalue(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree); }
+void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree); }
+void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree); }
+void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree); }
 void field::setvalue(int physreg) { rawfieldptr->setvalue(physreg); }
 
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, input, extraintegrationdegree); }

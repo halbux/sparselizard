@@ -217,7 +217,7 @@ void rawfield::setorder(int physreg, int interpolorder)
     }
 }
 
-void rawfield::setvalue(int physreg, expression input, int extraintegrationdegree)
+void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
@@ -232,7 +232,7 @@ void rawfield::setvalue(int physreg, expression input, int extraintegrationdegre
     
     // Set the values on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setvalue(physreg, input.at(i,0), extraintegrationdegree);
+        mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
     // Set the values on the harmonics all together (extracted harmonic is constant!).
     
     if (mysubfields.size() == 0)
@@ -241,8 +241,10 @@ void rawfield::setvalue(int physreg, expression input, int extraintegrationdegre
     
     	// Compute the projection of the expression (skip for a zero expression):
     	formulation projectedvalue;
-    	projectedvalue += integration(physreg, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
-    	
+    	if (meshdeform == NULL)
+    		projectedvalue += integration(physreg, numfftharms, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
+    	else
+    		projectedvalue += integration(physreg, numfftharms, *meshdeform, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
     	// Define an all-zero vector:
     	vec solvec(projectedvalue);
 		if (input.iszero() == false)
@@ -260,13 +262,13 @@ void rawfield::setvalue(int physreg)
     switch (countcomponents())
     {
         case 1:
-            setvalue(physreg, 0);
+            setvalue(physreg, -1, NULL, 0);
             break;
         case 2:
-            setvalue(physreg, expression(2,1,{0,0}));
+            setvalue(physreg, -1, NULL, expression(2,1,{0,0}));
             break;
         case 3:
-            setvalue(physreg, expression(3,1,{0,0,0}));
+            setvalue(physreg, -1, NULL, expression(3,1,{0,0,0}));
             break;
     }
 }

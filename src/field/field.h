@@ -70,6 +70,11 @@ class field
         // Use the default order + 'extraintegrationdegree' to 
         // compute the finite element discretisation of 'input'.
         void setvalue(int physreg, expression input, int extraintegrationdegree = 0);
+        // The 'input' expression is evaluated on the mesh deformed by 'meshdeform':
+        void setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree = 0);
+        // An FFT is used to project the 'input' expression:
+        void setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree = 0);
+        void setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:
         void setvalue(int physreg);
         
