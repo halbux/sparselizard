@@ -185,15 +185,6 @@ vec formulation::rhs(bool keepvector)
     if (myvec == NULL)
         myvec = shared_ptr<rawvec>(new rawvec(mydofmanager));
     
-	// Set the gauged indexes to zero:
-	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-	int numgaugedindexes = gaugedindexes.countrows()*gaugedindexes.countcolumns();
-	if (numgaugedindexes > 0)
-		myvec->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
-
-    if (isconstraintcomputation == false)
-        vec(myvec).updateconstraints();   
-    
     vec output;   
     if (keepvector == false)
     {
@@ -202,6 +193,15 @@ vec formulation::rhs(bool keepvector)
     }
     else
         output = vec(myvec).copy();
+    
+	// Set the gauged indexes to zero:
+	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+	int numgaugedindexes = gaugedindexes.countrows()*gaugedindexes.countcolumns();
+	if (numgaugedindexes > 0)
+		output.getpointer()->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
+
+    if (isconstraintcomputation == false)
+        output.updateconstraints();  
     
     return output; 
 }
