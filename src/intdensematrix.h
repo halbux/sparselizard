@@ -39,6 +39,7 @@ class intdensematrix
         
         int countrows(void) { return numrows; };
         int countcolumns(void) { return numcols; };
+        int count(void) { return numrows*numcols; };
         
         // Count the number of positive or zero integer values:
         int countpositive(void);

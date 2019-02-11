@@ -48,6 +48,7 @@ class densematrix
         
         int countrows(void) { return numrows; };
         int countcolumns(void) { return numcols; };
+        int count(void) { return numrows*numcols; };
 
         // Was it initialised?
         bool isdefined(void) { return (myvalues != NULL); };

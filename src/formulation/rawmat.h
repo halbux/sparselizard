@@ -56,6 +56,9 @@ class rawmat
         int countcolumns(void);
         
         int countnnz(void) { return nnz; };
+        
+        // Set all row and/or column indices requested to -1 (-1 adresses are ignored at assembly):
+        void zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns);
 
         // Set the gauged indices to -1:
         void gauge(void);  
@@ -70,10 +73,12 @@ class rawmat
     
         // Add a fragment to the matrix.
         void accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);   
-        // Create the petsc matrix. Choose to keep the fragments for reuse or not.
-        void process(bool keepfragments = false);
+        // Create the petsc matrix.
+        void process(void);
         // Remove the last added fragment:
         void removelastfragment(void);
+        // Clear all the fragments:
+        void clearfragments(void);
         
         void print(void);
 

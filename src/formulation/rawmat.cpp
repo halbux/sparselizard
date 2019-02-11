@@ -24,40 +24,50 @@ int rawmat::countcolumns(void)
         return mydofmanager->countdofs();
 }
 
-void rawmat::gauge(void)
+void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns)
 {
-	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-	int* gaugedindexesptr = gaugedindexes.getvalues();
+	int* entriestozeroptr = entriestozero.getvalues();
 
-	int numgaugedindexes = gaugedindexes.countrows()*gaugedindexes.countcolumns();
-	if (numgaugedindexes > 0)
+	int numentries = entriestozero.count();
+	if (numentries > 0)
 	{
 		// First build a vector for direct access:
-		std::vector<bool> isgauged(mydofmanager->countdofs(), false);
+		std::vector<bool> istozero(mydofmanager->countdofs(), false);
 
-		for (int i = 0; i < numgaugedindexes; i++)
-			isgauged[gaugedindexesptr[i]] = true;
-
-		// Now set to -1 all gauged adresses:
-		for (int i = 0; i < accumulatedrowindices.size(); i++)
+		for (int i = 0; i < numentries; i++)
+			istozero[entriestozeroptr[i]] = true;
+			
+		if (zerorows)
 		{
-        	int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-	        for (int j = 0; j < accumulatedrowindices[i].countrows()*accumulatedrowindices[i].countcolumns(); j++)
+			for (int i = 0; i < accumulatedrowindices.size(); i++)
 			{
-				if (accumulatedrowindicesptr[j] >= 0 && isgauged[accumulatedrowindicesptr[j]])
-					accumulatedrowindicesptr[j] = -1;
+				int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
+				for (int j = 0; j < accumulatedrowindices[i].count(); j++)
+				{
+					if (accumulatedrowindicesptr[j] >= 0 && istozero[accumulatedrowindicesptr[j]])
+						accumulatedrowindicesptr[j] = -1;
+				}
 			}
 		}
-		for (int i = 0; i < accumulatedcolindices.size(); i++)
+		if (zerocolumns)
 		{
-        	int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
-	        for (int j = 0; j < accumulatedcolindices[i].countrows()*accumulatedcolindices[i].countcolumns(); j++)
+			for (int i = 0; i < accumulatedcolindices.size(); i++)
 			{
-				if (accumulatedcolindicesptr[j] >= 0 && isgauged[accumulatedcolindicesptr[j]])
-					accumulatedcolindicesptr[j] = -1;
+				int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
+				for (int j = 0; j < accumulatedcolindices[i].count(); j++)
+				{
+					if (accumulatedcolindicesptr[j] >= 0 && istozero[accumulatedcolindicesptr[j]])
+						accumulatedcolindicesptr[j] = -1;
+				}
 			}
 		}
 	}
+}
+
+void rawmat::gauge(void)
+{
+	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+	zeroentries(gaugedindexes, true, true);
 }
 
 
@@ -111,7 +121,8 @@ void rawmat::removeconstraints(void)
     
     delete[] dofrenumbering;
     
-    process(false);
+    process();
+    clearfragments();
 }
 
 void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
@@ -121,7 +132,7 @@ void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, 
     accumulatedvals.push_back(vals);
 }
 
-void rawmat::process(bool keepfragments)
+void rawmat::process(void)
 {
     // Concatenate all accumulated fragments!
     // Remove negative indexes. First get the overall length.
@@ -227,13 +238,6 @@ void rawmat::process(bool keepfragments)
     
     MatAssemblyBegin(mymat, MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(mymat, MAT_FINAL_ASSEMBLY);
-    
-    if (keepfragments == false)
-    {
-        accumulatedrowindices = {};
-        accumulatedcolindices = {};
-        accumulatedvals = {};
-    }
 }
 
 void rawmat::removelastfragment(void)
@@ -241,6 +245,13 @@ void rawmat::removelastfragment(void)
     accumulatedrowindices.pop_back();
     accumulatedcolindices.pop_back();
     accumulatedvals.pop_back();
+}
+
+void rawmat::clearfragments(void)
+{
+	accumulatedrowindices = {};
+	accumulatedcolindices = {};
+	accumulatedvals = {};
 }
 
 void rawmat::print(void)
@@ -265,10 +276,6 @@ shared_ptr<rawmat> rawmat::extractaccumulated(void)
 	output->accumulatedrowindices = accumulatedrowindices;
 	output->accumulatedcolindices = accumulatedcolindices;
 	output->accumulatedvals = accumulatedvals;
-	
-	accumulatedrowindices = {};
-	accumulatedcolindices = {};
-	accumulatedvals = {};
 	
 	return output;
 }

@@ -215,10 +215,14 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
     if (mymat[KCM] == NULL)
         mymat[KCM] = shared_ptr<rawmat>(new rawmat(mydofmanager));
         
+    shared_ptr<rawmat> rawout = mymat[KCM]->extractaccumulated();
+    
+    if (keepfragments == false)
+    	mymat[KCM]->clearfragments();
+    	
+        
 	// Set the gauged indexes to all zero:
-	mymat[KCM]->gauge();
-
-    bool constrainteyematrixadded = false, gaugeeyematrixadded = false;
+	rawout->gauge();
 
     // Add the constraint diagonal ones to the matrix (if any):
     if (isconstraintcomputation == false)
@@ -230,8 +234,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
             // Create a vector of same length full of double ones:
             densematrix ones(1, numconstraineddofs, 1);
 
-            mymat[KCM]->accumulate(constrainedindexes, constrainedindexes, ones);  
-            constrainteyematrixadded = true;
+            rawout->accumulate(constrainedindexes, constrainedindexes, ones);  
         }
     }
     // Add the gauge diagonal ones to the matrix (if any):
@@ -242,20 +245,13 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
         // Create a vector of same length full of double ones:
         densematrix ones(1, numgaugeddofs, 1);
 
-        mymat[KCM]->accumulate(gaugedindexes, gaugedindexes, ones);  
-        gaugeeyematrixadded = true;
+        rawout->accumulate(gaugedindexes, gaugedindexes, ones);  
     }
 
-    mymat[KCM]->process(keepfragments); 
-    // To avoid duplicated eye blocks to be added:
-    if (keepfragments == true && gaugeeyematrixadded)
-        mymat[KCM]->removelastfragment();
-    if (keepfragments == true && constrainteyematrixadded)
-        mymat[KCM]->removelastfragment();
+    rawout->process(); 
+    rawout->clearfragments();
     
-    mat output(mymat[KCM]);
-    mymat[KCM] = mymat[KCM]->extractaccumulated();
-    return output;
+    return mat(rawout);
 }
 
 
