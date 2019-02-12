@@ -80,6 +80,8 @@ void field::setvalue(int physreg) { rawfieldptr->setvalue(physreg); }
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, input, extraintegrationdegree); }
 void field::setconstraint(int physreg) { rawfieldptr->setconstraint(physreg); }
 
+void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr) { rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr); }
+
 void field::setgauge(int physreg) 
 { 
     if (rawfieldptr->gettypename() != "hcurl")

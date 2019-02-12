@@ -84,6 +84,14 @@ class field
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
         // Set an homogeneous Dirichlet constraint.
         void setconstraint(int physreg);
+        
+        // Set a 'valexpr' valued constraint on the NODE-ASSOCIATED degrees of freedom of 
+        // physical region 'physreg' for which 'condexpr' is greater or equal to zero.
+        // All dofs that are not associated to nodes or the nodes at which condexpr < 0 are 
+        // left unconstrained (unless constrained by another constraint).
+        //
+        // This function should only be used for fields with nodal shape functions ("h1" like).
+        void setconditionalconstraint(int physreg, expression condexpr, expression valexpr);
 
         // Set a gauge condition on a given physical region:
         void setgauge(int physreg);

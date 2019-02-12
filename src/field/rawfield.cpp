@@ -75,6 +75,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
             interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), 1);
             // Set all unconstrained by default:
             myconstraints = std::vector<shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
+            
+            myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
 
             isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
 
@@ -324,6 +326,44 @@ void rawfield::setconstraint(int physreg)
         case 3:
             setconstraint(physreg, expression(3,1,{0,0,0}));
             break;
+    }
+}
+
+void rawfield::setconditionalconstraint(int physreg, expression condexpr, expression valexpr)
+{
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z")
+    {
+        std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
+        abort();
+    }
+    if (valexpr.countcolumns() != 1 || valexpr.countrows() != countcomponents())
+    {
+        std::cout << "Error in 'rawfield' object: the rawfield must be constrained using a " << countcomponents() << "x1 expression" << std::endl;
+        abort();
+    }
+    if (condexpr.countcolumns() != 1 || condexpr.countrows() != 1)
+    {
+        std::cout << "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" << std::endl;
+        abort();
+    }
+        
+    // Set the constraints on the sub fields:
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setconditionalconstraint(physreg, condexpr, valexpr.at(i,0));
+    // Set the constraints on the harmonics:
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setconditionalconstraint(physreg, condexpr, valexpr);
+    }
+    
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+        // Consider only the NODAL disjoint regions in the physical region with (0):
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(0);
+
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+            myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
     }
 }
 

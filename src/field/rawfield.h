@@ -83,6 +83,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // myconstraints[disjreg] gives the integration object to compute the 
         // constraint value on the disjoint region. NULL means unconstrained.
         std::vector<shared_ptr<integration>> myconstraints = {};
+        // myconditionalconstraints[disjreg] gives the {conditional expression, constraint value} 
+        // on the NODAL disjoint region 'disjreg'. Empty means unconstrained.
+        std::vector<std::vector<expression>> myconditionalconstraints = {};
     
         // The spanning tree used for gauging fields (empty vector if none):
         std::vector<spanningtree> myspanningtree = {};
@@ -122,6 +125,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
+        
+        // Set a conditional constraint:
+        void setconditionalconstraint(int physreg, expression condexpr, expression valexpr);
 
         // Set a gauge condition:
         void setgauge(int physreg);
@@ -146,6 +152,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Only valid for fields without subfields.
         bool isconstrained(int disjreg) { return not(myconstraints[disjreg] == NULL); };
         std::vector<shared_ptr<integration>> getconstraints(void) { return myconstraints; };
+        
+        bool isconditionallyconstrained(int disjreg) { return (myconditionalconstraints[disjreg].size() > 0); };
+        std::vector<expression> getconditionalconstraint(int disjreg) { return myconditionalconstraints[disjreg]; };
 
         bool isgauged(int disjreg);
 
