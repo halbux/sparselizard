@@ -23,51 +23,50 @@ class rawfield;
 
 class dofmanager
 {
-
-	private:
+    private:
         
         // The number of dofs managed:
-		int numberofdofs = 0;
+        int numberofdofs = 0;
         
         // All the fields in the structure:
         std::vector<shared_ptr<rawfield>> myfields = {};
         // The currently selected field (if any) is myfields[selectedfieldnumber]:
         int selectedfieldnumber = -1;
-	
-		// 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
+        
+        // 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
         // the first row/column in the matrix at which the data for 
-		//
-		// - field pointed by myfields[selectedfieldnumber]
-		// - vertex, edge, face or volume type-disjoint region 12
-		// - the third vertex, edge, face or volume form function
-		//
-		// can be found. 
+        //
+        // - field pointed by myfields[selectedfieldnumber]
+        // - vertex, edge, face or volume type-disjoint region 12
+        // - the third vertex, edge, face or volume form function
+        //
+        // can be found. 
         // 
         // 'rangeend[selectedfieldnumber][12][2]' gives the last row.
         //
-		std::vector<std::vector<std::vector< int >>> rangebegin = {};
+        std::vector<std::vector<std::vector< int >>> rangebegin = {};
         std::vector<std::vector<std::vector< int >>> rangeend = {};
-
-	public:
         
-		// 'addtostructure' defines dofs for a field on the disjoint 
+    public:
+        
+        // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
-		void addtostructure(shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
+        void addtostructure(shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
         void addtostructure(shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
         // Always select the field before accessing the dof structure.
-		void selectfield(shared_ptr<rawfield> selectedfield);
+        void selectfield(shared_ptr<rawfield> selectedfield);
         
         // Get all disjoint regions on which the selected field has dofs:
         std::vector<int> getdisjointregionsofselectedfield(void);
-   
+        
         int getrangebegin(int disjreg, int formfunc);
         int getrangeend(int disjreg, int formfunc);
-
+        
         bool isdefined(int disjreg, int formfunc) { return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); };
         
         int countconstraineddofs(void);
         intdensematrix getconstrainedindexes(void);
-
+        
         int countgaugeddofs(void);
         intdensematrix getgaugedindexes(void);
         
@@ -97,7 +96,7 @@ class dofmanager
         // - adress -2 is used for field dofs not in 'fieldphysreg' 
         //
         intdensematrix getadresses(shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
-																	
+														
 };
 
 #endif
