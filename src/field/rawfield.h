@@ -154,7 +154,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<shared_ptr<integration>> getconstraints(void) { return myconstraints; };
         
         bool isconditionallyconstrained(int disjreg) { return (myconditionalconstraints[disjreg].size() > 0); };
-        std::vector<std::vector<expression>> getconditionalconstraint(void) { return myconditionalconstraints; };
+        std::vector<std::vector<expression>> getconditionalconstraints(void) { return myconditionalconstraints; };
 
         bool isgauged(int disjreg);
 
