@@ -242,7 +242,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
         for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
         {
         	// Only the nodes are constrained:
-        	if (universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
+        	if (isdefined(disjreg,0) == false || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
         		continue;
         		
 			// Constraints have priority over the conditional constraints!
