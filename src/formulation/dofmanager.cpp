@@ -227,6 +227,124 @@ intdensematrix dofmanager::getgaugedindexes(void)
     return output;
 }
 
+std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(void)
+{
+	// This will have an entry for every field and every disjoint node region that is conditionally constrained:
+	std::vector<intdensematrix> indexmat = {};
+	std::vector<densematrix> condvalvec = {};
+	std::vector<densematrix> constrvalvec = {};
+	
+	
+    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    {
+    	// First get the list of disjoint NODE regions on which the rawfield is conditionally constrained:
+    	std::vector<bool> isdisjregactive(rangebegin[fieldindex].size(), false);
+        for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
+        {
+        	// Only the nodes are constrained:
+        	if (universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
+        		continue;
+        		
+			// Constraints have priority over the conditional constraints!
+			if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
+				isdisjregactive[disjreg] = true;
+		}
+			
+    	// Get the condition and value expressions for the conditional constraint:
+    	std::vector<std::vector<expression>> condconstrexpr = myfields[fieldindex]->getconditionalconstraints();
+    
+		// Loop on all disjoint regions:
+		for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
+		{
+			if (isdisjregactive[disjreg] == false)
+				continue;
+		    
+			std::shared_ptr<operation> condop = condconstrexpr[disjreg][0].getoperationinarray(0,0), constrop = condconstrexpr[disjreg][1].getoperationinarray(0,0);
+			
+		    // Combine all disjoint regions that share the same condop and constrop operations:
+		    std::vector<int> curdisjregs = {};
+	        for (int i = disjreg; i < isdisjregactive.size(); i++)
+	        {
+	        	if (isdisjregactive[i] && condop == condconstrexpr[i][0].getoperationinarray(0,0) && constrop == condconstrexpr[i][1].getoperationinarray(0,0))
+	        	{
+	        		curdisjregs.push_back(i);
+	        		isdisjregactive[i] = false;
+	        	}
+        	}
+	        	
+			// Compute the conditional and constraint expressions.
+			// For nodes the reference coordinates are all zero.
+			std::vector<double> evaluationcoordinates = {0,0,0};
+			elementselector myelemselect(curdisjregs, condop->isvalueorientationdependent(curdisjregs) || constrop->isvalueorientationdependent(curdisjregs));
+
+			std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
+			// Skip if no conditional constraint is active:
+   			if (condval[1][0].max() < 0)
+   				continue;
+   			std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
+   			
+   			// Create a matrix with all indices:
+   			intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
+   			int* curindexmatptr = curindexmat.getvalues();
+   			int index = 0;
+   			for (int i = 0; i < curdisjregs.size(); i++)
+   			{
+   				// There is only a single shape function per node!
+   				for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
+   				{
+   					curindexmatptr[index] = ind;
+   					index++;
+				}
+   			}
+
+   			// Append to the vectors:
+   			condvalvec.push_back(condval[1][0]);
+   			constrvalvec.push_back(constrval[1][0]);
+        	indexmat.push_back(curindexmat);
+        }
+    }
+
+	// Count the number of active conditional constraints:
+	int numactive = 0;
+	for (int i = 0; i < condvalvec.size(); i++)
+	{
+		double* condvalptr = condvalvec[i].getvalues();
+		for (int j = 0; j < condvalvec[i].count(); j++)
+		{
+			if (condvalptr[j] >= 0)
+				numactive++;
+		}
+	}
+	
+	// Combine all active conditional constraints together:
+	intdensematrix condconstrindices(numactive,1);
+	densematrix condconstrval(numactive,1);
+	
+	int* indptr = condconstrindices.getvalues();
+	double* valptr = condconstrval.getvalues();
+	
+	int index = 0;
+	for (int i = 0; i < condvalvec.size(); i++)
+	{
+		double* condvalptr = condvalvec[i].getvalues();
+		double* constrvalptr = constrvalvec[i].getvalues();
+		int* indmatptr = indexmat[i].getvalues();
+		for (int j = 0; j < condvalvec[i].count(); j++)
+		{
+			if (condvalptr[j] >= 0)
+			{
+				indptr[index] = indmatptr[j];
+				valptr[index] = constrvalptr[j];
+				
+				index++;
+			}
+		}
+	}
+	
+	return std::make_pair(condconstrindices, condconstrval);
+}
+
+
 shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
 {
     // Set a default -1 renumbering:

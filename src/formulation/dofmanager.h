@@ -71,6 +71,9 @@ class dofmanager
         int countgaugeddofs(void);
         intdensematrix getgaugedindexes(void);
         
+        // Get the conditionally constrained adresses as well as the constraint values:
+        std::pair<intdensematrix, densematrix> getconditionalconstraintdata(void);
+        
         // Return a new dofmanager object that does not include the Dirichlet constraints.
         // 'dofrenumbering' must have a size equal to the number of dofs before the call.
         // Removed dofs are renumbered as -1.
