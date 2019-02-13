@@ -94,7 +94,7 @@ void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vecto
             shared_ptr<integration> currentconstraint = fieldconstraints[disjreg];
             for (int i = d; i < disjregs.size(); i++)
             {
-                if (fieldconstraints[disjregs[i]] == currentconstraint)
+                if (mydofmanager->isdefined(disjregs[i], 0) && fieldconstraints[disjregs[i]] == currentconstraint)
                 {
                     // Transfer the data from 'constraintvalvec' to 'myvec' on disjoint region disjregs[i]:
                     setdata(constraintvalvec.getpointer(), disjregs[i], constrainedfield);
