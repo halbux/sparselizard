@@ -176,6 +176,11 @@ void formulation::generate(int contributionnumber)
             generate(i, contributionnumber);
 }
 
+void formulation::skipconditionalconstraints(bool skipit)
+{
+	isconditionalconstraintactive = not(skipit);
+}
+
 
 vec formulation::b(bool keepvector) { return rhs(keepvector); }
 mat formulation::A(bool keepfragments) { return K(keepfragments); }
@@ -201,7 +206,14 @@ vec formulation::rhs(bool keepvector)
 		output.getpointer()->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
 
     if (isconstraintcomputation == false)
-        output.updateconstraints();  
+        output.updateconstraints(); 
+        
+	// Set the conditionally constrained indexes to the required value.
+	if (isconditionalconstraintactive)
+	{
+		std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+		output.getpointer()->setvalues(condconstrdata.first, condconstrdata.second);
+    }
     
     return output; 
 }
@@ -246,6 +258,22 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
         densematrix ones(1, numgaugeddofs, 1);
 
         rawout->accumulate(gaugedindexes, gaugedindexes, ones);  
+    }
+	// Set the row indices of the conditionally constrained dofs to zero.
+    // Add the conditional constraint diagonal ones to the matrix (if any).
+    if (isconditionalconstraintactive)
+    {
+		std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+		intdensematrix condconstrainedindexes = condconstrdata.first;
+		int numcondconstraineddofs = condconstrainedindexes.count();
+		
+		if (numcondconstraineddofs > 0)
+		{
+			rawout->zeroentries(condconstrainedindexes, true, false);
+		    densematrix ones(1, numcondconstraineddofs, 1);
+
+		    rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones);  
+	    }
     }
 
     rawout->process(); 

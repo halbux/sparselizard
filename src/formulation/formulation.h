@@ -50,6 +50,8 @@ class formulation
         // Always call this generate from the public generate functions:
         void generate(int m, int contributionnumber);
         
+        bool isconditionalconstraintactive = true;
+        
 	public:
         
         // Has this formulation been called to compute a constraint?
@@ -75,6 +77,9 @@ class formulation
 		void generate(int contributionnumber);
         
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
+        
+        // Choose to skip or not the conditional constraints:
+        void skipconditionalconstraints(bool skipit = true);
         
         
         // Get the assembled matrices or get the right hanside vector.

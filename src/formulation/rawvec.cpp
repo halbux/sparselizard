@@ -115,6 +115,9 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
 
     // Remove the negative addresses:
     int numpositiveentries = addresses.countpositive();
+    
+    if (numpositiveentries == 0)
+    	return;
 
     intdensematrix filteredad(numpositiveentries,1);
     densematrix filteredval(numpositiveentries,1);
