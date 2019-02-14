@@ -27,9 +27,8 @@ class contribution;
 
 class formulation
 {
-
-	private:
-	
+    private:
+        
         // myvec is the right handside vector rhs.
         shared_ptr<rawvec> myvec = NULL;
         // - mymat[0] is the stiffness matrix K
@@ -37,34 +36,34 @@ class formulation
         // - mymat[2] is the mass matrix M
         std::vector<shared_ptr<rawmat>> mymat = {NULL, NULL, NULL};
         
-		// The link between the dof number and its row and column in the matrix:
-		shared_ptr<dofmanager> mydofmanager;
-		
-		// mycontributions[m][i][j] gives the jth contribution of block number i for:
+        // The link between the dof number and its row and column in the matrix:
+        shared_ptr<dofmanager> mydofmanager;
+        
+        // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
         // - the stiffness matrix if   m = 1
         // - the damping matrix if     m = 2
         // - the mass matrix if        m = 3
-		std::vector< std::vector<std::vector<contribution>> > mycontributions = {{}, {}, {}, {}};
-                
+        std::vector< std::vector<std::vector<contribution>> > mycontributions = {{}, {}, {}, {}};
+        
         // Always call this generate from the public generate functions:
         void generate(int m, int contributionnumber);
         
         bool isconditionalconstraintactive = true;
         
-	public:
+    public:
         
         // Has this formulation been called to compute a constraint?
         bool isconstraintcomputation = false;
-	
+        
         
         formulation(void);
         
-		// The following adds the contribution defined in the integration object.
-		void operator+=(integration integrationobject);
-		
-		int countdofs(void);
-		
+        // The following adds the contribution defined in the integration object.
+        void operator+=(integration integrationobject);
+        
+        int countdofs(void);
+        
         // Generate all blocks:
         void generate(void);
         // Generate all contributions of K, C, M or rhs:
@@ -74,7 +73,7 @@ class formulation
         void generaterhs(void);
         
         void generate(std::vector<int> contributionnumbers);
-		void generate(int contributionnumber);
+        void generate(int contributionnumber);
         
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         
@@ -95,7 +94,7 @@ class formulation
         mat M(bool keepfragments = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
         mat getmatrix(int KCM, bool keepfragments = false);
-        
+
 };
 
 
