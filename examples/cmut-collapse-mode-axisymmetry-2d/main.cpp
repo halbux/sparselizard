@@ -191,13 +191,13 @@ void sparselizard(void)
     vh.harmonic(1).setconstraint(electrode, 100);	
     // Set a tiny AC voltage on vh2:
     vh.harmonic(2).setconstraint(electrode, 1);
-    // Ground the insulator:	
-    vh.setconstraint(insulator);	
+    // Ground at the clamp:	
+    vh.setconstraint(clamp);	
     
     // The vibration around the static deflection is 0 at the contact: 
-    uh.setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
+    uh.harmonic(2).setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
     
-    // Redefine the electrostatic and elasticity formulations as done above:
+    // Redefine the electrostatic and elasticity formulations as above:
     formulation helectrostatics, helasticity;
     
     helectrostatics += integral(wholedomain, umesh, epsilon*grad(dof(vh))*grad(tf(vh)));
@@ -224,7 +224,7 @@ void sparselizard(void)
     std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (uacmax < 2.18623e-9 && uacmax > 2.18621e-9);
+    std::cout << (uacmax < 0.98385e-9 && uacmax > 0.983848e-9);
 }
 
 
