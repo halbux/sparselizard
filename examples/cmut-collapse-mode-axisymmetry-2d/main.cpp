@@ -139,22 +139,22 @@ void sparselizard(void)
         
         // Calculate the force balance on every node candidate for the conditional constraint. 
         // This requires the residual b-Ax (of the problem Ax = b) without the conditional constraints:
-		elasticity.skipconditionalconstraints();
-		// Argument 'true' is added so that the generated data is not cleared from the 'elasticity' object.
-		vec fbvec = -(elasticity.b(true) - elasticity.A(true) * solu);
-		// The conditional constraints are activated again:
-		elasticity.skipconditionalconstraints(false);
-		// The data in the 'fbvec' vector (containing the nodal force balance) is transferred to the
-		// 'nodalforcebalance' field. '|u' is needed because 'nodalforcebalance' is not a 
-		// field defined in the 'elasticity' formulation (field u is defined).
-		nodalforcebalance.setdata(solid, fbvec|u);
-
+        elasticity.skipconditionalconstraints();
+        // Argument 'true' is added so that the generated data is not cleared from the 'elasticity' object.
+        vec fbvec = -(elasticity.b(true) - elasticity.A(true) * solu);
+        // The conditional constraints are activated again:
+        elasticity.skipconditionalconstraints(false);
+        // The data in the 'fbvec' vector (containing the nodal force balance) is transferred to the
+        // 'nodalforcebalance' field. '|u' is needed because 'nodalforcebalance' is not a 
+        // field defined in the 'elasticity' formulation (field u is defined).
+        nodalforcebalance.setdata(solid, fbvec|u);
+        
         // Get the vector b and matrix A of problem Ax = b. Here they include the conditional constraints:
         vec b = elasticity.b();
         mat A = elasticity.A();
         // Compute the norm of the relative residual to check the convergence:
         relresnorm = (b-A*solu).norm()/b.norm();
-
+        
         solu = solve(A,b);
         u.setdata(solid, solu);
         // Write the deflection u:
@@ -172,13 +172,13 @@ void sparselizard(void)
     }
     
     
-	// HARMONIC PERTURBATION AROUND THE STATIC DEFLECTION:
-
-	// AC electric actuation frequency:
-	setfundamentalfrequency(1e6);
-
-	// Fields uh and vh have a constant deflection plus a harmonic deflection (harmonics 1 and 2):
-	// uh = uh1 + uh2 * sin(2*pi*f0*t), vh = vh1 + vh2 * sin(2*pi*f0*t)
+    // HARMONIC PERTURBATION AROUND THE STATIC DEFLECTION:
+    
+    // AC electric actuation frequency:
+    setfundamentalfrequency(1e6);
+    
+    // Fields uh and vh have a constant deflection plus a harmonic deflection (harmonics 1 and 2):
+    // uh = uh1 + uh2 * sin(2*pi*f0*t), vh = vh1 + vh2 * sin(2*pi*f0*t)
     field uh("h1xyz", {1,2}), vh("h1", {1,2});
     
     // Force the static deflection to the above solution:
@@ -193,39 +193,41 @@ void sparselizard(void)
     vh.harmonic(2).setconstraint(electrode, 1);
     // Ground the insulator:	
     vh.setconstraint(insulator);	
-
-	// The vibration around the static deflection is 0 at the contact: 
-	uh.setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
-
-	// Redefine the electrostatic and elasticity formulations as done above:
+    
+    // The vibration around the static deflection is 0 at the contact: 
+    uh.setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
+    
+    // Redefine the electrostatic and elasticity formulations as done above:
     formulation helectrostatics, helasticity;
-	
+    
     helectrostatics += integral(wholedomain, umesh, epsilon*grad(dof(vh))*grad(tf(vh)));
     helasticity += integral(solid, predefinedelasticity(dof(uh), tf(uh), u, E, nu, 0.0));
     // Here the electrostatic force must be computed using an FFT (on 5 timesteps)
     // because the force calculation involves nonlinear operations on multiharmonic fields:
     helasticity += integral(wholedomain, 5, umesh, predefinedelectrostaticforce(grad(tf(uh,solid)), grad(vh), epsilon));
-	// The inertia term is added for the harmonic analysis:
-	helasticity += integral(solid, -rho*dtdt(dof(uh))*tf(uh));
-   
-   	// Generate and solve the electrostatic problem:
-	helectrostatics.generate();
-	vec solvh = solve(helectrostatics.A(), helectrostatics.b());
-	vh.setdata(wholedomain, solvh);
-	
-	// Generate and solve the elasticity problem:
-	helasticity.generate();
-	vec soluh = solve(helasticity.A(), helasticity.b());
-	uh.setdata(solid, soluh);
-	uh.write(solid, umesh, "usmallsignal.pos");
-	
-	// Print the max AC deflection:
-	double uacmax = abs(compy(uh.harmonic(2))).max(solid, 5)[0];
-	std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
-	
+    // The inertia term is added for the harmonic analysis:
+    helasticity += integral(solid, -rho*dtdt(dof(uh))*tf(uh));
+    
+    // Generate and solve the electrostatic problem:
+    helectrostatics.generate();
+    vec solvh = solve(helectrostatics.A(), helectrostatics.b());
+    vh.setdata(wholedomain, solvh);
+    
+    // Generate and solve the elasticity problem:
+    helasticity.generate();
+    vec soluh = solve(helasticity.A(), helasticity.b());
+    uh.setdata(solid, soluh);
+    uh.write(solid, umesh, "usmallsignal.pos");
+    
+    // Print the max AC deflection:
+    double uacmax = abs(compy(uh.harmonic(2))).max(solid, 5)[0];
+    std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
+    
     // Code validation line. Can be removed.
     std::cout << (uacmax < 2.18623e-9 && uacmax > 2.18621e-9);
 }
+
+
 
 // THE MESH BELOW IS FULLY STRUCTURED AND IS CREATED USING THE (BASIC) SPARSELIZARD GEOMETRY CREATION TOOL.
 // THE ADVANTAGE OF IT IS THAT THE CODE ABOVE CAN BE CALLED FOR ANY CMUT DIMENSION WITHOUT NEEDING CALLS TO EXTERNAL MESHING SOFTWARE.
