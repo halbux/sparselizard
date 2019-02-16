@@ -74,7 +74,7 @@ void sparselizard(void)
     expression nodeforcebalancecondition = expression(compy(nodalforcebalance), -1, 1);
     expression condexpr(-compy(u)-thcav*0.95, nodeforcebalancecondition, -1);
     // Set the conditional constraint on the y component of the deflection field u:
-    u.compy().setconditionalconstraint(membrane, condexpr, -0.95*(thcav+1e-8*thcav));
+    u.compy().setconditionalconstraint(contact, condexpr, -0.95*(thcav+1e-8*thcav));
     
     // Young's modulus [Pa], Poisson's ratio [], the density [kg/m^3] and the electric permittivity [F/m]:
     parameter E, nu, rho, epsilon;
@@ -188,9 +188,9 @@ void sparselizard(void)
     uh.setconstraint(clamp);
     
     // Set the same conditional constraint as above:
-    uh.harmonic(1).compy().setconditionalconstraint(membrane, condexpr, -0.95*(thcav+1e-8*thcav));
+    uh.harmonic(1).compy().setconditionalconstraint(contact, condexpr, -0.95*(thcav+1e-8*thcav));
     // The vibration around the static deflection is 0 at the contact: 
-    uh.harmonic(2).setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
+    uh.harmonic(2).setconditionalconstraint(contact, condexpr, array3x1(0,0,0));
     
     // Set the DC voltage bias on the electrode:
     vh.harmonic(1).setconstraint(electrode, 100);	
@@ -227,7 +227,7 @@ void sparselizard(void)
     std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (uacmax < 0.98385e-9 && uacmax > 0.983848e-9);
+    std::cout << (uacmax < 0.989376e-9 && uacmax > 0.989374e-9);
 }
 
 
