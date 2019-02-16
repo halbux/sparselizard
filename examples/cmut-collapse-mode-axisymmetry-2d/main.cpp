@@ -181,11 +181,16 @@ void sparselizard(void)
     // uh = uh1 + uh2 * sin(2*pi*f0*t), vh = vh1 + vh2 * sin(2*pi*f0*t)
     field uh("h1xyz", {1,2}), vh("h1", {1,2});
     
-    // Force the static deflection to the above solution:
-    uh.harmonic(1).setconstraint(solid, u);
+    // Set the static deflection to the above solution:
+    uh.harmonic(1).setdata(solid, solu|u);
     
     // Clamp on the clamp region:
     uh.setconstraint(clamp);
+    
+    // Set the same conditional constraint as above:
+    uh.harmonic(1).compy().setconditionalconstraint(membrane, condexpr, -0.95*(thcav+1e-8*thcav));
+    // The vibration around the static deflection is 0 at the contact: 
+    uh.harmonic(2).setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
     
     // Set the DC voltage bias on the electrode:
     vh.harmonic(1).setconstraint(electrode, 100);	
@@ -194,8 +199,6 @@ void sparselizard(void)
     // Ground at the clamp:	
     vh.setconstraint(clamp);	
     
-    // The vibration around the static deflection is 0 at the contact: 
-    uh.harmonic(2).setconditionalconstraint(membrane, condexpr, array3x1(0,0,0));
     
     // Redefine the electrostatic and elasticity formulations as above:
     formulation helectrostatics, helasticity;
