@@ -221,6 +221,8 @@ void sparselizard(void)
     vec soluh = solve(helasticity.A(), helasticity.b());
     uh.setdata(solid, soluh);
     uh.write(solid, umesh, "usmallsignal.pos");
+    // Write the vibration at 50 timesteps of a period for a time visualization:
+    (uh-uh.harmonic(1)).write(solid, umesh, "usmallsignal.pos", 1, 50);
     
     // Print the max AC deflection:
     double uacmax = abs(compy(uh.harmonic(2))).max(solid, 5)[0];
