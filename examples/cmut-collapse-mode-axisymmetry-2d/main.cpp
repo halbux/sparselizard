@@ -61,18 +61,20 @@ void sparselizard(void)
     // Set a conditional constraint on compy(u), the y component of the mechanical deflection.
     // The constraint is active for all nodal degrees of freedom at which 'condexpr' is positive or zero. 
     // 
-    // There is mechanical contact if at the same time:
+    // There is mechanical contact if either the deflection is larger than a given threshold 
+    // (chosen as 95% of the gap size times 1+1e-6, not 100% to avoid the need of remeshing the cavity)
+    // or if at the same time:
     // 
-    // - compy(u) is greater than a given deflection (chosen as 95% of the gap size,
-    //	 not 100% to avoid the need of remeshing the cavity)
+    // - compy(u) is greater than a given deflection (95% of the gap size)
     // - the y direction force balance on the node is negative, i.e. the node is pulled downwards
     //
-    // Define conditional expressions for the 2 conditions above. The value of a conditional 
+    // Define conditional expressions for the conditions above. The value of a conditional 
     // expression is the second argument expression at all positions in space where the first 
     // argument is positive or zero. The value is the third argument expression otherwise.
     //
     expression nodeforcebalancecondition = expression(compy(nodalforcebalance), -1, 1);
-    expression condexpr(-compy(u)-thcav*0.95, nodeforcebalancecondition, -1);
+    expression contactcondition(-compy(u)-thcav*0.95, nodeforcebalancecondition, -1);
+    expression condexpr(-compy(u)-(thcav+1e-6*thcav)*0.95, 1, contactcondition);
     // Set the conditional constraint on the y component of the deflection field u:
     u.compy().setconditionalconstraint(contact, condexpr, -0.95*(thcav+1e-8*thcav));
     
@@ -167,7 +169,7 @@ void sparselizard(void)
         umesh.setdata(wholedomain, solumesh);
         
         // Print the iteration number and relative residual norm:
-        std::cout << "Rel. res. norm @it " << iter << " is " << relresnorm << ", max deflection is " << abs(compy(u)).max(solid, 5)[0]*1e9 << " nm" << std::endl;
+        std::cout << "Rel. res. norm @it " << iter << " is " << relresnorm << ", max deflection is " << abs(compy(u)).max(contact, 5)[0]*1e9 << " nm" << std::endl;
         iter++;
     }
     
