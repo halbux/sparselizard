@@ -33,7 +33,7 @@ void sparselizard(void)
     setaxisymmetry();
     
     // The domain regions as defined in 'createmesh':
-    int membrane = 1, pillar = 2, cavity = 3, clamp = 4, electrode = 5, insulator = 6;
+    int membrane = 1, pillar = 2, cavity = 3, ground = 4, electrode = 5, insulator = 6;
     
     // Create the geometry and the mesh:    
     mesh mymesh = createmesh(r, thmem, thcav, thins, lpillar);
@@ -52,11 +52,11 @@ void sparselizard(void)
     //
     field u("h1xyz"), v("h1"), umesh("h1xyz"), nodalforcebalance("h1xyz");
     
-    // Clamp:
+    // Clamp the insulator:
     u.setconstraint(insulator);
     
     v.setconstraint(electrode, 120);	
-    v.setconstraint(clamp, 0);	
+    v.setconstraint(ground, 0);	
     
     // Set a conditional constraint on compy(u), the y component of the mechanical deflection.
     // The constraint is active for all nodal degrees of freedom at which 'condexpr' is positive or zero. 
@@ -186,7 +186,7 @@ void sparselizard(void)
     // Set the static deflection to the above solution:
     uh.harmonic(1).setdata(solid, solu|u);
     
-    // Clamp:
+    // Clamp the insulator:
     uh.setconstraint(insulator);
     
     // Set the same conditional constraint as above:
@@ -198,8 +198,8 @@ void sparselizard(void)
     vh.harmonic(1).setconstraint(electrode, 100);	
     // Set a tiny AC voltage on vh2:
     vh.harmonic(2).setconstraint(electrode, 1);
-    // Ground at the clamp:	
-    vh.setconstraint(clamp);	
+    // Ground:	
+    vh.setconstraint(ground);	
     
     
     // Redefine the electrostatic and elasticity formulations as above:
@@ -242,7 +242,7 @@ void sparselizard(void)
 mesh createmesh(double r, double thmem, double thcav, double thins, double lpillar)
 {
     // Give names to the physical region numbers:
-    int membrane = 1, pillar = 2, cavity = 3, clamp = 4, electrode = 5, insulator = 6;
+    int membrane = 1, pillar = 2, cavity = 3, ground = 4, electrode = 5, insulator = 6;
     
     // Number of mesh layers:
     int nx = 40, nzcavity = 5, nzmembrane = 6, nzinsulator = 3;
@@ -258,8 +258,8 @@ mesh createmesh(double r, double thmem, double thcav, double thins, double lpill
     shape q11("quadrangle", cavity, {0,h,0, r,h,0, r,h+thcav,0, 0,h+thcav,0}, {nx, nzcavity, nx, nzcavity});
     shape q12("quadrangle", pillar, {r,h,0, r+lpillar,h,0, r+lpillar,h+thcav,0, r,h+thcav,0}, {nxpillar, nzcavity, nxpillar, nzcavity});
     
-    // Clamp line:
-    shape clampline("union", clamp, {q01.getsons()[0], q02.getsons()[0]});
+    // Ground line:
+    shape groundline("union", ground, {q01.getsons()[0], q02.getsons()[0]});
     
     // Membrane layer:	
     h = h+thcav;
@@ -270,7 +270,7 @@ mesh createmesh(double r, double thmem, double thcav, double thins, double lpill
     shape electrodeline("union", electrode, {q21.getsons()[2], q22.getsons()[2]});
     
     // Provide to the mesh all shapes of interest:
-    mesh mymesh({q01,q02,q11,q12,q21,q22,clampline,electrodeline});
+    mesh mymesh({q01,q02,q11,q12,q21,q22,groundline,electrodeline});
     
     return mymesh;
 }
