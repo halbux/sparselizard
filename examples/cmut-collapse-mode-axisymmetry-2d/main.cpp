@@ -53,7 +53,6 @@ void sparselizard(void)
     field u("h1xyz"), v("h1"), umesh("h1xyz"), nodalforcebalance("h1xyz");
     
     // Clamp:
-    u.setconstraint(clamp);
     u.setconstraint(insulator);
     
     v.setconstraint(electrode, 120);	
@@ -188,7 +187,6 @@ void sparselizard(void)
     uh.harmonic(1).setdata(solid, solu|u);
     
     // Clamp:
-    uh.setconstraint(clamp);
     uh.setconstraint(insulator);
     
     // Set the same conditional constraint as above:
