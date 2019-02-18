@@ -231,7 +231,7 @@ void sparselizard(void)
     std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (uacmax < 0.989376e-9 && uacmax > 0.989374e-9);
+    std::cout << (uacmax < 0.977925e-9 && uacmax > 0.977923e-9);
 }
 
 
