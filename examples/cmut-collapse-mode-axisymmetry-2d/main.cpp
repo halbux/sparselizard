@@ -52,8 +52,9 @@ void sparselizard(void)
     //
     field u("h1xyz"), v("h1"), umesh("h1xyz"), nodalforcebalance("h1xyz");
     
-    // Clamp on the clamp region:
+    // Clamp:
     u.setconstraint(clamp);
+    u.setconstraint(insulator);
     
     v.setconstraint(electrode, 120);	
     v.setconstraint(clamp, 0);	
@@ -186,8 +187,9 @@ void sparselizard(void)
     // Set the static deflection to the above solution:
     uh.harmonic(1).setdata(solid, solu|u);
     
-    // Clamp on the clamp region:
+    // Clamp:
     uh.setconstraint(clamp);
+    uh.setconstraint(insulator);
     
     // Set the same conditional constraint as above:
     uh.harmonic(1).compy().setconditionalconstraint(contact, condexpr, -0.95*(thcav+1e-8*thcav));
