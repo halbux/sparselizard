@@ -50,6 +50,9 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
     vec rhs = myformulation.rhs(); 
     mat K = myformulation.K(), C = myformulation.C();
     
+    // This will store a matrix used below (might be reused):
+    mat leftmat;
+    
     // Count the number of time steps to step through and the number of vectors to output:
     int numtimesteps = 0; int outputsize = 0;
     for (double t = starttime; t <= endtime; t = t + timestep)
@@ -84,12 +87,12 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             if (isconstant[1] == false)
             {
                 myformulation.generatestiffnessmatrix();
-                K = myformulation.K();
+                K = myformulation.K(false, false);
             }
             if (isconstant[2] == false)
             {
                 myformulation.generatedampingmatrix();
-                C = myformulation.C();
+                C = myformulation.C(false, true);
             }
             if (isconstant[0] == false)
             {
@@ -99,12 +102,15 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             else
                 rhs.updateconstraints();
             
-            // Reuse the LU decomposition when possible:
-            if (timestepindex == 1)
-            	C.reuselu();
+            // Reuse matrices when possible (including the LU decomposition):
+            if (isconstant[1] == false || isconstant[2] == false || timestepindex == 1)
+            {
+                leftmat = C + timestep*K;
+                leftmat.reuselu();
+            }
             
             // Update the solution xnext.
-            xnext = xnext + mathop::solve(C, timestep*(rhs-K*xnext));
+            xnext = mathop::solve(leftmat, C*xnext+timestep*rhs);
             
             // Update all fields in the formulation:
             for (int i = 0; i < allfields.size(); i++)

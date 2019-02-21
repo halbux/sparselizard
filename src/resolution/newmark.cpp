@@ -104,17 +104,17 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             if (isconstant[1] == false)
             {
                 myformulation.generatestiffnessmatrix();
-                K = myformulation.K();
+                K = myformulation.K(false, true);
             }
             if (isconstant[2] == false)
             {
                 myformulation.generatedampingmatrix();
-                C = myformulation.C();
+                C = myformulation.C(false, true);
             }
             if (isconstant[3] == false)
             {
                 myformulation.generatemassmatrix();
-                M = myformulation.M();
+                M = myformulation.M(false, false);
             }
             if (isconstant[0] == false)
             {

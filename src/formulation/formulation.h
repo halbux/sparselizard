@@ -83,17 +83,18 @@ class formulation
         
         // Get the assembled matrices or get the right hanside vector.
         // Choose to discard or not all values after getting the vector/matrix.
+        // Choose to add or not the diagonal ones for the Dirichlet constraints.
         
         // b() is an alias for rhs() and A() for K():
         vec b(bool keepvector = false);
-        mat A(bool keepfragments = false);
+        mat A(bool keepfragments = false, bool skipdiagonalones = false);
         
         vec rhs(bool keepvector = false);
-        mat K(bool keepfragments = false);
-        mat C(bool keepfragments = false);
-        mat M(bool keepfragments = false);
+        mat K(bool keepfragments = false, bool skipdiagonalones = false);
+        mat C(bool keepfragments = false, bool skipdiagonalones = false);
+        mat M(bool keepfragments = false, bool skipdiagonalones = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
-        mat getmatrix(int KCM, bool keepfragments = false);
+        mat getmatrix(int KCM, bool keepfragments = false, bool skipdiagonalones = false);
 
 };
 

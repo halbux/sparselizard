@@ -183,7 +183,7 @@ void formulation::skipconditionalconstraints(bool skipit)
 
 
 vec formulation::b(bool keepvector) { return rhs(keepvector); }
-mat formulation::A(bool keepfragments) { return K(keepfragments); }
+mat formulation::A(bool keepfragments, bool skipdiagonalones) { return K(keepfragments, skipdiagonalones); }
 
 vec formulation::rhs(bool keepvector)
 {
@@ -218,11 +218,11 @@ vec formulation::rhs(bool keepvector)
     return output; 
 }
 
-mat formulation::K(bool keepfragments) { return getmatrix(0, keepfragments); }
-mat formulation::C(bool keepfragments) { return getmatrix(1, keepfragments); }
-mat formulation::M(bool keepfragments) { return getmatrix(2, keepfragments); }
+mat formulation::K(bool keepfragments, bool skipdiagonalones) { return getmatrix(0, keepfragments, skipdiagonalones); }
+mat formulation::C(bool keepfragments, bool skipdiagonalones) { return getmatrix(1, keepfragments, skipdiagonalones); }
+mat formulation::M(bool keepfragments, bool skipdiagonalones) { return getmatrix(2, keepfragments, skipdiagonalones); }
 
-mat formulation::getmatrix(int KCM, bool keepfragments)
+mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
 {
     if (mymat[KCM] == NULL)
         mymat[KCM] = shared_ptr<rawmat>(new rawmat(mydofmanager));
@@ -237,7 +237,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
 	rawout->gauge();
 
     // Add the constraint diagonal ones to the matrix (if any):
-    if (isconstraintcomputation == false)
+    if (skipdiagonalones == false && isconstraintcomputation == false)
     {
         int numconstraineddofs = mydofmanager->countconstraineddofs();
         if (numconstraineddofs > 0)
@@ -251,7 +251,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
     }
     // Add the gauge diagonal ones to the matrix (if any):
     int numgaugeddofs = mydofmanager->countgaugeddofs();
-    if (numgaugeddofs > 0)
+    if (skipdiagonalones == false && numgaugeddofs > 0)
     {
         intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
         // Create a vector of same length full of double ones:
@@ -270,9 +270,11 @@ mat formulation::getmatrix(int KCM, bool keepfragments)
 		if (numcondconstraineddofs > 0)
 		{
 			rawout->zeroentries(condconstrainedindexes, true, false);
-		    densematrix ones(1, numcondconstraineddofs, 1);
-
-		    rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones);  
+			if (skipdiagonalones == false)
+			{
+				densematrix ones(1, numcondconstraineddofs, 1);
+				rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
+		    } 
 	    }
     }
 
