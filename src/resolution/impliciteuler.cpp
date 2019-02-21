@@ -46,9 +46,8 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
     mathop::settime(starttime);
     // Remove leftovers (if any):
     myformulation.rhs(); myformulation.K(); myformulation.C();
-    myformulation.generate();
-    vec rhs = myformulation.rhs(); 
-    mat K = myformulation.K(), C = myformulation.C();
+    vec rhs; 
+    mat K, C;
     
     // This will store a matrix used below (might be reused):
     mat leftmat;
@@ -84,17 +83,17 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             vec xtolcalc = xnext;
             
             // Reassemble only the non-constant matrices:
-            if (isconstant[1] == false)
+            if (isconstant[1] == false || timestepindex == 1)
             {
                 myformulation.generatestiffnessmatrix();
                 K = myformulation.K(false, false);
             }
-            if (isconstant[2] == false)
+            if (isconstant[2] == false || timestepindex == 1)
             {
                 myformulation.generatedampingmatrix();
                 C = myformulation.C(false, true);
             }
-            if (isconstant[0] == false)
+            if (isconstant[0] == false || timestepindex == 1)
             {
                 myformulation.generaterhs();
                 rhs = myformulation.rhs();
