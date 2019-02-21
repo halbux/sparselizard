@@ -103,7 +103,7 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             if (timestepindex == 1)
             	C.reuselu();
             
-            // Update the solution x.
+            // Update the solution xnext.
             xnext = xnext + mathop::solve(C, timestep*(rhs-K*xnext));
             
             // Update all fields in the formulation:
