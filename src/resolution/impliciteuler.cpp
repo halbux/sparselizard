@@ -42,15 +42,10 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, x|field(allfields[i]));
     
-    // Define the rhs vector and the K and C matrices at time 'starttime':
-    mathop::settime(starttime);
     // Remove leftovers (if any):
     myformulation.rhs(); myformulation.K(); myformulation.C();
-    vec rhs; 
-    mat K, C;
     
-    // This will store a matrix used below (might be reused):
-    mat leftmat;
+    vec rhs; mat K, C, leftmat;
     
     // Count the number of time steps to step through and the number of vectors to output:
     int numtimesteps = 0; int outputsize = 0;
