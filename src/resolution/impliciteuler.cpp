@@ -104,7 +104,7 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             	C.reuselu();
             
             // Update the solution x.
-            xnext = x + mathop::solve(C, timestep*(rhs-K*x));
+            xnext = xnext + mathop::solve(C, timestep*(rhs-K*xnext));
             
             // Update all fields in the formulation:
             for (int i = 0; i < allfields.size(); i++)
