@@ -56,7 +56,7 @@ void sparselizard(void)
     // Setting properly the 'isconstant' vector can give a dramatic speedup
     // since it may avoid reassembling or allow reusing the LU factorisation.
     //
-    newmark nm(maxwell, vec(maxwell), vec(maxwell), {true, true, true, true});
+    newmark nm(maxwell, vec(maxwell), vec(maxwell), vec(maxwell), {true, true, true, true});
     
     // Run the Newmark time resolution from the time in the first argument
     // to the time in the third argument by timesteps given as second argument.

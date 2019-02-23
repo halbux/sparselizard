@@ -45,20 +45,20 @@ class newmark
         //
         std::vector<bool> isconstant = {false, false, false, false};
         
-        // The displacement u and speed v at the current time step:
-        vec u, v;
+        // The displacement u, speed v and acceleration a at the current time step:
+        vec u, v, a;
         
         
         std::vector<vec> run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity);
         
     public:
 
-        newmark(formulation formul, vec initdisplacement, vec initspeed, std::vector<bool> isrhskcmconstant = {false, false, false, false}, double b = 0.25, double g = 0.5);
+        newmark(formulation formul, vec initdisplacement, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant = {false, false, false, false}, double b = 0.25, double g = 0.5);
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
         
-        std::vector<vec> getdisplacementandspeed(void) { return {u, v}; };
+        std::vector<vec> getcurrentsolution(void) { return {u, v, a}; };
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
         // seconds. One solution every 'outputeverynthtimestep' time steps is output.

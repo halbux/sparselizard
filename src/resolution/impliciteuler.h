@@ -40,20 +40,20 @@ class impliciteuler
         //
         std::vector<bool> isconstant = {false, false, false};
         
-        // Vector x at the current time step:
-        vec x;
+        // Vector x and dt(x) at the current time step:
+        vec x, dtx;
         
         
         std::vector<vec> run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity);
         
     public:
 
-        impliciteuler(formulation formul, vec initsolution, std::vector<bool> isrhskcconstant = {false, false, false});
+        impliciteuler(formulation formul, vec xinit, vec dtxinit, std::vector<bool> isrhskcconstant = {false, false, false});
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
         
-        vec getsolution(void) { return x; };
+        std::vector<vec> getcurrentsolution(void) { return {x, dtx}; };
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
         // seconds. One solution every 'outputeverynthtimestep' time steps is output.

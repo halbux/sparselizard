@@ -1,6 +1,6 @@
 #include "newmark.h"
 
-newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, std::vector<bool> isrhskcmconstant, double b, double g)
+newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant, double b, double g)
 {
     myformulation = formul;
     
@@ -9,6 +9,7 @@ newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, std::v
     
     u = initdisplacement;
     v = initspeed;
+    a = initacceleration;
     
     if (isrhskcmconstant.size() == 0)
         isconstant = {false,false,false,false};
@@ -56,19 +57,10 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     // Get all indexes at which the fields are constrained:
     intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
     
-    // Define the rhs vector and the K, C and M matrices at time 'starttime':
-    mathop::settime(starttime);
     // Remove leftovers (if any):
     myformulation.rhs(); myformulation.K(); myformulation.C(); myformulation.M();
-    myformulation.generate();
-    vec rhs = myformulation.rhs(); 
-    mat K = myformulation.K(), C = myformulation.C(), M = myformulation.M();
-    
-    // Compute the initial acceleration:
-    vec a = mathop::solve(M, rhs-(C*v+K*u)); 
-    
-    // This will store matrices used in Newmark (might be reused):
-    mat leftmat, matu, matv, mata;
+
+    vec rhs; mat K, C, M, leftmat, matu, matv, mata;
     
     // Count the number of time steps to step through and the number of vectors to output:
     int numtimesteps = 0; int outputsize = 0;
@@ -93,6 +85,9 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
 
         mathop::settime(t);
         
+        // Make all time derivatives available in the universe:
+        universe::xdtxdtdtx = {{u},{v},{a}};
+        
         // Nonlinear loop:
         double relchange = 1; int nlit = 0;
         vec unext = u, vnext, anext;
@@ -101,22 +96,22 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             vec utolcalc = unext;
             
             // Reassemble only the non-constant matrices:
-            if (isconstant[1] == false)
+            if (isconstant[1] == false || timestepindex == 1)
             {
                 myformulation.generatestiffnessmatrix();
                 K = myformulation.K(false, true);
             }
-            if (isconstant[2] == false)
+            if (isconstant[2] == false || timestepindex == 1)
             {
                 myformulation.generatedampingmatrix();
                 C = myformulation.C(false, true);
             }
-            if (isconstant[3] == false)
+            if (isconstant[3] == false || timestepindex == 1)
             {
                 myformulation.generatemassmatrix();
                 M = myformulation.M(false, false);
             }
-            if (isconstant[0] == false)
+            if (isconstant[0] == false || timestepindex == 1)
             {
                 myformulation.generaterhs();
                 rhs = myformulation.rhs();
@@ -142,7 +137,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             // displacement at the next time step:
             vec unextdirichlet(myformulation); 
             unextdirichlet.updateconstraints();
-            vec anextdirichlet = 1/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a );// beta cannot be zero!
+            vec anextdirichlet = 1/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a ); // beta cannot be zero!
             // Here are the constrained values of the next acceleration:
             densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
             
@@ -185,6 +180,9 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
         timestepindex++;
     }
     std::cout << std::endl;
+    
+    // Remove all time derivatives from the universe:
+    universe::xdtxdtdtx = {{},{},{}};
     
     return output;
 }

@@ -19,6 +19,7 @@
 #include "selector.h"
 #include "hierarchicalformfunction.h"
 #include "hierarchicalformfunctioncontainer.h"
+#include "vec.h"
 
 class mesh;
 class jacobian;
@@ -84,6 +85,10 @@ class universe
         // Every row in a given (int)densematrix corresponds to a shape function and every column to a given mesh element.
         // Do not forget to clear 'rhsterms' when you don't want to keep track anymore!
         static std::vector<std::pair<intdensematrix, densematrix>> rhsterms;
+        
+        // This stores the vec containing a solution x, its time derivative dtx and its second time derivative dtdtx
+        // respectively at index 0, 1 and 2. If xdtxdtdtx[i] is an empty vector then that solution is not available.
+        static std::vector<std::vector<vec>> xdtxdtdtx;
 
 };
 

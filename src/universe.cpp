@@ -143,12 +143,5 @@ bool universe::skipgausspointweightproduct = false;
 bool universe::keeptrackofrhsassembly = false;
 std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 
         
-        
+std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};        
 
-
-
-
-
-
-        
-        

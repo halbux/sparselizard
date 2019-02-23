@@ -1,10 +1,11 @@
 #include "impliciteuler.h"
 
-impliciteuler::impliciteuler(formulation formul, vec initsolution, std::vector<bool> isrhskcconstant)
+impliciteuler::impliciteuler(formulation formul, vec xinit, vec dtxinit, std::vector<bool> isrhskcconstant)
 {
     myformulation = formul;
     
-    x = initsolution;
+    x = xinit;
+    dtx = dtxinit;
     
     if (isrhskcconstant.size() == 0)
         isconstant = {false,false,false};
@@ -70,6 +71,9 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
 
         mathop::settime(t);
         
+        // Make all time derivatives available in the universe:
+        universe::xdtxdtdtx = {{x},{dtx},{}};
+        
         // Nonlinear loop:
         double relchange = 1; int nlit = 0;
         vec xnext = x;
@@ -120,7 +124,8 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             if (islinear)
                 break;
         }
-
+        
+        dtx = 1.0/timestep*(xnext-x);
         x = xnext;
         
         if (islinear == false)
@@ -134,6 +139,9 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
         timestepindex++;
     }
     std::cout << std::endl;
+    
+    // Remove all time derivatives from the universe:
+    universe::xdtxdtdtx = {{},{},{}};
     
     return output;
 }
