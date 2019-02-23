@@ -146,8 +146,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
             
             anext = mathop::solve(leftmat, rightvec);
-            anext.getpointer()->setvalues(constraintindexes, anextdirichletval);
-            
+
             // Update u and v:
             unext = u + timestep*v + ((0.5-beta)*timestep*timestep)*a + (beta*timestep*timestep)*anext;
             vnext = v + (timestep*(1-gamma))*a + (gamma*timestep)*anext;
