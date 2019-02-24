@@ -31,15 +31,15 @@ newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, vec in
 
 std::vector<vec> newmark::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
-    return run(true, starttime, timestep, endtime, outputeverynthtimestep, verbosity);
+    return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> newmark::runnonlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
+std::vector<vec> newmark::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
-    return run(false, starttime, timestep, endtime, outputeverynthtimestep, verbosity);
+    return run(false, starttime, timestep, endtime, maxnumnlit, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
+std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
     if (starttime > endtime)
         return {};
@@ -91,7 +91,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
         // Nonlinear loop:
         double relchange = 1; int nlit = 0;
         vec unext = u, vnext, anext;
-        while (relchange > tol)
+        while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
             vec utolcalc = unext;
             
@@ -181,7 +181,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     std::cout << std::endl;
     
     // Remove all time derivatives from the universe:
-    universe::xdtxdtdtx = {{},{},{}};
+    // universe::xdtxdtdtx = {{},{},{}};
     
     return output;
 }
