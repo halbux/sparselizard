@@ -141,7 +141,7 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
     std::cout << std::endl;
     
     // Remove all time derivatives from the universe:
-    // universe::xdtxdtdtx = {{},{},{}};
+    universe::xdtxdtdtx = {{},{},{}};
     
     return output;
 }
