@@ -181,7 +181,7 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     std::cout << std::endl;
     
     // Remove all time derivatives from the universe:
-    // universe::xdtxdtdtx = {{},{},{}};
+    universe::xdtxdtdtx = {{},{},{}};
     
     return output;
 }
