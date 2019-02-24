@@ -85,14 +85,14 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
 
         mathop::settime(t);
         
-        // Make all time derivatives available in the universe:
-        universe::xdtxdtdtx = {{u},{v},{a}};
-        
         // Nonlinear loop:
         double relchange = 1; int nlit = 0;
-        vec unext = u, vnext, anext;
+        vec unext = u, vnext = v, anext = a;
         while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
+        	// Make all time derivatives available in the universe:
+        	universe::xdtxdtdtx = {{unext},{vnext},{anext}};
+        
             vec utolcalc = unext;
             
             // Reassemble only the non-constant matrices:

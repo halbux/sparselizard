@@ -71,14 +71,14 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
 
         mathop::settime(t);
         
-        // Make all time derivatives available in the universe:
-        universe::xdtxdtdtx = {{x},{dtx},{}};
-        
         // Nonlinear loop:
         double relchange = 1; int nlit = 0;
-        vec xnext = x;
+        vec xnext = x, dtxnext = dtx;
         while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
+        	// Make all time derivatives available in the universe:
+        	universe::xdtxdtdtx = {{xnext},{dtxnext},{}};
+        	
             vec xtolcalc = xnext;
             
             // Reassemble only the non-constant matrices:
@@ -108,7 +108,9 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             }
             
             // Update the solution xnext.
-            xnext = mathop::solve(leftmat, C*xnext+timestep*rhs);
+            xnext = mathop::solve(leftmat, C*x+timestep*rhs);
+            
+            dtxnext = 1.0/timestep*(xnext-x);
             
             // Update all fields in the formulation:
             for (int i = 0; i < allfields.size(); i++)
@@ -125,8 +127,8 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
                 break;
         }
         
-        dtx = 1.0/timestep*(xnext-x);
         x = xnext;
+        dtx = dtxnext;
         
         if (islinear == false)
             std::cout << " (" << nlit << "NL it)" << std::flush;
