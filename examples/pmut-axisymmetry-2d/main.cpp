@@ -179,8 +179,7 @@ void sparselizard(void)
     std::cout << "Peak in-phase deflection:   " << 1e9*abs(u.compy().harmonic(2)).max(solid, 6)[0] << " nm" << std::endl;
     std::cout << "Peak quadrature deflection: " << 1e9*abs(u.compy().harmonic(3)).max(solid, 6)[0] << " nm" << std::endl;
     // Output the pressure at 'rfluid' meters above the PMUT center:
-    int pressurenode = regionintersection({yaxis,fluidboundary});
-    double pressureabove = sqrt( pow(scaling*p.harmonic(2),2) + pow(scaling*p.harmonic(3),2) ).max(pressurenode, 1)[0];
+    double pressureabove = sqrt( pow(scaling*p.harmonic(2),2) + pow(scaling*p.harmonic(3),2) ).interpolate(fluid, {0,rfluid,0})[0];
     std::cout << "Pressure at " << 1000*rfluid << " mm above PMUT center: " << pressureabove << " Pa" << std::endl;
     
     clk.print("Total computation time:");
