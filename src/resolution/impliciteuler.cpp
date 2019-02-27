@@ -18,17 +18,17 @@ impliciteuler::impliciteuler(formulation formul, vec xinit, vec dtxinit, std::ve
     }
 }
 
-std::vector<vec> impliciteuler::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
+std::vector<std::vector<vec>> impliciteuler::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
     return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> impliciteuler::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+std::vector<std::vector<vec>> impliciteuler::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
     return run(false, starttime, timestep, endtime, maxnumnlit, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> impliciteuler::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
     if (starttime > endtime)
         return {};
@@ -60,8 +60,8 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
     
     // Start the implicit Euler iteration:
     std::cout << "Implicit Euler for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
-    std::vector<vec> output(outputsize);
-    output[0] = x;
+    std::vector<std::vector<vec>> output(2, std::vector<vec>(outputsize));
+    output[0][0] = x; output[1][0] = dtx;
     
     // We already have everything for time step 0 so we start at 1:
     int timestepindex = 1;
@@ -108,7 +108,7 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
             }
             
             // Update the solution xnext.
-            xnext = mathop::solve(leftmat, C*x+timestep*rhs);
+            xnext = relaxationfactor * mathop::solve(leftmat, C*x+timestep*rhs) + (1.0-relaxationfactor)*xnext;
             
             dtxnext = 1.0/timestep*(xnext-x);
             
@@ -137,7 +137,10 @@ std::vector<vec> impliciteuler::run(bool islinear, double starttime, double time
         
         // Only one every 'outputeverynthtimestep' solutions is output:
         if (timestepindex%outputeverynthtimestep == 0)
-            output[timestepindex/outputeverynthtimestep] = x;
+        {
+            output[0][timestepindex/outputeverynthtimestep] = x;
+            output[1][timestepindex/outputeverynthtimestep] = dtx;
+        }
         timestepindex++;
     }
     std::cout << std::endl;

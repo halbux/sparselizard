@@ -28,6 +28,9 @@ class impliciteuler
         // The convergence tolerance for the fixed-point nonlinear iteration:
         double tol = 1e-3;
         
+        // The relaxation factor for the nonlinear iteration:
+        double relaxationfactor = 1.0;
+        
         // Set 'isconstant[i]' to true and the corresponding matrix/vector is 
         // supposed constant in time and will only be generated once then reused.
         //
@@ -44,7 +47,7 @@ class impliciteuler
         vec x, dtx;
         
         
-        std::vector<vec> run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity);
+        std::vector<std::vector<vec>> run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity);
         
     public:
 
@@ -53,13 +56,17 @@ class impliciteuler
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
         
+        // Set the relaxation factor for the inner nonlinear fixed-point iteration:
+        void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };
+        
         std::vector<vec> getcurrentsolution(void) { return {x, dtx}; };
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
-        // seconds. One solution every 'outputeverynthtimestep' time steps is output.
-        std::vector<vec> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
+        // seconds. output[0] gives the x time-solutions while output[1] gives dt(x). 
+        // One solution every 'outputeverynthtimestep' time steps is output.
+        std::vector<std::vector<vec>> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        std::vector<vec> runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit = -1, int outputeverynthtimestep = 1, int verbosity = 1);
+        std::vector<std::vector<vec>> runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit = -1, int outputeverynthtimestep = 1, int verbosity = 1);
         
 };
 
