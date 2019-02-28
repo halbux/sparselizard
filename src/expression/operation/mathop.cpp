@@ -225,22 +225,40 @@ expression mathop::grad(expression input)
 {
     if (input.countcolumns() != 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'mathop' namespace: can only take the gradient of scalars and column vectors" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only take the gradient of a scalar or an up to length 3 column vector" << std::endl;
         abort();
+    }
+    
+    // Cylindrical transformation of the gradient of a vector (different than of a scalar):
+    if (universe::isaxisymmetric && input.countrows() > 1)
+    {
+    	field x("x");
+    	// The output must be a nx3 matrix:
+    	if (input.countrows() == 2)
+    		return expression(2,3, {compx(dx(input)),compx(dy(input)),0, compy(dx(input)),compy(dy(input)),0});
+		if (input.countrows() == 3)
+			return expression(3,3, {compx(dx(input)),compx(dy(input)),-1.0/x*compz(input), compy(dx(input)),compy(dy(input)),0, compz(dx(input)),compz(dy(input)),1.0/x*compx(input)});
     }
 
     int problemdimension = universe::mymesh->getmeshdimension();
+    // In case of axisymmetry we need a 3 component output vector:
 	if (universe::isaxisymmetric)
 		problemdimension++;
 
     std::vector<expression> myexprs = {};
-    for (int i = 0; i < problemdimension; i++)
+    for (int comp = 0; comp < input.countrows(); comp++)
     {
-        for (int comp = 0; comp < input.countrows(); comp++)
+        for (int i = 0; i < problemdimension; i++)
             myexprs.push_back(input.spacederivative(i+1).at(comp,0));
     }
     
-    return expression(problemdimension, input.countrows(), myexprs);
+    expression output(input.countrows(), problemdimension, myexprs);
+    
+    // We want the gradient of a scalar to be a column vector:
+    if (input.countrows() == 1)
+    	output = output.transpose();
+    
+    return output;
 }
 
 expression mathop::div(expression input)
@@ -250,6 +268,20 @@ expression mathop::div(expression input)
         std::cout << "Error in 'mathop' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
         abort();
     }
+    
+    if (universe::isaxisymmetric)
+    {
+    	field x("x");
+    	switch (input.countrows())
+    	{
+			case 1:
+				return 1.0/x*compx(input)+compx(dx(input));
+			case 2:
+				return 1.0/x*compx(input)+compx(dx(input))+compy(dy(input));
+			case 3:
+				return 1.0/x*compx(input)+compx(dx(input))+compy(dy(input));
+    	}
+	}
 
 	switch (input.countrows())
 	{
@@ -277,6 +309,20 @@ expression mathop::curl(expression input)
     // The curl of a hcurl type field is computed in a special way:
     if (ishcurlfield == false)
     {
+    	if (universe::isaxisymmetric)
+    	{
+    		field x("x");
+		    switch (input.countrows())
+		    {
+		        case 1:
+		            return expression(3,1,{0, 0, compx(dy(input))});
+		        case 2:
+		            return expression(3,1,{0, 0, compx(dy(input))-compy(dx(input))});
+		        case 3:
+		            return expression(3,1,{-compz(dy(input)), 1.0/x*compz(input)+compz(dx(input)), compx(dy(input))-compy(dx(input))});
+		    }
+    	}
+    	
         switch (input.countrows())
         {
             case 1:
@@ -455,10 +501,13 @@ expression mathop::strain(expression input)
         std::cout << "Error in 'mathop' namespace: can only compute the strains of a 2x1 or 3x1 column vector" << std::endl;
         abort();
     }
+    
+    expression gradu = mathop::grad(input);
+    
 	if (input.countrows() == 2)
-		return expression(3,1,{compx(dx(input)), compy(dy(input)), compx(dy(input)) + compy(dx(input))});
+		return expression(3,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(1,0) + gradu.at(0,1)});
 	if (input.countrows() == 3)
-		return expression(6,1,{compx(dx(input)), compy(dy(input)), compz(dz(input)), compy(dz(input)) + compz(dy(input)), compz(dx(input)) + compx(dz(input)), compy(dx(input)) + compx(dy(input))});
+		return expression(6,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(2,2), gradu.at(2,1) + gradu.at(1,2), gradu.at(0,2) + gradu.at(2,0), gradu.at(0,1) + gradu.at(1,0)});
 }
 
 expression mathop::greenlagrangestrain(expression gradu)
@@ -468,8 +517,8 @@ expression mathop::greenlagrangestrain(expression gradu)
 
 	if (gradu.countrows() == 2 && gradu.countcolumns() == 2)
 	{
-		expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(0,1,gradu);
-		expression dycompxu = entry(1,0,gradu), dycompyu = entry(1,1,gradu);
+		expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(1,0,gradu);
+		expression dycompxu = entry(0,1,gradu), dycompyu = entry(1,1,gradu);
 
 		expression output = expression(3,1, {
 								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2)), 
@@ -480,9 +529,9 @@ expression mathop::greenlagrangestrain(expression gradu)
 	}
 	if (gradu.countrows() == 3 && gradu.countcolumns() == 3)
 	{
-		expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(0,1,gradu), dxcompzu = entry(0,2,gradu);
-		expression dycompxu = entry(1,0,gradu), dycompyu = entry(1,1,gradu), dycompzu = entry(1,2,gradu);
-		expression dzcompxu = entry(2,0,gradu), dzcompyu = entry(2,1,gradu), dzcompzu = entry(2,2,gradu);
+		expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(1,0,gradu), dxcompzu = entry(2,0,gradu);
+		expression dycompxu = entry(0,1,gradu), dycompyu = entry(1,1,gradu), dycompzu = entry(2,1,gradu);
+		expression dzcompxu = entry(0,2,gradu), dzcompyu = entry(1,2,gradu), dzcompzu = entry(2,2,gradu);
 
 		expression output = expression(6,1, {
 								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2) + pow(dxcompzu,2)), 
@@ -659,7 +708,6 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 		
 		if (myoption == "planestrain" || myoption == "planestress")
 		{
-			// NOTE: All vector gradients are transposed compared to standard notations!
 			H.reuseit();
 			
 			expression gradu = grad(u);
@@ -674,13 +722,13 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 			expression graddofdu = grad(dofu)-gradu;
 			expression gradtfdu = grad(tfu);
 
-			expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
+			expression ei = 0.5*( graddofdu + transpose(graddofdu) + transpose(gradu)*graddofdu + transpose(graddofdu)*gradu );
 			ei = expression(3,1, { entry(0,0,ei),entry(1,1,ei),2*entry(0,1,ei) });
 
-			expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + gradtfdu*transpose(gradu) );
+			expression deltae = 0.5*( gradtfdu + transpose(gradtfdu) + transpose(gradu)*gradtfdu + transpose(gradtfdu)*gradu );
 			deltae = expression(3,1, { entry(0,0,deltae),entry(1,1,deltae),2*entry(0,1,deltae) });
 
-			expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + gradtfdu*transpose(graddofdu) );
+			expression deltaeta = 0.5*( transpose(graddofdu) * gradtfdu + transpose(gradtfdu)*graddofdu );
 			deltaeta = expression(3,1, { entry(0,0,deltaeta),entry(1,1,deltaeta),2*entry(0,1,deltaeta) });
 
 			prestress.reuseit();
@@ -710,7 +758,6 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
             abort();
         }
 
-		// NOTE: All vector gradients are transposed compared to standard notations!
 		H.reuseit();
 
 		expression gradu = grad(u);
@@ -725,13 +772,13 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 		expression graddofdu = grad(dofu)-gradu;
 		expression gradtfdu = grad(tfu);
 
-		expression ei = 0.5*( transpose(graddofdu) + graddofdu + gradu*transpose(graddofdu) + graddofdu*transpose(gradu) );
+		expression ei = 0.5*( graddofdu + transpose(graddofdu) + transpose(gradu)*graddofdu + transpose(graddofdu)*gradu );
 		ei = expression(6,1, { entry(0,0,ei),entry(1,1,ei),entry(2,2,ei),2*entry(1,2,ei),2*entry(0,2,ei),2*entry(0,1,ei) });
 
-		expression deltae = 0.5*( transpose(gradtfdu) + gradtfdu + gradu*transpose(gradtfdu) + gradtfdu*transpose(gradu) );
+		expression deltae = 0.5*( gradtfdu + transpose(gradtfdu) + transpose(gradu)*gradtfdu + transpose(gradtfdu)*gradu );
 		deltae = expression(6,1, { entry(0,0,deltae),entry(1,1,deltae),entry(2,2,deltae),2*entry(1,2,deltae),2*entry(0,2,deltae),2*entry(0,1,deltae) });
 
-		expression deltaeta = 0.5*( graddofdu * transpose(gradtfdu) + gradtfdu*transpose(graddofdu) );
+		expression deltaeta = 0.5*( transpose(graddofdu) * gradtfdu + transpose(gradtfdu)*graddofdu );
 		deltaeta = expression(6,1, { entry(0,0,deltaeta),entry(1,1,deltaeta),entry(2,2,deltaeta),2*entry(1,2,deltaeta),2*entry(0,2,deltaeta),2*entry(0,1,deltaeta) });
 
 		prestress.reuseit();
@@ -752,6 +799,9 @@ expression mathop::predefinedelectrostaticforce(expression gradtfu, expression E
         std::cout << "Error in 'mathop' namespace: force formula is undefined for 1D displacements" << std::endl;
         abort();
     }
+    
+    gradtfu = gradtfu.transpose();
+    
     if (gradtfu.countcolumns() == 2)
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu)) );
     if (gradtfu.countcolumns() == 3)

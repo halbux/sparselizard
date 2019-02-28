@@ -1301,15 +1301,6 @@ expression expression::spacederivative(int whichderivative)
             derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
         else
         {
-			// In case the problem is axisymmetric the z derivatives of 'h1xyz' field u are all 0 
-			// except for the z component uz for which it is 1/x*ux. dx and dy are unchanged.
-			if (universe::isaxisymmetric && whichderivative == 3 && i == 2)
-			{ 
-					field x("x");
-					derivated.myoperations[i] = (1/x*mathop::compx(*this)).myoperations[0]; 
-					continue;
-			}
-
 		    if (whichderivative > problemdimension)
 		    {
 		        std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));
