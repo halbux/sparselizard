@@ -62,7 +62,7 @@ void sparselizard(void)
     //
     // div(1/rho * grad(v)) = 0
     //	
-    // with v = -grad(E)
+    // with E = -grad(v)
     //	
     formulation electrokinetics;
     
