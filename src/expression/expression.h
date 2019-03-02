@@ -44,12 +44,12 @@ class expression
 {    
     private:
         
-        int mynumrows = 1;
-        int mynumcols = 1;
+        int mynumrows = 0;
+        int mynumcols = 0;
         
         // myoperations[i*mynumcols+j] gives the 
         // expression operation defined at row i, column j.
-        std::vector<std::shared_ptr<operation>> myoperations;
+        std::vector<std::shared_ptr<operation>> myoperations = {};
         
         // Is this expression the projection on the physical element of a 
         // vector form function based-field defined in the reference element?

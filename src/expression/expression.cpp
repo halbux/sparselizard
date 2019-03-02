@@ -35,7 +35,7 @@ expression::expression(field input)
     }
 }
 
-expression::expression(double input) { myoperations = {std::shared_ptr<opconstant>(new opconstant(input))}; }
+expression::expression(double input) { mynumrows = 1; mynumcols = 1; myoperations = {std::shared_ptr<opconstant>(new opconstant(input))}; }
 
 expression::expression(parameter& input)
 { 
@@ -1212,7 +1212,7 @@ vec expression::integrateonelements(int physreg, field onefield, int integration
 
 void expression::print(void)
 {
-    std::cout << std::endl;
+    std::cout << std::endl << "Expression size is " << mynumrows << "x" << mynumcols << std::endl;
 
     for (int row = 0; row < mynumrows; row++)
     {          
@@ -1235,6 +1235,8 @@ expression expression::at(int row, int col)
         std::cout << "Error in 'expression' object: trying to get entry (" << row << ", " << col << ") in a " << mynumrows << " by " << mynumcols << " expression array" << std::endl;
         abort();
     }
+    arrayentry.mynumrows = 1; 
+    arrayentry.mynumcols = 1; 
     arrayentry.myoperations = {myoperations[row*mynumcols+col]};
 
     return arrayentry;
@@ -1432,6 +1434,8 @@ expression expression::determinant(void)
     }
     
     expression output;
+    output.mynumrows = 1;
+    output.mynumcols = 1;
     output.myoperations = {determ};
     return output;
 }
@@ -1656,6 +1660,8 @@ expression expression::log10(void)
 expression expression::time(void)
 {
     expression exp;
+    exp.mynumrows = 1;
+    exp.mynumcols = 1;
     exp.myoperations = {std::shared_ptr<optime>(new optime)};
     
     return exp;
@@ -1664,6 +1670,8 @@ expression expression::time(void)
 expression expression::invjac(int row, int col)
 {
     expression exp;
+    exp.mynumrows = 1;
+    exp.mynumcols = 1;
     exp.myoperations = {std::shared_ptr<opinvjac>(new opinvjac(row,col))};
     
     return exp;
@@ -1672,6 +1680,8 @@ expression expression::invjac(int row, int col)
 expression expression::jac(int row, int col)
 {
     expression exp;
+    exp.mynumrows = 1;
+    exp.mynumcols = 1;
     exp.myoperations = {std::shared_ptr<opjac>(new opjac(row,col))};
     
     return exp;
@@ -1680,6 +1690,8 @@ expression expression::jac(int row, int col)
 expression expression::detjac(void)
 {
     expression exp;
+    exp.mynumrows = 1;
+    exp.mynumcols = 1;
     exp.myoperations = {std::shared_ptr<opdetjac>(new opdetjac)};
     
     return exp;
@@ -1965,6 +1977,8 @@ expression expression::operator*(expression input)
         std::shared_ptr<opsum> op(new opsum);
         for (int i = 0; i < std::max(mynumrows,mynumcols); i++)
             op->addterm( std::shared_ptr<opproduct>(new opproduct( {myoperations[i], input.myoperations[i]} )) );
+        output.mynumrows = 1;
+        output.mynumcols = 1;
         output.myoperations = {op};
         return output;
     }
