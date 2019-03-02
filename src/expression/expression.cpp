@@ -116,7 +116,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 
 expression::expression(const std::vector<std::vector<expression>> input)
 {	
-	if (input.size() == 0 || input[0].size() == 0)
+	if (input.size() == 0 || input.size() == 1 && input[0].size() == 0)
 		return;
 
 	// Single column special case:
