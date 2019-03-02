@@ -116,12 +116,15 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 
 expression::expression(const std::vector<std::vector<expression>> input)
 {	
-	if (input.size() == 0 || input.size() == 1 && input[0].size() == 0)
+	if (input.size() == 0)
 		return;
 
 	// Single column special case:
 	if (input.size() == 1)
 	{
+		if (input[0].size() == 0)
+			return;
+	
 		// Get the final expression dimension:
 		int numcols = input[0][0].mynumcols;
 		int numrows = 0;
