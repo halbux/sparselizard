@@ -206,6 +206,44 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
 	}
 }
 
+expression expression::getrow(int rownum)
+{
+	if (rownum < 0 || rownum >= mynumrows)
+	{
+		std::cout << "Error in 'expression object': cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+		abort();
+	}
+	
+	expression output;
+	output.mynumrows = 1;
+	output.mynumcols = mynumcols;
+	output.myoperations.resize(mynumcols); 
+	
+	for (int i = 0; i < mynumcols; i++)
+		output.myoperations[i] = myoperations[rownum*mynumcols+i];
+
+	return output;
+}
+
+expression expression::getcolumn(int colnum)
+{
+	if (colnum < 0 || colnum >= mynumcols)
+	{
+		std::cout << "Error in 'expression object': cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+		abort();
+	}
+	
+	expression output;
+	output.mynumrows = mynumrows;
+	output.mynumcols = 1;
+	output.myoperations.resize(mynumrows); 
+	
+	for (int i = 0; i < mynumrows; i++)
+		output.myoperations[i] = myoperations[i*mynumcols+colnum];
+
+	return output;
+}
+
 void expression::reorderrows(std::vector<int> neworder)
 {
 	if (mynumrows != neworder.size())

@@ -83,6 +83,10 @@ class expression
         int countrows(void) { return mynumrows; };
         int countcolumns(void) { return mynumcols; };
         
+        // Get a given row/column in a matrix expression:
+        expression getrow(int rownum);
+        expression getcolumn(int colnum);
+        
         void reorderrows(std::vector<int> neworder);
         void reordercolumns(std::vector<int> neworder);
         
