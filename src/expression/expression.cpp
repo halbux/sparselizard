@@ -114,6 +114,59 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     }
 }
 
+expression::expression(const std::vector<std::vector<expression>> input)
+{	
+	if (input.size() == 0 || input[0].size() == 0)
+		return;
+
+	// Single column special case:
+	if (input.size() == 1)
+	{
+		// Get the final expression dimension:
+		int numcols = input[0][0].mynumcols;
+		int numrows = 0;
+		for (int i = 0; i < input[0].size(); i++)
+		{
+			if (input[0][i].mynumcols != numcols)
+		    {
+		        std::cout << "Error in 'expression' object: expression dimension mismatch in concatenation" << std::endl;
+		        abort();
+		    }
+		    numrows += input[0][i].mynumrows;
+	    }
+
+	    mynumrows = numrows;
+	    mynumcols = numcols;
+	    myoperations.resize(numrows*numcols);
+	    
+	    int index = 0;
+	    for (int i = 0; i < input[0].size(); i++)
+		{
+			for (int j = 0; j < input[0][i].mynumrows*input[0][i].mynumcols; j++)
+			{
+				myoperations[index] = input[0][i].myoperations[j];
+				index++;
+			}
+	    }
+	    return;
+    }
+	
+	// Combine all rows in each column:
+	std::vector<std::vector<expression>> exprs(1,std::vector<expression>(input.size()));
+	for (int i = 0; i < input.size(); i++)
+	{
+		expression rowsconcatenated({input[i]});
+		exprs[0][i] = rowsconcatenated.transpose();
+	}	
+	
+	expression finalconcatenated(exprs);
+	finalconcatenated = finalconcatenated.transpose();
+	
+	mynumrows = finalconcatenated.mynumrows;
+	mynumcols = finalconcatenated.mynumcols;
+	myoperations = finalconcatenated.myoperations;
+}
+
 expression::expression(expression condexpr, expression exprtrue, expression exprfalse)
 {
 	// Make sure the conditional expression is a scalar:
