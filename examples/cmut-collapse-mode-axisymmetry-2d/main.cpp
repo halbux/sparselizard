@@ -109,7 +109,7 @@ void sparselizard(void)
     // the gradient of the previously computed electric potential field and the electric permittivity.
     //
     // The electrostatic forces are computed on the mesh deformed by field umesh.
-    elasticity += integral(wholedomain, umesh, predefinedelectrostaticforce(grad(tf(u,solid)), grad(v), epsilon));
+    elasticity += integral(wholedomain, umesh, predefinedelectrostaticforce(tf(u,solid), grad(v), epsilon));
     
     
     // Solve the Laplace equation in the cavity to smoothly deform the mesh.
@@ -209,7 +209,7 @@ void sparselizard(void)
     helasticity += integral(solid, predefinedelasticity(dof(uh), tf(uh), u, E, nu, 0.0));
     // Here the electrostatic force must be computed using an FFT (on 5 timesteps)
     // because the force calculation involves nonlinear operations on multiharmonic fields:
-    helasticity += integral(wholedomain, 5, umesh, predefinedelectrostaticforce(grad(tf(uh,solid)), grad(vh), epsilon));
+    helasticity += integral(wholedomain, 5, umesh, predefinedelectrostaticforce(tf(uh,solid), grad(vh), epsilon));
     // The inertia term is added for the harmonic analysis:
     helasticity += integral(solid, -rho*dtdt(dof(uh))*tf(uh));
     
@@ -231,7 +231,7 @@ void sparselizard(void)
     std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (uacmax < 0.977925e-9 && uacmax > 0.977923e-9);
+    std::cout << (uacmax < 0.977678e-9 && uacmax > 0.977675e-9);
 }
 
 

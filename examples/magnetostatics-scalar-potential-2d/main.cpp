@@ -116,7 +116,7 @@ void sparselizard(void)
 	// The force term integral must be performed on all elements in the steel region AND in the ELEMENT LAYER AROUND.
 	// This is obtained by considering the elements on the whole domain 'wholedomain'. Since the force must only be
 	// calculated on the steel disk, the test functions are only selected on the steel (this is done with tf(..., steel)). 
-	forceprojection += integral(wholedomain, - predefinedmagnetostaticforce(grad(tf(magforce, steel)), -grad(phi), mu));
+	forceprojection += integral(wholedomain, - predefinedmagnetostaticforce(tf(magforce, steel), -grad(phi), mu));
 
 	forceprojection.generate();
 	vec solf = solve(forceprojection.A(), forceprojection.b());

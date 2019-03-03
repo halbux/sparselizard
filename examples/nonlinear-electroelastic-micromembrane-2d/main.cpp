@@ -89,7 +89,7 @@ void sparselizard(void)
     // the gradient of the previously computed electric potential field and the electric permittivity.
     //
     // The electrostatic forces are computed on the mesh deformed by field umesh.
-    elasticity += integral(electricdomain, umesh, predefinedelectrostaticforce(grad(tf(u,solid)), grad(v), epsilon));
+    elasticity += integral(electricdomain, umesh, predefinedelectrostaticforce(tf(u,solid), grad(v), epsilon));
     
     
     // Solve the Laplace equation in the vacuum gap to smoothly deform the mesh.
