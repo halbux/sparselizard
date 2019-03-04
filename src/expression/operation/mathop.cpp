@@ -237,7 +237,7 @@ expression mathop::grad(expression input)
     	if (input.countrows() == 2)
     		return expression(2,3, {compx(dx(input)),compx(dy(input)),0, compy(dx(input)),compy(dy(input)),0});
 		if (input.countrows() == 3)
-			return expression(3,3, {compx(dx(input)),compx(dy(input)),-1.0/x*compz(input), compy(dx(input)),compy(dy(input)),0, compz(dx(input)),compz(dy(input)),1.0/x*compx(input)});
+			return expression(3,3, {compx(dx(input)),compx(dy(input)),1.0/x*compz(input), compy(dx(input)),compy(dy(input)),0, -compz(dx(input)),-compz(dy(input)),1.0/x*compx(input)});
     }
 
     int problemdimension = universe::mymesh->getmeshdimension();
@@ -319,7 +319,7 @@ expression mathop::curl(expression input)
 		        case 2:
 		            return expression(3,1,{0, 0, compx(dy(input))-compy(dx(input))});
 		        case 3:
-		            return expression(3,1,{-compz(dy(input)), 1.0/x*compz(input)+compz(dx(input)), compx(dy(input))-compy(dx(input))});
+		            return expression(3,1,{compz(dy(input)), -1.0/x*compz(input)-compz(dx(input)), compx(dy(input))-compy(dx(input))});
 		    }
     	}
     	
