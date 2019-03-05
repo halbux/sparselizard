@@ -41,6 +41,28 @@ lagrangeformfunction::lagrangeformfunction(int elementtypenumber, int order, con
             myformfunctionpolynomials = lagrangepyramid::getformfunctionpolynomials(myorder);
             break;
     }
+    
+    // To avoid problems at the y axis in axisymmetric simulations the nodes are brought slightly closer to the barycenter:
+    if (universe::isaxisymmetric)
+    {
+    	int numnodes = mynodecoordinates.size()/3;
+    
+    	std::vector<double> curbarycenter(3,0.0);
+    	for (int i = 0; i < numnodes; i++)
+    	{
+    		curbarycenter[0] += mynodecoordinates[3*i+0]/numnodes;
+    		curbarycenter[1] += mynodecoordinates[3*i+1]/numnodes;
+    		curbarycenter[2] += mynodecoordinates[3*i+2]/numnodes;
+    	}
+		
+		double lambda = 1e-15;
+		for (int i = 0; i < numnodes; i++)
+    	{
+			mynodecoordinates[3*i+0] = (1.0-lambda)*mynodecoordinates[3*i+0] + lambda*curbarycenter[0];
+    		mynodecoordinates[3*i+1] = (1.0-lambda)*mynodecoordinates[3*i+1] + lambda*curbarycenter[1];
+    		mynodecoordinates[3*i+2] = (1.0-lambda)*mynodecoordinates[3*i+2] + lambda*curbarycenter[2];
+		}
+    }
 }
 
 densematrix lagrangeformfunction::getderivative(int whichderivative)

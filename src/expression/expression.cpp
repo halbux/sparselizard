@@ -521,6 +521,10 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     	xyz[3*i+0] = xyzcoord[3*reorderingvector[i]+0];
     	xyz[3*i+1] = xyzcoord[3*reorderingvector[i]+1];
     	xyz[3*i+2] = xyzcoord[3*reorderingvector[i]+2];
+    	
+    	// Slightly shift the x coordinate away from the y axis in case of axisymmetry:
+    	if (universe::isaxisymmetric && std::abs(xyz[3*i+0]) < 1e-50)
+    		xyz[3*i+0] = 1e-50;
     }
 		
     disjointregions* mydisjregs = universe::mymesh->getdisjointregions();

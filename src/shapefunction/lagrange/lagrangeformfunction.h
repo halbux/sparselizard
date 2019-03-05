@@ -13,6 +13,7 @@
 #include "polynomial.h"
 #include "element.h"
 #include <iomanip>
+#include "universe.h"
 
 #include "lagrangepoint.h"
 #include "lagrangeline.h"
