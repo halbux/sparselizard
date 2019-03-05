@@ -1611,6 +1611,9 @@ expression expression::dof(int physreg)
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {            
+    	if (doftag.myoperations[i]->isconstant() && doftag.myoperations[i]->getvalue() == 0)
+    		continue;
+    
         if (doftag.myoperations[i]->isfield())
         {
             if (doftag.myoperations[i]->getspacederivative() != 0 || doftag.myoperations[i]->getkietaphiderivative() != 0 || doftag.myoperations[i]->gettimederivative() != 0)
@@ -1625,7 +1628,7 @@ expression expression::dof(int physreg)
         }
         else
         {
-            std::cout << "Error in 'expression' object: the argument of dof() must be a field or field expression" << std::endl; 
+            std::cout << "Error in 'expression' object: the argument of dof() must be a field or a field expression (constant 0 is allowed)" << std::endl; 
             abort();
         }     
     }
@@ -1646,6 +1649,9 @@ expression expression::tf(int physreg)
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {            
+    	if (tftag.myoperations[i]->isconstant() && tftag.myoperations[i]->getvalue() == 0)
+    		continue;
+    		
         if (tftag.myoperations[i]->isfield())
         {
             if (tftag.myoperations[i]->getspacederivative() != 0 || tftag.myoperations[i]->getkietaphiderivative() != 0 || tftag.myoperations[i]->gettimederivative() != 0)
@@ -1660,7 +1666,7 @@ expression expression::tf(int physreg)
         }
         else
         {
-            std::cout << "Error in 'expression' object: the argument of tf() must be a field or field expression" << std::endl; 
+            std::cout << "Error in 'expression' object: the argument of tf() must be a field or a field expression (constant 0 is allowed)" << std::endl; 
             abort();
         }     
     }
