@@ -30,6 +30,9 @@ std::vector<std::vector<vec>> impliciteuler::runnonlinear(double starttime, doub
 
 std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
+    // Solve end time rounding issues:
+    endtime += endtime*1e-12;
+    
     if (starttime > endtime)
         return {};
     
