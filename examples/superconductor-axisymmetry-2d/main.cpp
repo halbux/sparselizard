@@ -29,7 +29,7 @@ void sparselizard(void)
     // Define the whole domain for convenience:
     int wholedomain = regionunion({tube, air});
     
-    // Magnetic permittivity of the air:
+    // Magnetic permeability of the air:
     double mu = 4.0*getpi()*1e-7;
     
     // In this axisymmetric problem the magnetic vector potential can
