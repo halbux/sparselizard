@@ -107,10 +107,10 @@ void sparselizard(void)
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         // Interpolate at a x coordinate slightly away from 0 to avoid NaN issues:
-        bcenter[i] = norm(curl(a)+bsource).interpolate(wholedomain, {1e-10,0,0})[0];
+        bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];
         std::cout << "b source " << i << " mT --> b tube center " << bcenter[i]*1e3 << " mT" << std::endl;
     }
-    // Write to text file the field at the tube center for all timesteps:
+    // Write to file the field at the tube center for all timesteps:
     writevector("bcenter.csv", bcenter);
     
     // Code validation line. Can be removed:
