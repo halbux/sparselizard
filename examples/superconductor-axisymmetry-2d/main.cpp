@@ -60,16 +60,16 @@ void sparselizard(void)
     // Here grad(v) is zero because of axisymmetry and the electric field becomes:
     expression e = -dt(a)-dtasource;
     
- 	// The conductivity of the high temperature superconductor is modelled using 
- 	// a power law relation between the electric field and the current density:
-	//
-	// J = Jc/Ec^(1/n) * norm(E)^((1-n)/n) * E
-	//    |_______________________________|
-	//                sigma(E)
-	//
-	// where the critical current density Jc [A/m^2] and critical electric field Ec [V/m] are supposed 
-	// constant here and the J(E) relation is isotropic. An extra 1e-11 is added to never divide by 0.
-	//
+    // The conductivity of the high temperature superconductor is modelled using 
+    // a power law relation between the electric field and the current density:
+    //
+    // J = Jc/Ec^(1/n) * norm(E)^((1-n)/n) * E
+    //    |_______________________________|
+    //                sigma(E)
+    //
+    // where the critical current density Jc [A/m^2] and critical electric field Ec [V/m] are supposed 
+    // constant here and the J(E) relation is isotropic. An extra 1e-11 is added to never divide by 0.
+    //
     double n = 30.0, Ec = 1e-4, Jc = 1e8;
     
     expression sigma = Jc/( pow(Ec,1.0/n) ) * pow( norm(e) + 1e-11, (1.0-n)/n );
