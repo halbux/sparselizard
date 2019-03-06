@@ -61,7 +61,7 @@ void sparselizard(void)
     //
     expression e = -dt(a)-dtasource;
     
-    // The conductivity of the high temperature superconductor is modelled using 
+    // The conductivity of the high temperature superconductor is modeled using 
     // a power law relation between the electric field and the current density:
     //
     // J = Jc/Ec^(1/n) * norm(E)^((1-n)/n) * E
@@ -94,7 +94,7 @@ void sparselizard(void)
     // Use a 1 second timestep:
     double timestep = 1.0;
     // Run from 0 to 150 sec with a fixed-point nonlinear iteration at every timestep:
-    std::vector<std::vector<vec>> sols = eul.runnonlinear(0.0, timestep, 150);
+    std::vector<std::vector<vec>> sols = eul.runnonlinear(0.0, timestep, 150.0);
     // Field a is available at every timestep in sols[0] and its time derivative in sols[1]:
     std::vector<vec> asol = sols[0];
     std::vector<vec> dtasol = sols[1];
