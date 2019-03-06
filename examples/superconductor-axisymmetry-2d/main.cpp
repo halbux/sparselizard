@@ -58,6 +58,7 @@ void sparselizard(void)
     // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js, with b = curl(a) and e = -dt(a) - grad(v)
     //
     // Here grad(v) is zero because of axisymmetry and the electric field becomes:
+    //
     expression e = -dt(a)-dtasource;
     
     // The conductivity of the high temperature superconductor is modelled using 
