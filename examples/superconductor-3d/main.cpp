@@ -78,19 +78,6 @@ void sparselizard(void)
     // 
     // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js, with b = curl(a) and e = -dt(a) - grad(v)
     //
-    // and the corresponding weak formulation is
-    //
-    // Magnetic equation:
-    //
-    // magdyn += integral(wholedomain, 1/mu* curl(dof(a)) * curl(tf(a)) );
-    // magdyn += integral(conductor, sigma*dt(dof(a))*tf(a) + sigma* grad(dof(v))*tf(a) );
-    //
-    // Electric equation:
-    //
-    // magdyn += integral(conductor, sigma*grad(dof(v))*grad(tf(v)) + sigma*dt(dof(a))*grad(tf(v)) );
-    //
-    // here with a expressed as a sum of a time dependent 'asource' and an unknown reaction field 'dof(a)'.
-    //
     expression e = -dt(a)-dtasource - grad(v);
     
     // The conductivity of the high temperature superconductor is modeled using 
