@@ -98,7 +98,7 @@ void sparselizard(void)
     // Define the weak magnetodynamic formulation:
     formulation magdyn;
     
-    // Magnetic equation (an extra odd integration degree for convergence):
+    // Magnetic equation (add an extra odd integration degree for convergence):
     magdyn += integral(wholedomain, 1/mu*( curl(dof(a)) + bsource ) * curl(tf(a)) );
     magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*tf(a), +1 );
     magdyn += integral(tube, sigma*grad(dof(v))*tf(a) );
