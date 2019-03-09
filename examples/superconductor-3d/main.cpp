@@ -29,7 +29,7 @@ void sparselizard(void)
     // The domain regions as defined in 'createmesh':
     int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
     
-    // Tube thickness, height, inner radius and domain radius [m]:
+    // Tube thickness, height, inner radius and domain size [m]:
     double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 40e-3;
     
     // Create the geometry and the mesh:   
