@@ -24,27 +24,27 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
 
 void sparselizard(void)
 {	
-	wallclock clk;
-
-	// The domain regions as defined in 'createmesh':
-	int wholedomain = 1, tube = 2, insidetube = 3, air = 4, tubeskin = 5, domainskin = 6, ground = 7, boxcut = 8;
-
-	// Tube thickness, height, inner radius and domain radius [m]:
-	double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 40e-3;
-	
-	// Create the geometry and the mesh:   
-	mesh mymesh = createmesh(thtube, htube, rintube, linf, 7, 4, 9, 8);
-	
-	// Define a region to visualise the solution:
-	boxcut = regionexclusion(wholedomain, boxcut);
-	
-	// Write the mesh for display:
-	mymesh.write("tubeinair.msh");
-	
-	
-	// Magnetic permittivity of the air:
- 	double mu = 4*getpi()*1e-7;
-	
+    wallclock clk;
+    
+    // The domain regions as defined in 'createmesh':
+    int wholedomain = 1, tube = 2, insidetube = 3, air = 4, tubeskin = 5, domainskin = 6, ground = 7, boxcut = 8;
+    
+    // Tube thickness, height, inner radius and domain radius [m]:
+    double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 40e-3;
+    
+    // Create the geometry and the mesh:   
+    mesh mymesh = createmesh(thtube, htube, rintube, linf, 7, 4, 9, 8);
+    
+    // Define a region to visualise the solution:
+    boxcut = regionexclusion(wholedomain, boxcut);
+    
+    // Write the mesh for display:
+    mymesh.write("tubeinair.msh");
+    
+    
+    // Magnetic permittivity of the air:
+    double mu = 4*getpi()*1e-7;
+    
     // Define a spanning tree to gauge the magnetic vector potential (otherwise the matrix to invert is singular).
     // Start growing the tree from the regions with constrained potential vector (here the domain boundary): 
     spanningtree spantree({domainskin});
@@ -67,13 +67,13 @@ void sparselizard(void)
     // source term and an unknown part to be determined: atotal = a + asource.
     // We want to apply an external induction field b of 1 mT in 
     // the z direction that linearly increases over time:
-	expression bsource = array3x1(0,0,1e-3)*t();
-	// Since b = curl(a) a valid choice for a is:
-	expression asource = 1e-3*0.5*array3x1(-y,x,0)*t();
-	// And dt(a)/dt is:
-	expression dtasource = 1e-3*0.5*array3x1(-y,x,0);
-
-
+    expression bsource = array3x1(0,0,1e-3)*t();
+    // Since b = curl(a) a valid choice for a is:
+    expression asource = 1e-3*0.5*array3x1(-y,x,0)*t();
+    // And dt(a)/dt is:
+    expression dtasource = 1e-3*0.5*array3x1(-y,x,0);
+    
+    
     // The strong form of the magnetodynamic a-v formulation is 
     // 
     // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js, with b = curl(a) and e = -dt(a) - grad(v)
@@ -91,7 +91,7 @@ void sparselizard(void)
     //
     // here with a expressed as a sum of a time dependent 'asource' and an unknown reaction field 'dof(a)'.
     //
-	expression e = -dt(a)-dtasource - grad(v);
+    expression e = -dt(a)-dtasource - grad(v);
     
     // The conductivity of the high temperature superconductor is modeled using 
     // a power law relation between the electric field and the current density:
@@ -103,11 +103,11 @@ void sparselizard(void)
     // where the critical current density Jc [A/m^2] and critical electric field Ec [V/m] are supposed 
     // constant here and the J(E) relation is isotropic. An extra 1e-11 is added to never divide by 0.
     //
-	double n = 30.0, Ec = 1e-4, Jc = 1e8, eps = 1e-11;
-	
- 	expression sigma = Jc/( pow(Ec,1.0/n) ) * pow( norm(e)+eps, (1.0-n)/n );
-	
-	
+    double n = 30.0, Ec = 1e-4, Jc = 1e8, eps = 1e-11;
+    
+    expression sigma = Jc/( pow(Ec,1.0/n) ) * pow( norm(e)+eps, (1.0-n)/n );
+    
+    
     // Define the weak magnetodynamic formulation:
     formulation magdyn;
     
@@ -121,20 +121,20 @@ void sparselizard(void)
     
     
     // Start the implicit Euler time resolution with an all zero solution and time derivative:
- 	vec initsol(magdyn), initdtsol(magdyn);
- 	
- 	impliciteuler eul(magdyn, initsol, initdtsol);
- 	// Tolerance on the nonlinear iteration:
-	eul.settolerance(1e-3);
-	// Relaxation factor for the nonlinear iteration (decrease to improve convergence):
-	eul.setrelaxationfactor(0.5);
-	
+    vec initsol(magdyn), initdtsol(magdyn);
+    
+    impliciteuler eul(magdyn, initsol, initdtsol);
+    // Tolerance on the nonlinear iteration:
+    eul.settolerance(1e-3);
+    // Relaxation factor for the nonlinear iteration (decrease to improve convergence):
+    eul.setrelaxationfactor(0.5);
+    
     // Use a 3 second timestep:
     double timestep = 3.0;
     // Run from 0 to 150 sec with a fixed-point nonlinear iteration at every timestep.
     // Set the maximum number of nonlinear iterations to 25.
     std::vector<std::vector<vec>> sols = eul.runnonlinear(0.0, timestep, 150.0, 25);
-
+    
     // Field a is available at every timestep in sols[0] and its time derivative in sols[1]:
     std::vector<vec> asol = sols[0];
     std::vector<vec> dtasol = sols[1];
@@ -172,77 +172,77 @@ void sparselizard(void)
 
 mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair)
 {
-	int wholedomain = 1, tube = 2, insidetube = 3, air = 4, tubeskin = 5, domainskin = 6, ground = 7, boxcut = 8;
-	
-	// To be sure to have nodes at z = 0:
-	if (nhtube%2 == 0)
-		nhtube++;
-		
-	// Create the footprint face for the air inside the tube:
-	shape disk("disk", -1, {0,0,0}, rintube, ncircumtube*4);
-	// Create the footprint face for the tube:
-	shape arcin = disk.getsons()[0];
-	shape arcout("arc", -1, {rintube+thtube,0,0, 0,rintube+thtube,0, 0,0,0}, ncircumtube+1);
-	shape line1("line", -1, {rintube,0,0, rintube+thtube,0,0}, nthtube);
-	shape line2 = line1.duplicate(); line2.rotate(0,0,90);
-	
-	std::vector<shape> quads(4);
-	for (int i = 0; i < 4; i++)
-	{
-		shape curquad("quadrangle", -1, {arcin,line1,arcout,line2});
-		curquad = curquad.duplicate();
-		curquad.rotate(0,0,90.0*i);
-		quads[i] = curquad;
-	}
-	shape tubefootprint("union", -1, quads);
-	// Create the footprint for the remaining domain:
-	shape arcinf("arc", -1, {linf,0,0, 0,linf,0, 0,0,0}, ncircumtube+1);
-	shape lineinf1("line", -1, {rintube+thtube,0,0, linf,0,0}, nair);
-	shape lineinf2 = lineinf1.duplicate(); lineinf2.rotate(0,0,90);
-	
-	std::vector<shape> airquads(4);
-	for (int i = 0; i < 4; i++)
-	{
-		shape curquad("quadrangle", -1, {arcout,lineinf1,arcinf,lineinf2});
-		curquad = curquad.duplicate();
-		curquad.rotate(0,0,90.0*i);
-		airquads[i] = curquad;
-	}
-	shape airfootprint("union", -1, airquads);
-	
-	
-	// Create the cylinder region inside the tube:
-	shape voltubeinside = disk.duplicate().extrude(insidetube, htube, nhtube);
-	voltubeinside.shift(0,0,-htube/2);
-	
-	// Create the tube region:
-	shape voltube = tubefootprint.duplicate().extrude(tube, htube, nhtube);
-	voltube.shift(0,0,-htube/2);
-	
-	// Create the air cylinder around the tube:
-	shape volairaroundtube = airfootprint.duplicate().extrude(air, htube, nhtube);
-	volairaroundtube.shift(0,0,-htube/2);
-	
-	// Create the air above and below the tube:
-	shape quadall("union", -1, {disk,tubefootprint,airfootprint});
-	shape volabove = quadall.duplicate().extrude(air, linf, nair);
-	volabove.shift(0,0,htube/2);
-	shape volbelow = volabove.duplicate();
-	volbelow.scale(1,1,-1);
-	
-	// Define the whole volume:
-	shape wholevol("union", wholedomain, {voltube.duplicate(), voltubeinside.duplicate(), volairaroundtube.duplicate(), volabove.duplicate(), volbelow.duplicate()});
-		
-	mesh mymesh;
-	
-	mymesh.regionskin(tubeskin, tube);
-	mymesh.regionskin(domainskin, wholedomain);
-	mymesh.boxselection(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
-	mymesh.boxselection(boxcut, wholedomain, 3, {-1e-10,linf+1e-10, -1e-10,linf+1e-10, -htube-linf,htube+linf});
-	
-	mymesh.load({voltube, voltubeinside, volairaroundtube, volabove, volbelow, wholevol});
-	
-	return mymesh;
+    int wholedomain = 1, tube = 2, insidetube = 3, air = 4, tubeskin = 5, domainskin = 6, ground = 7, boxcut = 8;
+    
+    // To be sure to have nodes at z = 0:
+    if (nhtube%2 == 0)
+    nhtube++;
+    
+    // Create the footprint face for the air inside the tube:
+    shape disk("disk", -1, {0,0,0}, rintube, ncircumtube*4);
+    // Create the footprint face for the tube:
+    shape arcin = disk.getsons()[0];
+    shape arcout("arc", -1, {rintube+thtube,0,0, 0,rintube+thtube,0, 0,0,0}, ncircumtube+1);
+    shape line1("line", -1, {rintube,0,0, rintube+thtube,0,0}, nthtube);
+    shape line2 = line1.duplicate(); line2.rotate(0,0,90);
+    
+    std::vector<shape> quads(4);
+    for (int i = 0; i < 4; i++)
+    {
+    shape curquad("quadrangle", -1, {arcin,line1,arcout,line2});
+    curquad = curquad.duplicate();
+    curquad.rotate(0,0,90.0*i);
+    quads[i] = curquad;
+    }
+    shape tubefootprint("union", -1, quads);
+    // Create the footprint for the remaining domain:
+    shape arcinf("arc", -1, {linf,0,0, 0,linf,0, 0,0,0}, ncircumtube+1);
+    shape lineinf1("line", -1, {rintube+thtube,0,0, linf,0,0}, nair);
+    shape lineinf2 = lineinf1.duplicate(); lineinf2.rotate(0,0,90);
+    
+    std::vector<shape> airquads(4);
+    for (int i = 0; i < 4; i++)
+    {
+    shape curquad("quadrangle", -1, {arcout,lineinf1,arcinf,lineinf2});
+    curquad = curquad.duplicate();
+    curquad.rotate(0,0,90.0*i);
+    airquads[i] = curquad;
+    }
+    shape airfootprint("union", -1, airquads);
+    
+    
+    // Create the cylinder region inside the tube:
+    shape voltubeinside = disk.duplicate().extrude(insidetube, htube, nhtube);
+    voltubeinside.shift(0,0,-htube/2);
+    
+    // Create the tube region:
+    shape voltube = tubefootprint.duplicate().extrude(tube, htube, nhtube);
+    voltube.shift(0,0,-htube/2);
+    
+    // Create the air cylinder around the tube:
+    shape volairaroundtube = airfootprint.duplicate().extrude(air, htube, nhtube);
+    volairaroundtube.shift(0,0,-htube/2);
+    
+    // Create the air above and below the tube:
+    shape quadall("union", -1, {disk,tubefootprint,airfootprint});
+    shape volabove = quadall.duplicate().extrude(air, linf, nair);
+    volabove.shift(0,0,htube/2);
+    shape volbelow = volabove.duplicate();
+    volbelow.scale(1,1,-1);
+    
+    // Define the whole volume:
+    shape wholevol("union", wholedomain, {voltube.duplicate(), voltubeinside.duplicate(), volairaroundtube.duplicate(), volabove.duplicate(), volbelow.duplicate()});
+    
+    mesh mymesh;
+    
+    mymesh.regionskin(tubeskin, tube);
+    mymesh.regionskin(domainskin, wholedomain);
+    mymesh.boxselection(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
+    mymesh.boxselection(boxcut, wholedomain, 3, {-1e-10,linf+1e-10, -1e-10,linf+1e-10, -htube-linf,htube+linf});
+    
+    mymesh.load({voltube, voltubeinside, volairaroundtube, volabove, volbelow, wholevol});
+    
+    return mymesh;
 }
 
 int main(void)
