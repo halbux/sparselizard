@@ -42,7 +42,7 @@ void sparselizard(void)
     mymesh.write("tubeinair.msh");
     
     
-    // Magnetic permittivity of the air:
+    // Magnetic permeability of the air:
     double mu = 4*getpi()*1e-7;
     
     // Define a spanning tree to gauge the magnetic vector potential (otherwise the matrix to invert is singular).
