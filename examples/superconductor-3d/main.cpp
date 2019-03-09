@@ -90,9 +90,9 @@ void sparselizard(void)
     // where the critical current density Jc [A/m^2] and critical electric field Ec [V/m] are supposed 
     // constant here and the J(E) relation is isotropic. An extra 1e-11 is added to never divide by 0.
     //
-    double n = 30.0, Ec = 1e-4, Jc = 1e8, eps = 1e-11;
+    double n = 30.0, Ec = 1e-4, Jc = 1e8;
     
-    expression sigma = Jc/( pow(Ec,1.0/n) ) * pow( norm(e)+eps, (1.0-n)/n );
+    expression sigma = Jc/( pow(Ec,1.0/n) ) * pow( norm(e) + 1e-11, (1.0-n)/n );
     
     
     // Define the weak magnetodynamic formulation:
