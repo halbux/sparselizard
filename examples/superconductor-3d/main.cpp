@@ -133,7 +133,7 @@ void sparselizard(void)
         // Set variable t() to the time of the current timestep:
         settime(timestep*i);
         
-        // Make the data of vector asol[i] available in field az:
+        // Make the data of vector asol[i] available in field a:
         a.setdata(wholedomain, asol[i]);
         
         // Write b = curl(a) to disk:
