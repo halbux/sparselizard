@@ -176,7 +176,7 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     
     // To be sure to have nodes at z = 0:
     if (nhtube%2 == 0)
-    nhtube++;
+        nhtube++;
     
     // Create the footprint face for the air inside the tube:
     shape disk("disk", -1, {0,0,0}, rintube, ncircumtube*4);
@@ -189,10 +189,10 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     std::vector<shape> quads(4);
     for (int i = 0; i < 4; i++)
     {
-    shape curquad("quadrangle", -1, {arcin,line1,arcout,line2});
-    curquad = curquad.duplicate();
-    curquad.rotate(0,0,90.0*i);
-    quads[i] = curquad;
+        shape curquad("quadrangle", -1, {arcin,line1,arcout,line2});
+        curquad = curquad.duplicate();
+        curquad.rotate(0,0,90.0*i);
+        quads[i] = curquad;
     }
     shape tubefootprint("union", -1, quads);
     // Create the footprint for the remaining domain:
@@ -203,10 +203,10 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     std::vector<shape> airquads(4);
     for (int i = 0; i < 4; i++)
     {
-    shape curquad("quadrangle", -1, {arcout,lineinf1,arcinf,lineinf2});
-    curquad = curquad.duplicate();
-    curquad.rotate(0,0,90.0*i);
-    airquads[i] = curquad;
+        shape curquad("quadrangle", -1, {arcout,lineinf1,arcinf,lineinf2});
+        curquad = curquad.duplicate();
+        curquad.rotate(0,0,90.0*i);
+        airquads[i] = curquad;
     }
     shape airfootprint("union", -1, airquads);
     
