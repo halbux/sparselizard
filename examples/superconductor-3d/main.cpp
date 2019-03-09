@@ -27,7 +27,7 @@ void sparselizard(void)
     wallclock clk;
     
     // The domain regions as defined in 'createmesh':
-    int wholedomain = 1, tube = 2, insidetube = 3, air = 4, tubeskin = 5, domainskin = 6, ground = 7, boxcut = 8;
+    int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
     
     // Tube thickness, height, inner radius and domain radius [m]:
     double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 40e-3;
@@ -149,8 +149,7 @@ void sparselizard(void)
         // Make the data of vector asol[i] available in field az:
         a.setdata(wholedomain, asol[i]);
         
-        // Write a and b = curl(a) to disk:
-        norm(a).write(boxcut, "norma" + std::to_string(i+1000) + ".pos"); 
+        // Write b = curl(a) to disk:
         norm(curl(a) + bsource).write(boxcut, "normbtotal" + std::to_string(i+1000) + ".pos"); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
@@ -172,7 +171,7 @@ void sparselizard(void)
 
 mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair)
 {
-    int wholedomain = 1, tube = 2, insidetube = 3, air = 4, tubeskin = 5, domainskin = 6, ground = 7, boxcut = 8;
+    int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
     
     // To be sure to have nodes at z = 0:
     if (nhtube%2 == 0)
@@ -220,12 +219,12 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     voltube.shift(0,0,-htube/2);
     
     // Create the air cylinder around the tube:
-    shape volairaroundtube = airfootprint.duplicate().extrude(air, htube, nhtube);
+    shape volairaroundtube = airfootprint.duplicate().extrude(-1, htube, nhtube);
     volairaroundtube.shift(0,0,-htube/2);
     
     // Create the air above and below the tube:
     shape quadall("union", -1, {disk,tubefootprint,airfootprint});
-    shape volabove = quadall.duplicate().extrude(air, linf, nair);
+    shape volabove = quadall.duplicate().extrude(-1, linf, nair);
     volabove.shift(0,0,htube/2);
     shape volbelow = volabove.duplicate();
     volbelow.scale(1,1,-1);
@@ -240,7 +239,7 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     mymesh.boxselection(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
     mymesh.boxselection(boxcut, wholedomain, 3, {-1e-10,linf+1e-10, -1e-10,linf+1e-10, -htube-linf,htube+linf});
     
-    mymesh.load({voltube, voltubeinside, volairaroundtube, volabove, volbelow, wholevol});
+    mymesh.load({voltube, voltubeinside, wholevol});
     
     return mymesh;
 }
