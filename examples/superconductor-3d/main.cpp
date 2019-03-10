@@ -30,10 +30,10 @@ void sparselizard(void)
     int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
     
     // Tube thickness, height, inner radius and domain size [m]:
-    double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 40e-3;
+    double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 100e-3;
     
     // Create the geometry and the mesh:   
-    mesh mymesh = createmesh(thtube, htube, rintube, linf, 7, 4, 9, 8);
+    mesh mymesh = createmesh(thtube, htube, rintube, linf, 8, 5, 10, 10);
     
     // Define a region to visualize the solution:
     boxcut = regionexclusion(wholedomain, boxcut);
@@ -116,8 +116,8 @@ void sparselizard(void)
     // Relaxation factor for the nonlinear iteration (decrease to improve convergence):
     eul.setrelaxationfactor(0.5);
     
-    // Use a 3 second timestep:
-    double timestep = 3.0;
+    // Use a 5 seconds timestep:
+    double timestep = 5.0;
     // Run from 0 to 150 sec with a fixed-point nonlinear iteration at every timestep.
     // Set the maximum number of nonlinear iterations to 25.
     std::vector<std::vector<vec>> sols = eul.runnonlinear(0.0, timestep, 150.0, 25);
