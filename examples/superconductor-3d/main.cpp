@@ -164,8 +164,8 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     // To be sure to have nodes at z = 0:
     if (nhtube%2 == 0)
         nhtube++;
-
-	field x("x"), y("y");
+    
+    field x("x"), y("y");
     
     // Create the footprint face for the air inside the tube:
     shape disk("disk", -1, {0,0,0}, rintube, ncircumtube*4);
@@ -185,7 +185,7 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     }
     shape tubefootprint("union", -1, quads);
     // Create the footprint for the remaining domain with a given progression 'prog':
-	double rout = std::pow(linf*std::pow(rintube+thtube,prog-1), 1.0/prog);
+    double rout = std::pow(linf*std::pow(rintube+thtube,prog-1), 1.0/prog);
     shape arcinf("arc", -1, {rout,0,0, 0,rout,0, 0,0,0}, ncircumtube+1);
     shape lineinf1("line", -1, {rintube+thtube,0,0, rout,0,0}, nair);
     shape lineinf2 = lineinf1.duplicate(); lineinf2.rotate(0,0,90);
@@ -200,9 +200,9 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     }
     shape airfootprint("union", -1, airquads);
     // Deform to have a mesh progression in the air:
-	expression radius = sqrt(x*x+y*y);
-	airfootprint.deform(x*pow(radius/(rintube+thtube),prog-1)-x,y*pow(radius/(rintube+thtube),prog-1)-y,0);
-
+    expression radius = sqrt(x*x+y*y);
+    airfootprint.deform(x*pow(radius/(rintube+thtube),prog-1)-x,y*pow(radius/(rintube+thtube),prog-1)-y,0);
+    
     
     // Create the cylinder region inside the tube:
     shape voltubeinside = disk.duplicate().extrude(insidetube, htube, nhtube);
