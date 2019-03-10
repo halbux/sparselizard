@@ -19,8 +19,9 @@ using namespace mathop;
 // Arguments are:
 // 
 // Tube thickness, height and inner radius, size of the air domain around as well as integers defining the mesh size.
+// The last argument gives the mesh progression in the air around the tube (increase for a finer mesh at the tube).
 //
-mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair);
+mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair, int prog);
 
 void sparselizard(void)
 {	
@@ -33,7 +34,7 @@ void sparselizard(void)
     double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 100e-3;
     
     // Create the geometry and the mesh:   
-    mesh mymesh = createmesh(thtube, htube, rintube, linf, 8, 5, 10, 10);
+    mesh mymesh = createmesh(thtube, htube, rintube, linf, 7, 4, 10, 7, 20);
     
     // Define a region to visualize the solution:
     boxcut = regionexclusion(wholedomain, boxcut);
@@ -156,13 +157,15 @@ void sparselizard(void)
 // THE ADVANTAGE OF IT IS THAT THE CODE ABOVE CAN BE CALLED FOR ANY TUBE DIMENSION WITHOUT NEEDING CALLS TO EXTERNAL MESHING SOFTWARE.
 // GMSH COULD HAVE BEEN USED AS AN ALTERNATIVE TO DEFINE THE GEOMETRY AND THE MESH.
 
-mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair)
+mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair, int prog)
 {
     int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
     
     // To be sure to have nodes at z = 0:
     if (nhtube%2 == 0)
         nhtube++;
+
+	field x("x"), y("y");
     
     // Create the footprint face for the air inside the tube:
     shape disk("disk", -1, {0,0,0}, rintube, ncircumtube*4);
@@ -181,9 +184,10 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
         quads[i] = curquad;
     }
     shape tubefootprint("union", -1, quads);
-    // Create the footprint for the remaining domain:
-    shape arcinf("arc", -1, {linf,0,0, 0,linf,0, 0,0,0}, ncircumtube+1);
-    shape lineinf1("line", -1, {rintube+thtube,0,0, linf,0,0}, nair);
+    // Create the footprint for the remaining domain with a given progression 'prog':
+	double rout = std::pow(linf*std::pow(rintube+thtube,prog-1), 1.0/prog);
+    shape arcinf("arc", -1, {rout,0,0, 0,rout,0, 0,0,0}, ncircumtube+1);
+    shape lineinf1("line", -1, {rintube+thtube,0,0, rout,0,0}, nair);
     shape lineinf2 = lineinf1.duplicate(); lineinf2.rotate(0,0,90);
     
     std::vector<shape> airquads(4);
@@ -195,7 +199,10 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
         airquads[i] = curquad;
     }
     shape airfootprint("union", -1, airquads);
-    
+    // Deform to have a mesh progression in the air:
+	expression radius = sqrt(x*x+y*y);
+	airfootprint.deform(x*pow(radius/(rintube+thtube),prog-1)-x,y*pow(radius/(rintube+thtube),prog-1)-y,0);
+
     
     // Create the cylinder region inside the tube:
     shape voltubeinside = disk.duplicate().extrude(insidetube, htube, nhtube);
