@@ -1,7 +1,7 @@
 // This example shows the time-simulation of a 2D axisymmetric high-temperature superconductor (HTS):
 // a superconducting tube is used to shield its inside from an externally applied magnetic field 
 // that increases linearly over time. For the simulation the so called a-v magnetodynamic formulation 
-// is used. The v part can be disregarded in this axisymmetric configuration.
+// is used. The v part can be disregarded in the configuration of this example.
 //
 // The tube height is 210 mm, its thickness is 1 mm and its inner radius is 10 mm. 
 //
@@ -57,7 +57,7 @@ void sparselizard(void)
     // 
     // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js, with b = curl(a) and e = -dt(a) - grad(v)
     //
-    // Here grad(v) is zero because of axisymmetry and the electric field becomes:
+    // Here grad(v) is zero because of axisymmetry and y direction bsource and the electric field becomes:
     //
     expression e = -dt(a)-dtasource;
     
