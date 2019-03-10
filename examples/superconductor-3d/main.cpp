@@ -35,7 +35,7 @@ void sparselizard(void)
     // Create the geometry and the mesh:   
     mesh mymesh = createmesh(thtube, htube, rintube, linf, 7, 4, 9, 8);
     
-    // Define a region to visualise the solution:
+    // Define a region to visualize the solution:
     boxcut = regionexclusion(wholedomain, boxcut);
     
     // Write the mesh for display:
