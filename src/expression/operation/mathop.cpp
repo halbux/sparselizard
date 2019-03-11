@@ -470,16 +470,15 @@ vec mathop::solve(mat A, vec b, bool diagscaling)
         PC pc;
         KSPCreate(PETSC_COMM_WORLD, ksp);
         KSPSetOperators(*ksp, Apetsc, Apetsc);
+        // Perform a diagonal scaling for improved matrix conditionning.
+        // This modifies the matrix A and right handside b!
+        if (diagscaling == true)
+            KSPSetDiagonalScale(*ksp, PETSC_TRUE);
         KSPSetFromOptions(*ksp);
 
         KSPGetPC(*ksp,&pc);
         PCSetType(pc,PCLU);
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
-        
-        // Perform a diagonal scaling for improved matrix conditionning.
-        // This modifies the matrix A and right handside b!
-        if (diagscaling == true)
-        	KSPSetDiagonalScale(*ksp, PETSC_TRUE);
     }
     	
     KSPSolve(*ksp, bpetsc, solpetsc);
