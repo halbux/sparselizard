@@ -443,7 +443,7 @@ expression mathop::array3x3(expression term11, expression term12, expression ter
     return expression(3,3, {term11, term12, term13, term21, term22, term23, term31, term32, term33});
 }
  
-vec mathop::solve(mat A, vec b)
+vec mathop::solve(mat A, vec b, bool diagscaling)
 {
     if (A.countrows() != b.size())
     {
@@ -477,6 +477,11 @@ vec mathop::solve(mat A, vec b)
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
     }
     
+    // Perform a diagonal scaling for improved matrix conditionning.
+    // This modifies the matrix A and right handside b!
+    if (diagscaling == true)
+    	KSPSetDiagonalScale(*ksp, PETSC_TRUE);
+    	
     KSPSolve(*ksp, bpetsc, solpetsc);
    
     A.getpointer()->isludefined(true);
