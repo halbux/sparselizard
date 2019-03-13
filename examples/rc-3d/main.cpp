@@ -22,7 +22,7 @@ void sparselizard(void)
     
     // Nodal shape functions 'h1' for the electric potential field.
     // Harmonics 2 and 3 are respectively the in-phase and quadrature 
-    // components of the electric potential field.
+    // component of the electric potential field.
     field v("h1", {2,3});
     
     // The working frequency is 1 MHz:
