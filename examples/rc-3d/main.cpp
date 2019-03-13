@@ -21,7 +21,7 @@ void sparselizard(void)
     int wholedomain = regionunion({conductor, dielectric});
     
     // Nodal shape functions 'h1' for the electric potential field.
-    // Harmonic 2 and 3 are respectively the in-phase and quadrature 
+    // Harmonics 2 and 3 are respectively the in-phase and quadrature 
     // components of the electric potential field.
     field v("h1", {2,3});
     
