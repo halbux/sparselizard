@@ -1,5 +1,5 @@
-// This code computes on a 1D line the electrostatic potential when 
-// the left point is forced at 10 V and the right point is at 2 V.
+// This code computes the resistance and capacitance in a 3D geometry made of a 
+// conducting trace connected to a circular-shaped parallel-plate air capacitor.
 
 
 #include "sparselizardbase.h"
@@ -9,10 +9,10 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-	wallclock clk;
-
+    wallclock clk;
+    
     // The domain regions as defined in 'rc.geo':
-	int electrode = 1, ground = 2, conductor = 3, dielectric = 4; 
+    int electrode = 1, ground = 2, conductor = 3, dielectric = 4; 
     
     // Load the mesh:
     mesh mymesh("rc.msh");
@@ -28,7 +28,7 @@ void sparselizard(void)
     // The working frequency is 1 MHz:
     double freq = 1e6;
     setfundamentalfrequency(freq);
-
+    
     // Use interpolation order 1 on the whole domain (default).
     
     // Force 1 V in-phase on the electrode and 0 V on the ground:
@@ -41,9 +41,9 @@ void sparselizard(void)
     double sigma = 1e3;
     // epsilon is the electric permittivity of the air [F/m]:
     double epsilon = 8.854e-12;
-  
+    
     formulation electrokinetics;
-   
+    
     // Define the weak formulation for the conduction current in 
     // the conductor and displacement current in the dielectric.
     //
@@ -62,7 +62,7 @@ void sparselizard(void)
     // Set last argument to 'true' to use a diagonal scaling (recommended 
     // due to the huge difference between the value of epsilon and sigma).
     vec solv = solve(electrokinetics.A(), electrokinetics.b(), true);
-
+    
     // Transfer the data from the solution vector to the v field:
     v.setdata(wholedomain, solv);
     // Write the electric potential:
@@ -101,19 +101,10 @@ void sparselizard(void)
 int main(void)
 {	
     SlepcInitialize(0,{},0,0);
-
+    
     sparselizard();
-
+    
     SlepcFinalize();
-
+    
     return 0;
 }
-
-
-
-
-
-
-
-
-
