@@ -58,10 +58,8 @@ void sparselizard(void)
     
     electrokinetics.generate();
     
-    // Solve the algebraic problem Ax = b to get the solution vector x.
-    // Set last argument to 'true' to use a diagonal scaling (recommended 
-    // due to the huge difference between the value of epsilon and sigma).
-    vec solv = solve(electrokinetics.A(), electrokinetics.b(), true);
+    // Solve the algebraic problem Ax = b to get the solution vector x:
+    vec solv = solve(electrokinetics.A(), electrokinetics.b());
     
     // Transfer the data from the solution vector to the v field:
     v.setdata(wholedomain, solv);
