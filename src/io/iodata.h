@@ -52,7 +52,7 @@ class iodata
         // Get time tag:
         std::vector<double> gettimetags(void);
         
-        // Check if there is data for a given element type:
+        // ALWAYS CHECK THAT THERE IS DATA FOR A GIVEN ELEMENT TYPE BEFORE REQUESTING IT:
         bool ispopulated(int elemtypenum);
         
         // Rows correspond to the elements. Columns correspond to the element nodes.
