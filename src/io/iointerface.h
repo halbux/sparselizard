@@ -20,7 +20,7 @@
 
 namespace iointerface
 {
-	void writetofile(std::string filename, iodata datatowrite);
+    void writetofile(std::string filename, iodata datatowrite);
 };
 
 #endif
