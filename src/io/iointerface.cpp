@@ -12,6 +12,6 @@ void iointerface::writetofile(std::string filename, iodata datatowrite)
             gmshinterface::writetofile(filename, datatowrite);
     }
     
-    std::cout << "Error in 'expression' object: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
+    std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
     abort();
 }
