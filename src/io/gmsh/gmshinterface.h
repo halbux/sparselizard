@@ -23,12 +23,18 @@
 #include "element.h"
 #include "mystring.h"
 #include "polynomial.h"
+#include "iodata.h"
+#include "lagrangeformfunction.h"
 
 namespace gmshinterface
 {
-    // Load the mesh to the 'nodes', 'elements' and 'physicalregions' objects .
+    // Load the .msh mesh to the 'nodes', 'elements' and 'physicalregions' objects.
     void readfromfile(std::string name, nodes&, elements&, physicalregions&);
+    // Write to .msh mesh format:
     void writetofile(std::string name, nodes&, elements&, physicalregions&, disjointregions&);
+    
+    // Write to .pos format:
+    void writetofile(std::string name, iodata datatowrite);
 
     // Write or append the header of a new view in the .pos file:
     void openview(std::string name, std::string viewname, double timetag, bool overwrite);

@@ -221,6 +221,52 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
 	}
 }
 
+void gmshinterface::writetofile(std::string name, iodata datatowrite)
+{
+	// Get the file name without the .pos extension:
+	std::string namenoext = name.substr(0, name.size()-4);
+
+	// Loop on all element types:
+	for (int i = 0; i < 8; i++)
+	{
+		element myelement(i);
+
+		// Skip in case there are no elements of the current type:
+		if (datatowrite.ispopulated(i) == false)
+			continue;
+
+		std::vector<densematrix> curcoords = datatowrite.getcoordinates(i);
+
+		// Open the view (overwrite if first time):
+		gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
+		// Append the data to the view:
+		if (datatowrite.isscalar())
+    		gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], datatowrite.getscalardata(i));
+		else
+		{
+			std::vector<densematrix> vecdata = datatowrite.getvectordata(i);
+			gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], vecdata[0], vecdata[1], vecdata[2]);
+		}
+
+		// Write the shape function polynomials:
+        lagrangeformfunction mylagrange(i, datatowrite.getinterpolorder(), {});
+        std::vector<polynomial> poly = mylagrange.getformfunctionpolynomials();
+        
+        std::vector<polynomial> polygeo = poly;
+        if (datatowrite.getinterpolorder() == datatowrite.getgeointerpolorder())
+        	polygeo = poly;
+    	else
+    	{
+			lagrangeformfunction mylagrangegeo(i, datatowrite.getgeointerpolorder(), {});
+			polygeo = mylagrangegeo.getformfunctionpolynomials();
+		}
+
+        gmshinterface::writeinterpolationscheme(name, {poly, polygeo});
+		// Close the view:
+        gmshinterface::closeview(name);
+	}
+}
+
 void gmshinterface::openview(std::string name, std::string viewname, double timetag, bool overwrite)
 {	
 	// 'file' cannot take a std::string argument --> name.c_str():
