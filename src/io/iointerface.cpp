@@ -9,7 +9,10 @@ void iointerface::writetofile(std::string filename, iodata datatowrite)
         std::string fileext = filename.substr(filename.size()-4,4);
         
         if (fileext == ".pos")
+        {
             gmshinterface::writetofile(filename, datatowrite);
+            return;
+        }
     }
     
     std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
