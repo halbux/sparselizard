@@ -252,7 +252,7 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         lagrangeformfunction mylagrange(i, datatowrite.getinterpolorder(), {});
         std::vector<polynomial> poly = mylagrange.getformfunctionpolynomials();
         
-        std::vector<polynomial> polygeo = poly;
+        std::vector<polynomial> polygeo;
         if (datatowrite.getinterpolorder() == datatowrite.getgeointerpolorder())
         	polygeo = poly;
     	else
