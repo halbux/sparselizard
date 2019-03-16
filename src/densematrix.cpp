@@ -169,6 +169,8 @@ densematrix densematrix::copy(void)
 
 void densematrix::print(void)
 {
+    printsize();
+    
     double* myvaluesptr = myvalues.get();
     for (int i = 0; i < numrows; i++)
     {
