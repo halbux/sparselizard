@@ -1,16 +1,20 @@
 #include "iointerface.h"
 
 
-void iointerface::writetofile(std::string filename, iodata datatowrite)
+void iointerface::writetofile(std::string filename, iodata datatowrite, std::string appendtofilename)
 {
     if (filename.size() >= 5)
     {
         // Get the extension:
         std::string fileext = filename.substr(filename.size()-4,4);
-        
+        // Get the file name without the extension:
+        std::string noext = filename.substr(0, filename.size()-4);
+        // Get the requested filename:
+        std::string requestedfilename = noext + appendtofilename + fileext;
+
         if (fileext == ".pos")
         {
-            gmshinterface::writetofile(filename, datatowrite);
+            gmshinterface::writetofile(requestedfilename, datatowrite);
             return;
         }
     }
