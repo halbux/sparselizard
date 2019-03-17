@@ -76,7 +76,7 @@ void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, do
     // Kill the too small harmonics:
     for (int harm = 1; harm < input.size(); harm++)
     {
-        if (input[harm].size() > 0 && maxabs[harm] < threshold*harmmax)
+        if (input[harm].size() > 0 && (maxabs[harm] == 0 || maxabs[harm] < threshold*harmmax))
             input[harm] = {};
     }
 }
