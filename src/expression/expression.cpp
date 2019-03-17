@@ -955,15 +955,6 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         abort();
 	}
 		
-    // Make sure the filename includes the extension:
-    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
-    {
-        std::cout << "Error in 'expression' object: cannot write stream lines to file '" << filename << "' (unknown or missing file extension)" << std::endl;
-        abort();
-    }
-    // Remove the extension:
-    std::string filenamenoextension = filename.substr(0, filename.size()-4);
-
 	// Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
 	int problemdimension = universe::mymesh->getmeshdimension();
     if (mynumrows < problemdimension || mynumrows > 3 || mynumcols != 1)
@@ -1082,7 +1073,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 	
 	
 	// Write to file:
-	gmshinterface::openview(filename, filenamenoextension, 0, true);
+	iodata datatowrite(1, 1, true, {});
 	for (int m = 0; m < xcoords.size(); m++)
 	{
 		int numlines = xcoords[m].size();
@@ -1101,10 +1092,11 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 		
 			fsptr[2*i+0] = magnitude[m][i%numlines]; fsptr[2*i+1] = magnitude[m][(i+1)%numlines];
 		}
-	
-		gmshinterface::appendtoview(filename, 1, xcoordsmat, ycoordsmat, zcoordsmat, flowspeedmat);
+		
+		datatowrite.addcoordinates(1, xcoordsmat, ycoordsmat, zcoordsmat);
+		datatowrite.adddata(1, {flowspeedmat});
 	}
-	gmshinterface::closeview(filename);
+	iointerface::writetofile(filename, datatowrite);
 }
 
 void expression::reuseit(bool istobereused)

@@ -14,7 +14,6 @@
 #include "operation.h"
 #include "field.h"
 #include "disjointregions.h"
-#include "gmshinterface.h"
 #include "physicalregions.h"
 #include "physicalregion.h"
 #include "elementselector.h"
