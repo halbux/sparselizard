@@ -265,13 +265,6 @@ std::vector<int> spanningtree::getedgesintree(void)
 
 void spanningtree::write(std::string filename)
 {
-    // Make sure the filename includes the extension:
-    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
-    {
-        std::cout << "Error in 'spanningtree' object: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
-        abort();
-    }
-
 	nodes* mynodes = universe::mymesh->getnodes();
 	std::vector<double>* nodecoords = mynodes->getcoordinates();
 	
@@ -299,14 +292,13 @@ void spanningtree::write(std::string filename)
 			index++;
 		}
 	}
-
-    // Write the header:
-    gmshinterface::openview(filename, filename, 0, true);
-    // Write the data:
-	gmshinterface::appendtoview(filename, 1, xcoords, ycoords, zcoords, densematrix(numberofedgesintree,2,1.0));
-    // Close view:
-    gmshinterface::closeview(filename);
-
+	
+	// Write to file:
+	iodata datatowrite(1, 1, true, {});
+	datatowrite.addcoordinates(1, xcoords, ycoords, zcoords);
+	datatowrite.adddata(1, {densematrix(numberofedgesintree, 2, 1.0)});
+	
+	iointerface::writetofile(filename, datatowrite);
 }
 
 
