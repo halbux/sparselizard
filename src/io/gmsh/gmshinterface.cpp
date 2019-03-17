@@ -236,6 +236,7 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         element myelement(elemtypenum);
         
         std::vector<densematrix> curcoords = datatowrite.getcoordinates(elemtypenum);
+        std::vector<densematrix> curdata = datatowrite.getdata(elemtypenum);
         
         // Open the view (overwrite if first time):
         if (activeelementtypes.size() == 1)
@@ -243,7 +244,6 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         else
             gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
         // Append the data to the view:
-        std::vector<densematrix> curdata = datatowrite.getdata(elemtypenum);
         if (datatowrite.isscalar())
             gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
         else
