@@ -225,29 +225,32 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
 {
 	// Get the file name without the .pos extension:
 	std::string namenoext = name.substr(0, name.size()-4);
-
+	
+	// Get the list of element types in the view:
+	std::vector<int> activeelementtypes = datatowrite.getactiveelementtypes();
+	
 	// Loop on all element types:
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < activeelementtypes.size(); i++)
 	{
-		element myelement(i);
+		int elemtypenum = activeelementtypes[i];
+		element myelement(elemtypenum);
 
-		// Skip in case there are no elements of the current type:
-		if (datatowrite.ispopulated(i) == false)
-			continue;
-
-		std::vector<densematrix> curcoords = datatowrite.getcoordinates(i);
+		std::vector<densematrix> curcoords = datatowrite.getcoordinates(elemtypenum);
 
 		// Open the view (overwrite if first time):
-		gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
-		// Append the data to the view:
-		std::vector<densematrix> curdata = datatowrite.getdata(i);
-		if (datatowrite.isscalar())
-    		gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
+		if (activeelementtypes.size() == 1)
+			gmshinterface::openview(name, namenoext, 0, i == 0);
 		else
-			gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
+			gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
+		// Append the data to the view:
+		std::vector<densematrix> curdata = datatowrite.getdata(elemtypenum);
+		if (datatowrite.isscalar())
+    		gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
+		else
+			gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
 
 		// Write the shape function polynomials:
-        lagrangeformfunction mylagrange(i, datatowrite.getinterpolorder(), {});
+        lagrangeformfunction mylagrange(elemtypenum, datatowrite.getinterpolorder(), {});
         std::vector<polynomial> poly = mylagrange.getformfunctionpolynomials();
         
         std::vector<polynomial> polygeo;
@@ -255,7 +258,7 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         	polygeo = poly;
     	else
     	{
-			lagrangeformfunction mylagrangegeo(i, datatowrite.getgeointerpolorder(), {});
+			lagrangeformfunction mylagrangegeo(elemtypenum, datatowrite.getgeointerpolorder(), {});
 			polygeo = mylagrangegeo.getformfunctionpolynomials();
 		}
 

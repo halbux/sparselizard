@@ -48,6 +48,17 @@ bool iodata::ispopulated(int elemtypenum)
 	return (mycoords[0][elemtypenum].size() > 0);
 }
 
+std::vector<int> iodata::getactiveelementtypes(void)
+{
+	std::vector<int> activeelementtypes = {};
+	for (int i = 0; i < 8; i++)
+	{
+		if (ispopulated(i) == true)
+			activeelementtypes.push_back(i);
+	}
+	return activeelementtypes;
+}
+
 void iodata::addcoordinates(int elemtypenum, densematrix xcoords, densematrix ycoords, densematrix zcoords)
 {
 	mycoords[0][elemtypenum].push_back(xcoords);

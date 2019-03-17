@@ -53,6 +53,7 @@ class iodata
         
         // ALWAYS CHECK THAT THERE IS DATA FOR A GIVEN ELEMENT TYPE BEFORE REQUESTING IT:
         bool ispopulated(int elemtypenum);
+        std::vector<int> getactiveelementtypes(void);
         
         // Rows correspond to the elements. Columns correspond to the element nodes.
         void addcoordinates(int elemtypenum, densematrix xcoords, densematrix ycoords, densematrix zcoords);

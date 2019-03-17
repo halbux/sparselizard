@@ -787,14 +787,6 @@ void expression::write(int physreg, expression meshdeform, std::string filename,
 
 void expression::write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps)
 {        
-    // Make sure the filename includes the extension:
-    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
-    {
-        std::cout << "Error in 'expression' object: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
-        abort();
-    }
-    // Remove the extension:
-    filename = filename.substr(0, filename.size()-4);
     // Make sure this expression is a column vector and the 
     // mesh deformation expression has the right size. 
     if (mynumrows > 3 || mynumcols != 1)
@@ -816,9 +808,6 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     field x("x"), y("y"), z("z");
     expression xyz(3,1, {x,y,z});
 
-    // In case there are multiple element types we append the type name to the view:
-    std::string elementtype = "";
-    
     // Loop on all disjoint regions:
     std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
         
@@ -829,36 +818,40 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         abort();
     }
     
+    // Get the geometry interpolation order (1 if the element is not curved):
+    int geolagrangeorder = lagrangeorder;
+    if (universe::mymesh->getelements()->getcurvatureorder() == 1 && meshdeform == NULL)
+    	geolagrangeorder = 1;
+    	
+	// These are the time tags that will be used:
+	std::vector<double> timetags = {};
+	if (numtimesteps > 0)
+		timetags = std::vector<double>(numtimesteps, 0.0);
+		
+	// The data to write for harmonic h will be added at datatowrite[h][0].
+	// For a time solution the data is at datatowrite[0][0].
+	std::vector<std::vector<iodata>> datatowrite = {};
+	if (numtimesteps > 0)
+		datatowrite = {{iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)}};
+    
     // Send the disjoint regions with same element type numbers together:
     disjointregionselector mydisjregselector(selecteddisjregs, {});
-    for (int i = 0; i < mydisjregselector.countgroups(); i++)
+    for (int g = 0; g < mydisjregselector.countgroups(); g++)
     {
-        std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
+        std::vector<int> mydisjregs = mydisjregselector.getgroup(g);
     
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
-        element myelement(elementtypenumber);
-        if (mydisjregselector.countgroups() > 1)
-            elementtype = "_" + myelement.gettypename();
-        
+        int elementtype = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        element myelement(elementtype);
+
         // The expression will be interpolated at the following Lagrange nodes:
-        lagrangeformfunction mylagrange(elementtypenumber,lagrangeorder, {});
+        lagrangeformfunction mylagrange(elementtype, lagrangeorder, {});
         std::vector<double> lagrangecoords = mylagrange.getnodecoordinates();
-        std::vector<polynomial> poly = mylagrange.getformfunctionpolynomials();
+        // The x, y and z coordinates will be interpolated at the following Lagrange nodes:
+        lagrangeformfunction mygeolagrange(elementtype, geolagrangeorder, {});
+        std::vector<double> geolagrangecoords = mygeolagrange.getnodecoordinates();
         
-        std::vector<double> lagrangecoordsxyz = lagrangecoords;
-        std::vector<polynomial> polyxyz = poly;
-        // The elements might not be curved:
-        if (universe::mymesh->getelements()->getcurvatureorder() == 1 && meshdeform == NULL)
-        {
-		    lagrangeformfunction mylagrangexyz(elementtypenumber,1, {});
-		    lagrangecoordsxyz = mylagrangexyz.getnodecoordinates();
-		    polyxyz = mylagrangexyz.getformfunctionpolynomials();
-	    }
-        
+        // The harmonics can change from a disjoint region to the other:
         std::vector<int> harms = {};
-        std::vector<mystring> harmfilename = {};
-        
-        bool writeheader = true;
         
         // Loop on all total orientations (if required):
         bool isorientationdependent = isvalueorientationdependent(mydisjregs) || (meshdeform != NULL && meshdeform->isvalueorientationdependent(mydisjregs));
@@ -866,12 +859,12 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         do 
         {
             // Compute the mesh coordinates. Initialise all coordinates to zero.
-            std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), lagrangecoordsxyz.size()/3,0));
+            std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), geolagrangecoords.size()/3,0));
             for (int i = 0; i < problemdimension; i++)
             {
-                coords[i] = (xyz.myoperations[i]->interpolate(myselector, lagrangecoordsxyz, NULL))[1][0];
+                coords[i] = (xyz.myoperations[i]->interpolate(myselector, geolagrangecoords, NULL))[1][0];
                 if (meshdeform != NULL)
-                    coords[i].add((meshdeform->myoperations[i]->interpolate(myselector, lagrangecoordsxyz, NULL))[1][0]);
+                    coords[i].add((meshdeform->myoperations[i]->interpolate(myselector, geolagrangecoords, NULL))[1][0]);
             }
             // Interpolate the current expression:
             std::vector<  std::vector<std::vector<densematrix>>  > expr(countrows());
@@ -891,79 +884,59 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     fftexpr[i] = myfft::toelementrowformat(myoperations[i]->multiharmonicinterpolate(numtimesteps, myselector, lagrangecoords, meshdeform), myselector.countinselection());
             }
             universe::forbidreuse();
-
-            if (harms.size() == 0)
+            
+            // Get a vector containing all harmonic numbers in 'expr' on the current disjoint regions:
+            if (numtimesteps <= 0)
             {
-                // Get a vector containing all harmonic numbers in 'expr':
-                if (numtimesteps <= 0)
+                for (int h = 0; h < expr[0].size(); h++)
                 {
-                    for (int h = 0; h < expr[0].size(); h++)
+                    if (expr[0][h].size() == 1)
                     {
-                        if (expr[0][h].size() == 1)
-                        {
-                            harms.push_back(h);
-                            // For a constant (harmonic 1) we do not append the harmonic number.
-                            if (h == 1)
-                                harmfilename.push_back(mystring(filename));
-                            else
-                                harmfilename.push_back(mystring(filename + "_harm" + std::to_string(h)));
-                        }
+                        harms.push_back(h);
+                        if (datatowrite.size() < h+1)
+                        	datatowrite.resize(h+1);
+                    	if (datatowrite[h].size() == 0)
+                    		datatowrite[h] = {iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)};
                     }
                 }
             }
-
-            // Write the header:
-            if (writeheader)
-            {
-                if (numtimesteps <= 0)
-                {
-                    for (int h = 0; h < harms.size(); h++)
-                        gmshinterface::openview(harmfilename[h].getstring() + ".pos", harmfilename[h].getstring() + elementtype, 0, i == 0);
-                }
-                else
-                    gmshinterface::openview(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", filename + "_" + std::to_string(numtimesteps) + "timesteps" + elementtype, 0, i == 0);
-                writeheader = false;
-            }
-            // Append the data:
+            
             if (numtimesteps <= 0)
             {
-                for (int h = 0; h < harms.size(); h++)
-                {
-                    if (countrows() == 1)
-                        gmshinterface::appendtoview(harmfilename[h].getstring() + ".pos", elementtypenumber, coords[0], coords[1], coords[2], expr[0][harms[h]][0]);
-                    if (countrows() == 2)
-                        gmshinterface::appendtoview(harmfilename[h].getstring() + ".pos", elementtypenumber, coords[0], coords[1], coords[2], expr[0][harms[h]][0], expr[1][harms[h]][0], densematrix(expr[0][harms[h]][0].countrows(), expr[0][harms[h]][0].countcolumns(),0));
-                    if (countrows() == 3)
-                        gmshinterface::appendtoview(harmfilename[h].getstring() + ".pos", elementtypenumber, coords[0], coords[1], coords[2], expr[0][harms[h]][0], expr[1][harms[h]][0], expr[2][harms[h]][0]);
-                }
-            }
-            else
-            {
-                if (countrows() == 1)
-                    gmshinterface::appendtoview(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", elementtypenumber, coords[0], coords[1], coords[2], fftexpr[0]);
-                if (countrows() == 2)
-                    gmshinterface::appendtoview(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", elementtypenumber, coords[0], coords[1], coords[2], fftexpr[0], fftexpr[1], densematrix(fftexpr[0].countrows(), fftexpr[0].countcolumns(),0));
-                if (countrows() == 3)
-                    gmshinterface::appendtoview(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", elementtypenumber, coords[0], coords[1], coords[2], fftexpr[0], fftexpr[1], fftexpr[2]);
-            }
+            	for (int h = 0; h < harms.size(); h++)
+            	{
+            		datatowrite[harms[h]][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
+            		std::vector<densematrix> curdata(countrows());
+            		for (int comp = 0; comp < countrows(); comp++)
+            			curdata[comp] = expr[comp][harms[h]][0];
+            		datatowrite[harms[h]][0].adddata(elementtype, curdata);
+    			}
+        	}
+        	else
+        	{
+        		datatowrite[0][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
+        		datatowrite[0][0].adddata(elementtype, fftexpr);
+        	}
         } 
         while (myselector.next());
-        
-        // Write the interpolation scheme:
-        if (numtimesteps <= 0)
-        {
-            for (int h = 0; h < harms.size(); h++)
-            {
-                gmshinterface::writeinterpolationscheme(harmfilename[h].getstring() + ".pos", {poly, polyxyz});
-                gmshinterface::closeview(harmfilename[h].getstring() + ".pos");
-            }
-        }
-        else
-        {
-            gmshinterface::writeinterpolationscheme(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos", {poly, polyxyz});
-            gmshinterface::closeview(filename + "_" + std::to_string(numtimesteps) + "timesteps" + ".pos");
-        }
     }
+    
+    // Write the data:
+    if (numtimesteps <= 0)
+    {
+    	for (int h = 0; h < datatowrite.size(); h++)
+    	{
+    		if (datatowrite[h].size() == 1)
+    		{
+    			if (h <= 1)
+    				iointerface::writetofile(filename, datatowrite[h][0]);
+				else
+					iointerface::writetofile(filename, datatowrite[h][0], "_harm"+std::to_string(h));
+    		}
+    	}
+	}
+	else
+		iointerface::writetofile(filename, datatowrite[0][0], "_"+std::to_string(numtimesteps)+"timesteps");
 }
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)

@@ -32,6 +32,7 @@
 #include "wallclock.h"
 #include "shape.h"
 #include "myalgorithm.h"
+#include "iointerface.h"
 
 
 class vec;
