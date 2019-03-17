@@ -128,25 +128,15 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
         std::cout << "Error in 'mathop' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
         abort();
     }
-
-    // Make sure the filename includes the extension:
-    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pos")
-    {
-        std::cout << "Error in 'mathop' namespace: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
-        abort();
-    }
-    // Remove the extension:
-    filename = filename.substr(0, filename.size()-4);
-
-    // Write the header:
-    gmshinterface::openview(filename + ".pos", filename, 0, true);
-    // Write the data:
+    
+    iodata datatowrite(1, 1, isscalar, {});
+    datatowrite.addcoordinates(0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords));
     if (isscalar)
-        gmshinterface::appendtoview(filename + ".pos", 0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords), densematrix(n,1,compxevals));
-    else
-        gmshinterface::appendtoview(filename + ".pos", 0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords), densematrix(n,1,compxevals), densematrix(n,1,compyevals), densematrix(n,1,compzevals));
-    // Close view:
-    gmshinterface::closeview(filename + ".pos");
+    	datatowrite.adddata(0, {densematrix(n,1,compxevals)});
+	else
+		datatowrite.adddata(0, {densematrix(n,1,compxevals), densematrix(n,1,compyevals), densematrix(n,1,compzevals)});
+		
+	iointerface::writetofile(filename, datatowrite);
 }
     
     

@@ -12,7 +12,7 @@
 #include "expression.h"
 #include "integration.h"
 #include "universe.h"
-#include "gmshinterface.h"
+#include "iointerface.h"
 #include "vec.h"
 #include "mat.h"
 
