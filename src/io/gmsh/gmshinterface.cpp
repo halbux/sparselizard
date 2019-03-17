@@ -223,49 +223,49 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
 
 void gmshinterface::writetofile(std::string name, iodata datatowrite)
 {
-	// Get the file name without the .pos extension:
-	std::string namenoext = name.substr(0, name.size()-4);
-	
-	// Get the list of element types in the view:
-	std::vector<int> activeelementtypes = datatowrite.getactiveelementtypes();
-	
-	// Loop on all element types:
-	for (int i = 0; i < activeelementtypes.size(); i++)
-	{
-		int elemtypenum = activeelementtypes[i];
-		element myelement(elemtypenum);
-
-		std::vector<densematrix> curcoords = datatowrite.getcoordinates(elemtypenum);
-
-		// Open the view (overwrite if first time):
-		if (activeelementtypes.size() == 1)
-			gmshinterface::openview(name, namenoext, 0, i == 0);
-		else
-			gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
-		// Append the data to the view:
-		std::vector<densematrix> curdata = datatowrite.getdata(elemtypenum);
-		if (datatowrite.isscalar())
-    		gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
-		else
-			gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
-
-		// Write the shape function polynomials:
+    // Get the file name without the .pos extension:
+    std::string namenoext = name.substr(0, name.size()-4);
+    
+    // Get the list of element types in the view:
+    std::vector<int> activeelementtypes = datatowrite.getactiveelementtypes();
+    
+    // Loop on all active element types:
+    for (int i = 0; i < activeelementtypes.size(); i++)
+    {
+        int elemtypenum = activeelementtypes[i];
+        element myelement(elemtypenum);
+        
+        std::vector<densematrix> curcoords = datatowrite.getcoordinates(elemtypenum);
+        
+        // Open the view (overwrite if first time):
+        if (activeelementtypes.size() == 1)
+            gmshinterface::openview(name, namenoext, 0, i == 0);
+        else
+            gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
+        // Append the data to the view:
+        std::vector<densematrix> curdata = datatowrite.getdata(elemtypenum);
+        if (datatowrite.isscalar())
+            gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
+        else
+            gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
+        
+        // Write the shape function polynomials:
         lagrangeformfunction mylagrange(elemtypenum, datatowrite.getinterpolorder(), {});
         std::vector<polynomial> poly = mylagrange.getformfunctionpolynomials();
         
         std::vector<polynomial> polygeo;
         if (datatowrite.getinterpolorder() == datatowrite.getgeointerpolorder())
-        	polygeo = poly;
-    	else
-    	{
-			lagrangeformfunction mylagrangegeo(elemtypenum, datatowrite.getgeointerpolorder(), {});
-			polygeo = mylagrangegeo.getformfunctionpolynomials();
-		}
-
+            polygeo = poly;
+        else
+        {
+            lagrangeformfunction mylagrangegeo(elemtypenum, datatowrite.getgeointerpolorder(), {});
+            polygeo = mylagrangegeo.getformfunctionpolynomials();
+        }
+        
         gmshinterface::writeinterpolationscheme(name, {poly, polygeo});
-		// Close the view:
+        // Close the view:
         gmshinterface::closeview(name);
-	}
+    }
 }
 
 void gmshinterface::openview(std::string name, std::string viewname, double timetag, bool overwrite)
