@@ -850,14 +850,14 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         lagrangeformfunction mygeolagrange(elementtype, geolagrangeorder, {});
         std::vector<double> geolagrangecoords = mygeolagrange.getnodecoordinates();
         
-        // The harmonics can change from a disjoint region to the other:
-        std::vector<int> harms = {};
-        
         // Loop on all total orientations (if required):
         bool isorientationdependent = isvalueorientationdependent(mydisjregs) || (meshdeform != NULL && meshdeform->isvalueorientationdependent(mydisjregs));
         elementselector myselector(mydisjregs, isorientationdependent);
         do 
         {
+        	// The harmonic content might have changed:
+        	std::vector<int> harms = {};
+        
             // Compute the mesh coordinates. Initialise all coordinates to zero.
             std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), geolagrangecoords.size()/3,0));
             for (int i = 0; i < problemdimension; i++)
@@ -884,6 +884,10 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     fftexpr[i] = myfft::toelementrowformat(myoperations[i]->multiharmonicinterpolate(numtimesteps, myselector, lagrangecoords, meshdeform), myselector.countinselection());
             }
             universe::forbidreuse();
+            
+            // Make sure the harmonic content is the same for every component:
+            if (numtimesteps <= 0)
+            	myfft::sameharmonics(expr);
             
             // Get a vector containing all harmonic numbers in 'expr' on the current disjoint regions:
             if (numtimesteps <= 0)

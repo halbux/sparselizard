@@ -143,3 +143,43 @@ densematrix myfft::toelementrowformat(densematrix timestepsinrows, int numberofe
     return output;
 }
 
+void myfft::sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& notsame)
+{
+	if (notsame.size() <= 1)
+		return;
+
+	int maxlen = notsame[0].size();
+	for (int i = 1; i < notsame.size(); i++)
+	{
+		if (notsame[i].size() > maxlen)
+			maxlen = notsame[i].size();
+	}
+	// Make sure the length of all notsame[i] is the same:
+	for (int i = 0; i < notsame.size(); i++)
+		notsame[i].resize(maxlen);
+		
+	for (int h = 0; h < maxlen; h++)
+	{
+		int curnumrows = -1, curnumcols = -1;
+		for (int i = 0; i < notsame.size(); i++)
+		{
+			if (notsame[i][h].size() == 1)
+			{
+				curnumrows = notsame[i][h][0].countrows();
+				curnumcols = notsame[i][h][0].countcolumns();
+				break;
+			}
+		}
+		if (curnumrows == -1 || curnumcols == -1)
+			continue;
+			
+		// Fill with full zero if an entry is missing:
+		for (int i = 0; i < notsame.size(); i++)
+		{
+			if (notsame[i][h].size() == 0)
+				notsame[i][h] = {densematrix(curnumrows, curnumcols, 0.0)};
+		}
+	}
+}
+
+

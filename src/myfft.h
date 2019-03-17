@@ -33,6 +33,9 @@ namespace myfft
     // with row i corresponding to time evaluation i. Output a 
     // densematrix in which row i corresponds to element i.
     densematrix toelementrowformat(densematrix timestepsinrows, int numberofelements);
+    
+    // Make sure notsame[i] has the same harmonic content for every i (fill with zeros if not).
+    void sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& notsame);
 };
 
 #endif
