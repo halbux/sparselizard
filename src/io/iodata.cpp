@@ -15,8 +15,10 @@ iodata::iodata(int interpolorder, int geointerpolorder, bool isitscalardata, std
 	mytimevals = timevals;
 
  	mycoords = std::vector<std::vector<std::vector<densematrix>>>(3, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
-	myscalardata = std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0));
-	myvectordata = std::vector<std::vector<std::vector<densematrix>>>(3, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
+ 	if (isscalardata)
+		mydata = std::vector<std::vector<std::vector<densematrix>>>(1, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
+	else
+		mydata = std::vector<std::vector<std::vector<densematrix>>>(3, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
 }
 
 void iodata::combine(void)
@@ -30,9 +32,8 @@ void iodata::combine(void)
 	
 		for (int s = 0; s < 3; s++)
 			mycoords[s][i] = {densematrix(mycoords[s][i])};
-		myscalardata[i] = {densematrix(myscalardata[i])};
-		for (int comp = 0; comp < 3; comp++)
-			myvectordata[comp][i] = {densematrix(myvectordata[comp][i])};
+		for (int comp = 0; comp < mydata.size(); comp++)
+			mydata[comp][i] = {densematrix(mydata[comp][i])};
 	}
 }
 
@@ -54,28 +55,18 @@ void iodata::addcoordinates(int elemtypenum, densematrix xcoords, densematrix yc
 	mycoords[2][elemtypenum].push_back(zcoords);
 }
 
-void iodata::addscalardata(int elemtypenum, densematrix vals)
+void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
 {
-	if (isscalardata == false)
+	// The non-provided components are set to 0:
+	int vallen = vals.size();
+	if (isscalardata == false && vallen < 3)
 	{
-        std::cout << "Error in 'iodata' object: expected scalar data" << std::endl;
-        abort();
+		for (int i = vallen; i < 3; i++)
+			vals.push_back(densematrix(vals[0].countrows(), vals[0].countcolumns(), 0.0));
 	}
 
-	myscalardata[elemtypenum].push_back(vals);
-}
-
-void iodata::addvectordata(int elemtypenum, densematrix compxvals, densematrix compyvals, densematrix compzvals)
-{
-	if (isscalardata == true)
-	{
-        std::cout << "Error in 'iodata' object: expected vector data" << std::endl;
-        abort();
-	}
-
-	myvectordata[0][elemtypenum].push_back(compxvals);
-	myvectordata[1][elemtypenum].push_back(compyvals);
-	myvectordata[2][elemtypenum].push_back(compzvals);
+	for (int comp = 0; comp < vals.size(); comp++)
+		mydata[comp][elemtypenum].push_back(vals[comp]);
 }
 
 std::vector<densematrix> iodata::getcoordinates(int elemtypenum)
@@ -84,15 +75,12 @@ std::vector<densematrix> iodata::getcoordinates(int elemtypenum)
 	return {mycoords[0][elemtypenum][0], mycoords[1][elemtypenum][0], mycoords[2][elemtypenum][0]};
 }
 
-densematrix iodata::getscalardata(int elemtypenum)
+std::vector<densematrix> iodata::getdata(int elemtypenum)
 {
 	combine();
-	return myscalardata[elemtypenum][0];
-}
-
-std::vector<densematrix> iodata::getvectordata(int elemtypenum)
-{
-	combine();
-	return {myvectordata[0][elemtypenum][0], myvectordata[1][elemtypenum][0], myvectordata[2][elemtypenum][0]};
+	if (isscalardata == true)
+		return {mydata[0][elemtypenum][0]};
+	else
+		return {mydata[0][elemtypenum][0], mydata[1][elemtypenum][0], mydata[2][elemtypenum][0]};
 }
 

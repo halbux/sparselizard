@@ -33,10 +33,9 @@ class iodata
         // Every row corresponds to a given element. Every column corresponds to a node in the element.
         std::vector<std::vector<std::vector<densematrix>>> mycoords;
         
-        // scalardata[i] gives the scalar data for all elements of type i.
-        std::vector<std::vector<densematrix>> myscalardata;
-        // vectordata[comp][i] gives the vector data at component 'comp' for all elements of type i.
-        std::vector<std::vector<std::vector<densematrix>>> myvectordata;		
+        // mydata[comp][i] gives the data at component 'comp' for all elements of type i.
+        // The data for scalars is at component 0.
+        std::vector<std::vector<std::vector<densematrix>>> mydata;		
         
         // Combine the data in every element type:
         void combine(void);
@@ -57,14 +56,13 @@ class iodata
         
         // Rows correspond to the elements. Columns correspond to the element nodes.
         void addcoordinates(int elemtypenum, densematrix xcoords, densematrix ycoords, densematrix zcoords);
-        void addscalardata(int elemtypenum, densematrix vals);
-        void addvectordata(int elemtypenum, densematrix compxvals, densematrix compyvals, densematrix compzvals);
+        // Add all components vals[comp] of the data:
+        void adddata(int elemtypenum, std::vector<densematrix> vals);
         
         // Get the x, y and z coordinates of the nodes in all elements of a given type:
         std::vector<densematrix> getcoordinates(int elemtypenum);
-        // Get the scalar/vector data at the nodes in all elements of a given type:
-        densematrix getscalardata(int elemtypenum);
-        std::vector<densematrix> getvectordata(int elemtypenum);
+        // Get all components of the data at the nodes in all elements of a given type:
+        std::vector<densematrix> getdata(int elemtypenum);
         
 };
 

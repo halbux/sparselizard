@@ -240,13 +240,11 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
 		// Open the view (overwrite if first time):
 		gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
 		// Append the data to the view:
+		std::vector<densematrix> curdata = datatowrite.getdata(i);
 		if (datatowrite.isscalar())
-    		gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], datatowrite.getscalardata(i));
+    		gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
 		else
-		{
-			std::vector<densematrix> vecdata = datatowrite.getvectordata(i);
-			gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], vecdata[0], vecdata[1], vecdata[2]);
-		}
+			gmshinterface::appendtoview(name, i, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
 
 		// Write the shape function polynomials:
         lagrangeformfunction mylagrange(i, datatowrite.getinterpolorder(), {});
