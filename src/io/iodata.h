@@ -60,6 +60,11 @@ class iodata
         // Add all components vals[comp] of the data:
         void adddata(int elemtypenum, std::vector<densematrix> vals);
         
+        int countnodes(int elemtypenum);
+        int countnodes(void);
+        int countelements(int elemtypenum);
+        int countelements(void);
+        
         // Get the x, y and z coordinates of the nodes in all elements of a given type:
         std::vector<densematrix> getcoordinates(int elemtypenum);
         // Get all components of the data at the nodes in all elements of a given type:
