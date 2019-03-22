@@ -4,7 +4,7 @@
 void pvinterface::writetofile(std::string name, iodata datatowrite)
 {
 
-    // Get the file name without the .pos extension:
+    // Get the file name without the .vtk extension:
     std::string namenoext = name.substr(0, name.size()-4);
     
 	// 'file' cannot take a std::string argument --> name.c_str():
