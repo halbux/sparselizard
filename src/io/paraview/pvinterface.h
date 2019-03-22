@@ -8,11 +8,22 @@
 #define PVINTERFACE_H
 
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <iomanip>
 #include "densematrix.h"
+#include "iodata.h"
+#include "element.h"
 
 namespace pvinterface
 {
+	// Write to .vtk format:
+	void writetofile(std::string name, iodata datatowrite);
 
+    // ParaView comes with its own element type numbering: we translate it from ours:
+    int converttoparaviewelementtypenumber(int ourtypenumber);
 };
 
 #endif

@@ -17,6 +17,11 @@ void iointerface::writetofile(std::string filename, iodata datatowrite, std::str
             gmshinterface::writetofile(requestedfilename, datatowrite);
             return;
         }
+        if (fileext == ".vtk")
+        {
+            pvinterface::writetofile(requestedfilename, datatowrite);
+            return;
+        }
     }
     
     std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "' (unknown or missing file extension)" << std::endl;
