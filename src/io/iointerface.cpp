@@ -33,6 +33,6 @@ bool iointerface::isonlyisoparametric(std::string filename)
     if (fileext == ".vtk")
         return true;
 		
-    std::cout << "Error in 'iointerface' namespace: unknown extension in file '" << filename << std::endl;
+    std::cout << "Error in 'iointerface' namespace: unknown extension in file '" << filename << " '" << std::endl;
     abort();
 }
