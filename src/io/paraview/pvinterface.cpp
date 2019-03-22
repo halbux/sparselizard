@@ -93,7 +93,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		// Write the scalar data section (if any):
 		if (datatowrite.isscalar() == true)
 		{
-			outfile << "SCALARS " << namenoext << " double\n";
+			outfile << "SCALARS " << namenoext.at(0) << " double\n";
 			outfile << "LOOKUP_TABLE default" << "\n";
 			for (int i = 0; i < 8; i++)
 			{
@@ -112,7 +112,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		// Write the vector data section (if any):
 		if (datatowrite.isscalar() == false)
 		{
-			outfile << "VECTORS " << namenoext << " double\n";
+			outfile << "VECTORS " << namenoext.at(0) << " double\n";
 			for (int i = 0; i < 8; i++)
 			{
 				if (datatowrite.ispopulated(i) == false)
