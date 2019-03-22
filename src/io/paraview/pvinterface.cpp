@@ -48,6 +48,8 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		// Write the cells section:
 		int numelems = datatowrite.countelements();
 		outfile << "CELLS " << numelems << " " << numnodes + numelems << "\n";
+		
+		int nodenum = 0;
 		for (int i = 0; i < 8; i++)
 		{
 			if (datatowrite.ispopulated(i) == false)
@@ -55,14 +57,13 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 				
 			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i);
 			
-			int index = 0;
 			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
 			{
 				outfile << curcoords[0].countcolumns() << " ";
 				for (int node = 0; node < curcoords[0].countcolumns(); node++)
 				{
-					outfile << index << " ";
-					index++;
+					outfile << nodenum << " ";
+					nodenum++;
 				}
 				outfile << "\n";
 			}
