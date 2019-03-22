@@ -25,13 +25,13 @@ void iointerface::writetofile(std::string filename, iodata datatowrite, std::str
 
 bool iointerface::isonlyisoparametric(std::string filename)
 {
-	// Get the extension:
-	std::string fileext = filename.substr(filename.size()-4,4);
-	
-	if (fileext == ".pos")
-		return false;
-	if (fileext == ".vtk")
-		return true;
+    // Get the extension:
+    std::string fileext = filename.substr(filename.size()-4,4);
+    
+    if (fileext == ".pos")
+        return false;
+    if (fileext == ".vtk")
+        return true;
 		
     std::cout << "Error in 'iointerface' namespace: unknown extension in file '" << filename << std::endl;
     abort();
