@@ -3,7 +3,6 @@
 
 void pvinterface::writetofile(std::string name, iodata datatowrite)
 {
-
     // Get the file name without the .vtk extension:
     std::string namenoext = name.substr(0, name.size()-4);
     
