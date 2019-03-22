@@ -21,6 +21,8 @@
 namespace iointerface
 {
     void writetofile(std::string filename, iodata datatowrite, std::string appendtofilename = "");
+    // The file format might allow only isoparametric elements:
+    bool isonlyisoparametric(std::string filename);
 };
 
 #endif

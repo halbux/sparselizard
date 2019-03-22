@@ -820,7 +820,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     
     // Get the geometry interpolation order (1 if the element is not curved):
     int geolagrangeorder = lagrangeorder;
-    if (universe::mymesh->getelements()->getcurvatureorder() == 1 && meshdeform == NULL)
+    if (iointerface::isonlyisoparametric(filename) == false && universe::mymesh->getelements()->getcurvatureorder() == 1 && meshdeform == NULL)
     	geolagrangeorder = 1;
     	
 	// These are the time tags that will be used:
