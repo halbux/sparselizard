@@ -7,6 +7,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
     std::string namenoext = name.substr(0, name.size()-4);
     
     mystring myname(name);
+    std::string viewname = myname.getstringwhileletter();
     
 	// 'file' cannot take a std::string argument --> name.c_str():
 	std::ofstream outfile (name.c_str());
@@ -95,7 +96,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		// Write the scalar data section (if any):
 		if (datatowrite.isscalar() == true)
 		{
-			outfile << "SCALARS " << myname.getstringwhileletter() << " double\n";
+			outfile << "SCALARS " << viewname << " double\n";
 			outfile << "LOOKUP_TABLE default" << "\n";
 			for (int i = 0; i < 8; i++)
 			{
@@ -114,7 +115,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		// Write the vector data section (if any):
 		if (datatowrite.isscalar() == false)
 		{
-			outfile << "VECTORS " << myname.getstringwhileletter() << " double\n";
+			outfile << "VECTORS " << viewname << " double\n";
 			for (int i = 0; i < 8; i++)
 			{
 				if (datatowrite.ispopulated(i) == false)
