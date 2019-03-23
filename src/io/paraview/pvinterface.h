@@ -16,6 +16,7 @@
 #include "densematrix.h"
 #include "iodata.h"
 #include "element.h"
+#include "mystring.h"
 
 namespace pvinterface
 {

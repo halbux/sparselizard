@@ -4,7 +4,6 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-
 #ifndef MYSTRING_H
 #define MYSTRING_H
 
@@ -37,9 +36,12 @@ class mystring
         std::string getstringtonextwhitespace(void);
         // 'jumptonextwhitespace' moves 'stringindex' to the position of the
         // next white space (or string end if none) plus 1. 
-        void jumptonextwhitespace(void);				
+        void jumptonextwhitespace(void);
+        
+        // Similar to 'getstringtonextwhitespace'.
+        std::string getstringwhileletter(void);
 	
 };
 
 #endif
- 
+
