@@ -80,7 +80,7 @@ void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
 		mydata[comp][elemtypenum].push_back(vals[comp]);
 }
 
-int iodata::countnodes(int elemtypenum)
+int iodata::countcoordnodes(int elemtypenum)
 {
 	combine();
 	
@@ -94,12 +94,12 @@ int iodata::countnodes(int elemtypenum)
 		return 0;
 }
 
-int iodata::countnodes(void)
+int iodata::countcoordnodes(void)
 {
 	combine();
 	int numnodes = 0;
 	for (int i = 0; i < 8; i++)
-		numnodes += countnodes(i);
+		numnodes += countcoordnodes(i);
 	return numnodes;
 }
 

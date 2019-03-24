@@ -60,8 +60,8 @@ class iodata
         // Add all components vals[comp] of the data:
         void adddata(int elemtypenum, std::vector<densematrix> vals);
         
-        int countnodes(int elemtypenum);
-        int countnodes(void);
+        int countcoordnodes(int elemtypenum);
+        int countcoordnodes(void);
         int countelements(int elemtypenum);
         int countelements(void);
         

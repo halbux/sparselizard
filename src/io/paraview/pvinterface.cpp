@@ -23,7 +23,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		outfile << "DATASET UNSTRUCTURED_GRID\n\n";
 		
 		// Write the points section.
-		int numnodes = datatowrite.countnodes();
+		int numnodes = datatowrite.countcoordnodes();
 		outfile << "POINTS " << numnodes << " double\n";
 		for (int i = 0; i < 8; i++)
 		{
