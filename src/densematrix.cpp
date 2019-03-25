@@ -538,3 +538,60 @@ densematrix densematrix::duplicatevertically(int n)
     
     return output;
 }
+
+densematrix densematrix::extractrows(std::vector<int> selected)
+{
+	int numselected = selected.size();
+
+	densematrix output(numselected, numcols);
+	
+	double* vals = getvalues();
+	double* outvals = output.getvalues();
+	for (int i = 0; i < numselected; i++)
+	{
+		int row = selected[i];
+		for (int j = 0; j < numcols; j++)
+			outvals[i*numcols+j] = vals[row*numcols+j];
+	}
+	
+	return output;
+}
+
+densematrix densematrix::extractcols(std::vector<int> selected)
+{
+	int numselected = selected.size();
+	
+	densematrix output(numrows, numselected);
+	
+	double* vals = getvalues();
+	double* outvals = output.getvalues();
+	for (int i = 0; i < numrows; i++)
+	{
+		for (int j = 0; j < numselected; j++)
+		{
+			int col = selected[j];
+			outvals[i*numselected+j] = vals[i*numcols+col];
+		}
+	}
+	
+	return output;
+}
+
+densematrix densematrix::extractrows(int rangebegin, int rangeend)
+{
+	std::vector<int> selected(rangeend-rangebegin+1);
+	for (int i = 0; i < selected.size(); i++)
+		selected[i] = rangebegin + i;
+		
+	return extractrows(selected);
+}
+
+densematrix densematrix::extractcols(int rangebegin, int rangeend)
+{
+	std::vector<int> selected(rangeend-rangebegin+1);
+	for (int i = 0; i < selected.size(); i++)
+		selected[i] = rangebegin + i;
+		
+	return extractcols(selected);
+}
+
