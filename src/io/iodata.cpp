@@ -61,6 +61,11 @@ std::vector<int> iodata::getactiveelementtypes(void)
 
 void iodata::addcoordinates(int elemtypenum, densematrix xcoords, densematrix ycoords, densematrix zcoords)
 {
+	element myelement(elemtypenum, mygeointerpolorder);
+	int numgeonodes = myelement.countcurvednodes();
+	
+	numcoordtimestepsprovided  = xcoords.countcolumns()/numgeonodes;
+
 	mycoords[0][elemtypenum].push_back(xcoords);
 	mycoords[1][elemtypenum].push_back(ycoords);
 	mycoords[2][elemtypenum].push_back(zcoords);
@@ -68,6 +73,11 @@ void iodata::addcoordinates(int elemtypenum, densematrix xcoords, densematrix yc
 
 void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
 {
+	element myelement(elemtypenum, myinterpolorder);
+	int numdatanodes = myelement.countcurvednodes();
+	
+	numdatatimestepsprovided  = vals[0].countcolumns()/numdatanodes;
+	
 	// The non-provided components are set to 0:
 	int vallen = vals.size();
 	if (isscalardata == false && vallen < 3)
@@ -83,13 +93,8 @@ void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
 int iodata::countcoordnodes(int elemtypenum)
 {
 	combine();
-	
-	int numtimesteps = 1;
-	if (mytimevals.size() > 0)
-		numtimesteps = mytimevals.size();
-	
 	if (mycoords[0][elemtypenum].size() > 0)
-		return mycoords[0][elemtypenum][0].count()/numtimesteps;
+		return mycoords[0][elemtypenum][0].count()/numcoordtimestepsprovided;
 	else
 		return 0;
 }
@@ -121,18 +126,42 @@ int iodata::countelements(void)
 	return numelems;
 }
 
-std::vector<densematrix> iodata::getcoordinates(int elemtypenum)
+std::vector<densematrix> iodata::getcoordinates(int elemtypenum, int timestepindex)
 {
 	combine();
-	return {mycoords[0][elemtypenum][0], mycoords[1][elemtypenum][0], mycoords[2][elemtypenum][0]};
+	
+	if (timestepindex == -1 || numcoordtimestepsprovided == 1)
+		return {mycoords[0][elemtypenum][0], mycoords[1][elemtypenum][0], mycoords[2][elemtypenum][0]};
+	else
+	{
+		element myelement(elemtypenum, mygeointerpolorder);
+		int numnod = myelement.countcurvednodes();
+		int col1 = timestepindex*numnod, col2 = (timestepindex+1)*numnod-1;
+		return {mycoords[0][elemtypenum][0].extractcols(col1,col2), mycoords[1][elemtypenum][0].extractcols(col1,col2), mycoords[2][elemtypenum][0].extractcols(col1,col2)};
+	}
 }
 
-std::vector<densematrix> iodata::getdata(int elemtypenum)
+std::vector<densematrix> iodata::getdata(int elemtypenum, int timestepindex)
 {
 	combine();
-	if (isscalardata == true)
-		return {mydata[0][elemtypenum][0]};
+	
+	if (timestepindex == -1 || numdatatimestepsprovided == 1)
+	{
+		if (isscalardata == true)
+			return {mydata[0][elemtypenum][0]};
+		else
+			return {mydata[0][elemtypenum][0], mydata[1][elemtypenum][0], mydata[2][elemtypenum][0]};
+	}
 	else
-		return {mydata[0][elemtypenum][0], mydata[1][elemtypenum][0], mydata[2][elemtypenum][0]};
+	{
+		element myelement(elemtypenum, myinterpolorder);
+		int numnod = myelement.countcurvednodes();
+		int col1 = timestepindex*numnod, col2 = (timestepindex+1)*numnod-1;
+		
+		if (isscalardata == true)
+			return {mydata[0][elemtypenum][0].extractcols(col1,col2)};
+		else
+			return {mydata[0][elemtypenum][0].extractcols(col1,col2), mydata[1][elemtypenum][0].extractcols(col1,col2), mydata[2][elemtypenum][0].extractcols(col1,col2)};
+	}
 }
 

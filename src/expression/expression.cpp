@@ -940,7 +940,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     	}
 	}
 	else
-		iointerface::writetofile(filename, datatowrite[0][0], "_"+std::to_string(numtimesteps)+"timesteps");
+		iointerface::writetofile(filename, datatowrite[0][0], "timesteps"+std::to_string(numtimesteps));
 }
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)

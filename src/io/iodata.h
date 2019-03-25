@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include "densematrix.h"
+#include "element.h"
 
 class iodata
 {   
@@ -24,9 +25,16 @@ class iodata
         
         // IN CASE OF MULTIPLE TIMESTEPS THE DATA BLOCKS BELOW ARE 
         // THE COLUMN-WISE CONCATENATION OF SINGLE-TIMESTEP DATA.
+        // IT IS ALLOWED TO PROVIDE THE COORDINATES AND/OR DATA FOR 
+        // A SINGLE TIMESTEP. IN SUCH A CASE THE COORDINATES/DATA IS
+        // SUPPOSED CONSTANT OVER TIME. IN ANY CASE THE NUMBER OF 
+        // TIMESTEPS PROVIDED MUST BE CONSISTENT ACROSS ALL INPUTS.
         //
         // Time vals in case of data at multiple timesteps.
         std::vector<double> mytimevals = {};
+        
+        int numcoordtimestepsprovided = -1;
+        int numdatatimestepsprovided = -1;
         
         // Coordinates of the nodes at which to write the data.
         // mycoords[xyz][i] gives the x, y or z coordinates for all elements of type i.
@@ -66,9 +74,9 @@ class iodata
         int countelements(void);
         
         // Get the x, y and z coordinates of the nodes in all elements of a given type:
-        std::vector<densematrix> getcoordinates(int elemtypenum);
+        std::vector<densematrix> getcoordinates(int elemtypenum, int timestepindex = -1);
         // Get all components of the data at the nodes in all elements of a given type:
-        std::vector<densematrix> getdata(int elemtypenum);
+        std::vector<densematrix> getdata(int elemtypenum, int timestepindex = -1);
         
 };
 

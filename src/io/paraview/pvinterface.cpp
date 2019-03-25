@@ -6,6 +6,24 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
     // Get the file name without the .vtk extension:
     std::string namenoext = name.substr(0, name.size()-4);
     
+	// Get all timesteps in 'datatowrite':
+	std::vector<double> timetags = datatowrite.gettimetags();
+	
+	if (timetags.size() == 0)
+		writetofile(name, datatowrite, -1);
+	
+	for (int i = 0; i < timetags.size(); i++)
+	{
+		std::string curname = namenoext + "_" + std::to_string(i) + ".vtk";
+		writetofile(curname, datatowrite, i);
+	}
+}
+
+void pvinterface::writetofile(std::string name, iodata datatowrite, int timestepindex)
+{
+    // Get the file name without the .vtk extension:
+    std::string namenoext = name.substr(0, name.size()-4);
+    
     mystring myname(name);
     std::string viewname = myname.getstringwhileletter();
     
@@ -17,7 +35,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 		outfile << std::setprecision(17);
 		
 		// Write the header:
-		outfile << "# vtk DataFile Version 4.2\n";
+		outfile << "# vtk DataFile Version 3.0\n";
 		outfile << namenoext+"\n";
 		outfile << "ASCII\n";
 		outfile << "DATASET UNSTRUCTURED_GRID\n\n";
@@ -30,7 +48,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 			if (datatowrite.ispopulated(i) == false)
 				continue;
 				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i);
+			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i,timestepindex);
 			double* xvals = curcoords[0].getvalues();
 			double* yvals = curcoords[1].getvalues();
 			double* zvals = curcoords[2].getvalues();
@@ -58,7 +76,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 			if (datatowrite.ispopulated(i) == false)
 				continue;
 				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i);
+			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i,timestepindex);
 			
 			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
 			{
@@ -82,7 +100,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 				
 			element myelem(i, datatowrite.getinterpolorder());
 				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i);
+			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i,timestepindex);
 			
 			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
 				outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
@@ -103,7 +121,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 				if (datatowrite.ispopulated(i) == false)
 					continue;
 					
-				densematrix scaldat = datatowrite.getdata(i)[0];
+				densematrix scaldat = datatowrite.getdata(i,timestepindex)[0];
 				double* scalvals = scaldat.getvalues();
 				
 				for (int i = 0; i < scaldat.count(); i++)
@@ -121,7 +139,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 				if (datatowrite.ispopulated(i) == false)
 					continue;
 					
-				std::vector<densematrix> vecdat = datatowrite.getdata(i);
+				std::vector<densematrix> vecdat = datatowrite.getdata(i,timestepindex);
 				double* compxvals = vecdat[0].getvalues();
 				double* compyvals = vecdat[1].getvalues();
 				double* compzvals = vecdat[2].getvalues();

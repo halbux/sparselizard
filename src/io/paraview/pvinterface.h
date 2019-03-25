@@ -22,6 +22,7 @@ namespace pvinterface
 {
     // Write to .vtk format:
     void writetofile(std::string name, iodata datatowrite);
+    void writetofile(std::string name, iodata datatowrite, int timestepindex);
     
     // ParaView comes with its own element type numbering: we translate it from ours:
     int converttoparaviewelementtypenumber(int ourtypenumber);
