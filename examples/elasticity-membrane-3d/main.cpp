@@ -47,7 +47,7 @@ void sparselizard(void)
     (0.5e9*u).write(top, "u.pos", 3);
     
     // Code validation line. Can be removed.
-    std::cout << (compz(u).integrate(vol, u, 5) < -1.14693e-10 && compz(u).integrate(vol, u, 5) > -1.14697e-10);
+    std::cout << (compz(u).integrate(vol, u, 5) < -1.24111e-10 && compz(u).integrate(vol, u, 5) > -1.24113e-10);
 }
 
 int main(void)
