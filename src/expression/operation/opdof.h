@@ -37,7 +37,7 @@ class opdof: public operation
         
         void setspacederivative(int whichderivative);
         void increasetimederivativeorder(int amount);
-        int selectformfunctioncomponent(int comp) { formfunctioncomponent = comp; };
+        void selectformfunctioncomponent(int comp) { formfunctioncomponent = comp; };
 
         void setfieldcomponent(int comp) { fieldcomponent = comp; };
         
