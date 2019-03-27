@@ -138,9 +138,9 @@ bool element::iscurved(void)
 int element::getcurvatureorder(void)
 {
 	if (curvedtypenumber%7 == 0 && curvedtypenumber != 0)
-		return curvedtypenumber/7.0;
+		return curvedtypenumber/7;
 	else
-		return (curvedtypenumber - curvedtypenumber%7)/7.0 + 1;		
+		return (curvedtypenumber - curvedtypenumber%7)/7 + 1;		
 }
 
 int element::gettypenumber(void)
@@ -171,7 +171,7 @@ int element::countcurvednodes(void)
 		// Triangle:
 		case 2:
 			// (#on quad + #on diagonal) / 2:
-			curvednumberofnodes = 0.5*( pow(order+1,2) + (order+1) );
+			curvednumberofnodes = ( pow(order+1,2) + (order+1) )/2;
 			break;
 		// Quadrangle:
 		case 3:
@@ -179,7 +179,7 @@ int element::countcurvednodes(void)
 			break;
 		// Tetrahedron:
 		case 4:
-			curvednumberofnodes = 1.0/6.0*(order+1)*(order+2)*(order+3);
+			curvednumberofnodes = ( (order+1)*(order+2)*(order+3) )/6;
             break;
 		// Hexahedron:
 		case 5:
@@ -187,7 +187,7 @@ int element::countcurvednodes(void)
 			break;
 		// Prism:
 		case 6:
-			curvednumberofnodes = 0.5*(order + 1)*( ( pow(order+1,2) + (order+1) ) );
+			curvednumberofnodes = ( (order + 1)*( pow(order+1,2) + (order+1) ) )/2;
 			break;
 		// Pyramid:
 		case 7:
