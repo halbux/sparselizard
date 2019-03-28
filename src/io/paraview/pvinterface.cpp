@@ -43,12 +43,12 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 		// Write the points section.
 		int numnodes = datatowrite.countcoordnodes();
 		outfile << "POINTS " << numnodes << " double\n";
-		for (int i = 0; i < 8; i++)
+		for (int tn = 0; tn < 8; tn++)
 		{
-			if (datatowrite.ispopulated(i) == false)
+			if (datatowrite.ispopulated(tn) == false)
 				continue;
 				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i,timestepindex);
+			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 			double* xvals = curcoords[0].getvalues();
 			double* yvals = curcoords[1].getvalues();
 			double* zvals = curcoords[2].getvalues();
@@ -71,12 +71,12 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 		outfile << "CELLS " << numelems << " " << numnodes + numelems << "\n";
 		
 		int nodenum = 0;
-		for (int i = 0; i < 8; i++)
+		for (int tn = 0; tn < 8; tn++)
 		{
-			if (datatowrite.ispopulated(i) == false)
+			if (datatowrite.ispopulated(tn) == false)
 				continue;
 				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i,timestepindex);
+			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 			
 			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
 			{
@@ -93,14 +93,14 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 		
 		// Write the cell types section:
 		outfile << "CELL_TYPES " << numelems << "\n";
-		for (int i = 0; i < 8; i++)
+		for (int tn = 0; tn < 8; tn++)
 		{
-			if (datatowrite.ispopulated(i) == false)
+			if (datatowrite.ispopulated(tn) == false)
 				continue;
 				
-			element myelem(i, datatowrite.getinterpolorder());
+			element myelem(tn, datatowrite.getinterpolorder());
 				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(i,timestepindex);
+			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 			
 			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
 				outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
@@ -116,12 +116,12 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 		{
 			outfile << "SCALARS " << viewname << " double\n";
 			outfile << "LOOKUP_TABLE default" << "\n";
-			for (int i = 0; i < 8; i++)
+			for (int tn = 0; tn < 8; tn++)
 			{
-				if (datatowrite.ispopulated(i) == false)
+				if (datatowrite.ispopulated(tn) == false)
 					continue;
 					
-				densematrix scaldat = datatowrite.getdata(i,timestepindex)[0];
+				densematrix scaldat = datatowrite.getdata(tn,timestepindex)[0];
 				double* scalvals = scaldat.getvalues();
 				
 				for (int i = 0; i < scaldat.count(); i++)
@@ -134,12 +134,12 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 		if (datatowrite.isscalar() == false)
 		{
 			outfile << "VECTORS " << viewname << " double\n";
-			for (int i = 0; i < 8; i++)
+			for (int tn = 0; tn < 8; tn++)
 			{
-				if (datatowrite.ispopulated(i) == false)
+				if (datatowrite.ispopulated(tn) == false)
 					continue;
 					
-				std::vector<densematrix> vecdat = datatowrite.getdata(i,timestepindex);
+				std::vector<densematrix> vecdat = datatowrite.getdata(tn,timestepindex);
 				double* compxvals = vecdat[0].getvalues();
 				double* compyvals = vecdat[1].getvalues();
 				double* compzvals = vecdat[2].getvalues();
