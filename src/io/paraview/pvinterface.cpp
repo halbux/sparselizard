@@ -78,7 +78,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 				
 			// Move from our node ordering to the one of ParaView:
 			element myelem(tn, datatowrite.getinterpolorder());
-			std::vector<int> reordering = nodereordering(myelem.getcurvedtypenumber());
+			std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
 			
 			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 			
@@ -172,7 +172,7 @@ int pvinterface::converttoparaviewelementtypenumber(int ourtypenumber)
 	return (67 + myelement.gettypenumber());
 }
 
-std::vector<int> pvinterface::nodereordering(int ourtypenumber)
+std::vector<int> pvinterface::getnodereordering(int ourtypenumber)
 {
 	element myelement(ourtypenumber);
 	
