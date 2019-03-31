@@ -122,7 +122,7 @@ void sparselizard(void)
     writevector("bcenter.csv", bcenter);
     
     // Code validation line. Can be removed:
-    std::cout << (bcenter[asol.size()-1] < 0.0374475 && bcenter[asol.size()-1] > 0.0374473);
+    std::cout << (bcenter[asol.size()-1] < 0.03746 && bcenter[asol.size()-1] > 0.03744);
 }
 
 int main(void)
