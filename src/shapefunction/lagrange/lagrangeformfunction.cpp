@@ -1,44 +1,69 @@
 #include "lagrangeformfunction.h"
 
-lagrangeformfunction::lagrangeformfunction(int elementtypenumber, int order, const std::vector<double> evaluationpoints)
-{    
-    myorder = order;
-    myelementtypenumber = elementtypenumber;
-	myevaluationpoints = evaluationpoints;
-    
+void lagrangeformfunction::preparepoly(void)
+{
+	if (myformfunctionpolynomials.size() > 0)
+		return;
+
+    switch (myelementtypenumber)
+    {
+        case 0:
+            myformfunctionpolynomials = lagrangepoint::getformfunctionpolynomials(myorder);
+            break;
+        case 1:
+            myformfunctionpolynomials = lagrangeline::getformfunctionpolynomials(myorder);
+            break;
+        case 2:
+            myformfunctionpolynomials = lagrangetriangle::getformfunctionpolynomials(myorder);
+            break;
+        case 3:
+            myformfunctionpolynomials = lagrangequadrangle::getformfunctionpolynomials(myorder);
+            break;
+        case 4:
+            myformfunctionpolynomials = lagrangetetrahedron::getformfunctionpolynomials(myorder);
+            break;
+        case 5:
+            myformfunctionpolynomials = lagrangehexahedron::getformfunctionpolynomials(myorder);
+            break;
+        case 6:
+            myformfunctionpolynomials = lagrangeprism::getformfunctionpolynomials(myorder);
+            break;
+        case 7:
+            myformfunctionpolynomials = lagrangepyramid::getformfunctionpolynomials(myorder);
+            break;
+    }
+}
+
+void lagrangeformfunction::preparecoords(void)
+{
+	if (mynodecoordinates.size() > 0)
+		return;
+		
     switch (myelementtypenumber)
     {
         case 0:
             mynodecoordinates = lagrangepoint::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangepoint::getformfunctionpolynomials(myorder);
             break;
         case 1:
             mynodecoordinates = lagrangeline::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangeline::getformfunctionpolynomials(myorder);
             break;
         case 2:
             mynodecoordinates = lagrangetriangle::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangetriangle::getformfunctionpolynomials(myorder);
             break;
         case 3:
             mynodecoordinates = lagrangequadrangle::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangequadrangle::getformfunctionpolynomials(myorder);
             break;
         case 4:
             mynodecoordinates = lagrangetetrahedron::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangetetrahedron::getformfunctionpolynomials(myorder);
             break;
         case 5:
             mynodecoordinates = lagrangehexahedron::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangehexahedron::getformfunctionpolynomials(myorder);
             break;
         case 6:
             mynodecoordinates = lagrangeprism::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangeprism::getformfunctionpolynomials(myorder);
             break;
         case 7:
             mynodecoordinates = lagrangepyramid::getnodecoordinates(myorder);
-            myformfunctionpolynomials = lagrangepyramid::getformfunctionpolynomials(myorder);
             break;
     }
     
@@ -65,8 +90,17 @@ lagrangeformfunction::lagrangeformfunction(int elementtypenumber, int order, con
     }
 }
 
+lagrangeformfunction::lagrangeformfunction(int elementtypenumber, int order, const std::vector<double> evaluationpoints)
+{    
+    myorder = order;
+    myelementtypenumber = elementtypenumber;
+	myevaluationpoints = evaluationpoints;
+}
+
 densematrix lagrangeformfunction::getderivative(int whichderivative)
 {
+    preparepoly();
+    
     // In case it has already been computed:
     if (evaluated[whichderivative].isdefined())
         return evaluated[whichderivative].copy();
@@ -85,8 +119,22 @@ densematrix lagrangeformfunction::getderivative(int whichderivative)
     return evaluated[whichderivative].copy();
 }
 
+std::vector<double> lagrangeformfunction::getnodecoordinates(void)
+{
+	preparecoords();
+	return mynodecoordinates;
+}
+
+std::vector<polynomial> lagrangeformfunction::getformfunctionpolynomials(void)
+{
+    preparepoly();
+    return myformfunctionpolynomials;
+}
+
 polynomial lagrangeformfunction::getinterpolationpolynomial(const std::vector<double>& interpol)
 {
+    preparepoly();
+
 	polynomial poly;
 	
 	for (int i = 0; i < myformfunctionpolynomials.size(); i++)
@@ -100,6 +148,9 @@ polynomial lagrangeformfunction::getinterpolationpolynomial(const std::vector<do
 
 void lagrangeformfunction::print(void)
 {
+    preparepoly();
+    preparecoords();
+    
     element myelement(myelementtypenumber, myorder);
     int numberofformfunctions = myelement.countcurvednodes();
     

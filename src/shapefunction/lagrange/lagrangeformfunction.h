@@ -33,8 +33,8 @@ class lagrangeformfunction
         int myelementtypenumber;
         std::vector<double> myevaluationpoints;
         
-        std::vector<double> mynodecoordinates;
-        std::vector<polynomial> myformfunctionpolynomials;
+        std::vector<double> mynodecoordinates = {};
+        std::vector<polynomial> myformfunctionpolynomials = {};
         
         // In the following dense matrices there is a row per Lagrange 
         // form function and a column per evaluation point.
@@ -44,6 +44,10 @@ class lagrangeformfunction
         // - with eta derivative for i = 2
         // - with phi derivative for i = 3
         std::vector<densematrix> evaluated = std::vector<densematrix>(4);
+        
+        // Make the Lagrange polynomials/coordinates available: 
+        void preparepoly(void);
+        void preparecoords(void);
         
 	public:
         
@@ -62,8 +66,8 @@ class lagrangeformfunction
         // It outputs a copy of evaluated[whichderivative] if available.
         densematrix getderivative(int whichderivative);
         
-        std::vector<double> getnodecoordinates(void) { return mynodecoordinates; };
-        std::vector<polynomial> getformfunctionpolynomials(void) { return myformfunctionpolynomials; };
+        std::vector<double> getnodecoordinates(void);
+        std::vector<polynomial> getformfunctionpolynomials(void);
         
         // Input is the weight for each shape function. Output is the sum of all weighted shape functions.  
         polynomial getinterpolationpolynomial(const std::vector<double>& interpol);
