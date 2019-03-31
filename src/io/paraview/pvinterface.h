@@ -26,7 +26,7 @@ namespace pvinterface
     
     // ParaView comes with its own element type numbering:
     int converttoparaviewelementtypenumber(int ourtypenumber);
-    // Paraview come with its own element node ordering:
+    // ParaView comes with its own element node ordering:
     std::vector<int> nodereordering(int ourtypenumber);
 };
 
