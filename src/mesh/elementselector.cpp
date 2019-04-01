@@ -129,7 +129,7 @@ int elementselector::countinselection(void)
         else
         {
             // 'isdisjregrequested[disjreg]' is true if disjreg is in 'selecteddisjointregions'.
-            std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end()), false);
+            std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
             for (int i = 0; i < selecteddisjointregions.size(); i++)
                 isdisjregrequested[selecteddisjointregions[i]] = true;
             
@@ -158,7 +158,7 @@ std::vector<int> elementselector::getelementnumbers(void)
     else
     {
         // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
-        std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end()), false);
+        std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
         for (int i = 0; i < selecteddisjointregions.size(); i++)
             isdisjregrequested[selecteddisjointregions[i]] = true;
         
@@ -189,7 +189,7 @@ std::vector<int> elementselector::getelementindexes(void)
     else
     {
         // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
-        std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end()), false);
+        std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
         for (int i = 0; i < selecteddisjointregions.size(); i++)
             isdisjregrequested[selecteddisjointregions[i]] = true;
         
