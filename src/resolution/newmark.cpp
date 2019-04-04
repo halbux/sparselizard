@@ -29,18 +29,21 @@ newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, vec in
     }
 }
 
-std::vector<vec> newmark::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
+std::vector<std::vector<vec>> newmark::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
     return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> newmark::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+std::vector<std::vector<vec>> newmark::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
     return run(false, starttime, timestep, endtime, maxnumnlit, outputeverynthtimestep, verbosity);
 }
 
-std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
 {
+    // Solve end time rounding issues:
+    endtime += endtime*1e-12;
+    
     if (starttime > endtime)
         return {};
     
@@ -74,8 +77,8 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
     
     // Start the Newmark iteration:
     std::cout << "Newmark (beta " << beta << ", gamma " << gamma << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
-    std::vector<vec> output(outputsize);
-    output[0] = u;
+    std::vector<std::vector<vec>> output(3, std::vector<vec>(outputsize));
+    output[0][0] = u; output[1][0] = v; output[2][0] = a;
     
     // We already have everything for time step 0 so we start at 1:
     int timestepindex = 1;
@@ -175,7 +178,11 @@ std::vector<vec> newmark::run(bool islinear, double starttime, double timestep, 
         
         // Only one every 'outputeverynthtimestep' solutions is output:
         if (timestepindex%outputeverynthtimestep == 0)
-            output[timestepindex/outputeverynthtimestep] = u;
+        {
+            output[0][timestepindex/outputeverynthtimestep] = u;
+            output[1][timestepindex/outputeverynthtimestep] = v;
+            output[2][timestepindex/outputeverynthtimestep] = a;
+        }
         timestepindex++;
     }
     std::cout << std::endl;

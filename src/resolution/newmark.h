@@ -49,7 +49,7 @@ class newmark
         vec u, v, a;
         
         
-        std::vector<vec> run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity);
+        std::vector<std::vector<vec>> run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity);
         
     public:
 
@@ -61,10 +61,11 @@ class newmark
         std::vector<vec> getcurrentsolution(void) { return {u, v, a}; };
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
-        // seconds. One solution every 'outputeverynthtimestep' time steps is output.
-        std::vector<vec> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
+        // seconds. output[0] gives the u time-solutions while output[1] gives v and output[2] gives a. 
+        // One solution every 'outputeverynthtimestep' time steps is output.
+        std::vector<std::vector<vec>> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        std::vector<vec> runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit = -1, int outputeverynthtimestep = 1, int verbosity = 1);
+        std::vector<std::vector<vec>> runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit = -1, int outputeverynthtimestep = 1, int verbosity = 1);
         
 };
 
