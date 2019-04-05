@@ -27,6 +27,17 @@ void vec::updateconstraints(void)
     std::vector<shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
         rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
+        
+    // Update the conditional constraints:
+    shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
+    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+    rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
+    
+    // Set the gauged indexes to zero:
+    intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+    int numgaugedindexes = gaugedindexes.count();
+    if (numgaugedindexes > 0)
+        rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
 }
 
 void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
