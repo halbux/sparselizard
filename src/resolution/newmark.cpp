@@ -143,10 +143,14 @@ std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, doub
             vec anextdirichlet = 1/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a ); // beta cannot be zero!
             // Here are the constrained values of the next acceleration:
             densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
+            // Here for the conditional constraints:
+            intdensematrix condconstrainedindexes = (myformulation.getdofmanager()->getconditionalconstraintdata()).first;
+            densematrix condconstranextdirichletval = anextdirichlet.getpointer()->getvalues(condconstrainedindexes);
             
             vec rightvec = matu*u + matv*v + mata*a + rhs;
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
+            rightvec.getpointer()->setvalues(condconstrainedindexes, anextdirichletval);
             
             anext = mathop::solve(leftmat, rightvec);
 
