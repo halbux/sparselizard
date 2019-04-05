@@ -46,9 +46,6 @@ class vec
         void removeconstraints(void);
         
         void updateconstraints(void);
-//         void updateconstraints(field inputfield);
-//         void updateconstraints(int physreg);
-//         void updateconstraints(field inputfield, int physreg);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
         void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
