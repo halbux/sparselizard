@@ -16,7 +16,7 @@ int vec::size(void) { errorifpointerisnull(); return rawvecptr->size(); }
 
 void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
         
-void vec::updateconstraints(void)
+void vec::updateconstraints(bool includeconditionalconstraint)
 {
     errorifpointerisnull();
     
@@ -30,8 +30,11 @@ void vec::updateconstraints(void)
         
     // Update the conditional constraints:
     shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
-    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
-    rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
+    if (includeconditionalconstraint)
+    {
+        std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+        rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
+    }
     
     // Set the gauged indexes to zero:
     intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
