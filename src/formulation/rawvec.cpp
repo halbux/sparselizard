@@ -104,16 +104,6 @@ void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vecto
             }
         }
     }
-
-    // Update the conditional constraints:
-    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
-    setvalues(condconstrdata.first, condconstrdata.second);
-
-	// Set the gauged indexes to zero:
-	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-	int numgaugedindexes = gaugedindexes.count();
-	if (numgaugedindexes > 0)
-		setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
 }
 
 void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op)
