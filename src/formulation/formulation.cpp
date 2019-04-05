@@ -199,21 +199,8 @@ vec formulation::rhs(bool keepvector)
     else
         output = vec(myvec).copy();
     
-	// Set the gauged indexes to zero:
-	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-	int numgaugedindexes = gaugedindexes.count();
-	if (numgaugedindexes > 0)
-		output.getpointer()->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
-
     if (isconstraintcomputation == false)
-        output.updateconstraints(); 
-        
-	// Set the conditionally constrained indexes to the required value.
-	if (isconditionalconstraintactive)
-	{
-		std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
-		output.getpointer()->setvalues(condconstrdata.first, condconstrdata.second);
-    }
+        output.updateconstraints(isconditionalconstraintactive); 
     
     return output; 
 }
