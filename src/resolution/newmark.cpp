@@ -150,7 +150,7 @@ std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, doub
             vec rightvec = matu*u + matv*v + mata*a + rhs;
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
-            rightvec.getpointer()->setvalues(condconstrainedindexes, anextdirichletval);
+            rightvec.getpointer()->setvalues(condconstrainedindexes, condconstranextdirichletval);
             
             anext = mathop::solve(leftmat, rightvec);
 
