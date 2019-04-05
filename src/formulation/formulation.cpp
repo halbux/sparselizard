@@ -201,7 +201,7 @@ vec formulation::rhs(bool keepvector)
     
 	// Set the gauged indexes to zero:
 	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-	int numgaugedindexes = gaugedindexes.countrows()*gaugedindexes.countcolumns();
+	int numgaugedindexes = gaugedindexes.count();
 	if (numgaugedindexes > 0)
 		output.getpointer()->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
 
