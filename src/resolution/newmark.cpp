@@ -148,9 +148,9 @@ std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, doub
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
             
-            anext = mathop::solve(leftmat, rightvec);
+            anext = relaxationfactor * mathop::solve(leftmat, rightvec) + (1.0-relaxationfactor)*anext;
 
-            // Update u and v:
+            // Update unext and vnext:
             unext = u + timestep*v + ((0.5-beta)*timestep*timestep)*a + (beta*timestep*timestep)*anext;
             vnext = v + (timestep*(1-gamma))*a + (gamma*timestep)*anext;
             
