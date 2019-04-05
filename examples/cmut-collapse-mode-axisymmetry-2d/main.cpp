@@ -62,10 +62,10 @@ void sparselizard(void)
     // The constraint is active for all nodal degrees of freedom at which 'condexpr' is positive or zero. 
     // 
     // There is mechanical contact if either the deflection is larger than a given threshold 
-    // (chosen as 95% of the gap size times 1+1e-6, not 100% to avoid the need of remeshing the cavity)
+    // (chosen as 99% of the gap size times 1+1e-6, not 100% to avoid the need of remeshing the cavity)
     // or if at the same time:
     // 
-    // - compy(u) is greater than a given deflection (95% of the gap size)
+    // - compy(u) is greater than a given deflection (99% of the gap size)
     // - the y direction force balance on the node is negative, i.e. the node is pulled downwards
     //
     // Define conditional expressions for the conditions above. The value of a conditional 
@@ -73,10 +73,10 @@ void sparselizard(void)
     // argument is positive or zero. The value is the third argument expression otherwise.
     //
     expression nodeforcebalancecondition = expression(compy(nodalforcebalance), -1, 1);
-    expression contactcondition(-compy(u)-thcav*0.95, nodeforcebalancecondition, -1);
-    expression condexpr(-compy(u)-(thcav+1e-6*thcav)*0.95, 1, contactcondition);
+    expression contactcondition(-compy(u)-thcav*0.99, nodeforcebalancecondition, -1);
+    expression condexpr(-compy(u)-(thcav+1e-6*thcav)*0.99, 1, contactcondition);
     // Set the conditional constraint on the y component of the deflection field u:
-    u.compy().setconditionalconstraint(contact, condexpr, -0.95*(thcav+1e-8*thcav));
+    u.compy().setconditionalconstraint(contact, condexpr, -0.99*(thcav+1e-8*thcav));
     
     // Young's modulus [Pa], Poisson's ratio [], the density [kg/m^3] and the electric permittivity [F/m]:
     parameter E, nu, rho, epsilon;
@@ -190,7 +190,7 @@ void sparselizard(void)
     uh.setconstraint(insulator);
     
     // Set the same conditional constraint as above:
-    uh.harmonic(1).compy().setconditionalconstraint(contact, condexpr, -0.95*(thcav+1e-8*thcav));
+    uh.harmonic(1).compy().setconditionalconstraint(contact, condexpr, -0.99*(thcav+1e-8*thcav));
     // The vibration around the static deflection is 0 at the contact: 
     uh.harmonic(2).setconditionalconstraint(contact, condexpr, array3x1(0,0,0));
     
@@ -231,7 +231,7 @@ void sparselizard(void)
     std::cout << "Peak AC deflection: " << uacmax*1e9 << " nm" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (uacmax < 0.977678e-9 && uacmax > 0.977675e-9);
+    std::cout << (uacmax < 0.99809e-9 && uacmax > 0.998080e-9);
 }
 
 
