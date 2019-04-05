@@ -32,9 +32,6 @@ class newmark
         // The convergence tolerance for the fixed-point nonlinear iteration:
         double tol = 1e-3;
         
-        // The relaxation factor for the nonlinear iteration:
-        double relaxationfactor = 1.0;
-        
         // Set 'isconstant[i]' to true and the corresponding matrix/vector is 
         // supposed constant in time and will only be generated once then reused.
         //
@@ -60,9 +57,6 @@ class newmark
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
-        
-        // Set the relaxation factor for the inner nonlinear fixed-point iteration:
-        void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };
         
         std::vector<vec> getcurrentsolution(void) { return {u, v, a}; };
         
