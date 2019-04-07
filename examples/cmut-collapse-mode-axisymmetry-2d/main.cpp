@@ -92,7 +92,7 @@ void sparselizard(void)
     // An electrostatic formulation is used for the electric problem.
     // An elasticity formulation is used for the mechanical problem.
     // Geometrical nonlinearity is taken into account.
-    formulation electrostatics, elasticity;
+    formulation electrostatics, elasticity, forcebalance;
 	
     // Weak electrostatic formulation, computed on the mesh deformed by field umesh:
     electrostatics += integral(wholedomain, umesh, epsilon*grad(dof(v))*grad(tf(v)));
@@ -111,6 +111,9 @@ void sparselizard(void)
     // The electrostatic forces are computed on the mesh deformed by field umesh.
     elasticity += integral(wholedomain, umesh, predefinedelectrostaticforce(tf(u,solid), grad(v), epsilon));
     
+    // Formulation (based on the elasticity) to get the force balance on the contact region:
+    forcebalance += integral(solid, predefinedelasticity(u, tf(nodalforcebalance,contact), u, E, nu, 0.0));
+    forcebalance += integral(wholedomain, umesh, predefinedelectrostaticforce(tf(nodalforcebalance,contact), grad(v), epsilon));
     
     // Solve the Laplace equation in the cavity to smoothly deform the mesh.
     // umesh is forced to field u on region solid:
@@ -136,21 +139,13 @@ void sparselizard(void)
         (-grad(v)).write(wholedomain, umesh, "E.pos");
         v.write(wholedomain, umesh, "v.pos");
         
-        // Use the now known electric potential v to compute the membrane deflection:
+        // Calculate the force balance at the contact using the now known electric potential:
+        forcebalance.generate();
+        // The force balance is in the right handside vector:
+        nodalforcebalance.setdata(contact, -forcebalance.b());
+        
+        // Compute the membrane deflection:
         elasticity.generate();
-        
-        // Calculate the force balance on every node candidate for the conditional constraint. 
-        // This requires the residual b-Ax (of the problem Ax = b) without the conditional constraints:
-        elasticity.skipconditionalconstraints();
-        // Argument 'true' is added so that the generated data is not cleared from the 'elasticity' object.
-        vec fbvec = -(elasticity.b(true) - elasticity.A(true) * solu);
-        // The conditional constraints are activated again:
-        elasticity.skipconditionalconstraints(false);
-        // The data in the 'fbvec' vector (containing the nodal force balance) is transferred to the
-        // 'nodalforcebalance' field. '|u' is needed because 'nodalforcebalance' is not a 
-        // field defined in the 'elasticity' formulation (field u is defined).
-        nodalforcebalance.setdata(solid, fbvec|u);
-        
         // Get the vector b and matrix A of problem Ax = b. Here they include the conditional constraints:
         vec b = elasticity.b();
         mat A = elasticity.A();
