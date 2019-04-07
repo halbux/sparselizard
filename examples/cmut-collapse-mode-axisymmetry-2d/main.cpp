@@ -55,7 +55,7 @@ void sparselizard(void)
     // Clamp the insulator:
     u.setconstraint(insulator);
     
-    v.setconstraint(electrode, 100);	
+    v.setconstraint(electrode, 120);	
     v.setconstraint(ground, 0);	
     
     // Set a conditional constraint on compy(u), the y component of the mechanical deflection.
@@ -191,7 +191,7 @@ void sparselizard(void)
     uh.harmonic(2).setconditionalconstraint(contact, condexpr, array3x1(0,0,0));
     
     // Set the DC voltage bias on the electrode:
-    vh.harmonic(1).setconstraint(electrode, 100);	
+    vh.harmonic(1).setconstraint(electrode, 120);	
     // Set a tiny AC voltage on vh2:
     vh.harmonic(2).setconstraint(electrode, 1);
     // Ground:	
