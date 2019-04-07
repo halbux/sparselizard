@@ -55,7 +55,7 @@ void sparselizard(void)
     // Clamp the insulator:
     u.setconstraint(insulator);
     
-    v.setconstraint(electrode, 120);	
+    v.setconstraint(electrode, 100);	
     v.setconstraint(ground, 0);	
     
     // Set a conditional constraint on compy(u), the y component of the mechanical deflection.
@@ -92,6 +92,7 @@ void sparselizard(void)
     // An electrostatic formulation is used for the electric problem.
     // An elasticity formulation is used for the mechanical problem.
     // Geometrical nonlinearity is taken into account.
+    // A forcebalance formulation is used for the conditional constraint.
     formulation electrostatics, elasticity, forcebalance;
 	
     // Weak electrostatic formulation, computed on the mesh deformed by field umesh:
