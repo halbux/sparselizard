@@ -488,6 +488,29 @@ vec mathop::solve(mat A, vec b, bool diagscaling)
     return sol;
 }
 
+void mathop::solve(formulation formul)
+{
+	// Get all fields in the formulation:
+	std::vector<shared_ptr<rawfield>> allfields = formul.getdofmanager()->getfields();
+
+	// Remove leftovers (if any):
+	mat A = formul.A(); vec b = formul.b();
+	// Generate:
+	formul.generate();
+	// Solve:
+	vec sol = mathop::solve(formul.A(), formul.b());
+	
+	// Save to fields:
+	for (int i = 0; i < allfields.size(); i++)
+		allfields[i]->setdata(-1, sol|field(allfields[i]));
+}
+
+void mathop::solve(std::vector<formulation> formuls)
+{
+	for (int i = 0; i < formuls.size(); i++)
+		solve(formuls[i]);
+}
+
 
 
 ////////// PREDEFINED OPERATORS

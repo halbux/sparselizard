@@ -15,12 +15,14 @@
 #include "iointerface.h"
 #include "vec.h"
 #include "mat.h"
+#include "formulation.h"
 
 class expression;
 class integration;
 class mat;
 class vec;
 class field;
+class formulation;
 
 namespace mathop
 {
@@ -128,6 +130,9 @@ namespace mathop
     // Direct resolution (with or without diagonal scaling):
     vec solve(mat A, vec b, bool diagscaling = false);
     
+    // Generate, solve and save to field a formulation:
+    void solve(formulation formul);
+    void solve(std::vector<formulation> formuls);
     
     
     ////////// PREDEFINED OPERATORS
