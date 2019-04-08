@@ -45,7 +45,8 @@ class vec
         // Remove the entries associated to Dirichlet constraints:
         void removeconstraints(void);
         
-        void updateconstraints(bool includeconditionalconstraint = true);
+        // Update the Dirichlet constraints:
+        void updateconstraints(void);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
         void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");

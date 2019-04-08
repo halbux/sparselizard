@@ -176,11 +176,6 @@ void formulation::generate(int contributionnumber)
             generate(i, contributionnumber);
 }
 
-void formulation::skipconditionalconstraints(bool skipit)
-{
-	isconditionalconstraintactive = not(skipit);
-}
-
 
 vec formulation::b(bool keepvector) { return rhs(keepvector); }
 mat formulation::A(bool keepfragments, bool skipdiagonalones) { return K(keepfragments, skipdiagonalones); }
@@ -200,7 +195,7 @@ vec formulation::rhs(bool keepvector)
         output = vec(myvec).copy();
     
     if (isconstraintcomputation == false)
-        output.updateconstraints(isconditionalconstraintactive); 
+        output.updateconstraints(); 
     
     return output; 
 }
@@ -248,21 +243,18 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
     }
 	// Set the row indices of the conditionally constrained dofs to zero.
     // Add the conditional constraint diagonal ones to the matrix (if any).
-    if (isconditionalconstraintactive)
-    {
-		std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
-		intdensematrix condconstrainedindexes = condconstrdata.first;
-		int numcondconstraineddofs = condconstrainedindexes.count();
-		
-		if (numcondconstraineddofs > 0)
+	std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+	intdensematrix condconstrainedindexes = condconstrdata.first;
+	int numcondconstraineddofs = condconstrainedindexes.count();
+	
+	if (numcondconstraineddofs > 0)
+	{
+		rawout->zeroentries(condconstrainedindexes, true, false);
+		if (skipdiagonalones == false)
 		{
-			rawout->zeroentries(condconstrainedindexes, true, false);
-			if (skipdiagonalones == false)
-			{
-				densematrix ones(1, numcondconstraineddofs, 1);
-				rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
-		    } 
-	    }
+			densematrix ones(1, numcondconstraineddofs, 1);
+			rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
+	    } 
     }
 
     rawout->process(); 
