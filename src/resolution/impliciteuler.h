@@ -66,8 +66,8 @@ class impliciteuler
         std::vector<vec> getcurrentsolution(void) { return {x, dtx}; };
         
         // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
-        void presolve(std::vector<formulations> formuls) { tosolvebefore = formuls; };
-        void postsolve(std::vector<formulations> formuls) { tosolveafter = formuls; };
+        void presolve(std::vector<formulation> formuls);
+        void postsolve(std::vector<formulation> formuls);
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
         // seconds. output[0] gives the x time-solutions while output[1] gives dt(x). 

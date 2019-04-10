@@ -18,6 +18,9 @@ impliciteuler::impliciteuler(formulation formul, vec xinit, vec dtxinit, std::ve
     }
 }
 
+void impliciteuler::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
+void impliciteuler::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
+
 std::vector<std::vector<vec>> impliciteuler::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
     return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);

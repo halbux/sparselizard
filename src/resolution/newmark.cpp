@@ -29,6 +29,9 @@ newmark::newmark(formulation formul, vec initdisplacement, vec initspeed, vec in
     }
 }
 
+void newmark::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
+void newmark::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
+        
 std::vector<std::vector<vec>> newmark::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
 {
     return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);
