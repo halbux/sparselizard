@@ -113,8 +113,8 @@ void sparselizard(void)
     elasticity += integral(wholedomain, umesh, predefinedelectrostaticforce(tf(u,solid), grad(v), epsilon));
     
     // Formulation (based on the elasticity) to get the force balance on the contact region:
-    forcebalance += integral(solid, predefinedelasticity(u, tf(nodalforcebalance,contact), u, E, nu, 0.0));
-    forcebalance += integral(wholedomain, umesh, predefinedelectrostaticforce(tf(nodalforcebalance,contact), grad(v), epsilon));
+    forcebalance += integral(solid, -predefinedelasticity(u, tf(nodalforcebalance,contact), u, E, nu, 0.0));
+    forcebalance += integral(wholedomain, umesh, -predefinedelectrostaticforce(tf(nodalforcebalance,contact), grad(v), epsilon));
     
     // Solve the Laplace equation in the cavity to smoothly deform the mesh.
     // umesh is forced to field u on region solid:
@@ -143,7 +143,7 @@ void sparselizard(void)
         // Calculate the force balance at the contact using the now known electric potential:
         forcebalance.generate();
         // The force balance is in the right handside vector:
-        nodalforcebalance.setdata(contact, -forcebalance.b());
+        nodalforcebalance.setdata(contact, forcebalance.b());
         
         // Compute the membrane deflection:
         elasticity.generate();
