@@ -19,9 +19,9 @@ cd ~/SLlibs;
 echo '__________________________________________';
 echo 'FETCHING SLEPC';
 if [ "$(uname)" == "Linux" ]; then
-wget http://slepc.upv.es/download/distrib/slepc-3.10.0.tar.gz;
+wget http://slepc.upv.es/download/distrib/slepc-3.11.0.tar.gz;
 elif [ "$(uname)" == "Darwin"  ]; then
-curl http://slepc.upv.es/download/distrib/slepc-3.10.0.tar.gz -o slepc.tar.gz;
+curl http://slepc.upv.es/download/distrib/slepc-3.11.0.tar.gz -o slepc.tar.gz;
 fi
 tar -xf slepc*.tar.gz;
 rm slepc*.tar.gz;
