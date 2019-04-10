@@ -45,6 +45,10 @@ class newmark
         //
         std::vector<bool> isconstant = {false, false, false, false};
         
+        // Formulations to solve before/after 'myformulation' is solved:
+        std::vector<formulation> tosolvebefore = {};
+        std::vector<formulation> tosolveafter = {};
+        
         // The displacement u, speed v and acceleration a at the current time step:
         vec u, v, a;
         
@@ -59,6 +63,10 @@ class newmark
         void settolerance(double newtol) { tol = newtol; };
         
         std::vector<vec> getcurrentsolution(void) { return {u, v, a}; };
+        
+        // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
+        void presolve(std::vector<formulations> formuls) { tosolvebefore = formuls; };
+        void postsolve(std::vector<formulations> formuls) { tosolveafter = formuls; };
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
         // seconds. output[0] gives the u time-solutions while output[1] gives v and output[2] gives a. 

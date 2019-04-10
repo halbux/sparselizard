@@ -93,6 +93,10 @@ std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, doub
         vec unext = u, vnext = v, anext = a;
         while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
+        	// Solve all formulations that must be solved at the beginning of the nonlinear loop:
+        	mathop::solve(tosolvebefore);
+        	
+        
         	// Make all time derivatives available in the universe:
         	universe::xdtxdtdtx = {{unext},{vnext},{anext}};
         
@@ -168,6 +172,11 @@ std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, doub
                 std::cout << " " << relchange << std::flush;
 
             nlit++; 
+
+
+        	// Solve all formulations that must be solved at the end of the nonlinear loop:
+        	mathop::solve(tosolveafter);
+        	
             
             if (islinear)
                 break;

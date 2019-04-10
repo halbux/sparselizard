@@ -79,6 +79,10 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
         vec xnext = x, dtxnext = dtx;
         while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
+        	// Solve all formulations that must be solved at the beginning of the nonlinear loop:
+        	mathop::solve(tosolvebefore);
+        
+        
         	// Make all time derivatives available in the universe:
         	universe::xdtxdtdtx = {{xnext},{dtxnext},{}};
         	
@@ -125,6 +129,11 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
                 std::cout << " " << relchange << std::flush;
 
             nlit++; 
+            
+            
+        	// Solve all formulations that must be solved at the end of the nonlinear loop:
+        	mathop::solve(tosolveafter);
+        	
             
             if (islinear)
                 break;

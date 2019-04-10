@@ -43,6 +43,10 @@ class impliciteuler
         //
         std::vector<bool> isconstant = {false, false, false};
         
+        // Formulations to solve before/after 'myformulation' is solved:
+        std::vector<formulation> tosolvebefore = {};
+        std::vector<formulation> tosolveafter = {};
+        
         // Vector x and dt(x) at the current time step:
         vec x, dtx;
         
@@ -60,6 +64,10 @@ class impliciteuler
         void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };
         
         std::vector<vec> getcurrentsolution(void) { return {x, dtx}; };
+        
+        // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
+        void presolve(std::vector<formulations> formuls) { tosolvebefore = formuls; };
+        void postsolve(std::vector<formulations> formuls) { tosolveafter = formuls; };
         
         // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
         // seconds. output[0] gives the x time-solutions while output[1] gives dt(x). 
