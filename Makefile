@@ -19,7 +19,7 @@ endif
 # D can be added to all of the above.
 
 CXX = g++ # -fopenmp
-CXX_FLAGS= -std=c++11 -O3
+CXX_FLAGS= -std=c++11 -O3 -Wno-return-type # Do not warn when not returning anything (e.g. in virtual functions)
 
 # List of all directories containing the headers:
 INCLUDES = -I src -I src/field -I src/expression -I src/expression/operation -I src/shapefunction -I src/formulation -I src/shapefunction/hierarchical -I src/shapefunction/hierarchical/h1 -I src/shapefunction/hierarchical/hcurl -I src/shapefunction/hierarchical/meca -I src/gausspoint -I src/shapefunction/lagrange -I src/mesh -I src/io -I src/io/gmsh -I src/io/paraview -I src/resolution -I src/geometry
