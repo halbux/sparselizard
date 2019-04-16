@@ -379,6 +379,26 @@ expression mathop::frobeniusproduct(expression a, expression b)
     return output;
 }
 
+expression mathop::trace(expression a)
+{
+    if (a.countcolumns() != a.countrows())
+    {
+        std::cout << "Error in 'mathop' namespace: can only get the trace of a square matrix" << std::endl;
+        abort();
+    }
+    
+    expression output;
+    for (int i = 0; i < a.countrows(); i++)
+    {
+        if (i == 0)
+            output = a.at(i,i);
+        else
+            output = output + a.at(i,i);
+    }
+
+    return output;
+}
+
 expression mathop::detjac(void) 
 { 
 	expression expr;
@@ -604,6 +624,37 @@ expression mathop::vonmises(expression stress)
 	s11.reuseit(); s22.reuseit(); s33.reuseit();
 
 	return sqrt( 0.5*( pow(s11-s22,2)+pow(s22-s33,2)+pow(s33-s11,2) ) + 3.0*( pow(s12,2)+pow(s23,2)+pow(s13,2) ) );
+}
+
+expression mathop::predefinedmassconservation(expression dofv, expression tfp, expression rho, bool istimedependent, bool isdensityconstant)
+{
+    if (isdensityconstant)
+        return div(dofv)*tfp;
+
+    if (istimedependent)
+        return ( dt(rho)*tfp -rho*dofv*grad(tfp) );
+    else
+        return ( -rho*dofv*grad(tfp) );
+}
+
+expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent, bool isdensityconstant)
+{
+    rho.reuseit(); v.reuseit();
+
+    if (istimedependent)
+        return ( -rho*dt(dofv)*tfv -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tf(v) );
+    else
+        return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tf(v) );
+}
+
+expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant)
+{
+    mu.reuseit();
+
+    if (isdensityconstant)
+        return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) - mu*frobeniusproduct(transpose(grad(dofv)), grad(tfv)) );
+    else
+        return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) - mu*frobeniusproduct(transpose(grad(dofv)), grad(tfv)) + (2.0/3.0)*mu*div(dofv)*trace(grad(tfv)) );
 }
 
 
@@ -882,4 +933,47 @@ expression mathop::predefinedmagnetostaticforce(std::vector<expression> dxyztfu,
 {
 	return predefinedelectrostaticforce(dxyztfu, H, mu);
 }
+
+expression mathop::predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+
+    if (problemdimension < 2)
+    {
+        std::cout << "Error in 'mathop' namespace: 'predefinedstokesflow' is only allowed on 2D and 3D geometries" << std::endl;
+        abort();
+    }
+    if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstokesflow'" << std::endl;
+        abort();
+    }
+
+    expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
+
+    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant) );
+}
+
+expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+
+    if (problemdimension < 2)
+    {
+        std::cout << "Error in 'mathop' namespace: 'predefinedlaminarflow' is only allowed on 2D and 3D geometries" << std::endl;
+        abort();
+    }
+    if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedlaminarflow'" << std::endl;
+        abort();
+    }
+    
+    expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
+
+    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant) +  predefinedinertialforce(dofv, tfv, v, rho, istimedependent, isdensityconstant) );
+}
+
+
+
 

@@ -101,6 +101,9 @@ namespace mathop
     // Frobenius product:
     expression frobeniusproduct(expression a, expression b);
     
+    // Get the trace of a square matrix:
+    expression trace(expression a);
+    
     // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);
     
@@ -146,6 +149,14 @@ namespace mathop
     expression greenlagrangestrain(expression gradu);
     // Gives the von Mises stress (Voigt form expected for the argument):
     expression vonmises(expression stress);
+
+    // Weak form of the mass conservation for Navier-Stokes:
+    expression predefinedmassconservation(expression dofv, expression tfp, expression rho, bool istimedependent, bool isdensityconstant);
+    // Weak form of the inertial forces for Navier-Stokes:
+    expression predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent, bool isdensityconstant);
+    // Weak form of the viscous forces for Navier-Stokes:
+    expression predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant);
+    
     
     ////////// PREDEFINED FORMULATIONS
     
@@ -163,6 +174,11 @@ namespace mathop
     expression predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon);
     expression predefinedmagnetostaticforce(expression tfu, expression H, expression mu);
     expression predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu);
+    
+    // Stokes flow:
+    expression predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant);
+    // Laminar flow:
+    expression predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant);
 };
 
 #endif
