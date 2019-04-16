@@ -356,6 +356,29 @@ expression mathop::crossproduct(expression a, expression b)
 	return crossprodexpr;
 }
 
+expression mathop::frobeniusproduct(expression a, expression b)
+{
+    if (a.countcolumns() != b.countcolumns() || a.countrows() != b.countrows())
+    {
+        std::cout << "Error in 'mathop' namespace: dimension mismatch for Frobenius product" << std::endl;
+        abort();
+    }
+    
+    expression output;
+    for (int i = 0; i < a.countrows(); i++)
+    {
+        for (int j = 0; j < a.countcolumns(); j++)
+        {
+            if (i == 0 && j == 0)
+                output = a.at(i,j) * b.at(i,j);
+            else
+                output = output + a.at(i,j) * b.at(i,j);
+        }
+    }
+
+    return output;
+}
+
 expression mathop::detjac(void) 
 { 
 	expression expr;

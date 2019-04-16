@@ -98,6 +98,9 @@ namespace mathop
     // Any argument that does not have 3 components will be filled with zeros.
     expression crossproduct(expression a, expression b);
     
+    // Frobenius product:
+    expression frobeniusproduct(expression a, expression b);
+    
     // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);
     
