@@ -642,9 +642,9 @@ expression mathop::predefinedinertialforce(expression dofv, expression tfv, expr
     rho.reuseit(); v.reuseit();
 
     if (istimedependent)
-        return ( -rho*dt(dofv)*tfv -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tf(v) );
+        return ( -rho*dt(dofv)*tfv -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
     else
-        return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tf(v) );
+        return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
 }
 
 expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant)
