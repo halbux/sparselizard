@@ -634,7 +634,7 @@ expression mathop::predefinedmassconservation(expression dofv, expression tfp, e
     if (istimedependent)
         return ( dt(rho)*tfp -rho*dofv*grad(tfp) );
     else
-        return ( -rho*dofv*grad(tfp) );
+        return ( dofv*grad(tfp) );
 }
 
 expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent, bool isdensityconstant)
