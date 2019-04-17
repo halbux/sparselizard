@@ -1,6 +1,6 @@
 // This code simulates the Stokes flow of a viscous fluid (water) in a microvalve.
 // Reynold's number rho*v*L/mu is very low so that the inertia terms can be neglected.
-// Since the velocities involved are very low the fluid can be considered incompressible.
+// The fluid is considered incompressible.
 //
 // This code can be validated with analytical solutions of a flow between two
 // infinite parallel plates with a thin gap. Only the geometry has to be adapted.
