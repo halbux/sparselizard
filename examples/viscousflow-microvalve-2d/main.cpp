@@ -29,8 +29,8 @@ void sparselizard(void)
     int solid = regionunion({pillar,support,membrane});
     int fluidboundary = regionintersection({fluid,solid});
     
-    // Dynamic viscosity of water [Pa.s]:
-    double mu = 8.9e-4;
+    // Dynamic viscosity of water [Pa.s] and density [kg/m3]:
+    double mu = 8.9e-4, rho = 1000;
     
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components.
     // Field p is the pressure.
@@ -50,31 +50,19 @@ void sparselizard(void)
     // Define the weak formulation of the flow problem.
     // The strong form can be found at https://en.wikipedia.org/wiki/Stokes_flow
     formulation viscousflow;
+
+    viscousflow += integral(fluid, predefinedstokesflow(dof(v), tf(v), dof(p), tf(p), mu, rho) );	
     
-    viscousflow += integral(fluid, - mu*grad(compx(dof(v)))*grad(compx(tf(v))) - mu*grad(compy(dof(v)))*grad(compy(tf(v))) - grad(dof(p))*tf(v));	
-    viscousflow += integral(fluid, div(dof(v))*tf(p));	
-    
-    // Generate the algebraic matrices:
-    viscousflow.generate();
-    
-    // Solve Ax = b:
-    vec sol = solve(viscousflow.A(), viscousflow.b());
-    
-    // Transfer the data from the solution vector to the p and v fields:
-    p.setdata(fluid, sol);
-    v.setdata(fluid, sol);    
+    // Generate, solve and save:
+    solve(viscousflow);
     
     // Write the p and v fields to file. Write v with an order 2 interpolation.
-    p.write(fluid, "p.pos");
-    v.write(fluid, "v.pos", 2);
+    p.write(fluid, "p.vtk");
+    v.write(fluid, "v.vtk", 2);
     
     // Output the flowrate for a unit width:
     double flowrate = (normal(inlet)*v).integrate(inlet, 4);
     std::cout << std::endl << "Flowrate for a unit width: " << flowrate << " m^3/s" << std::endl;
-    
-    // Write the stream lines starting on the mesh nodes of the shape below:
-    shape lin("line", -1, {-45e-6,0,0, -30e-6,0,0}, 10);
-    expression(v).streamline(fluid, "streamlines.pos", lin.getcoords(), 2e-6);
     
     // Code validation line. Can be removed.
     std::cout << (flowrate < 1.4845e-7 && flowrate > 1.4844e-7);
