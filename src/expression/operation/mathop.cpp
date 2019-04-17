@@ -963,7 +963,7 @@ expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expres
         std::cout << "Error in 'mathop' namespace: 'predefinedlaminarflow' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
-    if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
+    if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || v.countcolumns() != 1 || v.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedlaminarflow'" << std::endl;
         abort();
