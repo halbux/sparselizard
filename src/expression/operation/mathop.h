@@ -153,7 +153,7 @@ namespace mathop
     // Weak form of the mass conservation for Navier-Stokes:
     expression predefinedmassconservation(expression dofv, expression tfp, expression rho, bool istimedependent, bool isdensityconstant);
     // Weak form of the inertial forces for Navier-Stokes:
-    expression predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent, bool isdensityconstant);
+    expression predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent);
     // Weak form of the viscous forces for Navier-Stokes:
     expression predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant);
     

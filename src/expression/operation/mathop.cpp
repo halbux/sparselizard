@@ -637,7 +637,7 @@ expression mathop::predefinedmassconservation(expression dofv, expression tfp, e
         return ( dofv*grad(tfp) );
 }
 
-expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent, bool isdensityconstant)
+expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent)
 {
     rho.reuseit(); v.reuseit();
 
@@ -971,7 +971,7 @@ expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expres
     
     expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
 
-    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant) +  predefinedinertialforce(dofv, tfv, v, rho, istimedependent, isdensityconstant) );
+    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant) +  predefinedinertialforce(dofv, tfv, v, rho, istimedependent) );
 }
 
 
