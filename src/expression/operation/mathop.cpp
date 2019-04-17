@@ -647,10 +647,13 @@ expression mathop::predefinedinertialforce(expression dofv, expression tfv, expr
         return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
 }
 
-expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant)
+expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant, bool isviscosityconstant)
 {
     mu.reuseit();
-
+    
+    if (isdensityconstant && isviscosityconstant)
+        return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) );
+    
     if (isdensityconstant)
         return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) - mu*frobeniusproduct(transpose(grad(dofv)), grad(tfv)) );
     else
@@ -934,7 +937,7 @@ expression mathop::predefinedmagnetostaticforce(std::vector<expression> dxyztfu,
 	return predefinedelectrostaticforce(dxyztfu, H, mu);
 }
 
-expression mathop::predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant)
+expression mathop::predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
@@ -951,10 +954,10 @@ expression mathop::predefinedstokesflow(expression dofv, expression tfv, express
 
     expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
 
-    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant) );
+    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) );
 }
 
-expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant)
+expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
@@ -971,7 +974,7 @@ expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expres
     
     expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
 
-    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant) +  predefinedinertialforce(dofv, tfv, v, rho, istimedependent) );
+    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) +  predefinedinertialforce(dofv, tfv, v, rho, istimedependent) );
 }
 
 
