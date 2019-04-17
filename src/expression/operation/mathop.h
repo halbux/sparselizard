@@ -175,9 +175,9 @@ namespace mathop
     expression predefinedmagnetostaticforce(expression tfu, expression H, expression mu);
     expression predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu);
     
-    // Stokes flow:
+    // Stokes flow for Newtonian fluids:
     expression predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant);
-    // Laminar flow:
+    // Laminar flow for Newtonian fluids:
     expression predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, bool istimedependent, bool isdensityconstant);
 };
 
