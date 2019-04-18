@@ -35,7 +35,7 @@ void sparselizard(void)
 {	
     // Region numbers used in this simulation:
     int fluid = 1, inlet = 2, outlet = 3, skin = 4;
-    // Height of the inlet [mm]:
+    // Height of the inlet [m]:
     double h1 = 1e-3;
     mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 30, 150, 20, 50);
     
