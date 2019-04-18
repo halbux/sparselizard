@@ -77,7 +77,7 @@ void sparselizard(void)
 
         std::cout << "Flow velocity: " << velocity << " m/s" << std::endl;
         // Force the flow velocity at the inlet (quadratic profile w.r.t. the y axis):
-        v.setconstraint(inlet, array2x1(velocity*y*(h1-y)/pow(h1*0.5,2) ,0));
+        v.setconstraint(inlet, array2x1(velocity*y*(h1-y)/pow(h1*0.5,2), 0));
 
         // Get a measure of the solution for convergence evaluation:
         double measuresol = norm(v).integrate(fluid,2);
