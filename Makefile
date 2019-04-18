@@ -18,7 +18,7 @@ endif
 # $(@D) is the file path of the target file. 
 # D can be added to all of the above.
 
-CXX = g++ # -fopenmp
+CXX = g++ -fopenmp # openmp is used for parallel sorting on Linux
 CXX_FLAGS= -std=c++11 -O3 -Wno-return-type # Do not warn when not returning anything (e.g. in virtual functions)
 
 # List of all directories containing the headers:

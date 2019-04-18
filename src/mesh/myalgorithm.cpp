@@ -81,16 +81,18 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
         });
 }
 
+#if defined(__linux__)
+#include <parallel/algorithm>
+#endif
+
 int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
 {
-    /*
 	// Parallel sort on Linux only for now:
 	#if defined(__linux__)
 	using namespace __gnu_parallel;
 	#else
 	using namespace std;
 	#endif
-	*/
 	
     int* reorderingvector = new int[numentries];
     // Set 'reorderingvector' to [0 1 2 ...]:
@@ -103,7 +105,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
             int* tosort1 = tosort[0];
                 
             // The < operator is overloaded by a lambda function.
-            std::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
+            sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     if (tosort1[elem1] < tosort1[elem2])
                         return true;
@@ -121,7 +123,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
             int* tosort2 = tosort[1];
             
             // The < operator is overloaded by a lambda function.
-            std::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
+            sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     if (tosort1[elem1] < tosort1[elem2])
                         return true;
@@ -140,7 +142,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
         default:
             
             // The < operator is overloaded by a lambda function.
-            std::sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
+            sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     for (int i = 0; i < tosort.size(); i++)
                     {
