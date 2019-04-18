@@ -117,7 +117,7 @@ mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, in
     mymesh.regionskin(skin, fluid);
     mymesh.load({qthinleft,qthinright,qthick,linlet,loutlet});
 
-    mymesh.write("channel.msh");
+    mymesh.write("pipestep.msh");
 
     return mymesh;
 }
