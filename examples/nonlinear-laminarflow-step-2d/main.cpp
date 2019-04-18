@@ -6,6 +6,19 @@
 // More information for this standard example can be found in:
 //
 // "Finite element methods for the incompressible Navier-Stokes equations", A. Segal
+//
+// The step geometry is as follows:
+//
+//                               l2
+//                   <----------------------->
+//                    ________________________
+//                   | 
+//            l1     |
+//      <----------->|
+//      _____________|                  OUTLET
+//     
+//      INLET
+//      ______________________________________
 
 
 #include "sparselizardbase.h"
@@ -13,15 +26,16 @@
 
 using namespace mathop;
 
-mesh createmesh(double lthin, double hthin, double lthick, double hthick, int nlthin, int nlthick, int nhthin, int nhthick);
+// First four arguments give the geometry dimension, last four arguments give the mesh size:
+mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2);
 
 void sparselizard(void)
 {	
     // Region numbers used in this simulation:
     int fluid = 1, inlet = 2, outlet = 3, skin = 4;
     // Height of the inlet [mm]:
-    double hthin = 1e-3;
-    mesh mymesh = createmesh(2e-3, hthin, 12e-3, 1e-3, 30, 150, 20, 50);
+    double h1 = 1e-3;
+    mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 30, 150, 20, 50);
 
     // Define the fluid wall (not including the inlet and outlet):
     int wall = regionexclusion(skin, regionunion({inlet,outlet}));
@@ -58,7 +72,7 @@ void sparselizard(void)
 
         std::cout << "Flow velocity: " << velocity << " m/s" << std::endl;
         // Force the flow velocity at the inlet (quadratic profile w.r.t. the y axis):
-        v.setconstraint(inlet, array2x1(velocity*y*(hthin-y)/pow(hthin*0.5,2) ,0));
+        v.setconstraint(inlet, array2x1(velocity*y*(h1-y)/pow(h1*0.5,2) ,0));
 
         // Get a measure of the solution for convergence evaluation:
         double measuresol = norm(v).integrate(fluid,2);
@@ -87,13 +101,13 @@ void sparselizard(void)
     std::cout << (vnorm*flowrateout < 2.64489e-05 && vnorm*flowrateout > 2.64485e-05);
 }
 
-mesh createmesh(double lthin, double hthin, double lthick, double hthick, int nlthin, int nlthick, int nhthin, int nhthick)
+mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2)
 {
     int fluid = 1, inlet = 2, outlet = 3, skin = 4;
 
-    shape qthinleft("quadrangle", fluid, {0,0,0, lthin,0,0, lthin,hthin,0, 0,hthin,0}, {nlthin,nhthin,nlthin,nhthin});
-    shape qthinright("quadrangle", fluid, {lthin,0,0, lthin+lthick,0,0, lthin+lthick,hthin,0, lthin,hthin,0}, {nlthick,nhthin,nlthick,nhthin});
-    shape qthick("quadrangle", fluid, {lthin,hthin,0, lthin+lthick,hthin,0, lthin+lthick,hthin+hthick,0, lthin,hthin+hthick,0}, {nlthick,nhthick,nlthick,nhthick});
+    shape qthinleft("quadrangle", fluid, {0,0,0, l1,0,0, l1,h1,0, 0,h1,0}, {nl1,nh1,nl1,nh1});
+    shape qthinright("quadrangle", fluid, {l1,0,0, l1+l2,0,0, l1+l2,h1,0, l1,h1,0}, {nl2,nh1,nl2,nh1});
+    shape qthick("quadrangle", fluid, {l1,h1,0, l1+l2,h1,0, l1+l2,h1+h2,0, l1,h1+h2,0}, {nl2,nh2,nl2,nh2});
 
     shape linlet = qthinleft.getsons()[3];
     linlet.setphysicalregion(inlet);
