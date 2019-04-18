@@ -38,6 +38,9 @@ void sparselizard(void)
     // Height of the inlet [mm]:
     double h1 = 1e-3;
     mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 30, 150, 20, 50);
+    
+    // Write the mesh for illustration:
+    mymesh.write("pipestep.msh");
 
     // Define the fluid wall (not including the inlet and outlet):
     int wall = regionexclusion(skin, regionunion({inlet,outlet}));
