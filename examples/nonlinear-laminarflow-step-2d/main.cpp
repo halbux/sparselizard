@@ -95,9 +95,6 @@ void sparselizard(void)
         index++;
     }
 
-    // Compute the flow velocity norm at position (5,1,0) mm in space:
-    double vnorm = norm(v).interpolate(fluid, {5e-3, 1e-3, 0.0})[0];
-
     // Output the input and output flowrate for a unit width:
     double flowratein = (normal(inlet)*v).integrate(inlet, 4);
     double flowrateout = -(normal(outlet)*v).integrate(outlet, 4);
