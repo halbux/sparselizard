@@ -1,6 +1,6 @@
 // This code simulates the laminar, incompressible water flow past a step. 
 //
-// A parabolic normal flow velocity of 1 m/s is forced at the inlet and 
+// A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
 //
 // More information for this standard example can be found in:
