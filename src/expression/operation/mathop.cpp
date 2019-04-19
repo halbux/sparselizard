@@ -637,14 +637,11 @@ expression mathop::predefinedmassconservation(expression dofv, expression tfp, e
         return ( dofv*grad(tfp) );
 }
 
-expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho, bool istimedependent)
+expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho)
 {
     rho.reuseit(); v.reuseit();
-
-    if (istimedependent)
-        return ( -rho*dt(dofv)*tfv -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
-    else
-        return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
+    
+    return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
 }
 
 expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant, bool isviscosityconstant)
@@ -956,6 +953,9 @@ expression mathop::predefinedstokesflow(expression dofv, expression tfv, express
 
     expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
 
+    if (istimedependent)
+        output = output -rho*dt(dofv)*tfv;
+        
     return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) );
 }
 
@@ -977,8 +977,11 @@ expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expres
     }
     
     expression output = predefinedmassconservation(dofv, tfp, rho, istimedependent, isdensityconstant);
+    
+    if (istimedependent)
+        output = output -rho*dt(dofv)*tfv;
 
-    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) +  predefinedinertialforce(dofv, tfv, v, rho, istimedependent) );
+    return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) +  predefinedinertialforce(dofv, tfv, v, rho) );
 }
 
 
