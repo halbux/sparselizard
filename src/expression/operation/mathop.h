@@ -151,7 +151,7 @@ namespace mathop
     expression vonmises(expression stress);
 
     // Weak form of the mass conservation for Navier-Stokes:
-    expression predefinedmassconservation(expression dofv, expression tfp, expression rho, bool isdensityconstant);
+    expression predefinedmassconservation(expression dofv, expression tfp, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant);
     // Weak form of the inertial forces for Navier-Stokes:
     expression predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho);
     // Weak form of the viscous forces for Navier-Stokes:
@@ -176,9 +176,9 @@ namespace mathop
     expression predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu);
     
     // Stokes flow for Newtonian fluids:
-    expression predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, bool isdensityconstant = true, bool isviscosityconstant = true);
+    expression predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs = false, bool isdensityconstant = true, bool isviscosityconstant = true);
     // Laminar flow for Newtonian fluids:
-    expression predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, bool isdensityconstant = true, bool isviscosityconstant = true);
+    expression predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs = false, bool isdensityconstant = true, bool isviscosityconstant = true);
 };
 
 #endif

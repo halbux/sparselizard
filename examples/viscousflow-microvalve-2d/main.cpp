@@ -51,7 +51,7 @@ void sparselizard(void)
     // The strong form can be found at https://en.wikipedia.org/wiki/Stokes_flow
     formulation viscousflow;
 
-    viscousflow += integral(fluid, predefinedstokesflow(dof(v), tf(v), dof(p), tf(p), mu, rho) );	
+    viscousflow += integral(fluid, predefinedstokesflow(dof(v), tf(v), dof(p), tf(p), mu, rho, 0, 0) );	
     
     // Generate, solve and save:
     solve(viscousflow);

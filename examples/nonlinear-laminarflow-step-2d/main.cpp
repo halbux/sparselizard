@@ -61,7 +61,7 @@ void sparselizard(void)
     // Define the weak formulation for incompressible laminar flow:
     formulation laminarflow;
 
-    laminarflow += integral(fluid, predefinedlaminarflow(dof(v), tf(v), v, dof(p), tf(p), mu, rho) );
+    laminarflow += integral(fluid, predefinedlaminarflow(dof(v), tf(v), v, dof(p), tf(p), mu, rho, 0, 0) );
 
 
     // This loop with the above formulation is a Newton iteration:
