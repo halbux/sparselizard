@@ -1,6 +1,6 @@
-// sparselizard - Copyright (C) 2017- A. Halbach, University of Liege
+// sparselizard - Copyright (C) 2017- A. Halbach
 //
-// See the LICENSE.txt file for license information. Please report all
+// See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 #ifndef HARMONIC_H
