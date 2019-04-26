@@ -46,7 +46,7 @@ void sparselizard(void)
     double mu = 8.9e-4, rho = 1000;
 
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components.
-    // Field p is the pressure. Fields x and y are the space coordinates.
+    // Field p is the relative pressure. Fields x and y are the space coordinates.
     field v("h1xy"), p("h1"), x("x"), y("y");
 
     // Force the flow velocity to 0 on the wall:
