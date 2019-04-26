@@ -51,7 +51,7 @@ void sparselizard(void)
 
     // Force the flow velocity to 0 on the wall:
     v.setconstraint(wall);
-    // Set a 0 pressure at the outlet:
+    // Set a 0 relative pressure at the outlet:
     p.setconstraint(outlet);
 
     // Use an order 1 interpolation for p and 2 for v on the fluid region (satisfies the BB condition):
