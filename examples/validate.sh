@@ -28,7 +28,7 @@ for i in $(ls examples);
 do 
 
 # Skip this script as well as all too heavy examples:
-if [ $i == "validate.sh" ] || [ $i == "electromagnetic-waveguide-time-resolution-3d" ] || [ $i == "superconductor-3d" ]
+if [ $i == "validate.sh" ] || [ $i == "electromagnetic-waveguide-time-resolution-3d" ] || [ $i == "superconductor-3d" ] || [ $i == "nonlinear-vonkarman-vortex-2d" ]
 then
 continue
 fi
