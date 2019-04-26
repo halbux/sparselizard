@@ -39,7 +39,7 @@ void sparselizard(void)
     // Force the flow velocity to 0 at the solid interface:
     v.setconstraint(fluidboundary);
     
-    // Set a pressure of 100 Pa at the valve inlet and 0 at the outlet:
+    // Set a relative pressure of 100 Pa at the valve inlet and 0 at the outlet:
     p.setconstraint(inlet, 100);
     p.setconstraint(outlet);
     
