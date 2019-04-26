@@ -65,9 +65,6 @@ void sparselizard(void)
         // Write field v with an order 2 interpolation to ParaView .vtk format:
         v.write(fluid, "v" + std::to_string(1000 + i) + ".vtk", 2);
     }
-    
-    // Code validation line. Can be removed.
-    std::cout << (norm(v).max(fluid, 5)[0] < -1.24111e-10 && norm(v).max(fluid, 5)[0] > -1.24113e-10);
 }
 
 int main(void)
