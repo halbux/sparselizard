@@ -33,7 +33,7 @@ void sparselizard(void)
     double mu = 8.9e-4, rho = 1000;
     
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components.
-    // Field p is the pressure.
+    // Field p is the relative pressure.
     field v("h1xy"), p("h1");
     
     // Force the flow velocity to 0 at the solid interface:
