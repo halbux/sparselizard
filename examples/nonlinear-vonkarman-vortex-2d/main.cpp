@@ -3,7 +3,7 @@
 // Once the air velocity reaches a threshold value a von Karman vortex street appears.
 // The cylinder has a diameter of 14 cm and the truncated air domain is 2 m x 0.8 m.
 //
-// The Reynolds number (rho*v*D/mu) is 1400 for the max 0.15 m/s velocity.
+// The Reynolds number (rho*v*D/mu) is about 1000 for the max 0.1 m/s velocity.
 //
 // - rho is the density of air [kg/m3]
 // - v is the flow velocity far from the cylinder [m/s]
