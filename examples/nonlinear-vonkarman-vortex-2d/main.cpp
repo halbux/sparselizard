@@ -3,7 +3,7 @@
 // Once the air velocity reaches a threshold value a von Karman vortex street appears.
 // The cylinder has a diameter of 14 cm and the truncated air domain is 2 m x 0.8 m.
 //
-// The Reynolds number (rho*v*D/mu) is about 1000 for the max 0.1 m/s velocity.
+// The Reynolds number (rho*v*D/mu) is 1400 for the max 0.15 m/s velocity.
 //
 // - rho is the density of air [kg/m3]
 // - v is the flow velocity far from the cylinder [m/s]
@@ -56,7 +56,7 @@ void sparselizard(void)
     eul.settolerance(1e-4);
     
     // Run from 0sec to 90sec by steps of 0.2sec:
-    std::vector<vec> sols = eul.runnonlinear(0, 0.2, 60)[0];
+    std::vector<vec> sols = eul.runnonlinear(0, 0.2, 90)[0];
     
     for (int i = 0; i < sols.size(); i++)
     {
