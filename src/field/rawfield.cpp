@@ -593,15 +593,19 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
 
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
         // The interpolation order for this field and the selected fields might be different.
+        int numformfunctionsinoriginfield = myformfunction->count(interpolationorder[disjreg], elementdimension, 0);
         int numformfunctionsperelement = myformfunction->count(selectedrawfield->interpolationorder[disjreg], elementdimension, 0);
 
         for (int ff = 0; ff < numformfunctionsperelement; ff++)
         {
-            densematrix values(1,numelem);
+            densematrix values(1,numelem,0.0);
             double* vals = values.getvalues();
-
-            for (int elem = 0; elem < numelem; elem++)
-                vals[elem] = mycoefmanager->getcoef(disjreg, ff, elem);
+            
+            if (ff < numformfunctionsinoriginfield)
+            {
+                for (int elem = 0; elem < numelem; elem++)
+                    vals[elem] = mycoefmanager->getcoef(disjreg, ff, elem);
+            }
 
             selectedvec->setvalues(selectedrawfield, disjreg, ff, values, op);
         }
