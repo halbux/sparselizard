@@ -59,9 +59,10 @@ class vec
         
         shared_ptr<rawvec> getpointer(void) { return rawvecptr; };
         
-//         Also write other .setdata functions. Only if dofmanager is defined.
-//         void setdata(int physreg, field myfield);
-//         void setdata(int physreg, vectorfieldselect myvec);
+        // Transfer data from a field to this vector.
+        // Only the data corresponding to the physical region is transferred.
+        // 'op' can be 'add' or 'set'.
+        void setdata(int physreg, field myfield, std::string op = "set");
         
         Vec getpetsc(void);
         

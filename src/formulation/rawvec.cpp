@@ -170,6 +170,23 @@ double rawvec::getvalue(int address)
 	return outval[0];
 }
 
+void rawvec::setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op)
+{
+    mydofmanager->selectfield(selectedfield);
+
+    // Do nothing if the entries are not in the vector:
+    if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
+        return;
+
+    int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
+    int rangeend = mydofmanager->getrangeend(disjointregionnumber, formfunctionindex);
+
+    int numentries = rangeend-rangebegin+1;
+
+    intdensematrix addressestoset(numentries, 1, rangebegin, 1);
+    setvalues(addressestoset, vals, op);
+}
+
 densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
 {
     mydofmanager->selectfield(selectedfield);

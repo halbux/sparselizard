@@ -58,6 +58,12 @@ double vec::getvalue(int address)
 
 vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); return vectorfieldselect(rawvecptr, selectedfield.getpointer()); }
 
+void vec::setdata(int physreg, field myfield, std::string op)
+{
+    errorifpointerisnull();
+    vectorfieldselect(rawvecptr, myfield.getpointer()).setdata(physreg, myfield, op);
+}
+
 Vec vec::getpetsc(void) { errorifpointerisnull(); return rawvecptr->getpetsc(); }
 
 void vec::print(void) { errorifpointerisnull(); rawvecptr->print(); }

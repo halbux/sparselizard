@@ -522,6 +522,92 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
     }
 }
 
+void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op)
+{
+    // Extract the info from the vector with selected field:
+    shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
+    shared_ptr<rawvec> selectedvec = myvec.getrawvector();
+        
+    // The raw fields must be of the same type:
+    if (mytypename != selectedrawfield->mytypename)
+    {
+        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data between fields of same type" << std::endl;
+        abort();
+    }
+    // The raw fields must have a same number of subfields:
+    if (mysubfields.size() != selectedrawfield->mysubfields.size())
+    {
+        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same number of subfields" << std::endl;
+        abort();
+    }
+    
+    // Transfer the data of every subfield:
+    if (mysubfields.size() > 0)
+    {
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->transferdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op);
+        return;
+    }
+    
+    // The raw fields must include the same harmonic numbers:
+    if (getharmonics() != selectedrawfield->getharmonics())
+    {
+        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same harmonic numbers" << std::endl;
+        abort();
+    }
+    
+    // Transfer the data of every harmonic:
+    if (myharmonics.size() > 0)
+    {
+        for (int h = 0; h < myharmonics.size(); h++)
+        {
+            if (myharmonics[h].size() > 0)
+                myharmonics[h][0]->transferdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op);
+        }
+        return;
+    }
+    // Extract the actual field from non-multiharmonic fields:
+    if (selectedrawfield->multiharmonic == false)
+        selectedrawfield = selectedrawfield->harmonic(1);
+    
+    // Transfer the data for a single field.
+    
+    // Get ALL disjoint regions in the physical region:
+    std::vector<int> selecteddisjregs;
+    if (physreg != -1)
+        selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    else
+    {
+        std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
+        dofmngr->selectfield(shared_from_this());
+        selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
+    }
+
+    for (int i = 0; i < selecteddisjregs.size(); i++)
+    {
+        int disjreg = selecteddisjregs[i];
+
+        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjreg);
+        int elementdimension = (universe::mymesh->getdisjointregions())->getelementdimension(disjreg);
+        int numelem = (universe::mymesh->getdisjointregions())->countelements(disjreg);
+
+        std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
+        // The interpolation order for this field and the selected fields might be different.
+        int numformfunctionsperelement = myformfunction->count(selectedrawfield->interpolationorder[disjreg], elementdimension, 0);
+
+        for (int ff = 0; ff < numformfunctionsperelement; ff++)
+        {
+            densematrix values(1,numelem);
+            double* vals = values.getvalues();
+
+            for (int elem = 0; elem < numelem; elem++)
+                vals[elem] = mycoefmanager->getcoef(disjreg, ff, elem);
+
+            selectedvec->setvalues(selectedrawfield, disjreg, ff, values, op);
+        }
+    }
+}
+
 shared_ptr<rawfield> rawfield::comp(int component)
 {   
     // If there is a single component and the first one is requested:

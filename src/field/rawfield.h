@@ -141,7 +141,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Transfer data from a solution vector to the field.
         // Get from all regions with physreg set to -1. 'op' can be 'add' or 'set'. 
         void setdata(int physreg, vectorfieldselect myvec, std::string op = "set");
-                
+        
+        // Transfer data from the rawfield to a vectorfieldselect:
+        void transferdata(int physreg, vectorfieldselect myvec, std::string op);
+        
         // Select a component.
         shared_ptr<rawfield> comp(int component);
         // Select a single or several harmonics. 
