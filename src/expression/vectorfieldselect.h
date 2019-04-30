@@ -10,9 +10,11 @@
 #include "memory.h"
 #include "rawfield.h"
 #include "rawvec.h"
+#include "field.h"
 
 class rawfield;
 class rawvec;
+class field;
 
 class vectorfieldselect
 {
@@ -28,6 +30,8 @@ class vectorfieldselect
         
         shared_ptr<rawvec> getrawvector(void) { return myrawvec; };
         shared_ptr<rawfield> getrawfield(void) { return myrawfield; };
+        
+        void setdata(int physreg, field myfield, std::string op = "set");
         
 };
 

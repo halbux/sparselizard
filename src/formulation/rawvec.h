@@ -55,6 +55,8 @@ class rawvec
         densematrix getvalues(intdensematrix addresses);
         // Get value at a single index:
         double getvalue(int address);
+        
+        void setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
         densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
         
         void print(void);
