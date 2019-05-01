@@ -195,7 +195,7 @@ void sparselizard(void)
     
     // Transfer the data from the solution vector to the u field:
     u.setdata(vol, solu);
-    // Write the deflection with an order 2 interpolation. Exagerate the deflection by a large factor.
+    // Write the deflection with an order 2 interpolation. Exaggerate the deflection by a large factor.
     (0.3e10*u).write(vol, "u.pos", 2);
 
     // Code validation line. Can be removed.
