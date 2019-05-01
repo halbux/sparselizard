@@ -43,7 +43,7 @@ void sparselizard(void)
     // Transfer the data from the solution vector to the u field:
     u.setdata(vol, solu);
     // Write the deflection on the top surface of the membrane.
-    // Write with an order 3 interpolation. Exagerate the deflection by a factor 1e9.
+    // Write with an order 3 interpolation. Exaggerate the deflection by a factor 1e9.
     (0.5e9*u).write(top, "u.pos", 3);
     
     // Code validation line. Can be removed.
