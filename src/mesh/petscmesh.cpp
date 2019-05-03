@@ -45,11 +45,11 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     VecGetValues(coordvec, meshdim*numberofnodes, addresses.getvalues(), coordmat.getvalues());
     
     double* coordmatval = coordmat.getvalues();
-	std::vector<double>* nodecoordinates = mynodes.getcoordinates();
-	for (int i = 0; i < numberofnodes; i++)
-	{
-	    for (int j = 0; j < meshdim; j++)
-		    nodecoordinates->at(3*i+j) = coordmatval[meshdim*i+j];
+    std::vector<double>* nodecoordinates = mynodes.getcoordinates();
+    for (int i = 0; i < numberofnodes; i++)
+    {
+        for (int j = 0; j < meshdim; j++)
+            nodecoordinates->at(3*i+j) = coordmatval[meshdim*i+j];
     }
     
     if (verbosity)
