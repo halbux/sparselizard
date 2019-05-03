@@ -1108,4 +1108,40 @@ std::vector<double> element::listnodecoordinates(void)
 	return output;
 }
 
+int element::deducetypenumber(int elemdim, int numnodes)
+{
+	switch (numnodes)
+	{
+	    // Point:
+	    case 1:
+	        return 0;
+		// Line:
+		case 2:
+			return 1;
+		// Triangle:
+		case 3:
+			return 2;
+		// Quadrangle or tetrahedron:
+		case 4:
+		{
+			if (elemdim == 2)
+				return 3;
+			if (elemdim == 3)
+				return 4;
+			break;
+		}
+		// Pyramid:
+		case 5:
+			return 7;
+		// Prism:
+		case 6:
+			return 6;
+		// Hexahedron:
+		case 8:
+			return 5;
+	}
+
+	std::cout << "Error in 'element' object: unknown element of dimension " << elemdim << " with " << numnodes << " nodes" << std::endl;
+	abort();
+}
 
