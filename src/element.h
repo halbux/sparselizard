@@ -16,21 +16,21 @@
 // Element type numbers are as follows:
 //
 // 0  --> Point
-// 1  --> Line 		  order 1
-// 2  --> Triangle 	  order 1
+// 1  --> Line        order 1
+// 2  --> Triangle    order 1
 // 3  --> Quadrangle  order 1
 // 4  --> Tetrahedron order 1
 // 5  --> Hexahedron  order 1
-// 6  --> Prism 	  order 1
-// 7  --> Pyramid 	  order 1
-// 8  --> Line 		  order 2
-// 9  --> Triangle 	  order 2
+// 6  --> Prism       order 1
+// 7  --> Pyramid     order 1
+// 8  --> Line        order 2
+// 9  --> Triangle    order 2
 // 10 --> Quadrangle  order 2
 // 11 --> Tetrahedron order 2
 // 12 --> Hexahedron  order 2
-// 13 --> Prism 	  order 2
-// 14 --> Pyramid 	  order 2
-// 15 --> Line 		  order 3
+// 13 --> Prism       order 2
+// 14 --> Pyramid     order 2
+// 15 --> Line        order 3
 // ...
 //
 // Only complete order curved elements are defined.
@@ -369,6 +369,9 @@ class element
         // This function outputs the coordinates in format {x1,y1,z1,x2,y2,z2,x3,...}
         // of the phi then eta then ki coordinate-ordered nodes in the curved element.
         std::vector<double> listnodecoordinates(void);
+        
+        // Get the straight element type number corresponding to a number of nodes and dimension:
+        int deducetypenumber(int elemdim, int numnodes);
 };
 
 #endif
