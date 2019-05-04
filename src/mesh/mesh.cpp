@@ -111,7 +111,7 @@ elements* mesh::getelements(void) {return &myelements;}
 physicalregions* mesh::getphysicalregions(void) {return &myphysicalregions;}
 disjointregions* mesh::getdisjointregions(void) {return &mydisjointregions;}
 
-void mesh::load(std::string name, int verbosity)
+void mesh::load(std::string name, int verbosity, bool legacyreader)
 {
     ///// Reset all memory of the mesh object:
     mynodes = nodes();
@@ -128,7 +128,13 @@ void mesh::load(std::string name, int verbosity)
     
 	wallclock loadtime;
     
-    readfromfile(name);
+    if (legacyreader)
+        readfromfile(name);
+    else
+    {
+        petscmesh pmesh(name);
+        pmesh.extract(mynodes, myelements, myphysicalregions);
+    }
 	myelements.explode();
 	sortbybarycenters();
 	removeduplicates();

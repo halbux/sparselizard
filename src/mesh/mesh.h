@@ -71,7 +71,7 @@ class mesh
         disjointregions* getdisjointregions(void);
 
         // Load from file name:
-        void load(std::string name, int verbosity = 1);	
+        void load(std::string name, int verbosity = 1, bool legacyreader = true);	
         // Load from shape vector:
         void load(std::vector<shape> inputshapes, int verbosity = 1);	
 
