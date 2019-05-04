@@ -132,7 +132,7 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                 
                 DMPlexRestoreTransitiveClosure(mypetscmesh, i, PETSC_TRUE, &numpoints, &points);
                 
-                // Bring to out element node ordering:
+                // Bring to our element node ordering:
                 reordernodes(elemtypenum, nodesinelem);
                 
                 // Add element:
