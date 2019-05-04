@@ -1,6 +1,16 @@
 #include "petscmesh.h"
 
 
+void petscmesh::reordernodes(int ourtypenum, std::vector<int>& toreorder)
+{
+    switch (ourtypenum)
+    {
+        case 5:
+            toreorder = {toreorder[0], toreorder[1], toreorder[2], toreorder[3], toreorder[4], toreorder[7], toreorder[6], toreorder[5]};
+            break;
+    }
+}
+
 petscmesh::petscmesh(std::string filename)
 {
     // Make sure the format is supported (and has been validated):
@@ -121,6 +131,9 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                 }
                 
                 DMPlexRestoreTransitiveClosure(mypetscmesh, i, PETSC_TRUE, &numpoints, &points);
+                
+                // Bring to out element node ordering:
+                reordernodes(elemtypenum, nodesinelem);
                 
                 // Add element:
                 int elementindexincurrenttype = myelements.add(elemtypenum, curvatureorder, nodesinelem);
