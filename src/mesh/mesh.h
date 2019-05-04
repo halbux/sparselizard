@@ -62,7 +62,7 @@ class mesh
 	public:
         
         mesh(void);
-        mesh(std::string filename, int verbosity = 1);
+        mesh(std::string filename, int verbosity = 1, bool legacyreader = true);
         mesh(std::vector<shape> inputshapes, int verbosity = 1);
         
         nodes* getnodes(void);

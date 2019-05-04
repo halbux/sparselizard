@@ -94,10 +94,10 @@ mesh::mesh(void) : myelements(mynodes, myphysicalregions, mydisjointregions), my
     universe::mymesh = this;
 }
 
-mesh::mesh(std::string filename, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
+mesh::mesh(std::string filename, int verbosity, bool legacyreader) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
 {
     universe::mymesh = this;
-    load(filename, verbosity);
+    load(filename, verbosity, legacyreader);
 }
 
 mesh::mesh(std::vector<shape> inputshapes, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
