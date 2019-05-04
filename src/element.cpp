@@ -1140,8 +1140,5 @@ int element::deducetypenumber(int elemdim, int numnodes)
         case 8:
             return 5;
     }
-
-    std::cout << "Error in 'element' object: unknown element of dimension " << elemdim << " with " << numnodes << " nodes" << std::endl;
-    abort();
 }
 
