@@ -24,6 +24,7 @@
 #include "shape.h"
 #include "rawshape.h"
 #include "regiondefiner.h"
+#include "petscmesh.h"
 
 class nodes;
 class elements;
