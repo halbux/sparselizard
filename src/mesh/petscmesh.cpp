@@ -24,7 +24,7 @@ petscmesh::petscmesh(std::string filename)
 
 petscmesh::~petscmesh(void)
 {
-    // DMDestroy(&mypetscmesh);
+    DMDestroy(&mypetscmesh);
 }
 
 void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions, bool verbosity)
@@ -119,6 +119,8 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                         index++;
                     }
                 }
+                
+                DMPlexRestoreTransitiveClosure(mypetscmesh, i, PETSC_TRUE, &numpoints, &points);
                 
                 // Add element:
                 int elementindexincurrenttype = myelements.add(elemtypenum, curvatureorder, nodesinelem);
