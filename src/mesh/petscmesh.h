@@ -26,6 +26,8 @@ class petscmesh
         int meshdim;
         
         int curvatureorder = 1;
+        
+        void reordernodes(int ourtypenum, std::vector<int>& toreorder);
 
     public:
 
