@@ -59,7 +59,7 @@ namespace myalgorithm
     // Norm each block in the vector:
     std::vector<double> normblocks(std::vector<double>& tonorm, int blocklen);
     
-    // Get the file extension ('.' included) in a string (works for any extension length):
+    // Get the file extension (dot included) in a string (works for any extension length):
     std::string getfileextension(std::string filename);
     
 };
