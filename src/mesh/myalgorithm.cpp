@@ -342,4 +342,21 @@ std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blo
 	return output;
 }
 
+std::string myalgorithm::getfileextension(std::string filename)
+{
+    int index = -1;
+    for (int i = filename.length()-1; i >= 0; i--)
+    {
+        if (filename[i] == '.')
+        {
+            index = i;
+            break;
+        }
+    }
+    if (index > -1)
+        return filename.substr(index, filename.length()-index);
+    else
+        return "";
+}
+
 
