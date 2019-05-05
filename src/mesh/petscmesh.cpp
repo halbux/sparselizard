@@ -13,22 +13,32 @@ void petscmesh::reordernodes(int ourtypenum, std::vector<int>& toreorder)
 
 petscmesh::petscmesh(std::string filename)
 {
-    // Make sure the format is supported (and has been validated):
-    if (filename.size() >= 5)
+    std::vector<std::string> supportedextensions = {".msh",".msh2",".msh4",".cgns",".exo",".gen",".cas",".h5",".med",".ply",".dat"};
+ 
+    bool isvalidext = false;
+    
+    std::string curfileext = myalgorithm::getfileextension(filename);
+    for (int i = 0; i < supportedextensions.size(); i++)
     {
-        // Get the extension:
-        std::string fileext = filename.substr(filename.size()-4,4);
-
-        if (fileext == ".exo" || fileext == ".med" || fileext == ".msh" || fileext == ".ply")
+        if (supportedextensions[i] == curfileext)
         {
-            DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), PETSC_TRUE, &mypetscmesh);
-            DMGetDimension(mypetscmesh, &meshdim);
-            return;
+            isvalidext = true;
+            break;
         }
     }
     
+    if (isvalidext)
+    {
+        DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), PETSC_TRUE, &mypetscmesh);
+        DMGetDimension(mypetscmesh, &meshdim);
+        return;
+    }
+    
     std::cout << "Error while loading mesh file '" << filename << "'." << std::endl;
-    std::cout << "Supported mesh formats are .exo (ExodusII), .med (Salome), .msh (Fluent), .msh (Gmsh) and .ply (Polygon)." << std::endl;
+    std::cout << "Supported mesh formats are ";
+    for (int i = 0; i < supportedextensions.size()-1; i++)
+        std::cout << "'" << supportedextensions[i] << "', ";
+    std::cout << "'" << supportedextensions[supportedextensions.size()-1] << "'." << std::endl;
     abort();
 }
 
