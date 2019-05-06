@@ -25,8 +25,8 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
 		// Give an error if version is not supported:
 		if (formatversion >= 4)
 		{
-			std::cout << "Error in 'gmshinterface': GMSH format " << formatversion << " is not supported yet (might still be experimental)." << std::endl;
-			std::cout << "Use GMSH 3 instead or the built-in mesher." << std::endl;
+			std::cout << "Error in 'gmshinterface': GMSH format " << formatversion << " is not supported in the legacy mesh reader." << std::endl;
+			std::cout << "Use GMSH 3 instead." << std::endl;
 			abort();
 		}
 
@@ -223,8 +223,8 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
 
 void gmshinterface::writetofile(std::string name, iodata datatowrite)
 {
-    // Get the file name without the .pos extension:
-    std::string namenoext = name.substr(0, name.size()-4);
+    // Get the file name without the path and the .pos extension:
+    std::string viewname = myalgorithm::getfilename(name);
     
     // Get the list of element types in the view:
     std::vector<int> activeelementtypes = datatowrite.getactiveelementtypes();
@@ -240,9 +240,9 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         
         // Open the view (overwrite if first time):
         if (activeelementtypes.size() == 1)
-            gmshinterface::openview(name, namenoext, 0, i == 0);
+            gmshinterface::openview(name, viewname, 0, i == 0);
         else
-            gmshinterface::openview(name, namenoext + myelement.gettypename(), 0, i == 0);	
+            gmshinterface::openview(name, viewname + myelement.gettypename(), 0, i == 0);	
         // Append the data to the view:
         if (datatowrite.isscalar())
             gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
