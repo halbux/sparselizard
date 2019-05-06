@@ -359,4 +359,24 @@ std::string myalgorithm::getfileextension(std::string filename)
         return "";
 }
 
+std::string myalgorithm::getfilename(std::string filename)
+{
+    int startindex = -2, endindex = -2;
+    for (int i = filename.length()-1; i >= 0; i--)
+    {
+        if (endindex == -2 && filename[i] == '.')
+            endindex = i-1;
+        if (startindex == -2 && filename[i] == '/')
+            startindex = i+1;
+    }
+    if (startindex == -2)
+        startindex = 0;
+    if (endindex == -2)
+        endindex = filename.length()-1;
+
+    if (startindex > endindex)
+        return "";
+    else
+        return filename.substr(startindex, endindex-startindex+1);
+}
 

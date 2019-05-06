@@ -61,6 +61,8 @@ namespace myalgorithm
     
     // Get the file extension (dot included) in a string (works for any extension length):
     std::string getfileextension(std::string filename);
+    // Get the file name without the path and the extension:
+    std::string getfilename(std::string filename);
     
 };
 
