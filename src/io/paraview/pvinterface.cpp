@@ -21,11 +21,11 @@ void pvinterface::writetofile(std::string name, iodata datatowrite)
 
 void pvinterface::writetofile(std::string name, iodata datatowrite, int timestepindex)
 {
-    // Get the file name without the .vtk extension:
-    std::string namenoext = name.substr(0, name.size()-4);
+    // Get the file name without the path and the .vtk extension:
+    std::string viewname = myalgorithm::getfilename(name);
     
-    mystring myname(name);
-    std::string viewname = myname.getstringwhileletter();
+    mystring myname(viewname);
+    viewname = myname.getstringwhileletter();
     
 	// 'file' cannot take a std::string argument --> name.c_str():
 	std::ofstream outfile (name.c_str());
@@ -36,7 +36,7 @@ void pvinterface::writetofile(std::string name, iodata datatowrite, int timestep
 		
 		// Write the header:
 		outfile << "# vtk DataFile Version 4.2\n";
-		outfile << namenoext+"\n";
+		outfile << viewname+"\n";
 		outfile << "ASCII\n";
 		outfile << "DATASET UNSTRUCTURED_GRID\n\n";
 		
