@@ -63,9 +63,6 @@ std::vector<std::vector<vec>> newmark::run(bool islinear, double starttime, doub
     // Get all indexes at which the fields are constrained:
     intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
     
-    // Remove leftovers (if any):
-    myformulation.rhs(); myformulation.K(); myformulation.C(); myformulation.M();
-
     vec rhs; mat K, C, M, leftmat, matu, matv, mata;
     
     // Count the number of time steps to step through and the number of vectors to output:
