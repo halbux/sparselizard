@@ -13,7 +13,7 @@ void petscmesh::reordernodes(int ourtypenum, std::vector<int>& toreorder)
 
 petscmesh::petscmesh(std::string filename)
 {
-    std::vector<std::string> supportedextensions = {".msh",".msh2",".msh4",".cgns",".exo",".gen",".cas",".h5",".med",".ply",".dat"};
+    std::vector<std::string> supportedextensions = {".msh",".cgns",".exo",".gen",".cas",".h5",".med",".ply",".dat"};
  
     bool isvalidext = false;
     
