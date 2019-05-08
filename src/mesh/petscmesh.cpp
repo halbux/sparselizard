@@ -78,12 +78,12 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     
     ///// Extract the elements and the physical regions:
     
-    int numpoints = 0;
-    int* points = NULL;
-    
+    // Point range for every dimension:
+    std::vector<int> rangestart(meshdim+1), rangeend(meshdim+1);
+    for (int i = 0; i <= meshdim; i++)
+        DMPlexGetDepthStratum(mypetscmesh, i, &rangestart[i], &rangeend[i]);
     // Vertex number range [vstart,vend[
-    int vstart, vend;
-    DMPlexGetDepthStratum(mypetscmesh, 0, &vstart, &vend);
+    int vstart = rangestart[0], vend = rangeend[0];
     
     // Number of labels:
     int numlabels;
@@ -92,34 +92,56 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     numlabels--;
     
     element myelem(0);
-    
-    // Loop on all objects (vertices, edges, faces and volumes):
-    for (int dim = 0; dim <= meshdim; dim++)
+
+    for (int l = 0; l < numlabels; l++)
     {
-        // Number of objects of current dimension:
-        int rangestart, rangeend;
-        DMPlexGetDepthStratum(mypetscmesh, dim, &rangestart, &rangeend);
+        DMLabel curlabel;
+        DMGetLabelByNum(mypetscmesh, l, &curlabel);
         
-        for (int l = 0; l < numlabels; l++)
+        int numphysregsinlabel;
+        DMLabelGetNumValues(curlabel, &numphysregsinlabel);
+        
+        IS labelIS;
+        DMLabelGetValueIS(curlabel, &labelIS);
+
+        const int* physregsinlabel = NULL;
+        ISGetIndices(labelIS, &physregsinlabel);
+
+        for (int p = 0; p < numphysregsinlabel; p++)
         {
-            DMLabel curlabel;
-            DMGetLabelByNum(mypetscmesh, l, &curlabel);
-            // Value of the label for the object in the loop below:
-            int curlabelvalue;
+            int curphysreg = physregsinlabel[p];
 
-            for (int i = rangestart; i < rangeend; i++)
+            IS pointIS;
+            DMLabelGetStratumIS(curlabel, curphysreg, &pointIS);
+
+            int numptsincurphysreg;
+            ISGetSize(pointIS, &numptsincurphysreg);
+            
+            const int* curpoints = NULL;
+            ISGetIndices(pointIS, &curpoints);
+            
+            for (int i = 0; i < numptsincurphysreg; i++)
             {
-                DMLabelGetValue(curlabel, i, &curlabelvalue);
+                int curpt = curpoints[i];
+                
+                // Get the dimension of the current element:
+                int dim = -1;
+                for (int j = 0; j <= meshdim; j++)
+                {
+                    if (curpt >= rangestart[j] && curpt < rangeend[j])
+                    {
+                        dim = j; 
+                        break;
+                    }
+                }
+             
+                int curlen;
+                int* points = NULL;
+                DMPlexGetTransitiveClosure(mypetscmesh, curpt, PETSC_TRUE, &curlen, &points);
 
-                // Skip elements that have no label:
-                if (curlabelvalue == -1)
-                    continue;
-                
-                DMPlexGetTransitiveClosure(mypetscmesh, i, PETSC_TRUE, &numpoints, &points);
-                
                 // Count number of nodes in the element:
                 int numnodesinelem = 0;
-                for (int j = 0; j < 2*numpoints; j=j+2)
+                for (int j = 0; j < 2*curlen; j=j+2)
                 {
                     int cur = points[j];
                     if (cur >= vstart && cur < vend)
@@ -130,7 +152,7 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                 // Put the nodes in a vector:
                 std::vector<int> nodesinelem(numnodesinelem);
                 int index = 0;
-                for (int j = 0; j < 2*numpoints; j=j+2)
+                for (int j = 0; j < 2*curlen; j=j+2)
                 {
                     int cur = points[j];
                     if (cur >= vstart && cur < vend)
@@ -140,8 +162,8 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                     }
                 }
                 
-                DMPlexRestoreTransitiveClosure(mypetscmesh, i, PETSC_TRUE, &numpoints, &points);
-                
+                DMPlexRestoreTransitiveClosure(mypetscmesh, curpt, PETSC_TRUE, &curlen, &points);
+             
                 // Bring to our element node ordering:
                 reordernodes(elemtypenum, nodesinelem);
                 
@@ -149,10 +171,16 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                 int elementindexincurrenttype = myelements.add(elemtypenum, curvatureorder, nodesinelem);
                 
                 // Get the physical region and add the element:
-                physicalregion* currentphysicalregion = myphysicalregions.get(curlabelvalue);
+                physicalregion* currentphysicalregion = myphysicalregions.get(curphysreg);
                 currentphysicalregion->addelement(elemtypenum, elementindexincurrenttype);
             }
+                
+            ISRestoreIndices(pointIS, &curpoints);
+            ISDestroy(&pointIS);
         }
+        
+        ISRestoreIndices(labelIS, &physregsinlabel);
+        ISDestroy(&labelIS);
     }
     
     if (verbosity)
