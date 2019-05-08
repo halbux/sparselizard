@@ -49,9 +49,6 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, x|field(allfields[i]));
     
-    // Remove leftovers (if any):
-    myformulation.rhs(); myformulation.K(); myformulation.C();
-    
     vec rhs; mat K, C, leftmat;
     
     // Count the number of time steps to step through and the number of vectors to output:
