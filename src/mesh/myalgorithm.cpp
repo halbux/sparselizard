@@ -386,6 +386,5 @@ std::string myalgorithm::getplurals(int count)
 		return "s";
 	else
 		return "";
-
 }
 
