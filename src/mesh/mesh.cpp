@@ -157,12 +157,11 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
 	myelements.orient();
     
     if (verbosity > 0)
-    {
         printcount();
-        loadtime.print("Time to load the mesh: ");
-    }
     if (verbosity > 1)
         printelementsinphysicalregions();
+    if (verbosity > 0)
+        loadtime.print("Time to load the mesh: ");
 
 	// Make sure axisymmetry is valid for this mesh:	
 	if (universe::isaxisymmetric && getmeshdimension() != 2)
@@ -277,12 +276,11 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
 	myelements.orient();
     
     if (verbosity > 0)
-    {
         printcount();
-        loadtime.print("Time to load the mesh: ");
-    }
     if (verbosity > 1)
         printelementsinphysicalregions();
+    if (verbosity > 0)
+        loadtime.print("Time to load the mesh: ");
 
 	// Make sure axisymmetry is valid for this mesh:	
 	if (universe::isaxisymmetric && getmeshdimension() != 2)
