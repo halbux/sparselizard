@@ -408,6 +408,8 @@ void mesh::printelementsinphysicalregions(bool isdebug)
         }
         else
         {
+            std::cout << myphysicalregions.getnumber(physregindex) << " (" << currentphysicalregion->getelementdimension() << "D)";
+            
             std::vector<std::vector<int>>* elemlist = currentphysicalregion->getelementlist();
 
             for (int i = 0; i < elemlist->size(); i++)
