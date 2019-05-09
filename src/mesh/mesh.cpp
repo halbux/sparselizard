@@ -392,7 +392,7 @@ void mesh::printdisjointregions(void)
     }
 }
 
-void mesh::printelementsinphysicalregions(bool printcountonly)
+void mesh::printelementsinphysicalregions(bool isdebug)
 {
     int numphysregs = myphysicalregions.count();
     
@@ -401,10 +401,12 @@ void mesh::printelementsinphysicalregions(bool printcountonly)
     {
         physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
         
-        int numelems = currentphysicalregion->countelements();
-        std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+myalgorithm::getplurals(numelems)+")";
-        
-        if (printcountonly == false)
+        if (isdebug == false)
+        {
+            int numelems = currentphysicalregion->countelements();
+            std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+myalgorithm::getplurals(numelems)+")";
+        }
+        else
         {
             std::vector<std::vector<int>>* elemlist = currentphysicalregion->getelementlist();
 
