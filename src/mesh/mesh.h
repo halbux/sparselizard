@@ -97,6 +97,8 @@ class mesh
         void printphysicalregions(void);
         // Print the physical region list in every disjoint region:
         void printdisjointregions(void);
+        // Print the elements in every physical region:
+        void printelementsinphysicalregions(bool printcountonly = true);
 };
 
 

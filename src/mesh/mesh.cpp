@@ -161,6 +161,8 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
         printcount();
         loadtime.print("Time to load the mesh: ");
     }
+    if (verbosity > 1)
+        printelementsinphysicalregions();
 
 	// Make sure axisymmetry is valid for this mesh:	
 	if (universe::isaxisymmetric && getmeshdimension() != 2)
@@ -279,6 +281,8 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
         printcount();
         loadtime.print("Time to load the mesh: ");
     }
+    if (verbosity > 1)
+        printelementsinphysicalregions();
 
 	// Make sure axisymmetry is valid for this mesh:	
 	if (universe::isaxisymmetric && getmeshdimension() != 2)
@@ -390,8 +394,34 @@ void mesh::printdisjointregions(void)
     }
 }
 
+void mesh::printelementsinphysicalregions(bool printcountonly)
+{
+    int numphysregs = myphysicalregions.count();
+    
+    std::cout << "Extracted " << numphysregs << " physical region"+myalgorithm::getplurals(numphysregs)+":" << std::endl;
+    for (int physregindex = 0; physregindex < numphysregs; physregindex++)
+    {
+        physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
+        
+        int numelems = currentphysicalregion->countelements();
+        std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+myalgorithm::getplurals(numelems)+")";
+        
+        if (printcountonly == false)
+        {
+            std::vector<std::vector<int>>* elemlist = currentphysicalregion->getelementlist();
 
+            for (int i = 0; i < elemlist->size(); i++)
+            {
+                if (elemlist->at(i).size() > 0)
+                {
+                    std::cout << " (" << i << "): ";
+                    for (int j = 0; j < elemlist->at(i).size(); j++)
+                        std::cout << elemlist->at(i)[j] << " ";
+                }
+            }
+        }
 
-
-
+        std::cout << std::endl;
+    }
+}
 

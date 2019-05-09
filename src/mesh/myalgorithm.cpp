@@ -380,3 +380,12 @@ std::string myalgorithm::getfilename(std::string filename)
         return filename.substr(startindex, endindex-startindex+1);
 }
 
+std::string myalgorithm::getplurals(int count)
+{
+	if (count > 1)
+		return "s";
+	else
+		return "";
+
+}
+

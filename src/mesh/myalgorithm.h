@@ -64,6 +64,9 @@ namespace myalgorithm
     // Get the file name without the path and the extension:
     std::string getfilename(std::string filename);
     
+    // Return "s" for an argument bigger than 1, return "" otherwise:
+    std::string getplurals(int count);
+    
 };
 
 #endif
