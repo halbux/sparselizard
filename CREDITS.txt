@@ -2,4 +2,4 @@ Alexandre Halbach   <alexandre.halbach at gmail.com>    University of Liege, Bel
 
 Sincere thanks to Maxime Spirlet for all his technical help, 
 to Christophe Geuzaine for his very broad knowledge of numerical methods
-and to the PETSc team for PETSc and for the unlimited support they provided.
+and to the PETSc team for PETSc and for the unlimited support they provide.
