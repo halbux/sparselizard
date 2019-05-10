@@ -7,8 +7,9 @@ void mesh::readfromfile(std::string name)
 		gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
     else
     {
-		std::cout << "Error: file '" << name << "' has either no extension or it is not supported." << std::endl << "Currently supported: GMSH .msh" << std::endl;
-		abort();
+        std::cout << "Error: file '" << name << "' cannot be read by the legacy mesh reader." << std::endl;
+        std::cout << "Use the petsc mesh reader instead or use the GMSH .msh format." << std::endl;
+        abort();
 	}
 }
 
