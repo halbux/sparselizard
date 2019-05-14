@@ -590,7 +590,7 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
     if (soltype == "bicgstab")
         KSPSetType(*ksp, KSPBCGS);
     
-    // The initial guess is provided in vector b:
+    // The initial guess is provided in vector sol:
     KSPSetInitialGuessNonzero(*ksp, PETSC_TRUE);
         
     KSPSetTolerances(*ksp, relrestol, PETSC_DEFAULT, PETSC_DEFAULT, maxnumit);
