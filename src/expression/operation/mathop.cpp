@@ -542,7 +542,7 @@ int mykspmonitor(KSP ksp, PetscInt iter, PetscReal resnorm, void* unused)
     return 0;
 }
 
-vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string soltype, std::string precondtype, int verbosity, bool diagscaling)
+void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype, std::string precondtype, int verbosity, bool diagscaling)
 {
     if (soltype != "gmres" && soltype != "bicgstab")
     {
@@ -559,21 +559,21 @@ vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string so
         std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (size of A and b do not match)" << std::endl;
         abort();
     }
-    
-    if (A.getpointer() == NULL || b.getpointer() == NULL)
+    if (A.countrows() != sol.size())
     {
-        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (A or b is undefined)" << std::endl;
+        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (size of A and x do not match)" << std::endl;
         abort();
     }
     
-    // The copy of the rhs is returned in case there is no nonzero entry in A:
-    if (A.countnnz() == 0)
-    	return b.copy();
+    if (A.getpointer() == NULL || b.getpointer() == NULL || sol.getpointer() == NULL)
+    {
+        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
+        abort();
+    }
 
     Vec bpetsc = b.getpetsc();
     Mat Apetsc = A.getpetsc();
 
-    vec sol(shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
@@ -616,8 +616,6 @@ vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string so
     KSPGetResidualNorm(*ksp, &relrestol);
    
     KSPDestroy(ksp);
-    
-    return sol;
 }
 
 void mathop::solve(formulation formul)

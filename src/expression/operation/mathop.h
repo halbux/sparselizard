@@ -136,7 +136,7 @@ namespace mathop
     // Direct resolution (with or without diagonal scaling):
     vec solve(mat A, vec b, std::string soltype = "lu", bool diagscaling = false);
     // Iterative resolution (with or without diagonal scaling):
-    vec solve(mat A, vec b, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
+    void solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
     
     // Generate, solve and save to field a formulation:
     void solve(formulation formul);
