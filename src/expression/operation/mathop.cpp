@@ -476,8 +476,13 @@ expression mathop::array3x3(expression term11, expression term12, expression ter
     return expression(3,3, {term11, term12, term13, term21, term22, term23, term31, term32, term33});
 }
  
-vec mathop::solve(mat A, vec b, bool diagscaling)
+vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
+    if (soltype != "lu")
+    {
+        std::cout << "Error in 'mathop' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        abort();
+    }
     if (A.countrows() != b.size())
     {
         std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
@@ -527,6 +532,77 @@ vec mathop::solve(mat A, vec b, bool diagscaling)
         KSPDestroy(ksp);
         A.getpointer()->isludefined(false);
     }
+    
+    return sol;
+}
+
+int mykspmonitor(KSP ksp, PetscInt iter, PetscReal resnorm, void* unused)
+{
+    std::cout << iter << " KSP residual norm " << resnorm << std::endl;
+    return 0;
+}
+
+vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string soltype, int verbosity, bool diagscaling)
+{
+    if (soltype != "gmres" && soltype != "bicgstab")
+    {
+        std::cout << "Error in 'mathop' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
+        abort();
+    }
+    if (A.countrows() != b.size())
+    {
+        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (size of A and b do not match)" << std::endl;
+        abort();
+    }
+    
+    if (A.getpointer() == NULL || b.getpointer() == NULL)
+    {
+        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (A or b is undefined)" << std::endl;
+        abort();
+    }
+    
+    // The copy of the rhs is returned in case there is no nonzero entry in A:
+    if (A.countnnz() == 0)
+    	return b.copy();
+
+    Vec bpetsc = b.getpetsc();
+    Mat Apetsc = A.getpetsc();
+
+    vec sol(shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
+    Vec solpetsc = sol.getpetsc();
+
+    KSP* ksp = A.getpointer()->getksp();
+    
+    KSPCreate(PETSC_COMM_WORLD, ksp);
+    KSPSetOperators(*ksp, Apetsc, Apetsc);
+    // Perform a diagonal scaling for improved matrix conditionning.
+    // This modifies the matrix A and right handside b!
+    if (diagscaling == true)
+        KSPSetDiagonalScale(*ksp, PETSC_TRUE);
+    
+    if (soltype == "gmres")
+        KSPSetType(*ksp, KSPGMRES);
+    if (soltype == "bicgstab")
+        KSPSetType(*ksp, KSPBCGS);
+    
+    // The initial guess is provided in vector b:
+    KSPSetInitialGuessNonzero(*ksp, PETSC_TRUE);
+        
+    KSPSetTolerances(*ksp, relrestol, PETSC_DEFAULT, PETSC_DEFAULT, maxnumit);
+        
+    // Request to print the iteration information to the console:
+    if (verbosity > 0)
+        KSPMonitorSet(*ksp, mykspmonitor, PETSC_NULL, PETSC_NULL);
+        
+    KSPSetFromOptions(*ksp);
+    	
+    KSPSolve(*ksp, bpetsc, solpetsc);
+    
+    // Get the number of required iterations and the residual norm:
+    KSPGetIterationNumber(*ksp, &maxnumit);
+    KSPGetResidualNorm(*ksp, &relrestol);
+   
+    KSPDestroy(ksp);
     
     return sol;
 }

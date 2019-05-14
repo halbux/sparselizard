@@ -134,7 +134,9 @@ namespace mathop
     expression array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33);
     
     // Direct resolution (with or without diagonal scaling):
-    vec solve(mat A, vec b, bool diagscaling = false);
+    vec solve(mat A, vec b, std::string soltype = "lu", bool diagscaling = false);
+    // Iterative resolution (with or without diagonal scaling):
+    vec solve(mat A, vec b, double& relrestol, int& maxnumit, std::string soltype = "gmres", int verbosity = 1, bool diagscaling = false);
     
     // Generate, solve and save to field a formulation:
     void solve(formulation formul);
