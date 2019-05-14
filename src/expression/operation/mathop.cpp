@@ -601,7 +601,7 @@ vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string so
         
     KSPSetFromOptions(*ksp);
     	
-    // Use an preconditioner:
+    // Use a preconditioner:
     PC pc;
     KSPGetPC(*ksp,&pc);
     if (precondtype == "ilu")
