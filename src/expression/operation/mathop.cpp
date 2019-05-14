@@ -542,11 +542,16 @@ int mykspmonitor(KSP ksp, PetscInt iter, PetscReal resnorm, void* unused)
     return 0;
 }
 
-vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string soltype, int verbosity, bool diagscaling)
+vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string soltype, std::string precondtype, int verbosity, bool diagscaling)
 {
     if (soltype != "gmres" && soltype != "bicgstab")
     {
         std::cout << "Error in 'mathop' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
+        abort();
+    }
+    if (precondtype != "ilu" && precondtype != "sor")
+    {
+        std::cout << "Error in 'mathop' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu' or 'sor')" << std::endl;
         abort();
     }
     if (A.countrows() != b.size())
@@ -595,6 +600,14 @@ vec mathop::solve(mat A, vec b, double& relrestol, int& maxnumit, std::string so
         KSPMonitorSet(*ksp, mykspmonitor, PETSC_NULL, PETSC_NULL);
         
     KSPSetFromOptions(*ksp);
+    	
+    // Use an preconditioner:
+    PC pc;
+    KSPGetPC(*ksp,&pc);
+    if (precondtype == "ilu")
+        PCSetType(pc,PCILU);
+    if (precondtype == "sor")
+        PCSetType(pc,PCSOR);
     	
     KSPSolve(*ksp, bpetsc, solpetsc);
     
