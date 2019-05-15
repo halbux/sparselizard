@@ -136,7 +136,7 @@ void sparselizard(void)
     std::cout << std::endl << "Resistance is " << R << " Ohm. Current is " << I << " A" << std::endl;
     
     // Compute the peak temperature on the whole volume:
-    double peaktemperature = expression(T).max(volume,2)[0];
+    double peaktemperature = T.max(volume,2)[0];
     std::cout << "Peak temperature is " << peaktemperature << " K" << std::endl << std::endl;
     
     // Write v, j and T:
