@@ -40,7 +40,7 @@ void sparselizard(void)
     u.setdata(vol, solu);
     // Write the deflection to ParaView .vtk format.
     // Write with an order 2 interpolation. Exaggerate the deflection by a factor 1e9.
-    (1e9*u).write(top, "u.vtk", 2);
+    (1e9*u).write(vol, "u.vtk", 2);
     
 }
 
