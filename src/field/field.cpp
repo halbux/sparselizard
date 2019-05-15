@@ -144,6 +144,25 @@ field field::harmonic(const std::vector<int> harmonicnumbers)
 
 vec field::atbarycenter(int physreg, field onefield) { return ((expression)*this).atbarycenter(physreg, onefield); }
 
+std::vector<double> field::max(int physreg, int refinement, std::vector<double> xyzrange)
+{ return ((expression)*this).max(physreg, refinement, xyzrange); }
+std::vector<double> field::max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
+{ return ((expression)*this).max(physreg, meshdeform, refinement, xyzrange); }
+std::vector<double> field::min(int physreg, int refinement, std::vector<double> xyzrange)
+{ return ((expression)*this).min(physreg, refinement, xyzrange); }
+std::vector<double> field::min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
+{ return ((expression)*this).min(physreg, meshdeform, refinement, xyzrange); }
+
+void field::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
+{ ((expression)*this).interpolate(physreg, xyzcoord, interpolated, isfound); }
+void field::interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
+{ ((expression)*this).interpolate(physreg, meshdeform, xyzcoord, interpolated, isfound); }
+
+std::vector<double> field::interpolate(int physreg, const std::vector<double> xyzcoord)
+{ return ((expression)*this).interpolate(physreg, xyzcoord); }
+std::vector<double> field::interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord)
+{ return ((expression)*this).interpolate(physreg, meshdeform, xyzcoord); }
+
 double field::integrate(int physreg, expression meshdeform, int integrationorder) { return ((expression)*this).integrate(physreg, meshdeform, integrationorder); }
 double field::integrate(int physreg, int integrationorder) { return ((expression)*this).integrate(physreg, integrationorder); }
 
