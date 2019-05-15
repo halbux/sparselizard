@@ -39,8 +39,8 @@ void sparselizard(void)
     // Transfer the data from the solution vector to the u field:
     u.setdata(vol, solu);
     // Write the deflection to ParaView .vtk format.
-    // Write with an order 2 interpolation. Exaggerate the deflection by a factor 1e9.
-    (1e9*u).write(vol, "u.vtk", 2);
+    // Write with an order 2 interpolation. Exaggerate the deflection by a factor 0.5e9.
+    (0.5e9*u).write(vol, "u.vtk", 2);
     
 }
 
