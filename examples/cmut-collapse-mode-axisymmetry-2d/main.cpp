@@ -46,7 +46,7 @@ void sparselizard(void)
     int solid = regionunion({membrane, pillar, insulator});
     int wholedomain = regionunion({solid,cavity});
     
-    // Nodal shape functions 'h1' for v (the electric potential) and 
+    // Nodal shape functions 'h1' for v (electric potential) and 
     // u (membrane displacement). Three components are used for u.
     // Field umesh is used to smoothly deform the mesh in the cavity.
     //
