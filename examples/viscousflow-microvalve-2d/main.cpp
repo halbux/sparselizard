@@ -47,11 +47,11 @@ void sparselizard(void)
     p.setorder(fluid, 1);
     v.setorder(fluid, 2);
     
-    // Define the weak formulation of the flow problem.
+    // Define the weak formulation of the Stokes flow problem.
     // The strong form can be found at https://en.wikipedia.org/wiki/Stokes_flow
     formulation viscousflow;
 
-    viscousflow += integral(fluid, predefinedstokesflow(dof(v), tf(v), dof(p), tf(p), mu, rho, 0, 0) );	
+    viscousflow += integral(fluid, predefinedstokes(dof(v), tf(v), dof(p), tf(p), mu, rho, 0, 0) );	
     
     // Generate, solve and save:
     solve(viscousflow);
