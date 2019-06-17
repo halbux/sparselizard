@@ -47,7 +47,7 @@ void sparselizard(void)
     // Define the weak formulation for time-dependent incompressible laminar flow:
     formulation laminarflow;
     
-    laminarflow += integral(fluid, predefinedlaminarflow(dof(v), tf(v), v, dof(p), tf(p), mu, rho, 0, 0, true) );
+    laminarflow += integral(fluid, predefinednavierstokes(dof(v), tf(v), v, dof(p), tf(p), mu, rho, 0, 0, true) );
     
     // Define the object for an implicit Euler time resolution.
     // An all zero initial guess for the fields and their time derivative is set with 'vec(laminarflow)'.

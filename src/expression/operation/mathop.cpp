@@ -1021,20 +1021,20 @@ expression mathop::predefinedmagnetostaticforce(std::vector<expression> dxyztfu,
 	return predefinedelectrostaticforce(dxyztfu, H, mu);
 }
 
-expression mathop::predefinedstokesflow(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
+expression mathop::predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
     if (problemdimension < 2)
     {
-        std::cout << "Error in 'mathop' namespace: 'predefinedstokesflow' is only allowed on 2D and 3D geometries" << std::endl;
+        std::cout << "Error in 'mathop' namespace: 'predefinedstokes' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
     if (universe::isaxisymmetric)
         problemdimension++;
     if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstokesflow'" << std::endl;
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstokes'" << std::endl;
         abort();
     }
 
@@ -1046,20 +1046,20 @@ expression mathop::predefinedstokesflow(expression dofv, expression tfv, express
     return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) );
 }
 
-expression mathop::predefinedlaminarflow(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
+expression mathop::predefinednavierstokes(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
     if (problemdimension < 2)
     {
-        std::cout << "Error in 'mathop' namespace: 'predefinedlaminarflow' is only allowed on 2D and 3D geometries" << std::endl;
+        std::cout << "Error in 'mathop' namespace: 'predefinednavierstokes' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
     if (universe::isaxisymmetric)
         problemdimension++;
     if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || v.countcolumns() != 1 || v.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedlaminarflow'" << std::endl;
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
         abort();
     }
     
