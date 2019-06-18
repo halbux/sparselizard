@@ -6,7 +6,6 @@
 #ifndef RESOLUTION_H
 #define RESOLUTION_H
 
-#include "newmark.h"
 #include "eigenvalue.h"
 #include "genalpha.h"
 #include "impliciteuler.h"
