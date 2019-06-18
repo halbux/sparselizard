@@ -77,7 +77,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
     
     
     // Start the generalized alpha iteration:
-    std::cout << "Generalized alpha (af " << alphaf << ", am " << alpham << ", b " << beta << ", g " << gamma << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
+    std::cout << "Generalized alpha (b " << beta << ", g " << gamma << ", af " << alphaf << ", am " << alpham << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
     std::vector<std::vector<vec>> output(3, std::vector<vec>(outputsize));
     output[0][0] = u; output[1][0] = v; output[2][0] = a;
     
