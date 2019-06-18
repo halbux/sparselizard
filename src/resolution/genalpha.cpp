@@ -27,12 +27,9 @@ void genalpha::setparameter(double rinf)
         abort();  
     }
     
-    // Minimize low frequency dissipation:
     alphaf = rinf/(rinf+1.0);
     alpham = (2.0*rinf-1.0)/(rinf+1.0);
-    // Maximize high frequency dissipation:
     beta = 0.25*(1.0-alpham+alphaf)*(1.0-alpham+alphaf);
-    // Second order accuracy:
     gamma = 0.5-alpham+alphaf;
 }
 
