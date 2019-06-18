@@ -39,9 +39,9 @@ void sparselizard(void)
     // This is the weak formulation for electromagnetic waves in time:
     maxwell += integral(wholedomain, -curl(dof(E))*curl(tf(E)) - 1/(c*c)*dtdt(dof(E))*tf(E));
     
-    // Define the Newmark object to time-solve formulation 'maxwell' 
+    // Define the generalized alpha object to time-solve formulation 'maxwell' 
     // with initial all zero solution vectors 'vec(maxwell)'.
-    // The general system to solve with Newmark is M*dtdtx + C*dtx + K*x = b.
+    // The general system to solve in time is M*dtdtx + C*dtx + K*x = b.
     //
     // The last argument is a vector 'isconstant' telling if the:
     //
@@ -56,13 +56,13 @@ void sparselizard(void)
     // Setting properly the 'isconstant' vector can give a dramatic speedup
     // since it may avoid reassembling or allow reusing the LU factorisation.
     //
-    newmark nm(maxwell, vec(maxwell), vec(maxwell), vec(maxwell), {true, true, true, true});
+    genalpha ga(maxwell, vec(maxwell), vec(maxwell), vec(maxwell), {true, true, true, true});
     
-    // Run the Newmark time resolution from the time in the first argument
+    // Run the generalized alpha time resolution from the time in the first argument
     // to the time in the third argument by timesteps given as second argument.
     // The last argument is optional (default is 1). When set to an integer 'n'
     // only one every n timesteps is added to the output vector.
-    std::vector<vec> solvec = nm.runlinear(0, 0.05*1.0/freq, 20*1.0/freq, 2)[0];
+    std::vector<vec> solvec = ga.runlinear(0, 0.05*1.0/freq, 20*1.0/freq, 2)[0];
     
     // Now save all data in the 'solvec' vector (which contains the solution at every nth timestep).
     for (int ts = 0; ts < solvec.size(); ts++)
