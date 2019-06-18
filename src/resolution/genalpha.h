@@ -58,7 +58,6 @@ class genalpha
         
     public:
     
-        // Default parameters:
         genalpha(formulation formul, vec initdisplacement, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant = {false, false, false, false});
         
         // Manually specify all four parameters:
