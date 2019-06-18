@@ -8,6 +8,7 @@
 
 #include "newmark.h"
 #include "eigenvalue.h"
+#include "genalpha.h"
 #include "impliciteuler.h"
 
 class resolution
