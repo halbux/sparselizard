@@ -134,7 +134,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
                 leftmat.reuselu();
                 
                 matu = -K;
-                matv = (alphaf-1.0)*timestep*K-C;
+                matv = ((alphaf-1.0)*timestep)*K-C;
                 mata = ((1.0-alphaf)*(gamma-1.0)*timestep)*C+((1.0-alphaf)*(beta-0.5)*timestep*timestep)*K - alpham*M;
             }
             
