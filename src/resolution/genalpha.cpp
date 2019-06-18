@@ -64,9 +64,6 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, u|field(allfields[i]));
     
-    // Get all indexes at which the fields are constrained:
-    intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-    
     vec rhs; mat K, C, M, leftmat, matu, matv, mata;
     
     // Count the number of time steps to step through and the number of vectors to output:
@@ -150,6 +147,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             unextdirichlet.updateconstraints();
             vec anextdirichlet = (1.0-alpham)/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
+            intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
             densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
             // Here for the conditional constraints:
             intdensematrix condconstrainedindexes = (myformulation.getdofmanager()->getconditionalconstraintdata()).first;
