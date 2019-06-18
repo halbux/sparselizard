@@ -133,12 +133,12 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             // Reuse matrices when possible (including the LU decomposition):
             if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || timestepindex == 1)
             {
-                leftmat = (1.0-alpham)*M + (1.0-alphaf) * ( (gamma*timestep)*C + (beta*timestep*timestep)*K );
+                leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*timestep)*C + ((1.0-alphaf)*beta*timestep*timestep)*K;
                 leftmat.reuselu();
                 
                 matu = -K;
-                matv = -(1.0-alphaf)*timestep*K-C;
-                mata = (1.0-alphaf) * ( ((gamma-1.0)*timestep)*C+((beta-0.5)*timestep*timestep)*K ) - alpham*M;
+                matv = (alphaf-1.0)*timestep*K-C;
+                mata = ((1.0-alphaf)*(gamma-1.0)*timestep)*C+((1.0-alphaf)*(beta-0.5)*timestep*timestep)*K - alpham*M;
             }
             
             // Update the acceleration. 
