@@ -1,6 +1,6 @@
 // sparselizard - Copyright (C) 2017- A. Halbach
 //
-// Contributions kindly provided by R. Harouari.
+// Contributions kindly provided by R. Haouari.
 //
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
