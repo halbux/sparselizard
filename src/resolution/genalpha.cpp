@@ -148,7 +148,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             // displacement at the next time step:
             vec unextdirichlet(myformulation); 
             unextdirichlet.updateconstraints();
-            vec anextdirichlet = 1.0/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a );
+            vec anextdirichlet = (1.0-alpham)/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
             densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
             // Here for the conditional constraints:
