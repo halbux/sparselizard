@@ -13,7 +13,7 @@ impliciteuler::impliciteuler(formulation formul, vec xinit, vec dtxinit, std::ve
         isconstant = isrhskcconstant;
     if (isconstant.size() != 3)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a length 3 or empty vector as third argument" << std::endl;
+        std::cout << "Error in 'impliciteuler' object: expected a length 3 or empty vector as fourth argument" << std::endl;
         abort();  
     }
 }
