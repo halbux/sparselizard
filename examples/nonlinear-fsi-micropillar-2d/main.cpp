@@ -1,4 +1,4 @@
-// This code simulates the fluide structure interaction between an incompressible water 
+// This code simulates the fluid structure interaction between an incompressible water 
 // flow in a microchannel and a polyimide micropillar. The micropillar is modeled as 
 // an elastic structure. Small-strain geometric-nonlinearity is taken into account.
 // A monolithic fluid-structure coupling is used. 
