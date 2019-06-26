@@ -90,7 +90,7 @@ void sparselizard(void)
     double E = 1e6, nu = 0.3, rhos = 1420;
 
 
-    // Define the weak formulation for the fluid-structure interaction simulation:
+    // Define the weak formulation for the fluid-structure interaction:
     formulation fsi;
 
     // No-slip condition. Force the fluid flow at the interface to dt(u):
@@ -102,7 +102,7 @@ void sparselizard(void)
     fsi += integral(fluid, umesh, (   -mu*( grad((v))+transpose(grad(v)) )   ) * -normal(fsinterface) * tf(u,fsinterface) );
 
 
-    // Classical elasiticty with small-strain geometric-nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
+    // Classical elasticity with small-strain geometric-nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
     fsi += integral(solid, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0, "planestrain"));
     // Add the mechanic inertia terms:
     fsi += integral(solid, -rhos*dtdt(dof(u))*tf(u));
