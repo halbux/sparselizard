@@ -99,7 +99,7 @@ void sparselizard(void)
     // Argument 'umesh' means the term is calculated on the mesh deformed by umesh.
     fsi += integral(fsinterface, umesh, -normal(fsinterface) * p * tf(u) );
     // The gradient has to be calculated on the 2D fluid elements but test functions are only defined at the interface:
-    fsi += integral(fluid, umesh, (   -mu*( grad((v))+transpose(grad(v)) )   ) * -normal(fsinterface) * tf(u,fsinterface) );
+    fsi += integral(fluid, umesh, (   -mu*( grad(v)+transpose(grad(v)) )   ) * -normal(fsinterface) * tf(u,fsinterface) );
 
 
     // Classical elasticity with small-strain geometric-nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
