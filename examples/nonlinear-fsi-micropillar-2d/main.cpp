@@ -104,7 +104,7 @@ void sparselizard(void)
 
     // Classical elasticity with small-strain geometric-nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
     fsi += integral(solid, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0, "planestrain"));
-    // Add the mechanic inertia terms:
+    // Add the mechanic inertia term:
     fsi += integral(solid, -rhos*dtdt(dof(u))*tf(u));
 
     // Define the weak formulation for time-dependent incompressible laminar flow:
@@ -112,7 +112,7 @@ void sparselizard(void)
 
 
     // Define the object for a generalized alpha time resolution (default parameters leads to Newmark).
-    // An all zero initial guess for the fields and their time derivatives is set with 'vec(laminarflow)'.
+    // An all zero initial guess for the fields and their time derivatives is set with 'vec(fsi)'.
     genalpha ga(fsi, vec(fsi), vec(fsi), vec(fsi));
     // Set the relative tolerance on the inner nonlinear iteration:
     ga.settolerance(1e-4);
