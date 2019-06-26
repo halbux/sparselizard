@@ -57,7 +57,7 @@ void sparselizard(void)
     // Force a y-parabolic inflow velocity in the x direction increasing linearly over time at the inlet.
     // The channel height is h [m].
     double h = 120e-6;
-    v.setconstraint(inlet, array2x1(   0.07 *4.0/(h*h)*y*(h-y) * t() , 0));
+    v.setconstraint(inlet, array2x1(   0.1 *4.0/(h*h)*y*(h-y) * t() , 0));
     // Set a 0 relative pressure [Pa] at the outlet:
     p.setconstraint(outlet);
 
@@ -121,7 +121,7 @@ void sparselizard(void)
     ga.postsolve({laplacian});
 
     // Run in time from 0 to 1 sec by steps of 200 ms:
-    std::vector<vec> sols = ga.runnonlinear(0, 0.2, 1)[0];
+    std::vector<vec> sols = ga.runnonlinear(0, 0.1, 0.4)[0];
 
     for (int i = 0; i < sols.size(); i++)
     {
@@ -144,7 +144,7 @@ void sparselizard(void)
     std::cout << "Max pillar deflection: " << umax*1e6 << " um" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 9.78323e-06 && umax > 9.78321e-06);
+    std::cout << (umax < 10.0392e-06 && umax > 10.0390e-06);
 }
 
 int main(void)
