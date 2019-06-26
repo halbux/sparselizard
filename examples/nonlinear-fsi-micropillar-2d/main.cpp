@@ -90,7 +90,7 @@ void sparselizard(void)
     double E = 1e6, nu = 0.3, rhos = 1420;
 
 
-    // Define the weak formulation for the fluid structure interface simulation:
+    // Define the weak formulation for the fluid-structure interaction simulation:
     formulation fsi;
 
     // No-slip condition. Force the fluid flow at the interface to dt(u):
