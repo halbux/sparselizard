@@ -52,7 +52,7 @@ void sparselizard(void)
     field v("h1xy"), p("h1"), u("h1xy"), umesh("h1xy"), y("y");
 
     // Force a no-slip (0 velocity) condition on the non-moving walls:
-    v.setconstraint(fsinterface); v.setconstraint(sides);
+    v.setconstraint(sides);
 
     // Force a y-parabolic inflow velocity in the x direction increasing linearly over time at the inlet.
     // The channel height is h [m].
