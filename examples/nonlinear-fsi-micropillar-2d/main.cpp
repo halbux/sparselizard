@@ -1,3 +1,5 @@
+// STATUS: in validation phase, do not use before this line is removed
+
 // This code simulates the fluid-structure interaction between an incompressible water 
 // flow in a microchannel and a polyimide micropillar. The micropillar is modeled as 
 // an elastic structure. Small-strain geometric-nonlinearity is taken into account.
