@@ -7,7 +7,7 @@
 // a zero pressure is imposed at the outlet.
 //
 //
-// The microchannel geometry is as follows (l = 320 um, h = 120 um):
+// The microchannel geometry is as follows (l = 350 um, h = 120 um):
 //
 //                             l
 //      <---------------------------------------------->
