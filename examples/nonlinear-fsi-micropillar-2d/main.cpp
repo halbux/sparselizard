@@ -97,7 +97,7 @@ void sparselizard(void)
     // Define the weak formulation for the fluid-structure interaction:
     formulation fsi;
 
-    // No-slip condition. Force the fluid flow at the interface to dt(u):
+    // No-slip condition. Force the fluid flow at the fluid-structure interface to dt(u):
     v.setconstraint(fsinterface, dt(u));
     // Add the force term applied by the fluid flow on the pillar (minus sign needed because the normal points outwards to the pillar).
     // Argument 'umesh' means the term is calculated on the mesh deformed by umesh.
