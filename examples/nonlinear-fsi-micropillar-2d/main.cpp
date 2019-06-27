@@ -99,7 +99,7 @@ void sparselizard(void)
 
     // No-slip condition. Force the fluid flow at the fluid-structure interface to dt(u):
     v.setconstraint(fsinterface, dt(u));
-    // Add the force term applied by the fluid flow on the pillar (minus sign needed because the normal points outwards to the pillar).
+    // Add the force term applied by the fluid flow on the pillar (minus sign needed because the normal points outwards to the pillars).
     // Argument 'umesh' means the term is calculated on the mesh deformed by umesh.
     fsi += integral(fsinterface, umesh, -normal(fsinterface) * p * tf(u) );
     
