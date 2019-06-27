@@ -65,7 +65,7 @@ void sparselizard(void)
     // Set a 0 relative pressure [Pa] at the outlet:
     p.setconstraint(outlet);
 
-    // The flag is clamped at the pillar bottom:
+    // The pillars are clamped at their bottom side:
     u.setconstraint(clamp);
 
 
