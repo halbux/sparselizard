@@ -2,6 +2,7 @@
 // STATUS UPDATE 27/06: 10% DIFFERENCE VS WHAT DEFLECTION SHOULD BE :(
 // STATUS UPDATE 27/06: CAUSE IDENTIFIED, VISCOUS FORCES ON INTERFACE NOT COMPUTED CORRECTLY DUE TO NORMAL EVALUATION ON SURFACE AND NOT JUST LINE
 // AFTER CORRECTION OF VISCOUS FORCE RESULTS SEEM TO BE CORRECT: NEXT STEPS: CLEAN REWRITE+ CAREFUL VALIDATION
+// STATUS: CORRECTED BUT NOT 100% SATISFIED WITH IMPLEMENTATION READABILITY + TO BE CAREFULLY VALIDATED
 
 // This code simulates the fluid-structure interaction between an incompressible water 
 // flow in a microchannel and a polyimide micropillar. The micropillar is modeled as 
@@ -103,8 +104,17 @@ void sparselizard(void)
     // Add the force term applied by the fluid flow on the pillar (minus sign needed because the normal points outwards to the pillar).
     // Argument 'umesh' means the term is calculated on the mesh deformed by umesh.
     fsi += integral(fsinterface, umesh, -normal(fsinterface) * p * tf(u) );
-    // The gradient has to be calculated on the 2D fluid elements but test functions are only defined at the interface:
-    fsi += integral(fluid, umesh, (   -mu*( grad(v)+transpose(grad(v)) )   ) * -normal(fsinterface) * tf(u,fsinterface) );
+    
+    // The fluid velocity gradient has to be calculated on the 2D fluid elements first before being added as load to the interface elements.
+    expression viscousforcetensor = mu*( grad(v)+transpose(grad(v)) );
+    // Project each of its rows on a field to store the evaluated value. Only define degrees of freedom at the interface.
+    field row1("h1xy"), row2("h1xy");
+    row1.setorder(fluid, 2); row2.setorder(fluid, 2);
+    fsi += integral(fluid, umesh, dof(row1, fsinterface)*tf(row1, fsinterface) - compx(viscousforcetensor)*tf(row1, fsinterface));
+    fsi += integral(fluid, umesh, dof(row2, fsinterface)*tf(row2, fsinterface) - compy(viscousforcetensor)*tf(row2, fsinterface));
+    
+    // Use the fields as the viscous force tensor calculated on the fluid elements:
+    fsi += integral(fsinterface, umesh, array2x1(dof(row1)*normal(fsinterface), dof(row2)*normal(fsinterface)) * tf(u) );
 
 
     // Classical elasticity with small-strain geometric-nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
@@ -126,7 +136,7 @@ void sparselizard(void)
     ga.postsolve({laplacian});
 
     // Run in time from 0 to 1 sec by steps of 200 ms:
-    std::vector<vec> sols = ga.runnonlinear(0, 0.1, 0.4)[0];
+    std::vector<vec> sols = ga.runnonlinear(0, 0.1, 0.3)[0];
 
     for (int i = 0; i < sols.size(); i++)
     {
@@ -149,7 +159,7 @@ void sparselizard(void)
     std::cout << "Max pillar deflection: " << umax*1e6 << " um" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 10.0392e-06 && umax > 10.0390e-06);
+    std::cout << (umax < 8.7115e-06 && umax > 8.7113e-06);
 }
 
 int main(void)
