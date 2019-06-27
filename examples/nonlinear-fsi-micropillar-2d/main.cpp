@@ -115,7 +115,7 @@ void sparselizard(void)
     fsi += integral(fsinterface, umesh, array2x1(dof(row1)*normal(fsinterface), dof(row2)*normal(fsinterface)) * tf(u) );
 
 
-    // Classical elasticity with small-strain geometric-nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
+    // Classical elasticity with small-strain geometric nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
     fsi += integral(solid, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0, "planestrain"));
     // Add the mechanic inertia term:
     fsi += integral(solid, -rhos*dtdt(dof(u))*tf(u));
@@ -133,7 +133,7 @@ void sparselizard(void)
     // A Laplace resolution is solved in the inner nonlinear loop of the gen alpha time resolution for mesh smoothing:
     ga.postsolve({laplacian});
 
-    // Run in time from 0 to 1 sec by steps of 200 ms:
+    // Run in time from 0 to 0.3 sec by steps of 100 ms:
     std::vector<vec> sols = ga.runnonlinear(0, 0.1, 0.3)[0];
 
     for (int i = 0; i < sols.size(); i++)
