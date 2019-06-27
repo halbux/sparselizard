@@ -1,8 +1,5 @@
-// STATUS: in validation phase, do not use before this line is removed
-// STATUS UPDATE 27/06: 10% DIFFERENCE VS WHAT DEFLECTION SHOULD BE :(
-// STATUS UPDATE 27/06: CAUSE IDENTIFIED, VISCOUS FORCES ON INTERFACE NOT COMPUTED CORRECTLY DUE TO NORMAL EVALUATION ON SURFACE AND NOT JUST LINE
-// AFTER CORRECTION OF VISCOUS FORCE RESULTS SEEM TO BE CORRECT: NEXT STEPS: CLEAN REWRITE+ CAREFUL VALIDATION
-// STATUS: CORRECTED BUT NOT 100% SATISFIED WITH IMPLEMENTATION READABILITY + TO BE CAREFULLY VALIDATED
+// STATUS: almost validated, up to > 30 degrees pillar tilt, match better than 1% on peak deflection
+// NEXT STEPS: cleaning code a little + validating with 4 significant digits
 
 // This code simulates the fluid-structure interaction between an incompressible water 
 // flow in a microchannel and a polyimide micropillar. The micropillar is modeled as 
