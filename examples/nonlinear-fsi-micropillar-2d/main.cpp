@@ -4,7 +4,8 @@
 // This code simulates the fluid-structure interaction between an incompressible water 
 // flow in a microchannel and two polyimide micropillars. The micropillars are modeled as 
 // an elastic structure. Small-strain geometric-nonlinearity is taken into account.
-// A monolithic fluid-structure coupling is used. 
+// A monolithic fluid-structure coupling is used. A smooth mesh deformation is obtained
+// by solving a Laplace formulation.
 //
 // A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
