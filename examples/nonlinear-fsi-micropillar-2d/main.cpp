@@ -2,8 +2,8 @@
 // NEXT STEPS: cleaning code a little + validating with 4 significant digits
 
 // This code simulates the fluid-structure interaction between an incompressible water 
-// flow in a microchannel and two polyimide micropillars. The micropillars are modeled as 
-// elastic structures. Small-strain geometric nonlinearity is taken into account.
+// flow in a microchannel and two micropillars. The micropillars are modeled as elastic 
+// structures. Small-strain geometric nonlinearity is taken into account.
 // A monolithic fluid-structure coupling is used. A smooth mesh deformation is obtained
 // by solving a Laplace formulation.
 //
@@ -91,7 +91,7 @@ void sparselizard(void)
     double mu = 8.9e-4, rhof = 1000;
 
     // Mechanical properties. Young's modulus E [Pa], Poisson's ratio nu [] and the density rho [kg/m3]:
-    double E = 1e6, nu = 0.3, rhos = 1420;
+    double E = 1e6, nu = 0.3, rhos = 2000;
 
 
     // Define the weak formulation for the fluid-structure interaction:
