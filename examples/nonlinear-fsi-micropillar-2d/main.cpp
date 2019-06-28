@@ -1,4 +1,4 @@
-// STATUS: almost validated, up to > 30 degrees pillar tilt, match better than 1% on peak deflection
+// STATUS: almost validated, match better than 1% on peak deflection
 // NEXT STEPS: cleaning code a little + validating with 4 significant digits
 
 // This code simulates the fluid-structure interaction between an incompressible water 
@@ -105,11 +105,11 @@ void sparselizard(void)
     
     // The fluid velocity gradient has to be calculated on the 2D fluid elements first before being added as load to the interface elements.
     expression viscousforcetensor = mu*( grad(v)+transpose(grad(v)) );
-    // Project each of its rows on a field to store the evaluated value. Only define degrees of freedom at the interface.
+    // Project each of its rows on a field to store the evaluated value.
     field row1("h1xy"), row2("h1xy");
     row1.setorder(fluid, 2); row2.setorder(fluid, 2);
-    fsi += integral(fluid, umesh, dof(row1, fsinterface)*tf(row1, fsinterface) - compx(viscousforcetensor)*tf(row1, fsinterface));
-    fsi += integral(fluid, umesh, dof(row2, fsinterface)*tf(row2, fsinterface) - compy(viscousforcetensor)*tf(row2, fsinterface));
+    fsi += integral(fluid, umesh, dof(row1)*tf(row1) - compx(viscousforcetensor)*tf(row1));
+    fsi += integral(fluid, umesh, dof(row2)*tf(row2) - compy(viscousforcetensor)*tf(row2));
     
     // Use the fields as the viscous force tensor calculated on the fluid elements:
     fsi += integral(fsinterface, umesh, array2x1(dof(row1)*normal(fsinterface), dof(row2)*normal(fsinterface)) * tf(u) );
@@ -157,7 +157,7 @@ void sparselizard(void)
     std::cout << "Max pillar deflection: " << umax*1e6 << " um" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 8.7115e-06 && umax > 8.7113e-06);
+    std::cout << (umax < 8.35484e-06 && umax > 8.35482e-06);
 }
 
 int main(void)
