@@ -1,5 +1,8 @@
 // STATUS: almost validated, match better than 1% on peak deflection
 // NEXT STEPS: cleaning code a little + validating with 4 significant digits
+//
+// WARNING: THIS RESOLUTION INCLUDES 3X MORE UNKNOWNS THAN NEEDED AND RUNS SLOW FOR NOW
+// A FUNCTION TO AVOID THE NEED OF THESE 3X UNKNOWNS WILL SOON BE ADDED!!!!!!!!!!
 
 // This code simulates the fluid-structure interaction between an incompressible water 
 // flow in a microchannel and two micropillars. The micropillars are modeled as elastic 
