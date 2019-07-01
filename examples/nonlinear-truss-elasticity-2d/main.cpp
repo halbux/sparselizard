@@ -10,7 +10,7 @@ using namespace mathop;
 
 void sparselizard(void)
 {	
-    // The domain regions as defined in 'disk.geo':
+    // The domain regions as defined in 'truss2d.geo':
     int solid = 1, clamp = 2, load = 3;
 
     // Load the GMSH 4 format mesh with the petsc loader:
