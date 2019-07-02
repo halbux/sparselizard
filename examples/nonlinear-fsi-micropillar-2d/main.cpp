@@ -1,5 +1,3 @@
-// WORK IN PROGRESS, DO NOT USE UNTIL THE WARNING HEADER IS REMOVED, VALIDATION PENDING
-//
 // WARNING: THIS RESOLUTION INCLUDES 3X MORE UNKNOWNS THAN NEEDED AND RUNS SLOW FOR NOW
 // A FUNCTION TO AVOID THE NEED OF THESE 3X UNKNOWNS WILL SOON BE ADDED!!!!!!!!!!
 
@@ -7,7 +5,7 @@
 // flow in a microchannel and two micropillars. The micropillars are modeled as elastic 
 // structures. Small-strain geometric nonlinearity is taken into account.
 // A monolithic fluid-structure coupling is used. A smooth mesh deformation is obtained
-// by solving a Laplace formulation.
+// by solving a Laplace formulation. Alternatively an ALE resolution can be used.
 //
 // A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
@@ -60,10 +58,10 @@ void sparselizard(void)
     // Force a no-slip (0 velocity) condition on the non-moving walls:
     v.setconstraint(sides);
 
-    // Force a y-parabolic inflow velocity in the x direction increasing linearly over time at the inlet.
+    // Force a y-parabolic inflow velocity in the x direction at the inlet.
     // The channel height is h [m].
     double h = 120e-6;
-    v.setconstraint(inlet, array2x1(   0.1 *4.0/(h*h)*y*(h-y) * t() , 0));
+    v.setconstraint(inlet, array2x1( 0.03 * 4.0/(h*h)*y*(h-y), 0));
     // Set a 0 relative pressure [Pa] at the outlet:
     p.setconstraint(outlet);
 
@@ -99,8 +97,8 @@ void sparselizard(void)
     // Define the weak formulation for the fluid-structure interaction:
     formulation fsi;
 
-    // No-slip condition. Force the fluid flow at the fluid-structure interface to dt(u):
-    v.setconstraint(fsinterface, dt(u));
+    // No-slip condition. Force the fluid flow at the fluid-structure interface to zero:
+    v.setconstraint(fsinterface);
     // Add the force term applied by the fluid flow on the pillar (minus sign needed because the normal points outwards to the pillars).
     // Argument 'umesh' means the term is calculated on the mesh deformed by umesh.
     fsi += integral(fsinterface, umesh, -normal(fsinterface) * p * tf(u) );
@@ -119,47 +117,32 @@ void sparselizard(void)
 
     // Classical elasticity with small-strain geometric nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
     fsi += integral(solid, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0, "planestrain"));
-    // Add the mechanic inertia term:
-    fsi += integral(solid, -rhos*dtdt(dof(u))*tf(u));
 
-    // Define the weak formulation for time-dependent incompressible laminar flow:
-    fsi += integral(fluid, umesh, predefinednavierstokes(dof(v), tf(v), v, dof(p), tf(p), mu, rhof, 0, 0, true) );
+    // Define the weak formulation for time-independent incompressible laminar flow:
+    fsi += integral(fluid, umesh, predefinednavierstokes(dof(v), tf(v), v, dof(p), tf(p), mu, rhof, 0, 0, false) );
 
 
-    // Define the object for a generalized alpha time resolution (default parameters leads to Newmark).
-    // An all zero initial guess for the fields and their time derivatives is set with 'vec(fsi)'.
-    genalpha ga(fsi, vec(fsi), vec(fsi), vec(fsi));
-    // Set the relative tolerance on the inner nonlinear iteration:
-    ga.settolerance(1e-4);
-
-    // A Laplace resolution is solved in the inner nonlinear loop of the gen alpha time resolution for mesh smoothing:
-    ga.postsolve({laplacian});
-
-    // Run in time from 0 to 0.3 sec by steps of 100 ms:
-    std::vector<vec> sols = ga.runnonlinear(0, 0.1, 0.3)[0];
-
-    for (int i = 0; i < sols.size(); i++)
+    double uprev, umax = 1;
+    while (std::abs(umax-uprev)/std::abs(umax) > 1e-6)
     {
-        // Transfer the solution at the ith timestep to the fields:
-        v.setdata(fluid, sols[i]);
-        u.setdata(solid, sols[i]);
-
-        // Saving the velocity field on the deformed geometry requires the smoothed umesh field. 
-        // It must be recalculated based on the current u (made available after the u.setdata call).
+        // Solve the fluid-structure interaction formulation and the Laplace formulation to smooth the mesh. 
+        // The fields are updated in the 'solve' call.
+        solve(fsi);
         solve(laplacian);
-
-        // Write the fields to ParaView .vtk format:
-        u.write(solid, "u" + std::to_string(1000 + i) + ".vtk", 2);
-        // Write v on the deformed mesh:
-        v.write(fluid, umesh, "v" + std::to_string(1000 + i) + ".vtk", 2);
+        
+        // Output the max pillar deflection:
+        uprev = umax; 
+        umax = norm(u).max(solid, 5)[0];
+        std::cout << "Max pillar deflection (relative change): " << umax*1e6 << " um (" << std::abs(umax-uprev)/std::abs(umax) << ")" << std::endl;
     }
-
-    // Output the max pillar deflection:
-    double umax = norm(u).max(solid, 5)[0];
-    std::cout << "Max pillar deflection: " << umax*1e6 << " um" << std::endl;
+    
+    // Write the fields to ParaView .vtk format:
+    u.write(solid, "u.vtk", 2);
+    // Write v on the deformed mesh:
+    v.write(fluid, umesh, "v.vtk", 2);
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 8.35484e-06 && umax > 8.35482e-06);
+    std::cout << (umax < 8.35682e-06 && umax > 8.35680e-06);
 }
 
 int main(void)
