@@ -5,7 +5,8 @@
 // flow in a microchannel and two micropillars. The micropillars are modeled as elastic 
 // structures. Small-strain geometric nonlinearity is taken into account.
 // A monolithic fluid-structure coupling is used. A smooth mesh deformation is obtained
-// by solving a Laplace formulation. Alternatively an ALE resolution can be used.
+// by solving a Laplace formulation. 
+// ALE can be used as an alternative to solve this FSI problem.
 //
 // A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
