@@ -1,6 +1,3 @@
-// WARNING: THIS RESOLUTION INCLUDES 3X MORE UNKNOWNS THAN NEEDED AND RUNS SLOW FOR NOW
-// A FUNCTION TO AVOID THE NEED OF THESE 3X UNKNOWNS WILL SOON BE ADDED!!!!!!!!!!
-
 // This code simulates the fluid-structure interaction between an incompressible water 
 // flow in a microchannel and two micropillars. The micropillars are modeled as elastic 
 // structures. Small-strain geometric nonlinearity is taken into account.
@@ -40,14 +37,13 @@ void sparselizard(void)
     // The domain regions as defined in 'fsimicropillar.geo':
     int fluid = 1, solid = 2, inlet = 3, outlet = 4, sides = 5, clamp = 6;
 
-    // The mesh can be curved!
+    // Load the mesh file (the mesh can be curved):
     mesh mymesh("fsimicropillar.msh");
 
-    // Define the fluid-solid interface:
+    // Define the fluid-structure interface:
     int fsinterface = regionintersection({fluid, solid});
-    int boundary = regionunion({inlet,outlet,sides});
 
-    // Confirm that the normal at the interface is pointing out of the pillar:
+    // Confirm that the normal at the interface is pointing outwards of the pillar:
     normal(fsinterface).write(fsinterface, "normal.pos");
 
 
@@ -58,6 +54,8 @@ void sparselizard(void)
 
     // Force a no-slip (0 velocity) condition on the non-moving walls:
     v.setconstraint(sides);
+    // Force the fluid flow at the fluid-structure interface to zero (no-slip condition for static simulation, dt(u) = 0):
+    v.setconstraint(fsinterface);
 
     // Force a y-parabolic inflow velocity in the x direction at the inlet.
     // The channel height is h [m].
@@ -78,7 +76,7 @@ void sparselizard(void)
 
     // Mesh deformation field umesh is forced to 0 on the fluid boundary, 
     // to u on the solid and smoothed with a Laplace formulation in the fluid.
-    umesh.setconstraint(boundary); umesh.setconstraint(solid, u);
+    umesh.setconstraint(regionunion({inlet,outlet,sides})); umesh.setconstraint(solid, u);
 
     // Classical Laplace formulation for each component:
     formulation laplacian;
@@ -94,40 +92,43 @@ void sparselizard(void)
     // Mechanical properties. Young's modulus E [Pa], Poisson's ratio nu [] and the density rho [kg/m3]:
     double E = 1e6, nu = 0.3, rhos = 2000;
 
+    
+    // Calculate the viscous force tensor on the mesh deformed by field 'umesh'. The fluid velocity gradient 
+    // has to be calculated on the 2D fluid elements first before being added as load to the fsi formulation.
+    expression viscousforcetensor = mu*( grad(v) + transpose(grad(v)) );
+    // Project each of the tensor entries to a field (use default order 1 interpolation, set to 2 for even more accuracy).
+    field vft00("h1"), vft01("h1"), vft10("h1"), vft11("h1");
+    
+    formulation vftf00, vftf01, vftf10, vftf11;
+    
+    vftf00 += integral(fluid, umesh, dof(vft00)*tf(vft00) - entry(0,0,viscousforcetensor)*tf(vft00));
+    vftf01 += integral(fluid, umesh, dof(vft01)*tf(vft01) - entry(0,1,viscousforcetensor)*tf(vft01));
+    vftf10 += integral(fluid, umesh, dof(vft10)*tf(vft10) - entry(1,0,viscousforcetensor)*tf(vft10));
+    vftf11 += integral(fluid, umesh, dof(vft11)*tf(vft11) - entry(1,1,viscousforcetensor)*tf(vft11));
+    
+    // Define the whole projected viscous force tensor for convenience:
+    expression projectedviscousforcetensor = array2x2(vft00,vft01,vft10,vft11);
+    
 
     // Define the weak formulation for the fluid-structure interaction:
     formulation fsi;
-
-    // No-slip condition. Force the fluid flow at the fluid-structure interface to zero (since it is a static simulation dt(u) = 0):
-    v.setconstraint(fsinterface);
-    // Add the force term applied by the fluid flow on the pillar (minus sign needed because the normal points outwards to the pillars).
-    // Argument 'umesh' means the term is calculated on the mesh deformed by umesh.
-    fsi += integral(fsinterface, umesh, -normal(fsinterface) * p * tf(u) );
     
-    // The fluid velocity gradient has to be calculated on the 2D fluid elements first before being added as load to the interface elements.
-    expression viscousforcetensor = mu*( grad(v)+transpose(grad(v)) );
-    // Project each of its rows on a field to store the evaluated value.
-    field row1("h1xy"), row2("h1xy");
-    row1.setorder(fluid, 2); row2.setorder(fluid, 2);
-    fsi += integral(fluid, umesh, dof(row1)*tf(row1) - compx(viscousforcetensor)*tf(row1));
-    fsi += integral(fluid, umesh, dof(row2)*tf(row2) - compy(viscousforcetensor)*tf(row2));
-    
-    // Use the fields as the viscous force tensor calculated on the fluid elements:
-    fsi += integral(fsinterface, umesh, array2x1(dof(row1)*normal(fsinterface), dof(row2)*normal(fsinterface)) * tf(u) );
-
-
-    // Classical elasticity with small-strain geometric nonlinearity (obtained with the extra u argument). Update argument 0.0 for prestress.
+    // Classical elasticity with small-strain geometric nonlinearity (obtained with the extra u argument). Update argument 0.0 to add prestress.
     fsi += integral(solid, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0, "planestrain"));
 
-    // Define the weak formulation for time-independent incompressible laminar flow:
+    // Define the weak formulation for time-independent incompressible laminar flow (on the mesh deformed by 'umesh'):
     fsi += integral(fluid, umesh, predefinednavierstokes(dof(v), tf(v), v, dof(p), tf(p), mu, rhof, 0, 0, false) );
+
+    // Add the hydrodynamic load pI - mu*( grad(v) + transpose(grad(v)) ) normal to the FSI interface (on the mesh deformed by 'umesh'):
+    fsi += integral(fsinterface, umesh, ( p * -normal(fsinterface) - projectedviscousforcetensor * -normal(fsinterface) ) * tf(u) );
 
 
     double uprev, umax = 1;
     while (std::abs(umax-uprev)/std::abs(umax) > 1e-6)
     {
-        // Solve the fluid-structure interaction formulation and the Laplace formulation to smooth the mesh. 
-        // The fields are updated in the 'solve' call.
+        // Project the viscous force tensor entries then solve the fluid-structure interaction formulation 
+        // and the Laplace formulation to smooth the mesh. The fields are updated in each 'solve' call.
+        solve({vftf00,vftf01,vftf10,vftf11});
         solve(fsi);
         solve(laplacian);
         
@@ -136,14 +137,14 @@ void sparselizard(void)
         umax = norm(u).max(solid, 5)[0];
         std::cout << "Max pillar deflection (relative change): " << umax*1e6 << " um (" << std::abs(umax-uprev)/std::abs(umax) << ")" << std::endl;
     }
-    
+
     // Write the fields to ParaView .vtk format:
     u.write(solid, "u.vtk", 2);
     // Write v on the deformed mesh:
     v.write(fluid, umesh, "v.vtk", 2);
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 8.35682e-06 && umax > 8.35680e-06);
+    std::cout << (umax < 8.34643e-06 && umax > 8.34641e-06);
 }
 
 int main(void)
