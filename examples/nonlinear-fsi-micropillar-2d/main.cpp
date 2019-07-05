@@ -43,7 +43,7 @@ void sparselizard(void)
     // Define the fluid-structure interface:
     int fsinterface = regionintersection({fluid, solid});
 
-    // Confirm that the normal at the interface is pointing outwards of the pillar:
+    // Confirm that the normal at the interface is pointing outwards to the pillars:
     normal(fsinterface).write(fsinterface, "normal.pos");
 
 
