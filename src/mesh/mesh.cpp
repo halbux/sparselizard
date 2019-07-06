@@ -3,14 +3,20 @@
 
 void mesh::readfromfile(std::string name)
 {
-	if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
-		gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
-    else
+    if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
     {
-        std::cout << "Error: file '" << name << "' cannot be read by the legacy mesh reader." << std::endl;
-        std::cout << "Use the petsc mesh reader instead or use the GMSH .msh format." << std::endl;
-        abort();
-	}
+        gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
+        return;	
+    }
+    if (name.length() >= 5 && name.compare(name.size()-4,4,".nas") == 0)
+    {
+        nastraninterface::readfromfile(name, mynodes, myelements, myphysicalregions);
+        return;	
+    }
+
+    std::cout << "Error: file '" << name << "' cannot be read by the legacy mesh reader." << std::endl;
+    std::cout << "Use the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
+    abort();
 }
 
 void mesh::writetofile(std::string name)
