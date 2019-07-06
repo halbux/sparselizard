@@ -39,6 +39,7 @@ class mystring
         void jumptonextwhitespace(void);
         
         // Similar to 'getstringtonextwhitespace'.
+        std::string getstringtonextcomma(void);
         std::string getstringwhileletter(void);
 	
 };

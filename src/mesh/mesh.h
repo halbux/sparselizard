@@ -19,6 +19,7 @@
 #include "wallclock.h"
 #include "physicalregion.h"
 #include "gmshinterface.h"
+#include "nastraninterface.h"
 #include "element.h"
 #include <memory>
 #include "shape.h"

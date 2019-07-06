@@ -40,6 +40,17 @@ void mystring::jumptonextwhitespace(void)
 	stringindex = stringindex + 1;	
 }
 
+std::string mystring::getstringtonextcomma(void)
+{
+    int indexbackup = stringindex;
+	while (stringindex < stringtoprocess.length() && stringtoprocess[stringindex] != ',')
+        stringindex = stringindex + 1;
+    
+	stringindex = stringindex + 1;
+	
+	return stringtoprocess.substr(indexbackup, stringindex-indexbackup-1);
+}
+
 std::string mystring::getstringwhileletter(void)
 {
     int indexbackup = stringindex;
