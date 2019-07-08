@@ -40,6 +40,7 @@ class mystring
         
         // Similar to 'getstringtonextwhitespace'.
         std::string getstringtonextcomma(void);
+	
         std::string getstringwhileletter(void);
 	
 };
