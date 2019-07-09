@@ -35,7 +35,7 @@ PETSC_ARCH=arch-darwin-c-opt;
 fi
 
 # The configuration below does not add support for additional mesh formats but does not require mpi.
-./configure --with-mpi=0 --with-mumps-serial=1 --download-mumps=1 --download-openblas --with-debugging=0 --with-scalar-type=real COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
+./configure --with-mpi=0 --with-mumps-serial=1 --download-mumps --download-openblas --download-slepc --with-debugging=0 --with-scalar-type=real COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
 
 # The configuration below adds support for .exo and .med mesh formats (mpi is needed and it is therefore added to the configuration options).
 # Support for cgns can be added by manually installing cgns then providing the cgns folder to petsc.
@@ -44,7 +44,7 @@ fi
 # --> INSTALL CMAKE, AUTOTOOLS AND AUTOCONF BEFORE RUNNING THE CONFIGURE COMMAND BELOW  (on Ubuntu type: sudo apt-get install cmake autotools-dev autoconf)
 # --> IN THE MAKEFILE REMOVE '-I ~/SLlibs/petsc/include/petsc/mpiuni' (otherwise the wrong mpi.h header is selected during make) 
 #
-#./configure --download-mpich --download-mumps --download-scalapack --download-openblas --download-med --download-hdf5 --download-zlib --download-netcdf --download-pnetcdf --download-exodusii --with-scalar-type=real --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
+#./configure --download-mpich --download-mumps --download-scalapack --download-openblas --download-slepc --download-med --download-hdf5 --download-zlib --download-netcdf --download-pnetcdf --download-exodusii --with-scalar-type=real --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
 
 
 ########## COMPILE PETSC :
