@@ -13,14 +13,6 @@ mkdir ~/SLlibs;
 cd ~/SLlibs;
 
 
-echo '';
-echo 'Support for additional mesh formats can be added by editing this file and set the appropriate petsc configuration options.';
-echo 'WARNING: This requires a petsc configuration that takes longer and might in some cases need to be tuned to your system.';
-echo '';
-echo -n 'Press enter to continue without editing... ';
-read enterkey;
-
-
 ########## DOWNLOAD PETSC :
 
 echo '__________________________________________';
