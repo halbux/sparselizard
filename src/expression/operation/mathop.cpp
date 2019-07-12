@@ -193,6 +193,9 @@ expression mathop::sqrt(expression input) { return pow(input, 0.5); }
 expression mathop::log10(expression input) { return input.log10(); }
 expression mathop::pow(expression base, expression exponent) { return base.pow(exponent); }
 
+expression mathop::on(int physreg, expression expr) { return expr.on(physreg, NULL); }
+expression mathop::on(int physreg, expression coordshift, expression expr) { return expr.on(physreg, &coordshift); }
+    
 expression mathop::comp(int selectedcomp, expression input) 
 { 
     std::vector<expression> mycomp(input.countcolumns());

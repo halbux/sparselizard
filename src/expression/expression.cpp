@@ -206,6 +206,12 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
 	}
 }
 
+expression::expression(std::shared_ptr<operation> input)
+{
+    mynumrows = 1; mynumcols = 1;
+    myoperations = {input};
+}
+
 expression expression::getrow(int rownum)
 {
 	if (rownum < 0 || rownum >= mynumrows)
@@ -1638,6 +1644,33 @@ expression expression::log10(void)
         log10expr.myoperations[i] = std::shared_ptr<oplog10>(new oplog10(myoperations[i]));
     
     return log10expr;
+}
+
+expression expression::on(int physreg, expression* coordshift)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    if (coordshift != NULL && (coordshift->countcolumns() != 1 || coordshift->countrows() < problemdimension))
+    {
+        std::cout << "Error in 'expression' object: coordinate shift expression has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        abort();
+    }
+
+    // Loop on all disjoint regions:
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+
+    // Make sure the 'coordshift' expression is constant in time:
+    if (coordshift != NULL && not(coordshift->isharmonicone(selecteddisjregs)))
+    {
+        std::cout << "Error in 'expression' object: the coordinate shift expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+
+    expression onexpr = *this;
+
+    for (int i = 0; i < mynumrows*mynumcols; i++)
+        onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i]));
+
+    return onexpr;
 }
 
 expression expression::time(void)
