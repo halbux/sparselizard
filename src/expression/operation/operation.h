@@ -144,6 +144,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opinvjac.h"
 #include "opjac.h"
 #include "oplog10.h"
+#include "opon.h"
 #include "opparameter.h"
 #include "oppower.h"
 #include "opproduct.h"

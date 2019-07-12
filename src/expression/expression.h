@@ -79,6 +79,9 @@ class expression
         // expression provided as third argument.
         expression(expression condexpr, expression exprtrue, expression exprfalse);
         
+        // Define a 1x1 expression from an operation:
+        expression(std::shared_ptr<operation>);
+        
         int countrows(void) { return mynumrows; };
         int countcolumns(void) { return mynumcols; };
         
@@ -189,6 +192,8 @@ class expression
         expression atan(void);
         expression abs(void);
         expression log10(void);
+        
+        expression on(int physreg, expression* coordshift);
         
         // The time variable:
         expression time(void);

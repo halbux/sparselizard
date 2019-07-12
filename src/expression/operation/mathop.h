@@ -79,6 +79,11 @@ namespace mathop
     expression log10(expression input);
     expression pow(expression base, expression exponent);
     
+    // Evaluate an expression on physical region 'physreg' using interpolation:
+    expression on(int physreg, expression expr);
+    // Interpolate at coordinates shifted by 'coordshift':
+    expression on(int physreg, expression coordshift, expression expr);
+    
     expression comp(int selectedcomp, expression input);
     expression compx(expression input);
     expression compy(expression input);
