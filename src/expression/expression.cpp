@@ -1655,16 +1655,6 @@ expression expression::on(int physreg, expression* coordshift)
         abort();
     }
 
-    // Loop on all disjoint regions:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
-
-    // Make sure the 'coordshift' expression is constant in time:
-    if (coordshift != NULL && not(coordshift->isharmonicone(selecteddisjregs)))
-    {
-        std::cout << "Error in 'expression' object: the coordinate shift expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
-    }
-
     expression onexpr = *this;
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
