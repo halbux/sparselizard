@@ -1651,7 +1651,7 @@ expression expression::on(int physreg, expression* coordshift)
     int problemdimension = universe::mymesh->getmeshdimension();
     if (coordshift != NULL && (coordshift->countcolumns() != 1 || coordshift->countrows() < problemdimension))
     {
-        std::cout << "Error in 'expression' object: coordinate shift expression argument in 'on' has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        std::cout << "Error in 'expression' object: coordinate shift argument in 'on' has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
     }
 
