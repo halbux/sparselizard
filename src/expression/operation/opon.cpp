@@ -134,12 +134,9 @@ std::shared_ptr<operation> opon::copy(void)
 
 void opon::print(void)
 {
-    std::cout << "opon(" << myphysreg << ", ";
+    std::cout << "on(" << myphysreg << ", ";
     if (mycoordshift.size() > 0)
-    {
-        mycoordshift[0].print(); 
-        std::cout << ", ";
-    }
+        std::cout << "shiftedxyz, ";
     myarg->print();
     std::cout << ")";
 }
