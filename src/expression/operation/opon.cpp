@@ -136,7 +136,7 @@ void opon::print(void)
 {
     std::cout << "on(" << myphysreg << ", ";
     if (mycoordshift.size() > 0)
-        std::cout << "shiftedxyz, ";
+        std::cout << "movedxyz, ";
     myarg->print();
     std::cout << ")";
 }
