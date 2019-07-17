@@ -18,13 +18,14 @@ class opon: public operation
         bool reuse = false;
         
         int myphysreg;
+        bool myerrorifnotfound;
         // No shift if empty:
         std::vector<expression> mycoordshift = {};
         std::shared_ptr<operation> myarg;
         
 	public:
         
-        opon(int physreg, expression* coordshift, std::shared_ptr<operation> arg);
+        opon(int physreg, expression* coordshift, std::shared_ptr<operation> arg, bool errorifnotfound);
         
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
@@ -35,8 +36,6 @@ class opon: public operation
         std::shared_ptr<operation> copy(void);
         
         void reuseit(bool istobereused) { reuse = istobereused; };
-        
-		/// REMOVE + CHECK ERROR OK IF USED std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

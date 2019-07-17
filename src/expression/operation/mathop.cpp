@@ -193,8 +193,8 @@ expression mathop::sqrt(expression input) { return pow(input, 0.5); }
 expression mathop::log10(expression input) { return input.log10(); }
 expression mathop::pow(expression base, expression exponent) { return base.pow(exponent); }
 
-expression mathop::on(int physreg, expression expr) { return expr.on(physreg, NULL); }
-expression mathop::on(int physreg, expression coordshift, expression expr) { return expr.on(physreg, &coordshift); }
+expression mathop::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
+expression mathop::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
     
 expression mathop::comp(int selectedcomp, expression input) 
 { 

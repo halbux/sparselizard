@@ -41,7 +41,9 @@ class field;
 class shape;
 
 class expression
-{    
+{
+    friend class opon;
+
     private:
         
         int mynumrows = 0;
@@ -61,6 +63,7 @@ class expression
         
         std::vector<double> max(int physreg, expression* meshdeform, int refinement, std::vector<double> xyzrange);
         void interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
+        void interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<std::vector<double>>& interpolated, std::vector<bool>& isfound, int numtimeevals);
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
         
@@ -193,7 +196,7 @@ class expression
         expression abs(void);
         expression log10(void);
         
-        expression on(int physreg, expression* coordshift);
+        expression on(int physreg, expression* coordshift, bool errorifnotfound);
         
         // The time variable:
         expression time(void);
