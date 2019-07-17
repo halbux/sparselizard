@@ -474,6 +474,42 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 {
     // Make sure the mesh deformation expression has the right size. 
     int problemdimension = universe::mymesh->getmeshdimension();
+    
+    // Get only the disjoint regions with highest dimension elements:
+    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(problemdimension);
+
+    // Multiharmonic expressions are not allowed.
+    if (not(isharmonicone(disjregs)))
+    {
+        std::cout << "Error in 'expression' object: cannot interpolate a multiharmonic expression (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+    if (xyzcoord.size()%3 != 0)
+    {
+        std::cout << "Error in 'expression' object: the interpolation coordinates vector should have a length that is a multiple of 3" << std::endl;
+        abort();
+    }
+    
+    int numcoords = xyzcoord.size()/3;
+    int exprlen = countrows()*countcolumns();
+    interpolated.resize(numcoords*exprlen);
+    
+    // Interpolate every expression entry:
+    for (int i = 0; i < exprlen; i++)
+    {
+        std::vector<std::vector<double>> interpolatedscalar;
+        expression(myoperations[i]).interpolate(physreg, meshdeform, xyzcoord, interpolatedscalar, isfound, -1);
+        
+        for (int j = 0; j < numcoords; j++)
+            interpolated[j*exprlen+i] = interpolatedscalar[1][j];
+    }
+}
+
+
+void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<std::vector<double>>& interpolated, std::vector<bool>& isfound, int numtimeevals)
+{
+    // Make sure the mesh deformation expression has the right size. 
+    int problemdimension = universe::mymesh->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -489,20 +525,9 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
         abort();
 	}
 
-    // Multiharmonic expressions are not allowed.
-    if (not(isharmonicone(disjregs)))
-    {
-        std::cout << "Error in 'expression' object: cannot interpolate a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
-    }
     if (meshdeform != NULL && not(meshdeform->isharmonicone(disjregs)))
     {
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
-    }
-    if (xyzcoord.size()%3 != 0)
-    {
-        std::cout << "Error in 'expression' object: the interpolation coordinates vector should have a length that is a multiple of 3" << std::endl;
         abort();
     }
     
@@ -512,179 +537,247 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     isfound.resize(numcoords);
     for (int i = 0; i < numcoords; i++)
     	isfound[i] = false;
-	int exprlen = mynumrows*mynumcols;
-    interpolated.resize(numcoords*exprlen);
-    for (int i = 0; i < interpolated.size(); i++)
-    	interpolated[i] = 0.0;
+    	
+    interpolated = {};
+    if (numtimeevals != -1)
+        interpolated = {std::vector<double>(numcoords*numtimeevals)};
+    std::vector<int> harmoniclist = {};
 
-	// Sort the coordinates vector:
-	std::vector<int> reorderingvector = {};
-	std::vector<double> noisethres = universe::mymesh->getnodes()->getnoisethreshold();
-	myalgorithm::stablecoordinatesort(noisethres, xyzcoord, reorderingvector);
-	std::vector<double> xyz = xyzcoord;
-	for (int i = 0; i < numcoords; i++)
+    // Sort the coordinates vector:
+    std::vector<int> reorderingvector = {};
+    std::vector<double> noisethres = universe::mymesh->getnodes()->getnoisethreshold();
+    myalgorithm::stablecoordinatesort(noisethres, xyzcoord, reorderingvector);
+    std::vector<double> xyz = xyzcoord;
+    for (int i = 0; i < numcoords; i++)
     {
-    	xyz[3*i+0] = xyzcoord[3*reorderingvector[i]+0];
-    	xyz[3*i+1] = xyzcoord[3*reorderingvector[i]+1];
-    	xyz[3*i+2] = xyzcoord[3*reorderingvector[i]+2];
+        xyz[3*i+0] = xyzcoord[3*reorderingvector[i]+0];
+        xyz[3*i+1] = xyzcoord[3*reorderingvector[i]+1];
+        xyz[3*i+2] = xyzcoord[3*reorderingvector[i]+2];
     }
-		
-    disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
-	elements* myelems = universe::mymesh->getelements();
-	
-	int elemorder = myelems->getcurvatureorder();
 
-	// Parameter that gives the distance (in multiples of the max barycenter-element node distance)
-	// starting from which one can safely assume to always be outside the element for any point.
-	// For straight elements this always holds for alpha equal to 1 (plus roundoff safety):
-	double alpha = 1+1e-10;
-	if (elemorder > 1)
-		alpha = 2.0;
+    disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
+    elements* myelems = universe::mymesh->getelements();
+
+    int elemorder = myelems->getcurvatureorder();
+
+    // Parameter that gives the distance (in multiples of the max barycenter-element node distance)
+    // starting from which one can safely assume to always be outside the element for any point.
+    // For straight elements this always holds for alpha equal to 1 (plus roundoff safety):
+    double alpha = 1+1e-10;
+    if (elemorder > 1)
+        alpha = 2.0;
 
 
     for (int i = 0; i < disjregs.size(); i++)
     {
-    	int elemtypenum = mydisjregs->getelementtypenumber(disjregs[i]);
-    	int elemdim = mydisjregs->getelementdimension(disjregs[i]);
-    	
-    	lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
-		element myel(elemtypenum, elemorder);
-				
-    	// Get the element barycenter coordinates:
+        int elemtypenum = mydisjregs->getelementtypenumber(disjregs[i]);
+        int elemdim = mydisjregs->getelementdimension(disjregs[i]);
+
+        lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
+        element myel(elemtypenum, elemorder);
+
+        // Get the element barycenter coordinates:
         std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
         // Get the radius of the sphere centered at the barycenter and surrounding all nodes in an element:
         std::vector<double>* sphereradius = myelems->getsphereradius(elemtypenum);
-    
-    	// Loop on all elements in the disjoint region:
-    	int rangebegin = mydisjregs->getrangebegin(disjregs[i]), rangeend = mydisjregs->getrangeend(disjregs[i]);
-    	for (int current = rangebegin; current <= rangeend; current++)
-    	{    		
-    		double maxelemsize = alpha*sphereradius->at(current);
-    		double xbary = barycenters->at(3*current+0), ybary = barycenters->at(3*current+1), zbary = barycenters->at(3*current+2);
 
-			std::vector<polynomial> poly = {};
-			
-			// Get the index of the coordinate whose x is closest to the barycenter of the current element (using bisection):
-			int first = 0, last = numcoords-1;
-			int startindex;
+        // Loop on all elements in the disjoint region:
+        int rangebegin = mydisjregs->getrangebegin(disjregs[i]), rangeend = mydisjregs->getrangeend(disjregs[i]);
+        for (int current = rangebegin; current <= rangeend; current++)
+        {    		
+            double maxelemsize = alpha*sphereradius->at(current);
+            double xbary = barycenters->at(3*current+0), ybary = barycenters->at(3*current+1), zbary = barycenters->at(3*current+2);
+
+            std::vector<polynomial> poly = {};
+
+            // Get the index of the coordinate whose x is closest to the barycenter of the current element (using bisection):
+            int first = 0, last = numcoords-1;
+            int startindex;
 	
-			while (first < last-1)
-			{
-				if ((last+first)%2 == 0)
-					startindex = (last+first)/2;
-				else
-					startindex = (last+first-1)/2;
-	
-				if (xyz[3*startindex+0]-xbary > noisethres[0])
-					last = startindex;
-				else
-					first = startindex;
-			}
-			// This is required for cases where first = last-1:
-			if (std::abs(xyz[3*last+0]-xbary) >= std::abs(xyz[3*first+0]-xbary))
-				startindex = first;
-			else
-				startindex = last;
-			
-			// Move away in the increasing index direction from 'startindex':
-			for (int coordindex = startindex; coordindex < numcoords; coordindex++)
-			{    		
-				// If out of range in x it will not be found here.
-				if (std::abs(xyz[3*coordindex+0]-xbary) < maxelemsize)
-				{
-					// Only process when not yet found and when the coordinate is close enough to the element barycenter.
-					if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
-					else
-					{    			
-						// Reset to initial guess:
-						std::vector<double> kietaphi = {0,0,0};
-						std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
+            while (first < last-1)
+            {
+                if ((last+first)%2 == 0)
+                    startindex = (last+first)/2;
+                else
+                    startindex = (last+first-1)/2;
 
-						// Only create once for all coordinates the polynomials and only for the required elements:
-						if (poly.size() == 0)
-						{
-							poly.resize(elemdim);
-							for (int j = 0; j < elemdim; j++)
-								poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
-						}
+                if (xyz[3*startindex+0]-xbary > noisethres[0])
+                    last = startindex;
+                else
+                    first = startindex;
+            }
+            // This is required for cases where first = last-1:
+            if (std::abs(xyz[3*last+0]-xbary) >= std::abs(xyz[3*first+0]-xbary))
+                startindex = first;
+            else
+                startindex = last;
+
+            // Move away in the increasing index direction from 'startindex':
+            for (int coordindex = startindex; coordindex < numcoords; coordindex++)
+            {    		
+                // If out of range in x it will not be found here.
+                if (std::abs(xyz[3*coordindex+0]-xbary) < maxelemsize)
+                {
+                    // Only process when not yet found and when the coordinate is close enough to the element barycenter.
+                    if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
+                    else
+                    {    			
+                        // Reset to initial guess:
+                        std::vector<double> kietaphi = {0,0,0};
+                        std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
+
+                        // Only create once for all coordinates the polynomials and only for the required elements:
+                        if (poly.size() == 0)
+                        {
+                            poly.resize(elemdim);
+                            for (int j = 0; j < elemdim; j++)
+                                poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
+                        }
 				
-						if (myalgorithm::getroot(poly, rhs, kietaphi))
-						{
-							// Check if the (ki,eta,phi) coordinates are inside the element:
-							if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
-							{
-								isfound[coordindex] = true;
+                        if (myalgorithm::getroot(poly, rhs, kietaphi))
+                        {
+                            // Check if the (ki,eta,phi) coordinates are inside the element:
+                            if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                            {
+                                isfound[coordindex] = true;
 					
-								// Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
-								elementselector myselector(disjregs[i], current-rangebegin);
-								for (int k = 0; k < exprlen; k++)
-								{
-									densematrix interp = myoperations[k]->interpolate(myselector, kietaphi, meshdeform)[1][0];
-									interpolated[coordindex*exprlen+k] = interp.getvalues()[0];
-								}
-							}
-						}
-					}	
-				}
-				else
-					break;
-			}
+                                // Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
+                                elementselector myselector(disjregs[i], current-rangebegin);
+
+                                if (numtimeevals == -1)
+                                {
+                                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                                    if (interpolated.size() > 0)
+                                    {
+                                        for (int h = 0; h < harmoniclist.size(); h++)
+                                            interpolated[harmoniclist[h]][coordindex] = interp[harmoniclist[h]][0].getvalues()[0];
+                                    }
+                                    else
+                                    {
+                                        // Preallocate all harmonics:
+                                        interpolated = std::vector<std::vector<double>>(interp.size(), std::vector<double>(0));
+                                        for (int h = 0; h < interp.size(); h++)
+                                        {
+                                            if (interp[h].size() > 0)
+                                            {
+                                                harmoniclist.push_back(h);
+                                                interpolated[h] = std::vector<double>(numcoords);
+                                                interpolated[h][coordindex] = interp[h][0].getvalues()[0];
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                                    for (int tim = 0; tim < numtimeevals; tim++)
+                                        interpolated[0][numcoords*tim+coordindex] = interp.getvalues()[tim];
+                                }
+                            }
+                        }
+                    }	
+                }
+                else
+                    break;
+            }
 
 			
-			// Move away in the decreasing index direction from 'startindex':
-			for (int coordindex = startindex-1; coordindex >= 0; coordindex--)
-			{    		
-				// If out of range in x it will not be found here.
-				if (std::abs(xyz[3*coordindex+0]-xbary) < maxelemsize)
-				{
-					// Only process when not yet found and when the coordinate is close enough to the element barycenter.
-					if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
-					else
-					{    			
-						// Reset to initial guess:
-						std::vector<double> kietaphi = {0,0,0};
-						std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
+            // Move away in the decreasing index direction from 'startindex':
+            for (int coordindex = startindex-1; coordindex >= 0; coordindex--)
+            {    		
+                // If out of range in x it will not be found here.
+                if (std::abs(xyz[3*coordindex+0]-xbary) < maxelemsize)
+                {
+                    // Only process when not yet found and when the coordinate is close enough to the element barycenter.
+                    if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
+                    else
+                    {    			
+                        // Reset to initial guess:
+                        std::vector<double> kietaphi = {0,0,0};
+                        std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
-						// Only create once for all coordinates the polynomials and only for the required elements:
-						if (poly.size() == 0)
-						{
-							poly.resize(elemdim);
-							for (int j = 0; j < elemdim; j++)
-								poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
-						}
+                        // Only create once for all coordinates the polynomials and only for the required elements:
+                        if (poly.size() == 0)
+                        {
+                            poly.resize(elemdim);
+                            for (int j = 0; j < elemdim; j++)
+                                poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
+                        }
 				
-						if (myalgorithm::getroot(poly, rhs, kietaphi))
-						{
-							// Check if the (ki,eta,phi) coordinates are inside the element:
-							if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
-							{
-								isfound[coordindex] = true;
-					
-								// Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
-								elementselector myselector(disjregs[i], current-rangebegin);
-								for (int k = 0; k < exprlen; k++)
-								{
-									densematrix interp = myoperations[k]->interpolate(myselector, kietaphi, meshdeform)[1][0];
-									interpolated[coordindex*exprlen+k] = interp.getvalues()[0];
-								}
-							}
-						}
-					}		
-				}
-				else
-					break;
-			}
-		}
+                        if (myalgorithm::getroot(poly, rhs, kietaphi))
+                        {
+                            // Check if the (ki,eta,phi) coordinates are inside the element:
+                            if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                            {
+                                isfound[coordindex] = true;
+
+                                // Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
+                                elementselector myselector(disjregs[i], current-rangebegin);
+								
+                                if (numtimeevals == -1)
+                                {
+                                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                                    if (interpolated.size() > 0)
+                                    {
+                                        for (int h = 0; h < harmoniclist.size(); h++)
+                                            interpolated[harmoniclist[h]][coordindex] = interp[harmoniclist[h]][0].getvalues()[0];
+                                    }
+                                    else
+                                    {
+                                        // Preallocate all harmonics:
+                                        interpolated = std::vector<std::vector<double>>(interp.size(), std::vector<double>(0));
+                                        for (int h = 0; h < interp.size(); h++)
+                                        {
+                                            if (interp[h].size() > 0)
+                                            {
+                                                harmoniclist.push_back(h);
+                                                interpolated[h] = std::vector<double>(numcoords);
+                                                interpolated[h][coordindex] = interp[h][0].getvalues()[0];
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                                    for (int tim = 0; tim < numtimeevals; tim++)
+                                        interpolated[0][numcoords*tim+coordindex] = interp.getvalues()[tim];
+                                }
+                            }
+                        }
+                    }		
+                }
+                else
+                    break;
+            }
+        }
     }
     
+    
     // Unsort the containers:
-    std::vector<double> interpolatedcopy = interpolated;
+    std::vector<std::vector<double>> interpolatedcopy = interpolated;
     std::vector<bool> isfoundcopy = isfound;
     for (int i = 0; i < numcoords; i++)
+        isfound[reorderingvector[i]] = isfoundcopy[i];
+    if (numtimeevals == -1)
     {
-    	isfound[reorderingvector[i]] = isfoundcopy[i];
-    	for (int j = 0; j < exprlen; j++)
-    		interpolated[reorderingvector[i]*exprlen+j] = interpolatedcopy[i*exprlen+j];
+        // Provide a non-empty interpolation vector even in case nothing was found:
+        if (interpolated.size() == 0)
+            interpolated = {{},std::vector<double>(numcoords)};
+    
+        for (int h = 0; h < harmoniclist.size(); h++)
+        {
+            for (int i = 0; i < numcoords; i++)
+                interpolated[harmoniclist[h]][reorderingvector[i]] = interpolatedcopy[harmoniclist[h]][i];
+        }
+    }
+    else
+    {
+        for (int tim = 0; tim < numtimeevals; tim++)
+        {
+            for (int i = 0; i < numcoords; i++)
+                interpolated[0][numcoords*tim+reorderingvector[i]] = interpolatedcopy[0][numcoords*tim+i];
+        }
     }
 }
 
@@ -1646,7 +1739,7 @@ expression expression::log10(void)
     return log10expr;
 }
 
-expression expression::on(int physreg, expression* coordshift)
+expression expression::on(int physreg, expression* coordshift, bool errorifnotfound)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     if (coordshift != NULL && (coordshift->countcolumns() != 1 || coordshift->countrows() < problemdimension))
@@ -1658,7 +1751,7 @@ expression expression::on(int physreg, expression* coordshift)
     expression onexpr = *this;
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
-        onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i]));
+        onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i], errorifnotfound));
 
     return onexpr;
 }

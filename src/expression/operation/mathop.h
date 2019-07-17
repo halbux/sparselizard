@@ -80,9 +80,9 @@ namespace mathop
     expression pow(expression base, expression exponent);
     
     // Evaluate an expression on physical region 'physreg' using interpolation:
-    expression on(int physreg, expression expr);
+    expression on(int physreg, expression expr, bool errorifnotfound = true);
     // Interpolate at coordinates shifted by 'coordshift':
-    expression on(int physreg, expression coordshift, expression expr);
+    expression on(int physreg, expression coordshift, expression expr, bool errorifnotfound = true);
     
     expression comp(int selectedcomp, expression input);
     expression compx(expression input);
