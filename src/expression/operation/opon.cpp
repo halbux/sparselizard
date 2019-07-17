@@ -20,6 +20,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     }
 
     // Otherwise the stored data will be used during the interpolation step (on wrong ki, eta, phi coordinates):
+    bool wasreuseallowed = universe::isreuseallowed;
     universe::isreuseallowed = false;
     
 
@@ -108,7 +109,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     }
     
     
-    universe::isreuseallowed = true;   
+    universe::isreuseallowed = wasreuseallowed;   
     
     if (reuse && universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), outvec);
@@ -126,6 +127,7 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
     }
 
     // Otherwise the stored data will be used during the interpolation step (on wrong ki, eta, phi coordinates):
+    bool wasreuseallowed = universe::isreuseallowed;
     universe::isreuseallowed = false;
     
 
@@ -205,7 +207,7 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
         outmatvals[i] = interpolated[0][i];
     
     
-    universe::isreuseallowed = true;
+    universe::isreuseallowed = wasreuseallowed;
     
     if (reuse && universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), outmat);
