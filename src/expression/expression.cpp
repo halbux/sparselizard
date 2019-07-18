@@ -513,6 +513,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
         abort();
     }
     
+    if (universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension() != problemdimension)
+    {
+        std::cout << "Error in 'expression' object: expected a physical region with " << problemdimension << "D elements in 'interpolate'" << std::endl;
+        abort();
+    }
+    
     // Get only the disjoint regions with highest dimension elements:
     std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
     if (meshdeform != NULL && not(meshdeform->isharmonicone(disjregs)))
