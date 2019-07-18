@@ -472,11 +472,8 @@ std::vector<double> expression::interpolate(int physreg, expression meshdeform, 
 
 void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-    // Make sure the mesh deformation expression has the right size. 
-    int problemdimension = universe::mymesh->getmeshdimension();
-    
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(problemdimension);
+    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(disjregs)))
@@ -517,14 +514,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     }
     
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(problemdimension);
-
-	if (universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension() != problemdimension)
-	{
-        std::cout << "Error in 'expression' object: expected a physical region with " << problemdimension << "D elements in 'interpolate'" << std::endl;
-        abort();
-	}
-
+    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
     if (meshdeform != NULL && not(meshdeform->isharmonicone(disjregs)))
     {
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
