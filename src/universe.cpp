@@ -145,3 +145,46 @@ std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {};
         
 std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};        
 
+
+
+std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> universe::formfuncpolys = {};     
+
+std::vector<hierarchicalformfunctioncontainer> universe::getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder)
+{
+    // Find the type name in the container:
+    int typenameindex = -1;
+    for (int i = 0; i < formfuncpolys.size(); i++)
+    {
+        if (formfuncpolys[i].first == fftypename)
+        {
+            typenameindex = i;
+            break;
+        }
+    }
+
+    // In case the form function is available:
+    if (typenameindex != -1 && formfuncpolys[typenameindex].second.size() > elementtypenumber && formfuncpolys[typenameindex].second[elementtypenumber].size() > 0 && formfuncpolys[typenameindex].second[elementtypenumber][0].first >= interpolorder)
+        return {formfuncpolys[typenameindex].second[elementtypenumber][0].second};
+    else
+        return {};
+}
+
+void universe::setformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder, hierarchicalformfunctioncontainer inputcontainer)
+{
+    int typenameindex = -1;
+    for (int i = 0; i < formfuncpolys.size(); i++)
+    {
+        if (formfuncpolys[i].first == fftypename)
+        {
+            typenameindex = i;
+            break;
+        }
+    }
+
+    if (typenameindex == -1)
+        formfuncpolys.push_back( std::make_pair(fftypename, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >>(8,std::vector< std::pair<int,hierarchicalformfunctioncontainer> >(0))) );
+
+    typenameindex = formfuncpolys.size() - 1;
+    formfuncpolys[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, inputcontainer)};
+}
+

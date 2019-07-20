@@ -42,7 +42,16 @@ int q6::count(int order, int dim, int num)
 hierarchicalformfunctioncontainer q6::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
 	element quadrangle("quadrangle");
-    hierarchicalformfunctioncontainer val("q6", quadrangle.gettypenumber(), evaluationpoints);
+
+    // Reuse the polynomials if available in the universe:
+    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("q6", quadrangle.gettypenumber(), maxorder);
+    if (available.size() > 0)
+    {
+        available[0].evaluate(evaluationpoints);
+        return available[0];
+    }
+    
+    hierarchicalformfunctioncontainer val("q6", quadrangle.gettypenumber());
 
     polynomial ki, eta;
     ki.set({{{}},{{{1.0}}}});
@@ -74,6 +83,10 @@ hierarchicalformfunctioncontainer q6::evalat(int maxorder, vector<double> evalua
                 val.set(1,2,0,orientation,i-4,0,lambda[i+1]);
         }
     }
+    
+    universe::setformfunctionpolys("q6", quadrangle.gettypenumber(), maxorder, val);
+    
+    val.evaluate(evaluationpoints);
     
 	return val;
 }

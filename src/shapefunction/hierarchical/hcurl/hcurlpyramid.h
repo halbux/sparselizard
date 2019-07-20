@@ -8,6 +8,7 @@
 #define HCURLPYRAMID_H
 
 #include "hierarchicalformfunction.h"
+#include "universe.h"
 
 class hcurlpyramid: public hierarchicalformfunction
 {
@@ -23,7 +24,7 @@ class hcurlpyramid: public hierarchicalformfunction
         // - face   in case dim = 2 
         // - volume in case dim = 3 
         int count(int order, int dim, int num);
-        
+
         // Get the number of components in the form function.
         int countcomponents(void) { return 3; };
 

@@ -2,21 +2,17 @@
 #include "hierarchicalformfunction.h"
 #include "hierarchicalformfunctioniterator.h"
 
-hierarchicalformfunctioncontainer::hierarchicalformfunctioncontainer(std::string formfunctiontypename, int elementtypenumber, std::vector<double> evaluationpoints)
+hierarchicalformfunctioncontainer::hierarchicalformfunctioncontainer(std::string formfunctiontypename, int elementtypenumber)
 {
-	myformfunctiontypename = formfunctiontypename;
+    myformfunctiontypename = formfunctiontypename;
     myelementtypenumber = elementtypenumber;
-    myevaluationpoints = evaluationpoints;
 }
 
 void hierarchicalformfunctioncontainer::set(int h, int i, int j, int k, int l, int n, polynomial& poly)
 {   
-    // Compute without derivative as well as with ki, eta and phi derivative:
+    // Preallocate:
     for (int m = 0; m < 4; m++)
     {
-        std::vector<double> valatevaluationpoints = poly.evalat(myevaluationpoints, m);
-        
-        // First preallocate:
         if (val.size() < h+1)
             val.resize(h+1);
         if (val[h].size() < 4)
@@ -31,16 +27,55 @@ void hierarchicalformfunctioncontainer::set(int h, int i, int j, int k, int l, i
             val[h][i][j][k][l].resize(4);
         if (val[h][i][j][k][l][m].size() < n+1)
             val[h][i][j][k][l][m].resize(n+1);
-        
-        // Then add the values:
-        val[h][i][j][k][l][m][n] = valatevaluationpoints;
+    }
+    
+    if (ffpoly.size() < h+1)
+        ffpoly.resize(h+1);
+    if (ffpoly[h].size() < 4)
+        ffpoly[h].resize(4);
+    if (ffpoly[h][i].size() < j+1)
+        ffpoly[h][i].resize(j+1);
+    if (ffpoly[h][i][j].size() < k+1)
+        ffpoly[h][i][j].resize(k+1);
+    if (ffpoly[h][i][j][k].size() < l+1)
+        ffpoly[h][i][j][k].resize(l+1);
+    if (ffpoly[h][i][j][k][l].size() < n+1)
+        ffpoly[h][i][j][k][l].resize(n+1);
+
+    // Add the polynomial:
+    ffpoly[h][i][j][k][l][n] = poly;
+}
+
+void hierarchicalformfunctioncontainer::evaluate(std::vector<double> evaluationpoints)
+{
+    myevaluationpoints = evaluationpoints;
+
+    for (int h = 0; h < val.size(); h++)
+    {
+        for (int i = 0; i < val[h].size(); i++)
+        {
+            for (int j = 0; j < val[h][i].size(); j++)
+            {
+                for (int k = 0; k < val[h][i][j].size(); k++)
+                {
+                    for (int l = 0; l < val[h][i][j][k].size(); l++)
+                    {
+                        for (int m = 0; m < val[h][i][j][k][l].size(); m++)
+                        {
+                            for (int n = 0; n < val[h][i][j][k][l][m].size(); n++)
+                                val[h][i][j][k][l][m][n] = ffpoly[h][i][j][k][l][n].evalat(evaluationpoints, m);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, int order, int whichderivative, int component)
 {
-	std::vector<int> edgesorientations = orientation::getedgesorientationsfromtotalorientation(totalorientation, myelementtypenumber);
-	std::vector<int> facesorientations = orientation::getfacesorientationsfromtotalorientation(totalorientation, myelementtypenumber);
+    std::vector<int> edgesorientations = orientation::getedgesorientationsfromtotalorientation(totalorientation, myelementtypenumber);
+    std::vector<int> facesorientations = orientation::getfacesorientationsfromtotalorientation(totalorientation, myelementtypenumber);
 
     // Use an iterator to iterate through all form functions in the right order.
     hierarchicalformfunctioniterator myiterator(myformfunctiontypename, myelementtypenumber, order);
@@ -68,7 +103,7 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, in
         myiterator.next();
     }
     
-	return valmat;
+    return valmat;
 }
 
 void hierarchicalformfunctioncontainer::print(bool printallderivatives)

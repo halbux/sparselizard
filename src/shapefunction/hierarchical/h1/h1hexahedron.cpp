@@ -42,7 +42,16 @@ int h1hexahedron::count(int order, int dim, int num)
 hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
 	element hexahedron("hexahedron");
-    hierarchicalformfunctioncontainer val("h1", hexahedron.gettypenumber(), evaluationpoints);
+	
+    // Reuse the polynomials if available in the universe:
+    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("h1", hexahedron.gettypenumber(), maxorder);
+    if (available.size() > 0)
+    {
+        available[0].evaluate(evaluationpoints);
+        return available[0];
+    }
+	
+    hierarchicalformfunctioncontainer val("h1", hexahedron.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = hexahedron.getedgesdefinitionsbasedonnodes();						
@@ -199,5 +208,9 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder, vector<doub
         }
     }
 
+    universe::setformfunctionpolys("h1", hexahedron.gettypenumber(), maxorder, val);
+
+    val.evaluate(evaluationpoints);
+    
 	return val;    
 }

@@ -42,7 +42,16 @@ int h1quadrangle::count(int order, int dim, int num)
 hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
 	element quadrangle("quadrangle");
-    hierarchicalformfunctioncontainer val("h1", quadrangle.gettypenumber(), evaluationpoints);
+	
+    // Reuse the polynomials if available in the universe:
+    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("h1", quadrangle.gettypenumber(), maxorder);
+    if (available.size() > 0)
+    {
+        available[0].evaluate(evaluationpoints);
+        return available[0];
+    }
+    
+    hierarchicalformfunctioncontainer val("h1", quadrangle.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = quadrangle.getedgesdefinitionsbasedonnodes();						
@@ -159,6 +168,10 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder, vector<doub
             }
         }
     }
+    
+    universe::setformfunctionpolys("h1", quadrangle.gettypenumber(), maxorder, val);
+    
+    val.evaluate(evaluationpoints);
     
 	return val;
 }

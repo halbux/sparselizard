@@ -8,6 +8,7 @@
 #define H11_H
 
 #include "hierarchicalformfunction.h"
+#include "universe.h"
 
 class h11: public hierarchicalformfunction
 {
@@ -32,7 +33,7 @@ class h11: public hierarchicalformfunction
         // as an integer giving the highest order up to which to output the form 
         // function polynomials.
         hierarchicalformfunctioncontainer evalat(int maxorder, std::vector<double> evaluationpoints);
-        
+
         // If 'isorientationdependent' is false then the assembly can
         // be carried out without taking care of the element orientation.
         // This provides an assembly speedup.

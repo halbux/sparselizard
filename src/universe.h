@@ -45,7 +45,7 @@ class universe
         // CLEANS::
         static void forbidreuse(void);
 
-		static bool forcejacobianreuse;
+        static bool forcejacobianreuse;
         
         // Store all !HIERARCHICAL! form function values that can be reused.
         // 'computedformfuncs[i].first' gives the ith form function type name.
@@ -89,7 +89,16 @@ class universe
         // This stores the vec containing a solution x, its time derivative dtx and its second time derivative dtdtx
         // respectively at index 0, 1 and 2. If xdtxdtdtx[i] is an empty vector then that solution is not available.
         static std::vector<std::vector<vec>> xdtxdtdtx;
+        
+        
+        
+        // The form function polynomials can always be reused:
+        static std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> formfuncpolys;
 
+        // Return an empty vector if not defined yet:
+        static std::vector<hierarchicalformfunctioncontainer> getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder);
+        static void setformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder, hierarchicalformfunctioncontainer inputcontainer);
+        
 };
 
 #endif
