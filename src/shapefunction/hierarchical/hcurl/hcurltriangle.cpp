@@ -51,7 +51,16 @@ int hcurltriangle::count(int order, int dim, int num)
 hierarchicalformfunctioncontainer hcurltriangle::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
 	element triangle("triangle");
-    hierarchicalformfunctioncontainer val("hcurl", triangle.gettypenumber(), evaluationpoints);
+	
+    // Reuse the polynomials if available in the universe:
+    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("hcurl", triangle.gettypenumber(), maxorder);
+    if (available.size() > 0)
+    {
+        available[0].evaluate(evaluationpoints);
+        return available[0];
+    }
+    
+    hierarchicalformfunctioncontainer val("hcurl", triangle.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = triangle.getedgesdefinitionsbasedonnodes();						
@@ -174,6 +183,10 @@ hierarchicalformfunctioncontainer hcurltriangle::evalat(int maxorder, vector<dou
             }
         }
     }
+    
+    universe::setformfunctionpolys("hcurl", triangle.gettypenumber(), maxorder, val);
+    
+    val.evaluate(evaluationpoints);
     
 	return val;
 }

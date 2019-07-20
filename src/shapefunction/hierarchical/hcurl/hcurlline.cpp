@@ -42,7 +42,16 @@ int hcurlline::count(int order, int dim, int num)
 hierarchicalformfunctioncontainer hcurlline::evalat(int maxorder, vector<double> evaluationpoints) 
 {    
 	element line("line");
-    hierarchicalformfunctioncontainer val("hcurl", line.gettypenumber(), evaluationpoints);
+	
+    // Reuse the polynomials if available in the universe:
+    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("hcurl", line.gettypenumber(), maxorder);
+    if (available.size() > 0)
+    {
+        available[0].evaluate(evaluationpoints);
+        return available[0];
+    }
+    
+    hierarchicalformfunctioncontainer val("hcurl", line.gettypenumber());
 
     // Get the node list in every edge:
     std::vector<int> nodesinedges = line.getedgesdefinitionsbasedonnodes();						
@@ -104,6 +113,10 @@ hierarchicalformfunctioncontainer hcurlline::evalat(int maxorder, vector<double>
             }
         }
     }
+    
+    universe::setformfunctionpolys("hcurl", line.gettypenumber(), maxorder, val);
+    
+    val.evaluate(evaluationpoints);
     
 	return val;
 }

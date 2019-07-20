@@ -48,7 +48,7 @@ hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder, vector<doubl
     
 	int problemdimension = universe::mymesh->getmeshdimension();
 
-    hierarchicalformfunctioncontainer val("one", myelementtypenumber, evaluationpoints);
+    hierarchicalformfunctioncontainer val("one", myelementtypenumber);
 
 	if (elemdim == problemdimension)
 	{
@@ -61,5 +61,7 @@ hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder, vector<doubl
 		}
 	}
 
+    val.evaluate(evaluationpoints);
+    
     return val;
 }
