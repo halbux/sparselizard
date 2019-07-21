@@ -14,16 +14,16 @@
 class polynomial
 {
 	private:
-	
+
 		// 'mycoefficients[i][j][k]' gives the coefficient of the monomial ki^i*eta^j*phi^k
 		std::vector<std::vector<std::vector<double>>> mycoefficients = {};
-		
+
 	public:
-	
+
 		void set(const std::vector<std::vector<std::vector<double>>>& coefficients);
-        
-        std::vector<std::vector<std::vector<double>>> get(void) { return mycoefficients; };
-        
+
+		std::vector<std::vector<std::vector<double>>> get(void) { return mycoefficients; };
+
 		// 'print' prints the polynomial to the console:
 		void print(void);
 		// Compute for the ki, eta and phi values provided.
@@ -40,14 +40,14 @@ class polynomial
 		polynomial operator*(double);
 		polynomial operator+(double);
 		polynomial operator-(double);
-        
+
 		// Defining the ki, eta and phi derivatives:
 		void dki(void);
 		void deta(void);
 		void dphi(void);
-        // Defining a generic derivative operator.
-        // Argument set to 0 gives dki, 1 deta and 2 dphi.
-        polynomial derivative(int whichderivative);
+		// Defining a generic derivative operator.
+		// Argument set to 0 gives dki, 1 deta and 2 dphi.
+		polynomial derivative(int whichderivative);
 };
 
 // Define the left version of the operators based on the right one.
