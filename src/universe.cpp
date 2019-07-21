@@ -69,8 +69,10 @@ hierarchicalformfunctioncontainer universe::interpolateformfunction(std::string 
     if (isreuseallowed)
     {
         if (typenameindex == -1)
+        {
             computedformfuncs.push_back( std::make_pair(fftypename, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >>(8,std::vector< std::pair<int,hierarchicalformfunctioncontainer> >(0))) );
-        typenameindex = computedformfuncs.size() - 1;
+            typenameindex = computedformfuncs.size() - 1;
+        }
         computedformfuncs[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, val)};
     }
     
@@ -182,9 +184,11 @@ void universe::setformfunctionpolys(std::string fftypename, int elementtypenumbe
     }
 
     if (typenameindex == -1)
+    {
         formfuncpolys.push_back( std::make_pair(fftypename, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >>(8,std::vector< std::pair<int,hierarchicalformfunctioncontainer> >(0))) );
-
-    typenameindex = formfuncpolys.size() - 1;
+        typenameindex = formfuncpolys.size() - 1;
+    }
+    
     formfuncpolys[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, inputcontainer)};
 }
 
