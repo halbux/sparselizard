@@ -111,7 +111,7 @@ std::vector<double> polynomial::evalat(const std::vector<double>& evaluationpoin
 
 polynomial polynomial::operator*(polynomial tomultiply)
 {
-	polynomial output({});;
+	polynomial output({});
 	
 	// Loop on all coefficients of 'tomultiply' (descendingly to reduce the number of .resize calls on 'output):
 	for (int kiorder = tomultiply.mycoefficients.size()-1; kiorder >= 0; kiorder--) /////// START FROM HIGHEST ORDER TO SMALLEST TO AVOID USELESS PREALLOCATIONS!
