@@ -44,18 +44,9 @@ int h1prism::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer h1prism::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer h1prism::evalat(int maxorder) 
 {    
 	element prism("prism");
-	
-    // Reuse the polynomials if available in the universe:
-    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("h1", prism.gettypenumber(), maxorder);
-    if (available.size() > 0)
-    {
-        available[0].evaluate(evaluationpoints);
-        return available[0];
-    }
-    
     hierarchicalformfunctioncontainer val("h1", prism.gettypenumber());
 
     // Get the node list in every edge and face:
@@ -259,10 +250,6 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder, vector<double> e
             }
         }
     }
-    
-    universe::setformfunctionpolys("h1", prism.gettypenumber(), maxorder, val);
-    
-    val.evaluate(evaluationpoints);
     
 	return val;
 }

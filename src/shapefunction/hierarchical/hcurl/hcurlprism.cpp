@@ -50,18 +50,9 @@ int hcurlprism::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder) 
 {    
     element prism("prism");
-    
-    // Reuse the polynomials if available in the universe:
-    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("hcurl", prism.gettypenumber(), maxorder);
-    if (available.size() > 0)
-    {
-        available[0].evaluate(evaluationpoints);
-        return available[0];
-    }
-    
     hierarchicalformfunctioncontainer val("hcurl", prism.gettypenumber());
 
     // Get the node list in every edge and face:
@@ -378,10 +369,6 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder, vector<double
             }
         }
     }
-    
-    universe::setformfunctionpolys("hcurl", prism.gettypenumber(), maxorder, val);
-    
-    val.evaluate(evaluationpoints);
     
 	return val;
 }

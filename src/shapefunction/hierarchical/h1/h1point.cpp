@@ -39,7 +39,7 @@ int h1point::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer h1point::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer h1point::evalat(int maxorder) 
 {    
 	element point("point");
     hierarchicalformfunctioncontainer val("h1", point.gettypenumber());
@@ -48,7 +48,5 @@ hierarchicalformfunctioncontainer h1point::evalat(int maxorder, vector<double> e
     formfunc.set({{{1.0}}});
     val.set(1,0,0,0,0,0,formfunc);
 
-    val.evaluate(evaluationpoints);
-    
     return val;
 }

@@ -44,7 +44,7 @@ void universe::forbidreuse(void)
 bool universe::forcejacobianreuse = false;
 
 std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> universe::computedformfuncs = {};
-hierarchicalformfunctioncontainer universe::interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates)
+hierarchicalformfunctioncontainer* universe::interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates)
 {
     // Find the type name in the container:
     int typenameindex = -1;
@@ -59,11 +59,11 @@ hierarchicalformfunctioncontainer universe::interpolateformfunction(std::string 
     
     // In case the form function is available and we are allowed to reuse it:
     if (isreuseallowed && typenameindex != -1 && computedformfuncs[typenameindex].second.size() > elementtypenumber && computedformfuncs[typenameindex].second[elementtypenumber].size() > 0 && computedformfuncs[typenameindex].second[elementtypenumber][0].first >= interpolorder)
-        return computedformfuncs[typenameindex].second[elementtypenumber][0].second;
+        return &(computedformfuncs[typenameindex].second[elementtypenumber][0].second);
     
     // Otherwise it must be computed:
-    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fftypename);
-    hierarchicalformfunctioncontainer val = myformfunction->evalat(interpolorder, evaluationcoordinates);
+    hierarchicalformfunctioncontainer* val = getformfunctionpolys(fftypename, elementtypenumber, interpolorder);
+    val->evaluate(evaluationcoordinates);
     
     // Store it for reuse if allowed:
     if (isreuseallowed)
@@ -73,9 +73,9 @@ hierarchicalformfunctioncontainer universe::interpolateformfunction(std::string 
             computedformfuncs.push_back( std::make_pair(fftypename, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >>(8,std::vector< std::pair<int,hierarchicalformfunctioncontainer> >(0))) );
             typenameindex = computedformfuncs.size() - 1;
         }
-        computedformfuncs[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, val)};
+        computedformfuncs[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, *val)};
     }
-    
+
     return val;
 }
 
@@ -151,7 +151,7 @@ std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};
 
 std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> universe::formfuncpolys = {};     
 
-std::vector<hierarchicalformfunctioncontainer> universe::getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder)
+hierarchicalformfunctioncontainer* universe::getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder)
 {
     // Find the type name in the container:
     int typenameindex = -1;
@@ -166,23 +166,10 @@ std::vector<hierarchicalformfunctioncontainer> universe::getformfunctionpolys(st
 
     // In case the form function is available:
     if (typenameindex != -1 && formfuncpolys[typenameindex].second.size() > elementtypenumber && formfuncpolys[typenameindex].second[elementtypenumber].size() > interpolorder && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
-        return {formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]};
-    else
-        return {};
-}
+        return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
 
-void universe::setformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder, hierarchicalformfunctioncontainer inputcontainer)
-{
-    int typenameindex = -1;
-    for (int i = 0; i < formfuncpolys.size(); i++)
-    {
-        if (formfuncpolys[i].first == fftypename)
-        {
-            typenameindex = i;
-            break;
-        }
-    }
 
+    // Otherwise compute the form function polynomials and store them:
     if (typenameindex == -1)
     {
         formfuncpolys.push_back( std::make_pair(fftypename, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >>(8,std::vector< std::vector<hierarchicalformfunctioncontainer> >(0))) );
@@ -191,6 +178,10 @@ void universe::setformfunctionpolys(std::string fftypename, int elementtypenumbe
     if (formfuncpolys[typenameindex].second[elementtypenumber].size() <= interpolorder)
         formfuncpolys[typenameindex].second[elementtypenumber].resize(interpolorder+1);
 
-    formfuncpolys[typenameindex].second[elementtypenumber][interpolorder] = {inputcontainer};
+    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fftypename);
+    
+    formfuncpolys[typenameindex].second[elementtypenumber][interpolorder] = {myformfunction->evalat(interpolorder)};
+    
+    return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
 }
 

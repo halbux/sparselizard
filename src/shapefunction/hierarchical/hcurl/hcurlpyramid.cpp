@@ -17,7 +17,7 @@ int hcurlpyramid::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer hcurlpyramid::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer hcurlpyramid::evalat(int maxorder) 
 {    
 	std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
 	abort();  
