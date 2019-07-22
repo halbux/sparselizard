@@ -41,7 +41,7 @@ int oneconstant::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder) 
 {    
     element myelement(myelementtypenumber);
     int elemdim = myelement.getelementdimension();
@@ -60,8 +60,6 @@ hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder, vector<doubl
 			val.set(1,problemdimension,0,orientation,0,0,formfunc);
 		}
 	}
-
-    val.evaluate(evaluationpoints);
     
     return val;
 }

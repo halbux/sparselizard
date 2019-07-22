@@ -15,7 +15,7 @@ int hcurlpoint::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer hcurlpoint::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer hcurlpoint::evalat(int maxorder) 
 {    
     std::cout << "Error in 'hcurlpoint' object: hcurl form functions are not defined for point elements" << std::endl;
     abort();

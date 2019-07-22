@@ -39,18 +39,9 @@ int h11::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer h11::evalat(int maxorder, vector<double> evaluationpoints) 
+hierarchicalformfunctioncontainer h11::evalat(int maxorder) 
 {    
 	element hexahedron("hexahedron");
-	
-    // Reuse the polynomials if available in the universe:
-    std::vector<hierarchicalformfunctioncontainer> available = universe::getformfunctionpolys("h11", hexahedron.gettypenumber(), maxorder);
-    if (available.size() > 0)
-    {
-        available[0].evaluate(evaluationpoints);
-        return available[0];
-    }
-    
     hierarchicalformfunctioncontainer val("h11", hexahedron.gettypenumber());
     
     polynomial ki, eta, phi;
@@ -86,10 +77,6 @@ hierarchicalformfunctioncontainer h11::evalat(int maxorder, vector<double> evalu
         else
             val.set(1,3,0,0,i-8,0,lambda[i+1]);
     }
-    
-    universe::setformfunctionpolys("h11", hexahedron.gettypenumber(), maxorder, val);
-    
-    val.evaluate(evaluationpoints);
     
 	return val;
 }

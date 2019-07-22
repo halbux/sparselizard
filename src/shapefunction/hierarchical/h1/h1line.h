@@ -32,11 +32,8 @@ class h1line: public hierarchicalformfunction
         // Get the number of components in the form function.
         int countcomponents(void) { return 1; };
 
-        // 'evalat' takes a vector with the coordinates of the evaluation 
-        // points in the format [ki1 eta1 phi1 ki2 eta2 phi2 ki3 ...] as well 
-        // as an integer giving the highest order up to which to output the form 
-        // function polynomials.
-        hierarchicalformfunctioncontainer evalat(int maxorder, std::vector<double> evaluationpoints);
+        // 'evalat' takes an integer giving the highest order up to which to output the form function polynomials.
+        hierarchicalformfunctioncontainer evalat(int maxorder);
 
         // If 'isorientationdependent' is false then the assembly can
         // be carried out without taking care of the element orientation.

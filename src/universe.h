@@ -54,9 +54,10 @@ class universe
         // to which the form function has been interpolated and .second 
         // gives the interpolated values.
         static std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> computedformfuncs;
-        // This function returns the requested form function value. In case
-        // 'isreuseallowed' is true it reuses any already computed value.
-        static hierarchicalformfunctioncontainer interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates);
+        // This function returns the requested form function values and reuses any already computed value if 'isreuseallowed' is true.
+        // In case 'isreuseallowed' is false a pointer to the evaluated form function polynomial storage is returned for speed reasons.
+        // When multiple calls follow each other the latter storage might be modified and it is therefore safer to always copy the output.
+        static hierarchicalformfunctioncontainer* interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates);
         
         static shared_ptr<jacobian> computedjacobian;
         
@@ -96,8 +97,7 @@ class universe
         static std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> formfuncpolys;
 
         // Return an empty vector if not defined yet:
-        static std::vector<hierarchicalformfunctioncontainer> getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder);
-        static void setformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder, hierarchicalformfunctioncontainer inputcontainer);
+        static hierarchicalformfunctioncontainer* getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder);
         
 };
 

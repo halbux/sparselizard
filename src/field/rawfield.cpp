@@ -892,11 +892,11 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
             densematrix mycoefs = getcoefficients(elementtypenumber, interpolorder, elementnumbers);
             // Compute the form functions evaluated at the evaluation points.
             // This reuses as much as possible what's already been computed:
-            hierarchicalformfunctioncontainer val = universe::interpolateformfunction(mytypename, elementtypenumber, interpolorder, evaluationcoordinates);
+            hierarchicalformfunctioncontainer* val = universe::interpolateformfunction(mytypename, elementtypenumber, interpolorder, evaluationcoordinates);
             
             // We can get the total orientation from elementnumbers[0] since
             // we require that all elements have the same total orientation.
-            densematrix myformfunctionvalue = val.tomatrix(totalorientation, interpolorder, whichderivative, formfunctioncomponent);
+            densematrix myformfunctionvalue = val->tomatrix(totalorientation, interpolorder, whichderivative, formfunctioncomponent);
             
             mycoefs.transpose();
             densematrix coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
