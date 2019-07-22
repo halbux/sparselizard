@@ -96,7 +96,7 @@ class universe
         // The form function polynomials can always be reused:
         static std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> formfuncpolys;
 
-        // Return an empty vector if not defined yet:
+        // Get the form function polynomials:
         static hierarchicalformfunctioncontainer* getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder);
         
 };
