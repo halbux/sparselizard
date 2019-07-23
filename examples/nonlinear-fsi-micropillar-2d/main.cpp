@@ -92,23 +92,6 @@ void sparselizard(void)
     // Mechanical properties. Young's modulus E [Pa], Poisson's ratio nu [] and the density rho [kg/m3]:
     double E = 1e6, nu = 0.3, rhos = 2000;
 
-    
-    // Calculate the viscous force tensor on the mesh deformed by field 'umesh'. The fluid velocity gradient 
-    // has to be calculated on the 2D fluid elements first before being added as load to the fsi formulation.
-    expression viscousforcetensor = mu*( grad(v) + transpose(grad(v)) );
-    // Project each of the tensor entries to a field (use default order 1 interpolation, set to 2 for even more accuracy).
-    field vft00("h1"), vft01("h1"), vft10("h1"), vft11("h1");
-    
-    formulation vftf00, vftf01, vftf10, vftf11;
-    
-    vftf00 += integral(fluid, umesh, dof(vft00)*tf(vft00) - entry(0,0,viscousforcetensor)*tf(vft00));
-    vftf01 += integral(fluid, umesh, dof(vft01)*tf(vft01) - entry(0,1,viscousforcetensor)*tf(vft01));
-    vftf10 += integral(fluid, umesh, dof(vft10)*tf(vft10) - entry(1,0,viscousforcetensor)*tf(vft10));
-    vftf11 += integral(fluid, umesh, dof(vft11)*tf(vft11) - entry(1,1,viscousforcetensor)*tf(vft11));
-    
-    // Define the whole projected viscous force tensor for convenience:
-    expression projectedviscousforcetensor = array2x2(vft00,vft01,vft10,vft11);
-    
 
     // Define the weak formulation for the fluid-structure interaction:
     formulation fsi;
@@ -119,16 +102,16 @@ void sparselizard(void)
     // Define the weak formulation for time-independent incompressible laminar flow (on the mesh deformed by 'umesh'):
     fsi += integral(fluid, umesh, predefinednavierstokes(dof(v), tf(v), v, dof(p), tf(p), mu, rhof, 0, 0, false) );
 
-    // Add the hydrodynamic load pI - mu*( grad(v) + transpose(grad(v)) ) normal to the FSI interface (on the mesh deformed by 'umesh'):
-    fsi += integral(fsinterface, umesh, ( p * -normal(fsinterface) - projectedviscousforcetensor * -normal(fsinterface) ) * tf(u) );
+    // Add the hydrodynamic load pI - mu*( grad(v) + transpose(grad(v)) ) normal to the FSI interface (on the mesh deformed by 'umesh').
+    // The gradient in the viscous force term has to be evaluated on the fluid elements (here with a call to 'on').
+    fsi += integral(fsinterface, umesh, ( p * -normal(fsinterface) - on(fluid, mu*( grad(v) + transpose(grad(v)) ) ) * -normal(fsinterface) ) * tf(u) );
 
 
     double uprev, umax = 1;
     while (std::abs(umax-uprev)/std::abs(umax) > 1e-6)
     {
-        // Project the viscous force tensor entries then solve the fluid-structure interaction formulation 
-        // and the Laplace formulation to smooth the mesh. The fields are updated in each 'solve' call.
-        solve({vftf00,vftf01,vftf10,vftf11});
+        // Solve the fluid-structure interaction and the Laplace formulation to smooth the mesh. 
+        // The fields are updated in each 'solve' call.
         solve(fsi);
         solve(laplacian);
         
@@ -144,7 +127,7 @@ void sparselizard(void)
     v.write(fluid, umesh, "v.vtk", 2);
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 8.34643e-06 && umax > 8.34641e-06);
+    std::cout << (umax < 8.3835e-06 && umax > 8.3833e-06);
 }
 
 int main(void)
