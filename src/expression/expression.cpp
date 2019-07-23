@@ -1387,7 +1387,7 @@ expression expression::spacederivative(int whichderivative)
 
     int problemdimension = universe::mymesh->getmeshdimension();
     
-    expression derivated = *this;
+    expression derivated = this->getcopy();
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
@@ -1414,7 +1414,7 @@ expression expression::spacederivative(int whichderivative)
 
 expression expression::kietaphiderivative(int whichderivative)
 {
-    expression derivated = *this;
+    expression derivated = this->getcopy();
     
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
@@ -1504,7 +1504,7 @@ expression expression::removerowandcol(int rowtoremove, int coltoremove)
 expression expression::determinant(void)
 {
     if (mynumrows == 1 && mynumcols == 1)
-        return *this;
+        return this->getcopy();
     
     if (mynumrows != mynumcols)
     {
@@ -1534,7 +1534,7 @@ expression expression::determinant(void)
 
 expression expression::cofactormatrix(void)
 {
-    expression cofactors = *this;
+    expression cofactors = this->getcopy();
 
     for (int row = 0; row < mynumrows; row++)
     {          
@@ -1554,7 +1554,7 @@ expression expression::cofactormatrix(void)
 expression expression::invert(void)
 {
     if (mynumrows == 1 && mynumcols == 1)
-        return 1/(*this);
+        return 1/(this->getcopy());
     
     if (mynumrows != mynumcols)
     {
@@ -1571,7 +1571,7 @@ expression expression::invert(void)
 
 expression expression::pow(expression input)
 {
-    expression powered = *this;
+    expression powered = this->getcopy();
 
     // The base and exponent expressions must be scalar:
     if (not(isscalar()) || not(input.isscalar()))
@@ -1677,7 +1677,7 @@ expression expression::tf(int physreg)
 
 expression expression::sin(void)
 {
-    expression sinexpr = *this;
+    expression sinexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         sinexpr.myoperations[i] = std::shared_ptr<opsin>(new opsin(myoperations[i]));
@@ -1687,7 +1687,7 @@ expression expression::sin(void)
 
 expression expression::cos(void)
 {
-    expression cosexpr = *this;
+    expression cosexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         cosexpr.myoperations[i] = std::shared_ptr<opcos>(new opcos(myoperations[i]));
@@ -1697,7 +1697,7 @@ expression expression::cos(void)
 
 expression expression::tan(void)
 {
-    expression tanexpr = *this;
+    expression tanexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         tanexpr.myoperations[i] = std::shared_ptr<optan>(new optan(myoperations[i]));
@@ -1707,7 +1707,7 @@ expression expression::tan(void)
 
 expression expression::asin(void)
 {
-    expression asinexpr = *this;
+    expression asinexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         asinexpr.myoperations[i] = std::shared_ptr<opasin>(new opasin(myoperations[i]));
@@ -1717,7 +1717,7 @@ expression expression::asin(void)
 
 expression expression::acos(void)
 {
-    expression acosexpr = *this;
+    expression acosexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         acosexpr.myoperations[i] = std::shared_ptr<opacos>(new opacos(myoperations[i]));
@@ -1727,7 +1727,7 @@ expression expression::acos(void)
 
 expression expression::atan(void)
 {
-    expression atanexpr = *this;
+    expression atanexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         atanexpr.myoperations[i] = std::shared_ptr<opatan>(new opatan(myoperations[i]));
@@ -1737,7 +1737,7 @@ expression expression::atan(void)
 
 expression expression::abs(void)
 {
-    expression absexpr = *this;
+    expression absexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         absexpr.myoperations[i] = std::shared_ptr<opabs>(new opabs(myoperations[i]));
@@ -1747,7 +1747,7 @@ expression expression::abs(void)
 
 expression expression::log10(void)
 {
-    expression log10expr = *this;
+    expression log10expr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         log10expr.myoperations[i] = std::shared_ptr<oplog10>(new oplog10(myoperations[i]));
@@ -1764,7 +1764,7 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
         abort();
     }
 
-    expression onexpr = *this;
+    expression onexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
         onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i], errorifnotfound));
@@ -1838,6 +1838,14 @@ expression expression::jac(void)
         case 3:
             return expression(3,3,{jac(0,0),jac(0,1),jac(0,2),   jac(1,0),jac(1,1),jac(1,2),   jac(2,0),jac(2,1),jac(2,2)});
     }
+}
+
+expression expression::getcopy(void)
+{
+    expression output = *this;
+    output.unprojectedfield = {};
+    
+    return output;
 }
 
 std::shared_ptr<operation> expression::getoperationinarray(int row, int col)
@@ -2045,12 +2053,12 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
 }
 
 
-expression expression::operator+(void) { return *this; }
-expression expression::operator-(void) { return (*this * -1.0); }
+expression expression::operator+(void) { return this->getcopy(); }
+expression expression::operator-(void) { return (this->getcopy() * -1.0); }
 
 expression expression::operator+(expression input)
 {
-    expression output = *this;
+    expression output = this->getcopy();
 
     if (mynumrows != input.mynumrows || mynumcols != input.mynumcols)
     {
@@ -2062,7 +2070,7 @@ expression expression::operator+(expression input)
     return output;
 }
 
-expression expression::operator-(expression input) { return (*this + input*-1); }
+expression expression::operator-(expression input) { return (this->getcopy() + input*-1); }
 
 expression expression::operator*(expression input)
 {
@@ -2079,7 +2087,7 @@ expression expression::operator*(expression input)
     }
     if (input.isscalar())
     {
-        output = *this;
+        output = this->getcopy();
 
         for (int i = 0; i < mynumrows*mynumcols; i++)
             output.myoperations[i] = std::shared_ptr<opproduct>(new opproduct( {myoperations[i], input.myoperations[0]} ));
@@ -2132,7 +2140,7 @@ expression expression::operator/(expression input)
     // Only divisions by scalars are allowed:
     if (input.isscalar())
     {
-        output = *this;
+        output = this->getcopy();
 
         for (int i = 0; i < mynumrows*mynumcols; i++)
         {       
@@ -2149,20 +2157,20 @@ expression expression::operator/(expression input)
     }
 }
 
-expression expression::operator+(field inputfield) { return *this + (expression)inputfield; }
-expression expression::operator-(field inputfield) { return *this - (expression)inputfield; }
-expression expression::operator*(field inputfield) { return *this * (expression)inputfield; }
-expression expression::operator/(field inputfield) { return *this / (expression)inputfield; }
+expression expression::operator+(field inputfield) { return this->getcopy() + (expression)inputfield; }
+expression expression::operator-(field inputfield) { return this->getcopy() - (expression)inputfield; }
+expression expression::operator*(field inputfield) { return this->getcopy() * (expression)inputfield; }
+expression expression::operator/(field inputfield) { return this->getcopy() / (expression)inputfield; }
 
-expression expression::operator+(double val) { return *this + (expression)val; }
-expression expression::operator-(double val) { return *this - (expression)val; }
-expression expression::operator*(double val) { return *this * (expression)val; }
-expression expression::operator/(double val) { return *this / (expression)val; }
+expression expression::operator+(double val) { return this->getcopy() + (expression)val; }
+expression expression::operator-(double val) { return this->getcopy() - (expression)val; }
+expression expression::operator*(double val) { return this->getcopy() * (expression)val; }
+expression expression::operator/(double val) { return this->getcopy() / (expression)val; }
 
-expression expression::operator+(parameter& param) { return *this + (expression)param; }
-expression expression::operator-(parameter& param) { return *this - (expression)param; }
-expression expression::operator*(parameter& param) { return *this * (expression)param; }
-expression expression::operator/(parameter& param) { return *this / (expression)param; }    
+expression expression::operator+(parameter& param) { return this->getcopy() + (expression)param; }
+expression expression::operator-(parameter& param) { return this->getcopy() - (expression)param; }
+expression expression::operator*(parameter& param) { return this->getcopy() * (expression)param; }
+expression expression::operator/(parameter& param) { return this->getcopy() / (expression)param; }    
 
 
 expression operator+(double val, expression expr) { return expr+val; }
