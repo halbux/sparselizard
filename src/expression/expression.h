@@ -209,6 +209,8 @@ class expression
         expression invjac(void);
         expression jac(void);
         
+        expression getcopy(void);
+        
         std::shared_ptr<operation> getoperationinarray(int row, int col);
         
         // Expand only the terms containing a dof or a testfun.
