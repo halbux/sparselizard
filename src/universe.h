@@ -47,18 +47,6 @@ class universe
 
         static bool forcejacobianreuse;
         
-        // Store all !HIERARCHICAL! form function values that can be reused.
-        // 'computedformfuncs[i].first' gives the ith form function type name.
-        // 'computedformfuncs[i].second' gives a vector detailed below.
-        // 'computedformfuncs[i].second[elemtypenum][0].first' gives the order
-        // to which the form function has been interpolated and .second 
-        // gives the interpolated values.
-        static std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> computedformfuncs;
-        // This function returns the requested form function values and reuses any already computed value if 'isreuseallowed' is true.
-        // In case 'isreuseallowed' is false a pointer to the evaluated form function polynomial storage is returned for speed reasons.
-        // When multiple calls follow each other the latter storage might be modified and it is therefore safer to always copy the output.
-        static hierarchicalformfunctioncontainer* interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates);
-        
         static shared_ptr<jacobian> computedjacobian;
         
         // Store all operations that must be reused:
@@ -93,11 +81,18 @@ class universe
         
         
         
-        // The form function polynomials can always be reused:
+        // Store all !HIERARCHICAL! form function polynomials (can always be reused) and evaluated values.
+        // 'formfuncpolys[i].first' gives the ith form function type name.
+        // 'formfuncpolys[i].second' gives a vector detailed below.
+        // 'formfuncpolys[i].second[elemtypenum][interpolorder][0]' gives the polynomials.
         static std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> formfuncpolys;
 
-        // Get the form function polynomials:
-        static hierarchicalformfunctioncontainer* getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder);
+        // This function returns the requested form function values and reuses any already computed value if 'isreuseallowed' is true.
+        // In case 'isreuseallowed' is false a pointer to the evaluated form function polynomial storage is returned for speed reasons.
+        // When multiple calls follow each other and 'isreuseallowed' is false the latter storage might be modified!
+        static hierarchicalformfunctioncontainer* gethff(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates);
+        // Keep the polynomials but reset the values:
+        static void resethff(void);
         
 };
 
