@@ -30,7 +30,7 @@ void universe::forbidreuse(void)
 {
     isreuseallowed = false;
     
-    computedformfuncs = {};
+    resethff();
     
     if (forcejacobianreuse == false)
     	computedjacobian = NULL;
@@ -42,42 +42,6 @@ void universe::forbidreuse(void)
 }
 
 bool universe::forcejacobianreuse = false;
-
-std::vector<std::pair< std::string, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >> >> universe::computedformfuncs = {};
-hierarchicalformfunctioncontainer* universe::interpolateformfunction(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates)
-{
-    // Find the type name in the container:
-    int typenameindex = -1;
-    for (int i = 0; i < computedformfuncs.size(); i++)
-    {
-        if (computedformfuncs[i].first == fftypename)
-        {
-            typenameindex = i;
-            break;
-        }
-    }
-    
-    // In case the form function is available and we are allowed to reuse it:
-    if (isreuseallowed && typenameindex != -1 && computedformfuncs[typenameindex].second.size() > elementtypenumber && computedformfuncs[typenameindex].second[elementtypenumber].size() > 0 && computedformfuncs[typenameindex].second[elementtypenumber][0].first >= interpolorder)
-        return &(computedformfuncs[typenameindex].second[elementtypenumber][0].second);
-    
-    // Otherwise it must be computed:
-    hierarchicalformfunctioncontainer* val = getformfunctionpolys(fftypename, elementtypenumber, interpolorder);
-    val->evaluate(evaluationcoordinates);
-    
-    // Store it for reuse if allowed:
-    if (isreuseallowed)
-    {
-        if (typenameindex == -1)
-        {
-            computedformfuncs.push_back( std::make_pair(fftypename, std::vector<std::vector< std::pair<int,hierarchicalformfunctioncontainer> >>(8,std::vector< std::pair<int,hierarchicalformfunctioncontainer> >(0))) );
-            typenameindex = computedformfuncs.size() - 1;
-        }
-        computedformfuncs[typenameindex].second[elementtypenumber] = {std::make_pair(interpolorder, *val)};
-    }
-
-    return val;
-}
 
 shared_ptr<jacobian> universe::computedjacobian = NULL;
 
@@ -151,7 +115,7 @@ std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};
 
 std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> universe::formfuncpolys = {};     
 
-hierarchicalformfunctioncontainer* universe::getformfunctionpolys(std::string fftypename, int elementtypenumber, int interpolorder)
+hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates)
 {
     // Find the type name in the container:
     int typenameindex = -1;
@@ -164,11 +128,20 @@ hierarchicalformfunctioncontainer* universe::getformfunctionpolys(std::string ff
         }
     }
 
-    // In case the form function is available:
-    if (typenameindex != -1 && formfuncpolys[typenameindex].second.size() > elementtypenumber && formfuncpolys[typenameindex].second[elementtypenumber].size() > interpolorder && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
-        return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
-
-
+    // In case the form function polynomials are available:
+    if (typenameindex != -1 && formfuncpolys[typenameindex].second[elementtypenumber].size() > interpolorder && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
+    {
+        if (isreuseallowed && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].isvalueready())
+            return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
+        else
+        {
+            formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].evaluate(evaluationcoordinates);
+            if (isreuseallowed)
+                formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(true);
+            return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
+        }
+    }
+    
     // Otherwise compute the form function polynomials and store them:
     if (typenameindex == -1)
     {
@@ -181,7 +154,26 @@ hierarchicalformfunctioncontainer* universe::getformfunctionpolys(std::string ff
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fftypename);
     
     formfuncpolys[typenameindex].second[elementtypenumber][interpolorder] = {myformfunction->evalat(interpolorder)};
+    formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].evaluate(evaluationcoordinates);
+    
+    if (isreuseallowed)
+        formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(true);
     
     return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
+}
+
+void universe::resethff(void)
+{
+    for (int typenameindex = 0; typenameindex < formfuncpolys.size(); typenameindex++)
+    {
+        for (int elementtypenumber = 0; elementtypenumber < (formfuncpolys[typenameindex].second).size(); elementtypenumber++)
+        {
+            for (int interpolorder = 0; interpolorder < formfuncpolys[typenameindex].second[elementtypenumber].size(); interpolorder++)
+            {
+                if (formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
+                    formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(false);
+            }
+        }
+    }
 }
 

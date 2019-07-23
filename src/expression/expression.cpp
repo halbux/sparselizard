@@ -642,7 +642,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
                                 if (numtimeevals == -1)
                                 {
+                                    // Clean storage before allowing reuse:
+                                    universe::forbidreuse();
+                                    universe::allowreuse();
                                     std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                                    universe::forbidreuse();
+                                    
                                     if (interpolated.size() > 0)
                                     {
                                         for (int h = 0; h < harmoniclist.size(); h++)
@@ -665,7 +670,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 }
                                 else
                                 {
+                                    // Clean storage before allowing reuse:
+                                    universe::forbidreuse();
+                                    universe::allowreuse();
                                     densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                                    universe::forbidreuse();
+                                    
                                     for (int tim = 0; tim < numtimeevals; tim++)
                                         interpolated[0][numcoords*tim+coordindex] = interp.getvalues()[tim];
                                 }
@@ -712,7 +722,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 								
                                 if (numtimeevals == -1)
                                 {
+                                    // Clean storage before allowing reuse:
+                                    universe::forbidreuse();
+                                    universe::allowreuse();
                                     std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                                    universe::forbidreuse();
+                                    
                                     if (interpolated.size() > 0)
                                     {
                                         for (int h = 0; h < harmoniclist.size(); h++)
@@ -735,7 +750,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 }
                                 else
                                 {
+                                    // Clean storage before allowing reuse:
+                                    universe::forbidreuse();
+                                    universe::allowreuse();
                                     densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                                    universe::forbidreuse();
+                                    
                                     for (int tim = 0; tim < numtimeevals; tim++)
                                         interpolated[0][numcoords*tim+coordindex] = interp.getvalues()[tim];
                                 }

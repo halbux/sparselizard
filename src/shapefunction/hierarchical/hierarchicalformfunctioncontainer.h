@@ -20,7 +20,10 @@ class hierarchicalformfunctioncontainer
 {
 
     private:
-
+    
+        // A boolean to indicate that the polynomial evaluations can be used:
+        bool myisvalueready = false;
+    
         std::string myformfunctiontypename;
         int myelementtypenumber;
         std::vector<double> myevaluationpoints;
@@ -47,7 +50,10 @@ class hierarchicalformfunctioncontainer
 
         hierarchicalformfunctioncontainer(void) {};
         hierarchicalformfunctioncontainer(std::string formfunctiontypename, int elementtypenumber);
-
+        
+        bool isvalueready(void) { return myisvalueready; };
+        void setvaluestatus(bool valstatus) { myisvalueready = valstatus; };
+        
         // Know the highest order available in the container.
         int gethighestorder(void) { return val.size()-1; };
 

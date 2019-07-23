@@ -80,14 +80,14 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
         std::shared_ptr<hierarchicalformfunction> tfformfunction = selector::select(elementtypenumber, tffield->gettypename());
         
         // Copy needed here otherwise the pointed values will be overwritten by the dof:
-        hierarchicalformfunctioncontainer tfval = *(universe::interpolateformfunction(tffield->gettypename(), elementtypenumber, tfinterpolationorder, evaluationpoints));
+        hierarchicalformfunctioncontainer tfval = *(universe::gethff(tffield->gettypename(), elementtypenumber, tfinterpolationorder, evaluationpoints));
         
         std::shared_ptr<hierarchicalformfunction> dofformfunction;
         hierarchicalformfunctioncontainer dofval;
         if (doffield != NULL)
         {
             dofformfunction = selector::select(elementtypenumber, doffield->gettypename());
-            dofval = *(universe::interpolateformfunction(doffield->gettypename(), elementtypenumber, dofinterpolationorder, evaluationpoints));
+            dofval = *(universe::gethff(doffield->gettypename(), elementtypenumber, dofinterpolationorder, evaluationpoints));
         }
         
         // Simplify all coeffs for faster computation later on.
