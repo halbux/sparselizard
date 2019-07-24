@@ -66,6 +66,10 @@ class vec
         
         Vec getpetsc(void);
         
+        // Write and load raw vec data:
+        void write(std::string filename);
+        void load(std::string filename);
+        
         void print(void);
         
         vec copy(void);

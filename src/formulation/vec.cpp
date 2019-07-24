@@ -66,6 +66,18 @@ void vec::setdata(int physreg, field myfield, std::string op)
 
 Vec vec::getpetsc(void) { errorifpointerisnull(); return rawvecptr->getpetsc(); }
 
+void vec::write(std::string filename)
+{
+    errorifpointerisnull();
+    rawvecptr->write(filename);
+}
+
+void vec::load(std::string filename)
+{
+    errorifpointerisnull();
+    rawvecptr->load(filename);
+}
+
 void vec::print(void) { errorifpointerisnull(); rawvecptr->print(); }
 
 vec vec::copy(void)
