@@ -234,7 +234,7 @@ void rawvec::write(std::string filename)
         }
     }
     
-    std::cout << "Error in 'rawvec' namespace: cannot write vec data to file '" << filename << "'." << std::endl;
+    std::cout << "Error in 'rawvec' object: cannot write vec data to file '" << filename << "'." << std::endl;
     std::cout << "Supported formats are .bin (binary)." << std::endl;
     abort();
 }
@@ -263,7 +263,7 @@ void rawvec::load(std::string filename)
         }
     }
     
-    std::cout << "Error in 'rawvec' namespace: cannot load vec data from file '" << filename << "'." << std::endl;
+    std::cout << "Error in 'rawvec' object: cannot load vec data from file '" << filename << "'." << std::endl;
     std::cout << "Supported formats are .bin (binary)." << std::endl;
     abort();
 }
