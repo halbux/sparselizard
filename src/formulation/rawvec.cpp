@@ -263,6 +263,11 @@ void rawvec::load(std::string filename)
         if (fileext == ".txt")
         {
             std::vector<double> loadedvals = mathop::loadvector(filename, ',', true);
+            if (loadedvals.size() != size())
+            {
+                std::cout << "Error in 'rawvec' object: loaded data size (" << loadedvals.size() << ") does not match the vector size (" << size() << ") " << std::endl;
+                abort();
+            }
             densematrix valsmat(1,size(), loadedvals);
             intdensematrix adresses(1,size(),0,1);
             setvalues(adresses, valsmat);
