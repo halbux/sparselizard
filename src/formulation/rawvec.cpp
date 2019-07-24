@@ -222,11 +222,19 @@ void rawvec::write(std::string filename)
     {
         // Get the extension:
         std::string fileext = filename.substr(filename.size()-4,4);
-
-        PetscViewer v;
         
+        if (fileext == ".txt")
+        {
+            std::vector<double> towrite;
+            intdensematrix adresses(1,size(),0,1);
+            densematrix curvals = getvalues(adresses);
+            curvals.getvalues(towrite);
+            mathop::writevector(filename, towrite, ',', true);
+            return;
+        }
         if (fileext == ".bin")
         {
+            PetscViewer v;
             PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_WRITE, &v);
             VecView(myvec, v);
             PetscViewerDestroy(&v);
@@ -235,7 +243,7 @@ void rawvec::write(std::string filename)
     }
     
     std::cout << "Error in 'rawvec' object: cannot write vec data to file '" << filename << "'." << std::endl;
-    std::cout << "Supported formats are .bin (binary)." << std::endl;
+    std::cout << "Supported formats are .txt (ASCII) and .bin (binary)." << std::endl;
     abort();
 }
 
@@ -251,11 +259,18 @@ void rawvec::load(std::string filename)
     {
         // Get the extension:
         std::string fileext = filename.substr(filename.size()-4,4);
-
-        PetscViewer v;
         
+        if (fileext == ".txt")
+        {
+            std::vector<double> loadedvals = mathop::loadvector(filename, ',', true);
+            densematrix valsmat(1,size(), loadedvals);
+            intdensematrix adresses(1,size(),0,1);
+            setvalues(adresses, valsmat);
+            return;
+        }
         if (fileext == ".bin")
         {
+            PetscViewer v;
             PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &v);
             VecLoad(myvec, v);
             PetscViewerDestroy(&v);
@@ -264,7 +279,7 @@ void rawvec::load(std::string filename)
     }
     
     std::cout << "Error in 'rawvec' object: cannot load vec data from file '" << filename << "'." << std::endl;
-    std::cout << "Supported formats are .bin (binary)." << std::endl;
+    std::cout << "Supported formats are .txt (ASCII) and .bin (binary)." << std::endl;
     abort();
 }
      
