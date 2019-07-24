@@ -150,6 +150,15 @@ void densematrix::setvalue(int rownumber, int columnnumber, double val)
     myvaluesptr[rownumber*numcols+columnnumber] = val;
 }
 
+void densematrix::getvalues(std::vector<double>& topopulate)
+{
+    topopulate.resize(count());
+
+    double* myvaluesptr = myvalues.get();
+    for (int i = 0; i < count(); i++)
+        topopulate[i] = myvaluesptr[i];
+}
+
 densematrix densematrix::copy(void)
 {
     densematrix densematrixcopy = *this;

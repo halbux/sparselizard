@@ -37,7 +37,7 @@ void mathop::printvector(std::vector<int> input)
     std::cout << std::endl;
 }
 
-void mathop::writevector(std::string filename, std::vector<double>& towrite)
+void mathop::writevector(std::string filename, std::vector<double>& towrite, char delimiter, bool writesize)
 {
 	if (towrite.size() == 0)
 		return;
@@ -46,20 +46,61 @@ void mathop::writevector(std::string filename, std::vector<double>& towrite)
 	std::ofstream name (filename.c_str());
 	if (name.is_open())
 	{
+	    if (writesize)
+	        name << towrite.size() << delimiter;
+	
 		// To write all doubles with enough digits to the file:
 		name << std::setprecision(17);
 		
 		for (int i = 0; i < towrite.size()-1; i++)
-			name << towrite[i] << ",";
+			name << towrite[i] << delimiter;
 		name << towrite[towrite.size()-1];
 		
 		name.close();
 	}
 	else 
 	{
-		std::cout << "Unable to write to file " << filename << " or file not found" << std::endl;
+		std::cout << "Unable to write vector to file " << filename << " or file not found" << std::endl;
 		abort();
 	}
+}
+
+std::vector<double> mathop::loadvector(std::string filename, char delimiter, bool sizeincluded)
+{
+    std::vector<double> output = {};
+
+    std::string currentline;
+
+    // 'file' cannot take a std::string argument --> filename.c_str():
+    std::ifstream name (filename.c_str());
+    if (name.is_open())
+    {
+        if (sizeincluded)
+        {
+            std::getline(name, currentline, delimiter);
+            output.resize(std::stoi(currentline));
+        }
+    
+        int index = 0;
+        while (std::getline(name, currentline, delimiter))
+        {
+            if (sizeincluded)
+                output[index] = std::stod(currentline);
+            else
+                output.push_back(std::stod(currentline));
+                
+            index++;
+        }
+        
+        name.close();
+    }
+    else 
+    {
+        std::cout << "Unable to load vector from file " << filename << " or file not found" << std::endl;
+        abort();
+    }
+    
+    return output;
 }
 
 expression mathop::norm(expression expr)
