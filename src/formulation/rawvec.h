@@ -59,6 +59,10 @@ class rawvec
         void setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
         densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
         
+        // Write and load raw vec data:
+        void write(std::string filename);
+        void load(std::string filename);
+        
         void print(void);
         
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };

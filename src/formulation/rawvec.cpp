@@ -209,6 +209,64 @@ densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointre
     
     return vals;
 }
+
+void rawvec::write(std::string filename)
+{
+    if (mydofmanager == NULL)
+    {
+        std::cout << "Error in 'rawvec' object: cannot write vec (structure is not defined)" << std::endl;
+        abort();
+    }
+    
+    if (filename.size() >= 5)
+    {
+        // Get the extension:
+        std::string fileext = filename.substr(filename.size()-4,4);
+
+        PetscViewer v;
+        
+        if (fileext == ".bin")
+        {
+            PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_WRITE, &v);
+            VecView(myvec, v);
+            PetscViewerDestroy(&v);
+            return;
+        }
+    }
+    
+    std::cout << "Error in 'rawvec' namespace: cannot write vec data to file '" << filename << "'." << std::endl;
+    std::cout << "Supported formats are .bin (binary)." << std::endl;
+    abort();
+}
+
+void rawvec::load(std::string filename)
+{
+    if (mydofmanager == NULL)
+    {
+        std::cout << "Error in 'rawvec' object: cannot load vec (structure is not defined)" << std::endl;
+        abort();
+    }
+    
+    if (filename.size() >= 5)
+    {
+        // Get the extension:
+        std::string fileext = filename.substr(filename.size()-4,4);
+
+        PetscViewer v;
+        
+        if (fileext == ".bin")
+        {
+            PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &v);
+            VecLoad(myvec, v);
+            PetscViewerDestroy(&v);
+            return;
+        }
+    }
+    
+    std::cout << "Error in 'rawvec' namespace: cannot load vec data from file '" << filename << "'." << std::endl;
+    std::cout << "Supported formats are .bin (binary)." << std::endl;
+    abort();
+}
      
 void rawvec::print(void)
 {          
