@@ -23,28 +23,28 @@ class coefmanager
 {
 
 	private:
-        
-        std::string myfieldtypename;
-        
-		// 'coefs[disjreg][formfunc][elem]' gives the coefficient for  
-        //
-		// - vertex, edge, face or volume type-disjoint region 'disjreg'
-		// - the 'formfunc'th vertex, edge, face or volume form function
-        // - element index 'elem' in the disjoint region
-        //
-		std::vector<std::vector<std::vector<double>>> coefs;
-        
+
+	std::string myfieldtypename;
+
+	// 'coefs[disjreg][formfunc][elem]' gives the coefficient for  
+	//
+	// - vertex, edge, face or volume type-disjoint region 'disjreg'
+	// - the 'formfunc'th vertex, edge, face or volume form function
+	// - element index 'elem' in the disjoint region
+	//
+	std::vector<std::vector<std::vector<double>>> coefs;
+
 	public:
-        
-        coefmanager() {};
-        coefmanager(std::string fieldtypename);
-		
-        // Update the number of form functions considered in every disjoint region. 
-        // To be called every time the interpolation order of the field changes.
-		void fitinterpolationorder(int disjreg, int interpolationorder);
-        
-        double getcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion);
-        void setcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion, double val);
+
+	coefmanager() {};
+	coefmanager(std::string fieldtypename);
+
+	// Update the number of form functions considered in every disjoint region. 
+	// To be called every time the interpolation order of the field changes.
+	void fitinterpolationorder(int disjreg, int interpolationorder);
+
+	double getcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion);
+	void setcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion, double val);
         
 };
 
