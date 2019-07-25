@@ -8,7 +8,6 @@
 #define Q6_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class q6: public hierarchicalformfunction
 {

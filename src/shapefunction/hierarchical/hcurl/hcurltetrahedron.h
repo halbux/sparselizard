@@ -12,7 +12,6 @@
 #define HCURLTETRAHEDRON_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurltetrahedron: public hierarchicalformfunction
 {

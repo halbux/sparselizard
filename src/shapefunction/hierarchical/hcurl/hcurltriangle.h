@@ -12,7 +12,6 @@
 #define HCURLTRIANGLE_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurltriangle: public hierarchicalformfunction
 {

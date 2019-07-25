@@ -12,7 +12,6 @@
 #define H1QUADRANGLE_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class h1quadrangle: public hierarchicalformfunction
 {

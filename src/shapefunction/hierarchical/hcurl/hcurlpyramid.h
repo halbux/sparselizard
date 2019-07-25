@@ -8,7 +8,6 @@
 #define HCURLPYRAMID_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurlpyramid: public hierarchicalformfunction
 {

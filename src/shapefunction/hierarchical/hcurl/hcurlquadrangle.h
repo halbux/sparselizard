@@ -12,7 +12,6 @@
 #define HCURLQUADRANGLE_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurlquadrangle: public hierarchicalformfunction
 {

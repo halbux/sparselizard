@@ -12,7 +12,6 @@
 #define H1TRIANGLE_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class h1triangle: public hierarchicalformfunction
 {
