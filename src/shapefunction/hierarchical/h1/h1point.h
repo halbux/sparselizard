@@ -8,7 +8,6 @@
 #define H1POINT_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class h1point: public hierarchicalformfunction
 {

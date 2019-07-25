@@ -12,7 +12,6 @@
 #define H1HEXAHEDRON_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class h1hexahedron: public hierarchicalformfunction
 {

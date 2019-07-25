@@ -12,7 +12,6 @@
 #define H1LINE_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class h1line: public hierarchicalformfunction
 {

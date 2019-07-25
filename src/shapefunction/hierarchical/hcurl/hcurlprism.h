@@ -12,7 +12,6 @@
 #define HCURLPRISM_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurlprism: public hierarchicalformfunction
 {

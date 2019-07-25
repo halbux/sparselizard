@@ -12,7 +12,6 @@
 #define HCURLLINE_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurlline: public hierarchicalformfunction
 {

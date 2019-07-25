@@ -8,7 +8,6 @@
 #define HCURLPOINT_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class hcurlpoint: public hierarchicalformfunction
 {

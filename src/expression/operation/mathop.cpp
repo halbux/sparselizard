@@ -37,7 +37,7 @@ void mathop::printvector(std::vector<int> input)
     std::cout << std::endl;
 }
 
-void mathop::writevector(std::string filename, std::vector<double>& towrite, char delimiter, bool writesize)
+void mathop::writevector(std::string filename, std::vector<double> towrite, char delimiter, bool writesize)
 {
 	if (towrite.size() == 0)
 		return;

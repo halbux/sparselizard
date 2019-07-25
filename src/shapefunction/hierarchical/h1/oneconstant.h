@@ -8,7 +8,6 @@
 #define ONECONSTANT_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class oneconstant: public hierarchicalformfunction
 {

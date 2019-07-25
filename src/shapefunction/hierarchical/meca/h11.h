@@ -8,7 +8,6 @@
 #define H11_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class h11: public hierarchicalformfunction
 {
