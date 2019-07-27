@@ -15,7 +15,7 @@ int hierarchicalformfunction::gettypenumber(std::string fftypename)
     
     if (outtypenum == -1)
     {
-        std::cout << "Error in 'hierarchicalformfunction' object: unknown type name " << fftypename << std::endl;
+        std::cout << "Error in 'hierarchicalformfunction' object: unknown type name '" << fftypename << "'" << std::endl;
         abort();
     }
     
