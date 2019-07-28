@@ -172,6 +172,40 @@ void field::write(int physreg, int numfftharms, expression meshdeform, std::stri
 void field::write(int physreg, std::string filename, int lagrangeorder, int numtimesteps) { return ((expression)*this).write(physreg, filename, lagrangeorder, numtimesteps); }
 void field::write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps) { return ((expression)*this).write(physreg, meshdeform, filename, lagrangeorder, numtimesteps); }
 
+void field::writeraw(int physreg, std::string filename, bool isbinary)
+{
+    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".slz")
+    {
+        std::cout << "Error in 'field' object: expected .slz file extension to write raw field data" << std::endl;
+        abort();
+    }
+
+    if (rawfieldptr == NULL)
+    {
+        std::cout << "Error in 'field' object: cannot write raw field data (field undefined)" << std::endl;
+        abort();
+    }
+    
+    rawfieldptr->writeraw(physreg, filename, isbinary);
+}
+
+void field::loadraw(std::string filename, bool isbinary)
+{
+    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".slz")
+    {
+        std::cout << "Error in 'field' object: expected .slz file extension to load raw field data" << std::endl;
+        abort();
+    }
+    
+    if (rawfieldptr == NULL)
+    {
+        std::cout << "Error in 'field' object: cannot load raw field data (field undefined)" << std::endl;
+        abort();
+    }
+    
+    rawfieldptr->loadraw(filename, isbinary);
+}
+
 
 expression field::operator+(void) { return (expression)*this; }
 expression field::operator-(void) { return -(expression)*this; }

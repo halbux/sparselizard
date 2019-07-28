@@ -744,6 +744,341 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
 }
 
 
+std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> rawfield::getallsons(void)
+{
+    std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> output = {};
+    
+    if (mysubfields.size() > 0)
+    {
+        for (int i = 0; i < mysubfields.size(); i++)
+        {
+            if (mysubfields[i].size() > 0)
+            {
+                std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> cur = mysubfields[i][0]->getallsons();
+                for (int f = 0; f < cur.size(); f++)
+                {
+                    cur[f].first[0] = i;
+                    output.push_back(cur[f]);
+                }
+            }
+        }
+        return output;
+    }
+    
+    if (myharmonics.size() > 0)
+    {
+        for (int h = 0; h < myharmonics.size(); h++)
+        {
+            if (myharmonics[h].size() > 0)
+            {
+                std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> cur = myharmonics[h][0]->getallsons();
+                for (int f = 0; f < cur.size(); f++)
+                {
+                    cur[f].first[1] = h;
+                    output.push_back(cur[f]);
+                }
+            }
+        }
+        return output;
+    }
+    
+    std::vector<int> curfirst = {0,1};
+    output = {std::make_pair(curfirst, getpointer())};
+    
+    return output;
+}
+
+void rawfield::writeraw(int physreg, std::string filename, bool isbinary)
+{
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z")
+    {
+        std::cout << "Error in 'rawfield' object: cannot write field type '" << mytypename << "' to raw format" << std::endl;
+        abort();
+    }
+    
+    int numsubfields = countsubfields();
+    std::vector<int> harmoniclist = getharmonics();
+    int numharms = harmoniclist.size();
+
+    hierarchicalformfunction myhff;
+    int fieldtypenum = myhff.gettypenumber(mytypename);
+
+    // Get all disjoint regions in the physical region:
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    int numdisjregs = selecteddisjregs.size();
+    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+
+    // Get all sons:
+    std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> allsons = getallsons();
+    int numsons = allsons.size();
+    
+    
+    // Preallocate the int data vector. It consists in:
+    //
+    // 1. File format number
+    // 2. Field type number
+    // 3. Number of subfields
+    // 4. Number of harmonics in the field
+    // 5. Harmonic numbers in the field (must be identical for every subfield)
+    // 6. Number of disjoint regions
+    // 7. All disjoint region numbers interlaced with the number of elements in each disjoint region
+    // 8. For every son loop on every disjoint region and store {interpolorder, doublevecrangebegin}
+    //
+    std::vector<int> intdata(5 + numharms + 2*numdisjregs + numsons * 2*numdisjregs);
+
+    intdata[0] = 1; // Format number
+    intdata[1] = fieldtypenum;
+    intdata[2] = numsubfields;
+    intdata[3] = numharms;
+    
+    int indexinintvec = 4;
+    for (int i = 0; i < numharms; i++)  
+        intdata[indexinintvec+i] = harmoniclist[i];
+    indexinintvec += numharms;
+    
+    intdata[indexinintvec] = numdisjregs;
+    indexinintvec++;
+    for (int i = 0; i < numdisjregs; i++)
+    {
+        int disjreg = selecteddisjregs[i];
+        intdata[indexinintvec+0] = disjreg;
+        intdata[indexinintvec+1] = mydisjointregions->countelements(disjreg);
+        indexinintvec += 2;
+    }
+    
+    // Temporary double data container.
+    // One vector per son and per disjoint region (son listing order is first subfield then each harmonic of the first subfield, then next subfield...):
+    std::vector<std::vector<std::vector<double>>> doubledata(numsons, std::vector<std::vector<double>>(numdisjregs));
+
+
+    int doubledatasize = 0;
+    for (int i = 0; i < numsons; i++)
+    {
+        shared_ptr<rawfield> curson = allsons[i].second;
+        shared_ptr<coefmanager> curcoefmanager = curson->mycoefmanager;
+    
+        // For every son provide info for each disjoint region as {order, doublevecrangebegin}:
+        for (int d = 0; d < numdisjregs; d++)
+        {
+            int disjreg = selecteddisjregs[d];
+        
+            int interpolorder = curson->interpolationorder[disjreg];
+         
+            // Get the element type number, element dimension and number of elements in the current disjoint region:
+            int elementtypenumber = mydisjointregions->getelementtypenumber(disjreg);
+            int elementdimension = mydisjointregions->getelementdimension(disjreg);
+            int numberofelements = mydisjointregions->countelements(disjreg);
+            
+            // Get the number of form functions associated to dimension elementdimension:
+            std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
+            int numberofformfunctions = myformfunction->count(interpolorder, elementdimension, 0);
+
+            // Populate the int data vector:
+            intdata[indexinintvec+0] = interpolorder; 
+            intdata[indexinintvec+1] = doubledatasize;
+            indexinintvec += 2;
+            
+            doubledatasize += numberofelements * numberofformfunctions;
+            
+            
+            // Populate the 'doubledata' vector:
+            doubledata[i][d].resize(numberofelements * numberofformfunctions);
+                        
+            int curindex = 0;
+            for (int ff = 0; ff < numberofformfunctions; ff++)
+            {
+                for (int e = 0; e < numberofelements; e++)
+                {
+                    doubledata[i][d][curindex] = curcoefmanager->getcoef(disjreg, ff, e);
+                    curindex++;
+                }
+            }
+        }
+    }
+    
+    
+    // Flatten the double data vector:
+    std::vector<double> flatdoubledata(doubledatasize);
+    
+    int curindex = 0;
+    for (int i = 0; i < doubledata.size(); i++)
+    {
+        for (int j = 0; j < doubledata[i].size(); j++)
+        {
+            for (int k = 0; k < doubledata[i][j].size(); k++)
+            {
+                flatdoubledata[curindex] = doubledata[i][j][k];
+                curindex++;
+            }
+        } 
+    }
+    
+    
+    // This will write the int data length and double data length at the file begin:
+    iointerface::write(filename, intdata, flatdoubledata, isbinary);
+}
+
+void rawfield::loadraw(std::string filename, bool isbinary)
+{
+    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    
+    
+    ///// Load the data from disk:
+    std::vector<int> intdata;
+    std::vector<double> doubledata;
+
+    iointerface::load(filename, intdata, doubledata, isbinary);
+    
+    
+    ///// Extract the file format number:
+    int fileformatnum = intdata[0];
+    
+    
+    ///// Extract the field type number and make sure the field type names match:
+    int fieldtypenum = intdata[1];
+    hierarchicalformfunction myhff;
+    std::string fieldtypename = myhff.gettypename(fieldtypenum);
+
+    if (mytypename != fieldtypename)
+    {
+        std::cout << "Error in 'rawfield' object: trying to load a '" << fieldtypename << "' type field from file '" << filename << "' to a '" << mytypename << "' type" << std::endl;
+        abort();
+    }
+    
+    
+    ///// Extract the number of subfields and make sure they match:
+    int numsubfields = intdata[2];
+    if (numsubfields != countsubfields())
+    {
+        std::cout << "Error in 'rawfield' object: trying to load a field with " << numsubfields << " subfields from file '" << filename << "' to one with " << countsubfields() << " subfields" << std::endl;
+        abort();
+    }
+    
+    
+    ///// Extract the number of harmonics and all harmonics, make sure they match:
+    int numharms = intdata[3];
+    
+    int indexinintvec = 4;
+    std::vector<int> harmoniclist(numharms);
+    for (int i = 0; i < numharms; i++)
+        harmoniclist[i] = intdata[indexinintvec+i];
+    indexinintvec += numharms;
+    
+    std::vector<int> harmsinthisfield = getharmonics();
+    bool issameharms = true;
+    if (numharms != harmsinthisfield.size())
+        issameharms = false;
+    if (issameharms == true)
+    {
+        for (int i = 0; i < numharms; i++)
+        {
+            if (harmoniclist[i] != harmsinthisfield[i])
+            {
+                issameharms = false;
+                break;
+            }
+        }
+    }
+    if (issameharms == false)
+    {
+        std::cout << "Error in 'rawfield' object: harmonic list in field loaded from file '" << filename << "' does not match current field." << std::endl << std::endl;
+
+        std::cout << "Harmonics in loaded field (" << harmoniclist.size() << "): ";
+        for (int i = 0; i < harmoniclist.size(); i++)
+            std::cout << harmoniclist[i] << " ";
+        std::cout << std::endl;
+        
+        std::cout << "Harmonics in current field (" << harmsinthisfield.size() << "): ";
+        for (int i = 0; i < harmsinthisfield.size(); i++)
+            std::cout << harmsinthisfield[i] << " ";
+        std::cout << std::endl << std::endl;
+        abort();
+    }
+    
+    
+    ///// Extract the list of disjoint regions and the number of elements in them from intdata, make sure the meshes match:
+    int numdisjregs = intdata[indexinintvec];
+    indexinintvec++;
+    std::vector<int> disjregs(numdisjregs); std::vector<int> numelems(numdisjregs);
+    
+    for (int i = 0; i < numdisjregs; i++)
+    {
+        disjregs[i] = intdata[indexinintvec+0];
+        numelems[i] = intdata[indexinintvec+1];
+        indexinintvec += 2;
+    }
+    int maxdisjreg = *max_element(disjregs.begin(), disjregs.end());
+    
+    bool issamemesh = true;
+    if (maxdisjreg >= mydisjointregions->count())
+        issamemesh = false;
+    if (issamemesh == true)
+    {
+        for (int i = 0; i < numdisjregs; i++)
+        {
+            if (mydisjointregions->countelements(disjregs[i]) != numelems[i])
+            {
+                issamemesh = false;
+                break;
+            }
+        }
+    }
+    if (issamemesh == false)
+    {
+        std::cout << "Error in 'rawfield' object: the mesh used to write file '" << filename << "' is not the same as the current one" << std::endl;
+        abort();
+    }
+    
+    
+    ///// ALL CHECKS PERFORMED. LOAD THE DATA.
+    
+    // Calculate the number of sons:
+    int numsons = (intdata.size() - indexinintvec) / (2*numdisjregs);
+    // Get all the sons in this rawfield:
+    std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> allsons = getallsons();
+    
+    for (int i = 0; i < numsons; i++)
+    {
+        shared_ptr<rawfield> curson = allsons[i].second;
+        shared_ptr<coefmanager> curcoefmanager = curson->mycoefmanager;
+    
+        for (int d = 0; d < numdisjregs; d++)
+        {
+            int disjreg = disjregs[d];
+        
+            int interpolorder = intdata[indexinintvec+0];
+            int rangebeginindoubledata = intdata[indexinintvec+1];
+            indexinintvec += 2;
+            
+            // Update the current field order:
+            curcoefmanager->fitinterpolationorder(disjreg, interpolorder);
+            
+         
+            // Get the element type number, element dimension and number of elements in the current disjoint region:
+            int elementtypenumber = mydisjointregions->getelementtypenumber(disjreg);
+            int elementdimension = mydisjointregions->getelementdimension(disjreg);
+            int numberofelements = mydisjointregions->countelements(disjreg);
+            
+            // Get the number of form functions associated to dimension elementdimension:
+            std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
+            int numberofformfunctions = myformfunction->count(interpolorder, elementdimension, 0);
+
+            
+            // Extract the double data:
+            int curindex = 0;
+            for (int ff = 0; ff < numberofformfunctions; ff++)
+            {
+                for (int e = 0; e < numberofelements; e++)
+                {
+                    curcoefmanager->setcoef(disjreg, ff, e, doubledata[rangebeginindoubledata + curindex]);
+                    curindex++;
+                }
+            }
+        }
+    }
+}
+        
+
 std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     // Get all disjoint regions in the element selector:
