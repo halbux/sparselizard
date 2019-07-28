@@ -170,6 +170,15 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void errornotsameinterpolationorder(int disjreg);
         
 
+        // Get a vector listing all subfields and every harmonic for every subfield 
+        // as a pair of {subfieldnum,harmnum} and the rawfield pointer:
+        std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> getallsons(void);
+
+        // Write/load the raw data to/from compact sparselizard format:
+        void writeraw(int physreg, std::string filename, bool isbinary);
+        void loadraw(std::string filename, bool isbinary);
+        
+
         // This interpolate is called in practice:
         std::vector<std::vector<densematrix>> interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
         
