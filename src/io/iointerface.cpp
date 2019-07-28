@@ -56,17 +56,17 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
         if (name.is_open())
         {
             // Write the int and double data length:
-            name << intdata.size() << "," << doubledata.size() << ",";
+            name << intdata.size() << std::endl << doubledata.size() << std::endl;
 
             // Write the int data to the file:
             for (int i = 0; i < intdata.size(); i++)
-                name << intdata[i] << ",";
+                name << intdata[i] << std::endl;
 
             // To write all doubles with enough digits to the file:
             name << std::setprecision(17);
 
             for (int i = 0; i < doubledata.size()-1; i++)
-                name << doubledata[i] << ",";
+                name << doubledata[i] << std::endl;
             name << doubledata[doubledata.size()-1];
 
             name.close();
@@ -90,23 +90,23 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         if (name.is_open())
         {
             // First integer is the intdata size, second is the doubledata size:
-            std::getline(name, currentline, ',');
+            std::getline(name, currentline);
             intdata.resize(std::stoi(currentline));
             
-            std::getline(name, currentline, ',');
+            std::getline(name, currentline);
             doubledata.resize(std::stoi(currentline));
 
             // Load the intdata:
             for (int i = 0; i < intdata.size(); i++)
             {
-                std::getline(name, currentline, ',');
+                std::getline(name, currentline);
                 intdata[i] = std::stoi(currentline);
             }
             
             // Load the doubledata:
             for (int i = 0; i < doubledata.size(); i++)
             {
-                std::getline(name, currentline, ',');
+                std::getline(name, currentline);
                 doubledata[i] = std::stod(currentline);
             }
 
