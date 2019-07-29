@@ -1052,6 +1052,7 @@ void rawfield::loadraw(std::string filename, bool isbinary)
             
             // Update the current field order:
             curcoefmanager->fitinterpolationorder(disjreg, interpolorder);
+            curson->interpolationorder[disjreg] = interpolorder;
             
          
             // Get the element type number, element dimension and number of elements in the current disjoint region:
