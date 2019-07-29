@@ -181,10 +181,16 @@ void field::writeraw(int physreg, std::string filename, bool isbinary)
     }
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
+    {
         rawfieldptr->writeraw(physreg, filename, isbinary);
+        return;
+    }
     
     if (isbinary == false && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz"))
+    {
         rawfieldptr->writeraw(physreg, filename, isbinary);
+        return;
+    }
     
     std::cout << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to write raw field data" << std::endl;
     abort();
@@ -199,10 +205,16 @@ void field::loadraw(std::string filename, bool isbinary)
     }
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
+    {
         rawfieldptr->loadraw(filename, isbinary);
+        return;
+    }
     
     if (isbinary == false && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz"))
+    {
         rawfieldptr->loadraw(filename, isbinary);
+        return;
+    }
     
     std::cout << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to load raw field data" << std::endl;
     abort();
