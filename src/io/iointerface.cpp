@@ -77,6 +77,38 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
             abort();
         } 
     }
+    else
+    {
+        // All ints will be converted to doubles (doubles can exactly represent ints up to at least 2^52):
+        int totalsize = intdata.size() + doubledata.size() + 2;
+        intdensematrix alladdresses(1,totalsize, 0,1);
+        densematrix alldata(1,totalsize);
+
+        int* addsvals = alladdresses.getvalues();
+        double* datavals = alldata.getvalues();
+
+        datavals[0] = intdata.size();
+        datavals[1] = doubledata.size();
+        for (int i = 0; i < intdata.size(); i++)
+            datavals[2 + i] = (double)intdata[i];
+        for (int i = 0; i < doubledata.size(); i++)
+            datavals[2+intdata.size() + i] = doubledata[i];
+            
+        // Let petsc write the binary file for us:
+        Vec datvec;
+        VecCreate(PETSC_COMM_SELF, &datvec);
+        VecSetSizes(datvec, PETSC_DECIDE, totalsize);
+        VecSetFromOptions(datvec);  
+
+        VecSetValues(datvec, totalsize, addsvals, datavals, INSERT_VALUES);
+
+        PetscViewer v;
+        PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_WRITE, &v);
+        VecView(datvec, v);
+        PetscViewerDestroy(&v);
+
+        VecDestroy(&datvec);
+    }
 }
 
 void iointerface::load(std::string filename, std::vector<int>& intdata, std::vector<double>& doubledata, bool isbinary)
@@ -117,6 +149,40 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             std::cout << "Unable to load data from file " << filename << " or file not found" << std::endl;
             abort();
         }
+    }
+    else
+    {
+        // Let petsc read the binary file for us:
+        Vec datvec;
+        VecCreate(PETSC_COMM_SELF, &datvec);
+        
+        PetscViewer v;
+        PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_READ, &v);
+        VecLoad(datvec, v);
+        PetscViewerDestroy(&v);
+        
+        int veclen;
+        VecGetSize(datvec, &veclen);
+        
+        densematrix doublestoget(1, veclen);
+        intdensematrix addressestoget(1, veclen, 0, 1);
+        
+        double* vals = doublestoget.getvalues();
+        int* ads = addressestoget.getvalues();
+        
+        VecGetValues(datvec, veclen, ads, vals);
+        
+        int numints = vals[0];
+        int numdoubles = vals[1];
+        intdata.resize(numints);
+        doubledata.resize(numdoubles);
+        
+        for (int i = 0; i < numints; i++)
+            intdata[i] = (int)vals[2 + i];
+        for (int i = 0; i < numdoubles; i++)
+            doubledata[i] = vals[2+numints + i];
+        
+        VecDestroy(&datvec);
     }
 }
 

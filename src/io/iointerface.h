@@ -13,6 +13,8 @@
 
 #include <string>
 #include "iodata.h"
+#include "petsc.h"
+#include "petscvec.h"
 
 #include "gmshinterface.h"
 #include "pvinterface.h"
