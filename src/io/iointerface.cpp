@@ -90,7 +90,7 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
         datavals[0] = intdata.size();
         datavals[1] = doubledata.size();
         for (int i = 0; i < intdata.size(); i++)
-            datavals[2 + i] = (double)intdata[i];
+            datavals[2 + i] = intdata[i];
         for (int i = 0; i < doubledata.size(); i++)
             datavals[2+intdata.size() + i] = doubledata[i];
             
@@ -178,7 +178,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         doubledata.resize(numdoubles);
         
         for (int i = 0; i < numints; i++)
-            intdata[i] = (int)vals[2 + i];
+            intdata[i] = vals[2 + i];
         for (int i = 0; i < numdoubles; i++)
             doubledata[i] = vals[2+numints + i];
         
