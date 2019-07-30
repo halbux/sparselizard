@@ -965,21 +965,8 @@ void rawfield::loadraw(std::string filename, bool isbinary)
     indexinintvec += numharms;
     
     std::vector<int> harmsinthisfield = getharmonics();
-    bool issameharms = true;
-    if (numharms != harmsinthisfield.size())
-        issameharms = false;
-    if (issameharms == true)
-    {
-        for (int i = 0; i < numharms; i++)
-        {
-            if (harmoniclist[i] != harmsinthisfield[i])
-            {
-                issameharms = false;
-                break;
-            }
-        }
-    }
-    if (issameharms == false)
+
+    if (harmoniclist != harmsinthisfield)
     {
         std::cout << "Error in 'rawfield' object: harmonic list in field loaded from file '" << filename << "' does not match current field." << std::endl << std::endl;
 
