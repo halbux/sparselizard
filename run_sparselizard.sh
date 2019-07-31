@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # THIS SCRIPT RUNS THE SPARSELIZARD EXECUTABLE
 
