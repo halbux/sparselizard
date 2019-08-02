@@ -87,9 +87,10 @@ class mesh
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
         int getmeshdimension(void);
         
-        // Additional region selection tools. Will become effective only after loading the mesh.
+        // Additional region selection tools. Will become effective only after loading the mesh. Can reuse previous selections!
         void regionskin(int newphysreg, int physregtoskin);
         void boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
+        void sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
         
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:

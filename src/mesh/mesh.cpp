@@ -343,12 +343,17 @@ int mesh::getmeshdimension(void)
 
 void mesh::regionskin(int newphysreg, int physregtoskin)
 {
-	myregiondefiner.regionskin(newphysreg, physregtoskin);
+    myregiondefiner.regionskin(newphysreg, physregtoskin);
 }
 
 void mesh::boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
 {
-	myregiondefiner.boxselection(newphysreg, selecteddim, boxlimit, physregtobox);
+    myregiondefiner.boxselection(newphysreg, selecteddim, boxlimit, physregtobox);
+}
+
+void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
+{
+    myregiondefiner.sphereselection(newphysreg, selecteddim, centercoords, radius, physregtosphere);
 }
 
 
