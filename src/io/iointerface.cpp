@@ -19,13 +19,18 @@ void iointerface::writetofile(std::string filename, iodata datatowrite, std::str
         }
         if (fileext == ".vtk")
         {
-            pvinterface::writetofile(requestedfilename, datatowrite);
+            pvinterface::writetovtkfile(requestedfilename, datatowrite);
+            return;
+        }
+        if (fileext == ".vtu")
+        {
+            pvinterface::writetovtufile(requestedfilename, datatowrite);
             return;
         }
     }
     
     std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView) and .pos (GMSH)." << std::endl;
+    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
     abort();
 }
 
@@ -40,10 +45,12 @@ bool iointerface::isonlyisoparametric(std::string filename)
             return false;
         if (fileext == ".vtk")
             return true;
+        if (fileext == ".vtu")
+            return true;
     }
 		
-    std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView) and .pos (GMSH)." << std::endl;
+    std::cout << "Error in 'iointerface' namespace: cannot handle file '" << filename << "'." << std::endl;
+    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
     abort();
 }
 

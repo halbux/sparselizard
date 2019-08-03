@@ -1,175 +1,369 @@
 #include "pvinterface.h"
 
 
-void pvinterface::writetofile(std::string name, iodata datatowrite)
+void pvinterface::writetovtkfile(std::string name, iodata datatowrite)
 {
     // Get the file name without the .vtk extension:
     std::string namenoext = name.substr(0, name.size()-4);
-    
-	// Get all timesteps in 'datatowrite':
-	std::vector<double> timetags = datatowrite.gettimetags();
-	
-	if (timetags.size() == 0)
-		writetofile(name, datatowrite, -1);
-	
-	for (int i = 0; i < timetags.size(); i++)
-	{
-		std::string curname = namenoext + "_" + std::to_string(i) + ".vtk";
-		writetofile(curname, datatowrite, i);
-	}
+
+    // Get all timesteps in 'datatowrite':
+    std::vector<double> timetags = datatowrite.gettimetags();
+
+    if (timetags.size() == 0)
+        writetovtkfile(name, datatowrite, -1);
+
+    for (int i = 0; i < timetags.size(); i++)
+    {
+        std::string curname = namenoext + "_" + std::to_string(i) + ".vtk";
+        writetovtkfile(curname, datatowrite, i);
+    }
 }
 
-void pvinterface::writetofile(std::string name, iodata datatowrite, int timestepindex)
+void pvinterface::writetovtufile(std::string name, iodata datatowrite)
+{
+    // Get the file name without the .vtu extension:
+    std::string namenoext = name.substr(0, name.size()-4);
+
+    // Get all timesteps in 'datatowrite':
+    std::vector<double> timetags = datatowrite.gettimetags();
+
+    if (timetags.size() == 0)
+        writetovtufile(name, datatowrite, -1);
+
+    for (int i = 0; i < timetags.size(); i++)
+    {
+        std::string curname = namenoext + "_" + std::to_string(i) + ".vtu";
+        writetovtufile(curname, datatowrite, i);
+    }
+}
+
+void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int timestepindex)
 {
     // Get the file name without the path and the .vtk extension:
     std::string viewname = myalgorithm::getfilename(name);
-    
+
     mystring myname(viewname);
     viewname = myname.getstringwhileletter();
-    
-	// 'file' cannot take a std::string argument --> name.c_str():
-	std::ofstream outfile (name.c_str());
-	if (outfile.is_open())
-	{
-		// To write all doubles with enough digits to the file:
-		outfile << std::setprecision(17);
-		
-		// Write the header:
-		outfile << "# vtk DataFile Version 4.2\n";
-		outfile << viewname+"\n";
-		outfile << "ASCII\n";
-		outfile << "DATASET UNSTRUCTURED_GRID\n\n";
-		
-		// Write the points section.
-		int numnodes = datatowrite.countcoordnodes();
-		outfile << "POINTS " << numnodes << " double\n";
-		for (int tn = 0; tn < 8; tn++)
-		{
-			if (datatowrite.ispopulated(tn) == false)
-				continue;
-				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
-			double* xvals = curcoords[0].getvalues();
-			double* yvals = curcoords[1].getvalues();
-			double* zvals = curcoords[2].getvalues();
+
+    // 'file' cannot take a std::string argument --> name.c_str():
+    std::ofstream outfile (name.c_str());
+    if (outfile.is_open())
+    {
+        // To write all doubles with enough digits to the file:
+        outfile << std::setprecision(17);
+
+        // Write the header:
+        outfile << "# vtk DataFile Version 4.2\n";
+        outfile << viewname+"\n";
+        outfile << "ASCII\n";
+        outfile << "DATASET UNSTRUCTURED_GRID\n\n";
+
+        // Write the points section.
+        int numnodes = datatowrite.countcoordnodes();
+        outfile << "POINTS " << numnodes << " double\n";
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            double* xvals = curcoords[0].getvalues();
+            double* yvals = curcoords[1].getvalues();
+            double* zvals = curcoords[2].getvalues();
+
+            int index = 0;
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+            {
+                for (int node = 0; node < curcoords[0].countcolumns(); node++)
+                {
+                    outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << " ";
+                    index++;
+                }
+                outfile << "\n";
+            }
+        }
+        outfile << "\n";
+
+        // Write the cells section:
+        int numelems = datatowrite.countelements();
+        outfile << "CELLS " << numelems << " " << numnodes + numelems << "\n";
+
+        int nodenum = 0;
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            // Move from our node ordering to the one of ParaView:
+            element myelem(tn, datatowrite.getinterpolorder());
+            std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+            {
+                outfile << curcoords[0].countcolumns() << " ";
+                for (int node = 0; node < curcoords[0].countcolumns(); node++)
+                    outfile << nodenum + reordering[node] << " ";
+                nodenum += curcoords[0].countcolumns();
+                outfile << "\n";
+            }
+        }
+        outfile << "\n";
+
+        // Write the cell types section:
+        outfile << "CELL_TYPES " << numelems << "\n";
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            element myelem(tn, datatowrite.getinterpolorder());
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+                outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
+        }
+        outfile << "\n";
+
+        // Write the data section:
+        outfile << "POINT_DATA " << numnodes << "\n";
+        outfile << "\n";
+
+        // Write the scalar data section (if any):
+        if (datatowrite.isscalar() == true)
+        {
+            outfile << "SCALARS " << viewname << " double\n";
+            outfile << "LOOKUP_TABLE default" << "\n";
+            for (int tn = 0; tn < 8; tn++)
+            {
+                if (datatowrite.ispopulated(tn) == false)
+                    continue;
+
+                densematrix scaldat = datatowrite.getdata(tn,timestepindex)[0];
+                double* scalvals = scaldat.getvalues();
+
+                for (int i = 0; i < scaldat.count(); i++)
+                    outfile << scalvals[i] << "\n";
+            }
+            outfile << "\n";
+        }
+
+        // Write the vector data section (if any):
+        if (datatowrite.isscalar() == false)
+        {
+            outfile << "VECTORS " << viewname << " double\n";
+            for (int tn = 0; tn < 8; tn++)
+            {
+                if (datatowrite.ispopulated(tn) == false)
+                    continue;
+
+                std::vector<densematrix> vecdat = datatowrite.getdata(tn,timestepindex);
+                double* compxvals = vecdat[0].getvalues();
+                double* compyvals = vecdat[1].getvalues();
+                double* compzvals = vecdat[2].getvalues();
+
+                for (int i = 0; i < vecdat[0].count(); i++)
+                    outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
+            }
+            outfile << "\n";
+        }
+
+        outfile.close();
+    }
+    else 
+    {
+        std::cout << "Unable to write to file " << name << " or file not found" << std::endl;
+        abort();
+    }
+}
+
+void pvinterface::writetovtufile(std::string name, iodata datatowrite, int timestepindex)
+{
+    // Get the file name without the path and the .vtk extension:
+    std::string viewname = myalgorithm::getfilename(name);
+
+    mystring myname(viewname);
+    viewname = myname.getstringwhileletter();
+
+    // 'file' cannot take a std::string argument --> name.c_str():
+    std::ofstream outfile (name.c_str());
+    if (outfile.is_open())
+    {
+        // To write all doubles with enough digits to the file:
+        outfile << std::setprecision(17);
+        
+        // Write the header:
+        outfile << "<?xml version=\"1.0\"?>\n";
+        outfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
+        outfile << "<UnstructuredGrid>\n";
+
+        // Get the number of points and cells
+        int numnodes = datatowrite.countcoordnodes();
+        int numelems = datatowrite.countelements();
+        outfile << "<Piece NumberOfPoints=\"" << numnodes << "\" NumberOfCells=\"" << numelems <<"\">\n";
 			
-			int index = 0;
-			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
-			{
-				for (int node = 0; node < curcoords[0].countcolumns(); node++)
-				{
-					outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << " ";
-					index++;
-				}
-				outfile << "\n";
-			}
-		}
-		outfile << "\n";
-		
-		// Write the cells section:
-		int numelems = datatowrite.countelements();
-		outfile << "CELLS " << numelems << " " << numnodes + numelems << "\n";
-		
-		int nodenum = 0;
-		for (int tn = 0; tn < 8; tn++)
-		{
-			if (datatowrite.ispopulated(tn) == false)
-				continue;
-				
-			// Move from our node ordering to the one of ParaView:
-			element myelem(tn, datatowrite.getinterpolorder());
-			std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
+        // Write the points section.
+		outfile << "<Points>\n";
+		outfile << "<DataArray type=\"Float64\" Name=\"Points\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+        
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            double* xvals = curcoords[0].getvalues();
+            double* yvals = curcoords[1].getvalues();
+            double* zvals = curcoords[2].getvalues();
+
+            int index = 0;
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+            {
+                for (int node = 0; node < curcoords[0].countcolumns(); node++)
+                {
+                    outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << "\n";
+                    index++;
+                }
+            }
+        }
+        outfile << "</DataArray>\n";
+        outfile << "</Points>\n";
+
+        // Write the cells section:
+        outfile << "<Cells>\n";
+        outfile << "<DataArray type=\"Int64\" Name=\"connectivity\" format=\"ascii\">\n";
+
+        int nodenum = 0;
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            // Move from our node ordering to the one of ParaView:
+            element myelem(tn, datatowrite.getinterpolorder());
+            std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+            {
+                for (int node = 0; node < curcoords[0].countcolumns(); node++)
+                    outfile << nodenum + reordering[node] << " ";
+                nodenum += curcoords[0].countcolumns();
+                outfile << "\n";
+            }
+        }
+        outfile << "</DataArray>\n";
+        
+        // Write the offset section:
+        outfile << "<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">\n";
+        
+        nodenum = 0; int nb = 0;
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            // Move from our node ordering to the one of ParaView:
+            element myelem(tn, datatowrite.getinterpolorder());
+            std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+            {
+                nb += curcoords[0].countcolumns();
+                outfile << nb << "\n";
+            }
+        }
+        outfile << "</DataArray>\n";
+
+        // Write the cell types section:
+        outfile << "<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n";
+        
+        for (int tn = 0; tn < 8; tn++)
+        {
+            if (datatowrite.ispopulated(tn) == false)
+                continue;
+
+            element myelem(tn, datatowrite.getinterpolorder());
+
+            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+
+            for (int elem = 0; elem < curcoords[0].countrows(); elem++)
+                outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
+        }
+        outfile << "</DataArray>\n";
+        outfile << "</Cells>\n";
+
+        // Write the data section:
+
+        // Write the scalar data section (if any):
+        if (datatowrite.isscalar() == true)
+        {
+            outfile << "<PointData Scalars=\"" << viewname << "\" >\n";
+            outfile << "<DataArray type=\"Float64\" Name=\"" << viewname << "\" format=\"ascii\">\n";
+            for (int tn = 0; tn < 8; tn++)
+            {
+                if (datatowrite.ispopulated(tn) == false)
+                    continue;
+
+                densematrix scaldat = datatowrite.getdata(tn,timestepindex)[0];
+                double* scalvals = scaldat.getvalues();
+
+                for (int i = 0; i < scaldat.count(); i++)
+                    outfile << scalvals[i] << "\n";
+            }
+            outfile << "</DataArray>\n";
+            outfile << "</PointData>\n";
+        }
+
+        // Write the vector data section (if any):
+        if (datatowrite.isscalar() == false)
+        {
+            outfile << "<PointData Vectors=\"" << viewname << "\" >\n";
+            outfile << "<DataArray type=\"Float64\" Name=\"" << viewname << "\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+            for (int tn = 0; tn < 8; tn++)
+            {
+                if (datatowrite.ispopulated(tn) == false)
+                    continue;
+
+                std::vector<densematrix> vecdat = datatowrite.getdata(tn,timestepindex);
+                double* compxvals = vecdat[0].getvalues();
+                double* compyvals = vecdat[1].getvalues();
+                double* compzvals = vecdat[2].getvalues();
+
+                for (int i = 0; i < vecdat[0].count(); i++)
+                    outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
+            }
+            outfile << "</DataArray>\n";
+            outfile << "</PointData>\n";
+        }
+
+        outfile << "</Piece>\n";
+        outfile << "</UnstructuredGrid>\n";
+        outfile << "</VTKFile>\n";
 			
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
-			
-			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
-			{
-				outfile << curcoords[0].countcolumns() << " ";
-				for (int node = 0; node < curcoords[0].countcolumns(); node++)
-					outfile << nodenum + reordering[node] << " ";
-				nodenum += curcoords[0].countcolumns();
-				outfile << "\n";
-			}
-		}
-		outfile << "\n";
-		
-		// Write the cell types section:
-		outfile << "CELL_TYPES " << numelems << "\n";
-		for (int tn = 0; tn < 8; tn++)
-		{
-			if (datatowrite.ispopulated(tn) == false)
-				continue;
-				
-			element myelem(tn, datatowrite.getinterpolorder());
-				
-			std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
-			
-			for (int elem = 0; elem < curcoords[0].countrows(); elem++)
-				outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
-		}
-		outfile << "\n";
-		
-		// Write the data section:
-		outfile << "POINT_DATA " << numnodes << "\n";
-		outfile << "\n";
-		
-		// Write the scalar data section (if any):
-		if (datatowrite.isscalar() == true)
-		{
-			outfile << "SCALARS " << viewname << " double\n";
-			outfile << "LOOKUP_TABLE default" << "\n";
-			for (int tn = 0; tn < 8; tn++)
-			{
-				if (datatowrite.ispopulated(tn) == false)
-					continue;
-					
-				densematrix scaldat = datatowrite.getdata(tn,timestepindex)[0];
-				double* scalvals = scaldat.getvalues();
-				
-				for (int i = 0; i < scaldat.count(); i++)
-					outfile << scalvals[i] << "\n";
-			}
-			outfile << "\n";
-		}
-		
-		// Write the vector data section (if any):
-		if (datatowrite.isscalar() == false)
-		{
-			outfile << "VECTORS " << viewname << " double\n";
-			for (int tn = 0; tn < 8; tn++)
-			{
-				if (datatowrite.ispopulated(tn) == false)
-					continue;
-					
-				std::vector<densematrix> vecdat = datatowrite.getdata(tn,timestepindex);
-				double* compxvals = vecdat[0].getvalues();
-				double* compyvals = vecdat[1].getvalues();
-				double* compzvals = vecdat[2].getvalues();
-				
-				for (int i = 0; i < vecdat[0].count(); i++)
-					outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
-			}
-			outfile << "\n";
-		}
-		
-		outfile.close();
-	}
-	else 
-	{
-		std::cout << "Unable to write to file " << name << " or file not found" << std::endl;
-		abort();
-	}
+        outfile.close();
+    }
+    else 
+    {
+        std::cout << "Unable to write to file " << name << " or file not found" << std::endl;
+        abort();
+    }
 }
 
 int pvinterface::converttoparaviewelementtypenumber(int ourtypenumber)
 {
-	// Point:
-	if (ourtypenumber == 0)
-		return 1;
-			
-	// This is the general Lagrange elements starting from ParaView version 5.5:
-	element myelement(ourtypenumber);
-	return (67 + myelement.gettypenumber());
+    // Point:
+    if (ourtypenumber == 0)
+        return 1;
+
+    // This is the general Lagrange elements starting from ParaView version 5.5:
+    element myelement(ourtypenumber);
+    return (67 + myelement.gettypenumber());
 }
 
 std::vector<int> pvinterface::getnodereordering(int ourtypenumber)

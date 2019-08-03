@@ -2,6 +2,8 @@
 //
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
+//
+// Thanks to R. Harouari for the support of the .vtu output format.
 
 
 #ifndef PVINTERFACE_H
@@ -20,9 +22,10 @@
 
 namespace pvinterface
 {
-    // Write to .vtk format:
-    void writetofile(std::string name, iodata datatowrite);
-    void writetofile(std::string name, iodata datatowrite, int timestepindex);
+    void writetovtkfile(std::string name, iodata datatowrite);
+    void writetovtufile(std::string name, iodata datatowrite);
+    void writetovtkfile(std::string name, iodata datatowrite, int timestepindex);
+    void writetovtufile(std::string name, iodata datatowrite, int timestepindex);
     
     // ParaView comes with its own element type numbering:
     int converttoparaviewelementtypenumber(int ourtypenumber);

@@ -7,6 +7,7 @@
 //
 // - GMSH .pos
 // - ParaView .vtk
+// - ParaView .vtu
 
 #ifndef IOINTERFACE_H
 #define IOINTERFACE_H
