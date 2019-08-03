@@ -205,8 +205,8 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         outfile << "<Piece NumberOfPoints=\"" << numnodes << "\" NumberOfCells=\"" << numelems <<"\">\n";
 			
         // Write the points section.
-		outfile << "<Points>\n";
-		outfile << "<DataArray type=\"Float64\" Name=\"Points\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+        outfile << "<Points>\n";
+        outfile << "<DataArray type=\"Float64\" Name=\"Points\" NumberOfComponents=\"3\" format=\"ascii\">\n";
         
         for (int tn = 0; tn < 8; tn++)
         {
