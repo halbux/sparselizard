@@ -788,7 +788,7 @@ std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> rawfield::getalls
     return output;
 }
 
-void rawfield::writeraw(int physreg, std::string filename, bool isbinary)
+void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::vector<double> extradata)
 {
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
@@ -851,7 +851,7 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary)
     std::vector<std::vector<std::vector<double>>> doubledata(numsons, std::vector<std::vector<double>>(numdisjregs));
 
 
-    int doubledatasize = 0;
+    int doubledatasize = extradata.size();
     for (int i = 0; i < numsons; i++)
     {
         shared_ptr<rawfield> curson = allsons[i].second;
@@ -901,6 +901,12 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary)
     std::vector<double> flatdoubledata(doubledatasize);
     
     int curindex = 0;
+    for (int i = 0; i < extradata.size(); i++)
+    {
+        flatdoubledata[curindex] = extradata[i];
+        curindex++;
+    }
+    
     for (int i = 0; i < doubledata.size(); i++)
     {
         for (int j = 0; j < doubledata[i].size(); j++)
@@ -918,7 +924,7 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary)
     iointerface::write(filename, intdata, flatdoubledata, isbinary);
 }
 
-void rawfield::loadraw(std::string filename, bool isbinary)
+std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 {
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
     
@@ -1019,6 +1025,11 @@ void rawfield::loadraw(std::string filename, bool isbinary)
     
     ///// ALL CHECKS PERFORMED. LOAD THE DATA.
     
+    // Load the extra data at the double data vector begin:
+    std::vector<double> extradata(intdata[indexinintvec+1]);
+    for (int i = 0; i < extradata.size(); i++)
+        extradata[i] = doubledata[i];
+    
     // Calculate the number of sons:
     int numsons = (intdata.size() - indexinintvec) / (2*numdisjregs);
     // Get all the sons in this rawfield:
@@ -1064,6 +1075,7 @@ void rawfield::loadraw(std::string filename, bool isbinary)
             }
         }
     }
+    return extradata;
 }
         
 
