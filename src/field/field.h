@@ -144,8 +144,8 @@ class field
         void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
         
         // Write/load the raw field data to/from compact sparselizard format:
-        void writeraw(int physreg, std::string filename, bool isbinary = false);
-        void loadraw(std::string filename, bool isbinary = false);
+        void writeraw(int physreg, std::string filename, bool isbinary = false, std::vector<double> extradata = {});
+        std::vector<double> loadraw(std::string filename, bool isbinary = false);
         
 
         // Defining the +, -, * and / operators:
