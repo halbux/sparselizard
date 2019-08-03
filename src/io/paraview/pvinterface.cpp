@@ -76,7 +76,11 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
             {
                 for (int node = 0; node < curcoords[0].countcolumns(); node++)
                 {
-                    outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << " ";
+                    if (universe::isaxisymmetric)
+                        outfile << xvals[index] << " " << -zvals[index] << " " << yvals[index] << " ";
+                    else
+                        outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << " ";
+                
                     index++;
                 }
                 outfile << "\n";
@@ -165,7 +169,12 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
                 double* compzvals = vecdat[2].getvalues();
 
                 for (int i = 0; i < vecdat[0].count(); i++)
-                    outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
+                {
+                    if (universe::isaxisymmetric)
+                        outfile << compxvals[i] << " " << -compzvals[i]  << " " << compyvals[i] << "\n";
+                    else
+                        outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
+                }
             }
             outfile << "\n";
         }
@@ -223,7 +232,11 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
             {
                 for (int node = 0; node < curcoords[0].countcolumns(); node++)
                 {
-                    outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << "\n";
+                    if (universe::isaxisymmetric)
+                        outfile << xvals[index] << " " << -zvals[index] << " " << yvals[index] << "\n";
+                    else
+                        outfile << xvals[index] << " " << yvals[index] << " " << zvals[index] << "\n";
+                        
                     index++;
                 }
             }
@@ -336,7 +349,12 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
                 double* compzvals = vecdat[2].getvalues();
 
                 for (int i = 0; i < vecdat[0].count(); i++)
-                    outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
+                {
+                    if (universe::isaxisymmetric)
+                        outfile << compxvals[i] << " " << -compzvals[i]  << " " << compyvals[i] << "\n";
+                    else
+                        outfile << compxvals[i] << " " << compyvals[i] << " " << compzvals[i] << "\n";
+                }
             }
             outfile << "</DataArray>\n";
             outfile << "</PointData>\n";
