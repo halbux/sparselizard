@@ -19,6 +19,7 @@
 #include "iodata.h"
 #include "element.h"
 #include "mystring.h"
+#include "universe.h"
 
 namespace pvinterface
 {
