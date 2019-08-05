@@ -59,7 +59,7 @@ void sparselizard(void)
     v.setconstraint(ground, 0);	
     
     // Set a conditional constraint on compy(u), the y component of the mechanical deflection.
-    // The constraint is active for all nodal degrees of freedom at which 'condexpr' is positive or zero. 
+    // The constraint is active for all nodal degrees of freedom at which 'contactcondition' is positive or zero. 
     // 
     // There is mechanical contact if either the deflection is larger than a given threshold 
     // (chosen as 99% of the gap size times 1+1e-6, not 100% to avoid the need of remeshing the cavity)
@@ -68,15 +68,10 @@ void sparselizard(void)
     // - compy(u) is greater than a given deflection (99% of the gap size)
     // - the y direction force balance on the node is negative, i.e. the node is pulled downwards
     //
-    // Define conditional expressions for the conditions above. The value of a conditional 
-    // expression is the second argument expression at all positions in space where the first 
-    // argument is positive or zero. The value is the third argument expression otherwise.
-    //
-    expression nodeforcebalancecondition = expression(compy(nodalforcebalance), -1, 1);
-    expression contactcondition(-compy(u)-thcav*0.99, nodeforcebalancecondition, -1);
-    expression condexpr(-compy(u)-(thcav+1e-6*thcav)*0.99, 1, contactcondition);
+    expression contactcondition = orpositive({-compy(u)-(thcav+1e-6*thcav)*0.99, andpositive({-compy(u)-thcav*0.99, -compy(nodalforcebalance)})});
+    
     // Set the conditional constraint on the y component of the deflection field u:
-    u.compy().setconditionalconstraint(contact, condexpr, -0.99*(thcav+1e-8*thcav));
+    u.compy().setconditionalconstraint(contact, contactcondition, -0.99*(thcav+1e-8*thcav));
     
     // Young's modulus [Pa], Poisson's ratio [], the density [kg/m^3] and the electric permittivity [F/m]:
     parameter E, nu, rho, epsilon;
@@ -186,9 +181,9 @@ void sparselizard(void)
     uh.setconstraint(insulator);
     
     // Set the same conditional constraint as above:
-    uh.harmonic(1).compy().setconditionalconstraint(contact, condexpr, -0.99*(thcav+1e-8*thcav));
+    uh.harmonic(1).compy().setconditionalconstraint(contact, contactcondition, -0.99*(thcav+1e-8*thcav));
     // The vibration around the static deflection is 0 at the contact: 
-    uh.harmonic(2).setconditionalconstraint(contact, condexpr, array3x1(0,0,0));
+    uh.harmonic(2).setconditionalconstraint(contact, contactcondition, array3x1(0,0,0));
     
     // Set the DC voltage bias on the electrode:
     vh.harmonic(1).setconstraint(electrode, 120);	
