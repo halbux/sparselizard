@@ -85,6 +85,11 @@ namespace mathop
     expression log10(expression input);
     expression pow(expression base, expression exponent);
     
+    // Easy conditional functions for expressions (true if the expression value is >= 0):
+    expression ifpositive(expression condexpr, expression trueexpr, expression falseexpr);
+    expression andpositive(std::vector<expression> exprs);
+    expression orpositive(std::vector<expression> exprs);
+    
     // Evaluate an expression on physical region 'physreg' using interpolation:
     expression on(int physreg, expression expr, bool errorifnotfound = true);
     // Interpolate at coordinates shifted by 'coordshift':
