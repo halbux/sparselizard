@@ -250,6 +250,44 @@ expression mathop::sqrt(expression input) { return pow(input, 0.5); }
 expression mathop::log10(expression input) { return input.log10(); }
 expression mathop::pow(expression base, expression exponent) { return base.pow(exponent); }
 
+expression mathop::ifpositive(expression condexpr, expression trueexpr, expression falseexpr)
+{
+    expression output(condexpr, trueexpr, falseexpr);
+    return output;
+}
+
+expression mathop::andpositive(std::vector<expression> exprs)
+{
+    if (exprs.size() == 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot call andpositive on an empty vector of expressions" << std::endl;
+        abort();
+    }
+
+    expression output(exprs[exprs.size()-1], 1, -1);
+    
+    for (int i = exprs.size()-2; i >= 0; i--)
+        output = expression(exprs[i], output, -1);
+        
+    return output;
+}
+
+expression mathop::orpositive(std::vector<expression> exprs)
+{
+    if (exprs.size() == 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot call orpositive on an empty vector of expressions" << std::endl;
+        abort();
+    }
+
+    expression output(exprs[exprs.size()-1], 1, -1);
+    
+    for (int i = exprs.size()-2; i >= 0; i--)
+        output = expression(exprs[i], 1, output);
+        
+    return output;
+}
+
 expression mathop::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
 expression mathop::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
     
