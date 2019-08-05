@@ -189,6 +189,22 @@ double mathop::gettime(void) { return universe::currenttimestep; }
 
 expression mathop::t(void) { expression exp; return exp.time(); }
 
+void mathop::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
+{
+    iointerface::grouptimesteps(filename, filestogroup, timevals);
+}
+
+void mathop::grouptimesteps(std::string filename, std::string fileprefix, int firstint, std::vector<double> timevals)
+{
+    int numsteps = timevals.size();
+    
+    std::vector<std::string> filestogroup(numsteps);
+    for (int i = 0; i < numsteps; i++)
+        filestogroup[i] = fileprefix+std::to_string(firstint+i)+".vtu";
+    
+    iointerface::grouptimesteps(filename, filestogroup, timevals);
+}
+
 field mathop::elementsize(int physreg)
 {
 	int problemdimension = universe::mymesh->getmeshdimension();

@@ -8,6 +8,7 @@
 // - GMSH .pos
 // - ParaView .vtk
 // - ParaView .vtu
+// - ParaView .pvd
 
 #ifndef IOINTERFACE_H
 #define IOINTERFACE_H
@@ -25,6 +26,9 @@ namespace iointerface
     void writetofile(std::string filename, iodata datatowrite, std::string appendtofilename = "");
     // The file format might allow only isoparametric elements:
     bool isonlyisoparametric(std::string filename);
+    
+    // Group .vtu timestep files in a .pvd file:
+    void grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals);
     
     // Write first an int vector then a double vector to ASCII or binary format:
     void write(std::string filename, std::vector<int>& intdata, std::vector<double>& doubledata, bool isbinary);
