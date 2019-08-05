@@ -54,6 +54,36 @@ bool iointerface::isonlyisoparametric(std::string filename)
     abort();
 }
 
+void iointerface::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
+{
+    int numsteps = timevals.size();
+    
+    if (numsteps != filestogroup.size())
+    {
+        std::cout << "Error in 'iointerface': number of files to group does not match the number of time values provided" << std::endl;
+        abort();
+    }
+    
+    if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pvd")
+    {
+        std::cout << "Error in 'iointerface': expected .pvd file extension to group the timesteps" << std::endl;
+        abort();
+    }
+        
+    // Check that all file names end with .vtu:
+    for (int i = 0; i < numsteps; i++)
+    {
+        std::string curfile = filestogroup[i];
+        if (curfile.size() < 5 || curfile.substr(curfile.size()-4,4) != ".vtu")
+        {
+            std::cout << "Error in 'iointerface': can only group .vtu files into the .pvd file" << std::endl;
+            abort();
+        }
+    }
+    
+    pvinterface::grouptopvdfile(filename, filestogroup, timevals);
+}
+
 void iointerface::write(std::string filename, std::vector<int>& intdata, std::vector<double>& doubledata, bool isbinary)
 {
     if (isbinary == false)

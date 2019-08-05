@@ -28,6 +28,8 @@ namespace pvinterface
     void writetovtkfile(std::string name, iodata datatowrite, int timestepindex);
     void writetovtufile(std::string name, iodata datatowrite, int timestepindex);
     
+    void grouptopvdfile(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals);
+    
     // ParaView comes with its own element type numbering:
     int converttoparaviewelementtypenumber(int ourtypenumber);
     // ParaView comes with its own element node ordering:

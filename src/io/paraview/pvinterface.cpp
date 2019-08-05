@@ -373,6 +373,49 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
     }
 }
 
+void pvinterface::grouptopvdfile(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
+{
+    int numsteps = timevals.size();
+
+    // 'file' cannot take a std::string argument --> filename.c_str():
+    std::ofstream outfile (filename.c_str());
+    if (outfile.is_open())
+    {
+        // To write all doubles with enough digits to the file:
+        outfile << std::setprecision(17);
+        
+        // Write the header:
+        outfile << "<?xml version=\"1.0\"?>\n";
+        outfile << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
+        outfile << "<Collection>\n";
+    
+        for (int i = 0; i < numsteps; i++)
+        {
+            std::ifstream curfile (filestogroup[i].c_str());
+            if (curfile.is_open())
+            {
+                curfile.close();
+                outfile << "<DataSet timestep=\"" << timevals[i] << "\" group=\"\" part=\"0\" file=\"" << filestogroup[i] << "\"/>\n";
+            }
+            else
+            {
+                std::cout << "Error in 'pvinterface': could not find file '" << filestogroup[i] << "' during grouping" << std::endl;
+                abort();
+            }
+        }
+    
+        outfile << "</Collection>\n";
+        outfile << "</VTKFile>\n";
+    
+        outfile.close();
+    }
+    else 
+    {
+        std::cout << "Unable to write to file " << filename << " or file not found" << std::endl;
+        abort();
+    }
+}
+
 int pvinterface::converttoparaviewelementtypenumber(int ourtypenumber)
 {
     // Point:
