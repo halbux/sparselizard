@@ -4,6 +4,7 @@
 #include "rawline.h"
 #include "rawarc.h"
 #include "rawquadrangle.h"
+#include "rawtriangle.h"
 #include "rawdisk.h"
 #include "rawsurface.h"
 #include "rawextrusion.h"
@@ -75,6 +76,11 @@ shape::shape(std::string shapename, int physreg, std::vector<double> coords, std
 {
 	std::vector<std::shared_ptr<rawshape>> cornerpts = geotools::coordstopoints(coords);
 
+	if (shapename == "triangle")
+	{
+		rawshapeptr = std::shared_ptr<rawtriangle>(new rawtriangle(physreg, cornerpts, nummeshpts));
+		return;
+	}
 	if (shapename == "quadrangle")
 	{
 		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, cornerpts, nummeshpts));
@@ -110,6 +116,11 @@ shape::shape(std::string shapename, int physreg, std::vector<shape> subshapes, s
 	// Get the rawshape pointer from all shapes:
 	std::vector<std::shared_ptr<rawshape>> subrawshapes = geotools::getrawshapes(subshapes);
 
+	if (shapename == "triangle")
+	{
+		rawshapeptr = std::shared_ptr<rawtriangle>(new rawtriangle(physreg, subrawshapes, nummeshpts));
+		return;
+	}
 	if (shapename == "quadrangle")
 	{
 		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, subrawshapes, nummeshpts));
@@ -125,6 +136,11 @@ shape::shape(std::string shapename, int physreg, std::vector<shape> subshapes)
 	// Get the rawshape pointer from all shapes:
 	std::vector<std::shared_ptr<rawshape>> subrawshapes = geotools::getrawshapes(subshapes);
 
+	if (shapename == "triangle")
+	{
+		rawshapeptr = std::shared_ptr<rawtriangle>(new rawtriangle(physreg, subrawshapes));
+		return;
+	}
 	if (shapename == "quadrangle")
 	{
 		rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(physreg, subrawshapes));
