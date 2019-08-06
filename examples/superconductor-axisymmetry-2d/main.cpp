@@ -110,14 +110,20 @@ void sparselizard(void)
         az.setdata(wholedomain, asol[i]);
         
         // Write a and b = curl(a) to disk:
-        norm(a).write(wholedomain, "norma" + std::to_string(i+1000) + ".pos"); 
-        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".pos"); 
+        norm(a).write(wholedomain, "norma" + std::to_string(i+1000) + ".vtu"); 
+        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtu"); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         // Interpolate at a x coordinate slightly away from 0 to avoid NaN issues:
         bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];
         std::cout << "b source " << timestep*i << " mT --> b tube center " << bcenter[i]*1e3 << " mT" << std::endl;
     }
+    // Combine all timesteps in a ParaView .pvd file for convenience:
+    std::vector<double> timestepvalues(151);
+    for (int i = 0; i < 151; i++)
+        timestepvalues[i] = timestep*i;
+    grouptimesteps("normbtotal.pvd", "normbtotal", 1000, timestepvalues);
+    
     // Write to file the field at the tube center for all timesteps:
     writevector("bcenter.csv", bcenter);
     
