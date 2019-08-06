@@ -6,28 +6,25 @@
 
 // This object holds a geometrical shape.
 
-#ifndef RAWEXTRUSION_H
-#define RAWEXTRUSION_H
+#ifndef RAWTRIANGLE_H
+#define RAWTRIANGLE_H
 
 #include <iostream>
 #include <vector>
-
-#include "expression.h"
+#include <memory>
 
 #include "rawshape.h"
-#include "rawquadrangle.h"
-#include "rawtriangle.h"
-#include "rawline.h"
 #include "rawpoint.h"
-#include "geotools.h"
+#include "rawline.h"
+#include "rawextrusion.h"
 
-class rawextrusion: public rawshape
+class rawtriangle: public rawshape
 {   
 
     private:
 
 		int myphysicalregion = -1;
-		
+
 		// Son shapes:
 		std::vector<std::shared_ptr<rawshape>> sons = {};
 
@@ -36,21 +33,18 @@ class rawextrusion: public rawshape
 		// Elements in the mesh:
 		std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
 
-
-		// Number of node layers in the extrusion:
-		int mynumlayers;
-
-		// Extrusion length:
-		double myheight;
-
-		// Unextruded rawshape:
-		std::shared_ptr<rawshape> mybaseshape;
         
 	public:
 
-		rawextrusion(void) {};
+		rawtriangle(void) {};
 
-		rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers);
+		// Provide to this constructor the corner rawpoints in the triangle:
+		rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, std::vector<int> nummeshpoints);
+
+		// Provide to this constructor the contour rawlines in the triangle:
+		rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputlines);
+
+		std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
 
 		std::shared_ptr<rawshape> duplicate(void);
 
