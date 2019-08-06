@@ -187,17 +187,19 @@ void rawtriangle::mesh(void)
 				continue;
 			}
 
-			double mu = (double)i/(n-1);
+			double xh1 = linescoords[2]->at(3*(n-1-j)+0);
+			double xhn = linescoords[1]->at(3*j+0);
+			double yh1 = linescoords[2]->at(3*(n-1-j)+1);
+			double yhn = linescoords[1]->at(3*j+1);
+			double zh1 = linescoords[2]->at(3*(n-1-j)+2);
+			double zhn = linescoords[1]->at(3*j+2);
+
+			double mu = (double)i/(n-1-j);
 			double lambda = (double)j/(n-1-i);
 
-			// Coordinates of the current node in the undeformed triangle:
-			double xundef = (1-lambda)*((1-mu)*xcorner[0]+mu*xcorner[1]) + lambda*((1-mu)*xcorner[2]+mu*xcorner[1]);
-			double yundef = (1-lambda)*((1-mu)*ycorner[0]+mu*ycorner[1]) + lambda*((1-mu)*ycorner[2]+mu*ycorner[1]);
-			double zundef = (1-lambda)*((1-mu)*zcorner[0]+mu*zcorner[1]) + lambda*((1-mu)*zcorner[2]+mu*zcorner[1]);
-
-			mycoords[3*currentnode + 0] = (1-lambda)*x1 + lambda*xn  +  mu*linescoords[1]->at(3*j+0) + (1-mu)*linescoords[2]->at(3*(n-1-j)+0) - xundef;
-			mycoords[3*currentnode + 1] = (1-lambda)*y1 + lambda*yn  +  mu*linescoords[1]->at(3*j+1) + (1-mu)*linescoords[2]->at(3*(n-1-j)+1) - yundef;
-			mycoords[3*currentnode + 2] = (1-lambda)*z1 + lambda*zn  +  mu*linescoords[1]->at(3*j+2) + (1-mu)*linescoords[2]->at(3*(n-1-j)+2) - zundef;
+			mycoords[3*currentnode + 0] = 0.5*( (1-lambda)*x1 + lambda*xn + (1-mu)*xh1 + mu*xhn );
+			mycoords[3*currentnode + 1] = 0.5*( (1-lambda)*y1 + lambda*yn + (1-mu)*yh1 + mu*yhn );
+			mycoords[3*currentnode + 2] = 0.5*( (1-lambda)*z1 + lambda*zn + (1-mu)*zh1 + mu*zhn );
 
 			currentnode++;
 		}
