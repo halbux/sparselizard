@@ -215,7 +215,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
 			
         // Write the points section.
         outfile << "<Points>\n";
-        outfile << "<DataArray type=\"Float64\" Name=\"Points\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+        outfile << "<DataArray type=\"Float64\" Name=\"points\" NumberOfComponents=\"3\" format=\"ascii\">\n";
         
         for (int tn = 0; tn < 8; tn++)
         {
@@ -246,7 +246,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
 
         // Write the cells section:
         outfile << "<Cells>\n";
-        outfile << "<DataArray type=\"Int64\" Name=\"Connectivity\" format=\"ascii\">\n";
+        outfile << "<DataArray type=\"Int64\" Name=\"connectivity\" format=\"ascii\">\n";
 
         int nodenum = 0;
         for (int tn = 0; tn < 8; tn++)
@@ -271,7 +271,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         outfile << "</DataArray>\n";
         
         // Write the offset section:
-        outfile << "<DataArray type=\"Int64\" Name=\"Offsets\" format=\"ascii\">\n";
+        outfile << "<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">\n";
         
         nodenum = 0; int nb = 0;
         for (int tn = 0; tn < 8; tn++)
@@ -294,7 +294,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         outfile << "</DataArray>\n";
 
         // Write the cell types section:
-        outfile << "<DataArray type=\"UInt8\" Name=\"Types\" format=\"ascii\">\n";
+        outfile << "<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n";
         
         for (int tn = 0; tn < 8; tn++)
         {
