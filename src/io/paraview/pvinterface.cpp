@@ -273,7 +273,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         // Write the offset section:
         outfile << "<DataArray type=\"Int64\" Name=\"offsets\" format=\"ascii\">\n";
         
-        nodenum = 0; int nb = 0;
+        int nb = 0;
         for (int tn = 0; tn < 8; tn++)
         {
             if (datatowrite.ispopulated(tn) == false)
