@@ -1,14 +1,13 @@
 // THIS IS A RAW SPARSELIZARD CODE FILE!
-// VALIDATED CODE BUT TEMPORARY FILE: .VTU WRITE SUPPORT TO BE ADDED
+// VALIDATED CODE BUT NOT CLEANED
 // PLEASE REFER TO OTHER EXAMPLES FOR A SMOOTH SPARSELIZARD INTRODUCTION
-// EXTRA SLZ INTEGRATION STEP TO BE FOLLOWED (+ EQUATIONS HARDCODING)
 
-// CREDITS: R. HAOUARI (MERCI!)
+// CREDITS: R. HAOUARI
 
-//Time simulation of a thermaoacoustic wave propagation
-//Cylindrical wave created by a volumic heat source ( models laser beam)
-//Thermoviscouss acoustics assumed
-//Mechanical coupling with a glass membrane and radiation simulated as well 
+// Time simulation of a thermaoacoustic wave propagation
+// Cylindrical wave created by a volumic heat source ( models laser beam)
+// Thermoviscouss acoustics assumed
+// Mechanical coupling with a glass membrane and radiation simulated as well 
 
 
 #include "sparselizardbase.h"
@@ -60,13 +59,13 @@ void sparselizard(void)
     int slip = regionunion({botcoupl,wall});
 
     //normal tracking (for better BC setting... if needed)
-    //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):	normal(regionunion({axis,wall,botcoupl})).write(regionunion({axis,wall,botcoupl}),savefolder+"normal.vtu");
+    normal(regionunion({axis,wall,botcoupl})).write(regionunion({axis,wall,botcoupl}),savefolder+"normal.vtu");
     parameter nsign;
     nsign|axis=1;
     nsign|wall=1;
     nsign|botcoupl=-1;
     expression nor=(nsign*normal(slip));
-    //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):	nor.write(regionunion({axis,wall,botcoupl}),savefolder+"fixed_normal.vtu");
+    nor.write(regionunion({axis,wall,botcoupl}),savefolder+"fixed_normal.vtu");
 
 
     //Unknown fields defintion
@@ -332,14 +331,12 @@ void sparselizard(void)
 
 
             // Write with an order 2 interpolation and with the name of your choice (the name is also the relative path)
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			u.write(membrane, savefolder+"u"+num_file+".vtu",2); 
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			dtu.write(membrane, savefolder+"dtu"+num_file+".vtu",2); 
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			v.write(KviT, savefolder+"v"+num_file+".vtu",2);		
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			p.write(KviT, savefolder+"pch"+num_file+".vtu",2);
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			p.write(outair, savefolder+"pout"+num_file+".vtu",2);
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			T.write(KviT, savefolder+"T"+num_file+".vtu",2); 
-            //VTU SUPPORT TO BE ADDED SOON (USE VTK FOR NOW):			//L.write(botcoupl, "savefolder+"L"+num_file+".vtu",2); 
-
+            u.write(membrane, savefolder+"u"+num_file+".vtu",2); 
+            //dtu.write(membrane, savefolder+"dtu"+num_file+".vtu",2); 
+            v.write(KviT, savefolder+"v"+num_file+".vtu",2);		
+            p.write(KviT, savefolder+"pch"+num_file+".vtu",2);
+            p.write(outair, savefolder+"pout"+num_file+".vtu",2);
+            T.write(KviT, savefolder+"T"+num_file+".vtu",2); 
 
             times[index]=timesteping[i][0]+ts*timesteping[i][3]*timesteping[i][1];
 
@@ -377,24 +374,6 @@ void sparselizard(void)
             probes << endl;
             //close the file
             probes.close();
-
-            //print to the console the max and min vcalue in desired region
-            /*std::cout << index <<"  "<< times[index] << std::endl;
-            std::cout <<"max:   "<< expression(p).max(fluid,5)[0] <<"   "<< expression(u.compy()).max(membrane,5)[0] << "    min:   ";
-            std::cout << expression(p).min(fluid,5)[0] << "   "<< expression(u.compy()).min(membrane,5)[0] <<std::endl;*/
-            //if( i==0 && ts==0)
-            //{
-            //	std::cout<<"step	time	max p	max T	max v_fl	max u_mb	max vy_mb"<<std::endl;
-            //}
-            //std::cout << index <<"	"<< times[index] <<"	"<< expression(p).max(fluid,5)[0] ;
-            //std::cout<<"	"<< expression(T).max(fluid,5)[0] ;
-            //std::cout<<"	"<<	expression(sqrt(v.compy()*v.compy()+v.compx()*v.compx())).max(fluid,5)[0] ;
-            //std::cout<<"	"<< expression(sqrt(u.compy()*u.compy()+u.compx()*u.compx())).max(membrane,5)[0];
-            //std::cout<<"	"<< temp<<std::endl;
-            //std::cout<<"	"<< expression(p).min(fluid,5)[0] <<"	"<< expression(T).min(fluid,5)[0] ;
-            //std::cout<<"	"<< expression(sqrt(v.compy()*v.compy()+v.compx()*v.compx())).min(fluid,5)[0];
-            //std::cout<<"	"<< expression(sqrt(u.compy()*u.compy()+u.compx()*u.compx())).min(membrane,5)[0] <<std::endl;
-
 
             index++;	
 
