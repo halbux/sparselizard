@@ -279,10 +279,6 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
             if (datatowrite.ispopulated(tn) == false)
                 continue;
 
-            // Move from our node ordering to the one of ParaView:
-            element myelem(tn, datatowrite.getinterpolorder());
-            std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
-
             std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 
             for (int elem = 0; elem < curcoords[0].countrows(); elem++)
