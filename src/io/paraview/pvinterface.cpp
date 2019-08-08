@@ -211,7 +211,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         // Get the number of points and cells
         int numnodes = datatowrite.countcoordnodes();
         int numelems = datatowrite.countelements();
-        outfile << "<Piece NumberOfPoints=\"" << numnodes << "\" NumberOfCells=\"" << numelems <<"\">\n";
+        outfile << "<Piece NumberOfPoints=\"" << numnodes << "\" NumberOfCells=\"" << numelems << "\">\n";
 			
         // Write the points section.
         outfile << "<Points>\n";
