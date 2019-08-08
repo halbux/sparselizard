@@ -3,7 +3,7 @@
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
 //
-// Thanks to R. Harouari for the support of the .vtu output format.
+// Thanks to R. Haouari for the support of the .vtu output format.
 
 
 #ifndef PVINTERFACE_H
