@@ -190,7 +190,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
 
 void pvinterface::writetovtufile(std::string name, iodata datatowrite, int timestepindex)
 {
-    // Get the file name without the path and the .vtk extension:
+    // Get the file name without the path and the .vtu extension:
     std::string viewname = myalgorithm::getfilename(name);
 
     mystring myname(viewname);
