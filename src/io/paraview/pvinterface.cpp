@@ -312,7 +312,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         // Write the scalar data section (if any):
         if (datatowrite.isscalar() == true)
         {
-            outfile << "<PointData Scalars=\"" << viewname << "\" >\n";
+            outfile << "<PointData Scalars=\"" << viewname << "\">\n";
             outfile << "<DataArray type=\"Float64\" Name=\"" << viewname << "\" format=\"ascii\">\n";
             for (int tn = 0; tn < 8; tn++)
             {
@@ -332,7 +332,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
         // Write the vector data section (if any):
         if (datatowrite.isscalar() == false)
         {
-            outfile << "<PointData Vectors=\"" << viewname << "\" >\n";
+            outfile << "<PointData Vectors=\"" << viewname << "\">\n";
             outfile << "<DataArray type=\"Float64\" Name=\"" << viewname << "\" NumberOfComponents=\"3\" format=\"ascii\">\n";
             for (int tn = 0; tn < 8; tn++)
             {
