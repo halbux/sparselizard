@@ -152,12 +152,12 @@ void rawtriangle::mesh(void)
     {	
         // Coordinates of the first and last nodes in the line linking 
         // the current node in line 0 and its counterpart in line 1:
-        double x1 = linescoords[0]->at(3*i+0);
-        double xn = linescoords[1]->at(3*(n-1-i)+0);
-        double y1 = linescoords[0]->at(3*i+1);
-        double yn = linescoords[1]->at(3*(n-1-i)+1);
-        double z1 = linescoords[0]->at(3*i+2);
-        double zn = linescoords[1]->at(3*(n-1-i)+2);
+        double xv1 = linescoords[0]->at(3*i+0);
+        double xvn = linescoords[1]->at(3*(n-1-i)+0);
+        double yv1 = linescoords[0]->at(3*i+1);
+        double yvn = linescoords[1]->at(3*(n-1-i)+1);
+        double zv1 = linescoords[0]->at(3*i+2);
+        double zvn = linescoords[1]->at(3*(n-1-i)+2);
 
         for (int j = 0; j < n-i; j++)
         {
@@ -217,9 +217,9 @@ void rawtriangle::mesh(void)
             // On the diagonal between nodes 1 and 2:
             double kappa = (double)(j)/(i+j);
 
-            mycoords[3*currentnode + 0] = 0.5*( (1-lambda)*x1 + lambda*xn + (1-mu)*xh1 + mu*xhn + (1-kappa)*xd1 + kappa*xdn - xundef );
-            mycoords[3*currentnode + 1] = 0.5*( (1-lambda)*y1 + lambda*yn + (1-mu)*yh1 + mu*yhn + (1-kappa)*yd1 + kappa*ydn - yundef );
-            mycoords[3*currentnode + 2] = 0.5*( (1-lambda)*z1 + lambda*zn + (1-mu)*zh1 + mu*zhn + (1-kappa)*zd1 + kappa*zdn - zundef );
+            mycoords[3*currentnode + 0] = 0.5*( (1-lambda)*xv1 + lambda*xvn + (1-mu)*xh1 + mu*xhn + (1-kappa)*xd1 + kappa*xdn - xundef );
+            mycoords[3*currentnode + 1] = 0.5*( (1-lambda)*yv1 + lambda*yvn + (1-mu)*yh1 + mu*yhn + (1-kappa)*yd1 + kappa*ydn - yundef );
+            mycoords[3*currentnode + 2] = 0.5*( (1-lambda)*zv1 + lambda*zvn + (1-mu)*zh1 + mu*zhn + (1-kappa)*zd1 + kappa*zdn - zundef );
 
             currentnode++;
         }
