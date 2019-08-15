@@ -1276,7 +1276,7 @@ vec expression::atbarycenter(int physreg, field onefield)
 	// When there is a single Gauss point it is at the barycenter --> set integration order to 0. 
 	// The default integration order is 1 (order of a 'one' field) + 2 :
 	formulation formul;
-	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / detjac(), -3);
+	formul += integration(physreg, - mathop::transpose(mathop::tf(onefield))*(*this) / mathop::abs(detjac()), -3);
 	
 	universe::skipgausspointweightproduct = true;
 	formul.generate();
