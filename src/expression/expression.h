@@ -66,6 +66,7 @@ class expression
         void interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<std::vector<double>>& interpolated, std::vector<bool>& isfound, int numtimeevals);
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
+        vec integrateonelements(int physreg, expression* meshdeform, field onefield, int integrationorder);
         
     public:
         
@@ -150,6 +151,7 @@ class expression
         // Output a vector based on field 'onefield' that stores the value of the 
         // expression integrated on every element separately in region 'physreg'.
         vec integrateonelements(int physreg, field onefield, int integrationorder);
+        vec integrateonelements(int physreg, expression meshdeform, field onefield, int integrationorder);
         
         // Print the expression:
         void print(void);

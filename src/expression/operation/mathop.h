@@ -61,11 +61,6 @@ namespace mathop
     // Group .vtu timestep files in a .pvd file:
     void grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals);
     void grouptimesteps(std::string filename, std::string fileprefix, int firstint, std::vector<double> timevals);
-
-    // Get the size of every element in the region, i.e. the 
-    // volume, surface and length in respectively a 3D, 2D and 1D problem.
-    // The output field is of 'one' type.
-    field elementsize(int physreg);
     
     expression dx(expression input);
     expression dy(expression input);
