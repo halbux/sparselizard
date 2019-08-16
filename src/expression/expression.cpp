@@ -1304,13 +1304,6 @@ vec expression::integrateonelements(int physreg, expression* meshdeform, field o
         abort();
     }
     
-    // Make sure this expression is scalar and the mesh 
-    // deformation expression has the right size. 
-    if (not(isscalar()))
-    {
-        std::cout << "Error in 'expression' object: cannot integrate a nonscalar expression" << std::endl;
-        abort();
-    }
     int problemdimension = universe::mymesh->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
