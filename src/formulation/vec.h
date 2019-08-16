@@ -73,8 +73,9 @@ class vec
         void print(void);
         
         vec copy(void);
-        double norm(std::string type = "2");
         
+        double norm(std::string type = "2");
+        double sum(void);
         
         vec operator+(void);
         vec operator-(void);

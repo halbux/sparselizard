@@ -101,6 +101,13 @@ double vec::norm(std::string type)
     abort();
 }
 
+double vec::sum(void)
+{
+    double sumval;
+    VecSum(getpetsc(), &sumval);
+    return sumval;
+}
+
 
 vec vec::operator+(void) { return copy(); }
 vec vec::operator-(void) { return *this*-1; }
