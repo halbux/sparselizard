@@ -1263,12 +1263,12 @@ vec expression::atbarycenter(int physreg, field onefield)
     // The field must be a "one" type:
 	if (onefield.getpointer()->gettypename() != "one")
     {
-        std::cout << "Error in 'expression' object: .atbarycenter requires a 'one' type field" << std::endl;
+        std::cout << "Error in 'expression' object: atbarycenter requires a 'one' type field" << std::endl;
         abort();
     }
 	if (countcolumns() != 1 || onefield.countcomponents() != countrows())
     {
-        std::cout << "Error in 'expression' object: in .atbarycenter the size of the expression and of the argument field must match" << std::endl;
+        std::cout << "Error in 'expression' object: in atbarycenter the size of the expression and of the argument field must match" << std::endl;
         abort();
     }
     
@@ -1298,19 +1298,19 @@ vec expression::integrateonelements(int physreg, expression meshdeform, field on
 vec expression::integrateonelements(int physreg, expression* meshdeform, field onefield, int integrationorder)
 {
     // The expression must be scalar and the field must be a scalar "one" type:
-	if (onefield.getpointer()->gettypename() != "one" || onefield.countcomponents() != 1 || isscalar() == false)
+    if (onefield.getpointer()->gettypename() != "one" || onefield.countcomponents() != 1 || isscalar() == false)
     {
-        std::cout << "Error in 'expression' object: .integrateonelements requires a scalar expression and a scalar 'one' type field" << std::endl;
+        std::cout << "Error in 'expression' object: integrateonelements requires a scalar expression and a scalar 'one' type field" << std::endl;
         abort();
     }
-    
+
     int problemdimension = universe::mymesh->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
     }
-    
+
     // Get only the disjoint regions with highest dimension elements:
     std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
 
@@ -1325,13 +1325,17 @@ vec expression::integrateonelements(int physreg, expression* meshdeform, field o
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
         abort();
     }
-    
-	formulation formul;
-	// The default integration order is 1 (order of a 'one' field) + 2 :
-	formul += integration(physreg, - mathop::tf(onefield)*(*this), -3+integrationorder);
-	formul.generate();
-	
-	return formul.rhs();
+
+    formulation formul;
+    // The default integration order is 1 (order of a 'one' field) + 2 :
+    if (meshdeform == NULL)
+        formul += integration(physreg, - mathop::tf(onefield)*(*this), -3+integrationorder);
+    else
+        formul += integration(physreg, *meshdeform, - mathop::tf(onefield)*(*this), -3+integrationorder);
+        
+    formul.generate();
+
+    return formul.rhs();
 }
 
 void expression::print(void)
