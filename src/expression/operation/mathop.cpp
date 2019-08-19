@@ -48,17 +48,17 @@ void mathop::writevector(std::string filename, std::vector<double> towrite, char
 	{
 	    if (writesize)
 	        name << towrite.size() << delimiter;
-	
+
 		// To write all doubles with enough digits to the file:
 		name << std::setprecision(17);
-		
+
 		for (int i = 0; i < towrite.size()-1; i++)
 			name << towrite[i] << delimiter;
 		name << towrite[towrite.size()-1];
-		
+
 		name.close();
 	}
-	else 
+	else
 	{
 		std::cout << "Unable to write vector to file " << filename << " or file not found" << std::endl;
 		abort();
@@ -80,7 +80,7 @@ std::vector<double> mathop::loadvector(std::string filename, char delimiter, boo
             std::getline(name, currentline, delimiter);
             output.resize(std::stoi(currentline));
         }
-    
+
         int index = 0;
         while (std::getline(name, currentline, delimiter))
         {
@@ -88,18 +88,18 @@ std::vector<double> mathop::loadvector(std::string filename, char delimiter, boo
                 output[index] = std::stod(currentline);
             else
                 output.push_back(std::stod(currentline));
-                
+
             index++;
         }
-        
+
         name.close();
     }
-    else 
+    else
     {
         std::cout << "Unable to load vector from file " << filename << " or file not found" << std::endl;
         abort();
     }
-    
+
     return output;
 }
 
@@ -122,13 +122,13 @@ expression mathop::normal(int surfphysreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     int elementdimension = universe::mymesh->getphysicalregions()->get(surfphysreg)->getelementdimension();
-    
+
     if (problemdimension-1 != elementdimension || problemdimension == 1)
     {
         std::cout << "Error in 'mathop' namespace: can only compute the normal to a surface in 3D and to a line in 2D" << std::endl;
         abort();
     }
-    
+
     expression expr;
     if (problemdimension == 2)
     {
@@ -169,18 +169,18 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
         std::cout << "Error in 'mathop' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
         abort();
     }
-    
+
     iodata datatowrite(1, 1, isscalar, {});
     datatowrite.addcoordinates(0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords));
     if (isscalar)
     	datatowrite.adddata(0, {densematrix(n,1,compxevals)});
 	else
 		datatowrite.adddata(0, {densematrix(n,1,compxevals), densematrix(n,1,compyevals), densematrix(n,1,compzevals)});
-		
+
 	iointerface::writetofile(filename, datatowrite);
 }
-    
-    
+
+
 void mathop::setaxisymmetry(void) { universe::isaxisymmetric = true; }
 
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
@@ -197,11 +197,11 @@ void mathop::grouptimesteps(std::string filename, std::vector<std::string> files
 void mathop::grouptimesteps(std::string filename, std::string fileprefix, int firstint, std::vector<double> timevals)
 {
     int numsteps = timevals.size();
-    
+
     std::vector<std::string> filestogroup(numsteps);
     for (int i = 0; i < numsteps; i++)
         filestogroup[i] = fileprefix+std::to_string(firstint+i)+".vtu";
-    
+
     iointerface::grouptimesteps(filename, filestogroup, timevals);
 }
 
@@ -211,6 +211,8 @@ expression mathop::dz(expression input) { return input.spacederivative(3); }
 
 expression mathop::dt(expression input) { return input.timederivative(1); }
 expression mathop::dtdt(expression input) { return input.timederivative(2); }
+expression mathop::dtdtdt(expression input) { return input.timederivative(3); }
+expression mathop::dtdtdtdt(expression input) { return input.timederivative(4); }
 
 expression mathop::sin(expression input) { return input.sin(); }
 expression mathop::cos(expression input) { return input.cos(); }
@@ -238,10 +240,10 @@ expression mathop::andpositive(std::vector<expression> exprs)
     }
 
     expression output(exprs[exprs.size()-1], 1, -1);
-    
+
     for (int i = exprs.size()-2; i >= 0; i--)
         output = expression(exprs[i], output, -1);
-        
+
     return output;
 }
 
@@ -254,18 +256,18 @@ expression mathop::orpositive(std::vector<expression> exprs)
     }
 
     expression output(exprs[exprs.size()-1], 1, -1);
-    
+
     for (int i = exprs.size()-2; i >= 0; i--)
         output = expression(exprs[i], 1, output);
-        
+
     return output;
 }
 
 expression mathop::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
 expression mathop::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
-    
-expression mathop::comp(int selectedcomp, expression input) 
-{ 
+
+expression mathop::comp(int selectedcomp, expression input)
+{
     std::vector<expression> mycomp(input.countcolumns());
     for (int i = 0; i < input.countcolumns(); i++)
         mycomp[i] = input.at(selectedcomp,i);
@@ -289,7 +291,7 @@ expression mathop::grad(expression input)
         std::cout << "Error in 'mathop' namespace: can only take the gradient of a scalar or an up to length 3 column vector" << std::endl;
         abort();
     }
-    
+
     // Cylindrical transformation of the gradient of a vector (different than of a scalar):
     if (universe::isaxisymmetric && input.countrows() > 1)
     {
@@ -312,13 +314,13 @@ expression mathop::grad(expression input)
         for (int i = 0; i < problemdimension; i++)
             myexprs.push_back(input.spacederivative(i+1).at(comp,0));
     }
-    
+
     expression output(input.countrows(), problemdimension, myexprs);
-    
+
     // We want the gradient of a scalar to be a column vector:
     if (input.countrows() == 1)
     	output = output.transpose();
-    
+
     return output;
 }
 
@@ -329,7 +331,7 @@ expression mathop::div(expression input)
         std::cout << "Error in 'mathop' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
         abort();
     }
-    
+
     if (universe::isaxisymmetric)
     {
     	field x("x");
@@ -360,7 +362,7 @@ expression mathop::curl(expression input)
 {
     bool ishcurlfield = input.isprojectedfield();
     input = input.getunprojectedfield();
-    
+
     if (input.countcolumns() > 1 || input.countrows() > 3)
     {
         std::cout << "Error in 'mathop' namespace: can only take the curl of an up to length 3 column vector" << std::endl;
@@ -383,7 +385,7 @@ expression mathop::curl(expression input)
 		            return expression(3,1,{compz(dy(input)), -1.0/x*compz(input)-compz(dx(input)), -compx(dy(input))+compy(dx(input))});
 		    }
     	}
-    	
+
         switch (input.countrows())
         {
             case 1:
@@ -401,7 +403,7 @@ expression mathop::curl(expression input)
         // This is the curl in the reference element:
         expr = expression(3,1,{compz(input.kietaphiderivative(2))-compy(input.kietaphiderivative(3)), compx(input.kietaphiderivative(3))-compz(input.kietaphiderivative(1)), compy(input.kietaphiderivative(1))-compx(input.kietaphiderivative(2))});
 
-        // The curl of a 1 form (i.e. hcurl type field) is brought back 
+        // The curl of a 1 form (i.e. hcurl type field) is brought back
         // from the reference element with the following transformation:
         expr = transpose(expr.jac())*expr/expr.detjac();
         return expr;
@@ -434,7 +436,7 @@ expression mathop::frobeniusproduct(expression a, expression b)
         std::cout << "Error in 'mathop' namespace: dimension mismatch for Frobenius product" << std::endl;
         abort();
     }
-    
+
     expression output;
     for (int i = 0; i < a.countrows(); i++)
     {
@@ -457,7 +459,7 @@ expression mathop::trace(expression a)
         std::cout << "Error in 'mathop' namespace: can only get the trace of a square matrix" << std::endl;
         abort();
     }
-    
+
     expression output;
     for (int i = 0; i < a.countrows(); i++)
     {
@@ -470,10 +472,10 @@ expression mathop::trace(expression a)
     return output;
 }
 
-expression mathop::detjac(void) 
-{ 
+expression mathop::detjac(void)
+{
 	expression expr;
-	return expr.detjac(); 
+	return expr.detjac();
 }
 
 integration mathop::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
@@ -501,52 +503,52 @@ expression mathop::tf(expression input, int physreg) { return input.tf(physreg);
 
 
 
-expression mathop::array1x1(expression term11) 
+expression mathop::array1x1(expression term11)
 {
 	std::vector<expression> terms = {term11};
     return expression(1,1, terms);
 }
 
-expression mathop::array1x2(expression term11, expression term12) 
+expression mathop::array1x2(expression term11, expression term12)
 {
     return expression(1,2, {term11, term12});
 }
 
-expression mathop::array1x3(expression term11, expression term12, expression term13) 
+expression mathop::array1x3(expression term11, expression term12, expression term13)
 {
     return expression(1,3, {term11, term12, term13});
 }
 
-expression mathop::array2x1(expression term11, expression term21) 
+expression mathop::array2x1(expression term11, expression term21)
 {
     return expression(2,1, {term11, term21});
 }
 
-expression mathop::array2x2(expression term11, expression term12, expression term21, expression term22) 
+expression mathop::array2x2(expression term11, expression term12, expression term21, expression term22)
 {
     return expression(2,2, {term11, term12, term21, term22});
 }
 
-expression mathop::array2x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23) 
+expression mathop::array2x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23)
 {
     return expression(2,3, {term11, term12, term13, term21, term22, term23});
 }
 
-expression mathop::array3x1(expression term11, expression term21, expression term31) 
+expression mathop::array3x1(expression term11, expression term21, expression term31)
 {
     return expression(3,1, {term11, term21, term31});
 }
 
-expression mathop::array3x2(expression term11, expression term12, expression term21, expression term22, expression term31, expression term32) 
+expression mathop::array3x2(expression term11, expression term12, expression term21, expression term22, expression term31, expression term32)
 {
     return expression(3,2, {term11, term12, term21, term22, term31, term32});
 }
 
-expression mathop::array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33) 
+expression mathop::array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33)
 {
     return expression(3,3, {term11, term12, term13, term21, term22, term23, term31, term32, term33});
 }
- 
+
 vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
     if (soltype != "lu")
@@ -559,13 +561,13 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
         std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
         abort();
     }
-    
+
     if (A.getpointer() == NULL || b.getpointer() == NULL)
     {
         std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
         abort();
     }
-    
+
     // The copy of the rhs is returned in case there is no nonzero entry in A:
     if (A.countnnz() == 0)
     	return b.copy();
@@ -577,7 +579,7 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
-    
+
     if (A.getpointer()->isludefined() == false)
     {
         PC pc;
@@ -593,17 +595,17 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
         PCSetType(pc,PCLU);
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
     }
-    	
+
     KSPSolve(*ksp, bpetsc, solpetsc);
-   
+
     A.getpointer()->isludefined(true);
-    
+
     if (A.getpointer()->islutobereused() == false)
     {
         KSPDestroy(ksp);
         A.getpointer()->isludefined(false);
     }
-    
+
     return sol;
 }
 
@@ -635,7 +637,7 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
         std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (size of A and x do not match)" << std::endl;
         abort();
     }
-    
+
     if (A.getpointer() == NULL || b.getpointer() == NULL || sol.getpointer() == NULL)
     {
         std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
@@ -648,30 +650,30 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
-    
+
     KSPCreate(PETSC_COMM_WORLD, ksp);
     KSPSetOperators(*ksp, Apetsc, Apetsc);
     // Perform a diagonal scaling for improved matrix conditionning.
     // This modifies the matrix A and right handside b!
     if (diagscaling == true)
         KSPSetDiagonalScale(*ksp, PETSC_TRUE);
-    
+
     if (soltype == "gmres")
         KSPSetType(*ksp, KSPGMRES);
     if (soltype == "bicgstab")
         KSPSetType(*ksp, KSPBCGS);
-    
+
     // The initial guess is provided in vector sol:
     KSPSetInitialGuessNonzero(*ksp, PETSC_TRUE);
-        
+
     KSPSetTolerances(*ksp, relrestol, PETSC_DEFAULT, PETSC_DEFAULT, maxnumit);
-        
+
     // Request to print the iteration information to the console:
     if (verbosity > 0)
         KSPMonitorSet(*ksp, mykspmonitor, PETSC_NULL, PETSC_NULL);
-        
+
     KSPSetFromOptions(*ksp);
-    	
+
     // Use a preconditioner:
     PC pc;
     KSPGetPC(*ksp,&pc);
@@ -679,13 +681,13 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
         PCSetType(pc,PCILU);
     if (precondtype == "sor")
         PCSetType(pc,PCSOR);
-    	
+
     KSPSolve(*ksp, bpetsc, solpetsc);
-    
+
     // Get the number of required iterations and the residual norm:
     KSPGetIterationNumber(*ksp, &maxnumit);
     KSPGetResidualNorm(*ksp, &relrestol);
-   
+
     KSPDestroy(ksp);
 }
 
@@ -700,7 +702,7 @@ void mathop::solve(formulation formul)
 	formul.generate();
 	// Solve:
 	vec sol = mathop::solve(formul.A(), formul.b());
-	
+
 	// Save to fields:
 	for (int i = 0; i < allfields.size(); i++)
 		allfields[i]->setdata(-1, sol|field(allfields[i]));
@@ -723,9 +725,9 @@ expression mathop::strain(expression input)
         std::cout << "Error in 'mathop' namespace: can only compute the strains of a 2x1 or 3x1 column vector" << std::endl;
         abort();
     }
-    
+
     expression gradu = mathop::grad(input);
-    
+
 	if (input.countrows() == 2)
 		return expression(3,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(1,0) + gradu.at(0,1)});
 	if (input.countrows() == 3)
@@ -743,8 +745,8 @@ expression mathop::greenlagrangestrain(expression gradu)
 		expression dycompxu = entry(0,1,gradu), dycompyu = entry(1,1,gradu);
 
 		expression output = expression(3,1, {
-								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2)), 
-								dycompyu + 0.5*(pow(dycompxu,2) + pow(dycompyu,2)), 
+								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2)),
+								dycompyu + 0.5*(pow(dycompxu,2) + pow(dycompyu,2)),
 								dycompxu + dxcompyu + dxcompxu * dycompxu + dxcompyu * dycompyu});
 		output.reuseit();
 		return output;
@@ -756,11 +758,11 @@ expression mathop::greenlagrangestrain(expression gradu)
 		expression dzcompxu = entry(0,2,gradu), dzcompyu = entry(1,2,gradu), dzcompzu = entry(2,2,gradu);
 
 		expression output = expression(6,1, {
-								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2) + pow(dxcompzu,2)), 
-								dycompyu + 0.5*(pow(dycompxu,2) + pow(dycompyu,2) + pow(dycompzu,2)), 
-								dzcompzu + 0.5*(pow(dzcompxu,2) + pow(dzcompyu,2) + pow(dzcompzu,2)), 
-								dzcompyu + dycompzu + dycompxu * dzcompxu + dycompyu * dzcompyu + dycompzu * dzcompzu, 
-								dzcompxu + dxcompzu + dxcompxu * dzcompxu + dxcompyu * dzcompyu + dxcompzu * dzcompzu, 
+								dxcompxu + 0.5*(pow(dxcompxu,2) + pow(dxcompyu,2) + pow(dxcompzu,2)),
+								dycompyu + 0.5*(pow(dycompxu,2) + pow(dycompyu,2) + pow(dycompzu,2)),
+								dzcompzu + 0.5*(pow(dzcompxu,2) + pow(dzcompyu,2) + pow(dzcompzu,2)),
+								dzcompyu + dycompzu + dycompxu * dzcompxu + dycompyu * dzcompyu + dycompzu * dzcompzu,
+								dzcompxu + dxcompzu + dxcompxu * dzcompxu + dxcompyu * dzcompyu + dxcompzu * dzcompzu,
 								dycompxu + dxcompyu + dxcompxu * dycompxu + dxcompyu * dycompyu + dxcompzu * dycompzu});
 		output.reuseit();
 		return output;
@@ -788,7 +790,7 @@ expression mathop::predefinedmassconservation(expression dofv, expression tfp, e
 {
     if (isdensityconstant)
         return div(dofv)*tfp;
-        
+
     if (includetimederivs)
         return ( rho*div(dofv)*tfp + dofv*gradrho*tfp + dtrho*tfp );
     else
@@ -798,17 +800,17 @@ expression mathop::predefinedmassconservation(expression dofv, expression tfp, e
 expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho)
 {
     rho.reuseit(); v.reuseit();
-    
+
     return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
 }
 
 expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant, bool isviscosityconstant)
 {
     mu.reuseit();
-    
+
     if (isdensityconstant && isviscosityconstant)
         return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) );
-    
+
     if (isdensityconstant)
         return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) - mu*frobeniusproduct(transpose(grad(dofv)), grad(tfv)) );
     else
@@ -846,7 +848,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 			subdet = H.at(2,2)*H.at(3,3)*H.at(4,4)-H.at(2,2)*H.at(3,4)*H.at(4,3)-H.at(2,3)*H.at(3,2)*H.at(4,4)+H.at(2,3)*H.at(3,4)*H.at(4,2)+H.at(2,4)*H.at(3,2)*H.at(4,3)-H.at(2,4)*H.at(3,3)*H.at(4,2);
 			subdet.reuseit();
 
-			// This is the extra contribution of ezz: 
+			// This is the extra contribution of ezz:
 			ezztoexx = ( H.at(3,0)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,0)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,0)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
 			ezztoeyy = ( H.at(3,1)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,1)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,1)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
 			ezztog12 = ( H.at(3,5)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,5)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,5)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
@@ -854,14 +856,14 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 			g23toexx = ( H.at(4,0)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,0)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,0)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
 			g23toeyy = ( H.at(4,1)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,1)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,1)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
 			g23tog12 = ( H.at(4,5)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,5)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,5)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
-			// This is the extra contribution of g13: 
+			// This is the extra contribution of g13:
 			g13toexx = ( H.at(3,0)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,0)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,0)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
 			g13toeyy = ( H.at(3,1)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,1)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,1)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
 			g13tog12 = ( H.at(3,5)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,5)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,5)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
 
 			ezztoexx.reuseit(); ezztoeyy.reuseit(); ezztog12.reuseit(); g23toexx.reuseit(); g23toeyy.reuseit(); g23tog12.reuseit(); g13toexx.reuseit(); g13toeyy.reuseit(); g13tog12.reuseit();
 
-			H = expression(3,3,{  
+			H = expression(3,3,{
 			H.at(0,0) + H.at(0,2)*ezztoexx+H.at(0,3)*g23toexx+H.at(0,4)*g13toexx,
 			H.at(0,1) + H.at(0,2)*ezztoeyy+H.at(0,3)*g23toeyy+H.at(0,4)*g13toeyy,
 			H.at(0,5) + H.at(0,2)*ezztog12+H.at(0,3)*g23tog12+H.at(0,4)*g13tog12,
@@ -875,7 +877,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 			H.at(5,5) + H.at(5,2)*ezztog12+H.at(5,3)*g23tog12+H.at(5,4)*g13tog12
 			});
 		}
-		
+
 		if (myoption == "planestrain" || myoption == "planestress")
 			return -( H *strain(dofu) )*strain(tfu);
 
@@ -929,7 +931,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 			subdet = H.at(2,2)*H.at(3,3)*H.at(4,4)-H.at(2,2)*H.at(3,4)*H.at(4,3)-H.at(2,3)*H.at(3,2)*H.at(4,4)+H.at(2,3)*H.at(3,4)*H.at(4,2)+H.at(2,4)*H.at(3,2)*H.at(4,3)-H.at(2,4)*H.at(3,3)*H.at(4,2);
 			subdet.reuseit();
 
-			// This is the extra contribution of ezz: 
+			// This is the extra contribution of ezz:
 			ezztoexx = ( H.at(3,0)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,0)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,0)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
 			ezztoeyy = ( H.at(3,1)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,1)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,1)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
 			ezztog12 = ( H.at(3,5)*( H.at(2,3)*H.at(4,4) - H.at(2,4)*H.at(4,3)) - H.at(4,5)*( H.at(2,3)*H.at(3,4) - H.at(2,4)*H.at(3,3)) - H.at(2,5)*( H.at(3,3)*H.at(4,4) - H.at(3,4)*H.at(4,3)))/subdet;
@@ -937,14 +939,14 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 			g23toexx = ( H.at(4,0)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,0)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,0)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
 			g23toeyy = ( H.at(4,1)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,1)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,1)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
 			g23tog12 = ( H.at(4,5)*( H.at(2,2)*H.at(3,4) - H.at(2,4)*H.at(3,2)) - H.at(3,5)*( H.at(2,2)*H.at(4,4) - H.at(2,4)*H.at(4,2)) + H.at(2,5)*( H.at(3,2)*H.at(4,4) - H.at(3,4)*H.at(4,2)))/subdet;
-			// This is the extra contribution of g13: 
+			// This is the extra contribution of g13:
 			g13toexx = ( H.at(3,0)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,0)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,0)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
 			g13toeyy = ( H.at(3,1)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,1)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,1)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
 			g13tog12 = ( H.at(3,5)*( H.at(2,2)*H.at(4,3) - H.at(2,3)*H.at(4,2)) - H.at(4,5)*( H.at(2,2)*H.at(3,3) - H.at(2,3)*H.at(3,2)) - H.at(2,5)*( H.at(3,2)*H.at(4,3) - H.at(3,3)*H.at(4,2)))/subdet;
 
 			ezztoexx.reuseit(); ezztoeyy.reuseit(); ezztog12.reuseit(); g23toexx.reuseit(); g23toeyy.reuseit(); g23tog12.reuseit(); g13toexx.reuseit(); g13toeyy.reuseit(); g13tog12.reuseit();
 
-			H = expression(3,3,{  
+			H = expression(3,3,{
 			H.at(0,0) + H.at(0,2)*ezztoexx+H.at(0,3)*g23toexx+H.at(0,4)*g13toexx,
 			H.at(0,1) + H.at(0,2)*ezztoeyy+H.at(0,3)*g23toeyy+H.at(0,4)*g13toeyy,
 			H.at(0,5) + H.at(0,2)*ezztog12+H.at(0,3)*g23tog12+H.at(0,4)*g13tog12,
@@ -958,18 +960,18 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 			H.at(5,5) + H.at(5,2)*ezztog12+H.at(5,3)*g23tog12+H.at(5,4)*g13tog12
 			});
 		}
-		
+
 		if (myoption == "planestrain" || myoption == "planestress")
 		{
 			H.reuseit();
-			
+
 			expression gradu = grad(u);
 			gradu.reuseit();
 
 			expression Ei = greenlagrangestrain(gradu);
 			Ei.reuseit();
 
-			expression Si = H*Ei; 
+			expression Si = H*Ei;
 			Si.reuseit();
 
 			expression graddofdu = grad(dofu)-gradu;
@@ -1019,7 +1021,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
 		expression Ei = greenlagrangestrain(gradu);
 		Ei.reuseit();
 
-		expression Si = H*Ei; 
+		expression Si = H*Ei;
 		Si.reuseit();
 
 		expression graddofdu = grad(dofu)-gradu;
@@ -1054,7 +1056,7 @@ expression mathop::predefinedelectrostaticforce(expression tfu, expression E, ex
 	std::vector<expression> spacederivatives(tfu.countrows());
 	for (int i = 0; i < tfu.countrows(); i++)
 		spacederivatives[i] = grad(tfu.at(i,0));
-    
+
     return predefinedelectrostaticforce(spacederivatives, E, epsilon);
 }
 
@@ -1062,20 +1064,20 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
 {
     E.reuseit();
     epsilon.reuseit();
-    
+
     std::vector<std::vector<expression>> exprs(dxyztfu.size());
     for (int i = 0; i < dxyztfu.size(); i++)
     	exprs[i] = {dxyztfu[i]};
-    
+
     // Scalar gradient here:
     expression gradtfu(exprs);
-    
+
     if (gradtfu.countcolumns() == 1)
     {
         std::cout << "Error in 'mathop' namespace: the force formula is undefined for 1D displacements" << std::endl;
         abort();
     }
-    
+
     if (gradtfu.countcolumns() == 2)
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu)) );
     if (gradtfu.countcolumns() == 3)
@@ -1110,7 +1112,7 @@ expression mathop::predefinedstokes(expression dofv, expression tfv, expression 
     }
 
     expression output = predefinedmassconservation(dofv, tfp, rho, dtrho, gradrho, includetimederivs, isdensityconstant);
-    
+
     if (includetimederivs)
         output = output - rho*dt(dofv)*tfv;
 
@@ -1133,15 +1135,11 @@ expression mathop::predefinednavierstokes(expression dofv, expression tfv, expre
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
         abort();
     }
-    
+
     expression output = predefinedmassconservation(dofv, tfp, rho, dtrho, gradrho, includetimederivs, isdensityconstant);
-    
+
     if (includetimederivs)
         output = output - rho*dt(dofv)*tfv;
-        
+
     return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) +  predefinedinertialforce(dofv, tfv, v, rho) );
 }
-
-
-
-
