@@ -2,30 +2,30 @@
 
 
 void opdof::setspacederivative(int whichderivative)
-{ 
+{
     // Make sure a single space derivative is applied.
     if (spacederivative != 0)
     {
         std::cout << "Error in 'opdof' object: cannot apply more than one space derivative to the dof" << std::endl;
         abort();
     }
-    spacederivative = whichderivative; 
+    spacederivative = whichderivative;
 }
 
 void opdof::increasetimederivativeorder(int amount)
-{    
-    timederivativeorder += amount; 
+{
+    timederivativeorder += amount;
 
-    if (timederivativeorder > 2)
+    if (not(myfield->ismultiharmonic()) && timederivativeorder > 2)
     {
-        std::cout << "Error in 'opdof' object: time derivative order cannot exceed 2" << std::endl;
+        std::cout << "Error in 'opdof' object: time derivative order can exceed 2 only for multiharmonic fields" << std::endl;
         abort();
     }
 }
 
-bool opdof::isharmonicone(std::vector<int> disjregs) 
-{ 
-    std::vector<int> myharms = myfield->getharmonics(); 
+bool opdof::isharmonicone(std::vector<int> disjregs)
+{
+    std::vector<int> myharms = myfield->getharmonics();
     return (myharms.size() == 1 && myharms[0] == 1);
 }
 
@@ -46,7 +46,7 @@ void opdof::print(void)
 {
     for (int i = 0; i < timederivativeorder; i++)
         std::cout << "dt";
-    
+
     std::vector<std::string> nonedxdydz = {"","dx","dy","dz"};
     std::vector<std::string> nonedkidetadphi = {"","dki","deta","dphi"};
     std::vector<std::string> nonecompxcompycompz = {"compx","compy","compz"};
@@ -61,7 +61,7 @@ void opdof::print(void)
     }
     else
         std::cout << nonecompxcompycompz[fieldcomponent];
-    
+
     std::cout << "dof(";
     myfield->print();
     std::cout << ")";

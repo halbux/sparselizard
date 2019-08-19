@@ -2,41 +2,41 @@
 
 
 void opfield::setspacederivative(int whichderivative)
-{ 
+{
     // Make sure a single space derivative is applied.
     if (spacederivative != 0 || kietaphiderivative != 0)
     {
         std::cout << "Error in 'opfield' object: cannot apply more than one space derivative to a field" << std::endl;
         abort();
     }
-    spacederivative = whichderivative; 
+    spacederivative = whichderivative;
 }
 
 void opfield::setkietaphiderivative(int whichderivative)
-{ 
+{
     // Make sure a single space derivative is applied.
     if (spacederivative != 0 || kietaphiderivative != 0)
     {
         std::cout << "Error in 'opfield' object: cannot apply more than one space derivative to a field" << std::endl;
         abort();
     }
-    kietaphiderivative = whichderivative; 
+    kietaphiderivative = whichderivative;
 }
 
 void opfield::increasetimederivativeorder(int amount)
-{    
-    timederivativeorder += amount; 
+{
+    timederivativeorder += amount;
 
-    if (timederivativeorder > 2)
+    if (not(myfield->ismultiharmonic()) && timederivativeorder > 2)
     {
-        std::cout << "Error in 'opfield' object: time derivative order cannot exceed 2" << std::endl;
+        std::cout << "Error in 'opfield' object: time derivative order can exceed 2 only for multiharmonic fields" << std::endl;
         abort();
     }
 }
 
-bool opfield::isharmonicone(std::vector<int> disjregs) 
-{ 
-    std::vector<int> myharms = myfield->getharmonics(); 
+bool opfield::isharmonicone(std::vector<int> disjregs)
+{
+    std::vector<int> myharms = myfield->getharmonics();
     return (myharms.size() == 1 && myharms[0] == 1);
 }
 
@@ -61,7 +61,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
         int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
-    
+
     // Time derivative of non-multiharmonic fields:
     if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
     {
@@ -78,9 +78,9 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     	// Set the field value to the field time derivative value on all regions:
     	myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|myfield);
     }
-    
+
     std::vector<std::vector<densematrix>> output;
-    
+
     // In case there is no space derivative applied:
     if (spacederivative == 0 && kietaphiderivative == 0)
         output = myfield->interpolate(0, formfunctioncomponent, elemselect, evaluationcoordinates);
@@ -90,7 +90,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             output = myfield->interpolate(kietaphiderivative, formfunctioncomponent, elemselect, evaluationcoordinates);
         else
         {
-            // Otherwise compute the x, y or z field derivative using ki, eta, 
+            // Otherwise compute the x, y or z field derivative using ki, eta,
             // phi derivatives in the reference element and invjac() terms.
 
             // Compute the Jacobian terms or reuse if available in the universe.
@@ -107,7 +107,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             std::vector<std::vector<densematrix>> dkiargmat, detaargmat, dphiargmat;
 
             // Get the element dimension in the selected elements:
-            int elementdimension = elemselect.getelementdimension();  
+            int elementdimension = elemselect.getelementdimension();
 
                 dkiargmat = myfield->interpolate(1, formfunctioncomponent, elemselect, evaluationcoordinates);
             if (elementdimension > 1)
@@ -139,7 +139,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             output = dkiargmat;
         }
     }
-    
+
     if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
     {
     	// Get the vector in the universe corresponding to the field data.
@@ -152,13 +152,13 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     	// Set the field value back to its initial value on all regions:
     	myfield->setdata(-1, (universe::xdtxdtdtx)[0][0]|myfield);
     }
-    
+
     if (myfield->ismultiharmonic() && timederivativeorder > 0)
     	output = harmonic::timederivative(timederivativeorder, output);
-    
+
     if (reuse && universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), output);
-        
+
     return output;
 }
 
@@ -170,11 +170,11 @@ densematrix opfield::multiharmonicinterpolate(int numtimeevals, elementselector&
         int precomputedindex = universe::getindexofprecomputedvaluefft(shared_from_this());
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
-    
+
     std::vector<std::vector<densematrix>> interpolatedfield = interpolate(elemselect, evaluationcoordinates, meshdeform);
     // Compute at 'numtimevals' instants in time the multiharmonic field:
     densematrix output = myfft::inversefft(interpolatedfield, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
-    
+
     if (reuse && universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);
     return output;
@@ -184,7 +184,7 @@ bool opfield::isvalueorientationdependent(std::vector<int> disjregs)
 {
     if (myfield->gettypename() == "x" || myfield->gettypename() == "y" || myfield->gettypename() == "z")
         return false;
-    
+
     for (int i = 0; i < disjregs.size(); i++)
     {
         int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjregs[i]);
@@ -225,7 +225,7 @@ void opfield::print(void)
 {
     for (int i = 0; i < timederivativeorder; i++)
         std::cout << "dt";
-    
+
     std::vector<std::string> nonedxdydz = {"","dx","dy","dz"};
     std::vector<std::string> nonecompxcompycompz = {"compx","compy","compz"};
 
@@ -238,6 +238,6 @@ void opfield::print(void)
     }
     else
         std::cout << nonecompxcompycompz[fieldcomponent];
-    
+
     myfield->print();
 }
