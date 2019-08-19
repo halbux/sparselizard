@@ -16,7 +16,8 @@
 //
 // Refer to the following paper for more detail:
 //
-// "Display Compatible pMUT Device for Mid Air Ultrasound Gesture Recognition", C.H. Huang et al.
+// "Characterization of polymer-based piezoelectric micromachined ultrasound transducers for short-range gesture 
+// recognition applications", P. Gijsenbergh, A. Halbach et al.
 //
 // Please note that since this PMUT is being fabricated the materials have been modified for confidentiality reasons.
 // Standard literature properties or arbitrary values have been considered for the material properties.
