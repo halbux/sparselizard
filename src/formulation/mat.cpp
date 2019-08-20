@@ -21,7 +21,7 @@ mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix c
 int mat::countrows(void) { errorifpointerisnull(); return rawmatptr->countrows(); }
 int mat::countcolumns(void) { errorifpointerisnull(); return rawmatptr->countcolumns(); }
         
-int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->countnnz(); }
+long int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->countnnz(); }
 
 void mat::removeconstraints(void) { errorifpointerisnull(); rawmatptr->removeconstraints(); };
 

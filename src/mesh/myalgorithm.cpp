@@ -85,7 +85,7 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
 #include <parallel/algorithm>
 #endif
 
-int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
+long int* myalgorithm::stablesortparallel(std::vector<int*> tosort, long int numentries)
 {
 	// Parallel sort on Linux only for now:
 	#if defined(__linux__)
@@ -94,7 +94,7 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
 	using namespace std;
 	#endif
 	
-    int* reorderingvector = new int[numentries];
+    long int* reorderingvector = new long int[numentries];
     // Set 'reorderingvector' to [0 1 2 ...]:
     std::iota(reorderingvector, reorderingvector+numentries, 0);
    
@@ -181,7 +181,7 @@ std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
 void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
 {
     // Loop on all rows:
-    int index = 0;
+    long int index = 0;
     for (int i = 0; i < numberofrows; i++)
     {
         // Loop on all columns:

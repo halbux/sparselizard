@@ -19,8 +19,8 @@ class intdensematrix
 
     private:
         
-        int numrows = 0;
-        int numcols = 0;
+        long int numrows = 0;
+        long int numcols = 0;
         
         std::shared_ptr<int> myvalues = NULL;
         
@@ -29,20 +29,20 @@ class intdensematrix
         // Set empty matrix:
         intdensematrix(void) {};
         // Set number of rows and columns:
-        intdensematrix(int numberofrows, int numberofcolumns);
+        intdensematrix(long int numberofrows, long int numberofcolumns);
         // Initialise to a value:
-        intdensematrix(int numberofrows, int numberofcolumns, int initvalue);
+        intdensematrix(long int numberofrows, long int numberofcolumns, long int initvalue);
         // Initialise with a vector (row major):
-        intdensematrix(int numberofrows, int numberofcolumns, const std::vector<int> valvec);
+        intdensematrix(long int numberofrows, long int numberofcolumns, const std::vector<int> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
-        intdensematrix(int numberofrows, int numberofcolumns, int init, int step);
+        intdensematrix(long int numberofrows, long int numberofcolumns, long int init, long int step);
         
-        int countrows(void) { return numrows; };
-        int countcolumns(void) { return numcols; };
-        int count(void) { return numrows*numcols; };
+        long int countrows(void) { return numrows; };
+        long int countcolumns(void) { return numcols; };
+        long int count(void) { return numrows*numcols; };
         
         // Count the number of positive or zero integer values:
-        int countpositive(void);
+        long int countpositive(void);
 
         void print(void);
         void printsize(void);
@@ -53,12 +53,12 @@ class intdensematrix
         // whose form is  [row1; row2; row3; ...] outputs a matrix of size 
         // (p*n)xq where every row of matrix A has been duplicated n 
         // times as follows [row1; row2; row3;  ... row1; row2; row3; ...].
-        intdensematrix duplicateallrowstogether(int n);
+        intdensematrix duplicateallrowstogether(long int n);
         // A.duplicaterowsonebyone(int n) for a matrix A of size pxq 
         // whose form is [row1; row2; row3; ...] outputs a matrix of size 
         // (p*n)xq where every row of matrix A has been duplicated n 
         // times as follows [row1; row1; row1;  ... row2; row2; row2; ...].
-        intdensematrix duplicaterowsonebyone(int n);
+        intdensematrix duplicaterowsonebyone(long int n);
 
 };
 

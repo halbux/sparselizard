@@ -1,55 +1,55 @@
 #include "intdensematrix.h"
 
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns)
+intdensematrix::intdensematrix(long int numberofrows, long int numberofcolumns)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
 }
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, int initvalue)
+intdensematrix::intdensematrix(long int numberofrows, long int numberofcolumns, long int initvalue)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
     
-    for (int i = 0; i < numcols*numrows; i++)
+    for (long int i = 0; i < numcols*numrows; i++)
         myvaluesptr[i] = initvalue;
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, const std::vector<int> valvec)
+intdensematrix::intdensematrix(long int numberofrows, long int numberofcolumns, const std::vector<int> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
     
-    for (int i = 0; i < numcols*numrows; i++)
+    for (long int i = 0; i < numcols*numrows; i++)
         myvaluesptr[i] = valvec[i];
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, int init, int step)
+intdensematrix::intdensematrix(long int numberofrows, long int numberofcolumns, long int init, long int step)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
     
-    for (int i = 0; i < numcols*numrows; i++)
+    for (long int i = 0; i < numcols*numrows; i++)
         myvaluesptr[i] = init+i*step;
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-int intdensematrix::countpositive(void)
+long int intdensematrix::countpositive(void)
 {
     int* myvaluesptr = myvalues.get();
     
-    int numpositive = 0;
-    for (int i = 0; i < numrows*numcols; i++)
+    long int numpositive = 0;
+    for (long int i = 0; i < numrows*numcols; i++)
     {
         if (myvaluesptr[i] >= 0)
             numpositive++;            
@@ -61,9 +61,9 @@ void intdensematrix::print(void)
 {
     int* myvaluesptr = myvalues.get();
     
-    for (int i = 0; i < numrows; i++)
+    for (long int i = 0; i < numrows; i++)
     {
-        for (int j = 0; j < numcols; j++)
+        for (long int j = 0; j < numcols; j++)
             std::cout << myvaluesptr[i*numcols+j] << " ";
         std::cout << std::endl;
     }
@@ -79,36 +79,36 @@ int* intdensematrix::getvalues(void)
     return myvalues.get();
 }
 
-intdensematrix intdensematrix::duplicateallrowstogether(int n)
+intdensematrix intdensematrix::duplicateallrowstogether(long int n)
 {
     intdensematrix output(numrows*n, numcols);
     
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
         
-    int matsize = numrows*numcols;
+    long int matsize = numrows*numcols;
     
-    for (int duplicate = 0; duplicate < n; duplicate++)
+    for (long int duplicate = 0; duplicate < n; duplicate++)
     {
-        for (int i = 0; i < matsize; i++)
+        for (long int i = 0; i < matsize; i++)
             outvaluesptr[matsize*duplicate + i] = myvaluesptr[i];
     }
     
     return output;
 }
 
-intdensematrix intdensematrix::duplicaterowsonebyone(int n)
+intdensematrix intdensematrix::duplicaterowsonebyone(long int n)
 {
     intdensematrix output(numrows*n, numcols);
     
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
     
-    for (int row = 0; row < numrows; row++)
+    for (long int row = 0; row < numrows; row++)
     {
-        for (int duplicate = 0; duplicate < n; duplicate++)
+        for (long int duplicate = 0; duplicate < n; duplicate++)
         {
-            for (int col = 0; col < numcols; col++)
+            for (long int col = 0; col < numcols; col++)
                 outvaluesptr[row*(numcols*n) + duplicate*numcols + col] = myvaluesptr[row*numcols+col];
         }
     }

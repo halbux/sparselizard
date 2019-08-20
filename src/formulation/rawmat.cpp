@@ -28,13 +28,13 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
 {
 	int* entriestozeroptr = entriestozero.getvalues();
 
-	int numentries = entriestozero.count();
+	long int numentries = entriestozero.count();
 	if (numentries > 0)
 	{
 		// First build a vector for direct access:
 		std::vector<bool> istozero(mydofmanager->countdofs(), false);
 
-		for (int i = 0; i < numentries; i++)
+		for (long int i = 0; i < numentries; i++)
 			istozero[entriestozeroptr[i]] = true;
 			
 		if (zerorows)
@@ -42,7 +42,7 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
 			for (int i = 0; i < accumulatedrowindices.size(); i++)
 			{
 				int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-				for (int j = 0; j < accumulatedrowindices[i].count(); j++)
+				for (long int j = 0; j < accumulatedrowindices[i].count(); j++)
 				{
 					if (accumulatedrowindicesptr[j] >= 0 && istozero[accumulatedrowindicesptr[j]])
 						accumulatedrowindicesptr[j] = -1;
@@ -54,7 +54,7 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
 			for (int i = 0; i < accumulatedcolindices.size(); i++)
 			{
 				int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
-				for (int j = 0; j < accumulatedcolindices[i].count(); j++)
+				for (long int j = 0; j < accumulatedcolindices[i].count(); j++)
 				{
 					if (accumulatedcolindicesptr[j] >= 0 && istozero[accumulatedcolindicesptr[j]])
 						accumulatedcolindicesptr[j] = -1;
@@ -95,7 +95,7 @@ void rawmat::removeconstraints(void)
     }
         
     // Bring 'petscrows' from CSR to ijk format:
-    intdensematrix ijkpetscrows(petscvals.countrows()*petscvals.countcolumns(),1);
+    intdensematrix ijkpetscrows(petscvals.count(),1);
     myalgorithm::csrtoijk(mydofmanager->countdofs(), petscrows.getvalues(), ijkpetscrows.getvalues());
     petscrows = ijkpetscrows;
     
@@ -113,7 +113,7 @@ void rawmat::removeconstraints(void)
     int* myrows = petscrows.getvalues();
     int* mycols = petsccols.getvalues();
     
-    for (int i = 0; i < petscrows.countrows()*petscrows.countcolumns(); i++)
+    for (long int i = 0; i < petscrows.count(); i++)
     {
         myrows[i] = dofrenumbering[myrows[i]];
         mycols[i] = dofrenumbering[mycols[i]];
@@ -136,13 +136,13 @@ void rawmat::process(void)
 {
     // Concatenate all accumulated fragments!
     // Remove negative indexes. First get the overall length.
-    int veclen = 0;
+    long int veclen = 0;
     for (int i = 0; i < accumulatedvals.size(); i++)
     {
         int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
         int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
         
-        for (int j = 0; j < accumulatedvals[i].countrows()*accumulatedvals[i].countcolumns(); j++)
+        for (long int j = 0; j < accumulatedvals[i].count(); j++)
         {
             if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
                 veclen++;            
@@ -154,14 +154,14 @@ void rawmat::process(void)
     int* stitchedcolindices = new int[veclen];
     double* stitchedvals = new double[veclen];
 
-    int ind = 0;
+    long int ind = 0;
     for (int i = 0; i < accumulatedvals.size(); i++)
     {
         double* valsptr = accumulatedvals[i].getvalues();
         int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
         int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
         
-        for (int j = 0; j < accumulatedvals[i].countrows()*accumulatedvals[i].countcolumns(); j++)
+        for (long int j = 0; j < accumulatedvals[i].count(); j++)
         {
             if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
             {
@@ -175,13 +175,13 @@ void rawmat::process(void)
     
     // Sort the vectors according to the row then according to the column. 
     // 'reorderingvector' will tell us how to reorder.
-    int* reorderingvector = myalgorithm::stablesortparallel({stitchedrowindices, stitchedcolindices}, veclen);
+    long int* reorderingvector = myalgorithm::stablesortparallel({stitchedrowindices, stitchedcolindices}, veclen);
         
     // Get the number of nonzeros:
     nnz = 0;
     if (veclen > 0)
     	nnz = 1;
-    for (int i = 1; i < veclen; i++)
+    for (long int i = 1; i < veclen; i++)
     {
         if (stitchedrowindices[reorderingvector[i]] != stitchedrowindices[reorderingvector[i-1]] || stitchedcolindices[reorderingvector[i]] != stitchedcolindices[reorderingvector[i-1]])
             nnz++;
@@ -196,8 +196,9 @@ void rawmat::process(void)
     int* finalcolindices = petsccols.getvalues();
     double* finalvals = petscvals.getvalues();
 
-	int row = -1; ind = -1;
-    for (int i = 0; i < veclen; i++)
+    int row = -1; 
+    ind = -1;
+    for (long int i = 0; i < veclen; i++)
     {
         // Same row:
         if (i > 0 && stitchedrowindices[reorderingvector[i]] == stitchedrowindices[reorderingvector[i-1]])

@@ -111,10 +111,10 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
     double* myval = valsmat.getvalues();
     int* myad = addresses.getvalues();
 
-    int numentries = addresses.countrows()*addresses.countcolumns();
+    long int numentries = addresses.count();
 
     // Remove the negative addresses:
-    int numpositiveentries = addresses.countpositive();
+    long int numpositiveentries = addresses.countpositive();
     
     if (numpositiveentries == 0)
     	return;
@@ -124,8 +124,8 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
     int* filteredads = filteredad.getvalues();
     double* filteredvals = filteredval.getvalues();
 
-    int index = 0;
-    for (int i = 0; i < numentries; i++)
+    long int index = 0;
+    for (long int i = 0; i < numentries; i++)
     {
         if (myad[i] >= 0)
         {
@@ -154,7 +154,7 @@ void rawvec::setvalue(int address, double value, std::string op)
 
 densematrix rawvec::getvalues(intdensematrix addresses)
 {
-    int numentries = addresses.countrows()*addresses.countcolumns();
+    long int numentries = addresses.count();
     densematrix valmat(numentries,1);
     VecGetValues(myvec, numentries, addresses.getvalues(), valmat.getvalues());
     
