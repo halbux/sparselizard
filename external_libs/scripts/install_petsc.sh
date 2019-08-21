@@ -2,29 +2,33 @@
 
 # !!! THE GFORTRAN, GCC, AND G++ COMPILERS MUST BE AVAILABLE !!!
 #
-# THIS SCRIPT INSTALLS IN ~/SLlibs THE PETSC LIBRARY.
+# THIS SCRIPT INSTALLS THE PETSC LIBRARY IN REPO'S EXTERNAL_LIBS DIRECTORY.
 
 
 
-########## ALL LIBRARIES REQUIRED BY SPARSELIZARD ARE PUT IN ~/SLlibs.
+########## ALL LIBRARIES REQUIRED BY SPARSELIZARD ARE PUT IN `./external_libs/`.
 
-rm -rf ~/SLlibs/petsc;
-mkdir ~/SLlibs;
-cd ~/SLlibs;
+PRIORDIR=$(pwd)
+SCRIPT=$(readlink -f "$0")
+SCRIPTDIR=$(dirname "$SCRIPT")
+TARGETDIR=${SCRIPTDIR}/../libs/petsc
 
+if [ -d $TARGETDIR ]; then
+  cd $TARGETDIR;
+  git pull;
+else
+  ########## DOWNLOAD PETSC :
 
-########## DOWNLOAD PETSC :
-
-echo '__________________________________________';
-echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
-git clone -b maint https://gitlab.com/petsc/petsc.git petsc;
-
+  echo '__________________________________________';
+  echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
+  git clone -b maint https://gitlab.com/petsc/petsc.git $TARGETDIR;
+  cd $TARGETDIR;
+fi
 
 ########## CONFIGURE PETSC (SELECT THE APPROPRIATE CONFIGURATION OPTIONS BELOW) :
 
 echo '__________________________________________';
 echo 'CONFIGURING PETSC';
-cd petsc;
 
 if [ "$(uname)" == "Linux" ]; then
 PETSC_DIR=$(pwd);
@@ -52,8 +56,8 @@ fi
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
-make $PETSC_DIR $PETSC_ARCH test;    
+make $PETSC_DIR $PETSC_ARCH test;
 
-cd ..;
+cd $PRIORDIR;
 
 
