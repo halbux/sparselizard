@@ -22,8 +22,8 @@ class densematrix
 
     private:
 
-        long int numrows = 0;
-        long int numcols = 0;
+        int numrows = 0;
+        int numcols = 0;
 
         // This is only used in 'multiply':
         bool istransposed = false;
@@ -38,25 +38,25 @@ class densematrix
         // Set empty matrix:
         densematrix(void) {};
         // Set number of rows and columns:
-        densematrix(long int numberofrows, long int numberofcolumns);
+        densematrix(int numberofrows, int numberofcolumns);
         // Initialise to a double value. Use this to set a matrix with constant value.
-        densematrix(long int numberofrows, long int numberofcolumns, double initvalue);
+        densematrix(int numberofrows, int numberofcolumns, double initvalue);
         // Initialise with a vector (row major):
-        densematrix(long int numberofrows, long int numberofcolumns, const std::vector<double> valvec);
+        densematrix(int numberofrows, int numberofcolumns, const std::vector<double> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
-        densematrix(long int numberofrows, long int numberofcolumns, double init, double step);
+        densematrix(int numberofrows, int numberofcolumns, double init, double step);
         // Vertical concatenation of dense matrices:
         densematrix(std::vector<densematrix> input);
 
-        long int countrows(void) { return numrows; };
-        long int countcolumns(void) { return numcols; };
-        long int count(void) { return numrows*numcols; };
+        int countrows(void) { return numrows; };
+        int countcolumns(void) { return numcols; };
+        int count(void) { return numrows*numcols; };
 
         // Was it initialised?
         bool isdefined(void) { return (myvalues != NULL); };
 
         // Set the values of a given row.
-        void setrow(long int rownumber, std::vector<double> rowvals);
+        void setrow(int rownumber, std::vector<double> rowvals);
 
         // Output a flattened matrix, i.e. put all rows one after the other.
         // In practice this only requires to change 'numrows' and 'numcols'.
@@ -64,7 +64,7 @@ class densematrix
         densematrix flatten(void);
 
         // Insert a block in the matrix. Top left of block is at (row, col):
-        void insert(long int row, long int col, densematrix toinsert);
+        void insert(int row, int col, densematrix toinsert);
 
         // Insert a matrix at given row numbers. The number of columns must be the same.
         void insertatrows(std::vector<int> selectedrows, densematrix toinsert);
@@ -72,8 +72,8 @@ class densematrix
 
         // For fast access take into account that the storage is row-major.
         // Getting the values pointer with 'getvalues' is a better choice!
-        double getvalue(long int rownumber, long int columnnumber);
-        void setvalue(long int rownumber, long int columnnumber, double val);
+        double getvalue(int rownumber, int columnnumber);
+        void setvalue(int rownumber, int columnnumber, double val);
         
         void getvalues(std::vector<double>& topopulate);
 
@@ -135,14 +135,14 @@ class densematrix
         densematrix multiplyallrows(densematrix input);
 
         // A becomes [A; A; A; ...] n times.
-        densematrix duplicatevertically(long int n);
+        densematrix duplicatevertically(int n);
 
         // Extract a set of rows/columns from the matrix:
         densematrix extractrows(std::vector<int> selected);
         densematrix extractcols(std::vector<int> selected);
         // Extract the rows/columns in a given range:
-        densematrix extractrows(long int rangebegin, long int rangeend);
-        densematrix extractcols(long int rangebegin, long int rangeend);
+        densematrix extractrows(int rangebegin, int rangeend);
+        densematrix extractcols(int rangebegin, int rangeend);
 
 };
 

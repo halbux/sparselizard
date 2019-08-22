@@ -85,7 +85,7 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
 #include <parallel/algorithm>
 #endif
 
-long int* myalgorithm::stablesortparallel(std::vector<int*> tosort, long int numentries)
+int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
 {
 	// Parallel sort on Linux only for now:
 	#if defined(__linux__)
@@ -94,7 +94,7 @@ long int* myalgorithm::stablesortparallel(std::vector<int*> tosort, long int num
 	using namespace std;
 	#endif
 	
-    long int* reorderingvector = new long int[numentries];
+    int* reorderingvector = new int[numentries];
     // Set 'reorderingvector' to [0 1 2 ...]:
     std::iota(reorderingvector, reorderingvector+numentries, 0);
    
@@ -105,7 +105,7 @@ long int* myalgorithm::stablesortparallel(std::vector<int*> tosort, long int num
             int* tosort1 = tosort[0];
                 
             // The < operator is overloaded by a lambda function.
-            sort(reorderingvector, reorderingvector+numentries, [&](long int elem1, long int elem2)
+            sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     if (tosort1[elem1] < tosort1[elem2])
                         return true;
@@ -123,7 +123,7 @@ long int* myalgorithm::stablesortparallel(std::vector<int*> tosort, long int num
             int* tosort2 = tosort[1];
             
             // The < operator is overloaded by a lambda function.
-            sort(reorderingvector, reorderingvector+numentries, [&](long int elem1, long int elem2)
+            sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     if (tosort1[elem1] < tosort1[elem2])
                         return true;
@@ -142,7 +142,7 @@ long int* myalgorithm::stablesortparallel(std::vector<int*> tosort, long int num
         default:
             
             // The < operator is overloaded by a lambda function.
-            sort(reorderingvector, reorderingvector+numentries, [&](long int elem1, long int elem2)
+            sort(reorderingvector, reorderingvector+numentries, [&](int elem1, int elem2)
                 { 
                     for (int i = 0; i < tosort.size(); i++)
                     {
@@ -181,7 +181,7 @@ std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
 void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
 {
     // Loop on all rows:
-    long int index = 0;
+    int index = 0;
     for (int i = 0; i < numberofrows; i++)
     {
         // Loop on all columns:

@@ -27,7 +27,7 @@ std::vector<std::vector<densematrix>> opcondition::interpolate(elementselector& 
 		double* trueval = trueargmat[1][0].getvalues();
 		double* falseval = falseargmat[1][0].getvalues();
 
-		for (long int i = 0; i < condargmat[1][0].count(); i++)
+		for (int i = 0; i < condargmat[1][0].count(); i++)
 		{
 			if (condval[i] < 0)
 				trueval[i] = falseval[i]; 
@@ -60,7 +60,7 @@ densematrix opcondition::multiharmonicinterpolate(int numtimeevals, elementselec
 	double* trueval = trueargmat.getvalues();
 	double* falseval = falseargmat.getvalues();
 
-	for (long int i = 0; i < condargmat.count(); i++)
+	for (int i = 0; i < condargmat.count(); i++)
 	{
 		if (condval[i] < 0)
 			trueval[i] = falseval[i]; 

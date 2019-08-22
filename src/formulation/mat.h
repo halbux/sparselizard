@@ -47,7 +47,7 @@ class mat
         int countrows(void);
         int countcolumns(void);
         
-        long int countnnz(void);
+        int countnnz(void);
         
         // Remove the rows and columns associated to Dirichlet constraints:
         void removeconstraints(void);
