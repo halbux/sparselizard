@@ -25,7 +25,7 @@ class rawmat
 {
 	private:
         
-        long int nnz = -1;
+        int nnz = -1;
         
         // Combining all accumulated fragments below gives the overall matrix.
         std::vector<intdensematrix> accumulatedrowindices = {};
@@ -55,7 +55,7 @@ class rawmat
         int countrows(void);
         int countcolumns(void);
         
-        long int countnnz(void) { return nnz; };
+        int countnnz(void) { return nnz; };
         
         // Set all row and/or column indices requested to -1 (-1 adresses are ignored at assembly):
         void zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns);

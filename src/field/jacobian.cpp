@@ -6,9 +6,9 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
     field x("x"), y("y"), z("z");
 
     int elementdimension = elemselect.getelementdimension();
-    long int numberofelements = elemselect.countinselection();
+    int numberofelements = elemselect.countinselection();
     int problemdimension = universe::mymesh->getmeshdimension();
-    long int numberofgausspoints = evaluationcoordinates.size()/3;
+    int numberofgausspoints = evaluationcoordinates.size()/3;
 
     double *jac11, *jac12, *jac13, *jac21, *jac22, *jac23, *jac31, *jac32, *jac33, *detjacval;
 
@@ -92,7 +92,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 jac32 = jac[3*2+1].getvalues();
                 jac33 = jac[3*2+2].getvalues();
       
-                for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+                for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 {
                     // Second row perpendicular to first row --> [-b a 0] for row 1 = [a b c]
                     // In case the second row computed with [-b a 0] gives [0 0 0] then [0 -c b] is used instead.
@@ -169,7 +169,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 jac21 = jac[3*1+0].getvalues();
                 jac22 = jac[3*1+1].getvalues();
 
-                for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+                for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 {
                     // Second row perpendicular to first row --> [-b a] for row 1 = [a b]:
                     jac21[i] = -jac12[i];
@@ -224,7 +224,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 jac32 = jac[3*2+1].getvalues();
                 jac33 = jac[3*2+2].getvalues();
                 
-                for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+                for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 {
                     // Third row - normed cross product of row 1 and 2:
                     jac31[i] = jac12[i] * jac23[i] - jac22[i] * jac13[i];
@@ -319,7 +319,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
             
             detjacval = detjac.getvalues();
         
-            for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+            for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 detjacval[i] = jac11[i] * jac22[i] - jac12[i] * jac21[i];
             break;
             
@@ -337,7 +337,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
             
             detjacval = detjac.getvalues();
 
-            for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+            for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 detjacval[i] = jac11[i] * (jac22[i] * jac33[i] - jac32[i] * jac23[i]) - jac12[i] * (jac21[i] * jac33[i] - jac31[i] * jac23[i]) + jac13[i] * (jac21[i] * jac32[i] - jac31[i] * jac22[i]);
             break;
             
@@ -366,8 +366,8 @@ densematrix jacobian::getinvjac(int row, int column)
     {
         invjac = std::vector<densematrix>(3*3);
 
-        long int numberofelements = detjac.countrows();
-        long int numberofgausspoints = detjac.countcolumns();
+        int numberofelements = detjac.countrows();
+        int numberofgausspoints = detjac.countcolumns();
 
         double* jac11, *jac12, *jac13, *jac21, *jac22, *jac23, *jac31, *jac32, *jac33, *detjacval;
         double* invjac11, *invjac12, *invjac13, *invjac21, *invjac22, *invjac23, *invjac31, *invjac32, *invjac33;
@@ -382,7 +382,7 @@ densematrix jacobian::getinvjac(int row, int column)
                 jac11 = jac[3*0+0].getvalues();
                 invjac11 = invjac[3*0+0].getvalues();
 
-                for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+                for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                     invjac11[i] = 1/jac11[i];
                 break;
             case 2:
@@ -403,7 +403,7 @@ densematrix jacobian::getinvjac(int row, int column)
 
                 detjacval = detjac.getvalues();
 
-                for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+                for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 {
                     invjac11[i] =   jac22[i] / detjacval[i];
                     invjac12[i] = - jac12[i] / detjacval[i];
@@ -444,7 +444,7 @@ densematrix jacobian::getinvjac(int row, int column)
 
                 detjacval = detjac.getvalues();
 
-                for (long int i = 0; i < numberofelements*numberofgausspoints; i++)
+                for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 {
                     invjac11[i] = (jac22[i] * jac33[i] - jac23[i] * jac32[i]) /detjacval[i];
                     invjac12[i] = (jac13[i] * jac32[i] - jac12[i] * jac33[i]) /detjacval[i];

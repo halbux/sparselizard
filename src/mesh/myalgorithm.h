@@ -38,7 +38,7 @@ namespace myalgorithm
     // 'stablesortparallel' sorts in parallel according to tosort[0] then 
     // according to tosrt[1],... ALL int* arrays have size 'numentries'.
     // The output is a reordering vector.
-    long int* stablesortparallel(std::vector<int*> tosort, long int numentries);
+    int* stablesortparallel(std::vector<int*> tosort, int numentries);
     
     std::vector<int> intersect(std::vector<int> a, std::vector<int> b);
     

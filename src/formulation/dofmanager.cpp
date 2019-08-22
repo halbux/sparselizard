@@ -428,8 +428,8 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
     // Create a form function iterator to iterate through all form functions.
     hierarchicalformfunctioniterator myiterator(inputfield->gettypename(), elementtypenumber, fieldinterpolationorder);
 
-    long int numrows = myiterator.count();
-    long int numcols = elementlist.size();
+    int numrows = myiterator.count();
+    int numcols = elementlist.size();
     
     intdensematrix output(numrows, numcols);
     int* adresses = output.getvalues();
