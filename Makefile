@@ -1,14 +1,34 @@
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+current_dir := $(dir $(mkfile_path))
+external_libs_dir := $(current_dir)external_libs/libs
+
 ##### THESE ARE THE REQUIRED LIBRARIES:
 
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-LIBS = -L ~/SLlibs/petsc/arch-linux2-c-opt/lib -l openblas -l petsc -l slepc
-INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux2-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux2-c-opt/include/
+LIBS = \
+	-L $(external_libs_dir)/petsc/arch-linux2-c-opt/lib \
+	-l openblas \
+	-l petsc \
+	-l slepc
+INCL = \
+	-I $(external_libs_dir)/petsc/include/petsc/mpiuni \
+	-I $(external_libs_dir)/petsc/arch-linux2-c-opt/externalpackages/git.openblas \
+	-I $(external_libs_dir)/petsc/include/ \
+	-I $(external_libs_dir)/petsc/arch-linux2-c-opt/include/
 endif
 ifeq ($(UNAME), Darwin)
-LIBS = -L ~/SLlibs/petsc/arch-darwin-c-opt/lib -l openblas -l petsc -l slepc
-INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-darwin-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-darwin-c-opt/include/
+LIBS = \
+	-L $(external_libs_dir)/petsc/arch-darwin-c-opt/lib \
+	-l openblas \
+	-l petsc \
+	-l slepc
+INCL = \
+	-I $(external_libs_dir)/petsc/include/petsc/mpiuni \
+	-I $(external_libs_dir)/petsc/arch-darwin-c-opt/externalpackages/git.openblas \
+	-I $(external_libs_dir)/petsc/include/ \
+	-I $(external_libs_dir)/petsc/arch-darwin-c-opt/include/
 endif
 
 
