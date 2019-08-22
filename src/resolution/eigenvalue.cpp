@@ -37,7 +37,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
     if (myB.getpointer() == NULL)
     {
         EPSSetOperators( eps, myA.getpetsc(), NULL );
-        EPSSetProblemType(eps, EPS_NHEP);	
+        EPSSetProblemType(eps, EPS_NHEP);    
     }
     else
     {
@@ -46,10 +46,10 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
     }
     
     // Tell slepc how many eigs we want:
-	EPSSetDimensions(eps, numeigenvaluestocompute, PETSC_DECIDE, PETSC_DECIDE);
+    EPSSetDimensions(eps, numeigenvaluestocompute, PETSC_DECIDE, PETSC_DECIDE);
     
     // Set tolerance and max num of iterations allowed:
-	EPSSetTolerances(eps, 1e-6, 100);
+    EPSSetTolerances(eps, 1e-6, 100);
     
     // Set the eigenvalue solver:
     EPSSetType(eps, EPSKRYLOVSCHUR);
@@ -64,8 +64,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
     
     
     // We target the eigenvalues with a given magnitude:
- 	EPSSetTarget(eps, targeteigenvaluemagnitude);
-	EPSSetWhichEigenpairs(eps, EPS_TARGET_MAGNITUDE);
+     EPSSetTarget(eps, targeteigenvaluemagnitude);
+    EPSSetWhichEigenpairs(eps, EPS_TARGET_MAGNITUDE);
     
     
     // MUMPS petsc solver context:
@@ -79,13 +79,13 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
     
     
     // DO THE ACTUAL RESOLUTION:
-	EPSSolve( eps );
+    EPSSolve( eps );
     
-	// Get the number of eigs found:
+    // Get the number of eigs found:
     int numeigsfound;
-	EPSGetConverged( eps, &numeigsfound );
+    EPSGetConverged( eps, &numeigsfound );
     
-		
+        
     // Get all eigs:
     eigenvaluereal.resize(numeigsfound);
     eigenvalueimaginary.resize(numeigsfound);

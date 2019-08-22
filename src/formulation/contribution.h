@@ -40,9 +40,9 @@ class rawfield;
 class contribution
 {
 
-	private:
-	
-		shared_ptr<dofmanager> mydofmanager;
+    private:
+    
+        shared_ptr<dofmanager> mydofmanager;
         
         // All elementary coef*dof*tf terms to assemble and add together:
         std::vector<shared_ptr<operation>> mydofs = {};
@@ -69,9 +69,9 @@ class contribution
         std::vector<intdensematrix> fragmentcoladresses = {};
         std::vector<densematrix> fragmentvalues = {};
 
-	public:
-	
-		contribution(shared_ptr<dofmanager> dofmngr);
+    public:
+    
+        contribution(shared_ptr<dofmanager> dofmngr);
         
         void setdofs(std::vector<shared_ptr<operation>> dofs);
         void settfs(std::vector<shared_ptr<operation>> tfs);
@@ -87,11 +87,11 @@ class contribution
         
         // Generate the contribution and store it in the 
         // vec (for rhs contributions) or in the mat.
-		void generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, bool computeconstraints = true);
-		
+        void generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, bool computeconstraints = true);
+        
 // Add this to reduce the size of the system to solve:
 //void removebubblemode(void);
-																	
+                                                                    
 };
 
 #endif

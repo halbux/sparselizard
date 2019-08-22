@@ -10,8 +10,8 @@ std::vector<std::vector<densematrix>> opabs::interpolate(elementselector& elemse
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-	std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
-	
+    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
         argmat[1][0].abs();
@@ -64,10 +64,10 @@ std::shared_ptr<operation> opabs::copy(void)
 
 std::vector<double> opabs::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-	std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
-	for (int i = 0; i < evaluated.size(); i++)
-		evaluated[i] = std::abs(evaluated[i]);
-	return evaluated;
+    std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
+    for (int i = 0; i < evaluated.size(); i++)
+        evaluated[i] = std::abs(evaluated[i]);
+    return evaluated;
 }
 
 void opabs::print(void)

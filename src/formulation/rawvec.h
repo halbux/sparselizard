@@ -26,13 +26,13 @@ class rawfield;
 
 class rawvec
 {
-	private:
+    private:
 
         Vec myvec = PETSC_NULL;
         shared_ptr<dofmanager> mydofmanager = NULL;
-	
-	public:
-        	
+    
+    public:
+            
         rawvec(shared_ptr<dofmanager> dofmngr);
         rawvec(shared_ptr<dofmanager> dofmngr, Vec input) { mydofmanager = dofmngr; myvec = input; };
         

@@ -12,7 +12,7 @@
 class opfield: public operation
 {
 
-	private:
+    private:
 
         bool reuse = false;
 
@@ -29,7 +29,7 @@ class opfield: public operation
 
         shared_ptr<rawfield> myfield;
 
-	public:
+    public:
 
         opfield(shared_ptr<rawfield> fieldin) { myfield = fieldin; };
 
@@ -63,7 +63,7 @@ class opfield: public operation
 
         void reuseit(bool istobereused) { reuse = istobereused; };
 
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

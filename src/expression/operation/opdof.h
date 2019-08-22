@@ -12,7 +12,7 @@
 class opdof: public operation
 {
 
-	private:
+    private:
         
         int timederivativeorder = 0;
         // The space derivative is only temporary. It is split later on into 
@@ -30,8 +30,8 @@ class opdof: public operation
         shared_ptr<rawfield> myfield;
         
         int myphysicalregion;
-	
-	public:
+    
+    public:
         
         opdof(shared_ptr<rawfield> fieldin, int physreg = -1) { myfield = fieldin; myphysicalregion = physreg; };
         

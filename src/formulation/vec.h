@@ -27,15 +27,15 @@ class formulation;
 
 class vec
 {
-	private:
+    private:
 
         // The actual vector:
         shared_ptr<rawvec> rawvecptr = NULL;
         
         void errorifpointerisnull(void);
-	
-	public:
-        	
+    
+    public:
+            
         vec(void) {};
         vec(formulation formul);
         vec(shared_ptr<rawvec> inputrawvec) { rawvecptr = inputrawvec; };

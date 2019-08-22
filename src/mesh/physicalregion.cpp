@@ -104,7 +104,7 @@ std::vector<int> physicalregion::getdisjointregions(int dim)
 
 void physicalregion::renumberelements(int elementtypenumber, std::vector<int>& elementrenumbering)
 {
-	// Update 'elementlist'.
+    // Update 'elementlist'.
     for (int i = 0; i < elementlist[elementtypenumber].size(); i++)
         elementlist[elementtypenumber][i] = elementrenumbering[elementlist[elementtypenumber][i]];
 }

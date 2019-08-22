@@ -45,12 +45,12 @@ void elements::shift(double xshift, double yshift, double zshift)
 {
     for (int i = 0; i < barycenters.size(); i++)
     {
-    	for (int j = 0; j < barycenters[i].size()/3; j++)
-    	{
-    		barycenters[i][3*j+0] += xshift;
-    		barycenters[i][3*j+1] += yshift;
-    		barycenters[i][3*j+2] += zshift;
-    	}
+        for (int j = 0; j < barycenters[i].size()/3; j++)
+        {
+            barycenters[i][3*j+0] += xshift;
+            barycenters[i][3*j+1] += yshift;
+            barycenters[i][3*j+2] += zshift;
+        }
     }
 }
 
@@ -58,9 +58,9 @@ void elements::rotate(double alphax, double alphay, double alphaz)
 {
     for (int i = 0; i < barycenters.size(); i++)
     {
-    	if (barycenters[i].size() > 0)
-    		geotools::rotate(alphax, alphay, alphaz, &barycenters[i]);
-	}
+        if (barycenters[i].size() > 0)
+            geotools::rotate(alphax, alphay, alphaz, &barycenters[i]);
+    }
 }
 
 int elements::getsubelement(int subelementtypenumber, int elementtypenumber, int elementnumber, int subelementindex)
@@ -103,79 +103,79 @@ int elements::getcurvatureorder(void)
 
 void elements::populateedgesatnodes(void)
 {
-	// Get the number of nodes:
-	int numnodes = count(0);
-	// Get the number of edges:
-	int numedges = count(1);
-	// Get the number of curved nodes per edge:
-	int numcurvednodes = subelementsinelements[1][0].size()/numedges;
+    // Get the number of nodes:
+    int numnodes = count(0);
+    // Get the number of edges:
+    int numedges = count(1);
+    // Get the number of curved nodes per edge:
+    int numcurvednodes = subelementsinelements[1][0].size()/numedges;
 
 
-	// Preallocate vectors:
-	adressedgesatnodes = std::vector<int>(numnodes,0);
-	edgesatnodes = std::vector<int>(numedges*2);
+    // Preallocate vectors:
+    adressedgesatnodes = std::vector<int>(numnodes,0);
+    edgesatnodes = std::vector<int>(numedges*2);
 
 
-	// Vector to count the number of edges touching every node:
-	std::vector<int> numedgesonnode(numnodes,0);
+    // Vector to count the number of edges touching every node:
+    std::vector<int> numedgesonnode(numnodes,0);
 
-	// Loop on all edges:
-	for (int e = 0; e < numedges; e++)
-	{
-		// Corner nodes in current edge:
-		int edgefirstnode = subelementsinelements[1][0][e*numcurvednodes+0];
-		int edgelastnode = subelementsinelements[1][0][e*numcurvednodes+1];
+    // Loop on all edges:
+    for (int e = 0; e < numedges; e++)
+    {
+        // Corner nodes in current edge:
+        int edgefirstnode = subelementsinelements[1][0][e*numcurvednodes+0];
+        int edgelastnode = subelementsinelements[1][0][e*numcurvednodes+1];
 
-		numedgesonnode[edgefirstnode]++;
-		numedgesonnode[edgelastnode]++;
-	}
+        numedgesonnode[edgefirstnode]++;
+        numedgesonnode[edgelastnode]++;
+    }
 
-	for (int n = 1; n < numnodes; n++)
-		adressedgesatnodes[n] = adressedgesatnodes[n-1] + numedgesonnode[n-1];
+    for (int n = 1; n < numnodes; n++)
+        adressedgesatnodes[n] = adressedgesatnodes[n-1] + numedgesonnode[n-1];
 
-	std::vector<int> currentedgeinnode(numnodes,0);	
-	for (int e = 0; e < numedges; e++)
-	{
-		// Corner nodes in current edge:
-		int edgefirstnode = subelementsinelements[1][0][e*numcurvednodes+0];
-		int edgelastnode = subelementsinelements[1][0][e*numcurvednodes+1];
+    std::vector<int> currentedgeinnode(numnodes,0);    
+    for (int e = 0; e < numedges; e++)
+    {
+        // Corner nodes in current edge:
+        int edgefirstnode = subelementsinelements[1][0][e*numcurvednodes+0];
+        int edgelastnode = subelementsinelements[1][0][e*numcurvednodes+1];
 
-		edgesatnodes[adressedgesatnodes[edgefirstnode]+currentedgeinnode[edgefirstnode]] = e;
-		currentedgeinnode[edgefirstnode]++;
-		edgesatnodes[adressedgesatnodes[edgelastnode]+currentedgeinnode[edgelastnode]] = e;
-		currentedgeinnode[edgelastnode]++;
-	}
+        edgesatnodes[adressedgesatnodes[edgefirstnode]+currentedgeinnode[edgefirstnode]] = e;
+        currentedgeinnode[edgefirstnode]++;
+        edgesatnodes[adressedgesatnodes[edgelastnode]+currentedgeinnode[edgelastnode]] = e;
+        currentedgeinnode[edgelastnode]++;
+    }
 }
 
 int elements::countedgesonnode(int nodenumber)
 {
-	if (edgesatnodes.size() == 0)
-		populateedgesatnodes();
+    if (edgesatnodes.size() == 0)
+        populateedgesatnodes();
 
-	if (nodenumber+1 < adressedgesatnodes.size())
-		return adressedgesatnodes[nodenumber+1]-adressedgesatnodes[nodenumber];
-	else
-		return edgesatnodes.size()-adressedgesatnodes[nodenumber];
+    if (nodenumber+1 < adressedgesatnodes.size())
+        return adressedgesatnodes[nodenumber+1]-adressedgesatnodes[nodenumber];
+    else
+        return edgesatnodes.size()-adressedgesatnodes[nodenumber];
 }
 
 std::vector<int> elements::getedgesonnode(int nodenumber)
 {
-	int numedgesatnode = countedgesonnode(nodenumber);
+    int numedgesatnode = countedgesonnode(nodenumber);
 
-	std::vector<int> output(numedgesatnode);
-	for (int i = 0; i < numedgesatnode; i++)
-		output[i] = edgesatnodes[adressedgesatnodes[nodenumber]+i];
+    std::vector<int> output(numedgesatnode);
+    for (int i = 0; i < numedgesatnode; i++)
+        output[i] = edgesatnodes[adressedgesatnodes[nodenumber]+i];
 
-	return output;
+    return output;
 }
 
 std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elementnumber, int xyz)
 {
-	std::vector<double>* nodecoordinates = mynodes->getcoordinates();
-	
+    std::vector<double>* nodecoordinates = mynodes->getcoordinates();
+    
     if (elementtypenumber == 0)
         return {nodecoordinates->at(3*elementnumber+xyz)};
-	
+    
     element myelement(elementtypenumber, mycurvatureorder);
     int curvednumberofnodes = myelement.countcurvednodes();
     
@@ -189,42 +189,42 @@ std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elem
 
 std::vector<double>* elements::getbarycenters(int elementtypenumber)
 {
-	// If not yet populated for the element type:
-	if (barycenters[elementtypenumber].size() == 0)
-		barycenters[elementtypenumber] = computebarycenters(elementtypenumber);
-	
-	return &(barycenters[elementtypenumber]);
+    // If not yet populated for the element type:
+    if (barycenters[elementtypenumber].size() == 0)
+        barycenters[elementtypenumber] = computebarycenters(elementtypenumber);
+    
+    return &(barycenters[elementtypenumber]);
 }
 
 std::vector<double>* elements::getsphereradius(int elementtypenumber)
 {
-	std::vector<double>* mybarys = getbarycenters(elementtypenumber);
+    std::vector<double>* mybarys = getbarycenters(elementtypenumber);
 
-	// If not yet populated for the element type:
-	if (sphereradius[elementtypenumber].size() == 0)
-	{
-		sphereradius[elementtypenumber].resize(count(elementtypenumber));
-	
-		for (int i = 0; i < count(elementtypenumber); i++)
-		{
-			double maxdist = 0;
-		
-			std::vector<double> xnodes = getnodecoordinates(elementtypenumber, i, 0);
-			std::vector<double> ynodes = getnodecoordinates(elementtypenumber, i, 1);
-			std::vector<double> znodes = getnodecoordinates(elementtypenumber, i, 2);
-			
-			for (int j = 0; j < xnodes.size(); j++)
-			{
-				double curdist = std::sqrt( std::pow(mybarys->at(3*i+0)-xnodes[j], 2) + std::pow(mybarys->at(3*i+1)-ynodes[j], 2) + std::pow(mybarys->at(3*i+2)-znodes[j], 2) );
-				if (curdist > maxdist)
-					maxdist = curdist;
-			}
-			
-			sphereradius[elementtypenumber][i] = maxdist;
-		}
-	}
-	
-	return &(sphereradius[elementtypenumber]);
+    // If not yet populated for the element type:
+    if (sphereradius[elementtypenumber].size() == 0)
+    {
+        sphereradius[elementtypenumber].resize(count(elementtypenumber));
+    
+        for (int i = 0; i < count(elementtypenumber); i++)
+        {
+            double maxdist = 0;
+        
+            std::vector<double> xnodes = getnodecoordinates(elementtypenumber, i, 0);
+            std::vector<double> ynodes = getnodecoordinates(elementtypenumber, i, 1);
+            std::vector<double> znodes = getnodecoordinates(elementtypenumber, i, 2);
+            
+            for (int j = 0; j < xnodes.size(); j++)
+            {
+                double curdist = std::sqrt( std::pow(mybarys->at(3*i+0)-xnodes[j], 2) + std::pow(mybarys->at(3*i+1)-ynodes[j], 2) + std::pow(mybarys->at(3*i+2)-znodes[j], 2) );
+                if (curdist > maxdist)
+                    maxdist = curdist;
+            }
+            
+            sphereradius[elementtypenumber][i] = maxdist;
+        }
+    }
+    
+    return &(sphereradius[elementtypenumber]);
 }
 
 void elements::printnumber(void)
@@ -382,8 +382,8 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
     std::vector<double> noisethreshold = mynodes->getnoisethreshold();
     std::vector<double> barycentercoordinates = computebarycenters(elementtypenumber);
     
-	// 'elementrenumbering' will give the renumbering corresponding to removed duplicates:
-	std::vector<int> elementrenumbering;
+    // 'elementrenumbering' will give the renumbering corresponding to removed duplicates:
+    std::vector<int> elementrenumbering;
     int numberofnonduplicates = myalgorithm::removeduplicatedcoordinates(noisethreshold, barycentercoordinates, elementrenumbering);
     
     for (int i = 0; i < elementrenumbering.size(); i++)
@@ -410,8 +410,8 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
             }
         }
     }
-	// Shrink to fit:
-	subelementsinelements[elementtypenumber][0].resize(numberofnonduplicates*numberofcurvednodes);
+    // Shrink to fit:
+    subelementsinelements[elementtypenumber][0].resize(numberofnonduplicates*numberofcurvednodes);
     if (subelementsinelements[elementtypenumber][1].size() != 0)
         subelementsinelements[elementtypenumber][1].resize(numberofnonduplicates*numberoflines);
     if (subelementsinelements[elementtypenumber][2].size() != 0)
@@ -501,7 +501,7 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
 }
 
 void elements::explode(void)
-{							
+{                            
     // Add all new elements. Loop on all elements with increasing dimension 
     // to avoid defining too many duplicates.
     // Skip lines (type 1) since there is nothing to add for lines.
@@ -545,7 +545,7 @@ void elements::explode(void)
                     // Also link the triangle to its lines. All lines have already been defined before above.
                     for (int triangleline = 0; triangleline < 3; triangleline++)
                         subelementsinelements[2][1].push_back(firstnewlinenumber + std::abs(facesdefinitionsbasedonedges[3*triangle+triangleline])-1);
-                }	
+                }    
                 for (int quadrangle = 0; quadrangle < myelement.countquadrangularfaces(); quadrangle++)
                 {
                     std::vector<int> nodesinquadrangle = myelement.getnodesinquadrangle(quadrangle);
@@ -554,10 +554,10 @@ void elements::explode(void)
                     // Also link the quadrangle to its lines (defined before):
                     for (int quadrangleline = 0; quadrangleline < 4; quadrangleline++)
                         subelementsinelements[3][1].push_back(firstnewlinenumber + std::abs(facesdefinitionsbasedonedges[3*myelement.counttriangularfaces()+4*quadrangle+quadrangleline])-1);
-                }	
+                }    
             }
         }
-	}
+    }
 }
 
 void elements::definedisjointregions(void)
@@ -747,18 +747,18 @@ std::vector<bool> elements::iscornernode(void)
 
 void elements::tostandardorientation(void)
 {
-	// Only straight elements are supported for now:
-	if (getcurvatureorder() != 1)
-	{
-		std::cout << "Note: curved elements are not reoriented for now (some functions may thus perform slower)" << std::endl;
-		return;
-	}
+    // Only straight elements are supported for now:
+    if (getcurvatureorder() != 1)
+    {
+        std::cout << "Note: curved elements are not reoriented for now (some functions may thus perform slower)" << std::endl;
+        return;
+    }
 
-	// Loop on all element types except the point element (type 0):
-	for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
-	{	
-		if (subelementsinelements[elementtypenumber][0].size() == 0)
-			continue;
+    // Loop on all element types except the point element (type 0):
+    for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
+    {    
+        if (subelementsinelements[elementtypenumber][0].size() == 0)
+            continue;
         
         element myelement(elementtypenumber, mycurvatureorder);
         
@@ -769,59 +769,59 @@ void elements::tostandardorientation(void)
         int numberoftriangularfaces = myelement.counttriangularfaces();
         int numberofquadrangularfaces = myelement.countquadrangularfaces();
         
-		// Loop on all elements:
-		std::vector<int> currentnodes(numberofcurvednodes);
-		std::vector<int> currentedges(numberofedges);
-		std::vector<int> currenttriangularfaces(numberoftriangularfaces);
-		std::vector<int> currentquadrangularfaces(numberofquadrangularfaces);
-		
-		for (int i = 0; i < numelemofcurrenttype; i++)
-		{
-			for (int j = 0; j < numberofcurvednodes; j++)
-				currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
-			myelement.setnodes(currentnodes);
+        // Loop on all elements:
+        std::vector<int> currentnodes(numberofcurvednodes);
+        std::vector<int> currentedges(numberofedges);
+        std::vector<int> currenttriangularfaces(numberoftriangularfaces);
+        std::vector<int> currentquadrangularfaces(numberofquadrangularfaces);
+        
+        for (int i = 0; i < numelemofcurrenttype; i++)
+        {
+            for (int j = 0; j < numberofcurvednodes; j++)
+                currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
+            myelement.setnodes(currentnodes);
             // This gives the corner nodes reordering:
             std::vector<int> nodereordering = myelement.getstandardorientationreordering();
-			for (int j = 0; j < numberofcurvednodes; j++)
-				subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j] = currentnodes[nodereordering[j]];
-			// Reorder the edges:
-			if (numberofedges > 0 && elementtypenumber != 1)
-			{
-				for (int j = 0; j < numberofedges; j++)
-					currentedges[j] = subelementsinelements[elementtypenumber][1][i*numberofedges+j];
-				std::vector<int> edgereordering = myelement.getedgesreordering(nodereordering);
-				for (int j = 0; j < numberofedges; j++)
-					subelementsinelements[elementtypenumber][1][i*numberofedges+j] = currentedges[edgereordering[j]];
-			}
-			// Reorder the triangular faces:
-			if (numberoftriangularfaces > 0 && elementtypenumber != 2)
-			{
-				for (int j = 0; j < numberoftriangularfaces; j++)
-					currenttriangularfaces[j] = subelementsinelements[elementtypenumber][2][i*numberoftriangularfaces+j];
-				std::vector<int> triangularfacereordering = myelement.gettriangularfacesreordering(nodereordering);
-				for (int j = 0; j < numberoftriangularfaces; j++)
-					subelementsinelements[elementtypenumber][2][i*numberoftriangularfaces+j] = currenttriangularfaces[triangularfacereordering[j]];
-			}
-			// Reorder the quadrangular faces:
-			if (numberofquadrangularfaces > 0 && elementtypenumber != 3)
-			{
-				for (int j = 0; j < numberofquadrangularfaces; j++)
-					currentquadrangularfaces[j] = subelementsinelements[elementtypenumber][3][i*numberofquadrangularfaces+j];
-				std::vector<int> quadrangularfacereordering = myelement.getquadrangularfacesreordering(nodereordering);
-				for (int j = 0; j < numberofquadrangularfaces; j++)
-					subelementsinelements[elementtypenumber][3][i*numberofquadrangularfaces+j] = currentquadrangularfaces[quadrangularfacereordering[j]];
-			}
-		}
-	}
+            for (int j = 0; j < numberofcurvednodes; j++)
+                subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j] = currentnodes[nodereordering[j]];
+            // Reorder the edges:
+            if (numberofedges > 0 && elementtypenumber != 1)
+            {
+                for (int j = 0; j < numberofedges; j++)
+                    currentedges[j] = subelementsinelements[elementtypenumber][1][i*numberofedges+j];
+                std::vector<int> edgereordering = myelement.getedgesreordering(nodereordering);
+                for (int j = 0; j < numberofedges; j++)
+                    subelementsinelements[elementtypenumber][1][i*numberofedges+j] = currentedges[edgereordering[j]];
+            }
+            // Reorder the triangular faces:
+            if (numberoftriangularfaces > 0 && elementtypenumber != 2)
+            {
+                for (int j = 0; j < numberoftriangularfaces; j++)
+                    currenttriangularfaces[j] = subelementsinelements[elementtypenumber][2][i*numberoftriangularfaces+j];
+                std::vector<int> triangularfacereordering = myelement.gettriangularfacesreordering(nodereordering);
+                for (int j = 0; j < numberoftriangularfaces; j++)
+                    subelementsinelements[elementtypenumber][2][i*numberoftriangularfaces+j] = currenttriangularfaces[triangularfacereordering[j]];
+            }
+            // Reorder the quadrangular faces:
+            if (numberofquadrangularfaces > 0 && elementtypenumber != 3)
+            {
+                for (int j = 0; j < numberofquadrangularfaces; j++)
+                    currentquadrangularfaces[j] = subelementsinelements[elementtypenumber][3][i*numberofquadrangularfaces+j];
+                std::vector<int> quadrangularfacereordering = myelement.getquadrangularfacesreordering(nodereordering);
+                for (int j = 0; j < numberofquadrangularfaces; j++)
+                    subelementsinelements[elementtypenumber][3][i*numberofquadrangularfaces+j] = currentquadrangularfaces[quadrangularfacereordering[j]];
+            }
+        }
+    }
 }
 
 void elements::orient(void)
 {
-	// Loop on all element types except the point element (type 0):
-	for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
-	{	
-		if (subelementsinelements[elementtypenumber][0].size() == 0)
-			continue;
+    // Loop on all element types except the point element (type 0):
+    for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
+    {    
+        if (subelementsinelements[elementtypenumber][0].size() == 0)
+            continue;
         
         element myelement(elementtypenumber, mycurvatureorder);
         
@@ -830,16 +830,16 @@ void elements::orient(void)
         int numelemofcurrenttype = count(elementtypenumber);
         
         totalorientations[elementtypenumber].resize(numelemofcurrenttype);
-	
-		// Loop on all elements:
-		std::vector<int> currentnodes(numberofnodes);
-		for (int i = 0; i < numelemofcurrenttype; i++)
-		{
+    
+        // Loop on all elements:
+        std::vector<int> currentnodes(numberofnodes);
+        for (int i = 0; i < numelemofcurrenttype; i++)
+        {
             // Get only the corner nodes, not the curvature-related nodes:
-			for (int j = 0; j < numberofnodes; j++)
-				currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
-			
+            for (int j = 0; j < numberofnodes; j++)
+                currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
+            
             totalorientations[elementtypenumber][i] = orientation::gettotalorientation(elementtypenumber, currentnodes); 
-		}
-	}
+        }
+    }
 }

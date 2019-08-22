@@ -3,7 +3,7 @@
 
 std::vector<std::vector<densematrix>> operation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-	std::cout << "Error in 'operation' object: cannot interpolate the operation" << std::endl;
+    std::cout << "Error in 'operation' object: cannot interpolate the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     abort();
@@ -11,7 +11,7 @@ std::vector<std::vector<densematrix>> operation::interpolate(elementselector& el
 
 densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-	std::cout << "Error in 'operation' object: cannot interpolate the multiharmonic operation" << std::endl;
+    std::cout << "Error in 'operation' object: cannot interpolate the multiharmonic operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     abort();
@@ -19,7 +19,7 @@ densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselecto
 
 std::vector<std::vector<densematrix>> operation::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
-	std::cout << "Error in 'operation' object: expression provided for mesh deformation is invalid" << std::endl;
+    std::cout << "Error in 'operation' object: expression provided for mesh deformation is invalid" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     abort();
@@ -129,10 +129,10 @@ bool operation::isvalueorientationdependent(std::vector<int> disjregs)
 std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;
-	std::cout << "Operation was:" << std::endl;
-	this->print();
-	std::cout << std::endl;
-	abort();
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    std::cout << std::endl;
+    abort();
 }
         
 

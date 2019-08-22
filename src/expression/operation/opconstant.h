@@ -12,12 +12,12 @@
 class opconstant: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         double constantvalue;
-	
-	public:
+    
+    public:
         
         opconstant(double val) { constantvalue = val; };
         
@@ -31,7 +31,7 @@ class opconstant: public operation
         
         void reuseit(bool istobereused) { reuse = istobereused; };
         
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

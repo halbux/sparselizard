@@ -117,7 +117,7 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
     int numpositiveentries = addresses.countpositive();
     
     if (numpositiveentries == 0)
-    	return;
+        return;
 
     intdensematrix filteredad(numpositiveentries,1);
     densematrix filteredval(numpositiveentries,1);
@@ -163,11 +163,11 @@ densematrix rawvec::getvalues(intdensematrix addresses)
 
 double rawvec::getvalue(int address)
 {
-	int ads[1] = {address};
-	double outval[1];
-	VecGetValues(myvec, 1, ads, outval);
-	
-	return outval[0];
+    int ads[1] = {address};
+    double outval[1];
+    VecGetValues(myvec, 1, ads, outval);
+    
+    return outval[0];
 }
 
 void rawvec::setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op)
@@ -194,8 +194,8 @@ densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointre
     // Return an empty matrix if the entries are not in the vector:
     if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
     {
-    	densematrix vals;
-    	return vals;
+        densematrix vals;
+        return vals;
     }
     
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);

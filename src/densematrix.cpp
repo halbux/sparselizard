@@ -5,8 +5,8 @@ void densematrix::errorifempty(void)
 {
     if (numrows*numcols == 0)
     {
-    	std::cout << "Error in 'densematrix' object: cannot perform operation on empty matrix" << std::endl;
-    	abort();
+        std::cout << "Error in 'densematrix' object: cannot perform operation on empty matrix" << std::endl;
+        abort();
     }
 }
 
@@ -55,35 +55,35 @@ densematrix::densematrix(int numberofrows, int numberofcolumns, double init, dou
 
 densematrix::densematrix(std::vector<densematrix> input)
 {
-	if (input.size() == 0)
-		return;
-		
-	// Calculate the final concatenated size:
-	numcols = input[0].countcolumns();
-	numrows = input[0].countrows();
-	for (int i = 1; i < input.size(); i++)
-	{
-		numrows += input[i].countrows();
-		if (input[i].countcolumns() != numcols)
-		{
-			std::cout << "Error in 'densematrix' object: dimension mismatch in concatenation" << std::endl;
-			abort();
-		}
-	}
-	double* myvaluesptr = new double[numrows*numcols];
-	
-	int index = 0;
-	for (int i = 0; i < input.size(); i++)
-	{
-		double* curvals = input[i].getvalues();
-		for (int j = 0; j < input[i].count(); j++)
-		{
-			myvaluesptr[index] = curvals[j];
-			index++;
-		}
-	}
-	
-	myvalues = std::shared_ptr<double>(myvaluesptr);
+    if (input.size() == 0)
+        return;
+        
+    // Calculate the final concatenated size:
+    numcols = input[0].countcolumns();
+    numrows = input[0].countrows();
+    for (int i = 1; i < input.size(); i++)
+    {
+        numrows += input[i].countrows();
+        if (input[i].countcolumns() != numcols)
+        {
+            std::cout << "Error in 'densematrix' object: dimension mismatch in concatenation" << std::endl;
+            abort();
+        }
+    }
+    double* myvaluesptr = new double[numrows*numcols];
+    
+    int index = 0;
+    for (int i = 0; i < input.size(); i++)
+    {
+        double* curvals = input[i].getvalues();
+        for (int j = 0; j < input[i].count(); j++)
+        {
+            myvaluesptr[index] = curvals[j];
+            index++;
+        }
+    }
+    
+    myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
 void densematrix::setrow(int rownumber, std::vector<double> rowvals)
@@ -550,57 +550,57 @@ densematrix densematrix::duplicatevertically(int n)
 
 densematrix densematrix::extractrows(std::vector<int> selected)
 {
-	int numselected = selected.size();
+    int numselected = selected.size();
 
-	densematrix output(numselected, numcols);
-	
-	double* vals = getvalues();
-	double* outvals = output.getvalues();
-	for (int i = 0; i < numselected; i++)
-	{
-		int row = selected[i];
-		for (int j = 0; j < numcols; j++)
-			outvals[i*numcols+j] = vals[row*numcols+j];
-	}
-	
-	return output;
+    densematrix output(numselected, numcols);
+    
+    double* vals = getvalues();
+    double* outvals = output.getvalues();
+    for (int i = 0; i < numselected; i++)
+    {
+        int row = selected[i];
+        for (int j = 0; j < numcols; j++)
+            outvals[i*numcols+j] = vals[row*numcols+j];
+    }
+    
+    return output;
 }
 
 densematrix densematrix::extractcols(std::vector<int> selected)
 {
-	int numselected = selected.size();
-	
-	densematrix output(numrows, numselected);
-	
-	double* vals = getvalues();
-	double* outvals = output.getvalues();
-	for (int i = 0; i < numrows; i++)
-	{
-		for (int j = 0; j < numselected; j++)
-		{
-			int col = selected[j];
-			outvals[i*numselected+j] = vals[i*numcols+col];
-		}
-	}
-	
-	return output;
+    int numselected = selected.size();
+    
+    densematrix output(numrows, numselected);
+    
+    double* vals = getvalues();
+    double* outvals = output.getvalues();
+    for (int i = 0; i < numrows; i++)
+    {
+        for (int j = 0; j < numselected; j++)
+        {
+            int col = selected[j];
+            outvals[i*numselected+j] = vals[i*numcols+col];
+        }
+    }
+    
+    return output;
 }
 
 densematrix densematrix::extractrows(int rangebegin, int rangeend)
 {
-	std::vector<int> selected(rangeend-rangebegin+1);
-	for (int i = 0; i < selected.size(); i++)
-		selected[i] = rangebegin + i;
-		
-	return extractrows(selected);
+    std::vector<int> selected(rangeend-rangebegin+1);
+    for (int i = 0; i < selected.size(); i++)
+        selected[i] = rangebegin + i;
+        
+    return extractrows(selected);
 }
 
 densematrix densematrix::extractcols(int rangebegin, int rangeend)
 {
-	std::vector<int> selected(rangeend-rangebegin+1);
-	for (int i = 0; i < selected.size(); i++)
-		selected[i] = rangebegin + i;
-		
-	return extractcols(selected);
+    std::vector<int> selected(rangeend-rangebegin+1);
+    for (int i = 0; i < selected.size(); i++)
+        selected[i] = rangebegin + i;
+        
+    return extractcols(selected);
 }
 

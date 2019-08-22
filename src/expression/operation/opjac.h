@@ -12,11 +12,11 @@
 class opjac: public operation
 {
 
-	private:
+    private:
         
         int myrow, mycol;
-	
-	public:
+    
+    public:
         
         // Define as jac(m,n):
         opjac(int m, int n) { myrow = m; mycol = n; };

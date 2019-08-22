@@ -10,8 +10,8 @@ std::vector<std::vector<densematrix>> opasin::interpolate(elementselector& elems
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-	std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
-	
+    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
         argmat[1][0].asin();
@@ -64,10 +64,10 @@ std::shared_ptr<operation> opasin::copy(void)
 
 std::vector<double> opasin::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-	std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
-	for (int i = 0; i < evaluated.size(); i++)
-		evaluated[i] = std::asin(evaluated[i]);
-	return evaluated;
+    std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
+    for (int i = 0; i < evaluated.size(); i++)
+        evaluated[i] = std::asin(evaluated[i]);
+    return evaluated;
 }
 
 void opasin::print(void)

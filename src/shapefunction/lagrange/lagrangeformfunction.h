@@ -27,7 +27,7 @@
 
 class lagrangeformfunction
 {
-	private:
+    private:
         
         int myorder;
         int myelementtypenumber;
@@ -49,7 +49,7 @@ class lagrangeformfunction
         void preparepoly(void);
         void preparecoords(void);
         
-	public:
+    public:
         
         // The constructor takes the element type number, the form function
         // order and the coordinates of the evaluation points as input. 

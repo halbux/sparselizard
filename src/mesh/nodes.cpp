@@ -11,12 +11,12 @@ nodes::nodes(double roundoffnoise)
 
 void nodes::setnumber(int numberofnodes)
 {
-	mycoordinates.resize(3*numberofnodes);
+    mycoordinates.resize(3*numberofnodes);
 }
 
 int nodes::count(void)
 {
-	return mycoordinates.size()/3;
+    return mycoordinates.size()/3;
 }
 
 std::vector<double>* nodes::getcoordinates(void)
@@ -28,17 +28,17 @@ void nodes::shift(double xshift, double yshift, double zshift)
 {
     int numberofnodes = count();
     
-	for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
-	{
-		mycoordinates[3*nodenumber+0] += xshift;
-		mycoordinates[3*nodenumber+1] += yshift;
-		mycoordinates[3*nodenumber+2] += zshift;
-	}
+    for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
+    {
+        mycoordinates[3*nodenumber+0] += xshift;
+        mycoordinates[3*nodenumber+1] += yshift;
+        mycoordinates[3*nodenumber+2] += zshift;
+    }
 }
 
 void nodes::rotate(double alphax, double alphay, double alphaz)
 {
-	geotools::rotate(alphax, alphay, alphaz, &mycoordinates);
+    geotools::rotate(alphax, alphay, alphaz, &mycoordinates);
 }
 
 void nodes::print(void)
@@ -60,12 +60,12 @@ std::vector<int> nodes::sortbycoordinates(void)
 {
     int numberofnodes = count();
     
-	// 'reorderingvector' gives the relation between the indexes before and after node sorting:
-	std::vector<int> reorderingvector;
+    // 'reorderingvector' gives the relation between the indexes before and after node sorting:
+    std::vector<int> reorderingvector;
     myalgorithm::stablecoordinatesort(getnoisethreshold(), mycoordinates, reorderingvector);
 
-	// Reorder the nodes.:
-	reorder(reorderingvector);
+    // Reorder the nodes.:
+    reorder(reorderingvector);
     
     // sortedcoordinates = coordinates(reorderingvector,:).
     // sortedcoordinates(renumberingvector,:) = coordinates.
@@ -82,8 +82,8 @@ std::vector<int> nodes::removeduplicates(void)
 {
     int numberofnodes = count();
     
-	// 'noderenumbering' will give the renumbering corresponding to removed duplicates:
-	std::vector<int> noderenumbering;
+    // 'noderenumbering' will give the renumbering corresponding to removed duplicates:
+    std::vector<int> noderenumbering;
     int numberofnonduplicates = myalgorithm::removeduplicatedcoordinates(getnoisethreshold(), mycoordinates, noderenumbering);
 
     for (int i = 0; i < noderenumbering.size(); i++)
@@ -95,8 +95,8 @@ std::vector<int> nodes::removeduplicates(void)
             mycoordinates[3*noderenumbering[i]+2] = mycoordinates[3*i+2];
         }
     }
-	// Remove unused space:
-	mycoordinates.resize(numberofnonduplicates*3);
+    // Remove unused space:
+    mycoordinates.resize(numberofnonduplicates*3);
     
     return noderenumbering;
 }
@@ -105,29 +105,29 @@ void nodes::reorder(std::vector<int>& nodereordering)
 {
     int numberofnodes = count();
     
-	// Update 'mycoordinates':
-	std::vector<double> nodecoordinatescopy = mycoordinates;
-	for (int i = 0; i < numberofnodes; i++)
-	{
-		mycoordinates[3*i+0] = nodecoordinatescopy[3*nodereordering[i]+0]; 
-		mycoordinates[3*i+1] = nodecoordinatescopy[3*nodereordering[i]+1]; 
-		mycoordinates[3*i+2] = nodecoordinatescopy[3*nodereordering[i]+2]; 
-	}
+    // Update 'mycoordinates':
+    std::vector<double> nodecoordinatescopy = mycoordinates;
+    for (int i = 0; i < numberofnodes; i++)
+    {
+        mycoordinates[3*i+0] = nodecoordinatescopy[3*nodereordering[i]+0]; 
+        mycoordinates[3*i+1] = nodecoordinatescopy[3*nodereordering[i]+1]; 
+        mycoordinates[3*i+2] = nodecoordinatescopy[3*nodereordering[i]+2]; 
+    }
 }
 
 double nodes::getgeometrydimension(int coord)
 {
     int numberofnodes = count();
     
-	double maxcoord = mycoordinates[3*0+coord], mincoord = mycoordinates[3*0+coord];
-	for (int i = 1; i < numberofnodes; i++)
-	{
-		if (mycoordinates[3*i+coord] < mincoord)
-			mincoord = mycoordinates[3*i+coord];
-		if (mycoordinates[3*i+coord] > maxcoord)
-			maxcoord = mycoordinates[3*i+coord];
-	}
-	return std::abs(maxcoord-mincoord);
+    double maxcoord = mycoordinates[3*0+coord], mincoord = mycoordinates[3*0+coord];
+    for (int i = 1; i < numberofnodes; i++)
+    {
+        if (mycoordinates[3*i+coord] < mincoord)
+            mincoord = mycoordinates[3*i+coord];
+        if (mycoordinates[3*i+coord] > maxcoord)
+            maxcoord = mycoordinates[3*i+coord];
+    }
+    return std::abs(maxcoord-mincoord);
 }
 
 std::vector<double> nodes::getnoisethreshold(void)

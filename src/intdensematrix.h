@@ -24,7 +24,7 @@ class intdensematrix
         
         std::shared_ptr<int> myvalues = NULL;
         
-	public:
+    public:
         
         // Set empty matrix:
         intdensematrix(void) {};

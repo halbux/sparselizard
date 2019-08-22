@@ -12,10 +12,10 @@ void mat::errorifpointerisnull(void)
 
 mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
-	rawmatptr = shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
-	rawmatptr->accumulate(rowadresses, coladresses, vals);
-	rawmatptr->process();
-	rawmatptr->clearfragments();
+    rawmatptr = shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
+    rawmatptr->accumulate(rowadresses, coladresses, vals);
+    rawmatptr->process();
+    rawmatptr->clearfragments();
 }
 
 int mat::countrows(void) { errorifpointerisnull(); return rawmatptr->countrows(); }

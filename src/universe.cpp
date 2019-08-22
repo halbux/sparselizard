@@ -33,7 +33,7 @@ void universe::forbidreuse(void)
     resethff();
     
     if (forcejacobianreuse == false)
-    	computedjacobian = NULL;
+        computedjacobian = NULL;
     
     oppointers = {};
     oppointersfft = {};

@@ -43,7 +43,7 @@ class iodata
         
         // mydata[comp][i] gives the data at component 'comp' for all elements of type i.
         // The data for scalars is at component 0.
-        std::vector<std::vector<std::vector<densematrix>>> mydata;		
+        std::vector<std::vector<std::vector<densematrix>>> mydata;        
         
         // Combine the data in every element type:
         void combine(void);

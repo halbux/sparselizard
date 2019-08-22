@@ -41,46 +41,46 @@ int hcurlquadrangle::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlquadrangle::evalat(int maxorder) 
 {    
-	element quadrangle("quadrangle");
+    element quadrangle("quadrangle");
     hierarchicalformfunctioncontainer val("hcurl", quadrangle.gettypenumber());
 
     // Get the node list in every edge and face:
-    std::vector<int> nodesinedges = quadrangle.getedgesdefinitionsbasedonnodes();						
-    std::vector<int> nodesinfaces = quadrangle.getfacesdefinitionsbasedonnodes();	
-	
-	// Get for every edge and face orientation the vector reordering the 
+    std::vector<int> nodesinedges = quadrangle.getedgesdefinitionsbasedonnodes();                        
+    std::vector<int> nodesinfaces = quadrangle.getfacesdefinitionsbasedonnodes();    
+    
+    // Get for every edge and face orientation the vector reordering the 
     // nodes to bring the edge/face to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
-	std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
 
 
-	////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki, eta;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     
     // In Zaglmayr's thesis the reference elements are shifted and deformed.
-	// Variable change to correspond to our reference element definition:
-	// ki := (ki+1)/2; eta := (eta+1)/2;
+    // Variable change to correspond to our reference element definition:
+    // ki := (ki+1)/2; eta := (eta+1)/2;
     ki = 0.5*(ki+1); eta = 0.5*(eta+1);
     
-	vector<polynomial> lambda(5);
-	// lambda0 not used
-	lambda[1] = (1.0-ki)*(1.0-eta);
-	lambda[2] = ki*(1.0-eta);
+    vector<polynomial> lambda(5);
+    // lambda0 not used
+    lambda[1] = (1.0-ki)*(1.0-eta);
+    lambda[2] = ki*(1.0-eta);
     lambda[3] = ki*eta;
     lambda[4] = (1.0-ki)*eta;
-	
-	vector<polynomial> sigma(5);
-	// sigma0 not used
-	sigma[1] = (1.0-ki)+(1.0-eta);
-	sigma[2] = ki+(1.0-eta);
+    
+    vector<polynomial> sigma(5);
+    // sigma0 not used
+    sigma[1] = (1.0-ki)+(1.0-eta);
+    sigma[2] = ki+(1.0-eta);
     sigma[3] = ki+eta;
     sigma[4] = (1.0-ki)+eta;
     
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < quadrangle.countedges(); edge++)
@@ -113,7 +113,7 @@ hierarchicalformfunctioncontainer hcurlquadrangle::evalat(int maxorder)
     }
 
 
-	////////// Defining the face based form functions (if any):
+    ////////// Defining the face based form functions (if any):
 
     // Loop on all faces:
     for (int face = 0; face < quadrangle.countfaces(); face++)
@@ -189,12 +189,12 @@ hierarchicalformfunctioncontainer hcurlquadrangle::evalat(int maxorder)
         }
     }    
 
-	return val;
+    return val;
 }
 
 std::vector<bool> hcurlquadrangle::isgradienttype(int maxorder)
 {
-	std::vector<bool> output(count(maxorder,2,0), false);
+    std::vector<bool> output(count(maxorder,2,0), false);
 
     int ffindex = 0;
     for (int order = 1; order <= maxorder; order++)
@@ -213,12 +213,12 @@ std::vector<bool> hcurlquadrangle::isgradienttype(int maxorder)
                 ffindex++;
                 // "Type 3":
                 if (i == 0)
-                	ffindex++;
+                    ffindex++;
                 if (j == 0)
-                	ffindex++;
+                    ffindex++;
             }
         }
     }
 
-	return output;
+    return output;
 }

@@ -96,7 +96,7 @@ class dofmanager
         // - adress -2 is used for field dofs not in 'fieldphysreg' 
         //
         intdensematrix getadresses(shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
-														
+                                                        
 };
 
 #endif

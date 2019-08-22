@@ -94,10 +94,10 @@ std::shared_ptr<operation> opproduct::expand(void)
         
     // Everything is first put in form of a sum, possibly with a single sum term.
     // If there is no dof or tf this leads to treating a sum as a monolithic block.
-	std::vector<std::shared_ptr<operation>> prodtrms(productterms.size());
+    std::vector<std::shared_ptr<operation>> prodtrms(productterms.size());
     for (int i = 0; i < productterms.size(); i++)
     {
-		prodtrms[i] = productterms[i];
+        prodtrms[i] = productterms[i];
         if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()))
         {
             std::shared_ptr<opsum> op(new opsum);
@@ -209,14 +209,14 @@ std::shared_ptr<operation> opproduct::copy(void)
 
 std::vector<double> opproduct::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-	std::vector<double> evaluated(xcoords.size(), 1);
-	for (int i = 0; i < productterms.size(); i++)
-	{
-		std::vector<double> current = productterms[i]->evaluate(xcoords, ycoords, zcoords);
-		for (int j = 0; j < xcoords.size(); j++)
-			evaluated[j] *= current[j];
-	}
-	return evaluated;
+    std::vector<double> evaluated(xcoords.size(), 1);
+    for (int i = 0; i < productterms.size(); i++)
+    {
+        std::vector<double> current = productterms[i]->evaluate(xcoords, ycoords, zcoords);
+        for (int j = 0; j < xcoords.size(); j++)
+            evaluated[j] *= current[j];
+    }
+    return evaluated;
 }
 
 void opproduct::print(void)

@@ -23,7 +23,7 @@ class dofmanager;
 
 class rawmat
 {
-	private:
+    private:
         
         int nnz = -1;
         
@@ -44,9 +44,9 @@ class rawmat
         bool ludefined = false;
         
         shared_ptr<dofmanager> mydofmanager = NULL;
-        	
-	public:
-                	
+            
+    public:
+                    
         rawmat(shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; };
         rawmat(shared_ptr<dofmanager> dofmngr, Mat input) { mydofmanager = dofmngr; mymat = input; };
 
@@ -82,9 +82,9 @@ class rawmat
         
         void print(void);
 
-    	// Extract a new initialised rawmat that has all accumulated data. 
-    	shared_ptr<rawmat> extractaccumulated(void);
-    	
+        // Extract a new initialised rawmat that has all accumulated data. 
+        shared_ptr<rawmat> extractaccumulated(void);
+        
         shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         Mat getpetsc(void) { return mymat; };
         

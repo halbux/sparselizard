@@ -16,7 +16,7 @@
 class physicalregion
 {
 
-	private:
+    private:
 
         // The physical region can only hold elements of a single dimension (0D, 1D, 2D or 3D).
         int myelementdimension = -1;
@@ -31,7 +31,7 @@ class physicalregion
         // List of all element numbers for every type in every physical region defined in the loaded mesh file.
         std::vector<std::vector<int>> elementlist = std::vector<std::vector<int>>(8, std::vector<int>(0));
         
-	public:
+    public:
         
         physicalregion(disjointregions&, int physicalregionnumber, int physicalregionindex);
         

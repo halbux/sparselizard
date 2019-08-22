@@ -2,8 +2,8 @@
 
 void lagrangeformfunction::preparepoly(void)
 {
-	if (myformfunctionpolynomials.size() > 0)
-		return;
+    if (myformfunctionpolynomials.size() > 0)
+        return;
 
     switch (myelementtypenumber)
     {
@@ -36,9 +36,9 @@ void lagrangeformfunction::preparepoly(void)
 
 void lagrangeformfunction::preparecoords(void)
 {
-	if (mynodecoordinates.size() > 0)
-		return;
-		
+    if (mynodecoordinates.size() > 0)
+        return;
+        
     switch (myelementtypenumber)
     {
         case 0:
@@ -70,23 +70,23 @@ void lagrangeformfunction::preparecoords(void)
     // To avoid problems at the y axis in axisymmetric simulations the nodes are brought slightly closer to the barycenter:
     if (universe::isaxisymmetric)
     {
-    	int numnodes = mynodecoordinates.size()/3;
+        int numnodes = mynodecoordinates.size()/3;
     
-    	std::vector<double> curbarycenter(3,0.0);
-    	for (int i = 0; i < numnodes; i++)
-    	{
-    		curbarycenter[0] += mynodecoordinates[3*i+0]/numnodes;
-    		curbarycenter[1] += mynodecoordinates[3*i+1]/numnodes;
-    		curbarycenter[2] += mynodecoordinates[3*i+2]/numnodes;
-    	}
-		
-		double lambda = 1e-15;
-		for (int i = 0; i < numnodes; i++)
-    	{
-			mynodecoordinates[3*i+0] = (1.0-lambda)*mynodecoordinates[3*i+0] + lambda*curbarycenter[0];
-    		mynodecoordinates[3*i+1] = (1.0-lambda)*mynodecoordinates[3*i+1] + lambda*curbarycenter[1];
-    		mynodecoordinates[3*i+2] = (1.0-lambda)*mynodecoordinates[3*i+2] + lambda*curbarycenter[2];
-		}
+        std::vector<double> curbarycenter(3,0.0);
+        for (int i = 0; i < numnodes; i++)
+        {
+            curbarycenter[0] += mynodecoordinates[3*i+0]/numnodes;
+            curbarycenter[1] += mynodecoordinates[3*i+1]/numnodes;
+            curbarycenter[2] += mynodecoordinates[3*i+2]/numnodes;
+        }
+        
+        double lambda = 1e-15;
+        for (int i = 0; i < numnodes; i++)
+        {
+            mynodecoordinates[3*i+0] = (1.0-lambda)*mynodecoordinates[3*i+0] + lambda*curbarycenter[0];
+            mynodecoordinates[3*i+1] = (1.0-lambda)*mynodecoordinates[3*i+1] + lambda*curbarycenter[1];
+            mynodecoordinates[3*i+2] = (1.0-lambda)*mynodecoordinates[3*i+2] + lambda*curbarycenter[2];
+        }
     }
 }
 
@@ -94,7 +94,7 @@ lagrangeformfunction::lagrangeformfunction(int elementtypenumber, int order, con
 {    
     myorder = order;
     myelementtypenumber = elementtypenumber;
-	myevaluationpoints = evaluationpoints;
+    myevaluationpoints = evaluationpoints;
 }
 
 densematrix lagrangeformfunction::getderivative(int whichderivative)
@@ -121,8 +121,8 @@ densematrix lagrangeformfunction::getderivative(int whichderivative)
 
 std::vector<double> lagrangeformfunction::getnodecoordinates(void)
 {
-	preparecoords();
-	return mynodecoordinates;
+    preparecoords();
+    return mynodecoordinates;
 }
 
 std::vector<polynomial> lagrangeformfunction::getformfunctionpolynomials(void)
@@ -135,15 +135,15 @@ polynomial lagrangeformfunction::getinterpolationpolynomial(const std::vector<do
 {
     preparepoly();
 
-	polynomial poly;
-	
-	for (int i = 0; i < myformfunctionpolynomials.size(); i++)
-	{
-		if (interpol[i] != 0.0)
-			poly = poly + interpol[i]*myformfunctionpolynomials[i];
-	}
+    polynomial poly;
+    
+    for (int i = 0; i < myformfunctionpolynomials.size(); i++)
+    {
+        if (interpol[i] != 0.0)
+            poly = poly + interpol[i]*myformfunctionpolynomials[i];
+    }
 
-	return poly;
+    return poly;
 }
 
 void lagrangeformfunction::print(void)

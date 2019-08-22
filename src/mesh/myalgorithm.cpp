@@ -6,20 +6,20 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
     // There is a x, y and z coordinate for every nodes:
     int numberofnodes = coordinates.size()/3;
     
-	// 'reorderingvector' gives the relation between the indexes before and after node sorting:
+    // 'reorderingvector' gives the relation between the indexes before and after node sorting:
     if (reorderingvector.size() != numberofnodes)
         reorderingvector.resize(numberofnodes);
-	// Set 'reorderingvector' to [0 1 2 ...]:
-   	std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
-   	// Sort 'reorderingvector' according to 'coordinates' with x > y > z priority order:
-	// The < operator is overloaded by a lambda function.
-	std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
-		{ 
-			// First sort according to the x coordinate:
-			if (coordinates[elem1*3+0] < coordinates[elem2*3+0] - noisethreshold[0])
-				return true;
-			if (coordinates[elem1*3+0] > coordinates[elem2*3+0] + noisethreshold[0])
-				return false;
+    // Set 'reorderingvector' to [0 1 2 ...]:
+       std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
+       // Sort 'reorderingvector' according to 'coordinates' with x > y > z priority order:
+    // The < operator is overloaded by a lambda function.
+    std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+        { 
+            // First sort according to the x coordinate:
+            if (coordinates[elem1*3+0] < coordinates[elem2*3+0] - noisethreshold[0])
+                return true;
+            if (coordinates[elem1*3+0] > coordinates[elem2*3+0] + noisethreshold[0])
+                return false;
             // If it cannot be sorted according to the x coordinate sort according to y:
             if (coordinates[elem1*3+1] < coordinates[elem2*3+1] - noisethreshold[1])
                 return true;
@@ -32,7 +32,7 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
                 return false;
             // For identical entries make a COHERENT decision for a stable sorting.
             return (elem1 < elem2);
-		});
+        });
 }
 
 int myalgorithm::removeduplicatedcoordinates(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& renumberingvector)
@@ -46,17 +46,17 @@ int myalgorithm::removeduplicatedcoordinates(std::vector<double> noisethreshold,
     if (numberofnodes == 0)
         return 0;
     
-	int newnodenumber = 0;
-	renumberingvector[0] = 0;
-	for (int i = 1; i < numberofnodes; i++)
-	{
-		// If the node is not close enough to the previous one (i.e. is not a duplicate):
-		if (std::abs(coordinates[3*i+0] - coordinates[3*(i-1)+0]) > noisethreshold[0] || std::abs(coordinates[3*i+1] - coordinates[3*(i-1)+1]) > noisethreshold[1] || std::abs(coordinates[3*i+2] - coordinates[3*(i-1)+2]) > noisethreshold[2])
+    int newnodenumber = 0;
+    renumberingvector[0] = 0;
+    for (int i = 1; i < numberofnodes; i++)
+    {
+        // If the node is not close enough to the previous one (i.e. is not a duplicate):
+        if (std::abs(coordinates[3*i+0] - coordinates[3*(i-1)+0]) > noisethreshold[0] || std::abs(coordinates[3*i+1] - coordinates[3*(i-1)+1]) > noisethreshold[1] || std::abs(coordinates[3*i+2] - coordinates[3*(i-1)+2]) > noisethreshold[2])
             newnodenumber++;
 
-		// Create a vector whose ith node gives the new node number for node i:
-		renumberingvector[i] = newnodenumber;
-	}
+        // Create a vector whose ith node gives the new node number for node i:
+        renumberingvector[i] = newnodenumber;
+    }
 
     return newnodenumber + 1;
 }
@@ -87,13 +87,13 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
 
 int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
 {
-	// Parallel sort on Linux only for now:
-	#if defined(__linux__)
-	using namespace __gnu_parallel;
-	#else
-	using namespace std;
-	#endif
-	
+    // Parallel sort on Linux only for now:
+    #if defined(__linux__)
+    using namespace __gnu_parallel;
+    #else
+    using namespace std;
+    #endif
+    
     int* reorderingvector = new int[numentries];
     // Set 'reorderingvector' to [0 1 2 ...]:
     std::iota(reorderingvector, reorderingvector+numentries, 0);
@@ -213,7 +213,7 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     guess[0] += deltaki;
                     
                     if (std::abs(guess[0]) > boxsize)
-                    	return false;
+                        return false;
                 }
                 else
                 {
@@ -247,7 +247,7 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     guess[1] += deltaeta;
                     
                     if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize)
-                    	return false;
+                        return false;
                 }
                 else
                 {
@@ -289,7 +289,7 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     guess[2] += deltaphi;
                     
                     if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize || std::abs(guess[2]) > boxsize)
-                    	return false;
+                        return false;
                 }
                 else
                 {
@@ -306,40 +306,40 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
 
 std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& tosplit, int blocklen)
 {
-	int numdata = tosplit.size()/blocklen;
+    int numdata = tosplit.size()/blocklen;
 
-	std::vector<std::vector<double>> output(blocklen, std::vector<double>(numdata,0));
-	
-	for (int i = 0; i < numdata; i++)
-	{
-		for (int j = 0; j < blocklen; j++)
-			output[j][i] = tosplit[i*blocklen+j];
-	}
-	
-	return output;
+    std::vector<std::vector<double>> output(blocklen, std::vector<double>(numdata,0));
+    
+    for (int i = 0; i < numdata; i++)
+    {
+        for (int j = 0; j < blocklen; j++)
+            output[j][i] = tosplit[i*blocklen+j];
+    }
+    
+    return output;
 }
 
 std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blocklen)
 {
-	int numblocks = tonorm.size()/blocklen;
+    int numblocks = tonorm.size()/blocklen;
 
-	std::vector<double> output = tonorm;
-	
-	for (int i = 0; i < numblocks; i++)
-	{
-		double curnorm = 0;
-		for (int j = 0; j < blocklen; j++)
-			curnorm += tonorm[blocklen*i+j]*tonorm[blocklen*i+j];
-		curnorm = std::sqrt(curnorm);
-		
-		if (curnorm > 0)
-		{
-			for (int j = 0; j < blocklen; j++)
-				output[blocklen*i+j] = tonorm[blocklen*i+j]/curnorm;
-		}
-	}
-	
-	return output;
+    std::vector<double> output = tonorm;
+    
+    for (int i = 0; i < numblocks; i++)
+    {
+        double curnorm = 0;
+        for (int j = 0; j < blocklen; j++)
+            curnorm += tonorm[blocklen*i+j]*tonorm[blocklen*i+j];
+        curnorm = std::sqrt(curnorm);
+        
+        if (curnorm > 0)
+        {
+            for (int j = 0; j < blocklen; j++)
+                output[blocklen*i+j] = tonorm[blocklen*i+j]/curnorm;
+        }
+    }
+    
+    return output;
 }
 
 std::string myalgorithm::getfileextension(std::string filename)
@@ -382,9 +382,9 @@ std::string myalgorithm::getfilename(std::string filename)
 
 std::string myalgorithm::getplurals(int count)
 {
-	if (count > 1)
-		return "s";
-	else
-		return "";
+    if (count > 1)
+        return "s";
+    else
+        return "";
 }
 

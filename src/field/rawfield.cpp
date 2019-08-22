@@ -27,12 +27,12 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     }
     
     // Edge shape functions cannot be used with axisymmetry for now:
-	if (universe::isaxisymmetric && fieldtypename == "hcurl")
-	{
-		std::cout << "Error in 'rawfield' object: using hcurl (edge) shape functions with axisymmetry is not allowed." << std::endl;
-		std::cout << "Consider using an alternative formulation with h1 (nodal) shape functions." << std::endl;
-		abort();
-	}
+    if (universe::isaxisymmetric && fieldtypename == "hcurl")
+    {
+        std::cout << "Error in 'rawfield' object: using hcurl (edge) shape functions with axisymmetry is not allowed." << std::endl;
+        std::cout << "Consider using an alternative formulation with h1 (nodal) shape functions." << std::endl;
+        abort();
+    }
 
     // If the field type name ends with xy (or xyz) there are 2 (or 3) dof components.
     // 'xy' or 'xyz' can only be used on scalar form function type (e.g. not on hcurl).
@@ -226,7 +226,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
         std::cout << "Error in 'rawfield' object: cannot set the value for the x, y or z coordinate" << std::endl;
         abort();
     }
-	if (input.countcolumns() != 1 || input.countrows() != countcomponents())
+    if (input.countcolumns() != 1 || input.countrows() != countcomponents())
     {
         std::cout << "Error in 'rawfield' object: the rawfield value must be set with a " << countcomponents() << "x1 expression" << std::endl;
         abort();
@@ -238,23 +238,23 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
 
     if (mysubfields.size() == 0)
     {
-    	field thisfield(getpointer());
+        field thisfield(getpointer());
     
-    	// Compute the projection of the expression (skip for a zero expression):
-    	formulation projectedvalue;
-    	if (meshdeform == NULL)
-    		projectedvalue += integration(physreg, numfftharms, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
-    	else
-    		projectedvalue += integration(physreg, numfftharms, *meshdeform, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
-    	// Define an all-zero vector:
-    	vec solvec(projectedvalue);
-		if (input.iszero() == false)
-		{
-			projectedvalue.generate();
-			solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
-		}
-    	
-    	thisfield.setdata(physreg, solvec);
+        // Compute the projection of the expression (skip for a zero expression):
+        formulation projectedvalue;
+        if (meshdeform == NULL)
+            projectedvalue += integration(physreg, numfftharms, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
+        else
+            projectedvalue += integration(physreg, numfftharms, *meshdeform, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
+        // Define an all-zero vector:
+        vec solvec(projectedvalue);
+        if (input.iszero() == false)
+        {
+            projectedvalue.generate();
+            solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
+        }
+        
+        thisfield.setdata(physreg, solvec);
     }
 }
 
@@ -384,8 +384,8 @@ void rawfield::setgauge(int physreg)
         // Get ALL disjoint regions in the physical region (not only ders, to remove grad type form functions).
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
-		for (int i = 0; i < selecteddisjregs.size(); i++)
-			isitgauged[selecteddisjregs[i]] = true;
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+            isitgauged[selecteddisjregs[i]] = true;
     }
 }
 
@@ -402,18 +402,18 @@ void rawfield::setspanningtree(spanningtree spantree)
     }
     
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
-    	myspanningtree = {spantree};
+        myspanningtree = {spantree};
 }
 
 spanningtree* rawfield::getspanningtree(void)
 {
-	if (myspanningtree.size() == 1)
-		return &myspanningtree[0];
-	else
-	{
-		std::cout << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;
-		abort();
-	}
+    if (myspanningtree.size() == 1)
+        return &myspanningtree[0];
+    else
+    {
+        std::cout << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;
+        abort();
+    }
 }
 
 void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
@@ -507,16 +507,16 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
             // Transfer nothing if 'values' is empty:
             if (vals != NULL)
             {
-				if (op == "set")
-				{
-		            for (int elem = 0; elem < numelem; elem++)
-		                mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
-				}
-				if (op == "add")
-				{
-		            for (int elem = 0; elem < numelem; elem++)
-		                mycoefmanager->setcoef(disjreg, ff, elem, mycoefmanager->getcoef(disjreg, ff, elem) + vals[elem]);
-				}
+                if (op == "set")
+                {
+                    for (int elem = 0; elem < numelem; elem++)
+                        mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
+                }
+                if (op == "add")
+                {
+                    for (int elem = 0; elem < numelem; elem++)
+                        mycoefmanager->setcoef(disjreg, ff, elem, mycoefmanager->getcoef(disjreg, ff, elem) + vals[elem]);
+                }
             }
         }
     }
@@ -692,7 +692,7 @@ shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
 
 bool rawfield::isgauged(int disjreg) 
 { 
-	return isitgauged[disjreg];
+    return isitgauged[disjreg];
 }
 
 int rawfield::getinterpolationorder(int disjreg) 

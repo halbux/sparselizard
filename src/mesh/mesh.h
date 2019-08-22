@@ -33,7 +33,7 @@ class shape;
 
 class mesh
 {
-	private:
+    private:
         
         nodes mynodes;
         elements myelements;
@@ -59,8 +59,8 @@ class mesh
         
         // 'printcount' prints the number of elements for every type.
         void printcount(void);
-	
-	public:
+    
+    public:
         
         mesh(void);
         mesh(std::string filename, int verbosity = 1, bool legacyreader = true);
@@ -72,17 +72,17 @@ class mesh
         disjointregions* getdisjointregions(void);
 
         // Load from file name:
-        void load(std::string name, int verbosity = 1, bool legacyreader = true);	
+        void load(std::string name, int verbosity = 1, bool legacyreader = true);    
         // Load from shape vector:
-        void load(std::vector<shape> inputshapes, int verbosity = 1);	
+        void load(std::vector<shape> inputshapes, int verbosity = 1);    
 
         // Write to file name:
-        void write(std::string name, int verbosity = 1);		
+        void write(std::string name, int verbosity = 1);        
         
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
         void shift(double x, double y, double z);
         // 'rotate' rotates the mesh by ax, ay and az degrees around the x, y and z axis respectively.
-        void rotate(double ax, double ay, double az);	
+        void rotate(double ax, double ay, double az);    
         
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
         int getmeshdimension(void);

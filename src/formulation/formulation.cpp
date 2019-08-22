@@ -83,7 +83,7 @@ void formulation::operator+=(integration integrationobject)
         if (integrationobject.ismeshdeformdefined())
             mycontribution.setmeshdeformation(integrationobject.getmeshdeform());
 
-        // Add the contribution to the contribution container:	
+        // Add the contribution to the contribution container:    
         int blocknumber = integrationobject.getblocknumber();
         if (mycontributions[contribindex].size() < blocknumber+1)
             mycontributions[contribindex].resize(blocknumber+1);
@@ -93,7 +93,7 @@ void formulation::operator+=(integration integrationobject)
 
 int formulation::countdofs(void)
 {
-	return mydofmanager->countdofs(); 
+    return mydofmanager->countdofs(); 
 }
 
 void formulation::generate(int m, int contributionnumber)
@@ -114,7 +114,7 @@ void formulation::generate(int m, int contributionnumber)
         mymat[m-1] = shared_ptr<rawmat>(new rawmat(mydofmanager));
 
     std::vector<contribution> contributionstogenerate = mycontributions[m][contributionnumber];
-	for (int i = 0; i < contributionstogenerate.size(); i++)
+    for (int i = 0; i < contributionstogenerate.size(); i++)
     {
         if (m == 0)
             contributionstogenerate[i].generate(myvec, NULL, not(isconstraintcomputation));
@@ -212,11 +212,11 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
     shared_ptr<rawmat> rawout = mymat[KCM]->extractaccumulated();
     
     if (keepfragments == false)
-    	mymat[KCM]->clearfragments();
-    	
+        mymat[KCM]->clearfragments();
         
-	// Set the gauged indexes to all zero:
-	rawout->gauge();
+        
+    // Set the gauged indexes to all zero:
+    rawout->gauge();
 
     // Add the constraint diagonal ones to the matrix (if any):
     if (skipdiagonalones == false && isconstraintcomputation == false)
@@ -241,20 +241,20 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
 
         rawout->accumulate(gaugedindexes, gaugedindexes, ones);  
     }
-	// Set the row indices of the conditionally constrained dofs to zero.
+    // Set the row indices of the conditionally constrained dofs to zero.
     // Add the conditional constraint diagonal ones to the matrix (if any).
-	std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
-	intdensematrix condconstrainedindexes = condconstrdata.first;
-	int numcondconstraineddofs = condconstrainedindexes.count();
-	
-	if (numcondconstraineddofs > 0)
-	{
-		rawout->zeroentries(condconstrainedindexes, true, false);
-		if (skipdiagonalones == false)
-		{
-			densematrix ones(1, numcondconstraineddofs, 1);
-			rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
-	    } 
+    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+    intdensematrix condconstrainedindexes = condconstrdata.first;
+    int numcondconstraineddofs = condconstrainedindexes.count();
+    
+    if (numcondconstraineddofs > 0)
+    {
+        rawout->zeroentries(condconstrainedindexes, true, false);
+        if (skipdiagonalones == false)
+        {
+            densematrix ones(1, numcondconstraineddofs, 1);
+            rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
+        } 
     }
 
     rawout->process(); 

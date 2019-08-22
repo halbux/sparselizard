@@ -14,7 +14,7 @@ std::vector<std::vector<densematrix>> opdetjac::interpolate(elementselector& ele
         universe::computedjacobian = myjac;
     
     // The detjac is on the cos0 harmonic:
-	return {{},{myjac->getdetjac().copy()}};
+    return {{},{myjac->getdetjac().copy()}};
 }
 
 densematrix opdetjac::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

@@ -26,55 +26,55 @@ class rawextrusion: public rawshape
 
     private:
 
-		int myphysicalregion = -1;
-		
-		// Son shapes:
-		std::vector<std::shared_ptr<rawshape>> sons = {};
-
-		// Coordinates of the nodes in the mesh:
-		std::vector<double> mycoords = {};
-		// Elements in the mesh:
-		std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
-
-
-		// Number of node layers in the extrusion:
-		int mynumlayers;
-
-		// Extrusion length:
-		double myheight;
-
-		// Unextruded rawshape:
-		std::shared_ptr<rawshape> mybaseshape;
+        int myphysicalregion = -1;
         
-	public:
+        // Son shapes:
+        std::vector<std::shared_ptr<rawshape>> sons = {};
 
-		rawextrusion(void) {};
-
-		rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers);
-
-		std::shared_ptr<rawshape> duplicate(void);
-
-		void setphysicalregion(int physreg);
-	
-		int getdimension(void);
-
-		std::string getname(void);
-
-		std::vector<std::shared_ptr<rawshape>> getsons(void);
-
-		// Get subshapes (sons are included):
-		std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
-		void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
-
-		// Get the mesh info of the shape:
-		int getphysicalregion(void);
-		std::vector<double>* getcoords(void); 
-		std::vector<std::vector<int>>* getelems(void);
+        // Coordinates of the nodes in the mesh:
+        std::vector<double> mycoords = {};
+        // Elements in the mesh:
+        std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
 
 
-		std::shared_ptr<rawshape> getpointer(void);
+        // Number of node layers in the extrusion:
+        int mynumlayers;
 
-		void mesh(void);
+        // Extrusion length:
+        double myheight;
+
+        // Unextruded rawshape:
+        std::shared_ptr<rawshape> mybaseshape;
+        
+    public:
+
+        rawextrusion(void) {};
+
+        rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers);
+
+        std::shared_ptr<rawshape> duplicate(void);
+
+        void setphysicalregion(int physreg);
+    
+        int getdimension(void);
+
+        std::string getname(void);
+
+        std::vector<std::shared_ptr<rawshape>> getsons(void);
+
+        // Get subshapes (sons are included):
+        std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
+        void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
+
+        // Get the mesh info of the shape:
+        int getphysicalregion(void);
+        std::vector<double>* getcoords(void); 
+        std::vector<std::vector<int>>* getelems(void);
+
+
+        std::shared_ptr<rawshape> getpointer(void);
+
+        void mesh(void);
 
 };
 

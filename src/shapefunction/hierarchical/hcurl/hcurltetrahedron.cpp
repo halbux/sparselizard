@@ -21,13 +21,13 @@ int hcurltetrahedron::count(int order, int dim, int num)
     
     if (order < 0)
         return 0;
-	if (order == 0)
-	{
-		if (dim == 1)
-			return 1;
-		else
-			return 0;
-	}
+    if (order == 0)
+    {
+        if (dim == 1)
+            return 1;
+        else
+            return 0;
+    }
     
     switch (dim)
     {
@@ -50,35 +50,35 @@ int hcurltetrahedron::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurltetrahedron::evalat(int maxorder) 
 {    
-	element tetrahedron("tetrahedron");
+    element tetrahedron("tetrahedron");
     hierarchicalformfunctioncontainer val("hcurl", tetrahedron.gettypenumber());
     
     // Get the node list in every edge and face:
-    std::vector<int> nodesinedges = tetrahedron.getedgesdefinitionsbasedonnodes();						
-    std::vector<int> nodesinfaces = tetrahedron.getfacesdefinitionsbasedonnodes();	
-	
-	// Get for every edge and face orientation the vector reordering the 
+    std::vector<int> nodesinedges = tetrahedron.getedgesdefinitionsbasedonnodes();                        
+    std::vector<int> nodesinfaces = tetrahedron.getfacesdefinitionsbasedonnodes();    
+    
+    // Get for every edge and face orientation the vector reordering the 
     // nodes to bring the edge/face to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
-	std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
 
 
-	////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki, eta, phi;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     phi.set({{{0.0,1.0}}});
     
-	vector<polynomial> lambda(5);
-	// lambda0 not used
-	lambda[1] = 1.0-ki-eta-phi;
-	lambda[2] = ki;
+    vector<polynomial> lambda(5);
+    // lambda0 not used
+    lambda[1] = 1.0-ki-eta-phi;
+    lambda[2] = ki;
     lambda[3] = eta;
     lambda[4] = phi;
 
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < tetrahedron.countedges(); edge++)
@@ -111,7 +111,7 @@ hierarchicalformfunctioncontainer hcurltetrahedron::evalat(int maxorder)
     }
 
 
-	////////// Defining the face based form functions (if any):
+    ////////// Defining the face based form functions (if any):
 
     // Loop on all faces:
     for (int face = 0; face < tetrahedron.countfaces(); face++)
@@ -178,7 +178,7 @@ hierarchicalformfunctioncontainer hcurltetrahedron::evalat(int maxorder)
     }
     
     
-	////////// Defining the volume based form functions (if any):
+    ////////// Defining the volume based form functions (if any):
 
     // Defining the Legendre polynomials Ls, ls and l for all required orders:
     vector<polynomial> Ls = legendre::Ls(maxorder, lambda[1]-lambda[2], lambda[1]+lambda[2]);
@@ -239,12 +239,12 @@ hierarchicalformfunctioncontainer hcurltetrahedron::evalat(int maxorder)
         }
     }
     
-	return val;
+    return val;
 }
 
 std::vector<bool> hcurltetrahedron::isgradienttype(int maxorder)
 {
-	std::vector<bool> output(count(maxorder,3,0), false);
+    std::vector<bool> output(count(maxorder,3,0), false);
 
     int ffindex = 0;
     for (int order = 3; order <= maxorder; order++)
@@ -266,11 +266,11 @@ std::vector<bool> hcurltetrahedron::isgradienttype(int maxorder)
                     ffindex++;
                     // "Type 3":
                     if (i == 0)
-                    	ffindex++;
+                        ffindex++;
                 }
             }
         }
     }
 
-	return output;
+    return output;
 }

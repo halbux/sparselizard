@@ -17,12 +17,12 @@ class expression;
 class parameterselectedregion
 {
 
-	private:
+    private:
         
         parameter* myparam;
         int myphysreg;
-	
-	public:
+    
+    public:
         
         parameterselectedregion(parameter* param, int physreg) { myparam = param; myphysreg = physreg; };
 

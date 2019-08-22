@@ -33,8 +33,8 @@
 class hierarchicalformfunctioniterator
 {
 
-	private:
-	
+    private:
+    
         std::string myformfunctiontypename;
         int myelementtypenumber;
         int myorder;
@@ -48,9 +48,9 @@ class hierarchicalformfunctioniterator
         // The overall form function number:
         int overallformfunctionindex = -1;
         
-	public:
+    public:
 
-		hierarchicalformfunctioniterator(std::string formfunctiontypename, int elementtypenumber, int order);
+        hierarchicalformfunctioniterator(std::string formfunctiontypename, int elementtypenumber, int order);
 
         // Get the total number of form functions:
         int count(void);

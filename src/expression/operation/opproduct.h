@@ -12,12 +12,12 @@
 class opproduct: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         std::vector<std::shared_ptr<operation>> productterms = {};
-	
-	public:
+    
+    public:
         
         opproduct(void) {};
         opproduct(std::vector<std::shared_ptr<operation>> input) { productterms = input; };
@@ -49,7 +49,7 @@ class opproduct: public operation
         void reuseit(bool istobereused) { reuse = istobereused; };
         bool isreused(void) { return reuse; };
         
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

@@ -19,13 +19,13 @@ int hcurlprism::count(int order, int dim, int num)
     // The 'num' input argument is required here!
     if (order < 0)
         return 0;
-	if (order == 0)
-	{
-		if (dim == 1)
-			return 1;
-		else
-			return 0;
-	}
+    if (order == 0)
+    {
+        if (dim == 1)
+            return 1;
+        else
+            return 0;
+    }
     
     switch (dim)
     {
@@ -56,48 +56,48 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
     hierarchicalformfunctioncontainer val("hcurl", prism.gettypenumber());
 
     // Get the node list in every edge and face:
-    std::vector<int> nodesinedges = prism.getedgesdefinitionsbasedonnodes();						
-    std::vector<int> nodesinfaces = prism.getfacesdefinitionsbasedonnodes();	
-	
-	// Get for every edge and face orientation the vector reordering the 
+    std::vector<int> nodesinedges = prism.getedgesdefinitionsbasedonnodes();                        
+    std::vector<int> nodesinfaces = prism.getfacesdefinitionsbasedonnodes();    
+    
+    // Get for every edge and face orientation the vector reordering the 
     // nodes to bring the edge/face to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
-	std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
-	std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
 
 
-	////////// Define the 'lambda' and 'mu' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'mu' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki, eta, phi;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     phi.set({{{0.0,1.0}}});
     
     // In Zaglmayr's thesis the reference elements are shifted and deformed.
-	// Variable change to correspond to our reference element definition:
-	// phi := (phi+1)/2; 
+    // Variable change to correspond to our reference element definition:
+    // phi := (phi+1)/2; 
     phi = 0.5*(phi+1);
     
-	vector<polynomial> lambda(7);
-	// lambda0 not used
-	lambda[1] = 1.0-ki-eta;
-	lambda[2] = ki;
+    vector<polynomial> lambda(7);
+    // lambda0 not used
+    lambda[1] = 1.0-ki-eta;
+    lambda[2] = ki;
     lambda[3] = eta;
     lambda[4] = 1.0-ki-eta;
     lambda[5] = ki;
     lambda[6] = eta;
-	
-	vector<polynomial> mu(7);
-	// mu0 not used
-	mu[1] = 1.0-phi;
-	mu[2] = 1.0-phi;
+    
+    vector<polynomial> mu(7);
+    // mu0 not used
+    mu[1] = 1.0-phi;
+    mu[2] = 1.0-phi;
     mu[3] = 1.0-phi;
     mu[4] = phi;
     mu[5] = phi;
     mu[6] = phi;
     
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < prism.countedges(); edge++)
@@ -142,7 +142,7 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
     }
     
 
-	////////// Defining the face based form functions (if any):
+    ////////// Defining the face based form functions (if any):
 
     // Loop on all faces:
     for (int face = 0; face < prism.countfaces(); face++)
@@ -297,7 +297,7 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
     }
     
     
-	////////// Defining the volume based form functions (if any):
+    ////////// Defining the volume based form functions (if any):
 
     // Defining the Legendre polynomials for all required orders:
     vector<polynomial> Ls = legendre::Ls(maxorder, lambda[1]-lambda[2],lambda[1]+lambda[2]);
@@ -370,12 +370,12 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
         }
     }
     
-	return val;
+    return val;
 }
 
 std::vector<bool> hcurlprism::isgradienttype(int maxorder)
 {
-	std::vector<bool> output(count(maxorder,3,0), false);
+    std::vector<bool> output(count(maxorder,3,0), false);
 
     int ffindex = 0;
     for (int order = 2; order <= maxorder; order++)
@@ -397,13 +397,13 @@ std::vector<bool> hcurlprism::isgradienttype(int maxorder)
                     ffindex++;
                     // "Type 3":
                     if (k == 0)
-                    	ffindex++;
+                        ffindex++;
                     if (i == 0)
-                    	ffindex++;
+                        ffindex++;
                 }
             }
         }
     }
 
-	return output;
+    return output;
 }

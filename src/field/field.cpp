@@ -23,8 +23,8 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
 }
 field::field(std::string fieldtypename, spanningtree spantree)
 {
-	rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
-	rawfieldptr->setspanningtree(spantree);
+    rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
+    rawfieldptr->setspanningtree(spantree);
 }
 
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree)
@@ -45,7 +45,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, 
         std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
         abort();
     } 
-	rawfieldptr->setspanningtree(spantree);
+    rawfieldptr->setspanningtree(spantree);
 }
 
 int field::countcomponents(void) { return rawfieldptr->countcomponents(); }
@@ -90,18 +90,18 @@ void field::setgauge(int physreg)
         abort();   
     }
 
-	rawfieldptr->setgauge(physreg);
+    rawfieldptr->setgauge(physreg);
 }
 
 void field::setdata(int physreg, vectorfieldselect myvec, std::string op) 
 { 
-	if (op != "set" && op != "add")
-	{
-		std::cout << "Error in 'field' object: operation " << op << " is unknown in .setdata (use 'set' or 'add')" << std::endl;
-		abort();
-	}
+    if (op != "set" && op != "add")
+    {
+        std::cout << "Error in 'field' object: operation " << op << " is unknown in .setdata (use 'set' or 'add')" << std::endl;
+        abort();
+    }
 
-	rawfieldptr->setdata(physreg, myvec, op); 
+    rawfieldptr->setdata(physreg, myvec, op); 
 }
 
 void field::setdata(int physreg, vec myvec, std::string op)

@@ -85,7 +85,7 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
 
             // Make all time derivatives available in the universe:
             universe::xdtxdtdtx = {{xnext},{dtxnext},{}};
-        	
+            
             vec xtolcalc = xnext;
             
             // Reassemble only the non-constant matrices:
@@ -133,7 +133,7 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
             
             // Solve all formulations that must be solved at the end of the nonlinear loop:
             mathop::solve(tosolveafter);
-        	
+            
             
             if (islinear)
                 break;

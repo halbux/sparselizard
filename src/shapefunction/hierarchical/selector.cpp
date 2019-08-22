@@ -4,7 +4,7 @@
 std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber, std::string formfunctiontypename)
 {
     if (formfunctiontypename.compare("h1") == 0)
-	{
+    {
         switch (elementtypenumber)
         {
             case 0:
@@ -24,10 +24,10 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
             case 7:
                 return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
         }
-	}
+    }
     
     if (formfunctiontypename.compare("hcurl") == 0)
-	{
+    {
         switch (elementtypenumber)
         {
             case 0:
@@ -47,10 +47,10 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
             case 7:
                 return std::shared_ptr<hierarchicalformfunction>(new hcurlpyramid);
         }
-	}
+    }
     
     if (formfunctiontypename.compare("q6") == 0)
-	{
+    {
         switch (elementtypenumber)
         {
             case 0:
@@ -70,10 +70,10 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
             case 7:
                 return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
         }
-	}
+    }
     
     if (formfunctiontypename.compare("h11") == 0)
-	{
+    {
         switch (elementtypenumber)
         {
             case 0:
@@ -93,12 +93,12 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
             case 7:
                 return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
         }
-	}
-	
+    }
+    
     if (formfunctiontypename.compare("one") == 0)
-	{
-		return std::shared_ptr<hierarchicalformfunction>(new oneconstant(elementtypenumber));
-	}
+    {
+        return std::shared_ptr<hierarchicalformfunction>(new oneconstant(elementtypenumber));
+    }
     
     
     // If we arrive here it means the form function type name was incorrect:

@@ -13,11 +13,11 @@
 class optime: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         
-	public:
+    public:
         
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);

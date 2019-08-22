@@ -41,46 +41,46 @@ int hcurlhexahedron::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlhexahedron::evalat(int maxorder) 
 {    
-	element hexahedron("hexahedron");
+    element hexahedron("hexahedron");
     hierarchicalformfunctioncontainer val("hcurl", hexahedron.gettypenumber());
 
     // Get the node list in every edge and face:
-    std::vector<int> nodesinedges = hexahedron.getedgesdefinitionsbasedonnodes();						
-    std::vector<int> nodesinfaces = hexahedron.getfacesdefinitionsbasedonnodes();	
-	
-	// Get for every edge and face orientation the vector reordering the 
+    std::vector<int> nodesinedges = hexahedron.getedgesdefinitionsbasedonnodes();                        
+    std::vector<int> nodesinfaces = hexahedron.getfacesdefinitionsbasedonnodes();    
+    
+    // Get for every edge and face orientation the vector reordering the 
     // nodes to bring the edge/face to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
-	std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
 
 
-	////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki, eta, phi;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     phi.set({{{0.0,1.0}}});
     
     // In Zaglmayr's thesis the reference elements are shifted and deformed.
-	// Variable change to correspond to our reference element definition:
-	// ki := (ki+1)/2; eta := (eta+1)/2; phi := (phi+1)/2; 
+    // Variable change to correspond to our reference element definition:
+    // ki := (ki+1)/2; eta := (eta+1)/2; phi := (phi+1)/2; 
     ki = 0.5*(ki+1); eta = 0.5*(eta+1); phi = 0.5*(phi+1);
     
-	vector<polynomial> lambda(9);
-	// lambda0 not used
-	lambda[1] = (1.0-ki)*(1.0-eta)*(1.0-phi);
-	lambda[2] = ki*(1.0-eta)*(1.0-phi);
+    vector<polynomial> lambda(9);
+    // lambda0 not used
+    lambda[1] = (1.0-ki)*(1.0-eta)*(1.0-phi);
+    lambda[2] = ki*(1.0-eta)*(1.0-phi);
     lambda[3] = ki*eta*(1.0-phi);
     lambda[4] = (1.0-ki)*eta*(1.0-phi);
     lambda[5] = (1.0-ki)*(1.0-eta)*phi;
     lambda[6] = ki*(1.0-eta)*phi;
     lambda[7] = ki*eta*phi;
     lambda[8] = (1.0-ki)*eta*phi;
-	
-	vector<polynomial> sigma(9);
-	// sigma0 not used
-	sigma[1] = (1.0-ki)+(1.0-eta)+(1.0-phi);
-	sigma[2] = ki+(1.0-eta)+(1.0-phi);
+    
+    vector<polynomial> sigma(9);
+    // sigma0 not used
+    sigma[1] = (1.0-ki)+(1.0-eta)+(1.0-phi);
+    sigma[2] = ki+(1.0-eta)+(1.0-phi);
     sigma[3] = ki+eta+(1.0-phi);
     sigma[4] = (1.0-ki)+eta+(1.0-phi);
     sigma[5] = (1.0-ki)+(1.0-eta)+phi;
@@ -89,7 +89,7 @@ hierarchicalformfunctioncontainer hcurlhexahedron::evalat(int maxorder)
     sigma[8] = (1.0-ki)+eta+phi;
     
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < hexahedron.countedges(); edge++)
@@ -122,7 +122,7 @@ hierarchicalformfunctioncontainer hcurlhexahedron::evalat(int maxorder)
     }
 
 
-	////////// Defining the face based form functions (if any):
+    ////////// Defining the face based form functions (if any):
 
     // Loop on all faces:
     for (int face = 0; face < hexahedron.countfaces(); face++)
@@ -199,7 +199,7 @@ hierarchicalformfunctioncontainer hcurlhexahedron::evalat(int maxorder)
     }
     
     
-	////////// Defining the volume based form functions (if any):
+    ////////// Defining the volume based form functions (if any):
 
     // Defining the Legendre polynomials L(2*ki-1), L(2*eta-1) and L(2*phi-1) for all required orders:
     vector<polynomial> Ltwokiminusone = legendre::L(maxorder+1, 2*ki-1);
@@ -294,12 +294,12 @@ hierarchicalformfunctioncontainer hcurlhexahedron::evalat(int maxorder)
         }
     }
     
-	return val;
+    return val;
 }
 
 std::vector<bool> hcurlhexahedron::isgradienttype(int maxorder)
 {
-	std::vector<bool> output(count(maxorder,3,0), false);
+    std::vector<bool> output(count(maxorder,3,0), false);
 
     int ffindex = 0;
     for (int order = 1; order <= maxorder; order++)
@@ -314,24 +314,24 @@ std::vector<bool> hcurlhexahedron::isgradienttype(int maxorder)
                     if (i != order-1 && j != order-1 && k != order-1)
                         continue;
 
-					// "Type 1":
-					output[ffindex] = true; ffindex++;
+                    // "Type 1":
+                    output[ffindex] = true; ffindex++;
                     // "Type 2":
                     ffindex++;
                     ffindex++;
                     // "Type 3":
                     if (i == 0)
-                    	ffindex++;
+                        ffindex++;
                     if (j == 0)
-                    	ffindex++;
+                        ffindex++;
                     if (k == 0)
-                    	ffindex++;
+                        ffindex++;
                 }
             }
         }
     }
 
-	return output;
+    return output;
 }
 
 

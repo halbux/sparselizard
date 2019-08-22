@@ -16,7 +16,7 @@ class expression;
 
 class integration
 {
-	private:
+    private:
         
         std::vector<expression> myexpression = {};
         // Empty if undefined:
@@ -28,7 +28,7 @@ class integration
         
         int mynumcoefharms = -1;
 
-	public:
+    public:
         
         // This is used to accelerate all zero constraint computations.
         // Set it true if this object corresponds to project zero.

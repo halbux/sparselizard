@@ -8,7 +8,7 @@ physicalregions::physicalregions(disjointregions& inputdisjointregions)
 
 int physicalregions::createunion(const std::vector<int> input)
 {
-	errorundefined(input);
+    errorundefined(input);
 
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
@@ -28,7 +28,7 @@ int physicalregions::createunion(const std::vector<int> input)
 
 int physicalregions::createintersection(const std::vector<int> input)
 {
-	errorundefined(input);
+    errorundefined(input);
 
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
@@ -51,30 +51,30 @@ int physicalregions::createintersection(const std::vector<int> input)
 
 int physicalregions::createexclusion(int input, int toexclude)
 {
-	errorundefined({input,toexclude});
+    errorundefined({input,toexclude});
 
-	// Get all input disjoint regions:
-	std::vector<int> inputdisjregs = get(input)->getdisjointregions(-1);
+    // Get all input disjoint regions:
+    std::vector<int> inputdisjregs = get(input)->getdisjointregions(-1);
 
-	// Get all disjoint regions to exclude:
+    // Get all disjoint regions to exclude:
     std::vector<int> toexcludedisjregs = get(toexclude)->getdisjointregions(-1);
 
-	// Remove the disjoint regions to exclude from the list of input disjoint regions:
-	std::vector<int> disjregs = {};
-	for (int i = 0; i < inputdisjregs.size(); i++)
-	{
-		bool toinclude = true;
-		for (int j = 0; j < toexcludedisjregs.size(); j++)
-		{
-			if (inputdisjregs[i] == toexcludedisjregs[j])
-			{
-				toinclude = false;
-				break;			
-			}
-		}
-		if (toinclude)
-			disjregs.push_back(inputdisjregs[i]);
-	}
+    // Remove the disjoint regions to exclude from the list of input disjoint regions:
+    std::vector<int> disjregs = {};
+    for (int i = 0; i < inputdisjregs.size(); i++)
+    {
+        bool toinclude = true;
+        for (int j = 0; j < toexcludedisjregs.size(); j++)
+        {
+            if (inputdisjregs[i] == toexcludedisjregs[j])
+            {
+                toinclude = false;
+                break;            
+            }
+        }
+        if (toinclude)
+            disjregs.push_back(inputdisjregs[i]);
+    }
 
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
@@ -137,23 +137,23 @@ int physicalregions::getnumber(int physicalregionindex)
 
 int physicalregions::getindex(int physicalregionnumber)
 {
-	for (int i = 0; i < myphysicalregionnumbers.size(); i++)
-	{
-		if (myphysicalregionnumbers[i] == physicalregionnumber)
-			return i;
-	}
-	return -1;
+    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    {
+        if (myphysicalregionnumbers[i] == physicalregionnumber)
+            return i;
+    }
+    return -1;
 }
 
 void physicalregions::errorundefined(std::vector<int> physregs)
 {
-	for (int i = 0; i < physregs.size(); i++)
-	{
-		if (getindex(physregs[i]) == -1)
-		{
-			std::cout << "Error in 'physicalregions' object: physical region number " << physregs[i] << " is not defined" << std::endl;
-			abort();
-		}
-	}
+    for (int i = 0; i < physregs.size(); i++)
+    {
+        if (getindex(physregs[i]) == -1)
+        {
+            std::cout << "Error in 'physicalregions' object: physical region number " << physregs[i] << " is not defined" << std::endl;
+            abort();
+        }
+    }
 }
 
