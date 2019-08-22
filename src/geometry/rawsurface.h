@@ -19,7 +19,7 @@ class rawsurface: public rawshape
 
     private:
 
-	public:
+    public:
 
 };
 

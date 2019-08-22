@@ -58,42 +58,42 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     // In case the user provides only the diagonal part of a square diagonal matrix:
     if (mynumrows == mynumcols && input.size() == mynumrows)
     {
-		std::vector<expression> fullinput(mynumrows*mynumcols);
-		for (int i = 0; i < mynumrows; i++)
-		{
-			for (int j = 0; j < mynumcols; j++)
-			{
-				if (i == j)
-					fullinput[i*mynumcols+j] = input[i];
-				else
-					fullinput[i*mynumcols+j] = expression(0);
-			}
-		}
-		input = fullinput;
-	}
+        std::vector<expression> fullinput(mynumrows*mynumcols);
+        for (int i = 0; i < mynumrows; i++)
+        {
+            for (int j = 0; j < mynumcols; j++)
+            {
+                if (i == j)
+                    fullinput[i*mynumcols+j] = input[i];
+                else
+                    fullinput[i*mynumcols+j] = expression(0);
+            }
+        }
+        input = fullinput;
+    }
 
     // In case the user provides only the lower triangular part of a square symmetric matrix:
     if (mynumrows == mynumcols && input.size() == mynumrows*(mynumcols+1)/2)
     {
-		std::vector<expression> fullinput(mynumrows*mynumcols);
-		int index = 0;
-		for (int i = 0; i < mynumrows; i++)
-		{
-			for (int j = 0; j <= i; j++)
-			{
-				if (i == j)
-					fullinput[i*mynumcols+j] = input[index];
-				else
-				{
-					fullinput[i*mynumcols+j] = input[index];
-					fullinput[j*mynumcols+i] = input[index];
-				}
+        std::vector<expression> fullinput(mynumrows*mynumcols);
+        int index = 0;
+        for (int i = 0; i < mynumrows; i++)
+        {
+            for (int j = 0; j <= i; j++)
+            {
+                if (i == j)
+                    fullinput[i*mynumcols+j] = input[index];
+                else
+                {
+                    fullinput[i*mynumcols+j] = input[index];
+                    fullinput[j*mynumcols+i] = input[index];
+                }
 
-				index++;
-			}
-		}
-		input = fullinput;
-	}
+                index++;
+            }
+        }
+        input = fullinput;
+    }
 
     if (mynumrows*mynumcols != input.size())
     {
@@ -116,94 +116,94 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 
 expression::expression(const std::vector<std::vector<expression>> input)
 {
-	if (input.size() == 0)
-		return;
+    if (input.size() == 0)
+        return;
 
-	// Single column special case:
-	if (input.size() == 1)
-	{
-		if (input[0].size() == 0)
-			return;
+    // Single column special case:
+    if (input.size() == 1)
+    {
+        if (input[0].size() == 0)
+            return;
 
-		// Get the final expression dimension:
-		int numcols = input[0][0].mynumcols;
-		int numrows = 0;
-		for (int i = 0; i < input[0].size(); i++)
-		{
-			if (input[0][i].mynumcols != numcols)
-		    {
-		        std::cout << "Error in 'expression' object: expression dimension mismatch in concatenation" << std::endl;
-		        abort();
-		    }
-		    numrows += input[0][i].mynumrows;
-	    }
+        // Get the final expression dimension:
+        int numcols = input[0][0].mynumcols;
+        int numrows = 0;
+        for (int i = 0; i < input[0].size(); i++)
+        {
+            if (input[0][i].mynumcols != numcols)
+            {
+                std::cout << "Error in 'expression' object: expression dimension mismatch in concatenation" << std::endl;
+                abort();
+            }
+            numrows += input[0][i].mynumrows;
+        }
 
-	    mynumrows = numrows;
-	    mynumcols = numcols;
-	    myoperations.resize(numrows*numcols);
+        mynumrows = numrows;
+        mynumcols = numcols;
+        myoperations.resize(numrows*numcols);
 
-	    int index = 0;
-	    for (int i = 0; i < input[0].size(); i++)
-		{
-			for (int j = 0; j < input[0][i].mynumrows*input[0][i].mynumcols; j++)
-			{
-				myoperations[index] = input[0][i].myoperations[j];
-				index++;
-			}
-	    }
-	    return;
+        int index = 0;
+        for (int i = 0; i < input[0].size(); i++)
+        {
+            for (int j = 0; j < input[0][i].mynumrows*input[0][i].mynumcols; j++)
+            {
+                myoperations[index] = input[0][i].myoperations[j];
+                index++;
+            }
+        }
+        return;
     }
 
-	// Combine all rows in each column:
-	std::vector<std::vector<expression>> exprs(1,std::vector<expression>(input.size()));
-	for (int i = 0; i < input.size(); i++)
-	{
-		expression rowsconcatenated({input[i]});
-		exprs[0][i] = rowsconcatenated.transpose();
-	}
+    // Combine all rows in each column:
+    std::vector<std::vector<expression>> exprs(1,std::vector<expression>(input.size()));
+    for (int i = 0; i < input.size(); i++)
+    {
+        expression rowsconcatenated({input[i]});
+        exprs[0][i] = rowsconcatenated.transpose();
+    }
 
-	expression finalconcatenated(exprs);
-	finalconcatenated = finalconcatenated.transpose();
+    expression finalconcatenated(exprs);
+    finalconcatenated = finalconcatenated.transpose();
 
-	mynumrows = finalconcatenated.mynumrows;
-	mynumcols = finalconcatenated.mynumcols;
-	myoperations = finalconcatenated.myoperations;
+    mynumrows = finalconcatenated.mynumrows;
+    mynumcols = finalconcatenated.mynumcols;
+    myoperations = finalconcatenated.myoperations;
 }
 
 expression::expression(expression condexpr, expression exprtrue, expression exprfalse)
 {
-	// Make sure the conditional expression is a scalar:
-	if (condexpr.countrows() != 1 || condexpr.countcolumns() != 1)
-	{
-		std::cout << "Error in 'expression' object: expected a scalar condition expression (first argument)" << std::endl;
-		abort();
-	}
-	// Make sure the two other expressions have the same size:
-	if (exprtrue.countrows() != exprfalse.countrows() || exprtrue.countcolumns() != exprfalse.countcolumns())
-	{
-		std::cout << "Error in 'expression' object: expected same sized expressions in last two arguments" << std::endl;
-		abort();
-	}
+    // Make sure the conditional expression is a scalar:
+    if (condexpr.countrows() != 1 || condexpr.countcolumns() != 1)
+    {
+        std::cout << "Error in 'expression' object: expected a scalar condition expression (first argument)" << std::endl;
+        abort();
+    }
+    // Make sure the two other expressions have the same size:
+    if (exprtrue.countrows() != exprfalse.countrows() || exprtrue.countcolumns() != exprfalse.countcolumns())
+    {
+        std::cout << "Error in 'expression' object: expected same sized expressions in last two arguments" << std::endl;
+        abort();
+    }
 
     if (condexpr.myoperations[0]->isdofincluded() || condexpr.myoperations[0]->istfincluded())
     {
         std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
         abort();
-	}
+    }
 
-	// Break into scalars:
-	mynumrows = exprtrue.countrows(); mynumcols = exprtrue.countcolumns();
+    // Break into scalars:
+    mynumrows = exprtrue.countrows(); mynumcols = exprtrue.countcolumns();
 
     myoperations.resize(exprtrue.countrows()*exprtrue.countcolumns());
     for (int i = 0; i < exprtrue.countrows()*exprtrue.countcolumns(); i++)
-	{
-		if (exprtrue.myoperations[i]->isdofincluded() || exprtrue.myoperations[i]->istfincluded() || exprfalse.myoperations[i]->isdofincluded() || exprfalse.myoperations[i]->istfincluded())
-		{
-		    std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
-		    abort();
-		}
-    	myoperations[i] = std::shared_ptr<opcondition>(new opcondition(condexpr.myoperations[0], exprtrue.myoperations[i], exprfalse.myoperations[i]));
-	}
+    {
+        if (exprtrue.myoperations[i]->isdofincluded() || exprtrue.myoperations[i]->istfincluded() || exprfalse.myoperations[i]->isdofincluded() || exprfalse.myoperations[i]->istfincluded())
+        {
+            std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
+            abort();
+        }
+        myoperations[i] = std::shared_ptr<opcondition>(new opcondition(condexpr.myoperations[0], exprtrue.myoperations[i], exprfalse.myoperations[i]));
+    }
 }
 
 expression::expression(std::shared_ptr<operation> input)
@@ -214,103 +214,103 @@ expression::expression(std::shared_ptr<operation> input)
 
 expression expression::getrow(int rownum)
 {
-	if (rownum < 0 || rownum >= mynumrows)
-	{
-		std::cout << "Error in 'expression object': cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
-		abort();
-	}
+    if (rownum < 0 || rownum >= mynumrows)
+    {
+        std::cout << "Error in 'expression object': cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+        abort();
+    }
 
-	expression output;
-	output.mynumrows = 1;
-	output.mynumcols = mynumcols;
-	output.myoperations.resize(mynumcols);
+    expression output;
+    output.mynumrows = 1;
+    output.mynumcols = mynumcols;
+    output.myoperations.resize(mynumcols);
 
-	for (int i = 0; i < mynumcols; i++)
-		output.myoperations[i] = myoperations[rownum*mynumcols+i];
+    for (int i = 0; i < mynumcols; i++)
+        output.myoperations[i] = myoperations[rownum*mynumcols+i];
 
-	return output;
+    return output;
 }
 
 expression expression::getcolumn(int colnum)
 {
-	if (colnum < 0 || colnum >= mynumcols)
-	{
-		std::cout << "Error in 'expression object': cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
-		abort();
-	}
+    if (colnum < 0 || colnum >= mynumcols)
+    {
+        std::cout << "Error in 'expression object': cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+        abort();
+    }
 
-	expression output;
-	output.mynumrows = mynumrows;
-	output.mynumcols = 1;
-	output.myoperations.resize(mynumrows);
+    expression output;
+    output.mynumrows = mynumrows;
+    output.mynumcols = 1;
+    output.myoperations.resize(mynumrows);
 
-	for (int i = 0; i < mynumrows; i++)
-		output.myoperations[i] = myoperations[i*mynumcols+colnum];
+    for (int i = 0; i < mynumrows; i++)
+        output.myoperations[i] = myoperations[i*mynumcols+colnum];
 
-	return output;
+    return output;
 }
 
 void expression::reorderrows(std::vector<int> neworder)
 {
-	if (mynumrows != neworder.size())
-	{
-		std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
-		abort();
-	}
+    if (mynumrows != neworder.size())
+    {
+        std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
+        abort();
+    }
 
-	int minval = *min_element(neworder.begin(), neworder.end());
-	int maxval = *max_element(neworder.begin(), neworder.end());
+    int minval = *min_element(neworder.begin(), neworder.end());
+    int maxval = *max_element(neworder.begin(), neworder.end());
 
-	if (minval < 0 || maxval >= neworder.size())
-	{
-		std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (out of range integers)" << std::endl;
-		abort();
-	}
+    if (minval < 0 || maxval >= neworder.size())
+    {
+        std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (out of range integers)" << std::endl;
+        abort();
+    }
 
-	std::vector<std::shared_ptr<operation>> ops = myoperations;
+    std::vector<std::shared_ptr<operation>> ops = myoperations;
 
     for (int i = 0; i < mynumrows; i++)
     {
-		for (int j = 0; j < mynumcols; j++)
-			myoperations[i*mynumcols+j] = ops[neworder[i]*mynumcols+j];
-	}
+        for (int j = 0; j < mynumcols; j++)
+            myoperations[i*mynumcols+j] = ops[neworder[i]*mynumcols+j];
+    }
 }
 
 void expression::reordercolumns(std::vector<int> neworder)
 {
-	if (mynumcols != neworder.size())
-	{
-		std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
-		abort();
-	}
+    if (mynumcols != neworder.size())
+    {
+        std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
+        abort();
+    }
 
-	int minval = *min_element(neworder.begin(), neworder.end());
-	int maxval = *max_element(neworder.begin(), neworder.end());
+    int minval = *min_element(neworder.begin(), neworder.end());
+    int maxval = *max_element(neworder.begin(), neworder.end());
 
-	if (minval < 0 || maxval >= neworder.size())
-	{
-		std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (out of range integers)" << std::endl;
-		abort();
-	}
+    if (minval < 0 || maxval >= neworder.size())
+    {
+        std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (out of range integers)" << std::endl;
+        abort();
+    }
 
-	std::vector<std::shared_ptr<operation>> ops = myoperations;
+    std::vector<std::shared_ptr<operation>> ops = myoperations;
 
     for (int i = 0; i < mynumrows; i++)
     {
-		for (int j = 0; j < mynumcols; j++)
-			myoperations[i*mynumcols+j] = ops[i*mynumcols+neworder[j]];
-	}
+        for (int j = 0; j < mynumcols; j++)
+            myoperations[i*mynumcols+j] = ops[i*mynumcols+neworder[j]];
+    }
 }
 
 
 std::vector<double> expression::max(int physreg, int refinement, std::vector<double> xyzrange)
 {
-	return max(physreg, NULL, refinement, xyzrange);
+    return max(physreg, NULL, refinement, xyzrange);
 }
 
 std::vector<double> expression::max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
-	return max(physreg, &meshdeform, refinement, xyzrange);
+    return max(physreg, &meshdeform, refinement, xyzrange);
 }
 
 std::vector<double> expression::min(int physreg, int refinement, std::vector<double> xyzrange)
@@ -409,7 +409,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
                 bool isinboundedregion = (xyzrange.size() == 0) || (xyzrange[0] < xvalptr[d] && xyzrange[1] > xvalptr[d] && xyzrange[2] < yvalptr[d] && xyzrange[3] > yvalptr[d] && xyzrange[4] < zvalptr[d] && xyzrange[5] > zvalptr[d]);
 
                 if ( isinboundedregion && (maxval.size() == 0 || maxval[0] < valuesptr[d]) )
-                	    maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
+                        maxval = {valuesptr[d], xvalptr[d], yvalptr[d], zvalptr[d]};
             }
         }
         while (myselector.next());
@@ -420,54 +420,54 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
 
 void expression::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-	interpolate(physreg, NULL, xyzcoord, interpolated, isfound);
+    interpolate(physreg, NULL, xyzcoord, interpolated, isfound);
 }
 
 void expression::interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-	interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
+    interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
 }
 
 std::vector<double> expression::interpolate(int physreg, const std::vector<double> xyzcoord)
 {
-	std::vector<double> xyz = xyzcoord;
+    std::vector<double> xyz = xyzcoord;
 
-	if (xyz.size() != 3)
-	{
+    if (xyz.size() != 3)
+    {
         std::cout << "Error in 'expression' object: expected a coordinate vector of length 3" << std::endl;
         abort();
-	}
+    }
 
-	std::vector<double> interpolated = {};
-	std::vector<bool> isfound = {};
+    std::vector<double> interpolated = {};
+    std::vector<bool> isfound = {};
 
-	interpolate(physreg, NULL, xyz, interpolated, isfound);
+    interpolate(physreg, NULL, xyz, interpolated, isfound);
 
-	if (isfound[0])
-		return interpolated;
-	else
-		return {};
+    if (isfound[0])
+        return interpolated;
+    else
+        return {};
 }
 
 std::vector<double> expression::interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord)
 {
-	std::vector<double> xyz = xyzcoord;
+    std::vector<double> xyz = xyzcoord;
 
-	if (xyz.size() != 3)
-	{
+    if (xyz.size() != 3)
+    {
         std::cout << "Error in 'expression' object: expected a coordinate vector of length 3" << std::endl;
         abort();
-	}
+    }
 
-	std::vector<double> interpolated = {};
-	std::vector<bool> isfound = {};
+    std::vector<double> interpolated = {};
+    std::vector<bool> isfound = {};
 
-	interpolate(physreg, &meshdeform, xyz, interpolated, isfound);
+    interpolate(physreg, &meshdeform, xyz, interpolated, isfound);
 
-	if (isfound[0])
-		return interpolated;
-	else
-		return {};
+    if (isfound[0])
+        return interpolated;
+    else
+        return {};
 }
 
 void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
@@ -532,7 +532,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     int numcoords = xyzcoord.size()/3;
     isfound.resize(numcoords);
     for (int i = 0; i < numcoords; i++)
-    	isfound[i] = false;
+        isfound[i] = false;
 
     interpolated = {};
     if (numtimeevals != -1)
@@ -850,16 +850,16 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         elementselector myselector(mydisjregs, isorientationdependent);
         do
         {
-	    shared_ptr<jacobian> myjacobian;
+        shared_ptr<jacobian> myjacobian;
 
-	    if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
-		myjacobian = universe::computedjacobian;
-	    else
+        if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
+        myjacobian = universe::computedjacobian;
+        else
                 myjacobian = shared_ptr<jacobian>(new jacobian(myselector, evaluationpoints, meshdeform));
 
             densematrix detjac = myjacobian->getdetjac();
-    		// The Jacobian determinant should be positive irrespective of the node numbering:
-			detjac.abs();
+            // The Jacobian determinant should be positive irrespective of the node numbering:
+            detjac.abs();
             // Store it in the universe for reuse.
             universe::computedjacobian = myjacobian;
             universe::allowreuse();
@@ -936,18 +936,18 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Get the geometry interpolation order (1 if the element is not curved):
     int geolagrangeorder = lagrangeorder;
     if (iointerface::isonlyisoparametric(filename) == false && meshdeform == NULL)
-    	geolagrangeorder = universe::mymesh->getelements()->getcurvatureorder();
+        geolagrangeorder = universe::mymesh->getelements()->getcurvatureorder();
 
-	// These are the time tags that will be used:
-	std::vector<double> timetags = {};
-	if (numtimesteps > 0)
-		timetags = std::vector<double>(numtimesteps, 0.0);
+    // These are the time tags that will be used:
+    std::vector<double> timetags = {};
+    if (numtimesteps > 0)
+        timetags = std::vector<double>(numtimesteps, 0.0);
 
-	// The data to write for harmonic h will be added at datatowrite[h][0].
-	// For a time solution the data is at datatowrite[0][0].
-	std::vector<std::vector<iodata>> datatowrite = {};
-	if (numtimesteps > 0)
-		datatowrite = {{iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)}};
+    // The data to write for harmonic h will be added at datatowrite[h][0].
+    // For a time solution the data is at datatowrite[0][0].
+    std::vector<std::vector<iodata>> datatowrite = {};
+    if (numtimesteps > 0)
+        datatowrite = {{iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)}};
 
     // Send the disjoint regions with same element type numbers together:
     disjointregionselector mydisjregselector(selecteddisjregs, {});
@@ -970,8 +970,8 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         elementselector myselector(mydisjregs, isorientationdependent);
         do
         {
-        	// The harmonic content might have changed:
-        	std::vector<int> harms = {};
+            // The harmonic content might have changed:
+            std::vector<int> harms = {};
 
             // Compute the mesh coordinates. Initialise all coordinates to zero.
             std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), geolagrangecoords.size()/3,0));
@@ -1002,7 +1002,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
             // Make sure the harmonic content is the same for every component:
             if (numtimesteps <= 0)
-            	myfft::sameharmonics(expr);
+                myfft::sameharmonics(expr);
 
             // Get a vector containing all harmonic numbers in 'expr' on the current disjoint regions:
             if (numtimesteps <= 0)
@@ -1013,29 +1013,29 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     {
                         harms.push_back(h);
                         if (datatowrite.size() < h+1)
-                        	datatowrite.resize(h+1);
-                    	if (datatowrite[h].size() == 0)
-                    		datatowrite[h] = {iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)};
+                            datatowrite.resize(h+1);
+                        if (datatowrite[h].size() == 0)
+                            datatowrite[h] = {iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)};
                     }
                 }
             }
 
             if (numtimesteps <= 0)
             {
-            	for (int h = 0; h < harms.size(); h++)
-            	{
-            		datatowrite[harms[h]][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
-            		std::vector<densematrix> curdata(countrows());
-            		for (int comp = 0; comp < countrows(); comp++)
-            			curdata[comp] = expr[comp][harms[h]][0];
-            		datatowrite[harms[h]][0].adddata(elementtype, curdata);
-    			}
-        	}
-        	else
-        	{
-        		datatowrite[0][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
-        		datatowrite[0][0].adddata(elementtype, fftexpr);
-        	}
+                for (int h = 0; h < harms.size(); h++)
+                {
+                    datatowrite[harms[h]][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
+                    std::vector<densematrix> curdata(countrows());
+                    for (int comp = 0; comp < countrows(); comp++)
+                        curdata[comp] = expr[comp][harms[h]][0];
+                    datatowrite[harms[h]][0].adddata(elementtype, curdata);
+                }
+            }
+            else
+            {
+                datatowrite[0][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
+                datatowrite[0][0].adddata(elementtype, fftexpr);
+            }
         }
         while (myselector.next());
     }
@@ -1043,35 +1043,35 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Write the data:
     if (numtimesteps <= 0)
     {
-    	for (int h = 0; h < datatowrite.size(); h++)
-    	{
-    		if (datatowrite[h].size() == 1)
-    		{
-    			if (h <= 1)
-    				iointerface::writetofile(filename, datatowrite[h][0]);
-				else
-					iointerface::writetofile(filename, datatowrite[h][0], "_harm"+std::to_string(h));
-    		}
-    	}
-	}
-	else
-		iointerface::writetofile(filename, datatowrite[0][0], "timesteps"+std::to_string(numtimesteps));
+        for (int h = 0; h < datatowrite.size(); h++)
+        {
+            if (datatowrite[h].size() == 1)
+            {
+                if (h <= 1)
+                    iointerface::writetofile(filename, datatowrite[h][0]);
+                else
+                    iointerface::writetofile(filename, datatowrite[h][0], "_harm"+std::to_string(h));
+            }
+        }
+    }
+    else
+        iointerface::writetofile(filename, datatowrite[0][0], "timesteps"+std::to_string(numtimesteps));
 }
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
-	if (startcoords.size() == 0)
-		return;
+    if (startcoords.size() == 0)
+        return;
 
-	// This can happen with int divisions:
-	if (stepsize == 0)
-	{
+    // This can happen with int divisions:
+    if (stepsize == 0)
+    {
         std::cout << "Error in 'expression' object: step size for streamline cannot be zero" << std::endl;
         abort();
-	}
+    }
 
-	// Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
-	int problemdimension = universe::mymesh->getmeshdimension();
+    // Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
+    int problemdimension = universe::mymesh->getmeshdimension();
     if (mynumrows < problemdimension || mynumrows > 3 || mynumcols != 1)
     {
         std::cout << "Error in 'expression' object: expected a column vector expression with " << problemdimension << " to 3 components to get the stream lines" << std::endl;
@@ -1080,13 +1080,13 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     // For simplicity the code below is written only for 3x1 expressions:
     if (mynumrows == 1)
     {
-    	expression(3,1,{*this,0,0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
-    	return;
+        expression(3,1,{*this,0,0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
+        return;
     }
     if (mynumrows == 2)
     {
-    	expression(3,1,{this->at(0,0),this->at(1,0),0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
-    	return;
+        expression(3,1,{this->at(0,0),this->at(1,0),0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
+        return;
     }
 
     if (startcoords.size()%3 != 0)
@@ -1095,123 +1095,123 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         abort();
     }
 
-	int numnodes = startcoords.size()/3;
+    int numnodes = startcoords.size()/3;
 
-	// If upstream AND downstream calculation there are double the amount of starting coords:
-	int factortwo = 2;
-	if (downstreamonly)
-		factortwo = 1;
+    // If upstream AND downstream calculation there are double the amount of starting coords:
+    int factortwo = 2;
+    if (downstreamonly)
+        factortwo = 1;
 
-	std::vector<std::vector<double>> xcoords(factortwo*numnodes), ycoords(factortwo*numnodes), zcoords(factortwo*numnodes), magnitude(factortwo*numnodes);
+    std::vector<std::vector<double>> xcoords(factortwo*numnodes), ycoords(factortwo*numnodes), zcoords(factortwo*numnodes), magnitude(factortwo*numnodes);
 
-	// Current coordinates:
-	std::vector<double> curcoords(factortwo* 3*numnodes);
-	// Know which stream line is still active:
-	std::vector<bool> isactive(factortwo*numnodes, true);
+    // Current coordinates:
+    std::vector<double> curcoords(factortwo* 3*numnodes);
+    // Know which stream line is still active:
+    std::vector<bool> isactive(factortwo*numnodes, true);
 
-	// Stepsize vector for every starting point:
-	std::vector<double> h(factortwo*numnodes);
-
-
-	for (int i = 0; i < numnodes; i++)
-	{
-		curcoords[factortwo*3*i+0] = startcoords[3*i+0];
-		curcoords[factortwo*3*i+1] = startcoords[3*i+1];
-		curcoords[factortwo*3*i+2] = startcoords[3*i+2];
-
-		h[factortwo*i+0] = stepsize;
-
-		if (downstreamonly == false)
-		{
-			curcoords[factortwo*3*i+3] = startcoords[3*i+0];
-			curcoords[factortwo*3*i+4] = startcoords[3*i+1];
-			curcoords[factortwo*3*i+5] = startcoords[3*i+2];
-
-			h[factortwo*i+1] = -stepsize;
-		}
-	}
-
-	std::vector<double> k1, k2, k3, k4, k1scaled, k2scaled, k3scaled, k4scaled;
-	std::vector<bool> isfound;
-
-	bool isdone = false;
-	while (isdone == false)
-	{
-		// Calculate the Runge-Kutta parameters k1, k2, k3 and k4:
-		interpolate(physreg, NULL, curcoords, k1, isfound);
-		k1scaled = myalgorithm::normblocks(k1,3);
-		std::vector<double> ynplushk1over2 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1scaled[i];
-		interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
-		k2scaled = myalgorithm::normblocks(k2,3);
-		std::vector<double> ynplushk2over2 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2scaled[i];
-		interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
-		k3scaled = myalgorithm::normblocks(k3,3);
-		std::vector<double> ynplushk3 = curcoords;
-		for (int i = 0; i < curcoords.size(); i++)
-			ynplushk3[i] += h[(i-i%3)/3]*k3scaled[i];
-		interpolate(physreg, NULL, ynplushk3, k4, isfound);
-		k4scaled = myalgorithm::normblocks(k4,3);
+    // Stepsize vector for every starting point:
+    std::vector<double> h(factortwo*numnodes);
 
 
-		isdone = true;
-		for (int i = 0; i < isfound.size(); i++)
-		{
-			if (isfound[i] == false)
-				isactive[i] = false;
-			if (isactive[i])
-				isdone = false;
-		}
+    for (int i = 0; i < numnodes; i++)
+    {
+        curcoords[factortwo*3*i+0] = startcoords[3*i+0];
+        curcoords[factortwo*3*i+1] = startcoords[3*i+1];
+        curcoords[factortwo*3*i+2] = startcoords[3*i+2];
 
-		// Append data to write to disk:
-		for (int i = 0; i < isactive.size(); i++)
-		{
-			if (isactive[i])
-			{
-				xcoords[i].push_back(curcoords[3*i+0]);
-				ycoords[i].push_back(curcoords[3*i+1]);
-				zcoords[i].push_back(curcoords[3*i+2]);
+        h[factortwo*i+0] = stepsize;
 
-				double flowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
+        if (downstreamonly == false)
+        {
+            curcoords[factortwo*3*i+3] = startcoords[3*i+0];
+            curcoords[factortwo*3*i+4] = startcoords[3*i+1];
+            curcoords[factortwo*3*i+5] = startcoords[3*i+2];
 
-				magnitude[i].push_back(flowspeed);
-			}
-		}
+            h[factortwo*i+1] = -stepsize;
+        }
+    }
 
-		// Update the coordinates:
-		for (int i = 0; i < curcoords.size(); i++)
-			curcoords[i] += h[(i-i%3)/3]/6.0*( k1scaled[i]+2.0*k2scaled[i]+2.0*k3scaled[i]+k4scaled[i] );
-	}
+    std::vector<double> k1, k2, k3, k4, k1scaled, k2scaled, k3scaled, k4scaled;
+    std::vector<bool> isfound;
+
+    bool isdone = false;
+    while (isdone == false)
+    {
+        // Calculate the Runge-Kutta parameters k1, k2, k3 and k4:
+        interpolate(physreg, NULL, curcoords, k1, isfound);
+        k1scaled = myalgorithm::normblocks(k1,3);
+        std::vector<double> ynplushk1over2 = curcoords;
+        for (int i = 0; i < curcoords.size(); i++)
+            ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1scaled[i];
+        interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
+        k2scaled = myalgorithm::normblocks(k2,3);
+        std::vector<double> ynplushk2over2 = curcoords;
+        for (int i = 0; i < curcoords.size(); i++)
+            ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2scaled[i];
+        interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
+        k3scaled = myalgorithm::normblocks(k3,3);
+        std::vector<double> ynplushk3 = curcoords;
+        for (int i = 0; i < curcoords.size(); i++)
+            ynplushk3[i] += h[(i-i%3)/3]*k3scaled[i];
+        interpolate(physreg, NULL, ynplushk3, k4, isfound);
+        k4scaled = myalgorithm::normblocks(k4,3);
 
 
-	// Write to file:
-	iodata datatowrite(1, 1, true, {});
-	for (int m = 0; m < xcoords.size(); m++)
-	{
-		int numlines = xcoords[m].size();
-		if (numlines == 0)
-			continue;
+        isdone = true;
+        for (int i = 0; i < isfound.size(); i++)
+        {
+            if (isfound[i] == false)
+                isactive[i] = false;
+            if (isactive[i])
+                isdone = false;
+        }
 
-		densematrix xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
-		double* xptr = xcoordsmat.getvalues(); double* yptr = ycoordsmat.getvalues(); double* zptr = zcoordsmat.getvalues();
-		double* fsptr = flowspeedmat.getvalues();
+        // Append data to write to disk:
+        for (int i = 0; i < isactive.size(); i++)
+        {
+            if (isactive[i])
+            {
+                xcoords[i].push_back(curcoords[3*i+0]);
+                ycoords[i].push_back(curcoords[3*i+1]);
+                zcoords[i].push_back(curcoords[3*i+2]);
 
-		for (int i = 0; i < numlines-1; i++)
-		{
-			xptr[2*i+0] = xcoords[m][i%numlines]; xptr[2*i+1] = xcoords[m][(i+1)%numlines];
-			yptr[2*i+0] = ycoords[m][i%numlines]; yptr[2*i+1] = ycoords[m][(i+1)%numlines];
-			zptr[2*i+0] = zcoords[m][i%numlines]; zptr[2*i+1] = zcoords[m][(i+1)%numlines];
+                double flowspeed = std::sqrt(k1[3*i+0]*k1[3*i+0] + k1[3*i+1]*k1[3*i+1] + k1[3*i+2]*k1[3*i+2]);
 
-			fsptr[2*i+0] = magnitude[m][i%numlines]; fsptr[2*i+1] = magnitude[m][(i+1)%numlines];
-		}
+                magnitude[i].push_back(flowspeed);
+            }
+        }
 
-		datatowrite.addcoordinates(1, xcoordsmat, ycoordsmat, zcoordsmat);
-		datatowrite.adddata(1, {flowspeedmat});
-	}
-	iointerface::writetofile(filename, datatowrite);
+        // Update the coordinates:
+        for (int i = 0; i < curcoords.size(); i++)
+            curcoords[i] += h[(i-i%3)/3]/6.0*( k1scaled[i]+2.0*k2scaled[i]+2.0*k3scaled[i]+k4scaled[i] );
+    }
+
+
+    // Write to file:
+    iodata datatowrite(1, 1, true, {});
+    for (int m = 0; m < xcoords.size(); m++)
+    {
+        int numlines = xcoords[m].size();
+        if (numlines == 0)
+            continue;
+
+        densematrix xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
+        double* xptr = xcoordsmat.getvalues(); double* yptr = ycoordsmat.getvalues(); double* zptr = zcoordsmat.getvalues();
+        double* fsptr = flowspeedmat.getvalues();
+
+        for (int i = 0; i < numlines-1; i++)
+        {
+            xptr[2*i+0] = xcoords[m][i%numlines]; xptr[2*i+1] = xcoords[m][(i+1)%numlines];
+            yptr[2*i+0] = ycoords[m][i%numlines]; yptr[2*i+1] = ycoords[m][(i+1)%numlines];
+            zptr[2*i+0] = zcoords[m][i%numlines]; zptr[2*i+1] = zcoords[m][(i+1)%numlines];
+
+            fsptr[2*i+0] = magnitude[m][i%numlines]; fsptr[2*i+1] = magnitude[m][(i+1)%numlines];
+        }
+
+        datatowrite.addcoordinates(1, xcoordsmat, ycoordsmat, zcoordsmat);
+        datatowrite.adddata(1, {flowspeedmat});
+    }
+    iointerface::writetofile(filename, datatowrite);
 }
 
 void expression::reuseit(bool istobereused)
@@ -1261,28 +1261,28 @@ bool expression::iszero(void)
 vec expression::atbarycenter(int physreg, field onefield)
 {
     // The field must be a "one" type:
-	if (onefield.getpointer()->gettypename() != "one")
+    if (onefield.getpointer()->gettypename() != "one")
     {
         std::cout << "Error in 'expression' object: atbarycenter requires a 'one' type field" << std::endl;
         abort();
     }
-	if (countcolumns() != 1 || onefield.countcomponents() != countrows())
+    if (countcolumns() != 1 || onefield.countcomponents() != countrows())
     {
         std::cout << "Error in 'expression' object: in atbarycenter the size of the expression and of the argument field must match" << std::endl;
         abort();
     }
 
-	// Compute the expression at the barycenter.
-	// When there is a single Gauss point it is at the barycenter --> set integration order to 0.
-	// The default integration order is 1 (order of a 'one' field) + 2 :
-	formulation formul;
-	formul += integration(physreg, - mathop::tf(onefield)*(*this) / mathop::abs(detjac()), -3);
+    // Compute the expression at the barycenter.
+    // When there is a single Gauss point it is at the barycenter --> set integration order to 0.
+    // The default integration order is 1 (order of a 'one' field) + 2 :
+    formulation formul;
+    formul += integration(physreg, - mathop::tf(onefield)*(*this) / mathop::abs(detjac()), -3);
 
-	universe::skipgausspointweightproduct = true;
-	formul.generate();
-	universe::skipgausspointweightproduct = false;
+    universe::skipgausspointweightproduct = true;
+    formul.generate();
+    universe::skipgausspointweightproduct = false;
 
-	return formul.rhs();
+    return formul.rhs();
 }
 
 vec expression::integrateonelements(int physreg, field onefield, int integrationorder)
@@ -1372,54 +1372,54 @@ expression expression::at(int row, int col)
 
 std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-	if (isscalar())
-	{
-		if (xcoords.size() == ycoords.size() && xcoords.size() == zcoords.size())
-		{
-			if (xcoords.size() == 0)
-				return std::vector<double>(0);
-			else
-				return myoperations[0]->evaluate(xcoords, ycoords, zcoords);
-		}
-		else
-		{
-			std::cout << "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" << std::endl;
-			abort();
-		}
-	}
-	else
-	{
-		std::cout << "Error in 'expression' object: 'evaluate' can only be called on a scalar expression" << std::endl;
-		abort();
-	}
+    if (isscalar())
+    {
+        if (xcoords.size() == ycoords.size() && xcoords.size() == zcoords.size())
+        {
+            if (xcoords.size() == 0)
+                return std::vector<double>(0);
+            else
+                return myoperations[0]->evaluate(xcoords, ycoords, zcoords);
+        }
+        else
+        {
+            std::cout << "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" << std::endl;
+            abort();
+        }
+    }
+    else
+    {
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on a scalar expression" << std::endl;
+        abort();
+    }
 }
 
 expression expression::resize(int numrows, int numcols)
 {
-	std::vector<expression> args(numrows*numcols);
-	for (int i = 0; i < numrows; i++)
-	{
-		for (int j = 0; j < numcols; j++)
-		{
-			if (i < mynumrows && j < mynumcols)
-				args[i*numcols+j] = at(i,j);
-			else
-				args[i*numcols+j] = expression(0);
-		}
-	}
+    std::vector<expression> args(numrows*numcols);
+    for (int i = 0; i < numrows; i++)
+    {
+        for (int j = 0; j < numcols; j++)
+        {
+            if (i < mynumrows && j < mynumcols)
+                args[i*numcols+j] = at(i,j);
+            else
+                args[i*numcols+j] = expression(0);
+        }
+    }
 
-	expression output(numrows,numcols,args);
-	return output;
+    expression output(numrows,numcols,args);
+    return output;
 }
 
 
 expression expression::spacederivative(int whichderivative)
 {
-	if (mynumrows > 3 || mynumcols != 1)
-	{
-		std::cout << "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" << std::endl;
-		abort();
-	}
+    if (mynumrows > 3 || mynumcols != 1)
+    {
+        std::cout << "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" << std::endl;
+        abort();
+    }
 
     int problemdimension = universe::mymesh->getmeshdimension();
 
@@ -1431,18 +1431,18 @@ expression expression::spacederivative(int whichderivative)
             derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
         else
         {
-		    if (whichderivative > problemdimension)
-		    {
-		        std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));
-		        derivated.myoperations[i] = op;
-		    }
-		    else
-		    {
-		        std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
-		        op->setspacederivative(whichderivative);
-		        derivated.myoperations[i] = op;
-		    }
-	    }
+            if (whichderivative > problemdimension)
+            {
+                std::shared_ptr<opproduct> op(new opproduct( {derivated.myoperations[i], std::shared_ptr<operation>(new opconstant(0))} ));
+                derivated.myoperations[i] = op;
+            }
+            else
+            {
+                std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
+                op->setspacederivative(whichderivative);
+                derivated.myoperations[i] = op;
+            }
+        }
     }
 
     return derivated;
@@ -1641,8 +1641,8 @@ expression expression::dof(int physreg)
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-    	if (doftag.myoperations[i]->isconstant() && doftag.myoperations[i]->getvalue() == 0)
-    		continue;
+        if (doftag.myoperations[i]->isconstant() && doftag.myoperations[i]->getvalue() == 0)
+            continue;
 
         if (doftag.myoperations[i]->isfield())
         {
@@ -1679,8 +1679,8 @@ expression expression::tf(int physreg)
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-    	if (tftag.myoperations[i]->isconstant() && tftag.myoperations[i]->getvalue() == 0)
-    		continue;
+        if (tftag.myoperations[i]->isconstant() && tftag.myoperations[i]->getvalue() == 0)
+            continue;
 
         if (tftag.myoperations[i]->isfield())
         {
@@ -1908,8 +1908,8 @@ void expression::expand(void)
 
 std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftfpolynomial(int elementdimension)
 {
-	// Simplify the operation:
-	myoperations[0]->simplify({});
+    // Simplify the operation:
+    myoperations[0]->simplify({});
 
     // To make sure the format of the expression is ok.
     // Otherwise an error is thrown at the end.

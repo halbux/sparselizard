@@ -49,96 +49,96 @@ int orientation::countorientations(int elemtypenum)
 
 std::vector<int> orientation::getedgesorientationsfromtotalorientation(int totalorientation, int elementtypenumber)
 {
-	element myelement(elementtypenumber);
-	int numberofedges = myelement.countedges();
+    element myelement(elementtypenumber);
+    int numberofedges = myelement.countedges();
 
-	std::vector<int> edgesorientations(numberofedges);
+    std::vector<int> edgesorientations(numberofedges);
 
-	for (int edge = 0; edge < numberofedges; edge++)
-	{
-		int remainder = totalorientation%2;
-		edgesorientations[edge] = remainder;	
-		totalorientation = (totalorientation-remainder)/2;
-	}
-		
-	return edgesorientations;
+    for (int edge = 0; edge < numberofedges; edge++)
+    {
+        int remainder = totalorientation%2;
+        edgesorientations[edge] = remainder;    
+        totalorientation = (totalorientation-remainder)/2;
+    }
+        
+    return edgesorientations;
 }
 
 std::vector<int> orientation::getfacesorientationsfromtotalorientation(int totalorientation, int elementtypenumber)
 {
-	element myelement(elementtypenumber);
-	int numberofedges = myelement.countedges();
-	int numberoffaces = myelement.countfaces();
-	
-	int twotothenumberofedges = pow(2,numberofedges);
-	
-	// Remove the part that corresponds to the edges orientations:
-	totalorientation = (totalorientation-totalorientation%(twotothenumberofedges)) / twotothenumberofedges;
+    element myelement(elementtypenumber);
+    int numberofedges = myelement.countedges();
+    int numberoffaces = myelement.countfaces();
+    
+    int twotothenumberofedges = pow(2,numberofedges);
+    
+    // Remove the part that corresponds to the edges orientations:
+    totalorientation = (totalorientation-totalorientation%(twotothenumberofedges)) / twotothenumberofedges;
 
-	std::vector<int> facesorientations(numberoffaces);
+    std::vector<int> facesorientations(numberoffaces);
 
-	for (int face = 0; face < numberoffaces; face++)
-	{
-		int remainder = totalorientation%8;
-		facesorientations[face] = remainder;	
-		totalorientation = (totalorientation-remainder)/8;
-	}
-		
-	return facesorientations;
+    for (int face = 0; face < numberoffaces; face++)
+    {
+        int remainder = totalorientation%8;
+        facesorientations[face] = remainder;    
+        totalorientation = (totalorientation-remainder)/8;
+    }
+        
+    return facesorientations;
 }
 
 std::vector<std::vector<int>> orientation::getreorderingtoreferenceedgeorientation(void)
 {
-	std::vector<std::vector<int>> reordering = {{0,1},{1,0}};
-	return reordering;
+    std::vector<std::vector<int>> reordering = {{0,1},{1,0}};
+    return reordering;
 }
 
 std::vector<std::vector<int>> orientation::getreorderingtoreferencetriangularfaceorientation(void)
 {
-	std::vector<std::vector<int>> reordering = {{0,1,2},{0,2,1},{1,2,0},{1,0,2},{2,0,1},{2,1,0}};
-	return reordering;
+    std::vector<std::vector<int>> reordering = {{0,1,2},{0,2,1},{1,2,0},{1,0,2},{2,0,1},{2,1,0}};
+    return reordering;
 }
 
 std::vector<std::vector<int>> orientation::getreorderingtoreferencequadrangularfaceorientation(void)
 {
-	std::vector<std::vector<int>> reordering = {{0,1,2,3},{0,3,2,1},{1,2,3,0},{1,0,3,2},{2,3,0,1},{2,1,0,3},{3,0,1,2},{3,2,1,0}};
-	return reordering;
+    std::vector<std::vector<int>> reordering = {{0,1,2,3},{0,3,2,1},{1,2,3,0},{1,0,3,2},{2,3,0,1},{2,1,0,3},{3,0,1,2},{3,2,1,0}};
+    return reordering;
 }
 
 std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumber, std::vector<int>& curvednodelist)
 {
     element myelement(elementtypenumber);
     
-	int numberofedges = myelement.countedges();
-	std::vector<int> alledgesorientations(numberofedges);
-	std::vector<int> edgesdefinitionbasedonnodes = myelement.getedgesdefinitionsbasedonnodes();
-	std::vector<int> nodesinedges(2);
-	
-	// Loop on all edges:
-	for (int i = 0; i < numberofedges; i++)
-	{
-		// Create the edge node list:
-		nodesinedges[0] = curvednodelist[edgesdefinitionbasedonnodes[2*i+0]];
-		nodesinedges[1] = curvednodelist[edgesdefinitionbasedonnodes[2*i+1]];
-		
-		alledgesorientations[i] = getorientationofedge(nodesinedges);
-	}
-	return alledgesorientations;
+    int numberofedges = myelement.countedges();
+    std::vector<int> alledgesorientations(numberofedges);
+    std::vector<int> edgesdefinitionbasedonnodes = myelement.getedgesdefinitionsbasedonnodes();
+    std::vector<int> nodesinedges(2);
+    
+    // Loop on all edges:
+    for (int i = 0; i < numberofedges; i++)
+    {
+        // Create the edge node list:
+        nodesinedges[0] = curvednodelist[edgesdefinitionbasedonnodes[2*i+0]];
+        nodesinedges[1] = curvednodelist[edgesdefinitionbasedonnodes[2*i+1]];
+        
+        alledgesorientations[i] = getorientationofedge(nodesinedges);
+    }
+    return alledgesorientations;
 }
 
 std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumber, std::vector<int>& curvednodelist)
 {
     element myelement(elementtypenumber);
     
-	int numberoffaces = myelement.countfaces();
+    int numberoffaces = myelement.countfaces();
     int numberoftriangularfaces = myelement.counttriangularfaces();
     
-	std::vector<int> allfacesorientations(numberoffaces);
+    std::vector<int> allfacesorientations(numberoffaces);
     std::vector<int> facesdefinitionbasedonnodes = myelement.getfacesdefinitionsbasedonnodes();
-	
-	// Loop on all faces:
-	for (int i = 0; i < numberoffaces; i++)
-	{
+    
+    // Loop on all faces:
+    for (int i = 0; i < numberoffaces; i++)
+    {
         if (myelement.istriangularface(i))
         {
             std::vector<int> nodesinface(3);
@@ -147,7 +147,7 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
             nodesinface[0] = curvednodelist[facesdefinitionbasedonnodes[3*i+0]];
             nodesinface[1] = curvednodelist[facesdefinitionbasedonnodes[3*i+1]];
             nodesinface[2] = curvednodelist[facesdefinitionbasedonnodes[3*i+2]];
-		
+        
             allfacesorientations[i] = getorientationoftriangle(nodesinface);
         }
         else
@@ -163,16 +163,16 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
 
             allfacesorientations[i] = getorientationofquadrangle(nodesinface);
         }
-	}
-	return allfacesorientations;
+    }
+    return allfacesorientations;
 }
 
 int orientation::getorientationofedge(std::vector<int>& physicalnodesinedge)
 {
-	if (physicalnodesinedge[0] > physicalnodesinedge[1])
-		return 0;
-	else
-		return 1;
+    if (physicalnodesinedge[0] > physicalnodesinedge[1])
+        return 0;
+    else
+        return 1;
 }
 
 int orientation::getorientationoftriangle(std::vector<int>& physicalnodesintriangle)

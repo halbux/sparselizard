@@ -31,7 +31,7 @@ class gausspoints
         std::vector<double> mycoordinates;
         std::vector<double> myweights;
         
-	public:
+    public:
         
         gausspoints(int elementtypenumber, int integrationorder);
         

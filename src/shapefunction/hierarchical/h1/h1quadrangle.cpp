@@ -41,57 +41,57 @@ int h1quadrangle::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder) 
 {    
-	element quadrangle("quadrangle");
+    element quadrangle("quadrangle");
     hierarchicalformfunctioncontainer val("h1", quadrangle.gettypenumber());
 
     // Get the node list in every edge and face:
-    std::vector<int> nodesinedges = quadrangle.getedgesdefinitionsbasedonnodes();						
-    std::vector<int> nodesinfaces = quadrangle.getfacesdefinitionsbasedonnodes();	
-	
-	// Get for every edge and face orientation the vector reordering the 
+    std::vector<int> nodesinedges = quadrangle.getedgesdefinitionsbasedonnodes();                        
+    std::vector<int> nodesinfaces = quadrangle.getfacesdefinitionsbasedonnodes();    
+    
+    // Get for every edge and face orientation the vector reordering the 
     // nodes to bring the edge/face to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
-	std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
 
 
-	////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki, eta;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     
     // In Zaglmayr's thesis the reference elements are shifted and deformed.
-	// Variable change to correspond to our reference element definition:
-	// ki := (ki+1)/2; eta := (eta+1)/2;
+    // Variable change to correspond to our reference element definition:
+    // ki := (ki+1)/2; eta := (eta+1)/2;
     ki = 0.5*(ki+1); eta = 0.5*(eta+1);
     
-	vector<polynomial> lambda(5);
-	// lambda0 not used
-	lambda[1] = (1.0-ki)*(1.0-eta);
-	lambda[2] = ki*(1.0-eta);
+    vector<polynomial> lambda(5);
+    // lambda0 not used
+    lambda[1] = (1.0-ki)*(1.0-eta);
+    lambda[2] = ki*(1.0-eta);
     lambda[3] = ki*eta;
     lambda[4] = (1.0-ki)*eta;
-	
-	vector<polynomial> sigma(5);
-	// sigma0 not used
-	sigma[1] = (1.0-ki)+(1.0-eta);
-	sigma[2] = ki+(1.0-eta);
+    
+    vector<polynomial> sigma(5);
+    // sigma0 not used
+    sigma[1] = (1.0-ki)+(1.0-eta);
+    sigma[2] = ki+(1.0-eta);
     sigma[3] = ki+eta;
     sigma[4] = (1.0-ki)+eta;
     
     
-	////////// Defining the vertex based form functions (if any):
-	
+    ////////// Defining the vertex based form functions (if any):
+    
     // Only order 1 has vertex based form functions:
-	if (maxorder >= 1)
-	{
-		// Loop on all nodes:
-		for (int node = 0; node < quadrangle.countnodes(); node++)
+    if (maxorder >= 1)
+    {
+        // Loop on all nodes:
+        for (int node = 0; node < quadrangle.countnodes(); node++)
             val.set(1,0,node,0,0,0,lambda[node+1]);
-	}
+    }
     
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < quadrangle.countedges(); edge++)
@@ -115,7 +115,7 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
     }
 
 
-	////////// Defining the face based form functions (if any):
+    ////////// Defining the face based form functions (if any):
 
     // Loop on all faces:
     for (int face = 0; face < quadrangle.countfaces(); face++)
@@ -160,5 +160,5 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
         }
     }
     
-	return val;
+    return val;
 }

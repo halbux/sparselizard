@@ -24,7 +24,7 @@ class nodes;
 class elements
 {
 
-	private:
+    private:
         
         nodes* mynodes;
         physicalregions* myphysicalregions;
@@ -74,7 +74,7 @@ class elements
         // Create the two vectors above:
         void populateedgesatnodes(void);
 
-	public:
+    public:
         
         elements(nodes&, physicalregions&, disjointregions&);
         
@@ -139,16 +139,16 @@ class elements
         // 'renumber' updates the element numbers in 'linesinelements', 
         // 'trianglesinelements' and 'quadranglesinelements'. 'renumberingvector' 
         // is such that linesinelementsrenumbered = renumberingvector(linesinelements).
-        void renumber(int elementtypenumber, std::vector<int>& renumberingvector);	
+        void renumber(int elementtypenumber, std::vector<int>& renumberingvector);    
         // 'reorder' is similar to 'renumber' except that it reorders the elements
         // using 'reorderingvector' such that orderedelements = elements(reorderingvector,:);
-        void reorder(int elementtypenumber, std::vector<int>& reorderingvector);	
+        void reorder(int elementtypenumber, std::vector<int>& reorderingvector);    
 
         // 'explode' extract the subelements from the existing ones. The 
         // elements created are lines (the edges) and triangles/quadrangles 
         // (the faces) that are part of the original elements. This function 
         // creates duplicated elements that have to be uniqued afterwards.
-        void explode(void);					
+        void explode(void);                    
         
         
         // To call only after all renumbering and reordering steps:
@@ -169,7 +169,7 @@ class elements
         // 'orient' defines 'totalorientations'. Note: 'totalorientations'
         // is untouched in all renumbering and reordering steps and
         // should thus be called last, after all other steps.
-        void orient(void);	
+        void orient(void);    
 
 };
 

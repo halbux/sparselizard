@@ -12,13 +12,13 @@
 class oppower: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         std::shared_ptr<operation> mybase;
         std::shared_ptr<operation> myexponent;
-	
-	public:
+    
+    public:
         
         oppower(std::shared_ptr<operation> base, std::shared_ptr<operation> exponent) { mybase = base; myexponent = exponent; };
         
@@ -32,7 +32,7 @@ class oppower: public operation
         
         void reuseit(bool istobereused) { reuse = istobereused; };
         
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

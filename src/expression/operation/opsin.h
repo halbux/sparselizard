@@ -12,12 +12,12 @@
 class opsin: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         std::shared_ptr<operation> myarg;
         
-	public:
+    public:
         
         opsin(std::shared_ptr<operation> arg) { myarg = arg; };
         
@@ -31,7 +31,7 @@ class opsin: public operation
         
         void reuseit(bool istobereused) { reuse = istobereused; };
         
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

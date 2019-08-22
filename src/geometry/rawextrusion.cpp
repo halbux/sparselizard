@@ -3,215 +3,215 @@
 
 rawextrusion::rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers)
 {
-	myphysicalregion = physreg;
+    myphysicalregion = physreg;
 
-	// Sons will be created while meshing
+    // Sons will be created while meshing
 
-	myheight = height;
+    myheight = height;
 
-	mynumlayers = numlayers;
+    mynumlayers = numlayers;
 
-	mybaseshape = innerrawshape;
+    mybaseshape = innerrawshape;
 
-	mesh();
+    mesh();
 }
 
 std::shared_ptr<rawshape> rawextrusion::duplicate(void)
 { 
-	std::shared_ptr<rawextrusion> out(new rawextrusion);
-	*out = *this;
+    std::shared_ptr<rawextrusion> out(new rawextrusion);
+    *out = *this;
 
-	out->sons = geotools::duplicate(sons);
-	out->mybaseshape = mybaseshape->duplicate();
+    out->sons = geotools::duplicate(sons);
+    out->mybaseshape = mybaseshape->duplicate();
 
-	out->replicatelinks(shared_from_this());
+    out->replicatelinks(shared_from_this());
 
-	return out;	
+    return out;    
 }
 
 void rawextrusion::setphysicalregion(int physreg)
 {
-	myphysicalregion = physreg;
+    myphysicalregion = physreg;
 }
 
 int rawextrusion::getdimension(void)
 {
-	return mybaseshape->getdimension() + 1;
+    return mybaseshape->getdimension() + 1;
 }
 
 std::string rawextrusion::getname(void)
 {
-	return "extrusion";
+    return "extrusion";
 }
 
 
 std::vector<std::shared_ptr<rawshape>> rawextrusion::getsons(void) 
 { 
-	return sons; 
+    return sons; 
 }
 
 std::vector<std::shared_ptr<rawshape>> rawextrusion::getsubshapes(void)
 {
-	return sons;
+    return sons;
 }
 
 void rawextrusion::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
 {
-	sons = subshapes;
+    sons = subshapes;
 }
 
 int rawextrusion::getphysicalregion(void) 
 { 
-	return myphysicalregion; 
+    return myphysicalregion; 
 }
 
 std::vector<double>* rawextrusion::getcoords(void) 
 { 
-	return &mycoords; 
+    return &mycoords; 
 }
 
 std::vector<std::vector<int>>* rawextrusion::getelems(void) 
 { 
-	return &myelems; 
+    return &myelems; 
 }
 
 std::shared_ptr<rawshape> rawextrusion::getpointer(void) 
 { 
-	return shared_from_this(); 
+    return shared_from_this(); 
 }
 
 
 void rawextrusion::mesh(void)
 {
-	// The extrusion of a 0D shape (point) is a line:
-	if (mybaseshape->getdimension() == 0)
-	{
-		// Create the point at the top side of the extrusion:
-		std::shared_ptr<rawshape> toppoint = mybaseshape->duplicate();
-		toppoint->setphysicalregion(-1);
-		toppoint->shift(0, 0, myheight);
+    // The extrusion of a 0D shape (point) is a line:
+    if (mybaseshape->getdimension() == 0)
+    {
+        // Create the point at the top side of the extrusion:
+        std::shared_ptr<rawshape> toppoint = mybaseshape->duplicate();
+        toppoint->setphysicalregion(-1);
+        toppoint->shift(0, 0, myheight);
 
-		sons = {mybaseshape, toppoint};
+        sons = {mybaseshape, toppoint};
 
-		// Create this temporary object to get the mesh:
-		std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawline>(new rawline(myphysicalregion, {mybaseshape, toppoint}, mynumlayers));
+        // Create this temporary object to get the mesh:
+        std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawline>(new rawline(myphysicalregion, {mybaseshape, toppoint}, mynumlayers));
 
-		mycoords = *(rawshapeptr->getcoords());
-		myelems = *(rawshapeptr->getelems());
-	}
+        mycoords = *(rawshapeptr->getcoords());
+        myelems = *(rawshapeptr->getelems());
+    }
 
-	// The extrusion of a 1D shape is a quadrangle:
-	if (mybaseshape->getdimension() == 1)
-	{
-		// Create the line at the top side of the extrusion:
-		std::shared_ptr<rawshape> topline = mybaseshape->duplicate();
-		topline->setphysicalregion(-1);
-		topline->shift(0, 0, myheight);
+    // The extrusion of a 1D shape is a quadrangle:
+    if (mybaseshape->getdimension() == 1)
+    {
+        // Create the line at the top side of the extrusion:
+        std::shared_ptr<rawshape> topline = mybaseshape->duplicate();
+        topline->setphysicalregion(-1);
+        topline->shift(0, 0, myheight);
 
-		// Create the lines at both sides of the quadrangle:
-		std::shared_ptr<rawshape> leftline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[0], topline->getsons()[0]}, mynumlayers));
-		std::shared_ptr<rawshape> rightline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[1], topline->getsons()[1]}, mynumlayers));
+        // Create the lines at both sides of the quadrangle:
+        std::shared_ptr<rawshape> leftline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[0], topline->getsons()[0]}, mynumlayers));
+        std::shared_ptr<rawshape> rightline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[1], topline->getsons()[1]}, mynumlayers));
 
-		sons = {mybaseshape, rightline, topline, leftline};
+        sons = {mybaseshape, rightline, topline, leftline};
 
-		// Create this temporary object to get the mesh:
-		std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, sons));
+        // Create this temporary object to get the mesh:
+        std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, sons));
 
-		mycoords = *(rawshapeptr->getcoords());
-		myelems = *(rawshapeptr->getelems());
-	}
+        mycoords = *(rawshapeptr->getcoords());
+        myelems = *(rawshapeptr->getelems());
+    }
 
-	// The extrusion of a 2D shape is a volume:
-	if (mybaseshape->getdimension() == 2)
-	{
-		// Create the face at the top side of the extrusion:
-		std::shared_ptr<rawshape> topface = mybaseshape->duplicate();
-		topface->setphysicalregion(-1);
-		topface->shift(0, 0, myheight);
+    // The extrusion of a 2D shape is a volume:
+    if (mybaseshape->getdimension() == 2)
+    {
+        // Create the face at the top side of the extrusion:
+        std::shared_ptr<rawshape> topface = mybaseshape->duplicate();
+        topface->setphysicalregion(-1);
+        topface->shift(0, 0, myheight);
 
-		// Get the contour regions:
-		std::vector<std::shared_ptr<rawshape>> contourlines = mybaseshape->getsons();
-		std::vector<std::shared_ptr<rawshape>> topcontourlines = topface->getsons();
+        // Get the contour regions:
+        std::vector<std::shared_ptr<rawshape>> contourlines = mybaseshape->getsons();
+        std::vector<std::shared_ptr<rawshape>> topcontourlines = topface->getsons();
 
-		contourlines = geotools::orient(contourlines);
-		topcontourlines = geotools::orient(topcontourlines);
+        contourlines = geotools::orient(contourlines);
+        topcontourlines = geotools::orient(topcontourlines);
 
-		// Create the contour faces:
-		std::vector<std::shared_ptr<rawshape>> contourfaces(contourlines.size());
+        // Create the contour faces:
+        std::vector<std::shared_ptr<rawshape>> contourfaces(contourlines.size());
 
-		std::vector<std::shared_ptr<rawshape>> verticallines(contourlines.size());
-		for (int i = 0; i < contourlines.size(); i++)
-			verticallines[i] = std::shared_ptr<rawline>(new rawline(-1, {contourlines[i]->getsons()[0], topcontourlines[i]->getsons()[0]}, mynumlayers));
-		
-		for (int i = 0; i < contourfaces.size(); i++)
-			contourfaces[i] = std::shared_ptr<rawquadrangle>(new rawquadrangle(-1, {contourlines[i], verticallines[(i+1)%verticallines.size()], topcontourlines[i], verticallines[i]}));
+        std::vector<std::shared_ptr<rawshape>> verticallines(contourlines.size());
+        for (int i = 0; i < contourlines.size(); i++)
+            verticallines[i] = std::shared_ptr<rawline>(new rawline(-1, {contourlines[i]->getsons()[0], topcontourlines[i]->getsons()[0]}, mynumlayers));
+        
+        for (int i = 0; i < contourfaces.size(); i++)
+            contourfaces[i] = std::shared_ptr<rawquadrangle>(new rawquadrangle(-1, {contourlines[i], verticallines[(i+1)%verticallines.size()], topcontourlines[i], verticallines[i]}));
 
-		sons = geotools::concatenate({{mybaseshape}, contourfaces, {topface}});
-
-
-		// Get total number of nodes, triangles and quadrangles in the unextruded mesh:
-		int numnodesperlayer = mybaseshape->getcoords()->size()/3;
-		int numtriangles = mybaseshape->getelems()->at(2).size()/3;
-		int numquadrangles = mybaseshape->getelems()->at(3).size()/4;
-
-		mycoords.resize(3*numnodesperlayer*mynumlayers);
-		// Extruded triangles are prisms (element number 6):
-		myelems[6].resize(6*numtriangles*(mynumlayers-1));
-		// Extruded quadrangles are hexahedra (element number 5):
-		myelems[5].resize(8*numquadrangles*(mynumlayers-1));
+        sons = geotools::concatenate({{mybaseshape}, contourfaces, {topface}});
 
 
-		// Place the nodes.
-		int index = 0;
-		
-		std::vector<double>* currentcoords = mybaseshape->getcoords();
+        // Get total number of nodes, triangles and quadrangles in the unextruded mesh:
+        int numnodesperlayer = mybaseshape->getcoords()->size()/3;
+        int numtriangles = mybaseshape->getelems()->at(2).size()/3;
+        int numquadrangles = mybaseshape->getelems()->at(3).size()/4;
 
-		for (int l = 0; l < mynumlayers; l++)
-		{
-			for (int j = 0; j < numnodesperlayer; j++)
-			{
-				mycoords[3*index+0] = currentcoords->at(3*j+0);
-				mycoords[3*index+1] = currentcoords->at(3*j+1);
-				mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
-				index++;
-			}
-		}
+        mycoords.resize(3*numnodesperlayer*mynumlayers);
+        // Extruded triangles are prisms (element number 6):
+        myelems[6].resize(6*numtriangles*(mynumlayers-1));
+        // Extruded quadrangles are hexahedra (element number 5):
+        myelems[5].resize(8*numquadrangles*(mynumlayers-1));
 
 
-		// Place the elements:
-		int prismindex = 0, hexindex = 0;
+        // Place the nodes.
+        int index = 0;
+        
+        std::vector<double>* currentcoords = mybaseshape->getcoords();
 
-		std::vector<std::vector<int>>* currentelems = mybaseshape->getelems();
+        for (int l = 0; l < mynumlayers; l++)
+        {
+            for (int j = 0; j < numnodesperlayer; j++)
+            {
+                mycoords[3*index+0] = currentcoords->at(3*j+0);
+                mycoords[3*index+1] = currentcoords->at(3*j+1);
+                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
+                index++;
+            }
+        }
 
-		for (int l = 0; l < mynumlayers-1; l++)
-		{
-			// Extrude all triangles:
-			for (int tri = 0; tri < numtriangles; tri++)
-			{
-				myelems[6][6*prismindex+0] = currentelems->at(2)[3*tri+0] + l*numnodesperlayer;
-				myelems[6][6*prismindex+1] = currentelems->at(2)[3*tri+1] + l*numnodesperlayer;
-				myelems[6][6*prismindex+2] = currentelems->at(2)[3*tri+2] + l*numnodesperlayer;
-				myelems[6][6*prismindex+3] = currentelems->at(2)[3*tri+0] + (l+1)*numnodesperlayer;
-				myelems[6][6*prismindex+4] = currentelems->at(2)[3*tri+1] + (l+1)*numnodesperlayer;
-				myelems[6][6*prismindex+5] = currentelems->at(2)[3*tri+2] + (l+1)*numnodesperlayer;
-				prismindex++;
-			}
 
-			// Extrude all quadrangles:
-			for (int quad = 0; quad < numquadrangles; quad++)
-			{
-				myelems[5][8*hexindex+0] = currentelems->at(3)[4*quad+0] + l*numnodesperlayer;
-				myelems[5][8*hexindex+1] = currentelems->at(3)[4*quad+1] + l*numnodesperlayer;
-				myelems[5][8*hexindex+2] = currentelems->at(3)[4*quad+2] + l*numnodesperlayer;
-				myelems[5][8*hexindex+3] = currentelems->at(3)[4*quad+3] + l*numnodesperlayer;
-				myelems[5][8*hexindex+4] = currentelems->at(3)[4*quad+0] + (l+1)*numnodesperlayer;
-				myelems[5][8*hexindex+5] = currentelems->at(3)[4*quad+1] + (l+1)*numnodesperlayer;
-				myelems[5][8*hexindex+6] = currentelems->at(3)[4*quad+2] + (l+1)*numnodesperlayer;
-				myelems[5][8*hexindex+7] = currentelems->at(3)[4*quad+3] + (l+1)*numnodesperlayer;
-				hexindex++;
-			}
-		}
-	}
+        // Place the elements:
+        int prismindex = 0, hexindex = 0;
+
+        std::vector<std::vector<int>>* currentelems = mybaseshape->getelems();
+
+        for (int l = 0; l < mynumlayers-1; l++)
+        {
+            // Extrude all triangles:
+            for (int tri = 0; tri < numtriangles; tri++)
+            {
+                myelems[6][6*prismindex+0] = currentelems->at(2)[3*tri+0] + l*numnodesperlayer;
+                myelems[6][6*prismindex+1] = currentelems->at(2)[3*tri+1] + l*numnodesperlayer;
+                myelems[6][6*prismindex+2] = currentelems->at(2)[3*tri+2] + l*numnodesperlayer;
+                myelems[6][6*prismindex+3] = currentelems->at(2)[3*tri+0] + (l+1)*numnodesperlayer;
+                myelems[6][6*prismindex+4] = currentelems->at(2)[3*tri+1] + (l+1)*numnodesperlayer;
+                myelems[6][6*prismindex+5] = currentelems->at(2)[3*tri+2] + (l+1)*numnodesperlayer;
+                prismindex++;
+            }
+
+            // Extrude all quadrangles:
+            for (int quad = 0; quad < numquadrangles; quad++)
+            {
+                myelems[5][8*hexindex+0] = currentelems->at(3)[4*quad+0] + l*numnodesperlayer;
+                myelems[5][8*hexindex+1] = currentelems->at(3)[4*quad+1] + l*numnodesperlayer;
+                myelems[5][8*hexindex+2] = currentelems->at(3)[4*quad+2] + l*numnodesperlayer;
+                myelems[5][8*hexindex+3] = currentelems->at(3)[4*quad+3] + l*numnodesperlayer;
+                myelems[5][8*hexindex+4] = currentelems->at(3)[4*quad+0] + (l+1)*numnodesperlayer;
+                myelems[5][8*hexindex+5] = currentelems->at(3)[4*quad+1] + (l+1)*numnodesperlayer;
+                myelems[5][8*hexindex+6] = currentelems->at(3)[4*quad+2] + (l+1)*numnodesperlayer;
+                myelems[5][8*hexindex+7] = currentelems->at(3)[4*quad+3] + (l+1)*numnodesperlayer;
+                hexindex++;
+            }
+        }
+    }
 }
 
 

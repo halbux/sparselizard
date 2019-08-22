@@ -11,12 +11,12 @@ int oneconstant::count(int order)
     element myelement(myelementtypenumber);
     int elemdim = myelement.getelementdimension();
     
-	int problemdimension = universe::mymesh->getmeshdimension();
-	
+    int problemdimension = universe::mymesh->getmeshdimension();
+    
     if (elemdim == problemdimension)
-    	return 1;
-	else
-		return 0;
+        return 1;
+    else
+        return 0;
 }
 
 int oneconstant::count(int order, int dim, int num)
@@ -31,12 +31,12 @@ int oneconstant::count(int order, int dim, int num)
     element myelement(myelementtypenumber);
     int elemdim = myelement.getelementdimension();
     
-	int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::mymesh->getmeshdimension();
     
     if (elemdim == problemdimension && dim == problemdimension)
-    	return 1;
-	else
-		return 0;
+        return 1;
+    else
+        return 0;
 }
 
 
@@ -46,20 +46,20 @@ hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder)
     element myelement(myelementtypenumber);
     int elemdim = myelement.getelementdimension();
     
-	int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::mymesh->getmeshdimension();
 
     hierarchicalformfunctioncontainer val("one", myelementtypenumber);
 
-	if (elemdim == problemdimension)
-	{
-		// Loop on all possible orientations. The value is the same.
-		for (int orientation = 0; orientation < orientation::countorientations(myelementtypenumber); orientation++)
-		{
-			polynomial formfunc;
-			formfunc.set({{{1.0}}});
-			val.set(1,problemdimension,0,orientation,0,0,formfunc);
-		}
-	}
+    if (elemdim == problemdimension)
+    {
+        // Loop on all possible orientations. The value is the same.
+        for (int orientation = 0; orientation < orientation::countorientations(myelementtypenumber); orientation++)
+        {
+            polynomial formfunc;
+            formfunc.set({{{1.0}}});
+            val.set(1,problemdimension,0,orientation,0,0,formfunc);
+        }
+    }
     
     return val;
 }

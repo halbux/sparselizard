@@ -3,10 +3,10 @@
 
 std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-	densematrix output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
+    densematrix output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
     
     // This can only be on the cos0 harmonic:
-	return {{},{output}};
+    return {{},{output}};
 }
 
 densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

@@ -21,13 +21,13 @@ int hcurltriangle::count(int order, int dim, int num)
     
     if (order < 0)
         return 0;
-	if (order == 0)
-	{
-		if (dim == 1)
-			return 1;
-		else
-			return 0;
-	}
+    if (order == 0)
+    {
+        if (dim == 1)
+            return 1;
+        else
+            return 0;
+    }
     
     switch (dim)
     {
@@ -50,33 +50,33 @@ int hcurltriangle::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurltriangle::evalat(int maxorder) 
 {    
-	element triangle("triangle");
+    element triangle("triangle");
     hierarchicalformfunctioncontainer val("hcurl", triangle.gettypenumber());
 
     // Get the node list in every edge and face:
-    std::vector<int> nodesinedges = triangle.getedgesdefinitionsbasedonnodes();						
-    std::vector<int> nodesinfaces = triangle.getfacesdefinitionsbasedonnodes();	
-	
-	// Get for every edge and face orientation the vector reordering the 
+    std::vector<int> nodesinedges = triangle.getedgesdefinitionsbasedonnodes();                        
+    std::vector<int> nodesinfaces = triangle.getfacesdefinitionsbasedonnodes();    
+    
+    // Get for every edge and face orientation the vector reordering the 
     // nodes to bring the edge/face to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
-	std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
 
 
-	////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki, eta;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     
-	vector<polynomial> lambda(4);
-	// lambda0 not used
-	lambda[1] = 1.0-ki-eta;
-	lambda[2] = ki;
+    vector<polynomial> lambda(4);
+    // lambda0 not used
+    lambda[1] = 1.0-ki-eta;
+    lambda[2] = ki;
     lambda[3] = eta;
 
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < triangle.countedges(); edge++)
@@ -109,7 +109,7 @@ hierarchicalformfunctioncontainer hcurltriangle::evalat(int maxorder)
     }
 
 
-	////////// Defining the face based form functions (if any):
+    ////////// Defining the face based form functions (if any):
 
     // Loop on all faces:
     for (int face = 0; face < triangle.countfaces(); face++)
@@ -175,12 +175,12 @@ hierarchicalformfunctioncontainer hcurltriangle::evalat(int maxorder)
         }
     }
     
-	return val;
+    return val;
 }
 
 std::vector<bool> hcurltriangle::isgradienttype(int maxorder)
 {
-	std::vector<bool> output(count(maxorder,2,0), false);
+    std::vector<bool> output(count(maxorder,2,0), false);
 
     int ffindex = 0;
     for (int order = 2; order <= maxorder; order++)
@@ -199,10 +199,10 @@ std::vector<bool> hcurltriangle::isgradienttype(int maxorder)
                 ffindex++;
                 // "Type 3":
                 if (i == 0)
-                	ffindex++;
+                    ffindex++;
             }
         }
     }
 
-	return output;
+    return output;
 }

@@ -32,26 +32,26 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
         // Loop on every time step in the input matrix:
         for (int i = 0; i < numtimeevals; i++)
         {
-        	// Real part then imaginary part.
-        	double coef;
-        	if (harm%2 == 1)
-        		coef = std::cos(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
-        	else
-        		coef = std::sin(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
-        	// Correct the missing factor 2 for everything but the constant:
-        	if (currentfreq > 0)
-        		coef *= 2;
+            // Real part then imaginary part.
+            double coef;
+            if (harm%2 == 1)
+                coef = std::cos(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
+            else
+                coef = std::sin(2.0*pi*currentfreq*i/numtimeevals) / numtimeevals;
+            // Correct the missing factor 2 for everything but the constant:
+            if (currentfreq > 0)
+                coef *= 2;
         
-        	for (int j = 0; j < numtransforms; j++)
-        		currentvals[j] += inputvals[i*numtransforms+j] * coef;
+            for (int j = 0; j < numtransforms; j++)
+                currentvals[j] += inputvals[i*numtransforms+j] * coef;
         }
 
-		output[harm] = {currentmat};
+        output[harm] = {currentmat};
     }
 
     removeroundoffnoise(output);
 
-	return output;
+    return output;
 }
 
 void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, double threshold)
@@ -145,41 +145,41 @@ densematrix myfft::toelementrowformat(densematrix timestepsinrows, int numberofe
 
 void myfft::sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& notsame)
 {
-	if (notsame.size() <= 1)
-		return;
+    if (notsame.size() <= 1)
+        return;
 
-	int maxlen = notsame[0].size();
-	for (int i = 1; i < notsame.size(); i++)
-	{
-		if (notsame[i].size() > maxlen)
-			maxlen = notsame[i].size();
-	}
-	// Make sure the length of all notsame[i] is the same:
-	for (int i = 0; i < notsame.size(); i++)
-		notsame[i].resize(maxlen);
-		
-	for (int h = 0; h < maxlen; h++)
-	{
-		int curnumrows = -1, curnumcols = -1;
-		for (int i = 0; i < notsame.size(); i++)
-		{
-			if (notsame[i][h].size() == 1)
-			{
-				curnumrows = notsame[i][h][0].countrows();
-				curnumcols = notsame[i][h][0].countcolumns();
-				break;
-			}
-		}
-		if (curnumrows == -1 || curnumcols == -1)
-			continue;
-			
-		// Fill with full zero if an entry is missing:
-		for (int i = 0; i < notsame.size(); i++)
-		{
-			if (notsame[i][h].size() == 0)
-				notsame[i][h] = {densematrix(curnumrows, curnumcols, 0.0)};
-		}
-	}
+    int maxlen = notsame[0].size();
+    for (int i = 1; i < notsame.size(); i++)
+    {
+        if (notsame[i].size() > maxlen)
+            maxlen = notsame[i].size();
+    }
+    // Make sure the length of all notsame[i] is the same:
+    for (int i = 0; i < notsame.size(); i++)
+        notsame[i].resize(maxlen);
+        
+    for (int h = 0; h < maxlen; h++)
+    {
+        int curnumrows = -1, curnumcols = -1;
+        for (int i = 0; i < notsame.size(); i++)
+        {
+            if (notsame[i][h].size() == 1)
+            {
+                curnumrows = notsame[i][h][0].countrows();
+                curnumcols = notsame[i][h][0].countcolumns();
+                break;
+            }
+        }
+        if (curnumrows == -1 || curnumcols == -1)
+            continue;
+            
+        // Fill with full zero if an entry is missing:
+        for (int i = 0; i < notsame.size(); i++)
+        {
+            if (notsame[i][h].size() == 0)
+                notsame[i][h] = {densematrix(curnumrows, curnumcols, 0.0)};
+        }
+    }
 }
 
 

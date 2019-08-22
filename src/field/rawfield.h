@@ -59,7 +59,7 @@ class spanningtree;
 class rawfield : public std::enable_shared_from_this<rawfield>
 {
     
-	private:
+    private:
         
         bool multiharmonic;
 
@@ -94,7 +94,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<bool> isitgauged;
 
             
-	public:
+    public:
         
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
         rawfield(void) {};

@@ -65,18 +65,18 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     // Time derivative of non-multiharmonic fields:
     if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
     {
-    	// Get the vector in the universe corresponding to the field time derivative.
-    	// This was created and set to the universe by a time resolution object.
-    	if ((universe::xdtxdtdtx)[timederivativeorder].size() == 0)
-    	{
-    		if (timederivativeorder == 1)
-				std::cout << "Error in 'opfield' object: the dt(field) value was not made available by a time resolution" << std::endl;
-    		if (timederivativeorder == 2)
-				std::cout << "Error in 'opfield' object: the dtdt(field) value was not made available by a time resolution" << std::endl;
-			abort();
-    	}
-    	// Set the field value to the field time derivative value on all regions:
-    	myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|myfield);
+        // Get the vector in the universe corresponding to the field time derivative.
+        // This was created and set to the universe by a time resolution object.
+        if ((universe::xdtxdtdtx)[timederivativeorder].size() == 0)
+        {
+            if (timederivativeorder == 1)
+                std::cout << "Error in 'opfield' object: the dt(field) value was not made available by a time resolution" << std::endl;
+            if (timederivativeorder == 2)
+                std::cout << "Error in 'opfield' object: the dtdt(field) value was not made available by a time resolution" << std::endl;
+            abort();
+        }
+        // Set the field value to the field time derivative value on all regions:
+        myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|myfield);
     }
 
     std::vector<std::vector<densematrix>> output;
@@ -142,19 +142,19 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
 
     if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
     {
-    	// Get the vector in the universe corresponding to the field data.
-    	// This was created and set to the universe by a time resolution object.
-    	if ((universe::xdtxdtdtx)[0].size() == 0)
-    	{
-    		std::cout << "Error in 'opfield' object: the field value was not made available by a time resolution" << std::endl;
-			abort();
-    	}
-    	// Set the field value back to its initial value on all regions:
-    	myfield->setdata(-1, (universe::xdtxdtdtx)[0][0]|myfield);
+        // Get the vector in the universe corresponding to the field data.
+        // This was created and set to the universe by a time resolution object.
+        if ((universe::xdtxdtdtx)[0].size() == 0)
+        {
+            std::cout << "Error in 'opfield' object: the field value was not made available by a time resolution" << std::endl;
+            abort();
+        }
+        // Set the field value back to its initial value on all regions:
+        myfield->setdata(-1, (universe::xdtxdtdtx)[0][0]|myfield);
     }
 
     if (myfield->ismultiharmonic() && timederivativeorder > 0)
-    	output = harmonic::timederivative(timederivativeorder, output);
+        output = harmonic::timederivative(timederivativeorder, output);
 
     if (reuse && universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), output);
@@ -204,21 +204,21 @@ std::shared_ptr<operation> opfield::copy(void)
 
 std::vector<double> opfield::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-	std::string mytype = myfield->gettypename();
-	if (timederivativeorder != 0 || spacederivative != 0 || kietaphiderivative != 0)
-	{
-		std::cout << "Error in 'opfield' object: evaluate does not allow derivatives" << std::endl;
-		abort();
-	}
-	if (mytype == "x")
-		return xcoords;
-	if (mytype == "y")
-		return ycoords;
-	if (mytype == "z")
-		return zcoords;
+    std::string mytype = myfield->gettypename();
+    if (timederivativeorder != 0 || spacederivative != 0 || kietaphiderivative != 0)
+    {
+        std::cout << "Error in 'opfield' object: evaluate does not allow derivatives" << std::endl;
+        abort();
+    }
+    if (mytype == "x")
+        return xcoords;
+    if (mytype == "y")
+        return ycoords;
+    if (mytype == "z")
+        return zcoords;
 
-	std::cout << "Error in 'opfield' object: evaluate only allows the x, y and z field" << std::endl;
-	abort();
+    std::cout << "Error in 'opfield' object: evaluate only allows the x, y and z field" << std::endl;
+    abort();
 }
 
 void opfield::print(void)

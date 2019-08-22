@@ -2,9 +2,9 @@
 
 opcondition::opcondition(std::shared_ptr<operation> condarg, std::shared_ptr<operation> truearg, std::shared_ptr<operation> falsearg)
 {
-	mycond = condarg;
-	mytrue = truearg;
-	myfalse = falsearg;
+    mycond = condarg;
+    mytrue = truearg;
+    myfalse = falsearg;
 }
 
 
@@ -17,21 +17,21 @@ std::vector<std::vector<densematrix>> opcondition::interpolate(elementselector& 
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-	std::vector<std::vector<densematrix>> condargmat = mycond->interpolate(elemselect, evaluationcoordinates, meshdeform);
-	std::vector<std::vector<densematrix>> trueargmat = mytrue->interpolate(elemselect, evaluationcoordinates, meshdeform);
-	std::vector<std::vector<densematrix>> falseargmat = myfalse->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densematrix>> condargmat = mycond->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densematrix>> trueargmat = mytrue->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densematrix>> falseargmat = myfalse->interpolate(elemselect, evaluationcoordinates, meshdeform);
 
     if (condargmat.size() == 2 && condargmat[1].size() == 1 && trueargmat.size() == 2 && trueargmat[1].size() == 1 && falseargmat.size() == 2 && falseargmat[1].size() == 1)
     {
-		double* condval = condargmat[1][0].getvalues();
-		double* trueval = trueargmat[1][0].getvalues();
-		double* falseval = falseargmat[1][0].getvalues();
+        double* condval = condargmat[1][0].getvalues();
+        double* trueval = trueargmat[1][0].getvalues();
+        double* falseval = falseargmat[1][0].getvalues();
 
-		for (int i = 0; i < condargmat[1][0].count(); i++)
-		{
-			if (condval[i] < 0)
-				trueval[i] = falseval[i]; 
-		}
+        for (int i = 0; i < condargmat[1][0].count(); i++)
+        {
+            if (condval[i] < 0)
+                trueval[i] = falseval[i]; 
+        }
         
         if (reuse && universe::isreuseallowed)
             universe::setprecomputed(shared_from_this(), trueargmat);
@@ -52,19 +52,19 @@ densematrix opcondition::multiharmonicinterpolate(int numtimeevals, elementselec
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-	densematrix condargmat = mycond->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-	densematrix trueargmat = mytrue->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-	densematrix falseargmat = myfalse->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densematrix condargmat = mycond->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densematrix trueargmat = mytrue->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densematrix falseargmat = myfalse->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
 
-	double* condval = condargmat.getvalues();
-	double* trueval = trueargmat.getvalues();
-	double* falseval = falseargmat.getvalues();
+    double* condval = condargmat.getvalues();
+    double* trueval = trueargmat.getvalues();
+    double* falseval = falseargmat.getvalues();
 
-	for (int i = 0; i < condargmat.count(); i++)
-	{
-		if (condval[i] < 0)
-			trueval[i] = falseval[i]; 
-	}
+    for (int i = 0; i < condargmat.count(); i++)
+    {
+        if (condval[i] < 0)
+            trueval[i] = falseval[i]; 
+    }
             
     if (reuse && universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), trueargmat);
@@ -95,16 +95,16 @@ std::shared_ptr<operation> opcondition::copy(void)
 
 std::vector<double> opcondition::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-	std::vector<double> evaldcond = mycond->evaluate(xcoords, ycoords, zcoords);
-	std::vector<double> evaldtrue = mytrue->evaluate(xcoords, ycoords, zcoords);
-	std::vector<double> evaldfalse = myfalse->evaluate(xcoords, ycoords, zcoords);
+    std::vector<double> evaldcond = mycond->evaluate(xcoords, ycoords, zcoords);
+    std::vector<double> evaldtrue = mytrue->evaluate(xcoords, ycoords, zcoords);
+    std::vector<double> evaldfalse = myfalse->evaluate(xcoords, ycoords, zcoords);
 
-	for (int i = 0; i < evaldcond.size(); i++)
-	{
-		if (evaldcond[i] < 0)
-			evaldtrue[i] = evaldfalse[i];
-	}
-	return evaldtrue;
+    for (int i = 0; i < evaldcond.size(); i++)
+    {
+        if (evaldcond[i] < 0)
+            evaldtrue[i] = evaldfalse[i];
+    }
+    return evaldtrue;
 }
 
 void opcondition::print(void)

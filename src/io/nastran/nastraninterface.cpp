@@ -2,7 +2,7 @@
 
 
 void nastraninterface::readfromfile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
-{	
+{    
     // Depending on the software that has generated the .nas file the physical region numbers for regions with elements of different dimensions can overlap.
     // A number large enough is used to shift the regions of different dimensions by an amount equal to physregnumshift x dim:
     int physregnumshift = 1e6;
@@ -23,7 +23,7 @@ void nastraninterface::readfromfile(std::string name, nodes& mynodes, elements& 
             bool isready = mydataline.addline(currentline);
 
             if (isready == true)
-            {				
+            {                
                 if (mydataline.isgriddata())
                     nodecoords.push_back(mydataline.getnodecoordinates());
                 

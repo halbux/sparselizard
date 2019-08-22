@@ -15,7 +15,7 @@ class parameter;
 class opparameter: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         
@@ -23,8 +23,8 @@ class opparameter: public operation
         int mycolumn;
         
         parameter* myparameter;
-	
-	public:
+    
+    public:
         
         opparameter(parameter* input, int row, int col) { myparameter = input; myrow = row; mycolumn = col; };
         

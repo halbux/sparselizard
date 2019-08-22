@@ -12,11 +12,11 @@
 class opinvjac: public operation
 {
 
-	private:
+    private:
         
         int myrow, mycol;
-	
-	public:
+    
+    public:
         
         // Define as invjac(m,n):
         opinvjac(int m, int n) { myrow = m; mycol = n; };

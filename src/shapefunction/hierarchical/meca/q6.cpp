@@ -41,26 +41,26 @@ int q6::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer q6::evalat(int maxorder) 
 {    
-	element quadrangle("quadrangle");
+    element quadrangle("quadrangle");
     hierarchicalformfunctioncontainer val("q6", quadrangle.gettypenumber());
 
     polynomial ki, eta;
     ki.set({{{}},{{{1.0}}}});
     eta.set({{{},{1.0}}});
     
-	// lambda0 not used
-	vector<polynomial> lambda(7);
+    // lambda0 not used
+    vector<polynomial> lambda(7);
     
     // These form functions are expressed in our reference element and do not need a variable change:
-	lambda[5] = 0.5*(1.0-ki*ki);
+    lambda[5] = 0.5*(1.0-ki*ki);
     lambda[6] = 0.5*(1.0-eta*eta);
     
-	// Variable change to correspond to our reference element definition:
-	// ki := (ki+1)/2; eta := (eta+1)/2;
+    // Variable change to correspond to our reference element definition:
+    // ki := (ki+1)/2; eta := (eta+1)/2;
     ki = 0.5*(ki+1); eta = 0.5*(eta+1);
     
-	lambda[1] = (1.0-ki)*(1.0-eta);
-	lambda[2] = ki*(1.0-eta);
+    lambda[1] = (1.0-ki)*(1.0-eta);
+    lambda[2] = ki*(1.0-eta);
     lambda[3] = ki*eta;
     lambda[4] = (1.0-ki)*eta;
     
@@ -75,5 +75,5 @@ hierarchicalformfunctioncontainer q6::evalat(int maxorder)
         }
     }
     
-	return val;
+    return val;
 }

@@ -19,7 +19,7 @@ class rawvolume: public rawshape
 
     private:
 
-	public:
+    public:
 
 };
 

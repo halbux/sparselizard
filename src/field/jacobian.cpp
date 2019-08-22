@@ -343,19 +343,19 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
             
     }
 
-	if (universe::isaxisymmetric)
-		xcoord = (x.getpointer()->interpolate(0, 0, elemselect, evaluationcoordinates))[1][0];
+    if (universe::isaxisymmetric)
+        xcoord = (x.getpointer()->interpolate(0, 0, elemselect, evaluationcoordinates))[1][0];
 }
 
 densematrix jacobian::getdetjac(void)
 { 
-	densematrix detj = detjac.copy();
+    densematrix detj = detjac.copy();
 
-	if (universe::isaxisymmetric)
-		detj.multiplyelementwise(xcoord);
+    if (universe::isaxisymmetric)
+        detj.multiplyelementwise(xcoord);
 
-	return detj;
-}	
+    return detj;
+}    
 
 densematrix jacobian::getjac(int row, int column) { return jac[3*row+column]; }
 

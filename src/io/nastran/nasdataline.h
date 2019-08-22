@@ -21,7 +21,7 @@ class nasdataline
         bool isitgriddata = false;
         bool isitelementdata = false;
 
-        // For grid data:		
+        // For grid data:        
         std::vector<double> nodecoordinate = std::vector<double>(3,0);
 
         // For element data:
@@ -37,7 +37,7 @@ class nasdataline
 
         // Add a data line. True is returned in case any data can be returned
         // (i.e. when at the end of multiple lines, not in a comment,...).
-        bool addline(std::string linetoadd);	
+        bool addline(std::string linetoadd);    
 
         // Does the data correspond to grid data:
         bool isgriddata(void) { return isitgriddata; };

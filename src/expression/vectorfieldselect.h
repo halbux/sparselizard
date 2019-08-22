@@ -19,12 +19,12 @@ class field;
 class vectorfieldselect
 {
 
-	private:
+    private:
        
         shared_ptr<rawvec> myrawvec;
         shared_ptr<rawfield> myrawfield;
         
-	public:
+    public:
         
         vectorfieldselect(shared_ptr<rawvec> vecin, shared_ptr<rawfield> fieldin) { myrawvec = vecin; myrawfield = fieldin; };
         

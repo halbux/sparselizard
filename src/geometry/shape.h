@@ -31,65 +31,65 @@ class shape
 
     private:
         
-		std::shared_ptr<rawshape> rawshapeptr = NULL;
+        std::shared_ptr<rawshape> rawshapeptr = NULL;
 
-		// Give an error on a NULL rawshape pointer:
-		void errornullpointer(void);
+        // Give an error on a NULL rawshape pointer:
+        void errornullpointer(void);
 
-	public:
+    public:
 
-		shape(void);
-		// Define a shape based on a rawshape pointer:
-		shape(std::shared_ptr<rawshape> inputptr);
+        shape(void);
+        // Define a shape based on a rawshape pointer:
+        shape(std::shared_ptr<rawshape> inputptr);
 
-		// Constructor with the coordinates of all nodes in the shape provided as input (for points and lines only):
-		shape(std::string shapename, int physreg, std::vector<double> coords);
+        // Constructor with the coordinates of all nodes in the shape provided as input (for points and lines only):
+        shape(std::string shapename, int physreg, std::vector<double> coords);
 
-		// Constructor based on the coordinates of the corner nodes in the shape:
-		shape(std::string shapename, int physreg, std::vector<double> coords, int nummeshpts);
-		shape(std::string shapename, int physreg, std::vector<double> coords, std::vector<int> nummeshpts);
+        // Constructor based on the coordinates of the corner nodes in the shape:
+        shape(std::string shapename, int physreg, std::vector<double> coords, int nummeshpts);
+        shape(std::string shapename, int physreg, std::vector<double> coords, std::vector<int> nummeshpts);
 
-		// Constructor based on sub-shapes (not for point shapes):
-		shape(std::string shapename, int physreg, std::vector<shape> subshapes, int nummeshpts);
-		shape(std::string shapename, int physreg, std::vector<shape> subshapes, std::vector<int> nummeshpts);
-		shape(std::string shapename, int physreg, std::vector<shape> subshapes);
+        // Constructor based on sub-shapes (not for point shapes):
+        shape(std::string shapename, int physreg, std::vector<shape> subshapes, int nummeshpts);
+        shape(std::string shapename, int physreg, std::vector<shape> subshapes, std::vector<int> nummeshpts);
+        shape(std::string shapename, int physreg, std::vector<shape> subshapes);
 
-		// Define a disk:
-		shape(std::string shapename, int physreg, std::vector<double> centercoords, double radius, int nummeshpts);
-		shape(std::string shapename, int physreg, shape centerpoint, double radius, int nummeshpts);
+        // Define a disk:
+        shape(std::string shapename, int physreg, std::vector<double> centercoords, double radius, int nummeshpts);
+        shape(std::string shapename, int physreg, shape centerpoint, double radius, int nummeshpts);
 
 
-		void setphysicalregion(int physreg);
+        void setphysicalregion(int physreg);
 
-		// Deform the shape in the x, y and z direction by a value given in the expressions.
-		// Only the x, y and z coordinate field are allowed in the expressions.
-		void deform(expression xdeform, expression ydeform, expression zdeform);
+        // Deform the shape in the x, y and z direction by a value given in the expressions.
+        // Only the x, y and z coordinate field are allowed in the expressions.
+        void deform(expression xdeform, expression ydeform, expression zdeform);
 
-		// Shift the shape in the x, y and z direction.
-		void shift(double shiftx, double shifty, double shiftz);
-		// Scale the shape in the x, y and z direction.
-		void scale(double scalex, double scaley, double scalez);
-		// Rotate the mesh by alphax, alphay and alphaz degrees around the x, y and z axis respectively:
-		void rotate(double alphax, double alphay, double alphaz);
+        // Shift the shape in the x, y and z direction.
+        void shift(double shiftx, double shifty, double shiftz);
+        // Scale the shape in the x, y and z direction.
+        void scale(double scalex, double scaley, double scalez);
+        // Rotate the mesh by alphax, alphay and alphaz degrees around the x, y and z axis respectively:
+        void rotate(double alphax, double alphay, double alphaz);
 
-		shape extrude(int physreg, double height, int numlayers);
+        shape extrude(int physreg, double height, int numlayers);
 
-		// Duplicate the shape and all subshapes. 
-		shape duplicate(void);
+        // Duplicate the shape and all subshapes. 
+        shape duplicate(void);
 
-		// Return the dimension of the shape (0D, 1D, 2D or 3D):
-		int getdimension(void);
-		
-		// Return the coordinates of the shape mesh nodes:
-		std::vector<double> getcoords(void);
+        // Return the dimension of the shape (0D, 1D, 2D or 3D):
+        int getdimension(void);
+        
+        // Return the coordinates of the shape mesh nodes:
+        std::vector<double> getcoords(void);
 
-		std::string getname(void);
+        std::string getname(void);
 
-		std::vector<shape> getsons(void);
+        std::vector<shape> getsons(void);
 
-		int getphysicalregion(void);
+        int getphysicalregion(void);
 
- 		std::shared_ptr<rawshape> getpointer(void);
+         std::shared_ptr<rawshape> getpointer(void);
 };
 
 

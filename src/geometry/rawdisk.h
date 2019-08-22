@@ -28,53 +28,53 @@ class rawdisk: public rawshape
 
     private:
 
-		int myphysicalregion = -1;
+        int myphysicalregion = -1;
 
-		int mynummeshpoints;
+        int mynummeshpoints;
 
-		// Son shapes (lines defining the contour of the surface).
-		std::vector<std::shared_ptr<rawshape>> sons = {};
-		// Disk center point:
-		std::shared_ptr<rawshape> mycenterpoint;
+        // Son shapes (lines defining the contour of the surface).
+        std::vector<std::shared_ptr<rawshape>> sons = {};
+        // Disk center point:
+        std::shared_ptr<rawshape> mycenterpoint;
 
-		double myradius;
+        double myradius;
 
-		// Coordinates of the nodes in the mesh:
-		std::vector<double> mycoords = {};
-		// Elements in the mesh:
-		std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
+        // Coordinates of the nodes in the mesh:
+        std::vector<double> mycoords = {};
+        // Elements in the mesh:
+        std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
         
-	public:
+    public:
 
-		rawdisk(void) {};
+        rawdisk(void) {};
 
-		rawdisk(int physreg, std::shared_ptr<rawshape> centerpoint, double radius, int nummeshpts);
+        rawdisk(int physreg, std::shared_ptr<rawshape> centerpoint, double radius, int nummeshpts);
 
-		std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
 
-		std::shared_ptr<rawshape> duplicate(void);
+        std::shared_ptr<rawshape> duplicate(void);
 
-		void setphysicalregion(int physreg);
-	
-		int getdimension(void);
+        void setphysicalregion(int physreg);
+    
+        int getdimension(void);
 
-		std::string getname(void);
+        std::string getname(void);
 
-		std::vector<std::shared_ptr<rawshape>> getsons(void);
+        std::vector<std::shared_ptr<rawshape>> getsons(void);
 
-		// Get subshapes (sons are included):
-		std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
-		void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
-		
-		// Get the mesh info of the shape:
-		int getphysicalregion(void);
-		std::vector<double>* getcoords(void); 
-		std::vector<std::vector<int>>* getelems(void);
+        // Get subshapes (sons are included):
+        std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
+        void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
+        
+        // Get the mesh info of the shape:
+        int getphysicalregion(void);
+        std::vector<double>* getcoords(void); 
+        std::vector<std::vector<int>>* getelems(void);
 
 
-		std::shared_ptr<rawshape> getpointer(void);
+        std::shared_ptr<rawshape> getpointer(void);
 
-		void mesh(void);
+        void mesh(void);
 
 };
 

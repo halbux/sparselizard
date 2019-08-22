@@ -6,7 +6,7 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
     // Have a coherent disjoint region ordering:
     std::sort(disjointregionnumbers.begin(), disjointregionnumbers.end());
     
-	mydisjointregionnumbers = disjointregionnumbers;
+    mydisjointregionnumbers = disjointregionnumbers;
 
     // Get the total number of elements in all disjoint regions for preallocation.
     int totalnumberofelements = 0;
@@ -66,7 +66,7 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
             currentrangeend++;
         currentrangeend--;
     }   
-}	
+}    
 
 elementselector::elementselector(int disjointregionnumber, int elemindex)
 {
@@ -75,9 +75,9 @@ elementselector::elementselector(int disjointregionnumber, int elemindex)
     int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(disjointregionnumber);
     int rangebegin = universe::mymesh->getdisjointregions()->getrangebegin(disjointregionnumber);
     
-	mydisjointregionnumbers = {disjointregionnumber};
-	
-	currenttotalorientation = myelements->gettotalorientation(myelementtypenumber, rangebegin+elemindex);
+    mydisjointregionnumbers = {disjointregionnumber};
+    
+    currenttotalorientation = myelements->gettotalorientation(myelementtypenumber, rangebegin+elemindex);
  
     disjointregions = {disjointregionnumber};
     totalorientations = {currenttotalorientation};
@@ -109,7 +109,7 @@ bool elementselector::next(void)
     currentrangeend--;
     
     return true;
-}	
+}    
 
 void elementselector::selectdisjointregions(std::vector<int> disjregs) 
 { 
@@ -142,7 +142,7 @@ int elementselector::countinselection(void)
             return numinselection;
         }
     }
-}	
+}    
 
 std::vector<int> elementselector::getelementnumbers(void)
 {
@@ -173,7 +173,7 @@ std::vector<int> elementselector::getelementnumbers(void)
         }
     }
     return elementnumbers;
-}	
+}    
 
 std::vector<int> elementselector::getelementindexes(void)
 {
@@ -204,7 +204,7 @@ std::vector<int> elementselector::getelementindexes(void)
         }
     }
     return elementindexes;
-}	
+}    
 
 elementselector elementselector::extractselection(void)
 {

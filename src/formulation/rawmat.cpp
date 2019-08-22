@@ -3,9 +3,9 @@
 
 rawmat::~rawmat(void) 
 { 
-	MatDestroy(&mymat);
-	if (ludefined) 
-		KSPDestroy(&myksp);
+    MatDestroy(&mymat);
+    if (ludefined) 
+        KSPDestroy(&myksp);
 }
 
 int rawmat::countrows(void) 
@@ -26,48 +26,48 @@ int rawmat::countcolumns(void)
 
 void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns)
 {
-	int* entriestozeroptr = entriestozero.getvalues();
+    int* entriestozeroptr = entriestozero.getvalues();
 
-	int numentries = entriestozero.count();
-	if (numentries > 0)
-	{
-		// First build a vector for direct access:
-		std::vector<bool> istozero(mydofmanager->countdofs(), false);
+    int numentries = entriestozero.count();
+    if (numentries > 0)
+    {
+        // First build a vector for direct access:
+        std::vector<bool> istozero(mydofmanager->countdofs(), false);
 
-		for (int i = 0; i < numentries; i++)
-			istozero[entriestozeroptr[i]] = true;
-			
-		if (zerorows)
-		{
-			for (int i = 0; i < accumulatedrowindices.size(); i++)
-			{
-				int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-				for (int j = 0; j < accumulatedrowindices[i].count(); j++)
-				{
-					if (accumulatedrowindicesptr[j] >= 0 && istozero[accumulatedrowindicesptr[j]])
-						accumulatedrowindicesptr[j] = -1;
-				}
-			}
-		}
-		if (zerocolumns)
-		{
-			for (int i = 0; i < accumulatedcolindices.size(); i++)
-			{
-				int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
-				for (int j = 0; j < accumulatedcolindices[i].count(); j++)
-				{
-					if (accumulatedcolindicesptr[j] >= 0 && istozero[accumulatedcolindicesptr[j]])
-						accumulatedcolindicesptr[j] = -1;
-				}
-			}
-		}
-	}
+        for (int i = 0; i < numentries; i++)
+            istozero[entriestozeroptr[i]] = true;
+            
+        if (zerorows)
+        {
+            for (int i = 0; i < accumulatedrowindices.size(); i++)
+            {
+                int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
+                for (int j = 0; j < accumulatedrowindices[i].count(); j++)
+                {
+                    if (accumulatedrowindicesptr[j] >= 0 && istozero[accumulatedrowindicesptr[j]])
+                        accumulatedrowindicesptr[j] = -1;
+                }
+            }
+        }
+        if (zerocolumns)
+        {
+            for (int i = 0; i < accumulatedcolindices.size(); i++)
+            {
+                int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
+                for (int j = 0; j < accumulatedcolindices[i].count(); j++)
+                {
+                    if (accumulatedcolindicesptr[j] >= 0 && istozero[accumulatedcolindicesptr[j]])
+                        accumulatedcolindicesptr[j] = -1;
+                }
+            }
+        }
+    }
 }
 
 void rawmat::gauge(void)
 {
-	intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-	zeroentries(gaugedindexes, true, true);
+    intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
+    zeroentries(gaugedindexes, true, true);
 }
 
 
@@ -180,7 +180,7 @@ void rawmat::process(void)
     // Get the number of nonzeros:
     nnz = 0;
     if (veclen > 0)
-    	nnz = 1;
+        nnz = 1;
     for (int i = 1; i < veclen; i++)
     {
         if (stitchedrowindices[reorderingvector[i]] != stitchedrowindices[reorderingvector[i-1]] || stitchedcolindices[reorderingvector[i]] != stitchedcolindices[reorderingvector[i-1]])
@@ -216,13 +216,13 @@ void rawmat::process(void)
         }
         else
         {
-        	// New row:
-        	row++; ind++;
+            // New row:
+            row++; ind++;
         
             // If empty row move to the next not empty one:
             int newrow = stitchedrowindices[reorderingvector[i]];
             while (row < newrow) { finalrowindices[row] = ind; row++; }
-        	
+            
             finalvals[ind] = stitchedvals[reorderingvector[i]];
             finalcolindices[ind] = stitchedcolindices[reorderingvector[i]];
             finalrowindices[row] = ind;
@@ -250,9 +250,9 @@ void rawmat::removelastfragment(void)
 
 void rawmat::clearfragments(void)
 {
-	accumulatedrowindices = {};
-	accumulatedcolindices = {};
-	accumulatedvals = {};
+    accumulatedrowindices = {};
+    accumulatedcolindices = {};
+    accumulatedvals = {};
 }
 
 void rawmat::print(void)
@@ -272,13 +272,13 @@ void rawmat::print(void)
 
 shared_ptr<rawmat> rawmat::extractaccumulated(void)
 {
-	shared_ptr<rawmat> output(new rawmat(mydofmanager));
-	
-	output->accumulatedrowindices = accumulatedrowindices;
-	output->accumulatedcolindices = accumulatedcolindices;
-	output->accumulatedvals = accumulatedvals;
-	
-	return output;
+    shared_ptr<rawmat> output(new rawmat(mydofmanager));
+    
+    output->accumulatedrowindices = accumulatedrowindices;
+    output->accumulatedcolindices = accumulatedcolindices;
+    output->accumulatedvals = accumulatedvals;
+    
+    return output;
 }
 
 

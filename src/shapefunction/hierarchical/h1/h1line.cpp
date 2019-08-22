@@ -41,50 +41,50 @@ int h1line::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1line::evalat(int maxorder) 
 {    
-	element line("line");
+    element line("line");
     hierarchicalformfunctioncontainer val("h1", line.gettypenumber());
 
     // Get the node list in every edge:
-    std::vector<int> nodesinedges = line.getedgesdefinitionsbasedonnodes();						
-	
-	// Get for every edge orientation the vector reordering the 
+    std::vector<int> nodesinedges = line.getedgesdefinitionsbasedonnodes();                        
+    
+    // Get for every edge orientation the vector reordering the 
     // nodes to bring the edge to its reference orientation 0.
-	std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
 
 
-	////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
-	
+    ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
+    
     polynomial ki;
     ki.set({{{}},{{{1.0}}}});
     
     // In Zaglmayr's thesis the reference elements are shifted and deformed.
-	// Variable change to correspond to our reference element definition:
-	// ki := (ki+1)/2;
+    // Variable change to correspond to our reference element definition:
+    // ki := (ki+1)/2;
     ki = 0.5*(ki+1);
     
-	vector<polynomial> lambda(3);
-	// lambda0 not used
-	lambda[1] = 1.0-ki;
-	lambda[2] = ki;
-	
-	vector<polynomial> sigma(3);
-	// sigma0 not used
-	sigma[1] = 1.0-ki;
-	sigma[2] = ki;
+    vector<polynomial> lambda(3);
+    // lambda0 not used
+    lambda[1] = 1.0-ki;
+    lambda[2] = ki;
+    
+    vector<polynomial> sigma(3);
+    // sigma0 not used
+    sigma[1] = 1.0-ki;
+    sigma[2] = ki;
     
     
-	////////// Defining the vertex based form functions (if any):
-	
+    ////////// Defining the vertex based form functions (if any):
+    
     // Only order 1 has vertex based form functions:
-	if (maxorder >= 1)
-	{
-		// Loop on all nodes:
-		for (int node = 0; node < line.countnodes(); node++)
+    if (maxorder >= 1)
+    {
+        // Loop on all nodes:
+        for (int node = 0; node < line.countnodes(); node++)
             val.set(1,0,node,0,0,0,lambda[node+1]);
-	}
+    }
     
     
-	////////// Defining the edge based form functions (if any):
+    ////////// Defining the edge based form functions (if any):
 
     // Loop on all edges:
     for (int edge = 0; edge < line.countedges(); edge++)

@@ -13,7 +13,7 @@
 class opon: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         
@@ -23,7 +23,7 @@ class opon: public operation
         std::vector<expression> mycoordshift = {};
         std::shared_ptr<operation> myarg;
         
-	public:
+    public:
         
         opon(int physreg, expression* coordshift, std::shared_ptr<operation> arg, bool errorifnotfound);
         

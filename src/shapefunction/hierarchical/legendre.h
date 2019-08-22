@@ -15,7 +15,7 @@
 #include "polynomial.h"
 
 namespace legendre
-{	
+{    
     // Legendre polynomials ln(x).
     // Output is ln for n = 0 ... maxn.
     std::vector<polynomial> l(int maxn, polynomial x);

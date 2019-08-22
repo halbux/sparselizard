@@ -23,20 +23,20 @@ std::vector<polynomial> lagrangepyramid::getformfunctionpolynomials(int order)
      {
           case 1:
           {
-				polynomial ki, eta, phi;
-				ki.set({{{}},{{{1.0}}}});
-				eta.set({{{},{1.0}}});
-				phi.set({{{0.0,1.0}}});
+                polynomial ki, eta, phi;
+                ki.set({{{}},{{{1.0}}}});
+                eta.set({{{},{1.0}}});
+                phi.set({{{0.0,1.0}}});
 
-				// Variable change to correspond to our reference element definition:
-				ki = 0.5*(ki+1); eta = 0.5*(eta+1);
+                // Variable change to correspond to our reference element definition:
+                ki = 0.5*(ki+1); eta = 0.5*(eta+1);
 
-				formfunctionpoly[0] = (1.0-ki)*(1.0-eta)*(1.0-phi);
-				formfunctionpoly[1] = ki*(1.0-eta)*(1.0-phi);
-				formfunctionpoly[2] = ki*eta*(1.0-phi);
-				formfunctionpoly[3] = (1.0-ki)*eta*(1.0-phi);
-				formfunctionpoly[4] = phi;
-				break;
+                formfunctionpoly[0] = (1.0-ki)*(1.0-eta)*(1.0-phi);
+                formfunctionpoly[1] = ki*(1.0-eta)*(1.0-phi);
+                formfunctionpoly[2] = ki*eta*(1.0-phi);
+                formfunctionpoly[3] = (1.0-ki)*eta*(1.0-phi);
+                formfunctionpoly[4] = phi;
+                break;
           }
           default:
                std::cout << "Error in 'lagrangepyramid' namespace: Lagrange form functions of order 2 and above not defined" << std::endl;

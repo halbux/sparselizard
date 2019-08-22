@@ -12,44 +12,44 @@ gausspoints::gausspoints(int elementtypenumber, int integrationorder)
         abort();
     }
     
-	switch (elementtypenumber)
-	{
+    switch (elementtypenumber)
+    {
         // Point element:
         case 0:
             gppoint::set(integrationorder, mycoordinates, myweights);
             break;
         // Line element:
-		case 1:
+        case 1:
             gpline::set(integrationorder, mycoordinates, myweights);
             break; 
         // Triangle element:
-		case 2:
+        case 2:
             gptriangle::set(integrationorder, mycoordinates, myweights);
             break; 
         // Quadrangle element:
-		case 3:
+        case 3:
             gpquadrangle::set(integrationorder, mycoordinates, myweights);
             break; 
         // Tetrahedron element:
-		case 4:
+        case 4:
             gptetrahedron::set(integrationorder, mycoordinates, myweights);
             break; 
         // Hexahedron element:
-		case 5:
+        case 5:
             gphexahedron::set(integrationorder, mycoordinates, myweights);
             break; 
         // Prism element:
-		case 6:
+        case 6:
             gpprism::set(integrationorder, mycoordinates, myweights);
             break; 
         // Pyramid element:
-		case 7:
+        case 7:
             gppyramid::set(integrationorder, mycoordinates, myweights);
             break; 
         default:
             std::cout << "Error in 'gausspoints' object: unknown element type number " << elementtypenumber << std::endl;
             abort();
-	}
+    }
 }
 
 void gausspoints::print(void)

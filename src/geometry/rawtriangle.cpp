@@ -3,51 +3,51 @@
 
 rawtriangle::rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, std::vector<int> nummeshpoints)
 {
-	if (inputpoints.size() != 3 || inputpoints[0]->getdimension() != 0 || inputpoints[1]->getdimension() != 0 || inputpoints[2]->getdimension() != 0)
-	{
-		std::cout << "Error in 'rawtriangle' object: expected three points in the triangle definition" << std::endl;
-		abort();
-	}
+    if (inputpoints.size() != 3 || inputpoints[0]->getdimension() != 0 || inputpoints[1]->getdimension() != 0 || inputpoints[2]->getdimension() != 0)
+    {
+        std::cout << "Error in 'rawtriangle' object: expected three points in the triangle definition" << std::endl;
+        abort();
+    }
 
-	if (nummeshpoints.size() != 3)
-	{
-		std::cout << "Error in 'rawtriangle' object: expected a vector of length three to define the number of mesh nodes" << std::endl;
-		abort();
-	}
+    if (nummeshpoints.size() != 3)
+    {
+        std::cout << "Error in 'rawtriangle' object: expected a vector of length three to define the number of mesh nodes" << std::endl;
+        abort();
+    }
 
-	std::vector<std::shared_ptr<rawshape>> lns(3);
-	
-	for (int i = 0; i < 3; i++)
-		lns[i] = std::shared_ptr<rawline>(new rawline(-1, {inputpoints[i], inputpoints[(i+1)%3]}, nummeshpoints[i]));
+    std::vector<std::shared_ptr<rawshape>> lns(3);
+    
+    for (int i = 0; i < 3; i++)
+        lns[i] = std::shared_ptr<rawline>(new rawline(-1, {inputpoints[i], inputpoints[(i+1)%3]}, nummeshpoints[i]));
 
 
-	myphysicalregion = physreg;
+    myphysicalregion = physreg;
 
-	sons = lns;
+    sons = lns;
 
-	mesh();
+    mesh();
 }
 
 rawtriangle::rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputlines)
 {
-	if (inputlines.size() != 3 || inputlines[0]->getdimension() != 1 || inputlines[1]->getdimension() != 1 || inputlines[2]->getdimension() != 1)
-	{
-		std::cout << "Error in 'rawtriangle' object: expected three lines in the triangle definition" << std::endl;
-		abort();
-	}
+    if (inputlines.size() != 3 || inputlines[0]->getdimension() != 1 || inputlines[1]->getdimension() != 1 || inputlines[2]->getdimension() != 1)
+    {
+        std::cout << "Error in 'rawtriangle' object: expected three lines in the triangle definition" << std::endl;
+        abort();
+    }
 
-	myphysicalregion = physreg;
+    myphysicalregion = physreg;
 
-	sons = geotools::orient(inputlines);
+    sons = geotools::orient(inputlines);
 
-	mesh();
+    mesh();
 }
 
 
 
 std::shared_ptr<rawshape> rawtriangle::extrude(int physreg, double height, int numlayers)
 {
-	return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
+    return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
 }
 
 std::shared_ptr<rawshape> rawtriangle::duplicate(void)
@@ -55,62 +55,62 @@ std::shared_ptr<rawshape> rawtriangle::duplicate(void)
     std::shared_ptr<rawtriangle> out(new rawtriangle);
     *out = *this;
 
-	out->sons = geotools::duplicate(sons);
+    out->sons = geotools::duplicate(sons);
 
-	out->replicatelinks(shared_from_this());
+    out->replicatelinks(shared_from_this());
 
-    return out;	
+    return out;    
 }
 
 void rawtriangle::setphysicalregion(int physreg)
 {
-	myphysicalregion = physreg;
+    myphysicalregion = physreg;
 }
 
 int rawtriangle::getdimension(void)
 {
-	return 2;
+    return 2;
 }
 
 std::string rawtriangle::getname(void)
 {
-	return "triangle";
+    return "triangle";
 }
 
 
 std::vector<std::shared_ptr<rawshape>> rawtriangle::getsons(void) 
 { 
-	return sons; 
+    return sons; 
 }
 
 std::vector<std::shared_ptr<rawshape>> rawtriangle::getsubshapes(void)
 {
-	return sons;
+    return sons;
 }
 
 void rawtriangle::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
 {
-	sons = subshapes;
+    sons = subshapes;
 }
 
 int rawtriangle::getphysicalregion(void) 
 { 
-	return myphysicalregion; 
+    return myphysicalregion; 
 }
 
 std::vector<double>* rawtriangle::getcoords(void) 
 { 
-	return &mycoords; 
+    return &mycoords; 
 }
 
 std::vector<std::vector<int>>* rawtriangle::getelems(void) 
 { 
-	return &myelems; 
+    return &myelems; 
 }
 
 std::shared_ptr<rawshape> rawtriangle::getpointer(void) 
 { 
-	return shared_from_this(); 
+    return shared_from_this(); 
 }
 
 
@@ -149,7 +149,7 @@ void rawtriangle::mesh(void)
     // Loop on all layers in the ki direction:
     int currentnode = 0;
     for (int i = 0; i < n; i++)
-    {	
+    {    
         // Coordinates of the first and last nodes in the line linking 
         // the current node in line 0 and its counterpart in line 1:
         double xv1 = linescoords[0]->at(3*i+0);

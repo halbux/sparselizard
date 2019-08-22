@@ -29,19 +29,19 @@ class formulation;
 
 class mat
 {
-	private:
+    private:
         
         // The actual matrix:
         shared_ptr<rawmat> rawmatptr = NULL;
         
         void errorifpointerisnull(void);
-        	
-	public:
-                	
+            
+    public:
+                    
         mat(void) {};
         mat(shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
      
-    	// Create a matrix with structure based on a formulation and with initial values:
+        // Create a matrix with structure based on a formulation and with initial values:
         mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
      
         int countrows(void);
@@ -57,7 +57,7 @@ class mat
         shared_ptr<rawmat> getpointer(void) { return rawmatptr; };
         
         Mat getpetsc(void);
-		
+        
         void print(void);
         
         mat copy(void);

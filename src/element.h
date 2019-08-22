@@ -277,8 +277,8 @@
 class element
 {
 
-	private:
-	
+    private:
+    
         int curvedtypenumber = -1;
         std::vector<int> curvednodelist = {};
         
@@ -287,8 +287,8 @@ class element
         // if the second is false and the third is true. No error check is performed here.
         std::vector<int> getnodesinsurface(int surfaceindex, bool faceistriangle, bool faceisquadrangle);
 
-	public:
-	
+    public:
+    
         // Set the element name:
         element(std::string elementname);
         // Set the curved type number:
@@ -299,26 +299,26 @@ class element
         void setnodes(std::vector<int>& nodelist);
         
         std::vector<int> getnodes(void);
-        std::string gettypename(void);									
+        std::string gettypename(void);                                    
         // 'gettypenameconjugation' is singular for 0 or 1 as input, plural otherwise.
-        std::string gettypenameconjugation(int numberofelements);				
-        bool iscurved(void);										
-        int getcurvatureorder(void);								
+        std::string gettypenameconjugation(int numberofelements);                
+        bool iscurved(void);                                        
+        int getcurvatureorder(void);                                
         // Get the straight type number corresponding to the curved element:
-        int gettypenumber(void);						
-        int getcurvedtypenumber(void);									
-        int countcurvednodes(void);			
-        int getelementdimension(void);	
+        int gettypenumber(void);                        
+        int getcurvedtypenumber(void);                                    
+        int countcurvednodes(void);            
+        int getelementdimension(void);    
         
         // Number of elements of type typenum/of dimension dim in the element. The curvature nodes are not counted.
         int counttype(int typenum);
         int countdim(int dim);
-        				
-        int countnodes(void);						
-        int countedges(void);	
-        int countfaces(void);										
-        int counttriangularfaces(void);					
-        int countquadrangularfaces(void);				
+                        
+        int countnodes(void);                        
+        int countedges(void);    
+        int countfaces(void);                                        
+        int counttriangularfaces(void);                    
+        int countquadrangularfaces(void);                
         int countvolumes(void);
         
         // Returns true if point with coordinates (ki, eta, phi) is inside the reference element:
@@ -341,7 +341,7 @@ class element
         std::vector<int> getnodesinline(int lineindex);
         std::vector<int> getnodesintriangle(int triangleindex);
         std::vector<int> getnodesinquadrangle(int quadrangleindex);
-	
+    
         // This function outputs the reordered node INDEX numbers to 
         // bring a STRAIGHT element to its standard orientation, i.e.
         // the smallest node number is set as first then the smallest 
@@ -353,18 +353,18 @@ class element
         std::vector<int> getedgesreordering(std::vector<int> nodereordering);
         std::vector<int> gettriangularfacesreordering(std::vector<int> nodereordering);
         std::vector<int> getquadrangularfacesreordering(std::vector<int> nodereordering);
-		
+        
         // 'getedgesdefinitionbasedonnodes()[2*i+j]' gives the index of the jth node
         // in the ith edge [node1edgei node2edgei] in the element. The edges ordering 
         // is as described at the top of this file. Only the corner nodes are given,
         // not the curvature-related inner nodes.
-        std::vector<int> getedgesdefinitionsbasedonnodes(void);		
+        std::vector<int> getedgesdefinitionsbasedonnodes(void);        
         // In 'getfacesdefinitionsbasedonnodes' first all triangular faces 
         // are listed then the quadrangular ones.
         std::vector<int> getfacesdefinitionsbasedonnodes(void);
-        std::vector<int> getfacesdefinitionsbasedonedges(void);											
+        std::vector<int> getfacesdefinitionsbasedonedges(void);                                            
 
-        bool iselementedgeorface(void);		
+        bool iselementedgeorface(void);        
 
         // This function outputs the coordinates in format {x1,y1,z1,x2,y2,z2,x3,...}
         // of the phi then eta then ki coordinate-ordered nodes in the curved element.

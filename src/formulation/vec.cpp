@@ -21,8 +21,8 @@ void vec::updateconstraints(void)
     errorifpointerisnull();
     
     std::vector<int> disjregs((universe::mymesh->getdisjointregions())->count());
-	// Set 'disjregs' to [0 1 2 ...]:
-   	std::iota(disjregs.begin(), disjregs.end(), 0);
+    // Set 'disjregs' to [0 1 2 ...]:
+       std::iota(disjregs.begin(), disjregs.end(), 0);
     
     std::vector<shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
@@ -42,18 +42,18 @@ void vec::updateconstraints(void)
 
 void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
 { 
-	errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
+    errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
 densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
 
 void vec::setvalue(int address, double value, std::string op)
 {
-	errorifpointerisnull(); rawvecptr->setvalue(address, value, op); 
+    errorifpointerisnull(); rawvecptr->setvalue(address, value, op); 
 }
 
 double vec::getvalue(int address)
 {
-	errorifpointerisnull(); return rawvecptr->getvalue(address); 
+    errorifpointerisnull(); return rawvecptr->getvalue(address); 
 }
 
 vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); return vectorfieldselect(rawvecptr, selectedfield.getpointer()); }

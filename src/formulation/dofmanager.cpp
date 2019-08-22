@@ -62,7 +62,7 @@ void dofmanager::addtostructure(shared_ptr<rawfield> fieldtoadd, std::vector<int
 void dofmanager::addtostructure(shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     // Get all disjoint regions in the physical region with (-1):
-	std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
+    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
     
     addtostructure(fieldtoadd, disjregs);
 }
@@ -157,32 +157,32 @@ int dofmanager::countgaugeddofs(void)
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
-	    for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
-	    {
-			// Constraints have priority over the gauge!
-			if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
-			{
-				spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        {
+            // Constraints have priority over the gauge!
+            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            {
+                spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
-				int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
-				int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
-				std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
-				std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
-	   
-				for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
-				{
-					// The lowest order hcurl form function is gauged only on the spanning tree:
-					if (elementtype == 1 && ff == 0)
-						numgaugeddofs += myspantree->countedgesintree(disjreg);
-					else
-					{
-						// All other form functions are gauged on all dofs in the disjoint region:
-						if (isitgradienttype[ff])
-							numgaugeddofs += rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
-					}
-				}
-		    }
-		}
+                int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+                int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
+                std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
+                std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
+       
+                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+                {
+                    // The lowest order hcurl form function is gauged only on the spanning tree:
+                    if (elementtype == 1 && ff == 0)
+                        numgaugeddofs += myspantree->countedgesintree(disjreg);
+                    else
+                    {
+                        // All other form functions are gauged on all dofs in the disjoint region:
+                        if (isitgradienttype[ff])
+                            numgaugeddofs += rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
+                    }
+                }
+            }
+        }
     }
     return numgaugeddofs;
 }
@@ -197,31 +197,31 @@ intdensematrix dofmanager::getgaugedindexes(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-			// Constraints have priority over the gauge!
-			if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
-			{
-				spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+            // Constraints have priority over the gauge!
+            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            {
+                spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
-				int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
-				int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
-				std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
-				std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
-	   
-				for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
-				{
-					// The lowest order hcurl form function is gauged only on the spanning tree.
-					// All other form functions are gauged on all dofs in the disjoint region.
-			        int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
-			        for (int i = 0; i < numdofshere; i++)
-					{
-						if ((elementtype != 1 || ff != 0) && isitgradienttype[ff] || elementtype == 1 && ff == 0 && myspantree->isintree(i, disjreg))
-						{
-			            	myval[currentindex] = rangebegin[fieldindex][disjreg][ff] + i;
-			            	currentindex++;
-						}
-					}
-				}
-		    }
+                int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+                int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
+                std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
+                std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
+       
+                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+                {
+                    // The lowest order hcurl form function is gauged only on the spanning tree.
+                    // All other form functions are gauged on all dofs in the disjoint region.
+                    int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
+                    for (int i = 0; i < numdofshere; i++)
+                    {
+                        if ((elementtype != 1 || ff != 0) && isitgradienttype[ff] || elementtype == 1 && ff == 0 && myspantree->isintree(i, disjreg))
+                        {
+                            myval[currentindex] = rangebegin[fieldindex][disjreg][ff] + i;
+                            currentindex++;
+                        }
+                    }
+                }
+            }
         }
     }
     return output;
@@ -229,119 +229,119 @@ intdensematrix dofmanager::getgaugedindexes(void)
 
 std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(void)
 {
-	// This will have an entry for every field and every disjoint node region that is conditionally constrained:
-	std::vector<intdensematrix> indexmat = {};
-	std::vector<densematrix> condvalvec = {};
-	std::vector<densematrix> constrvalvec = {};
-	
-	
+    // This will have an entry for every field and every disjoint node region that is conditionally constrained:
+    std::vector<intdensematrix> indexmat = {};
+    std::vector<densematrix> condvalvec = {};
+    std::vector<densematrix> constrvalvec = {};
+    
+    
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
-    	// First get the list of disjoint NODE regions on which the rawfield is conditionally constrained:
-    	std::vector<bool> isdisjregactive(rangebegin[fieldindex].size(), false);
+        // First get the list of disjoint NODE regions on which the rawfield is conditionally constrained:
+        std::vector<bool> isdisjregactive(rangebegin[fieldindex].size(), false);
         for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
         {
-        	// Only the nodes are constrained:
-        	if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
-        		continue;
-        		
-			// Constraints have priority over the conditional constraints!
-			if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
-				isdisjregactive[disjreg] = true;
-		}
-			
-    	// Get the condition and value expressions for the conditional constraint:
-    	std::vector<std::vector<expression>> condconstrexpr = myfields[fieldindex]->getconditionalconstraints();
+            // Only the nodes are constrained:
+            if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
+                continue;
+                
+            // Constraints have priority over the conditional constraints!
+            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
+                isdisjregactive[disjreg] = true;
+        }
+            
+        // Get the condition and value expressions for the conditional constraint:
+        std::vector<std::vector<expression>> condconstrexpr = myfields[fieldindex]->getconditionalconstraints();
     
-		// Loop on all disjoint regions:
-		for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
-		{
-			if (isdisjregactive[disjreg] == false)
-				continue;
-		    
-			std::shared_ptr<operation> condop = condconstrexpr[disjreg][0].getoperationinarray(0,0), constrop = condconstrexpr[disjreg][1].getoperationinarray(0,0);
-			
-		    // Combine all disjoint regions that share the same condop and constrop operations:
-		    std::vector<int> curdisjregs = {};
-	        for (int i = disjreg; i < isdisjregactive.size(); i++)
-	        {
-	        	if (isdisjregactive[i] && condop == condconstrexpr[i][0].getoperationinarray(0,0) && constrop == condconstrexpr[i][1].getoperationinarray(0,0))
-	        	{
-	        		curdisjregs.push_back(i);
-	        		isdisjregactive[i] = false;
-	        	}
-        	}
-	        	
-			// Compute the conditional and constraint expressions.
-			// For nodes the reference coordinates are all zero.
-			std::vector<double> evaluationcoordinates = {0,0,0};
-			elementselector myelemselect(curdisjregs, condop->isvalueorientationdependent(curdisjregs) || constrop->isvalueorientationdependent(curdisjregs));
+        // Loop on all disjoint regions:
+        for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
+        {
+            if (isdisjregactive[disjreg] == false)
+                continue;
+            
+            std::shared_ptr<operation> condop = condconstrexpr[disjreg][0].getoperationinarray(0,0), constrop = condconstrexpr[disjreg][1].getoperationinarray(0,0);
+            
+            // Combine all disjoint regions that share the same condop and constrop operations:
+            std::vector<int> curdisjregs = {};
+            for (int i = disjreg; i < isdisjregactive.size(); i++)
+            {
+                if (isdisjregactive[i] && condop == condconstrexpr[i][0].getoperationinarray(0,0) && constrop == condconstrexpr[i][1].getoperationinarray(0,0))
+                {
+                    curdisjregs.push_back(i);
+                    isdisjregactive[i] = false;
+                }
+            }
+                
+            // Compute the conditional and constraint expressions.
+            // For nodes the reference coordinates are all zero.
+            std::vector<double> evaluationcoordinates = {0,0,0};
+            elementselector myelemselect(curdisjregs, condop->isvalueorientationdependent(curdisjregs) || constrop->isvalueorientationdependent(curdisjregs));
 
-			std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
-			// Skip if no conditional constraint is active:
-   			if (condval[1][0].max() < 0)
-   				continue;
-   			std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
-   			
-   			// Create a matrix with all indices:
-   			intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
-   			int* curindexmatptr = curindexmat.getvalues();
-   			int index = 0;
-   			for (int i = 0; i < curdisjregs.size(); i++)
-   			{
-   				// There is only a single shape function per node!
-   				for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
-   				{
-   					curindexmatptr[index] = ind;
-   					index++;
-				}
-   			}
+            std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            // Skip if no conditional constraint is active:
+               if (condval[1][0].max() < 0)
+                   continue;
+               std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
+               
+               // Create a matrix with all indices:
+               intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
+               int* curindexmatptr = curindexmat.getvalues();
+               int index = 0;
+               for (int i = 0; i < curdisjregs.size(); i++)
+               {
+                   // There is only a single shape function per node!
+                   for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
+                   {
+                       curindexmatptr[index] = ind;
+                       index++;
+                }
+               }
 
-   			// Append to the vectors:
-   			condvalvec.push_back(condval[1][0]);
-   			constrvalvec.push_back(constrval[1][0]);
-        	indexmat.push_back(curindexmat);
+               // Append to the vectors:
+               condvalvec.push_back(condval[1][0]);
+               constrvalvec.push_back(constrval[1][0]);
+            indexmat.push_back(curindexmat);
         }
     }
 
-	// Count the number of active conditional constraints:
-	int numactive = 0;
-	for (int i = 0; i < condvalvec.size(); i++)
-	{
-		double* condvalptr = condvalvec[i].getvalues();
-		for (int j = 0; j < condvalvec[i].count(); j++)
-		{
-			if (condvalptr[j] >= 0)
-				numactive++;
-		}
-	}
-	
-	// Combine all active conditional constraints together:
-	intdensematrix condconstrindices(numactive,1);
-	densematrix condconstrval(numactive,1);
-	
-	int* indptr = condconstrindices.getvalues();
-	double* valptr = condconstrval.getvalues();
-	
-	int index = 0;
-	for (int i = 0; i < condvalvec.size(); i++)
-	{
-		double* condvalptr = condvalvec[i].getvalues();
-		double* constrvalptr = constrvalvec[i].getvalues();
-		int* indmatptr = indexmat[i].getvalues();
-		for (int j = 0; j < condvalvec[i].count(); j++)
-		{
-			if (condvalptr[j] >= 0)
-			{
-				indptr[index] = indmatptr[j];
-				valptr[index] = constrvalptr[j];
-				
-				index++;
-			}
-		}
-	}
-	
-	return std::make_pair(condconstrindices, condconstrval);
+    // Count the number of active conditional constraints:
+    int numactive = 0;
+    for (int i = 0; i < condvalvec.size(); i++)
+    {
+        double* condvalptr = condvalvec[i].getvalues();
+        for (int j = 0; j < condvalvec[i].count(); j++)
+        {
+            if (condvalptr[j] >= 0)
+                numactive++;
+        }
+    }
+    
+    // Combine all active conditional constraints together:
+    intdensematrix condconstrindices(numactive,1);
+    densematrix condconstrval(numactive,1);
+    
+    int* indptr = condconstrindices.getvalues();
+    double* valptr = condconstrval.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < condvalvec.size(); i++)
+    {
+        double* condvalptr = condvalvec[i].getvalues();
+        double* constrvalptr = constrvalvec[i].getvalues();
+        int* indmatptr = indexmat[i].getvalues();
+        for (int j = 0; j < condvalvec[i].count(); j++)
+        {
+            if (condvalptr[j] >= 0)
+            {
+                indptr[index] = indmatptr[j];
+                valptr[index] = constrvalptr[j];
+                
+                index++;
+            }
+        }
+    }
+    
+    return std::make_pair(condconstrindices, condconstrval);
 }
 
 
@@ -447,7 +447,7 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
             num -= myelement.counttriangularfaces();
         
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, inputfield->gettypename());
-	int currentnumberofformfunctions, previousdisjreg;       
+    int currentnumberofformfunctions, previousdisjreg;       
 
         for (int i = 0; i < elementlist.size(); i++)
         {
@@ -458,10 +458,10 @@ intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fiel
             int currentdisjointregion = myelements->getdisjointregion(associatedelementtype, currentsubelem);
             
             // The current subelement might require less form functions:
-	    if (i == 0 || currentdisjointregion != previousdisjreg)
+        if (i == 0 || currentdisjointregion != previousdisjreg)
                 currentnumberofformfunctions = myformfunction->count(inputfield->getinterpolationorder(currentdisjointregion), associatedelementdimension, myiterator.getnodeedgefacevolumeindex());
 
-	    previousdisjreg = currentdisjointregion;
+        previousdisjreg = currentdisjointregion;
             
             // If not in a disjoint region on which the field is defined set -2 adress.
             if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)

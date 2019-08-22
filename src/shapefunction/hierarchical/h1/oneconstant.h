@@ -14,12 +14,12 @@ class oneconstant: public hierarchicalformfunction
 {
     private:
     
-    	int myelementtypenumber;
+        int myelementtypenumber;
 
     public:
     
-    	// There is a single 'oneconstant' form function per element and it has a constant, scalar one value.
-    	oneconstant(int elemtypenum) { myelementtypenumber = elemtypenum; };
+        // There is a single 'oneconstant' form function per element and it has a constant, scalar one value.
+        oneconstant(int elemtypenum) { myelementtypenumber = elemtypenum; };
 
         // Get the number of form functions of order <= 'order':
         int count(int order);

@@ -12,12 +12,12 @@
 class opsum: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         std::vector<std::shared_ptr<operation>> sumterms = {};
-	
-	public:
+    
+    public:
         
         opsum(void) {};
         opsum(std::vector<std::shared_ptr<operation>> input) { sumterms = input; };
@@ -47,7 +47,7 @@ class opsum: public operation
         void reuseit(bool istobereused) { reuse = istobereused; };
         bool isreused(void) { return reuse; };
         
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

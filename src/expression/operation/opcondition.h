@@ -12,14 +12,14 @@
 class opcondition: public operation
 {
 
-	private:
+    private:
         
         bool reuse = false;
         std::shared_ptr<operation> mycond;
-		std::shared_ptr<operation> mytrue;
-		std::shared_ptr<operation> myfalse;
+        std::shared_ptr<operation> mytrue;
+        std::shared_ptr<operation> myfalse;
         
-	public:
+    public:
         
         opcondition(std::shared_ptr<operation> condarg, std::shared_ptr<operation> truearg, std::shared_ptr<operation> falsearg);
         
@@ -33,7 +33,7 @@ class opcondition: public operation
         
         void reuseit(bool istobereused) { reuse = istobereused; };
         
-		std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
+        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);
 

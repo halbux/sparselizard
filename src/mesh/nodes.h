@@ -16,15 +16,15 @@
 class nodes
 {
 
-	private:
+    private:
         
         // 'roundoffnoiselevel' quantifies the round off noise on the node coordinates:
         double roundoffnoiselevel = 1e-10;
         
-		// Coordinates of every node. Format is [x1 y1 z1 x2 y2 z2 ... ].
-		std::vector<double> mycoordinates = {};
+        // Coordinates of every node. Format is [x1 y1 z1 x2 y2 z2 ... ].
+        std::vector<double> mycoordinates = {};
         
-	public:
+    public:
         
         nodes(void);
         nodes(double roundoffnoise);
@@ -50,7 +50,7 @@ class nodes
         // 'removeduplicates' removes the duplicated nodes in 'mycoordinates'.
         // NOTE: 'mycoordinates' must be sorted before the call.
         // The output vector v is such that sortedcoordinates(v,:) = coordinates.
-        std::vector<int> removeduplicates(void);	
+        std::vector<int> removeduplicates(void);    
         
         // 'reorder' updates the node orders (i.e. renumbers them) in 
         // 'mycoordinates' based on the input vector. The input vector is 
@@ -60,9 +60,9 @@ class nodes
         
         // 'getgeometrydimension' gives the max length of the geometry in 
         // the x, y and z dimension for input 0, 1 and 2 respectively.
-        double getgeometrydimension(int coord);	
+        double getgeometrydimension(int coord);    
         // Get a round off noise threshold for each coordinate.
-		std::vector<double> getnoisethreshold(void);
+        std::vector<double> getnoisethreshold(void);
         
 };
 

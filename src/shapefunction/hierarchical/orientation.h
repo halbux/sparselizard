@@ -29,7 +29,7 @@
 // - 1 if i > k > j | [0 2 1]
 // - 2 if j > k > i | [1 2 0]
 // - 3 if j > i > k | [1 0 2]
-// - 4 if k > i > j	| [2 0 1]
+// - 4 if k > i > j    | [2 0 1]
 // - 5 if k > j > i | [2 1 0]
 //
 // The vector on the right of '|' gives the node reordering to be in orientation 0.
@@ -78,17 +78,17 @@ namespace orientation
     // Count the number of orientations for a given element type:
     int countorientations(int elemtypenum);
     
-	// 'getedgesorientationsfromtotalorientation'returns a vector whose 
+    // 'getedgesorientationsfromtotalorientation'returns a vector whose 
     // index i gives the orientation of edge number i.
-	std::vector<int> getedgesorientationsfromtotalorientation(int totalorientation, int elementtypenumber);
-	std::vector<int> getfacesorientationsfromtotalorientation(int totalorientation, int elementtypenumber);
-	
-	// 'getreorderingtoreferenceedgeorientation' returns a vector of vectors 'a' 
-	// such that if n is a vector containing the node list of an edge of 
-	// orientation i then n(a(i)) is an edge of orientation number 0. 
-	std::vector<std::vector<int>> getreorderingtoreferenceedgeorientation(void);
-	std::vector<std::vector<int>> getreorderingtoreferencetriangularfaceorientation(void);
-	std::vector<std::vector<int>> getreorderingtoreferencequadrangularfaceorientation(void);
+    std::vector<int> getedgesorientationsfromtotalorientation(int totalorientation, int elementtypenumber);
+    std::vector<int> getfacesorientationsfromtotalorientation(int totalorientation, int elementtypenumber);
+    
+    // 'getreorderingtoreferenceedgeorientation' returns a vector of vectors 'a' 
+    // such that if n is a vector containing the node list of an edge of 
+    // orientation i then n(a(i)) is an edge of orientation number 0. 
+    std::vector<std::vector<int>> getreorderingtoreferenceedgeorientation(void);
+    std::vector<std::vector<int>> getreorderingtoreferencetriangularfaceorientation(void);
+    std::vector<std::vector<int>> getreorderingtoreferencequadrangularfaceorientation(void);
     
     // 'getedgesorientationsinelement' outputs a vector listing the 
     // orientation of all edges in the element.

@@ -178,7 +178,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
 
             // Solve all formulations that must be solved at the end of the nonlinear loop:
             mathop::solve(tosolveafter);
-        	
+            
             
             if (islinear)
                 break;

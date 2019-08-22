@@ -81,7 +81,7 @@ class spanningtree
         
         // Write to file to visualize the tree:
         void write(std::string filename);
-	
+    
 };
 
 #endif

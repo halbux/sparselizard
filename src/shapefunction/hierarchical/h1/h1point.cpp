@@ -41,7 +41,7 @@ int h1point::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1point::evalat(int maxorder) 
 {    
-	element point("point");
+    element point("point");
     hierarchicalformfunctioncontainer val("h1", point.gettypenumber());
 
     polynomial formfunc;

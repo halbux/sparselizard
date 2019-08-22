@@ -14,7 +14,7 @@
 class disjointregions
 {
 
-	private:
+    private:
         
         std::vector<int> rangebegin;
         std::vector<int> rangeend;
@@ -26,7 +26,7 @@ class disjointregions
         // type number of the elements in the disjoint region i.
         std::vector<int> elementtypenumbers;
         
-	public:
+    public:
         
         int count(void);
         int countelements(int disjointregionnumber);

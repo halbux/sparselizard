@@ -114,11 +114,11 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
             std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
 
             // Compute the Jacobian for the variable change to the reference element.
-	    shared_ptr<jacobian> myjacobian;
+        shared_ptr<jacobian> myjacobian;
 
-	    if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
-		myjacobian = universe::computedjacobian;
-	    else
+        if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
+        myjacobian = universe::computedjacobian;
+        else
                 myjacobian = shared_ptr<jacobian>(new jacobian(myselector, evaluationpoints, meshdeformationptr));
 
             densematrix detjac = myjacobian->getdetjac();
@@ -151,7 +151,7 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                         
                 // Multiply by the weights:
                 if (universe::skipgausspointweightproduct == false)
-                	tfformfunctionvalue.multiplycolumns(weights);
+                    tfformfunctionvalue.multiplycolumns(weights);
                 if (doffield != NULL)
                 {
                     dofformfunctionvalue = dofval.tomatrix(myselector.gettotalorientation(), dofinterpolationorder, mydofs[term]->getkietaphiderivative(), mydofs[term]->getformfunctioncomponent());
@@ -246,7 +246,7 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                         
                         // Keep track of how the rhs was assembled if requested:
                         if (universe::keeptrackofrhsassembly)
-                        	universe::rhsterms.push_back(std::make_pair(testfunadresses, stiffnesses[currenttfharm][1][0]));
+                            universe::rhsterms.push_back(std::make_pair(testfunadresses, stiffnesses[currenttfharm][1][0]));
                     }
                 }
             }

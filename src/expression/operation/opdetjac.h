@@ -12,9 +12,9 @@
 class opdetjac: public operation
 {
 
-	private:
+    private:
         
-	public:
+    public:
         
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);

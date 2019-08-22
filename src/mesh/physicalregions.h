@@ -17,14 +17,14 @@
 class physicalregions
 {
 
-	private:
+    private:
 
         std::vector<physicalregion> myphysicalregions;
         std::vector<int> myphysicalregionnumbers;
         
         disjointregions* mydisjointregions;
         
-	public:
+    public:
         
         physicalregions(disjointregions&);
                 
