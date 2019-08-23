@@ -23,7 +23,7 @@ std::vector<std::vector<densematrix>> oppower::interpolate(elementselector& elem
         return computedbase;
     }
 
-    std::cout << "Error in 'oppower' object: without FFT a power can only be computed for constant (harmonic 1) operations. Use an FFT call or rewrite as a product to avoid an FFT." << std::endl;
+    std::cout << "Error in 'oppower' object: without FFT a power can only be computed for constant (harmonic 1) operations. Use an FFT call or rewrite as a product." << std::endl;
     abort();
 }
 
