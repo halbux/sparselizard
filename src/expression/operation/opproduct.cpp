@@ -71,7 +71,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
 
                     for (int p = 0; p < harmsofproduct.size(); p++)
                     {
-                        double currentharm = harmsofproduct[p].first;
+                        int currentharm = harmsofproduct[p].first;
                         // currentharmcoef can be + or - 0.5 or 1.
                         double currentharmcoef = harmsofproduct[p].second;
                         
