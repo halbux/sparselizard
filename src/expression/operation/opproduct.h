@@ -8,6 +8,7 @@
 #define OPPRODUCT_H
 
 #include "operation.h"
+#include "harmonic.h"
 
 class opproduct: public operation
 {
