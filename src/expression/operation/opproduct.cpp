@@ -45,10 +45,47 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
             }
             continue;
         }
+        
+        // General case:
         if (not(isonlycos0) && not(iscurrenttermonlycos0))
         {
-            std::cout << "Error in 'opproduct': cannot compute a product of two multiharmonic arguments without FFT" << std::endl;
-            abort();
+            std::vector<std::vector<densematrix>> tempproduct = {};
+        
+            // Loop on all product harmonics:
+            for (int pharm = 0; pharm < product.size(); pharm++)
+            {
+                if (product[pharm].size() == 0)
+                    continue;
+                
+                // Loop on all harmonics of the current term:
+                for (int charm = 0; charm < currentterm.size(); charm++)
+                {
+                    if (currentterm[charm].size() == 0)
+                        continue;
+                    
+                    // Precompute the product of the current set of harmonics:
+                    densematrix curprod = product[pharm][0].copy();
+                    curprod.multiplyelementwise(currentterm[charm][0]);
+                
+                    std::vector<std::pair<int, double>> harmsofproduct = harmonic::getproduct(pharm, charm);
+
+                    for (int p = 0; p < harmsofproduct.size(); p++)
+                    {
+                        double currentharm = harmsofproduct[p].first;
+                        // currentharmcoef can be + or - 0.5 or 1.
+                        double currentharmcoef = harmsofproduct[p].second;
+                    
+                        if (tempproduct.size() < currentharm+1)
+                            tempproduct.resize(currentharm+1);
+                            
+                        if (tempproduct[currentharm].size() == 1)
+                            tempproduct[currentharm][0].addproduct(currentharmcoef, curprod);
+                        else
+                            tempproduct[currentharm] = {curprod.returnproduct(currentharmcoef)};
+                    }
+                }
+            }
+            product = tempproduct;
         }
     }
     
