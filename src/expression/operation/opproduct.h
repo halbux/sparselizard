@@ -9,6 +9,7 @@
 
 #include "operation.h"
 #include "harmonic.h"
+#include "myfft.h"
 
 class opproduct: public operation
 {
