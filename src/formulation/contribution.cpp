@@ -114,11 +114,11 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
             std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
 
             // Compute the Jacobian for the variable change to the reference element.
-        shared_ptr<jacobian> myjacobian;
+            shared_ptr<jacobian> myjacobian;
 
-        if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
-        myjacobian = universe::computedjacobian;
-        else
+            if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
+                myjacobian = universe::computedjacobian;
+            else
                 myjacobian = shared_ptr<jacobian>(new jacobian(myselector, evaluationpoints, meshdeformationptr));
 
             densematrix detjac = myjacobian->getdetjac();
@@ -191,7 +191,7 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                         // Loop on all product harmonics:
                         for (int p = 0; p < harmsofproduct.size(); p++)
                         {
-                            double currentharm = harmsofproduct[p].first;
+                            int currentharm = harmsofproduct[p].first;
                             // currentharmcoef can be + or - 0.5 or 1 (+ the time derivation factor).
                             double currentharmcoef = harmsofproduct[p].second;
                             
