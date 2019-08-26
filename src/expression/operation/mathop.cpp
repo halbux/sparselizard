@@ -224,6 +224,7 @@ expression mathop::abs(expression input) { return input.abs(); }
 expression mathop::sqrt(expression input) { return pow(input, 0.5); }
 expression mathop::log10(expression input) { return input.log10(); }
 expression mathop::pow(expression base, expression exponent) { return base.pow(exponent); }
+expression mathop::exp(expression input) { return pow(2.7182818284590452353, input); }
 
 expression mathop::ifpositive(expression condexpr, expression trueexpr, expression falseexpr)
 {
