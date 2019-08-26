@@ -81,6 +81,7 @@ namespace mathop
     expression sqrt(expression input);
     expression log10(expression input);
     expression pow(expression base, expression exponent);
+    expression exp(expression input);
 
     // Easy conditional functions for expressions (true if the expression value is >= 0):
     expression ifpositive(expression condexpr, expression trueexpr, expression falseexpr);
