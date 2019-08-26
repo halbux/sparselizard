@@ -30,13 +30,7 @@ fi
 echo '__________________________________________';
 echo 'CONFIGURING PETSC';
 
-if [ "$(uname)" == "Linux" ]; then
 PETSC_DIR=$(pwd);
-PETSC_ARCH=arch-linux2-c-opt;
-elif [ "$(uname)" == "Darwin"  ]; then
-PETSC_DIR=$(pwd);
-PETSC_ARCH=arch-darwin-c-opt;
-fi
 
 # The configuration below does not add support for additional mesh formats but does not require mpi.
 ./configure --with-openmp --with-mpi=0 --with-mumps-serial=1 --download-mumps --download-openblas --download-slepc --with-debugging=0 --with-scalar-type=real COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
@@ -55,8 +49,8 @@ fi
 
 echo '__________________________________________';
 echo 'COMPILING PETSC';
-make $PETSC_DIR $PETSC_ARCH all;
-make $PETSC_DIR $PETSC_ARCH test;
+make $PETSC_DIR all;
+make $PETSC_DIR test;
 
 cd $PRIORDIR;
 
