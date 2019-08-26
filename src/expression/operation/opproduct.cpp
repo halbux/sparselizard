@@ -89,8 +89,6 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
                 }
             }
             product = tempproduct;
-            
-            myfft::removeroundoffnoise(product);
         }
     }
     
