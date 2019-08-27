@@ -2,6 +2,8 @@
 //
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
+//
+// Thanks to R. Haouari for the damped eigenvalue calculation code.
 
 // This object uses the SLEPc library to get the eigenvalues and eigenvectors.
 // More information on SLEPc can be found at http://slepc.upv.es
@@ -17,6 +19,7 @@
 #include "rawvec.h"
 #include "memory"
 #include <slepceps.h>
+#include <slepcpep.h>
 
 class eigenvalue
 {
@@ -24,6 +27,7 @@ class eigenvalue
         
         mat myA;
         mat myB;
+        std::vector<mat> mymats = {};
         
         // Real and imaginary part of the eigenvalues and eigenvectors:
         std::vector<double> eigenvaluereal = {};
@@ -32,12 +36,19 @@ class eigenvalue
         std::vector<vec> eigenvectorreal = {};
         std::vector<vec> eigenvectorimaginary = {};
         
+        void errorifdirichletnotremoved(std::vector<mat> input);
+        
     public:
 
         // Define a standard eigenvalue problem A*x = lambda*x:
         eigenvalue(mat A);
-        // Define a generalised eigenvalue problem A*x = lambda*B*x:
+        // Define a generalized eigenvalue problem A*x = lambda*B*x:
         eigenvalue(mat A, mat B);
+        
+        // Define an eigenvalue problem of the form (M*lambda^2 + C*lambda + K)*u = 0:
+        eigenvalue(mat M, mat C, mat K);
+        // Define a general polynomial eigenvalue problem:
+        eigenvalue(std::vector<mat> inmats);
         
         void compute(int numeigenvaluestocompute, double targeteigenvaluemagnitude = 0.0);
         
@@ -52,7 +63,7 @@ class eigenvalue
         
         // Print the eigenvalues:
         void printeigenvalues(void);
-        // In case the eigenvalues are real and correspond to the square of the angular frequency:
+        
         void printeigenfrequencies(void);
         
 };
