@@ -137,7 +137,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         
         Mat petscmats[mymats.size()];
         for (int i = 0; i < mymats.size(); i++)
-            petscmats[i] = mymats[i].getpetsc();
+            petscmats[i] = mymats[mymats.size()-1-i].getpetsc();
         
         PEPSetOperators( pep, mymats.size(), petscmats );
         // We assume a general problem:
@@ -161,7 +161,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         // MUMPS petsc solver context:
         KSP ksp;
         STGetKSP(st, &ksp);
-        KSPSetType(ksp, KSPPREONLY);
+        KSPSetType(ksp, "preonly");
         PC pc;
         KSPGetPC(ksp, &pc);
         PCSetType(pc, PCLU);
