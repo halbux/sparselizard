@@ -222,7 +222,7 @@ void eigenvalue::printeigenfrequencies(void)
 {   
     double pival = 3.1415926535897932384;
 
-    if (mymats.size() == 0)
+    if (mymats.size() == 0 && myB.getpointer() != NULL)
     {
         std::cout << std::endl << "Printing the " << count() << " eigenfrequencies [Hz]:" << std::endl << std::endl;
     
@@ -241,7 +241,7 @@ void eigenvalue::printeigenfrequencies(void)
 
         std::cout << "        ";
         std::cout << std::left << std::setw(16)<<  "Damped [Hz]"  ;
-        std::cout << std::left << std::setw(16) << "Undamped [Hz]";
+        std::cout << std::left << std::setw(16) << "Undamped* [Hz]";
         std::cout << std::left << std::setw(16) << "Bandwidth [Hz]";
         std::cout << std::left << std::setw(16) << "Damping ratio";
         std::cout << std::left << std::setw(16) << "Q factor" << std::endl;
@@ -266,6 +266,8 @@ void eigenvalue::printeigenfrequencies(void)
             std::cout << std::left << std::setw(16) << zeta ;
             std::cout << std::left << std::setw(16) << Qf << std::endl;
         }
+        std::cout << std::endl;
+        std::cout << "*Only valid for proportional damping" << std::endl;
         std::cout << std::endl;
     }
 }
