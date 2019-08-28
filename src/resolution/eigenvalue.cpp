@@ -27,9 +27,9 @@ eigenvalue::eigenvalue(mat A, mat B)
     errorifdirichletnotremoved({A,B});
 }
 
-eigenvalue::eigenvalue(mat M, mat C, mat K)
+eigenvalue::eigenvalue(mat K, mat C, mat M)
 {
-    mymats = {M,C,K};
+    mymats = {K,C,M};
     errorifdirichletnotremoved(mymats);
 }
 
@@ -137,7 +137,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         
         Mat petscmats[mymats.size()];
         for (int i = 0; i < mymats.size(); i++)
-            petscmats[i] = mymats[mymats.size()-1-i].getpetsc();
+            petscmats[i] = mymats[i].getpetsc();
         
         PEPSetOperators( pep, mymats.size(), petscmats );
         // We assume a general problem:

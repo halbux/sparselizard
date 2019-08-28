@@ -46,9 +46,9 @@ class eigenvalue
         eigenvalue(mat A, mat B);
         
         // Define an eigenvalue problem of the form (M*lambda^2 + C*lambda + K)*u = 0:
-        eigenvalue(mat M, mat C, mat K);
+        eigenvalue(mat K, mat C, mat M);
         // Define a general polynomial eigenvalue problem of the form
-        // ... + inmats[2]*lambda^2 + inmats[1]*lambda + inmats[0].
+        // inmats[0] + inmats[1]*lambda + inmats[2]*lambda^2 + ...
         eigenvalue(std::vector<mat> inmats);
         
         void compute(int numeigenvaluestocompute, double targeteigenvaluemagnitude = 0.0);
