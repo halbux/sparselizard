@@ -75,17 +75,14 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         
         EPSSetFromOptions(eps);
         
-        
         // We use a shift and invert transform:
         ST st;
         EPSGetST(eps, &st);
         STSetType(st, STSINVERT);
         
-        
         // We target the eigenvalues with a given magnitude:
         EPSSetTarget(eps, targeteigenvaluemagnitude);
         EPSSetWhichEigenpairs(eps, EPS_TARGET_MAGNITUDE);
-        
         
         // MUMPS petsc solver context:
         KSP ksp;
@@ -95,7 +92,6 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         KSPGetPC(ksp, &pc);
         PCSetType(pc, PCLU);
         PCFactorSetMatSolverType(pc, MATSOLVERMUMPS);
-        
         
         // DO THE ACTUAL RESOLUTION:
         EPSSolve( eps );
