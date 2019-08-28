@@ -227,7 +227,12 @@ void eigenvalue::printeigenfrequencies(void)
         std::cout << std::endl << "Printing the " << count() << " eigenfrequencies [Hz]:" << std::endl << std::endl;
     
         for (int i = 0; i < count(); i++)
-            std::cout << "#" << std::left << std::setw(7) << i << std::left << std::setw(16) << std::sqrt(eigenvaluereal[i])/(2.0*pival) << std::endl;
+        {
+            std::cout << "#" << std::left << std::setw(7) << i+1 << std::left << std::setw(16) << std::sqrt(eigenvaluereal[i])/(2.0*pival);
+            if (eigenvalueimaginary[i] != 0)
+                std::cout << "Expected a real eigenvalue";
+            std::cout << std::endl;
+        }
         std::cout << std::endl;
     }
     if (mymats.size() == 3)
@@ -241,7 +246,7 @@ void eigenvalue::printeigenfrequencies(void)
         std::cout << std::left << std::setw(16) << "Damping ratio";
         std::cout << std::left << std::setw(16) << "Q factor" << std::endl;
 
-	    double fd,fud,zeta,imf,Qf,Bw;
+        double fd,fud,zeta,imf,Qf,Bw;
 
         for (int i = 0; i < count(); i++)
         {	
@@ -249,7 +254,7 @@ void eigenvalue::printeigenfrequencies(void)
 
             fd = std::abs(eigenvalueimaginary[i])/(2.0*pival);
             imf = std::abs(eigenvaluereal[i])/(2.0*pival);
-            fud = std::sqrt( std::pow(eigenvaluereal[i],2) + std::pow(eigenvalueimaginary[i],2)) ;
+            fud = std::sqrt( std::pow(eigenvaluereal[i],2) + std::pow(eigenvalueimaginary[i],2) ) ;
             zeta = -eigenvaluereal[i]/fud;
             fud = fud/(2.0*pival);
             Qf = fud/(2.0*imf);
