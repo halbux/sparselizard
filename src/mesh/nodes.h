@@ -19,7 +19,7 @@ class nodes
     private:
         
         // 'roundoffnoiselevel' quantifies the round off noise on the node coordinates:
-        double roundoffnoiselevel = 1e-10;
+        double roundoffnoiselevel = 1e-8;
         
         // Coordinates of every node. Format is [x1 y1 z1 x2 y2 z2 ... ].
         std::vector<double> mycoordinates = {};
