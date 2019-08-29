@@ -85,6 +85,7 @@ class elements
         
         void shift(double xshift, double yshift, double zshift);
         void rotate(double alphax, double alphay, double alphaz);
+        void scale(double xscale, double yscale, double zscale);
         
         // 'getsubelement' returns the number of the 'subelementindex'th 
         // subelement of type 'subelementtypenumber' in element number 

@@ -38,6 +38,7 @@ class nodes
         
         void shift(double xshift, double yshift, double zshift);
         void rotate(double alphax, double alphay, double alphaz);
+        void scale(double xscale, double yscale, double zscale);
         
         // Print node coordinates for debugging:
         void print(void);
