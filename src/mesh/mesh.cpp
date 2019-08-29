@@ -323,6 +323,12 @@ void mesh::rotate(double ax, double ay, double az)
     myelements.rotate(ax, ay, az);
 }
 
+void mesh::scale(double x, double y, double z)
+{
+    mynodes.scale(x, y, z);
+    myelements.scale(x, y, z);
+}
+
 int mesh::getmeshdimension(void)
 {
     int maxelementdimension = -1;

@@ -41,6 +41,18 @@ void nodes::rotate(double alphax, double alphay, double alphaz)
     geotools::rotate(alphax, alphay, alphaz, &mycoordinates);
 }
 
+void nodes::scale(double xscale, double yscale, double zscale)
+{
+    int numberofnodes = count();
+    
+    for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
+    {
+        mycoordinates[3*nodenumber+0] *= xscale;
+        mycoordinates[3*nodenumber+1] *= yscale;
+        mycoordinates[3*nodenumber+2] *= zscale;
+    }
+}
+
 void nodes::print(void)
 {
     std::cout << "Number of nodes: " << count() << std::endl;

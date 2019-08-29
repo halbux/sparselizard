@@ -63,6 +63,19 @@ void elements::rotate(double alphax, double alphay, double alphaz)
     }
 }
 
+void elements::scale(double xscale, double yscale, double zscale)
+{
+    for (int i = 0; i < barycenters.size(); i++)
+    {
+        for (int j = 0; j < barycenters[i].size()/3; j++)
+        {
+            barycenters[i][3*j+0] *= xscale;
+            barycenters[i][3*j+1] *= yscale;
+            barycenters[i][3*j+2] *= zscale;
+        }
+    }
+}
+
 int elements::getsubelement(int subelementtypenumber, int elementtypenumber, int elementnumber, int subelementindex)
 {
     if (elementtypenumber == subelementtypenumber)
