@@ -66,7 +66,7 @@ void sparselizard(void)
     // Loop on all eigenvectors found:
     for (int i = 0; i < myrealeigenvectors.size(); i++)
     {
-        // Transfer the data from the ith eigenvector to field u.
+        // Transfer the data from the ith eigenvector to field u:
         u.setdata(vol, myrealeigenvectors[i]);
         // Write the deflection on the membrane with an order 2 interpolation:
         u.write(vol, "u"+std::to_string(i)+".vtk", 2);
