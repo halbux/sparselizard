@@ -60,10 +60,6 @@ void sparselizard(void)
     // Print the eigenfrequencies:
     eig.printeigenfrequencies();
 
-    // Create a harmonic field to store the real and imaginary eigenvector part:
-    field ueig("h1xyz", {2,3});
-    ueig.setorder(vol, 2);
-
     // The eigenvectors are real thus we only need the real part:
     std::vector<vec> myrealeigenvectors = eig.geteigenvectorrealpart();
     std::vector<vec> myimageigenvectors = eig.geteigenvectorimaginarypart();
@@ -71,12 +67,10 @@ void sparselizard(void)
     // Loop on all eigenvectors found:
     for (int i = 0; i < myrealeigenvectors.size(); i++)
     {
-        // Transfer the data from the ith eigenvector to field ueig.
-        // Use |u to select field u in the vector structure since ueig is not part of it:
-        ueig.harmonic(2).setdata(vol, myrealeigenvectors[i]|u);
-        ueig.harmonic(3).setdata(vol, myimageigenvectors[i]|u);
+        // Transfer the data from the ith eigenvector to field u.
+        u.setdata(vol, myrealeigenvectors[i]);
         // Write the deflection on the top surface of the membrane with an order 2 interpolation:
-        ueig.write(vol, "ueig"+std::to_string(i)+".vtk", 2);
+        u.write(vol, "u"+std::to_string(i)+".vtk", 2);
     }
 
     // Code validation line. Can be removed.
