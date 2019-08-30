@@ -1,6 +1,5 @@
 // This code gives the mechanical vibration eigenfrequencies and eigenmodes of a 
 // 3D disk that is clamped at its outer face and subject to proportional damping.
-// A second order polynomial eigenvalue problem is solved.
 
 
 #include "sparselizardbase.h"
