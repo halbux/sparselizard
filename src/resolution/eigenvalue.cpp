@@ -162,7 +162,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         KSPGetPC(ksp, &pc);
         PCSetType(pc, PCLU);
 
-        PEPSTOARSetDetectZeros(pep,PETSC_TRUE); 
+        PEPSTOARSetDetectZeros(pep,PETSC_TRUE);
+        PEPSetScale(pep, PEP_SCALE_SCALAR, PETSC_DECIDE, PETSC_NULL, PETSC_NULL, PETSC_DECIDE, PETSC_DECIDE);
 
         PCFactorSetMatSolverType(pc, MATSOLVERMUMPS);
         PEPSetFromOptions(pep);
