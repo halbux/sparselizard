@@ -59,7 +59,7 @@ void sparselizard(void)
     // Print the eigenfrequencies:
     eig.printeigenfrequencies();
 
-    // The eigenvectors are real thus we only need the real part:
+    // The eigenvectors are real only in the undamped case:
     std::vector<vec> myrealeigenvectors = eig.geteigenvectorrealpart();
     std::vector<vec> myimageigenvectors = eig.geteigenvectorimaginarypart();
 
