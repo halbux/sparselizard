@@ -48,6 +48,8 @@ void sparselizard(void)
 
     // Proportional damping:
     double alpha = 0.00003, beta = 0.00006;
+    // This defines the damping matrix C. It can alternatively be obtained with elasticity.C()
+    // after having defined an additional damping term (i.e. a term with a dt(dof(u))) in the formulation.
     mat C = alpha*M + beta*K;
 
     // Create the object to solve the second order polynomial eigenvalue problem (M*lambda^2 + C*lambda + K)u = 0 :
