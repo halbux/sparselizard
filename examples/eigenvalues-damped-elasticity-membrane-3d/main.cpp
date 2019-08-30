@@ -28,6 +28,9 @@ void sparselizard(void)
     // E is Young's modulus. nu is Poisson's ratio. rho is the volumic mass.
     parameter E, nu, rho;
     E|vol = 150e9; nu|vol = 0.3; rho|vol = 2330;
+    
+    // Proportional damping C = alpha*M + beta*K:
+    double alpha = 100, beta = 0.00006;
 
     formulation elasticity;
 
@@ -35,22 +38,26 @@ void sparselizard(void)
     elasticity += integral(vol, predefinedelasticity(dof(u), tf(u), E, nu));
     // Add the inertia terms:
     elasticity += integral(vol, -rho*dtdt(dof(u))*tf(u));
+    // Add the proportional damping terms to get damping matrix C = alpha*M + beta*K. 
+    // The mechanical equation can be written as M*dtdt(u) + C*dt(u) + K*u = 0.
+    // All terms with a first order time derivative on the dof are added to C.
+    elasticity += integral(vol, alpha * -rho*dt(dof(u))*tf(u));
+    elasticity += integral(vol, beta * predefinedelasticity(dt(dof(u)), tf(u), E, nu));
 
     elasticity.generate();
 
-    // Get the stiffness and mass matrix:
+    // Get the stiffness, damping and mass matrix:
     mat K = elasticity.K();
+    mat C = elasticity.C();
     mat M = elasticity.M();
 
     // Remove the rows and columns corresponding to the 0 constraints:
     K.removeconstraints();
+    C.removeconstraints();
     M.removeconstraints();
 
-    // Proportional damping:
-    double alpha = 0.00003, beta = 0.00006;
-    // This defines the damping matrix C. It can alternatively be obtained with elasticity.C()
-    // after having defined an additional damping term (i.e. a term with a dt(dof(u))) in the formulation.
-    mat C = alpha*M + beta*K;
+    // In case of proportional damping this yields the same results:
+    // C = alpha*M + beta*K;
 
     // Create the object to solve the second order polynomial eigenvalue problem (M*lambda^2 + C*lambda + K)u = 0 :
     eigenvalue eig(K, C, M); // Replace by eig(K, M) for an undamped simulation
@@ -76,7 +83,7 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     double checkval = eig.geteigenvaluerealpart()[1]*myimageigenvectors[3].norm();
-    std::cout << (checkval > -0.0021397 && checkval < -0.0021396);
+    std::cout << (checkval > -0.0029259 && checkval < -0.00292588);
 }
 
 int main(void)
