@@ -50,7 +50,7 @@ void sparselizard(void)
     double alpha = 0.00003, beta = 0.00006;
     mat C = alpha*M + beta*K;
 
-    // Create the object to solve the second order polynomial eigenvalue problem (M*lambda^2 + C*lamda + K)x = 0 :
+    // Create the object to solve the second order polynomial eigenvalue problem (M*lambda^2 + C*lambda + K)u = 0 :
     eigenvalue eig(K, C, M); // Replace by eig(K, M) for an undamped simulation
 
     // Compute the 10 eigenvalues closest to the target magnitude 0.0 (i.e. the 10 first ones):
