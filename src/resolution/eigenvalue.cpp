@@ -239,7 +239,7 @@ void eigenvalue::printeigenfrequencies(void)
         std::cout << "        ";
         std::cout << std::left << std::setw(16)<<  "Damped [Hz]"  ;
         std::cout << std::left << std::setw(16) << "Undamped* [Hz]";
-        std::cout << std::left << std::setw(16) << "Bandwidth [Hz]";
+        std::cout << std::left << std::setw(16) << "Bandwidth** [Hz]";
         std::cout << std::left << std::setw(16) << "Damping ratio";
         std::cout << std::left << std::setw(16) << "Q factor" << std::endl;
 
@@ -265,6 +265,7 @@ void eigenvalue::printeigenfrequencies(void)
         }
         std::cout << std::endl;
         std::cout << "*Only valid for proportional damping" << std::endl;
+        std::cout << "**-3dB bandwidth (at half power, 71% of peak signal)" << std::endl;
         std::cout << std::endl;
     }
 }
