@@ -237,11 +237,11 @@ void eigenvalue::printeigenfrequencies(void)
         std::cout << std::endl << "Printing the " << count() << " eigenfrequencies:" << std::endl << std::endl;
 
         std::cout << "        ";
-        std::cout << std::left << std::setw(16)<<  "Damped [Hz]"  ;
-        std::cout << std::left << std::setw(16) << "Undamped* [Hz]";
-        std::cout << std::left << std::setw(16) << "Bandwidth** [Hz]";
-        std::cout << std::left << std::setw(16) << "Damping ratio";
-        std::cout << std::left << std::setw(16) << "Q factor" << std::endl;
+        std::cout << std::left << std::setw(16)<<  " Damped [Hz]"  ;
+        std::cout << std::left << std::setw(16) << " Undamped* [Hz]";
+        std::cout << std::left << std::setw(16) << " Bandwidth** [Hz]";
+        std::cout << std::left << std::setw(16) << " Damping ratio";
+        std::cout << std::left << std::setw(16) << " Q factor" << std::endl;
 
         double fd,fud,zeta,imf,Qf,Bw;
 
@@ -257,10 +257,10 @@ void eigenvalue::printeigenfrequencies(void)
             Qf = fud/(2.0*imf);
             Bw = fd/Qf;
 
-            std::cout << fd << std::left << std::setw(16);
-            std::cout << std::left << std::setw(16)<< fud;
-            std::cout << std::left << std::setw(16) << Bw;
-            std::cout << std::left << std::setw(16) << zeta ;
+            std::cout << fd << std::left << std::setw(16) << " ";
+            std::cout << std::left << std::setw(16) << fud << " ";
+            std::cout << std::left << std::setw(16) << Bw << " ";
+            std::cout << std::left << std::setw(16) << zeta << " ";
             std::cout << std::left << std::setw(16) << Qf << std::endl;
         }
         std::cout << std::endl;
