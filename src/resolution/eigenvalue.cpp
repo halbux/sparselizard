@@ -237,7 +237,7 @@ void eigenvalue::printeigenfrequencies(void)
         std::cout << std::endl << "Printing the " << count() << " eigenfrequencies:" << std::endl << std::endl;
 
         std::cout << "        ";
-        std::cout << std::left << std::setw(17) << "Damped [Hz]"  ;
+        std::cout << std::left << std::setw(17) << "Damped [Hz]";
         std::cout << std::left << std::setw(17) << "Undamped* [Hz]";
         std::cout << std::left << std::setw(17) << "Bandwidth** [Hz]";
         std::cout << std::left << std::setw(17) << "Damping ratio";
