@@ -265,7 +265,7 @@ void eigenvalue::printeigenfrequencies(void)
         }
         std::cout << std::endl;
         std::cout << "*Only valid for proportional damping" << std::endl;
-        std::cout << "**-3dB bandwidth (at half power, 71% of peak signal)" << std::endl;
+        std::cout << "**At -3dB (71% of peak signal)" << std::endl;
         std::cout << std::endl;
     }
 }
