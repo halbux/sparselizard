@@ -257,11 +257,11 @@ void eigenvalue::printeigenfrequencies(void)
             Qf = fud/(2.0*imf);
             Bw = fd/Qf;
 
-            std::cout << fd << std::left << std::setw(16) << " ";
-            std::cout << std::left << std::setw(16) << fud << " ";
-            std::cout << std::left << std::setw(16) << Bw << " ";
-            std::cout << std::left << std::setw(16) << zeta << " ";
-            std::cout << std::left << std::setw(16) << Qf << std::endl;
+            std::cout << " " << fd << std::left << std::setw(16);
+            std::cout << " " << std::left << std::setw(16) << fud;
+            std::cout << " " << std::left << std::setw(16) << Bw;
+            std::cout << " " << std::left << std::setw(16) << zeta;
+            std::cout << " " << std::left << std::setw(16) << Qf << std::endl;
         }
         std::cout << std::endl;
         std::cout << "*Only valid for proportional damping" << std::endl;
