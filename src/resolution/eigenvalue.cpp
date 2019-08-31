@@ -247,17 +247,17 @@ void eigenvalue::printeigenfrequencies(void)
 
         for (int i = 0; i < count(); i++)
         {	
-            std::cout << "#" << std::left << std::setw(7) << i+1 << std::left << std::setw(17);
+            std::cout << "#" << std::left << std::setw(7) << i+1;
 
             fd = std::abs(eigenvalueimaginary[i])/(2.0*pival);
             imf = std::abs(eigenvaluereal[i])/(2.0*pival);
-            fud = std::sqrt( std::pow(eigenvaluereal[i],2) + std::pow(eigenvalueimaginary[i],2) ) ;
+            fud = std::sqrt( std::pow(eigenvaluereal[i],2.0) + std::pow(eigenvalueimaginary[i],2.0) ) ;
             zeta = -eigenvaluereal[i]/fud;
             fud = fud/(2.0*pival);
             Qf = fud/(2.0*imf);
             Bw = fd/Qf;
 
-            std::cout << fd << std::left << std::setw(17);
+            std::cout << std::left << std::setw(17) << fd;
             std::cout << std::left << std::setw(17) << fud;
             std::cout << std::left << std::setw(17) << Bw;
             std::cout << std::left << std::setw(17) << zeta;
