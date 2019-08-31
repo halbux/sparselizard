@@ -237,17 +237,17 @@ void eigenvalue::printeigenfrequencies(void)
         std::cout << std::endl << "Printing the " << count() << " eigenfrequencies:" << std::endl << std::endl;
 
         std::cout << "        ";
-        std::cout << std::left << std::setw(16)<<  " Damped [Hz]"  ;
-        std::cout << std::left << std::setw(16) << " Undamped* [Hz]";
-        std::cout << std::left << std::setw(16) << " Bandwidth** [Hz]";
-        std::cout << std::left << std::setw(16) << " Damping ratio";
-        std::cout << std::left << std::setw(16) << " Q factor" << std::endl;
+        std::cout << std::left << std::setw(17)<<  "Damped [Hz]"  ;
+        std::cout << std::left << std::setw(17) << "Undamped* [Hz]";
+        std::cout << std::left << std::setw(17) << "Bandwidth** [Hz]";
+        std::cout << std::left << std::setw(17) << "Damping ratio";
+        std::cout << std::left << std::setw(17) << "Q factor" << std::endl;
 
         double fd,fud,zeta,imf,Qf,Bw;
 
         for (int i = 0; i < count(); i++)
         {	
-            std::cout << "#" << std::left << std::setw(7) << i+1 << std::left << std::setw(16);
+            std::cout << "#" << std::left << std::setw(7) << i+1 << std::left << std::setw(17);
 
             fd = std::abs(eigenvalueimaginary[i])/(2.0*pival);
             imf = std::abs(eigenvaluereal[i])/(2.0*pival);
@@ -257,11 +257,11 @@ void eigenvalue::printeigenfrequencies(void)
             Qf = fud/(2.0*imf);
             Bw = fd/Qf;
 
-            std::cout << " " << fd << std::left << std::setw(16);
-            std::cout << " " << std::left << std::setw(16) << fud;
-            std::cout << " " << std::left << std::setw(16) << Bw;
-            std::cout << " " << std::left << std::setw(16) << zeta;
-            std::cout << " " << std::left << std::setw(16) << Qf << std::endl;
+            std::cout << fd << std::left << std::setw(17);
+            std::cout << std::left << std::setw(17) << fud;
+            std::cout << std::left << std::setw(17) << Bw;
+            std::cout << std::left << std::setw(17) << zeta;
+            std::cout << std::left << std::setw(17) << Qf << std::endl;
         }
         std::cout << std::endl;
         std::cout << "*Only valid for proportional damping" << std::endl;
