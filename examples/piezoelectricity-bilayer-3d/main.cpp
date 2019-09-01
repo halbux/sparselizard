@@ -32,9 +32,6 @@ void sparselizard(void)
     
     // Clamp on surface 'sur' (i.e. 0 valued-Dirichlet conditions):
     u.setconstraint(clamp);
-    // To force a displacement and see the resulting electric potential you could use:
-    // u.compx().setconstraint(freeside, 1e-8);
-    // u.setconstraint(freeside, array3x1(1e-8,1.5e-8,0.8e-8));
     
     v.harmonic(2).setconstraint(electrode, 10);	
     v.setconstraint(ground, 0);	
