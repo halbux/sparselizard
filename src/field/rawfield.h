@@ -119,10 +119,12 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::string gettypename(void) { return mytypename; };
 
         void setorder(int physreg, int interpolorder);
+        
         void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:
         void setvalue(int physreg);
-        void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
+        
+        void setconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
         

@@ -82,6 +82,11 @@ class field
         // Use the default order + 'extraintegrationdegree' to 
         // compute the finite element discretisation of 'input'.
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
+        // The 'input' expression is evaluated on the mesh deformed by 'meshdeform':
+        void setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree = 0);
+        // An FFT is used to project the 'input' expression:
+        void setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree = 0);
+        void setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree = 0);
         // Set an homogeneous Dirichlet constraint.
         void setconstraint(int physreg);
 

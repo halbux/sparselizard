@@ -217,7 +217,7 @@ void sparselizard(void)
     (scaling*p).write(fluid, "p.pos", 3, 50);
     
     // Code validation line. Can be removed.
-    std::cout << (solup.norm() < 0.000276 && solup.norm() > 0.000275);
+    std::cout << (solup.norm() < 0.0002539 && solup.norm() > 0.0002537);
 }
 
 int main(void)
