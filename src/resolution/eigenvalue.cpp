@@ -218,10 +218,7 @@ void eigenvalue::printeigenvalues(void)
 void eigenvalue::printeigenfrequencies(void)
 {   
     if (count() == 0)
-    {
-        std::cout << "No eigenfrequency data to print" << std::endl;
         return;
-    }
 
     double pival = 3.1415926535897932384;
 
