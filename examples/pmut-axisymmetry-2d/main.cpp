@@ -80,7 +80,7 @@ void sparselizard(void)
     // Clamp on the clamp region:
     u.setconstraint(clamp);
 
-    v.setconstraint(electrode, 1);
+    v.harmonic(2).setconstraint(electrode, 1);
     v.setconstraint(ground, 0);
 
     // Young's modulus [Pa], Poisson's ratio [] (for isotropic materials) and the density [kg/m^3]:
