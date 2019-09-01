@@ -77,7 +77,10 @@ void field::setvalue(int physreg, int numfftharms, expression input, int extrain
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree); }
 void field::setvalue(int physreg) { rawfieldptr->setvalue(physreg); }
 
-void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree); }
 void field::setconstraint(int physreg) { rawfieldptr->setconstraint(physreg); }
 
 void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr) { rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr); }

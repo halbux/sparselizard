@@ -243,9 +243,9 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
         // Compute the projection of the expression (skip for a zero expression):
         formulation projectedvalue;
         if (meshdeform == NULL)
-            projectedvalue += integration(physreg, numfftharms, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
+            projectedvalue += integration(physreg, numfftharms, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree);
         else
-            projectedvalue += integration(physreg, numfftharms, *meshdeform, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree);
+            projectedvalue += integration(physreg, numfftharms, *meshdeform, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree);
         // Define an all-zero vector:
         vec solvec(projectedvalue);
         if (input.iszero() == false)
@@ -274,7 +274,7 @@ void rawfield::setvalue(int physreg)
     }
 }
 
-void rawfield::setconstraint(int physreg, expression input, int extraintegrationdegree)
+void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
@@ -289,27 +289,40 @@ void rawfield::setconstraint(int physreg, expression input, int extraintegration
         
     // Set the constraints on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setconstraint(physreg, input.at(i,0), extraintegrationdegree);
-    // Set the constraints on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
-    {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setconstraint(physreg, input, extraintegrationdegree);
-    }
-    
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+        mysubfields[i][0]->setconstraint(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
+        
+    if (mysubfields.size() == 0)
     {
         // Consider ALL disjoint regions in the physical region with (-1):
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
         field thisfield(getpointer());
-        std::shared_ptr<integration> constraintcomputation(new integration(physreg, mathop::transpose(mathop::dof(thisfield))*mathop::tf(thisfield) - mathop::transpose(mathop::tf(thisfield))*input, extraintegrationdegree));
+        std::shared_ptr<integration> constraintcomputation;
+        
+        if (meshdeform == NULL)
+            constraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree));
+        else
+            constraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree));
         
         if (input.iszero())
             constraintcomputation->isprojectionofzero = true;
-        
-        for (int i = 0; i < selecteddisjregs.size(); i++)
-            myconstraints[selecteddisjregs[i]] = constraintcomputation;
+            
+        if (myharmonics.size() == 0)
+        {
+            for (int i = 0; i < selecteddisjregs.size(); i++)
+                myconstraints[selecteddisjregs[i]] = constraintcomputation;
+        }
+        else
+        {
+            for (int h = 0; h < myharmonics.size(); h++)
+            {
+                if (myharmonics[h].size() > 0)
+                {
+                    for (int i = 0; i < selecteddisjregs.size(); i++)
+                        myharmonics[h][0]->myconstraints[selecteddisjregs[i]] = constraintcomputation;
+                }
+            }
+        }
     }
 }
 
@@ -318,13 +331,13 @@ void rawfield::setconstraint(int physreg)
     switch (countcomponents())
     {
         case 1:
-            setconstraint(physreg, 0);
+            setconstraint(physreg, -1, NULL, 0);
             break;
         case 2:
-            setconstraint(physreg, expression(2,1,{0,0}));
+            setconstraint(physreg, -1, NULL, expression(2,1,{0,0}));
             break;
         case 3:
-            setconstraint(physreg, expression(3,1,{0,0,0}));
+            setconstraint(physreg, -1, NULL, expression(3,1,{0,0,0}));
             break;
     }
 }
