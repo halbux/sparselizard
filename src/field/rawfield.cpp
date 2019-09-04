@@ -1119,7 +1119,10 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     int numrows = numcurvednodes;
     int numcols = elementlist.size();
 
-    std::vector<densematrix> coefmatrix(problemdimension, densematrix(numrows, numcols));
+    std::vector<densematrix> coefmatrix(problemdimension);
+    for (int d = 0; d < problemdimension; d++)
+        coefmatrix[d] = densematrix(numrows, numcols);
+        
     std::vector<double*> coefs(problemdimension);
     for (int d = 0; d < problemdimension; d++)
         coefs[d] = coefmatrix[d].getvalues();
@@ -1146,7 +1149,6 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     for (int ed = 0; ed < elementdimension; ed++)
         myformfunctionvalue[ed] = mylagrange.getderivative(1+ed);
 
-    std::vector<int> elemindexes = elemselect.getelementindexes();
     for (int ed = 0; ed < elementdimension; ed++)
     {
         for (int d = 0; d < problemdimension; d++)
