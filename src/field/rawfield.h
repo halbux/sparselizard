@@ -181,6 +181,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<double> loadraw(std::string filename, bool isbinary);
         
 
+		// Return {dkix,dkiy,...,detax,detay,...}:
+        std::vector<densematrix> getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+
+
         // This interpolate is called in practice:
         std::vector<std::vector<densematrix>> interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
         
