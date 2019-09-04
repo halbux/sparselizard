@@ -1144,7 +1144,7 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     lagrangeformfunction mylagrange(elementtypenumber, myelements->getcurvatureorder(), evaluationcoordinates);
     std::vector<densematrix> myformfunctionvalue(elementdimension);
     for (int ed = 0; ed < elementdimension; ed++)
-        myformfunctionvalue[ed] = mylagrange.getderivative(ed);
+        myformfunctionvalue[ed] = mylagrange.getderivative(1+ed);
 
     std::vector<int> elemindexes = elemselect.getelementindexes();
     for (int ed = 0; ed < elementdimension; ed++)
