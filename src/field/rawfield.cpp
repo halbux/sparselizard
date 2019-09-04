@@ -1090,6 +1090,94 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     }
     return extradata;
 }
+
+
+std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+{
+    int elementdimension = elemselect.getelementdimension();
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int numberofelements = elemselect.countinselection();
+    int numberofgausspoints = evaluationcoordinates.size()/3;
+    
+    std::vector<densematrix> output(elementdimension*problemdimension);
+    for (int i = 0; i < output.size(); i++)
+        output[i] = densematrix(numberofelements,numberofgausspoints);
+    
+
+    elements* myelements = universe::mymesh->getelements();
+
+    // Get all disjoint regions in the element selector:
+    std::vector<int> alldisjregs = elemselect.getdisjointregions();
+
+    // Group disj. regs. with same element type number (interpolation orders are all identical here).
+    disjointregionselector mydisjregselector(alldisjregs, {});
+    for (int i = 0; i < mydisjregselector.countgroups(); i++)
+    {
+        std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
+
+        elemselect.selectdisjointregions(mydisjregs);
+        if (elemselect.countinselection() == 0)
+            continue;
+
+        int elementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjregs[0]);
+        std::vector<int> elementlist = elemselect.getelementnumbers();
+
+
+        // Get all node coordinates:
+        std::vector<double>* mynodecoordinates = universe::mymesh->getnodes()->getcoordinates();
+
+        element myelement(elementtypenumber, myelements->getcurvatureorder());        
+        int numcurvednodes = myelement.countcurvednodes();
+
+        int numrows = numcurvednodes;
+        int numcols = elementlist.size();
+
+        std::vector<densematrix> coefmatrix(problemdimension, densematrix(numrows, numcols));
+        std::vector<double*> coefs(problemdimension);
+        for (int d = 0; d < problemdimension; d++)
+            coefs[d] = coefmatrix[d].getvalues();
+
+        for (int num = 0; num < numcurvednodes; num++)
+        {
+            for (int i = 0; i < elementlist.size(); i++)
+            {
+                int elem = elementlist[i];
+                // Get the node to which the current form function is associated:
+                int currentnode = myelements->getsubelement(0, elementtypenumber, elem, num);
+
+                for (int d = 0; d < problemdimension; d++)
+                    coefs[d][num*numcols+i] = mynodecoordinates->at(3*currentnode+d);
+            }
+        }
+        for (int d = 0; d < problemdimension; d++)
+            coefmatrix[d].transpose();
+
+
+        // Compute the form functions evaluated at the evaluation points:
+        lagrangeformfunction mylagrange(elementtypenumber, myelements->getcurvatureorder(), evaluationcoordinates);
+        std::vector<densematrix> myformfunctionvalue(elementdimension);
+        for (int ed = 0; ed < elementdimension; ed++)
+            myformfunctionvalue[ed] = mylagrange.getderivative(ed);
+
+        std::vector<int> elemindexes = elemselect.getelementindexes();
+        for (int ed = 0; ed < elementdimension; ed++)
+        {
+            for (int d = 0; d < problemdimension; d++)
+            {
+                densematrix currentinterp = coefmatrix[d].multiply(myformfunctionvalue[ed]);
+                // In case there is a single disjoint region group there is not need to insert:
+                if (mydisjregselector.countgroups() == 1)
+                    output[ed*problemdimension+d] = currentinterp;
+                else
+                    output[ed*problemdimension+d].insertatrows(elemindexes, currentinterp);
+            }
+        }
+    }
+    // Unselect the disjoint regions:
+    elemselect.selectdisjointregions({});
+    
+    return output;
+}
         
 
 std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
