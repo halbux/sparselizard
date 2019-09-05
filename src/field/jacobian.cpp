@@ -3,7 +3,10 @@
 
 jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationcoordinates, expression* meshdeform)
 {
-    field x("x"), y("y"), z("z");
+    rawfield rf;
+    std::vector<densematrix> calced = rf.getjacterms(elemselect, evaluationcoordinates);
+    
+    field x("x");
 
     int elementdimension = elemselect.getelementdimension();
     int numberofelements = elemselect.countinselection();
@@ -65,9 +68,9 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 // a length 1 in dimension 2 and a length 1 in dimension 3. 
                 // This does not affect the determinant value, which is just multiplied by 1 x 1.
 
-                jac[3*0+0] = (x.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+1] = (y.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+2] = (z.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
+                jac[3*0+0] = calced[0]; 
+                jac[3*0+1] = calced[1];
+                jac[3*0+2] = calced[2];
                 jac[3*1+0] = densematrix(numberofelements,numberofgausspoints);
                 jac[3*1+1] = densematrix(numberofelements,numberofgausspoints);
                 jac[3*1+2] = densematrix(numberofelements,numberofgausspoints);
@@ -151,17 +154,15 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 // 1D element a length 1 in dimension 2. 
                 // This does not affect the determinant value, which is just multiplied by 1.
                     
-                jac[3*0+0] = (x.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+1] = (y.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+0] = (x.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+1] = (y.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
+                jac[3*0+0] = calced[0]; 
+                jac[3*0+1] = calced[1];
+                jac[3*1+0] = densematrix(numberofelements,numberofgausspoints);
+                jac[3*1+1] = densematrix(numberofelements,numberofgausspoints);
 
                 if (meshdeform != NULL)
                 {
                     jac[3*0+0].add((meshdeform->getoperationinarray(0,0)->interpolate(1, elemselect, evaluationcoordinates))[1][0]);
                     jac[3*0+1].add((meshdeform->getoperationinarray(1,0)->interpolate(1, elemselect, evaluationcoordinates))[1][0]);
-                    jac[3*1+0].add((meshdeform->getoperationinarray(0,0)->interpolate(2, elemselect, evaluationcoordinates))[1][0]);
-                    jac[3*1+1].add((meshdeform->getoperationinarray(1,0)->interpolate(2, elemselect, evaluationcoordinates))[1][0]);
                 }
                 
                 jac11 = jac[3*0+0].getvalues();
@@ -194,12 +195,12 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 // a thickness of 1 in the third dimension which does not affect the
                 // determinant value which is just multiplied by 1.
                 
-                jac[3*0+0] = (x.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+1] = (y.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+2] = (z.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+0] = (x.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+1] = (y.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+2] = (z.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
+                jac[3*0+0] = calced[0]; 
+                jac[3*0+1] = calced[1];
+                jac[3*0+2] = calced[2];
+                jac[3*1+0] = calced[3];
+                jac[3*1+1] = calced[4];
+                jac[3*1+2] = calced[5];
                 jac[3*2+0] = densematrix(numberofelements,numberofgausspoints);
                 jac[3*2+1] = densematrix(numberofelements,numberofgausspoints);
                 jac[3*2+2] = densematrix(numberofelements,numberofgausspoints);
@@ -248,7 +249,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
         {
             case 1:
 
-                jac[3*0+0] = (x.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
+                jac[3*0+0] = calced[0]; 
                 
                 if (meshdeform != NULL)
                     jac[3*0+0].add((meshdeform->getoperationinarray(0,0)->interpolate(1, elemselect, evaluationcoordinates))[1][0]);
@@ -256,10 +257,10 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 
             case 2:
 
-                jac[3*0+0] = (x.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+1] = (y.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+0] = (x.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+1] = (y.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
+                jac[3*0+0] = calced[0]; 
+                jac[3*0+1] = calced[1];
+                jac[3*1+0] = calced[2];
+                jac[3*1+1] = calced[3];
                 
                 if (meshdeform != NULL)
                 {
@@ -272,15 +273,15 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 
             case 3:
 
-                jac[3*0+0] = (x.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+1] = (y.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*0+2] = (z.getpointer()->interpolate(1, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+0] = (x.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+1] = (y.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*1+2] = (z.getpointer()->interpolate(2, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*2+0] = (x.getpointer()->interpolate(3, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*2+1] = (y.getpointer()->interpolate(3, 0, elemselect, evaluationcoordinates))[1][0];
-                jac[3*2+2] = (z.getpointer()->interpolate(3, 0, elemselect, evaluationcoordinates))[1][0];
+                jac[3*0+0] = calced[0]; 
+                jac[3*0+1] = calced[1];
+                jac[3*0+2] = calced[2];
+                jac[3*1+0] = calced[3];
+                jac[3*1+1] = calced[4]; 
+                jac[3*1+2] = calced[5];
+                jac[3*2+0] = calced[6];
+                jac[3*2+1] = calced[7];
+                jac[3*2+2] = calced[8]; 
                 
                 if (meshdeform != NULL)
                 {

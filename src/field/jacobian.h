@@ -18,6 +18,7 @@
 #include <math.h>
 #include <memory>
 #include "field.h"
+#include "rawfield.h"
 #include "expression.h"
 #include "universe.h"
 #include "densematrix.h"
