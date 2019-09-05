@@ -32,8 +32,7 @@ void universe::forbidreuse(void)
     
     resethff();
     
-    if (forcejacobianreuse == false)
-        computedjacobian = NULL;
+    computedjacobian = NULL;
     
     oppointers = {};
     oppointersfft = {};
@@ -41,7 +40,6 @@ void universe::forbidreuse(void)
     opcomputedfft = {};
 }
 
-bool universe::forcejacobianreuse = false;
 
 shared_ptr<jacobian> universe::computedjacobian = NULL;
 

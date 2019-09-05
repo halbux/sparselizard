@@ -114,16 +114,11 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
             std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
 
             // Compute the Jacobian for the variable change to the reference element.
-            shared_ptr<jacobian> myjacobian;
-
-            if (universe::forcejacobianreuse && universe::computedjacobian != NULL)
-                myjacobian = universe::computedjacobian;
-            else
-                myjacobian = shared_ptr<jacobian>(new jacobian(myselector, evaluationpoints, meshdeformationptr));
-
+            shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeformationptr));
             densematrix detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();
+
             // Store it in the universe for reuse.
             universe::computedjacobian = myjacobian;
             universe::allowreuse();
@@ -208,7 +203,7 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
                     }
                 }
             }
-            // The Jacobian must now be recomputed: remove it from the universe.
+            // Clear all reused data from the universe.
             universe::forbidreuse();
             
             // Get the adresses of all stiffnesses in the assembled matrix.
