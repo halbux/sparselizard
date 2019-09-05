@@ -1098,16 +1098,12 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     int problemdimension = universe::mymesh->getmeshdimension();
     int numberofelements = elemselect.countinselection();
     int numberofgausspoints = evaluationcoordinates.size()/3;
+    int elementtypenumber = elemselect.getelementtypenumber();
     
     std::vector<densematrix> output(elementdimension*problemdimension);
 
     elements* myelements = universe::mymesh->getelements();
 
-    // Get all disjoint regions in the element selector.
-    // At this stage the disjoint regions all have same element types.
-    std::vector<int> alldisjregs = elemselect.getdisjointregions();
-
-    int elementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(alldisjregs[0]);
     std::vector<int> elementlist = elemselect.getelementnumbers();
 
     // Get all node coordinates:
