@@ -44,8 +44,6 @@ class universe
         static void allowreuse(void);
         // CLEANS::
         static void forbidreuse(void);
-
-        static bool forcejacobianreuse;
         
         static shared_ptr<jacobian> computedjacobian;
         
