@@ -230,6 +230,31 @@ shape shape::extrude(int physreg, double height, int numlayers)
     return shape(rawshapeptr->extrude(physreg, height, numlayers));
 }
 
+std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers)
+{
+    if (physreg.size() != height.size() || physreg.size() != numlayers.size())
+    {
+        std::cout << "Error in 'shape' object: extrude vector arguments should have the same size" << std::endl;
+        abort();
+    }
+    
+    int num = physreg.size();
+    std::vector<shape> output(num);
+
+    double zshift = 0.0;
+    for (int i = 0; i < num; i++)
+    {
+        shape curextr(rawshapeptr->duplicate()->extrude(physreg[i], height[i], numlayers[i]));
+        curextr.shift(0,0,zshift);
+        
+        zshift += height[i];
+        
+        output[i] = curextr;
+    }
+    
+    return output;
+}
+
 shape shape::duplicate(void)
 {
     errornullpointer();

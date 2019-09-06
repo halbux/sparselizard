@@ -73,6 +73,7 @@ class shape
         void rotate(double alphax, double alphay, double alphaz);
 
         shape extrude(int physreg, double height, int numlayers);
+        std::vector<shape> extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers);
 
         // Duplicate the shape and all subshapes. 
         shape duplicate(void);
