@@ -7,9 +7,9 @@ double geotools::acos(double arg)
 
     // Extra margin because of the sensitivity of acos to noise at 1 and -1:
     double tol = 1e-10;
-    if (arg >= 1-tol)
+    if (arg >= 1.0-tol)
         return 0.0;
-    if (arg <= -1+tol)
+    if (arg <= -1.0+tol)
         return pi;
 
     return std::acos(arg);
