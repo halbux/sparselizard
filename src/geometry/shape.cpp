@@ -227,7 +227,7 @@ shape shape::extrude(int physreg, double height, int numlayers)
         std::cout << "Error in 'shape' object: cannot extrude with " << numlayers << " node layers (at least two are needed)" << std::endl;
         abort();
     }
-    return shape(rawshapeptr->extrude(physreg, height, numlayers));
+    return shape(rawshapeptr->duplicate()->extrude(physreg, height, numlayers));
 }
 
 std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers)
