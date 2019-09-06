@@ -5,12 +5,14 @@ double geotools::acos(double arg)
 {
     double pi = 3.1415926535897932384;
 
-    if (arg >= 1)
+    // Extra margin because of the sensitivity of acos to noise at 1 and -1:
+    double tol = 1e-10;
+    if (arg >= 1-tol)
         return 0.0;
-    if (arg <= -1)
+    if (arg <= -1+tol)
         return pi;
-    if (std::abs(arg) < 1)
-        return std::acos(arg);
+
+    return std::acos(arg);
 }
 
 std::vector<std::shared_ptr<rawshape>> geotools::coordstopoints(std::vector<double> coords)
