@@ -1101,7 +1101,7 @@ expression mathop::predefinedacoustics(expression dofp, expression tfp, expressi
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacoustic'" << std::endl;
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacoustics'" << std::endl;
         abort();
     }
 
