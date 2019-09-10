@@ -1095,6 +1095,29 @@ expression mathop::predefinedmagnetostaticforce(std::vector<expression> dxyztfu,
     return predefinedelectrostaticforce(dxyztfu, H, mu);
 }
 
+expression mathop::predefinedacoustics(expression dofp, expression tfp, expression c, expression alpha)
+{
+    c.reuseit(); alpha.reuseit();
+
+    if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacoustic'" << std::endl;
+        abort();
+    }
+
+    if (alpha.iszero())
+        return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp );
+    
+    // Only valid for harmonic problems in case of nonzero attenuation:
+    if (universe::getfundamentalfrequency() == -1)
+    {
+        std::cout << "Error in 'mathop' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        abort();
+    }
+
+    return -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp -2.0*alpha/c*dt(dofp)*tfp -pow(alpha,2.0)*dofp*tfp;
+}
+
 expression mathop::predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
