@@ -718,7 +718,7 @@ void mathop::solve(std::vector<formulation> formuls)
 expression mathop::dbtoneper(expression toconvert)
 {
     if (toconvert.iszero())
-        return toconvert.getcopy();
+        return toconvert;
 
     return ( 0.1151292546497023 * toconvert );
 }
