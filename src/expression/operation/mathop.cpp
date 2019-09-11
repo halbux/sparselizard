@@ -1116,7 +1116,7 @@ expression mathop::predefinedacoustics(expression dofp, expression tfp, expressi
         return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::getfundamentalfrequency() == -1)
+    if (universe::fundamentalfrequency == -1)
     {
         std::cout << "Error in 'mathop' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
