@@ -715,6 +715,13 @@ void mathop::solve(std::vector<formulation> formuls)
         solve(formuls[i]);
 }
 
+expression mathop::dbtoneper(expression toconvert)
+{
+    if (toconvert.iszero())
+        return toconvert.getcopy();
+
+    return ( 0.1151292546497023 * toconvert );
+}
 
 
 ////////// PREDEFINED OPERATORS

@@ -155,6 +155,9 @@ namespace mathop
     // Generate, solve and save to field a formulation:
     void solve(formulation formul);
     void solve(std::vector<formulation> formuls);
+    
+    // Convert dB to Nepers:
+    expression dbtoneper(expression toconvert);
 
 
     ////////// PREDEFINED OPERATORS
