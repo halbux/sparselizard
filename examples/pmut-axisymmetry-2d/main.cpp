@@ -145,12 +145,9 @@ void sparselizard(void)
     // A Sommerfeld condition is used on the fluid boundary to have outgoing waves:
     pmutmodel += integral(fluidboundary, predefinedacousticradiation(dof(p), tf(p), c, 0.0));
 
-    // Elastoacoustic coupling terms:
-    //
-    // -dof(p)*tf(compy(u)) * scaling + rho*dtdt(dof(compy(u)))*tf(p) / scaling
-    //
-    // The first term is the forces applied by the fluid on the PMUT top.
-    // The second term is Newton's law: a membrane acceleration creates a
+    // Elastoacoustic coupling terms are predefined. They consists in two terms.
+    // The first term is the force applied by the fluid normal to the PMUT top.
+    // The second term comes from Newton's law: a membrane acceleration creates a
     // pressure gradient in the fluid.
     //
     // To have a good matrix conditionning the pressure source is divided by
