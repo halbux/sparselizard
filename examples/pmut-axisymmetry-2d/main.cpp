@@ -102,7 +102,10 @@ void sparselizard(void)
     rho|piezo = 1780;
     rho|topelec = 1000;
     rho|fluid = 1.2;
-
+    
+    // Attenuation alpha [Neper/m] at the considered frequency:
+    expression alpha = dbtoneper(5.4);
+    
     // Propagation speed c [m/s] and a scaling factor for numerical conditionning:
     double c = 340, scaling = 1e10;
 
@@ -141,9 +144,9 @@ void sparselizard(void)
     pmutmodel += integral(piezo, ( transpose(C)*strain(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
 
     // The wave equation is solved in the fluid:
-    pmutmodel += integral(fluid, predefinedacoustics(dof(p), tf(p), c, 0.0));
+    pmutmodel += integral(fluid, predefinedacoustics(dof(p), tf(p), c, alpha));
     // A Sommerfeld condition is used on the fluid boundary to have outgoing waves:
-    pmutmodel += integral(fluidboundary, predefinedacousticradiation(dof(p), tf(p), c, 0.0));
+    pmutmodel += integral(fluidboundary, predefinedacousticradiation(dof(p), tf(p), c, alpha));
 
     // Elastoacoustic coupling terms are predefined. They consist in two terms.
     // The first term is the pressure applied by the fluid normal to the PMUT top.
@@ -153,7 +156,7 @@ void sparselizard(void)
     // To have a good matrix conditionning the pressure source is divided by
     // the scaling factor and to compensate it multiplies the pressure force.
     // This leads to the correct membrane deflection but a pressure field divided by the scaling factor.
-    pmutmodel += integral(pmuttop, predefinedacousticstructureinteraction(dof(p), tf(p), dof(u), tf(u), c, rho, array3x1(0,1,0), 0.0, scaling));
+    pmutmodel += integral(pmuttop, predefinedacousticstructureinteraction(dof(p), tf(p), dof(u), tf(u), c, rho, array3x1(0,1,0), alpha, scaling));
 
     // Generate the algebraic matrix A and right handside vector b of 'Ax = b':
     pmutmodel.generate();
@@ -171,7 +174,7 @@ void sparselizard(void)
     (scaling*p).write(fluid, "p.vtk", 2);
     v.write(piezo, "v.vtk", 1);
     // Write p with 50 timesteps for illustration:
-    (scaling*p).write(fluid, "p.vtk", 2, 50);
+    // (scaling*p).write(fluid, "p.vtk", 2, 50);
 
     // Output the peak deflection:
     std::cout << "Peak in-phase deflection:   " << 1e9*abs(u.compy().harmonic(2)).max(solid, 6)[0] << " nm" << std::endl;
@@ -183,7 +186,7 @@ void sparselizard(void)
     clk.print("Total computation time:");
 
     // Code validation line. Can be removed.
-    std::cout << (pressureabove < 0.577405 && pressureabove > 0.577404);
+    std::cout << (pressureabove < 0.574576 && pressureabove > 0.574574);
 }
 
 // THE MESH BELOW IS FULLY STRUCTURED AND IS CREATED USING THE (BASIC) SPARSELIZARD GEOMETRY CREATION TOOL.
