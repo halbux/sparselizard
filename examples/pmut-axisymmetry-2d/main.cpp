@@ -146,7 +146,7 @@ void sparselizard(void)
     pmutmodel += integral(fluidboundary, predefinedacousticradiation(dof(p), tf(p), c, 0.0));
 
     // Elastoacoustic coupling terms are predefined. They consist in two terms.
-    // The first term is the force applied by the fluid normal to the PMUT top.
+    // The first term is the pressure applied by the fluid normal to the PMUT top.
     // The second term comes from Newton's law: a membrane acceleration creates a
     // pressure gradient in the fluid.
     //
