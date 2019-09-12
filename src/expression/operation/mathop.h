@@ -195,6 +195,8 @@ namespace mathop
     expression predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu);
 
     expression predefinedacoustics(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
+    expression predefinedacousticradiation(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
+    expression predefinedacousticstructureinteraction(expression dofp, expression tfp, expression dofu, expression tfu, expression soundspeed, expression fluiddensity, expression normal, expression neperattenuation, double scaling = 1.0);
 
     // Stokes flow for Newtonian fluids:
     expression predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs = false, bool isdensityconstant = true, bool isviscosityconstant = true);

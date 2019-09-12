@@ -141,11 +141,14 @@ void sparselizard(void)
     pmutmodel += integral(piezo, ( transpose(C)*strain(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
 
     // The wave equation is solved in the fluid:
-    pmutmodel += integral(fluid, -grad(dof(p))*grad(tf(p)) -1/pow(c,2)*dtdt(dof(p))*tf(p));
+    pmutmodel += integral(fluid, predefinedacoustics(dof(p), tf(p), c, 0.0));
     // A Sommerfeld condition is used on the fluid boundary to have outgoing waves:
-    pmutmodel += integral(fluidboundary, -1/c*dt(dof(p))*tf(p));
+    pmutmodel += integral(fluidboundary, predefinedacousticradiation(dof(p), tf(p), c, 0.0));
 
-    // Elastoacoustic coupling terms.
+    // Elastoacoustic coupling terms:
+    //
+    // -dof(p)*tf(compy(u)) * scaling + rho*dtdt(dof(compy(u)))*tf(p) / scaling
+    //
     // The first term is the forces applied by the fluid on the PMUT top.
     // The second term is Newton's law: a membrane acceleration creates a
     // pressure gradient in the fluid.
@@ -153,8 +156,7 @@ void sparselizard(void)
     // To have a good matrix conditionning the pressure source is divided by
     // the scaling factor and to compensate it multiplies the pressure force.
     // This leads to the correct membrane deflection but a pressure field divided by the scaling factor.
-    pmutmodel += integral(pmuttop, -dof(p)*tf(compy(u)) * scaling);
-    pmutmodel += integral(pmuttop, rho*dtdt(dof(compy(u)))*tf(p) / scaling);
+    pmutmodel += integral(pmuttop, predefinedacousticstructureinteraction(dof(p), tf(p), dof(u), tf(u), c, rho, array3x1(0,1,0), 0.0, scaling));
 
     // Generate the algebraic matrix A and right handside vector b of 'Ax = b':
     pmutmodel.generate();

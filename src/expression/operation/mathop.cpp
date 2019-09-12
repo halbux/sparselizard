@@ -1122,7 +1122,57 @@ expression mathop::predefinedacoustics(expression dofp, expression tfp, expressi
         abort();
     }
 
-    return -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp -2.0*alpha/c*dt(dofp)*tfp -pow(alpha,2.0)*dofp*tfp;
+    return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp -2.0*alpha/c*dt(dofp)*tfp -pow(alpha,2.0)*dofp*tfp );
+}
+
+expression mathop::predefinedacousticradiation(expression dofp, expression tfp, expression c, expression alpha)
+{
+    c.reuseit(); alpha.reuseit();
+
+    if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacousticradiation'" << std::endl;
+        abort();
+    }
+
+    if (alpha.iszero())
+        return ( -1.0/c*dt(dofp)*tfp );
+    
+    // Only valid for harmonic problems in case of nonzero attenuation:
+    if (universe::fundamentalfrequency == -1)
+    {
+        std::cout << "Error in 'mathop' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        abort();
+    }
+
+    return ( -1.0/c*dt(dofp)*tfp -alpha*dofp*tfp );
+}
+
+expression mathop::predefinedacousticstructureinteraction(expression dofp, expression tfp, expression dofu, expression tfu, expression c, expression rho, expression n, expression alpha, double scaling)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    
+    double invscal = 1.0/scaling;
+
+    c.reuseit(); rho.reuseit(); n.reuseit(); alpha.reuseit();
+
+    if (not(dofp.isscalar()) || not(tfp.isscalar()) || (dofu.countcolumns() != 1 || dofu.countrows() < problemdimension) || (tfu.countcolumns() != 1 || tfu.countrows() < problemdimension) || not(c.isscalar()) || not(rho.isscalar()) || (n.countcolumns() != 1 || n.countrows() < problemdimension) || not(alpha.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacousticstructureinteraction'" << std::endl;
+        abort();
+    }
+
+    if (alpha.iszero())
+        return ( -dofp*tfu*n * scaling + rho*dtdt(dofu)*n*tfp * invscal );
+    
+    // Only valid for harmonic problems in case of nonzero attenuation:
+    if (universe::fundamentalfrequency == -1)
+    {
+        std::cout << "Error in 'mathop' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        abort();
+    }
+
+    return ( -dofp*tfu*n * scaling + rho*dtdt(dofu)*n*tfp * invscal +2.0*alpha*rho*c*dt(dofu)*n*tfp * invscal +rho*pow(alpha*c,2.0)*dofu*n*tfp * invscal );
 }
 
 expression mathop::predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
