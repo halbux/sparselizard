@@ -103,10 +103,10 @@ void sparselizard(void)
     rho|topelec = 1000;
     rho|fluid = 1.2;
     
-    // Attenuation alpha [Neper/m] at the considered frequency:
+    // Acoustic attenuation alpha [Neper/m] at the considered frequency:
     expression alpha = dbtoneper(5.4);
     
-    // Propagation speed c [m/s] and a scaling factor for numerical conditionning:
+    // Acoustic propagation speed c [m/s] and a scaling factor for numerical conditionning:
     double c = 340, scaling = 1e10;
 
     // Diagonal relative permittivity matrix for the piezo:
