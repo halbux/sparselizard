@@ -31,17 +31,23 @@ using namespace mathop;
 
 // Arguments are:
 //
-// PMUT radius, radius of the fluid region around (should be large enough), thickness of the top metal, piezo layer and
-// bottom metal, thickness of the membrane, thickness of the cavity, electrode coverage (in %) and x-length of the pillar under the membrane.
+// PMUT radius, radius of the fluid region around (should be large enough), thickness of the top metal, piezo layer and bottom metal, 
+// thickness of the membrane, thickness of the cavity, electrode coverage (in %), x-length of the pillar under the membrane and wavelength in the fluid.
 //
-mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, double thbotelec, double thmem, double thcav, double cov, double lpillar);
+mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, double thbotelec, double thmem, double thcav, double cov, double lpillar, double wavelength);
 
 void sparselizard(void)
 {
     wallclock clk;
+    
+    // Driving frequency [Hz]:
+    double f0 = 163.1e3;
+    
+    // Acoustic propagation speed c [m/s] and a scaling factor for numerical conditionning:
+    double c = 340, scaling = 1e10;
 
     // Define the PMUT geometric dimensions [m]:
-    double r = 300e-6, rfluid = 6e-3, thtopelec = 100e-9, thpiezo = 500e-9, thbotelec = 100e-9, thmem = 15e-6, thcav = 35e-6, cov = 0.67, lpillar = 300e-6;
+    double r = 300e-6, rfluid = 20e-3, thtopelec = 100e-9, thpiezo = 500e-9, thbotelec = 100e-9, thmem = 15e-6, thcav = 35e-6, cov = 0.67, lpillar = 300e-6;
 
     // Axisymmetric assumption:
     setaxisymmetry();
@@ -50,7 +56,7 @@ void sparselizard(void)
     int piezo = 1, membrane = 2, topelec = 3, botelec = 4, pillar = 5, fluid = 6, clamp = 7, electrode = 8, fluidboundary = 9;
 
     // Create the geometry and the mesh:
-    mesh mymesh = createmesh(r, rfluid, thtopelec, thpiezo, thbotelec, thmem, thcav, cov, lpillar);
+    mesh mymesh = createmesh(r, rfluid, thtopelec, thpiezo, thbotelec, thmem, thcav, cov, lpillar, c/f0);
 
     // Write the mesh for display:
     mymesh.write("pmutaxisym.msh");
@@ -62,7 +68,7 @@ void sparselizard(void)
     int pmuttop = regionintersection({topelec,fluid});
 
     // Harmonic analysis. Set the fundamental frequency [Hz]:
-    setfundamentalfrequency(163.2e3);
+    setfundamentalfrequency(f0);
 
     // Nodal shape functions 'h1' for v (the electric potential), p (acoustic
     // pressure) and u (membrane displacement). Three components are used for u.
@@ -106,9 +112,6 @@ void sparselizard(void)
     // Acoustic attenuation alpha [Neper/m] at the considered frequency:
     expression alpha = dbtoneper(5.4);
     
-    // Acoustic propagation speed c [m/s] and a scaling factor for numerical conditionning:
-    double c = 340, scaling = 1e10;
-
     // Diagonal relative permittivity matrix for the piezo:
     expression K(3,3,{7.4,9.3,7.6});
     K = K * 8.854e-12;
@@ -173,27 +176,32 @@ void sparselizard(void)
     std::cout << "Peak quadrature deflection: " << 1e9*abs(u.compy().harmonic(3)).max(solid, 6)[0] << " nm" << std::endl;
     // Output the pressure at 'rfluid' meters above the PMUT center:
     double pressureabove = sqrt( pow(scaling*p.harmonic(2),2) + pow(scaling*p.harmonic(3),2) ).interpolate(fluid, {0,rfluid,0})[0];
+    double peakpressure = sqrt( pow(scaling*p.harmonic(2),2) + pow(scaling*p.harmonic(3),2) ).max(fluid, 5)[0];
     std::cout << "Pressure at " << 1000*rfluid << " mm above PMUT center: " << pressureabove << " Pa" << std::endl;
+    std::cout << "Peak pressure is " << peakpressure << " Pa" << std::endl;
 
     clk.print("Total computation time:");
 
     // Code validation line. Can be removed.
-    std::cout << (pressureabove < 0.574576 && pressureabove > 0.574574);
+    std::cout << (pressureabove < 0.165637 && pressureabove > 0.165635);
 }
 
 // THE MESH BELOW IS FULLY STRUCTURED AND IS CREATED USING THE (BASIC) SPARSELIZARD GEOMETRY CREATION TOOL.
 // THE ADVANTAGE OF IT IS THAT THE CODE ABOVE CAN BE CALLED FOR ANY PMUT DIMENSION WITHOUT NEEDING CALLS TO EXTERNAL MESHING SOFTWARE.
 // AS AN ALTERNATIVE, GMSH COULD HAVE BEEN USED TO EASILY DEFINE THE GEOMETRY AND CREATE A DELAUNAY MESH IN THE FLUID.
 
-mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, double thbotelec, double thmem, double thcav, double cov, double lpillar)
+mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, double thbotelec, double thmem, double thcav, double cov, double lpillar, double wavelength)
 {
     // Give names to the physical region numbers:
     int piezo = 1, membrane = 2, topelec = 3, botelec = 4, pillar = 5, fluid = 6, clamp = 7, electrode = 8, fluidboundary = 9;
 
     // Number of mesh layers:
-    int nxpmut = 20, nzthick = 10, nzthin = 5, nair = 50;
-    int nxpillar = nxpmut*(r+lpillar)/r;
-
+    int nxpmut = 30, nzthick = 10, nzthin = 5;
+    int nxpillar = nxpmut*lpillar/r;
+    
+    // Calculate the number of fluid elements to have about 10 elements per wavelength:
+    int nair = std::ceil(10.0 * rfluid/wavelength);
+    
     // Cavity layer:
     double h = -(thcav+thmem+thbotelec+thpiezo+thtopelec);
     shape q13("quadrangle", pillar, {r,h,0, r+lpillar,h,0, r+lpillar,h+thcav,0, r,h+thcav,0}, {nxpillar, nzthick, nxpillar, nzthick});
@@ -231,7 +239,6 @@ mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, doubl
     shape q61("quadrangle", fluid, {0,0,0, r*cov,0,0, r*cov,r+lpillar,0, 0,r+lpillar,0}, {int(nxpmut*cov), int(nxpmut*(r+lpillar)/r), int(nxpmut*cov), int(nxpmut*(r+lpillar)/r)});
     shape q62("quadrangle", fluid, {r*cov,0,0, r,0,0, r,r+lpillar,0, r*cov,r+lpillar,0}, {int(nxpmut*(1-cov)), int(nxpmut*(r+lpillar)/r), int(nxpmut*(1-cov)), int(nxpmut*(r+lpillar)/r)});
     shape q63("quadrangle", fluid, {r,0,0, r+lpillar,0,0, r+lpillar,r+lpillar,0, r,r+lpillar,0}, {nxpillar, int(nxpmut*(r+lpillar)/r), nxpillar, int(nxpmut*(r+lpillar)/r)});
-
 
     shape l1 = q61.getsons()[2];
     shape l2("line", -1, {r*cov,r+lpillar,0, r*cov,sqrt(pow(rfluid,2)-pow(r*cov,2)),0}, nair);
