@@ -41,7 +41,7 @@ void sparselizard(void)
     wallclock clk;
     
     // Driving frequency [Hz]:
-    double f0 = 163.1e3;
+    double f0 = 165.31e3;
     
     // Acoustic propagation speed c [m/s] and a scaling factor for numerical conditionning:
     double c = 340, scaling = 1e10;
@@ -183,7 +183,7 @@ void sparselizard(void)
     clk.print("Total computation time:");
 
     // Code validation line. Can be removed.
-    std::cout << (pressureabove < 0.165637 && pressureabove > 0.165635);
+    std::cout << (pressureabove < 0.16326 && pressureabove > 0.16324);
 }
 
 // THE MESH BELOW IS FULLY STRUCTURED AND IS CREATED USING THE (BASIC) SPARSELIZARD GEOMETRY CREATION TOOL.
@@ -196,7 +196,7 @@ mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, doubl
     int piezo = 1, membrane = 2, topelec = 3, botelec = 4, pillar = 5, fluid = 6, clamp = 7, electrode = 8, fluidboundary = 9;
 
     // Number of mesh layers:
-    int nxpmut = 30, nzthick = 10, nzthin = 5;
+    int nxpmut = 10, nzthick = 10, nzthin = 5;
     int nxpillar = nxpmut*lpillar/r;
     
     // Calculate the number of fluid elements to have about 10 elements per wavelength:
