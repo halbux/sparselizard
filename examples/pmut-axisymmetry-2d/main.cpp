@@ -158,16 +158,8 @@ void sparselizard(void)
     // This leads to the correct membrane deflection but a pressure field divided by the scaling factor.
     pmutmodel += integral(pmuttop, predefinedacousticstructureinteraction(dof(p), tf(p), dof(u), tf(u), c, rho, array3x1(0,1,0), alpha, scaling));
 
-    // Generate the algebraic matrix A and right handside vector b of 'Ax = b':
-    pmutmodel.generate();
-
-    // Solve 'Ax = b':
-    vec sol = solve(pmutmodel.A(), pmutmodel.b());
-
-    // Transfer the data from the solution vector to the v, u and p fields:
-    u.setdata(solid, sol);
-    p.setdata(fluid, sol);
-    v.setdata(piezo, sol);
+    // Generate, solve and transfer the solution to the u, p and v fields:
+    solve(pmutmodel);
 
     // Write the deflection, pressure and electric potential to file (with an order 2 interpolation for p and u).
     u.write(solid, "u.vtk", 2);
