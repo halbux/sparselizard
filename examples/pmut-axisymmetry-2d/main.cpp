@@ -14,7 +14,7 @@
 // - a top metal layer
 // - a fluid
 //
-// Refer to the following paper for more detail:
+// Refer to the following paper for more details:
 //
 // "Characterization of polymer-based piezoelectric micromachined ultrasound transducers for short-range gesture 
 // recognition applications", P. Gijsenbergh, A. Halbach et al.
