@@ -197,6 +197,9 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
 {
     int it = 0;
     double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
+    
+    // Limit the jumps to a fraction of the box size:
+    double maxjump = 0.35;
 
     switch (poly.size())
     {
@@ -210,6 +213,11 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     double jac11 = poly[0].evalat(guess, 1)[0];
                     
                     deltaki = -1.0/jac11 * f;
+                    
+                    double scaling = maxjump*boxsize / ( std::abs(deltaki) );
+                    if (scaling < 1.0)
+                        deltaki *= scaling;
+                    
                     guess[0] += deltaki;
                     
                     if (std::abs(guess[0]) > boxsize)
@@ -242,6 +250,13 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     
                     deltaki = -invdet * (jac22*f - jac12*g);
                     deltaeta = -invdet * (-jac21*f + jac11*g);
+                    
+                    double scaling = maxjump*boxsize / ( std::abs(deltaki)+std::abs(deltaeta) );
+                    if (scaling < 1.0)
+                    {
+                        deltaki *= scaling;
+                        deltaeta *= scaling;
+                    }
                     
                     guess[0] += deltaki;
                     guess[1] += deltaeta;
@@ -283,6 +298,14 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     deltaki = -invdet * ((jac22*jac33 - jac23*jac32)*f - (jac12*jac33 - jac13*jac32)*g + (jac12*jac23 - jac13*jac22)*h);
                     deltaeta = -invdet * (-(jac21*jac33 - jac23*jac31)*f + (jac11*jac33 - jac13*jac31)*g - (jac11*jac23 - jac13*jac21)*h);
                     deltaphi = -invdet * ((jac21*jac32 - jac22*jac31)*f - (jac11*jac32 - jac12*jac31)*g + (jac11*jac22 - jac12*jac21)*h);
+                    
+                    double scaling = maxjump*boxsize / ( std::abs(deltaki)+std::abs(deltaeta)+std::abs(deltaphi) );
+                    if (scaling < 1.0)
+                    {
+                        deltaki *= scaling;
+                        deltaeta *= scaling;
+                        deltaphi *= scaling;
+                    }
                     
                     guess[0] += deltaki;
                     guess[1] += deltaeta;
