@@ -335,9 +335,7 @@ int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<do
         }
     }
 
-    // In case no initial guess could make Newton converge there is nothing more that can be done:
-    std::cout << "Error in 'myalgorithm' namespace: Newton iteration could not converge to given tolerance (" << numguesses << " initial guesses tried)" << std::endl;
-    abort();
+    return -1;
 }
 
 std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& tosplit, int blocklen)
