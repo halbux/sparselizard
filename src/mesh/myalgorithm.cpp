@@ -193,7 +193,7 @@ void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
     }
 }
 
-bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& guess, double boxsize, double tol, int maxit)
+int myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& guess, double boxsize, double tol, int maxit)
 {
     int it = 0;
     double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
@@ -221,13 +221,10 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     guess[0] += deltaki;
                     
                     if (std::abs(guess[0]) > boxsize)
-                        return false;
+                        return 0;
                 }
                 else
-                {
-                    std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
-                    abort();
-                }
+                    return -1;
                 it++;
             }
             break;
@@ -262,13 +259,10 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     guess[1] += deltaeta;
                     
                     if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize)
-                        return false;
+                        return 0;
                 }
                 else
-                {
-                    std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
-                    abort();
-                }
+                    return -1;
                 it++;
             }
             break;
@@ -312,19 +306,40 @@ bool myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rh
                     guess[2] += deltaphi;
                     
                     if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize || std::abs(guess[2]) > boxsize)
-                        return false;
+                        return 0;
                 }
                 else
-                {
-                    std::cout << "Error in 'polynomial' object: Newton iteration could not converge to given tolerance" << std::endl;
-                    abort();
-                }
+                    return -1;
                 it++;
             }
             break;
         }
     }
-    return true;
+    return 1;
+}
+
+int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, double boxsize, double tol, int maxit)
+{
+    int numguesses = initialguesses.size()/3;
+
+    for (int i = 0; i < numguesses; i++)
+    {
+        std::vector<double> curguess = {initialguesses[3*i+0],initialguesses[3*i+1],initialguesses[3*i+2]};
+        int curstatus = getroot(poly, rhs, curguess, boxsize, tol, maxit);
+
+        // Return unless Newton has not converged (if so try next initial guess):
+        if (curstatus >= 0)
+        {
+            // if (i > 0) { std::cout << "Success at guess #" << i << std::endl; } 
+            
+            initialguesses = curguess;
+            return curstatus;
+        }
+    }
+
+    // In case no initial guess could make Newton converge there is nothing more that can be done:
+    std::cout << "Error in 'myalgorithm' namespace: Newton iteration could not converge to given tolerance (" << numguesses << " initial guesses tried)" << std::endl;
+    abort();
 }
 
 std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& tosplit, int blocklen)
