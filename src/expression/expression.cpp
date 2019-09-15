@@ -571,6 +571,10 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
         lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
         element myel(elemtypenum, elemorder);
+        
+        // Initial guesses for the root calculation call:
+        gausspoints mygausspoints(elemtypenum, 15);
+        std::vector<double> gplist = mygausspoints.getcoordinates();
 
         // Get the element barycenter coordinates:
         std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
@@ -619,7 +623,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     else
                     {
                         // Reset to initial guess:
-                        std::vector<double> kietaphi = {0,0,0};
+                        std::vector<double> kietaphi = gplist;
                         std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
                         // Only create once for all coordinates the polynomials and only for the required elements:
@@ -630,7 +634,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
                         }
 
-                        if (myalgorithm::getroot(poly, rhs, kietaphi))
+                        if (myalgorithm::getrootmultiguess(poly, rhs, kietaphi))
                         {
                             // Check if the (ki,eta,phi) coordinates are inside the element:
                             if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
@@ -699,7 +703,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     else
                     {
                         // Reset to initial guess:
-                        std::vector<double> kietaphi = {0,0,0};
+                        std::vector<double> kietaphi = gplist;
                         std::vector<double> rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
                         // Only create once for all coordinates the polynomials and only for the required elements:
@@ -710,7 +714,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
                         }
 
-                        if (myalgorithm::getroot(poly, rhs, kietaphi))
+                        if (myalgorithm::getrootmultiguess(poly, rhs, kietaphi))
                         {
                             // Check if the (ki,eta,phi) coordinates are inside the element:
                             if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
