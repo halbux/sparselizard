@@ -318,21 +318,19 @@ int myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rhs
     return 1;
 }
 
-int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, double boxsize, double tol, int maxit)
+int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize, double tol, int maxit)
 {
     int numguesses = initialguesses.size()/3;
 
     for (int i = 0; i < numguesses; i++)
     {
-        std::vector<double> curguess = {initialguesses[3*i+0],initialguesses[3*i+1],initialguesses[3*i+2]};
-        int curstatus = getroot(poly, rhs, curguess, boxsize, tol, maxit);
+        kietaphi = {initialguesses[3*i+0],initialguesses[3*i+1],initialguesses[3*i+2]};
+        int curstatus = getroot(poly, rhs, kietaphi, boxsize, tol, maxit);
 
         // Return unless Newton has not converged (if so try next initial guess):
         if (curstatus >= 0)
         {
             // if (i > 0) { std::cout << "Success at guess #" << i << std::endl; } 
-            
-            initialguesses = curguess;
             return curstatus;
         }
     }
