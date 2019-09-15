@@ -199,7 +199,7 @@ int myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rhs
     double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
     
     // Limit the jumps to a fraction of the box size:
-    double maxjump = 0.35;
+    double maxjump = 0.45;
 
     switch (poly.size())
     {
