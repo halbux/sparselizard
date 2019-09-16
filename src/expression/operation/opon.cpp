@@ -86,7 +86,8 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
         {
             if (isfound[i] == false)
             {
-                std::cout << "Error in 'opon' object: trying to interpolate at a point outside of physical region " << myphysreg << " (x,y,z) = (" << xyzcoords[3*i+0] << ", " << xyzcoords[3*i+1] << ", " << xyzcoords[3*i+2] << ")" << std::endl;
+                std::cout << "Error in 'opon' object: trying to interpolate at a point outside of physical region " << myphysreg << " or interpolation algorithm failed to converge" << std::endl;
+                std::cout << "Error was at (x,y,z) = (" << xyzcoords[3*i+0] << ", " << xyzcoords[3*i+1] << ", " << xyzcoords[3*i+2] << ")" << std::endl;
                 abort();
             }
         }
@@ -193,7 +194,8 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
         {
             if (isfound[i] == false)
             {
-                std::cout << "Error in 'opon' object: trying to interpolate at a point outside of physical region " << myphysreg << " (x,y,z) = (" << xyzcoords[3*i+0] << ", " << xyzcoords[3*i+1] << ", " << xyzcoords[3*i+2] << ")" << std::endl;
+                std::cout << "Error in 'opon' object: trying to interpolate at a point outside of physical region " << myphysreg << " or interpolation algorithm failed to converge" << std::endl;
+                std::cout << "Error was at (x,y,z) = (" << xyzcoords[3*i+0] << ", " << xyzcoords[3*i+1] << ", " << xyzcoords[3*i+2] << ")" << std::endl;
                 abort();
             }
         }
