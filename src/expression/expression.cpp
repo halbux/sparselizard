@@ -575,7 +575,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
         element myel(elemtypenum, elemorder);
         
         // Initial guesses for the root calculation call:
-        gausspoints mygausspoints(elemtypenum, 15);
+        gausspoints mygausspoints(elemtypenum, 2);
         std::vector<double> gplist = mygausspoints.getcoordinates();
 
         // Get the element barycenter coordinates:
