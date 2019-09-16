@@ -624,8 +624,6 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
                     else
                     {
-                        // Reset initial guess:
-                        kietaphi = {0.0, 0.0, 0.0};
                         rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
                         // Only create once for all coordinates the polynomials and only for the required elements:
@@ -636,7 +634,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
                         }
 
-                        if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
+                        if (myalgorithm::getrootmultiguess(poly, rhs, gplist, kietaphi) == 1)
                         {
                             // Check if the (ki,eta,phi) coordinates are inside the element:
                             if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
@@ -704,8 +702,6 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
                     else
                     {
-                        // Reset initial guess:
-                        kietaphi = {0.0, 0.0, 0.0};
                         rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
 
                         // Only create once for all coordinates the polynomials and only for the required elements:
@@ -716,7 +712,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
                         }
 
-                        if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
+                        if (myalgorithm::getrootmultiguess(poly, rhs, gplist, kietaphi) == 1)
                         {
                             // Check if the (ki,eta,phi) coordinates are inside the element:
                             if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
