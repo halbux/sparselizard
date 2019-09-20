@@ -22,8 +22,6 @@ rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
     }
 
     myphysicalregion = physreg;
-    for (int i = 0; i < mybuildingblocks.size(); i++)
-        mybuildingblocks[i]->setphysicalregion(physreg);
         
     mesh();
 }
@@ -53,9 +51,6 @@ std::shared_ptr<rawshape> rawunion::duplicate(void)
 void rawunion::setphysicalregion(int physreg)
 {
     myphysicalregion = physreg;
-
-    for (int i = 0; i < mybuildingblocks.size(); i++)
-        mybuildingblocks[i]->setphysicalregion(physreg);
 }
 
 int rawunion::getdimension(void)
