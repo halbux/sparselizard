@@ -109,11 +109,16 @@ void rawextrusion::mesh(void)
         topline->shift(0, 0, myheight);
 
         // Create the lines at both sides of the quadrangle:
-        std::shared_ptr<rawshape> leftline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[0], topline->getsons()[0]}, mynumlayers));
-        std::shared_ptr<rawshape> rightline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[1], topline->getsons()[1]}, mynumlayers));
+        if (mybaseshape->getsons() > 0)
+        {
+            std::shared_ptr<rawshape> leftline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[0], topline->getsons()[0]}, mynumlayers));
+            std::shared_ptr<rawshape> rightline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[1], topline->getsons()[1]}, mynumlayers));
 
-        sons = {mybaseshape, rightline, topline, leftline};
-
+            sons = {mybaseshape, rightline, topline, leftline};
+        }
+        else
+            sons = {mybaseshape, topline};
+            
         // Create this temporary object to get the mesh:
         std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, sons));
 
