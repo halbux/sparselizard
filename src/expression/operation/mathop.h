@@ -23,6 +23,7 @@ class mat;
 class vec;
 class field;
 class formulation;
+class shape;
 
 namespace mathop
 {
@@ -61,6 +62,9 @@ namespace mathop
     // Group .vtu timestep files in a .pvd file:
     void grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals);
     void grouptimesteps(std::string filename, std::string fileprefix, int firstint, std::vector<double> timevals);
+    
+    // Load a mesh file into a shape. Return the list of shapes of all dimensions {{0D},{1D},{2D},{3D}} (if any):
+    std::vector<std::vector<shape>> loadshape(std::string meshfile);
 
     expression dx(expression input);
     expression dy(expression input);
