@@ -44,7 +44,9 @@ class mesh
         
 
         std::string filename = "";
-
+    
+    public:
+        
         // 'readfromfile' hands over to the function reading the format of the mesh file.
         void readfromfile(std::string);
         // 'writetofile' hands over to the function writing the format of the mesh file.
@@ -59,9 +61,7 @@ class mesh
         
         // 'printcount' prints the number of elements for every type.
         void printcount(void);
-    
-    public:
-        
+
         mesh(void);
         mesh(std::string filename, int verbosity = 1, bool legacyreader = true);
         mesh(std::vector<shape> inputshapes, int verbosity = 1);
