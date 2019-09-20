@@ -23,17 +23,13 @@ class rawunion: public rawshape
 
         int myphysicalregion = -1;
 
-        // Son shapes:
+        // Shapes that have been united:
         std::vector<std::shared_ptr<rawshape>> sons = {};
 
         // Coordinates of the nodes in the mesh:
         std::vector<double> mycoords = {};
         // Elements in the mesh:
         std::vector<std::vector<int>> myelems = std::vector<std::vector<int>>(8, std::vector<int>(0));
-        
-        
-        // Shapes that have been united:
-        std::vector<std::shared_ptr<rawshape>> mybuildingblocks;
         
     public:
 
@@ -54,7 +50,7 @@ class rawunion: public rawshape
 
         std::vector<std::shared_ptr<rawshape>> getsons(void);
 
-        // Get subshapes (sons are included):
+        // Get subshapes:
         std::vector<std::shared_ptr<rawshape>> getsubshapes(void);
         void setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes);
 
