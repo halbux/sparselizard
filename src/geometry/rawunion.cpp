@@ -30,7 +30,7 @@ std::shared_ptr<rawshape> rawunion::extrude(int physreg, double height, int numl
 {
     std::vector<std::shared_ptr<rawshape>> extrudedshapes(sons.size());
     for (int i = 0; i < sons.size(); i++)
-        extrudedshapes[i] = std::shared_ptr<rawextrusion>(new rawextrusion(physreg, sons[i], height, numlayers));
+        extrudedshapes[i] = sons[i]->extrude(physreg, height, numlayers);
 
     return std::shared_ptr<rawunion>(new rawunion(physreg, extrudedshapes));
 }
