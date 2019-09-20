@@ -109,7 +109,7 @@ void rawextrusion::mesh(void)
         topline->shift(0, 0, myheight);
 
         // Create the lines at both sides of the quadrangle:
-        if (mybaseshape->getsons() > 0)
+        if ((mybaseshape->getsons()).size() > 0)
         {
             std::shared_ptr<rawshape> leftline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[0], topline->getsons()[0]}, mynumlayers));
             std::shared_ptr<rawshape> rightline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[1], topline->getsons()[1]}, mynumlayers));
