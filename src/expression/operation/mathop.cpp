@@ -1,4 +1,5 @@
 #include "mathop.h"
+#include "rawpoint.h"
 #include "rawline.h"
 #include "rawsurface.h"
 #include "rawvolume.h"
@@ -232,79 +233,71 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
     
     std::vector<int> physregnums = loadedphysregs->getallnumbers();
     int numphysregs = physregnums.size();
-    std::vector<physicalregion*> physregs(numphysregs);
-    for (int i = 0; i < numphysregs; i++)
-        physregs[i] = loadedphysregs->get(physregnums[i]);
-    std::vector<int> physregdims(numphysregs);
-    for (int i = 0; i < numphysregs; i++)
-        physregdims[i] = physregs[i]->getelementdimension();
         
-    // Loop on all dimensions except points (point shape allows only a single point):
     std::vector<std::vector<shape>> output(4,std::vector<shape>(0));
-    for (int d = 1; d < 4; d++)
+    for (int i = 0; i < numphysregs; i++)
     {
-        for (int i = 0; i < numphysregs; i++)
+        int curphysreg = physregnums[i];
+        physicalregion* pr = loadedphysregs->get(curphysreg);
+        int physregdim = pr->getelementdimension();
+        
+        // Get the list of all elements in the physical region:
+        std::vector<std::vector<int>>* curelemlist = pr->getelementlist();
+        
+        // Get the elements with all their nodes:
+        std::vector<std::vector<int>> nodesinelements(8);
+        for (int j = 0; j < 8; j++)
         {
-            int curphysreg = physregnums[i];
-            if (physregdims[i] == d)
+            int numelems = curelemlist->at(j).size();
+            element myelem(j,curvatureorder);
+            int numnodes = myelem.countcurvednodes();
+            nodesinelements[j].resize(numnodes*numelems);
+            for (int k = 0; k < numelems; k++)
             {
-                // Get the list of all elements in the physical region:
-                std::vector<std::vector<int>>* curelemlist = physregs[i]->getelementlist();
-                
-                // Get the elements with all their nodes:
-                std::vector<std::vector<int>> nodesinelements(8);
-                for (int j = 0; j < 8; j++)
-                {
-                    int numelems = curelemlist->at(j).size();
-                    element myelem(j,curvatureorder);
-                    int numnodes = myelem.countcurvednodes();
-                    nodesinelements[j].resize(numnodes*numelems);
-                    for (int k = 0; k < numelems; k++)
-                    {
-                        int curelem = curelemlist->at(j)[k];
-                        for (int l = 0; l < numnodes; l++)
-                            nodesinelements[j][numnodes*k+l] = loadedelems->getsubelement(0,j,curelem,l);
-                    }
-                }
-                // Create a vector to renumber all node coordinates from 0 up consecutively:
-                std::vector<int> renumbernodes(totalnumnodes,-1);
-                int nodeindex = 0;
-                for (int j = 0; j < 8; j++)
-                {
-                    for (int k = 0; k < nodesinelements[j].size(); k++)
-                    {
-                        int curnode = nodesinelements[j][k];
-                        if (renumbernodes[curnode] == -1)
-                        {
-                            renumbernodes[curnode] = nodeindex;
-                            nodeindex++;
-                        }
-                        nodesinelements[j][k] = renumbernodes[curnode];
-                    }
-                }
-                // Create the vector of node coordinates:
-                std::vector<double> nodecoordinates(3*nodeindex);
-                for (int j = 0; j < renumbernodes.size(); j++)
-                {
-                    if (renumbernodes[j] != -1)
-                    {
-                        nodecoordinates[3*renumbernodes[j]+0] = nodecoords->at(3*j+0);
-                        nodecoordinates[3*renumbernodes[j]+1] = nodecoords->at(3*j+1);
-                        nodecoordinates[3*renumbernodes[j]+2] = nodecoords->at(3*j+2);
-                    }
-                }
-                
-                shape curshape;
-                if (d == 1)
-                    curshape = shape(std::shared_ptr<rawline>(new rawline(curphysreg, nodecoordinates, nodesinelements)));
-                if (d == 2)
-                    curshape = shape(std::shared_ptr<rawsurface>(new rawsurface(curphysreg, nodecoordinates, nodesinelements)));
-                if (d == 3)
-                    curshape = shape(std::shared_ptr<rawvolume>(new rawvolume(curphysreg, nodecoordinates, nodesinelements)));
-            
-                output[d].push_back(curshape);
+                int curelem = curelemlist->at(j)[k];
+                for (int l = 0; l < numnodes; l++)
+                    nodesinelements[j][numnodes*k+l] = loadedelems->getsubelement(0,j,curelem,l);
             }
         }
+        // Create a vector to renumber all node coordinates from 0 up consecutively:
+        std::vector<int> renumbernodes(totalnumnodes,-1);
+        int nodeindex = 0;
+        for (int j = 0; j < 8; j++)
+        {
+            for (int k = 0; k < nodesinelements[j].size(); k++)
+            {
+                int curnode = nodesinelements[j][k];
+                if (renumbernodes[curnode] == -1)
+                {
+                    renumbernodes[curnode] = nodeindex;
+                    nodeindex++;
+                }
+                nodesinelements[j][k] = renumbernodes[curnode];
+            }
+        }
+        // Create the vector of node coordinates:
+        std::vector<double> nodecoordinates(3*nodeindex);
+        for (int j = 0; j < renumbernodes.size(); j++)
+        {
+            if (renumbernodes[j] != -1)
+            {
+                nodecoordinates[3*renumbernodes[j]+0] = nodecoords->at(3*j+0);
+                nodecoordinates[3*renumbernodes[j]+1] = nodecoords->at(3*j+1);
+                nodecoordinates[3*renumbernodes[j]+2] = nodecoords->at(3*j+2);
+            }
+        }
+        
+        shape curshape;
+        if (physregdim == 0)
+            curshape = shape(std::shared_ptr<rawpoint>(new rawpoint(curphysreg, nodecoordinates, nodesinelements)));
+        if (physregdim == 1)
+            curshape = shape(std::shared_ptr<rawline>(new rawline(curphysreg, nodecoordinates, nodesinelements)));
+        if (physregdim == 2)
+            curshape = shape(std::shared_ptr<rawsurface>(new rawsurface(curphysreg, nodecoordinates, nodesinelements)));
+        if (physregdim == 3)
+            curshape = shape(std::shared_ptr<rawvolume>(new rawvolume(curphysreg, nodecoordinates, nodesinelements)));
+    
+        output[physregdim].push_back(curshape);
     }
     
     // Restore the mesh to the universe:
