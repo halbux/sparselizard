@@ -296,7 +296,7 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
                 
                 shape curshape;
                 if (d == 1)
-                    curshape = shape(std::shared_ptr<rawline>(new rawline(curphysreg, nodecoordinates)));
+                    curshape = shape(std::shared_ptr<rawline>(new rawline(curphysreg, nodecoordinates, nodesinelements)));
                 if (d == 2)
                     curshape = shape(std::shared_ptr<rawsurface>(new rawsurface(curphysreg, nodecoordinates, nodesinelements)));
                 if (d == 3)
