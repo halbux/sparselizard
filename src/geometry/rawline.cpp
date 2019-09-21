@@ -53,6 +53,14 @@ rawline::rawline(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints
 
     mesh();
 }
+
+rawline::rawline(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+{
+    myphysicalregion = physreg;
+
+    mycoords = allcoords;
+    myelems = allelems;
+}
  
 
 std::shared_ptr<rawshape> rawline::extrude(int physreg, double height, int numlayers)

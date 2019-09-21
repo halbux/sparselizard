@@ -44,6 +44,9 @@ class rawline: public rawshape
         // Provide to this constructor the point rawshapes at the two ends of the line:
         rawline(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, int nummeshpoints);
 
+        // Provide to this constructor the coordinates of all mesh nodes and elements in the line:
+        rawline(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
+
         std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
 
         std::shared_ptr<rawshape> duplicate(void);
