@@ -16,6 +16,14 @@ rawpoint::rawpoint(int physreg, std::vector<double> coords)
     }
 }
 
+rawpoint::rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+{
+    myphysicalregion = physreg;
+
+    mycoords = allcoords;
+    myelems = allelems;
+}
+
 
 std::shared_ptr<rawshape> rawpoint::extrude(int physreg, double height, int numlayers)
 {

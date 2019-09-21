@@ -93,11 +93,46 @@ void rawextrusion::mesh(void)
 
         sons = {mybaseshape, toppoint};
 
-        // Create this temporary object to get the mesh:
-        std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawline>(new rawline(myphysicalregion, {mybaseshape, toppoint}, mynumlayers));
+        
+        int numnodesperlayer = mybaseshape->getcoords()->size()/3;
+        
+        mycoords.resize(3*numnodesperlayer*mynumlayers);
+        // Extruded points are lines (element number 1):
+        myelems[1].resize(2*numnodesperlayer*(mynumlayers-1));
 
-        mycoords = *(rawshapeptr->getcoords());
-        myelems = *(rawshapeptr->getelems());
+
+        // Place the nodes.
+        int index = 0;
+        
+        std::vector<double>* currentcoords = mybaseshape->getcoords();
+
+        for (int l = 0; l < mynumlayers; l++)
+        {
+            for (int j = 0; j < numnodesperlayer; j++)
+            {
+                mycoords[3*index+0] = currentcoords->at(3*j+0);
+                mycoords[3*index+1] = currentcoords->at(3*j+1);
+                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
+                index++;
+            }
+        }
+
+
+        // Place the elements:
+        int lineindex = 0;
+
+        std::vector<std::vector<int>>* currentelems = mybaseshape->getelems();
+
+        for (int l = 0; l < mynumlayers-1; l++)
+        {
+            // Extrude all points:
+            for (int p = 0; p < numnodesperlayer; p++)
+            {
+                myelems[1][2*lineindex+0] = currentelems->at(0)[p] + l*numnodesperlayer;
+                myelems[1][2*lineindex+1] = currentelems->at(0)[p] + (l+1)*numnodesperlayer;
+                lineindex++;
+            }
+        }
     }
 
     // The extrusion of a 1D shape is a quadrangle:
@@ -109,7 +144,7 @@ void rawextrusion::mesh(void)
         topline->shift(0, 0, myheight);
 
         // Create the lines at both sides of the quadrangle:
-        if ((mybaseshape->getsons()).size() > 0)
+        if ((mybaseshape->getsons()).size() == 2)
         {
             std::shared_ptr<rawshape> leftline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[0], topline->getsons()[0]}, mynumlayers));
             std::shared_ptr<rawshape> rightline = std::shared_ptr<rawline>(new rawline(-1, {mybaseshape->getsons()[1], topline->getsons()[1]}, mynumlayers));
@@ -119,11 +154,49 @@ void rawextrusion::mesh(void)
         else
             sons = {mybaseshape, topline};
             
-        // Create this temporary object to get the mesh:
-        std::shared_ptr<rawshape> rawshapeptr = std::shared_ptr<rawquadrangle>(new rawquadrangle(myphysicalregion, sons));
 
-        mycoords = *(rawshapeptr->getcoords());
-        myelems = *(rawshapeptr->getelems());
+        int numnodesperlayer = mybaseshape->getcoords()->size()/3;
+        int numlines = mybaseshape->getelems()->at(1).size()/2;
+        
+        mycoords.resize(3*numnodesperlayer*mynumlayers);
+        // Extruded lines are quadrangles (element number 3):
+        myelems[3].resize(4*numlines*(mynumlayers-1));
+
+
+        // Place the nodes.
+        int index = 0;
+        
+        std::vector<double>* currentcoords = mybaseshape->getcoords();
+
+        for (int l = 0; l < mynumlayers; l++)
+        {
+            for (int j = 0; j < numnodesperlayer; j++)
+            {
+                mycoords[3*index+0] = currentcoords->at(3*j+0);
+                mycoords[3*index+1] = currentcoords->at(3*j+1);
+                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
+                index++;
+            }
+        }
+
+
+        // Place the elements:
+        int quadindex = 0;
+
+        std::vector<std::vector<int>>* currentelems = mybaseshape->getelems();
+
+        for (int l = 0; l < mynumlayers-1; l++)
+        {
+            // Extrude all lines:
+            for (int p = 0; p < numlines; p++)
+            {
+                myelems[3][4*quadindex+0] = currentelems->at(1)[2*p+0] + l*numnodesperlayer;
+                myelems[3][4*quadindex+1] = currentelems->at(1)[2*p+1] + l*numnodesperlayer;
+                myelems[3][4*quadindex+2] = currentelems->at(1)[2*p+1] + (l+1)*numnodesperlayer;
+                myelems[3][4*quadindex+3] = currentelems->at(1)[2*p+0] + (l+1)*numnodesperlayer;
+                quadindex++;
+            }
+        }
     }
 
     // The extrusion of a 2D shape is a volume:

@@ -38,6 +38,9 @@ class rawpoint: public rawshape
 
         rawpoint(int physreg, std::vector<double> coords);
       
+        // Provide to this constructor the coordinates of all mesh nodes and elements in the surface:
+        rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
+        
         std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
 
         std::shared_ptr<rawshape> duplicate(void);
