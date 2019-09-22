@@ -35,8 +35,7 @@ void sparselizard(void)
     u.setconstraint(sur);
   
     // E is Young's modulus. nu is Poisson's ratio. 
-    parameter E, nu;
-    E|vol = 150e9; nu|vol = 0.3;
+    double E = 150e9, nu = 0.3;
   
     formulation elasticity;
 
