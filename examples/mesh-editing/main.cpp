@@ -17,7 +17,7 @@ void sparselizard(void)
     // region of dimension d (0D, 1D, 2D or 3D) in file 'disk.msh'.
     std::vector<std::vector<shape>> diskshapes = loadshape("disk.msh");
     
-    // Add a thin slice on top of the disk (shapes[2][1] is the disk top face):
+    // Add a thin slice on top of the disk (diskshapes[2][1] is the disk top face):
     shape thinslice = diskshapes[2][1].extrude(vol, 0.02, 2);
     
     // Load all shapes of interest (the disk and the additional thin slice):
