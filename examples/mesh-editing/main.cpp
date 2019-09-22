@@ -1,4 +1,4 @@
-// This code shows how to load a mesh file from disk to shape objects for editing.
+// This code shows how to load a mesh file to shape objects for editing.
 // The 'disk.msh' file is loaded and a thin extra disk slice is added on top of it.
 
 
