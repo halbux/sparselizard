@@ -81,6 +81,26 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
         });
 }
 
+void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector)
+{
+    if (reorderingvector.size() != tosort.size())
+        reorderingvector.resize(tosort.size());
+    
+    // Set 'reorderingvector' to [0 1 2 ...]:
+    std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
+    // Sort 'reorderingvector' according to 'tosort':
+    // The < operator is overloaded by a lambda function.
+    std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+        { 
+            if (tosort[elem1] < tosort[elem2] - noisethreshold)
+                return true;
+            if (tosort[elem1] > tosort[elem2] + noisethreshold)
+                return false;
+            // For identical entries make a COHERENT decision for a stable sorting.
+            return elem1 < elem2;
+        });
+}
+
 #if defined(__linux__)
 #include <parallel/algorithm>
 #endif
@@ -160,6 +180,45 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
         
         
     return reorderingvector;
+}
+
+void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& toslice, std::vector<double>& slicepos, std::vector<std::vector<int>>& slices)
+{
+    int num = toslice.size();
+    int numslices = slicepos.size()-1;
+    
+    slices = {};
+    
+    // Sort the 'coord' vector:
+    std::vector<int> reorderingvector = {};
+    stablesort(noisethreshold, toslice, reorderingvector);
+    
+    // Loop on all slices:
+    int numprocessed = 0;
+    for (int s = 0; s < numslices; s++)
+    {
+        double cursliceend = slicepos[s+1] + noisethreshold;
+        
+        // Calculate the current slice size:
+        int pos;
+        for (pos = numprocessed; pos < num; pos++)
+        {
+            if (toslice[reorderingvector[pos]] <= cursliceend) {}
+            else
+                break;
+    
+        }
+        int slicesize = pos-numprocessed;
+        if (slicesize > 0)
+        {
+            slices.push_back(std::vector<int>(slicesize));
+            // Populate the current slice:
+            for (int i = 0; i < slicesize; i++)
+                slices[s][i] = reorderingvector[numprocessed+i];
+                
+            numprocessed += slicesize;
+        }
+    }
 }
 
 std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
