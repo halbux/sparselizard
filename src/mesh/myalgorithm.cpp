@@ -209,15 +209,12 @@ void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& t
     
         }
         int slicesize = pos-numprocessed;
-        if (slicesize > 0)
-        {
-            slices.push_back(std::vector<int>(slicesize));
-            // Populate the current slice:
-            for (int i = 0; i < slicesize; i++)
-                slices[s][i] = reorderingvector[numprocessed+i];
-                
-            numprocessed += slicesize;
-        }
+        slices.push_back(std::vector<int>(slicesize));
+        // Populate the current slice:
+        for (int i = 0; i < slicesize; i++)
+            slices[s][i] = reorderingvector[numprocessed+i];
+
+        numprocessed += slicesize;
     }
 }
 
