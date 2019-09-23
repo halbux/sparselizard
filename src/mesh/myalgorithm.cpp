@@ -221,6 +221,33 @@ void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& t
     }
 }
 
+std::vector<double> myalgorithm::getcoordbounds(std::vector<double>& coords)
+{
+    int numcoords = coords.size()/3;
+    
+    if (numcoords == 0)
+        return {};
+    
+    std::vector<double> output = {coords[0],coords[0], coords[1],coords[1], coords[2],coords[2]};
+    
+    for (int i = 1; i < numcoords; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            // Min:
+            if (output[2*j+0] <= coords[3*i+j]) {}
+            else
+                output[2*j+0] = coords[3*i+j];
+            // Max:
+            if (output[2*j+1] >= coords[3*i+j]) {}
+            else
+                output[2*j+1] = coords[3*i+j];
+        }
+    }
+    
+    return output;
+}
+
 std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
 {
     // Sort both vectors:

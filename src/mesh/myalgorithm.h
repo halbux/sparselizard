@@ -46,6 +46,9 @@ namespace myalgorithm
     // 'slicepos[0]' must be smaller than the smallest value in 'toslice' and 'slicepos[slicepos.size()-1]' must be larger than the largest value.
     void slicecoordinates(double noisethreshold, std::vector<double>& toslice, std::vector<double>& slicepos, std::vector<std::vector<int>>& slices);
     
+    // Return {xmin,xmax,ymin,ymax,zmin,zmax} for the coordinates {x1,y1,z1,x2,...}:
+    std::vector<double> getcoordbounds(std::vector<double>& coordinates);
+    
     std::vector<int> intersect(std::vector<int> a, std::vector<int> b);
     
     // Compressed sparse row to ijk format converter for sparse matrices.
