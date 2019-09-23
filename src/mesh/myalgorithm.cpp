@@ -189,7 +189,7 @@ void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& t
     
     slices = {};
     
-    // Sort the 'coord' vector:
+    // Sort the 'toslice' vector:
     std::vector<int> reorderingvector = {};
     stablesort(noisethreshold, toslice, reorderingvector);
     
