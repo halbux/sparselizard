@@ -34,11 +34,17 @@ namespace myalgorithm
     // 'stablesort' is like 'stablecoordinatesort' but instead of sorting 
     // according to coordinates it sorts according to 'tosort', a vector of ints.
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
+    // This is for a vector of doubles:
+    void stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector);
     
     // 'stablesortparallel' sorts in parallel according to tosort[0] then 
     // according to tosrt[1],... ALL int* arrays have size 'numentries'.
     // The output is a reordering vector.
     int* stablesortparallel(std::vector<int*> tosort, int numentries);
+    
+    // The output 'slices[i]' gives the indexes of all values of 'toslice' that are in the interval between slicepos[i] and slicepos[i+1].
+    // 'slicepos[0]' must be smaller than the smallest value in 'toslice' and 'slicepos[slicepos.size()-1]' must be larger than the largest value.
+    void slicecoordinates(double noisethreshold, std::vector<double>& toslice, std::vector<double>& slicepos, std::vector<std::vector<int>>& slices);
     
     std::vector<int> intersect(std::vector<int> a, std::vector<int> b);
     
