@@ -24,7 +24,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     for (int i = 0; i < 3; i++)
     {
         if (delta[i] < noisethreshold[i])
-            delta[i] = 1;
+            delta[i] = (bounds[2*i+1]-bounds[2*i+0])+noisethreshold[i];
     }
     
     // Get the slice tics:
