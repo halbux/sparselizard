@@ -48,7 +48,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     myalgorithm::slicecoordinates(noisethreshold[0], xcoords, xslicetics, xslices);
     
     // Loop on all x slices:
-    for (int i = 0; i < xslices.size(); i++)
+    for (int i = 0; i < numslices[0]; i++)
     {
         // Get the y coordinates vector for the current slice:
         std::vector<double> curycoords(xslices[i].size());
@@ -60,7 +60,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         myalgorithm::slicecoordinates(noisethreshold[1], curycoords, yslicetics, yslices);
         
         // Loop on all y slices:
-        for (int j = 0; j < yslices.size(); j++)
+        for (int j = 0; j < numslices[1]; j++)
         {
             // Get the z coordinates vector for the current slice:
             std::vector<double> curzcoords(yslices[j].size());
@@ -72,7 +72,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
             myalgorithm::slicecoordinates(noisethreshold[2], curzcoords, zslicetics, zslices);
             
             // Fill the group indexes:
-            for (int k = 0; k < zslices.size(); k++)
+            for (int k = 0; k < numslices[2]; k++)
                 mygroups[i][j][k] = zslices[k];
             
         }
