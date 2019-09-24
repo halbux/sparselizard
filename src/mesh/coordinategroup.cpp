@@ -7,7 +7,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     mynumcoords = coords.size()/3;
     
     noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
-    int meshsize = 0.0;
+    double meshsize = 0.0;
     for (int i = 0; i < 3; i++)
         meshsize += universe::mymesh->getnodes()->getgeometrydimension(i);
     
