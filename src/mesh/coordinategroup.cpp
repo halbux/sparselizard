@@ -26,8 +26,8 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     if (problemdimension == 2) { delta[2] = 1; }
     for (int i = 0; i < 3; i++)
     {
-        if (delta[i] < 1e-5*meshsize)
-            delta[i] = 1e-5*meshsize;
+        if (delta[i] < 1e-6*meshsize)
+            delta[i] = 1e-6*meshsize;
     }
     
     // Get the slice tics:
