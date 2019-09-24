@@ -71,29 +71,18 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
             std::vector<std::vector<int>> zslices;
             myalgorithm::slicecoordinates(noisethreshold[2], curzcoords, zslicetics, zslices);
             
-            // Fill the group indexes:
-            for (int k = 0; k < numslices[2]; k++)
-                mygroups[i][j][k] = zslices[k];
-            
-        }
-    
-    }
-    
-    // Populate 'mygroupcoords':
-    for (int i = 0; i < numslices[0]; i++)
-    {
-        for (int j = 0; j < numslices[1]; j++)
-        {
             for (int k = 0; k < numslices[2]; k++)
             {
-                int numelems = mygroups[i][j][k].size();
-                mygroupcoords[i][j][k] = std::vector<double>(3*numelems);
-                for (int l = 0; l < numelems; l++)
+                // Populate the groups:
+                mygroups[i][j][k] = zslices[k];
+            
+                mygroupcoords[i][j][k] = std::vector<double>(3*zslices[k].size());
+                for (int l = 0; l < zslices[k].size(); l++)
                 {
-                    int curelem = mygroupcoords[i][j][k][l];
-                    mygroupcoords[i][j][k][3*l+0] = coords[3*curelem+0];
-                    mygroupcoords[i][j][k][3*l+1] = coords[3*curelem+1];
-                    mygroupcoords[i][j][k][3*l+2] = coords[3*curelem+2];
+                    int cur = mygroups[i][j][k][l];
+                    mygroupcoords[i][j][k][3*l+0] = coords[3*cur+0];
+                    mygroupcoords[i][j][k][3*l+1] = coords[3*cur+1];
+                    mygroupcoords[i][j][k][3*l+2] = coords[3*cur+2];
                 }
             }
         }
