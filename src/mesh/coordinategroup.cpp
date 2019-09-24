@@ -59,7 +59,6 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         std::vector<std::vector<int>> yslices;
         myalgorithm::slicecoordinates(noisethreshold[1], curycoords, yslicetics, yslices);
         
-            
         // Loop on all y slices:
         for (int j = 0; j < yslices.size(); j++)
         {
