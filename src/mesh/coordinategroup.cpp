@@ -106,12 +106,17 @@ void coordinategroup::select(double x, double y, double z, double maxelemsize)
     myradius = maxelemsize;
     
     // Take an extra noise margin to be sure not to miss any candidate slice:
-    int x1 = std::max(0, (int)std::floor( ( x-maxelemsize-noisethreshold[0] - bounds[0] )/delta[0] ));
-    int x2 = std::min(numslices[0]-1, (int)std::ceil( ( x+maxelemsize+noisethreshold[0] - bounds[0] )/delta[0] ));
-    int y1 = std::max(0, (int)std::floor( ( y-maxelemsize-noisethreshold[1] - bounds[2] )/delta[1] ));
-    int y2 = std::min(numslices[1]-1, (int)std::ceil( ( y+maxelemsize+noisethreshold[1] - bounds[2] )/delta[1] ));
-    int z1 = std::max(0, (int)std::floor( ( z-maxelemsize-noisethreshold[2] - bounds[4] )/delta[2] ));
-    int z2 = std::min(numslices[2]-1, (int)std::ceil( ( z+maxelemsize+noisethreshold[2] - bounds[4] )/delta[2] ));
+    int x1 = std::floor( ( x-maxelemsize-noisethreshold[0] - bounds[0] )/delta[0] );
+    int x2 = std::ceil( ( x+maxelemsize+noisethreshold[0] - bounds[0] )/delta[0] );
+    int y1 = std::floor( ( y-maxelemsize-noisethreshold[1] - bounds[2] )/delta[1] );
+    int y2 = std::ceil( ( y+maxelemsize+noisethreshold[1] - bounds[2] )/delta[1] );
+    int z1 = std::floor( ( z-maxelemsize-noisethreshold[2] - bounds[4] )/delta[2] );
+    int z2 = std::ceil( ( z+maxelemsize+noisethreshold[2] - bounds[4] )/delta[2] );
+    
+    // Be sure they are all in bound:
+    x1 = std::max(0,x1); x2 = std::max(0,x2); y1 = std::max(0,y1); y2 = std::max(0,y2); z1 = std::max(0,z1); z2 = std::max(0,z2);
+    int a = numslices[0]-1, b = numslices[1]-1, c = numslices[2]-1;
+    x1 = std::min(a,x1); x2 = std::min(a,x2); y1 = std::min(b,y1); y2 = std::min(b,y2); z1 = std::min(c,z1); z2 = std::min(c,z2);
     
     selectedgroups.resize( 3*(x2-x1+1)*(y2-y1+1)*(z2-z1+1) );
     int index = 0;
