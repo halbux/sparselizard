@@ -73,7 +73,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
             // Get the z coordinates vector for the current slice:
             std::vector<double> curzcoords(yslices[j].size());
             for (int k = 0; k < yslices[j].size(); k++)
-                curzcoords[k] = zcoords[yslices[j][k]];
+                curzcoords[k] = zcoords[xslices[i][yslices[j][k]]];
                 
             // Slice the current slice in z slices:
             std::vector<std::vector<int>> zslices;
@@ -82,7 +82,9 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
             for (int k = 0; k < numslices[2]; k++)
             {
                 // Populate the groups:
-                mygroups[i][j][k] = zslices[k];
+                mygroups[i][j][k] = std::vector<int>(zslices[k].size());
+                for (int l = 0; l < zslices[k].size(); l++)
+                    mygroups[i][j][k][l] = xslices[i][yslices[j][zslices[k][l]]];
             
                 mygroupcoords[i][j][k] = std::vector<double>(3*zslices[k].size());
                 for (int l = 0; l < zslices[k].size(); l++)
