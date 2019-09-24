@@ -59,6 +59,10 @@ class intdensematrix
         // (p*n)xq where every row of matrix A has been duplicated n 
         // times as follows [row1; row1; row1;  ... row2; row2; row2; ...].
         intdensematrix duplicaterowsonebyone(int n);
+        
+        // Do not call this yourself:
+        void setnumrows(int num) { numrows = num; };
+        void setnumcols(int num) { numcols = num; };
 
 };
 
