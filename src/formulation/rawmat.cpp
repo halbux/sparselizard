@@ -290,7 +290,7 @@ void rawmat::mergeadresses(intdensematrix& rowadresses, intdensematrix& coladres
     double* values = vals.getvalues();
     
     
-    ///// Remove negative adresses:
+    ///// Remove negative addresses:
     if (removenegative)
     {
         int index = 0;
@@ -309,7 +309,7 @@ void rawmat::mergeadresses(intdensematrix& rowadresses, intdensematrix& coladres
     }
     
     
-    ///// Merge same adresses:
+    ///// Merge same addresses:
     int* reorderingvector = myalgorithm::stablesortparallel({rowindices, colindices}, veclen);
     
     intdensematrix myrows(1,veclen);
