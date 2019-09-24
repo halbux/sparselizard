@@ -7,6 +7,9 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     mynumcoords = coords.size()/3;
     
     noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
+    int meshsize = 0.0;
+    for (int i = 0; i < 3; i++)
+        meshsize += universe::mymesh->getnodes()->getgeometrydimension(i);
     
     // Define the number of slices in the x, y and z direction:
     int numblocks = std::ceil((double)mynumcoords/N);
@@ -23,8 +26,8 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     if (problemdimension == 2) { delta[2] = 1; }
     for (int i = 0; i < 3; i++)
     {
-        if (delta[i] < noisethreshold[i])
-            delta[i] = (bounds[2*i+1]-bounds[2*i+0])+noisethreshold[i];
+        if (delta[i] < 1e-5*meshsize)
+            delta[i] = 1e-5*meshsize;
     }
     
     // Get the slice tics:
