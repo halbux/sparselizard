@@ -90,7 +90,7 @@ class rawmat
         
         KSP* getksp(void) { return &myksp; };
         
-        // Remove the negative adresses (if flag is set to true) then add the values at same addresses together: 
+        // Remove the negative addresses (if flag is set to true) then add the values at same addresses together: 
         void mergeadresses(intdensematrix& rowadresses, intdensematrix& coladresses, densematrix& vals, bool removenegative);
 
 };
