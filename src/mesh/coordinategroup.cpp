@@ -101,9 +101,9 @@ void coordinategroup::select(double x, double y, double z, double maxelemsize)
     int x1 = std::max(0, (int)std::floor( ( x-maxelemsize-noisethreshold[0] - bounds[0] )/delta[0] ));
     int x2 = std::min(numslices[0]-1, (int)std::ceil( ( x+maxelemsize+noisethreshold[0] - bounds[0] )/delta[0] ));
     int y1 = std::max(0, (int)std::floor( ( y-maxelemsize-noisethreshold[1] - bounds[1] )/delta[1] ));
-    int y2 = std::min(numslices[1]-1, (int)std::ceil( ( y+maxelemsize+noisethreshold[1] - bounds[1] )/delta[1] ));
+    int y2 = std::min(numslices[1]-1, (int)std::ceil( ( y+maxelemsize+noisethreshold[1] - bounds[2] )/delta[1] ));
     int z1 = std::max(0, (int)std::floor( ( z-maxelemsize-noisethreshold[2] - bounds[2] )/delta[2] ));
-    int z2 = std::min(numslices[2]-1, (int)std::ceil( ( z+maxelemsize+noisethreshold[2] - bounds[2] )/delta[2] ));
+    int z2 = std::min(numslices[2]-1, (int)std::ceil( ( z+maxelemsize+noisethreshold[2] - bounds[4] )/delta[2] ));
     
     selectedgroups.resize( 3*(x2-x1+1)*(y2-y1+1)*(z2-z1+1) );
     int index = 0;
