@@ -348,9 +348,9 @@ void rawmat::mergeadresses(intdensematrix& rowadresses, intdensematrix& coladres
     }
     
     // Avoid a copy by not shrinking the allocated space:
-    myrows.setnumrows(1); myrows.setnumcols(index);
-    mycols.setnumrows(1); mycols.setnumcols(index);
-    myvals.setnumrows(1); myvals.setnumcols(index);
+    myrows.setnumrows(1); myrows.setnumcols(index+1);
+    mycols.setnumrows(1); mycols.setnumcols(index+1);
+    myvals.setnumrows(1); myvals.setnumcols(index+1);
     
     rowadresses = myrows; coladresses = mycols; vals = myvals;
 }
