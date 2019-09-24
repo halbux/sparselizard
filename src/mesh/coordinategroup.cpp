@@ -17,6 +17,8 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     // Get the coordinate x, y and z bounds as well as the distance between slices:
     bounds = myalgorithm::getcoordbounds(coords);
     delta = {(bounds[1]-bounds[0])/numslices[0], (bounds[3]-bounds[2])/numslices[1], (bounds[5]-bounds[4])/numslices[2]};
+    if (problemdimension == 1) { delta[1] = 1; delta[2] = 1; }
+    if (problemdimension == 2) { delta[2] = 1; }
     
     // Get the slice tics:
     std::vector<double> xslicetics(numslices[0]+1), yslicetics(numslices[1]+1), zslicetics(numslices[2]+1);
