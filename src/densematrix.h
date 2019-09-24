@@ -144,6 +144,10 @@ class densematrix
         densematrix extractrows(int rangebegin, int rangeend);
         densematrix extractcols(int rangebegin, int rangeend);
 
+        // Do not call this yourself:
+        void setnumrows(int num) { numrows = num; };
+        void setnumcols(int num) { numcols = num; };
+
 };
 
 #endif
