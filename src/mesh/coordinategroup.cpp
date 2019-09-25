@@ -24,7 +24,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     {
         if (delta[i] < 1e-6*meshsize)
         {
-            delta[i] = 1e-6*meshsize;
+            delta[i] = 2.0*meshsize;
             numslices[i] = 1;
         }
     }
