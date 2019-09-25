@@ -15,15 +15,11 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     int numblocks = std::ceil((double)mynumcoords/N);
     int ns = std::ceil( std::pow(numblocks, 1.0/problemdimension) );
     numslices = {ns,ns,ns};
-    // In 1D and 2D the y and/or z slices do not exist:
-    if (problemdimension == 1) { numslices[1] = 1; numslices[2] = 1; }
-    if (problemdimension == 2) { numslices[2] = 1; }
     
     // Get the coordinate x, y and z bounds as well as the distance between slices:
     bounds = myalgorithm::getcoordbounds(coords);
     delta = {(bounds[1]-bounds[0])/numslices[0], (bounds[3]-bounds[2])/numslices[1], (bounds[5]-bounds[4])/numslices[2]};
-    if (problemdimension == 1) { delta[1] = 1; delta[2] = 1; }
-    if (problemdimension == 2) { delta[2] = 1; }
+    // This solves the non-existing dimension issues:
     for (int i = 0; i < 3; i++)
     {
         if (delta[i] < 1e-6*meshsize)
