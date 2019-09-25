@@ -99,20 +99,27 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
 }
 
 
-void coordinategroup::select(double x, double y, double z, double maxelemsize)
+void coordinategroup::select(double x, double y, double z, double r)
 {
     xselect = x;
     yselect = y;
     zselect = z;
-    myradius = maxelemsize;
+    myradius = r;
+    
+    // In case no block is close enough to the selected coordinate:
+    if (x+r+noisethreshold[0] < bounds[0] || x-r-noisethreshold[0] > bounds[1] || y+r+noisethreshold[1] < bounds[2] || y-r-noisethreshold[1] > bounds[3] || z+r+noisethreshold[2] < bounds[4] || z-r-noisethreshold[2] > bounds[5])
+    {
+        selectedgroups = {};
+        return;
+    }
     
     // Take an extra noise margin to be sure not to miss any candidate slice:
-    int x1 = std::floor( ( x-maxelemsize-noisethreshold[0] - bounds[0] )/delta[0] );
-    int x2 = std::ceil( ( x+maxelemsize+noisethreshold[0] - bounds[0] )/delta[0] );
-    int y1 = std::floor( ( y-maxelemsize-noisethreshold[1] - bounds[2] )/delta[1] );
-    int y2 = std::ceil( ( y+maxelemsize+noisethreshold[1] - bounds[2] )/delta[1] );
-    int z1 = std::floor( ( z-maxelemsize-noisethreshold[2] - bounds[4] )/delta[2] );
-    int z2 = std::ceil( ( z+maxelemsize+noisethreshold[2] - bounds[4] )/delta[2] );
+    int x1 = std::floor( ( x-r-noisethreshold[0] - bounds[0] )/delta[0] );
+    int x2 = std::ceil( ( x+r+noisethreshold[0] - bounds[0] )/delta[0] );
+    int y1 = std::floor( ( y-r-noisethreshold[1] - bounds[2] )/delta[1] );
+    int y2 = std::ceil( ( y+r+noisethreshold[1] - bounds[2] )/delta[1] );
+    int z1 = std::floor( ( z-r-noisethreshold[2] - bounds[4] )/delta[2] );
+    int z2 = std::ceil( ( z+r+noisethreshold[2] - bounds[4] )/delta[2] );
     
     // Be sure they are all in bound:
     x1 = std::max(0,x1); x2 = std::max(0,x2); y1 = std::max(0,y1); y2 = std::max(0,y2); z1 = std::max(0,z1); z2 = std::max(0,z2);
