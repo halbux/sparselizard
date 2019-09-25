@@ -510,7 +510,7 @@ void myalgorithm::getreferencecoordinates(std::vector<double>& xyzcoords, int di
                             poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
                     }
 
-                    if (false && myalgorithm::getroot(poly, rhs, kietaphi) == 1)
+                    if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
                     {
                         // Check if the (ki,eta,phi) coordinates are inside the element:
                         if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
