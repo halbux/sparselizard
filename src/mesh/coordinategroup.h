@@ -19,7 +19,7 @@ class coordinategroup
         int mynumcoords = 0;
 
         // Target N elements per block on a structured grid:
-        int N = 1000;
+        int N = 100;
         
         // Bounds gives {xmin, xmax, ymin, ymax, zmin, zmax}:
         std::vector<double> bounds = {};
