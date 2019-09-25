@@ -218,6 +218,39 @@ void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& t
     }
 }
 
+void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices)
+{
+    int num = toslice.size();
+    
+    // To be sure not to miss any value:
+    minval -= noisethreshold;
+    delta += 2.0*noisethreshold;
+    
+    slices = {};
+    
+    // Create a vector giving the slice in which each value is:
+    std::vector<int> inslice(num);
+    std::vector<int> countinslice(numslices,0);
+    for (int i = 0; i < num; i++)
+    {
+        int curslice = std::floor((toslice[i]-minval)/delta);
+        inslice[i] = curslice;
+        countinslice[curslice]++;
+    }
+    
+    // Preallocate 'slices':
+    for (int s = 0; s < numslices; s++)
+        slices.push_back(std::vector<int>(countinslice[s]));
+    // Populate 'slices':
+    std::vector<int> curposinslice(numslices,0);
+    for (int i = 0; i < num; i++)
+    {
+        int s = inslice[i];
+        slices[s][curposinslice[s]] = i;
+        curposinslice[s]++;
+    }
+}
+
 std::vector<double> myalgorithm::getcoordbounds(std::vector<double>& coords)
 {
     int numcoords = coords.size()/3;

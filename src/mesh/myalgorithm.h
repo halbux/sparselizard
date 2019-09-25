@@ -46,6 +46,10 @@ namespace myalgorithm
     // 'slicepos[0]' must be smaller than the smallest value in 'toslice' and 'slicepos[slicepos.size()-1]' must be larger than the largest value.
     void slicecoordinates(double noisethreshold, std::vector<double>& toslice, std::vector<double>& slicepos, std::vector<std::vector<int>>& slices);
     
+    // The output 'slices[i]' gives the indexes of all values of 'toslice' that are in the interval between minval+i*delta and minval+(i+1)*delta.
+    // Value minval must be smaller than the smallest value in 'toslice' and minval+numslices*delta must be larger than the largest value.
+    void slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices);
+    
     // Return {xmin,xmax,ymin,ymax,zmin,zmax} for the coordinates {x1,y1,z1,x2,...}:
     std::vector<double> getcoordbounds(std::vector<double>& coordinates);
     
