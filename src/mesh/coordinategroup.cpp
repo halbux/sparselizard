@@ -27,7 +27,10 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     for (int i = 0; i < 3; i++)
     {
         if (delta[i] < 1e-6*meshsize)
+        {
             delta[i] = 1e-6*meshsize;
+            numslices[i] = 1;
+        }
     }
     
     // Get the slice tics:
