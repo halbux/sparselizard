@@ -64,7 +64,11 @@ namespace myalgorithm
 
     // Attempt to get the above mentionned root with multiple initial guesses provided in format {ki1,eta1,phi1,ki2,eta2,phi2,...}.
     int getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize = 2, double tol = 1e-12, int maxit = 20);
-    
+
+    // Get the reference coordinates and the element indexes in disjoint region 'disjreg' corresponding to each (x,y,z) coordinate provided as argument. 
+    // If the ith coordinate (xi,yi,zi) cannot be found in any element of the disjoint region then elems[i] is set to -1.
+    void getreferencecoordinates(std::vector<double>& xyzcoords, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis);
+ 
     // Split the 'tosplit' vector into 'blocklen' vectors of length tosplit.size()/blocklen.
     std::vector<std::vector<double>> splitvector(std::vector<double>& tosplit, int blocklen);
     

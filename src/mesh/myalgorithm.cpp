@@ -421,6 +421,113 @@ int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<do
     return -1;
 }
 
+#include "universe.h"
+#include "disjointregions.h"
+#include "lagrangeformfunction.h"
+#include "coordinategroup.h"
+
+void myalgorithm::getreferencecoordinates(std::vector<double>& xyzcoords, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
+{
+    // Preallocate the input containers:
+    int numcoords = xyzcoords.size()/3;
+    elems.resize(numcoords);
+    for (int i = 0; i < numcoords; i++)
+        elems[i] = -1;
+    kietaphis.resize(3*numcoords);
+    std::vector<bool> isfound(numcoords);
+    for (int i = 0; i < numcoords; i++)
+        isfound[i] = false;
+    
+    disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
+    elements* myelems = universe::mymesh->getelements();
+    
+    // Get information related to the disjoint region:
+    int elemtypenum = mydisjregs->getelementtypenumber(disjreg);
+    int elemdim = mydisjregs->getelementdimension(disjreg);
+    int elemorder = myelems->getcurvatureorder();
+    
+    int rangebegin = mydisjregs->getrangebegin(disjreg), rangeend = mydisjregs->getrangeend(disjreg);
+    int numelems = rangeend-rangebegin+1;
+
+    lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
+    element myel(elemtypenum, elemorder);
+    
+    
+    // Get the element barycenter coordinates:
+    std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
+    // Get the radius of the sphere centered at the barycenter and surrounding all nodes in an element:
+    std::vector<double>* sphereradius = myelems->getsphereradius(elemtypenum);
+    
+    // Group elements into x, y and z slices:
+    coordinategroup coordgroup(xyzcoords);
+
+    // Parameter that gives the distance (in multiples of the max barycenter-element node distance)
+    // starting from which one can safely assume to always be outside the element for any point.
+    // For straight elements this always holds for alpha equal to 1 (plus roundoff safety):
+    double alpha = 1+1e-10;
+    if (elemorder > 1)
+        alpha = 2.0;
+        
+    // Loop on all elements in the disjoint region:
+    for (int e = 0; e < numelems; e++)
+    {
+        double curelem = rangebegin+e;
+        
+        std::vector<polynomial> poly = {};
+    
+        double maxelemsize = alpha*sphereradius->at(curelem);
+        double xbary = barycenters->at(3*curelem+0), ybary = barycenters->at(3*curelem+1), zbary = barycenters->at(3*curelem+2);
+    
+        // Loop on all candidate groups:
+        coordgroup.select(xbary,ybary,zbary, maxelemsize);
+        for (int g = 0; g < coordgroup.countgroups(); g++)
+        {
+            std::vector<int>* curgroupindexes = coordgroup.getgroupindexes(g);
+            int numcoordsingroup = curgroupindexes->size();
+            if (numcoordsingroup == 0)
+                continue;
+            std::vector<double>* curgroupcoords = coordgroup.getgroupcoordinates(g);
+            
+            // Loop on all coordinates in the current group:
+            for (int c = 0; c < numcoordsingroup; c++)
+            {
+                int curindex = curgroupindexes->at(c);
+                double curx = curgroupcoords->at(3*c+0), cury = curgroupcoords->at(3*c+1), curz = curgroupcoords->at(3*c+2);
+
+                // Only process when not yet found and when the coordinate is close enough to the element barycenter.
+                if (isfound[curindex] == true || std::abs(curx-xbary) > maxelemsize || std::abs(cury-ybary) > maxelemsize || std::abs(curz-zbary) > maxelemsize) {}
+                else
+                {
+                    // Reset initial guess:
+                    std::vector<double> kietaphi = {0.0,0.0,0.0};
+                    std::vector<double> rhs = {curx, cury, curz};
+
+                    // Only create once for all coordinates the polynomials and only for the required elements:
+                    if (poly.size() == 0)
+                    {
+                        poly.resize(elemdim);
+                        for (int j = 0; j < elemdim; j++)
+                            poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
+                    }
+
+                    if (false && myalgorithm::getroot(poly, rhs, kietaphi) == 1)
+                    {
+                        // Check if the (ki,eta,phi) coordinates are inside the element:
+                        if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                        {
+                            isfound[curindex] = true;
+                            kietaphis[3*curindex+0] = kietaphi[0]; 
+                            kietaphis[3*curindex+1] = kietaphi[1]; 
+                            kietaphis[3*curindex+2] = kietaphi[2];
+                            elems[curindex] = e;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& tosplit, int blocklen)
 {
     int numdata = tosplit.size()/blocklen;
