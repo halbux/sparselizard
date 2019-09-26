@@ -1455,7 +1455,7 @@ expression expression::rotate(double alphax, double alphay, double alphaz)
         rotated = rotated*invR66expr;
         
         
-    return rotated;
+    myoperations = rotated.myoperations;
 }
 
 expression expression::at(int row, int col)
