@@ -29,15 +29,6 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         }
     }
     
-    // Get the slice tics:
-    std::vector<double> xslicetics(numslices[0]+1), yslicetics(numslices[1]+1), zslicetics(numslices[2]+1);
-    for (int i = 0; i <= numslices[0]; i++)
-        xslicetics[i] = bounds[0] + delta[0] * i;
-    for (int i = 0; i <= numslices[1]; i++)
-        yslicetics[i] = bounds[2] + delta[1] * i;
-    for (int i = 0; i <= numslices[2]; i++)
-        zslicetics[i] = bounds[4] + delta[2] * i;
-    
     std::vector<double> xcoords(mynumcoords), ycoords(mynumcoords), zcoords(mynumcoords);
     for (int i = 0; i < mynumcoords; i++)
     {
@@ -52,7 +43,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         
 
     std::vector<std::vector<int>> xslices;
-    myalgorithm::slicecoordinates(noisethreshold[0], xcoords, xslicetics, xslices);
+    myalgorithm::slicecoordinates(noisethreshold[0], xcoords, bounds[0], delta[0], numslices[0], xslices);
     
     // Loop on all x slices:
     for (int i = 0; i < numslices[0]; i++)
@@ -64,7 +55,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
             
         // Slice the current slice in y slices:
         std::vector<std::vector<int>> yslices;
-        myalgorithm::slicecoordinates(noisethreshold[1], curycoords, yslicetics, yslices);
+        myalgorithm::slicecoordinates(noisethreshold[1], curycoords, bounds[2], delta[1], numslices[1], yslices);
         
         // Loop on all y slices:
         for (int j = 0; j < numslices[1]; j++)
@@ -76,7 +67,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
                 
             // Slice the current slice in z slices:
             std::vector<std::vector<int>> zslices;
-            myalgorithm::slicecoordinates(noisethreshold[2], curzcoords, zslicetics, zslices);
+            myalgorithm::slicecoordinates(noisethreshold[2], curzcoords, bounds[4], delta[2], numslices[2], zslices);
             
             for (int k = 0; k < numslices[2]; k++)
             {
