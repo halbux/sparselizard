@@ -1356,6 +1356,108 @@ void expression::print(void)
     std::cout << std::endl;
 }
 
+expression expression::rotate(double alphax, double alphay, double alphaz)
+{
+    if ( not(mynumrows == 3 && mynumcols == 3) && not(mynumrows == 3 && mynumcols == 6) && not(mynumrows == 6 && mynumcols == 3) && not(mynumrows == 6 && mynumcols == 6) )
+    {
+        std::cout << "Error in 'expression' object: rotation only works on 3x3, 3x6, 6x3, 6x6 vectors/tensors (size 3 expects x,y,z component form while size 6 expects Voigt form)" << std::endl;
+        abort();
+    }
+
+    double pi = 3.1415926535897932384;
+    double ax = alphax*2*pi/360;
+    double ay = alphay*2*pi/360;
+    double az = alphaz*2*pi/360;
+    
+    double tx,ty,tz,c,s;
+    
+    
+    ///// Define the rotation matrix R and its inverse for classical 3x3 tensors:
+    
+    tx = ax; ty = ay; tz = az;
+    
+    c = std::cos(tx); s = std::sin(tx);
+    densematrix Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
+    c = std::cos(ty); s = std::sin(ty);
+    densematrix Ry(3,3, { c,0,s, 0,1,0, -s,0,c });
+    c = std::cos(tz); s = std::sin(tz);
+    densematrix Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
+    
+    densematrix R33 = Rz; R33.multiply(Ry); R33.multiply(Rx);
+    
+    // And its inverse:
+    tx = -ax, ty = -ay, tz = -az;
+    
+    c = std::cos(tx); s = std::sin(tx);
+    densematrix invRx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
+    c = std::cos(ty); s = std::sin(ty);
+    densematrix invRy(3,3, { c,0,s, 0,1,0, -s,0,c });
+    c = std::cos(tz); s = std::sin(tz);
+    densematrix invRz(3,3, { c,-s,0, s,c,0, 0,0,1 });
+    
+    densematrix invR33 = invRx; invR33.multiply(invRy); invR33.multiply(invRz);
+    
+    double* R33val = R33.getvalues();
+    double* invR33val = invR33.getvalues();
+    
+    expression R33expr(3,3, {R33val[0], R33val[1], R33val[2], R33val[3], R33val[4], R33val[5]});
+    expression invR33expr(3,3, {invR33val[0], invR33val[1], invR33val[2], invR33val[3], invR33val[4], invR33val[5]});
+    
+    
+    ///// Define the rotation matrix R and its inverse for Voigt-form 6x6 tensors:
+
+    tx = ax; ty = ay; tz = az;
+    
+    c = std::cos(tx); s = std::sin(tx);
+    densematrix Rvx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
+    c = std::cos(ty); s = std::sin(ty);
+    densematrix Rvy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
+    c = std::cos(tz); s = std::sin(tz);
+    densematrix Rvz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
+    
+    densematrix R66 = Rvz; R66.multiply(Rvy); R66.multiply(Rvx);
+    
+    // And its inverse:
+    tx = -ax; ty = -ay; tz = -az;
+    
+    c = std::cos(tx); s = std::sin(tx);
+    densematrix invRvx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
+    c = std::cos(ty); s = std::sin(ty);
+    densematrix invRvy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
+    c = std::cos(tz); s = std::sin(tz);
+    densematrix invRvz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
+    
+    densematrix invR66 = invRvx; invR66.multiply(invRvy); invR66.multiply(invRvz);
+    
+    double* R66val = R66.getvalues();
+    double* invR66val = invR66.getvalues();
+    
+    std::vector<expression> exprs(36);
+    for (int i = 0; i < 36; i++)
+        exprs[i] = expression(R66val[i]);
+    expression R66expr(6,6, exprs);
+    for (int i = 0; i < 36; i++)
+        exprs[i] = expression(invR66val[i]);
+    expression invR66expr(6,6, exprs);
+    
+    
+    ///// Rotate the matrix in this expression:
+    
+    expression rotated = *this;
+    if (mynumrows == 3)
+        rotated = R33expr*rotated;
+    if (mynumrows == 6)
+        rotated = mathop::transpose(invR66expr)*rotated;
+        
+    if (mynumcols == 3)
+        rotated = rotated*invR33expr;
+    if (mynumcols == 6)
+        rotated = rotated*invR66expr;
+        
+        
+    return rotated;
+}
+
 expression expression::at(int row, int col)
 {
     expression arrayentry;

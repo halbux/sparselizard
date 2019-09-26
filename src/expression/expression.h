@@ -156,6 +156,10 @@ class expression
         // Print the expression:
         void print(void);
         
+        // Rotate a tensor (e.g. 3x3 permittivity matrix, 3x6 or 6x3 piezoelectric coupling matrix, 6x6 Hooke's matrix,...).
+        // Rotate by ax, ay and az degrees around the x, y and z axis respectively.
+        expression rotate(double ax, double ay, double az);
+        
         expression at(int row, int col);
         
         // Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
