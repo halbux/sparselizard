@@ -1383,7 +1383,7 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     c = std::cos(tz); s = std::sin(tz);
     densematrix Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
     
-    densematrix R33 = Rz; R33.multiply(Ry); R33.multiply(Rx);
+    densematrix R33 = Rz.multiply(Ry.multiply(Rx));
     
     // And its inverse:
     tx = -ax, ty = -ay, tz = -az;
@@ -1395,7 +1395,7 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     c = std::cos(tz); s = std::sin(tz);
     densematrix invRz(3,3, { c,-s,0, s,c,0, 0,0,1 });
     
-    densematrix invR33 = invRx; invR33.multiply(invRy); invR33.multiply(invRz);
+    densematrix invR33 = invRx.multiply(invRy.multiply(invRz));
     
     double* R33val = R33.getvalues();
     double* invR33val = invR33.getvalues();
@@ -1415,7 +1415,7 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     c = std::cos(tz); s = std::sin(tz);
     densematrix Rvz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
     
-    densematrix R66 = Rvz; R66.multiply(Rvy); R66.multiply(Rvx);
+    densematrix R66 = Rvz.multiply(Rvy.multiply(Rvx));
     
     // And its inverse:
     tx = -ax; ty = -ay; tz = -az;
@@ -1427,7 +1427,7 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     c = std::cos(tz); s = std::sin(tz);
     densematrix invRvz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
     
-    densematrix invR66 = invRvx; invR66.multiply(invRvy); invR66.multiply(invRvz);
+    densematrix invR66 = invRvx.multiply(invRvy.multiply(invRvz));
     
     double* R66val = R66.getvalues();
     double* invR66val = invR66.getvalues();
@@ -1447,7 +1447,7 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     if (mynumrows == 3)
         rotated = R33expr*rotated;
     if (mynumrows == 6)
-        rotated = mathop::transpose(invR66expr)*rotated;
+        rotated = R66expr*rotated;
         
     if (mynumcols == 3)
         rotated = rotated*invR33expr;
