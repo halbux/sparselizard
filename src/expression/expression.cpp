@@ -1400,8 +1400,13 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     double* R33val = R33.getvalues();
     double* invR33val = invR33.getvalues();
     
-    expression R33expr(3,3, {R33val[0], R33val[1], R33val[2], R33val[3], R33val[4], R33val[5]});
-    expression invR33expr(3,3, {invR33val[0], invR33val[1], invR33val[2], invR33val[3], invR33val[4], invR33val[5]});
+    std::vector<expression> exprs33(9);
+    for (int i = 0; i < 9; i++)
+        exprs33[i] = expression(R33val[i]);
+    expression R33expr(3,3, exprs33);
+    for (int i = 0; i < 9; i++)
+        exprs33[i] = expression(invR33val[i]);
+    expression invR33expr(3,3, exprs33);
     
     
     ///// Define the rotation matrix R and its inverse for Voigt-form 6x6 tensors:
@@ -1432,13 +1437,13 @@ void expression::rotate(double alphax, double alphay, double alphaz)
     double* R66val = R66.getvalues();
     double* invR66val = invR66.getvalues();
     
-    std::vector<expression> exprs(36);
+    std::vector<expression> exprs66(36);
     for (int i = 0; i < 36; i++)
-        exprs[i] = expression(R66val[i]);
-    expression R66expr(6,6, exprs);
+        exprs66[i] = expression(R66val[i]);
+    expression R66expr(6,6, exprs66);
     for (int i = 0; i < 36; i++)
-        exprs[i] = expression(invR66val[i]);
-    expression invR66expr(6,6, exprs);
+        exprs66[i] = expression(invR66val[i]);
+    expression invR66expr(6,6, exprs66);
     
     
     ///// Rotate the matrix in this expression:
