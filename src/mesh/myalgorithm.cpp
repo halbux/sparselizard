@@ -182,42 +182,6 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
     return reorderingvector;
 }
 
-void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& toslice, std::vector<double>& slicepos, std::vector<std::vector<int>>& slices)
-{
-    int num = toslice.size();
-    int numslices = slicepos.size()-1;
-    
-    slices = {};
-    
-    // Sort the 'toslice' vector:
-    std::vector<int> reorderingvector = {};
-    stablesort(noisethreshold, toslice, reorderingvector);
-    
-    // Loop on all slices:
-    int numprocessed = 0;
-    for (int s = 0; s < numslices; s++)
-    {
-        double cursliceend = slicepos[s+1] + noisethreshold;
-        
-        // Calculate the current slice size:
-        int pos;
-        for (pos = numprocessed; pos < num; pos++)
-        {
-            if (toslice[reorderingvector[pos]] <= cursliceend) {}
-            else
-                break;
-    
-        }
-        int slicesize = pos-numprocessed;
-        slices.push_back(std::vector<int>(slicesize));
-        // Populate the current slice:
-        for (int i = 0; i < slicesize; i++)
-            slices[s][i] = reorderingvector[numprocessed+i];
-
-        numprocessed += slicesize;
-    }
-}
-
 void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices)
 {
     int num = toslice.size();
