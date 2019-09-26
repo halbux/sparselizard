@@ -234,8 +234,16 @@ void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& t
     for (int i = 0; i < num; i++)
     {
         int curslice = std::floor((toslice[i]-minval)/delta);
-        inslice[i] = curslice;
-        countinslice[curslice]++;
+        if (curslice >= 0 && curslice < numslices)
+        {
+            inslice[i] = curslice;
+            countinslice[curslice]++;
+        }
+        else
+        {
+            std::cout << "Error in 'myalgorithm': value to slice is out of range (numerical noise threshold exceeded)" << std::endl;
+            abort();
+        }
     }
     
     // Preallocate 'slices':
