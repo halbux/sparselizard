@@ -1356,7 +1356,7 @@ void expression::print(void)
     std::cout << std::endl;
 }
 
-expression expression::rotate(double alphax, double alphay, double alphaz)
+void expression::rotate(double alphax, double alphay, double alphaz)
 {
     if ( not(mynumrows == 3 && mynumcols == 3) && not(mynumrows == 3 && mynumcols == 6) && not(mynumrows == 6 && mynumcols == 3) && not(mynumrows == 6 && mynumcols == 6) )
     {
