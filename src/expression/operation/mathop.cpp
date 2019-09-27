@@ -634,7 +634,7 @@ expression mathop::voigtrotation(double alphax, double alphay, double alphaz)
     std::vector<expression> exprs(36);
     for (int i = 0; i < 36; i++)
     {
-        if (Kval[i] < 1e-12)
+        if (std::abs(Kval[i]) < 1e-12)
             Kval[i] = 0;
         exprs[i] = expression(Kval[i]);
     }
