@@ -1356,7 +1356,7 @@ void expression::print(void)
     std::cout << std::endl;
 }
 
-void expression::rotate(double alphax, double alphay, double alphaz)
+void expression::rotate(double ax, double ay, double az, std::string type)
 {
     if ( not(mynumrows == 3 && mynumcols == 3) && not(mynumrows == 3 && mynumcols == 6) && not(mynumrows == 6 && mynumcols == 3) && not(mynumrows == 6 && mynumcols == 6) )
     {
@@ -1364,11 +1364,6 @@ void expression::rotate(double alphax, double alphay, double alphaz)
         abort();
     }
 
-    double pi = 3.1415926535897932384;
-    double ax = alphax*2*pi/360;
-    double ay = alphay*2*pi/360;
-    double az = alphaz*2*pi/360;
-    
     double tx,ty,tz,c,s;
     
     
