@@ -1358,7 +1358,7 @@ void expression::print(void)
 
 void expression::rotate(double ax, double ay, double az, std::string type)
 {
-    std::vector<std::string> types = {"tensor3x3", "elasticity6x6", "compliance6x6", "stress6x1", "strain6x1"};
+    std::vector<std::string> types = {"tensor3x3", "elasticity6x6", "compliance6x6", "stress6x1", "strain6x1", "piezo3x6", "piezo6x3"};
     
     bool isfound = false;
     for (int i = 0; i < types.size(); i++)
@@ -1381,24 +1381,16 @@ void expression::rotate(double ax, double ay, double az, std::string type)
     
     // Define the rotation matrices:
     expression R = mathop::rotation(ax, ay, az);
-    expression invR = mathop::inverse(R);
+    expression invR = mathop::transpose(R);
     expression K = mathop::voigtrotation(ax, ay, az);
     expression invK = mathop::inverse(K);
     
-    // Simplify the inverses and remove the roundoff noise:
-    for (int i = 0; i < invR.countrows()*invR.countcolumns(); i++)
-    {
-        invR.myoperations[i] = invR.myoperations[i]->simplify({});
-        // The operation here is always a constant:
-        if (invR.myoperations[i]->getvalue() < 1e-12)
-            invR.myoperations[i] = shared_ptr<opconstant>(new opconstant(0));
-    }
-    
+    // Simplify invK and remove the roundoff noise:
     for (int i = 0; i < invK.countrows()*invK.countcolumns(); i++)
     {
         invK.myoperations[i] = invK.myoperations[i]->simplify({});
         // The operation here is always a constant:
-        if (invK.myoperations[i]->getvalue() < 1e-12)
+        if (std::abs(invK.myoperations[i]->getvalue()) < 1e-12)
             invK.myoperations[i] = shared_ptr<opconstant>(new opconstant(0));
     }
     
@@ -1448,6 +1440,22 @@ void expression::rotate(double ax, double ay, double az, std::string type)
             isvalidsize = false;
     
         rotated = mathop::transpose(invK)*rotated; 
+    }
+    // Piezo in Voigt form 3x6:
+    if (type == types[5])
+    {
+        if (mynumrows != 3 || mynumcols != 6)
+            isvalidsize = false;
+    
+        rotated = R*rotated*mathop::transpose(K); 
+    }
+    // Piezo in Voigt form 6x3:
+    if (type == types[6])
+    {
+        if (mynumrows != 6 || mynumcols != 3)
+            isvalidsize = false;
+    
+        rotated = K*rotated*invR; 
     }
     
         

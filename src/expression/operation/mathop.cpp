@@ -600,7 +600,7 @@ expression mathop::rotation(double alphax, double alphay, double alphaz)
     std::vector<expression> exprs(9);
     for (int i = 0; i < 9; i++)
     {
-        if (Rval[i] < 1e-12)
+        if (std::abs(Rval[i]) < 1e-12)
             Rval[i] = 0;
         exprs[i] = expression(Rval[i]);
     }
