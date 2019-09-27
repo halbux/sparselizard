@@ -121,6 +121,12 @@ namespace mathop
 
     // Get the trace of a square matrix:
     expression trace(expression a);
+    
+    // Get the rotation matrix for a 3x3 tensor with (x,y,z) component ordering.
+    // Input angles are in degrees.
+    expression rotation(double alphax, double alphay, double alphaz);
+    // Get the rotation matrix for a 6x6 tensor in Voigt ordering:
+    expression voigtrotation(double alphax, double alphay, double alphaz);
 
     // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);
