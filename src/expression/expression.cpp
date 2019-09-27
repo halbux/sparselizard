@@ -1358,104 +1358,106 @@ void expression::print(void)
 
 void expression::rotate(double ax, double ay, double az, std::string type)
 {
-    if ( not(mynumrows == 3 && mynumcols == 3) && not(mynumrows == 3 && mynumcols == 6) && not(mynumrows == 6 && mynumcols == 3) && not(mynumrows == 6 && mynumcols == 6) )
+    std::vector<std::string> types = {"tensor3x3", "elasticity6x6", "compliance6x6", "stress6x1", "strain6x1"};
+    
+    bool isfound = false;
+    for (int i = 0; i < types.size(); i++)
     {
-        std::cout << "Error in 'expression' object: rotation only works on 3x3, 3x6, 6x3, 6x6 vectors/tensors (size 3 expects x,y,z component form while size 6 expects Voigt form)" << std::endl;
+        if (types[i] == type)
+        {
+            isfound = true;
+            break;
+        }
+    }
+    if (isfound == false)
+    {
+        std::cout << "Error in 'expression' object: rotation for " << mynumrows << "x" << mynumcols << " expression of type '" << type << "' is not defined" << std::endl;
+        std::cout << "Defined types are " << std::endl;
+        for (int i = 0; i < types.size()-1; i++)
+            std::cout << "'" << types[i] << "', ";
+        std::cout << types[types.size()-1] << "'";
         abort();
     }
-
-    double tx,ty,tz,c,s;
     
+    // Define the rotation matrices:
+    expression R = mathop::rotation(ax, ay, az);
+    expression invR = mathop::inverse(R);
+    expression K = mathop::voigtrotation(ax, ay, az);
+    expression invK = mathop::inverse(K);
     
-    ///// Define the rotation matrix R and its inverse for classical 3x3 tensors:
+    // Simplify the inverses and remove the roundoff noise:
+    for (int i = 0; i < invR.countrows()*invR.countcolumns(); i++)
+    {
+        invR.myoperations[i] = invR.myoperations[i]->simplify({});
+        // The operation here is always a constant:
+        if (invR.myoperations[i]->getvalue() < 1e-12)
+            invR.myoperations[i] = shared_ptr<opconstant>(new opconstant(0));
+    }
     
-    tx = ax; ty = ay; tz = az;
-    
-    c = std::cos(tx); s = std::sin(tx);
-    densematrix Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
-    c = std::cos(ty); s = std::sin(ty);
-    densematrix Ry(3,3, { c,0,s, 0,1,0, -s,0,c });
-    c = std::cos(tz); s = std::sin(tz);
-    densematrix Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
-    
-    densematrix R33 = Rz.multiply(Ry.multiply(Rx));
-    
-    // And its inverse:
-    tx = -ax, ty = -ay, tz = -az;
-    
-    c = std::cos(tx); s = std::sin(tx);
-    densematrix invRx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
-    c = std::cos(ty); s = std::sin(ty);
-    densematrix invRy(3,3, { c,0,s, 0,1,0, -s,0,c });
-    c = std::cos(tz); s = std::sin(tz);
-    densematrix invRz(3,3, { c,-s,0, s,c,0, 0,0,1 });
-    
-    densematrix invR33 = invRx.multiply(invRy.multiply(invRz));
-    
-    double* R33val = R33.getvalues();
-    double* invR33val = invR33.getvalues();
-    
-    std::vector<expression> exprs33(9);
-    for (int i = 0; i < 9; i++)
-        exprs33[i] = expression(R33val[i]);
-    expression R33expr(3,3, exprs33);
-    for (int i = 0; i < 9; i++)
-        exprs33[i] = expression(invR33val[i]);
-    expression invR33expr(3,3, exprs33);
-    
-    
-    ///// Define the rotation matrix R and its inverse for Voigt-form 6x6 tensors:
-
-    tx = ax; ty = ay; tz = az;
-    
-    c = std::cos(tx); s = std::sin(tx);
-    densematrix Rvx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
-    c = std::cos(ty); s = std::sin(ty);
-    densematrix Rvy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
-    c = std::cos(tz); s = std::sin(tz);
-    densematrix Rvz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
-    
-    densematrix R66 = Rvz.multiply(Rvy.multiply(Rvx));
-    
-    // And its inverse:
-    tx = -ax; ty = -ay; tz = -az;
-    
-    c = std::cos(tx); s = std::sin(tx);
-    densematrix invRvx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
-    c = std::cos(ty); s = std::sin(ty);
-    densematrix invRvy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
-    c = std::cos(tz); s = std::sin(tz);
-    densematrix invRvz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
-    
-    densematrix invR66 = invRvx.multiply(invRvy.multiply(invRvz));
-    
-    double* R66val = R66.getvalues();
-    double* invR66val = invR66.getvalues();
-    
-    std::vector<expression> exprs66(36);
-    for (int i = 0; i < 36; i++)
-        exprs66[i] = expression(R66val[i]);
-    expression R66expr(6,6, exprs66);
-    for (int i = 0; i < 36; i++)
-        exprs66[i] = expression(invR66val[i]);
-    expression invR66expr(6,6, exprs66);
+    for (int i = 0; i < invK.countrows()*invK.countcolumns(); i++)
+    {
+        invK.myoperations[i] = invK.myoperations[i]->simplify({});
+        // The operation here is always a constant:
+        if (invK.myoperations[i]->getvalue() < 1e-12)
+            invK.myoperations[i] = shared_ptr<opconstant>(new opconstant(0));
+    }
     
     
     ///// Rotate the matrix in this expression:
     
+    bool isvalidsize = true;
+    
     expression rotated = *this;
-    if (mynumrows == 3)
-        rotated = R33expr*rotated;
-    if (mynumrows == 6)
-        rotated = R66expr*rotated;
-        
-    if (mynumcols == 3)
-        rotated = rotated*invR33expr;
-    if (mynumcols == 6)
-        rotated = rotated*invR66expr;
-        
+    
+    // Tensor 3x3:
+    if (type == types[0])
+    {
+        if (mynumrows != 3 || mynumcols != 3)
+            isvalidsize = false;
+    
+        rotated = R*rotated*invR; 
+    }
+    // Elasticity matrix 6x6:
+    if (type == types[1])
+    {
+        if (mynumrows != 6 || mynumcols != 6)
+            isvalidsize = false;
+    
+        rotated = K*rotated*mathop::transpose(K); 
+    }
+    // Compliance matrix 6x6:
+    if (type == types[2])
+    {
+        if (mynumrows != 6 || mynumcols != 6)
+            isvalidsize = false;
+    
+        rotated = mathop::transpose(invK)*rotated*invK; 
+    }
+    // Stress tensor in Voigt form 6x1:
+    if (type == types[3])
+    {
+        if (mynumrows != 6 || mynumcols != 1)
+            isvalidsize = false;
+    
+        rotated = K*rotated; 
+    }
+    // Strain tensor in Voigt form 6x1:
+    if (type == types[4])
+    {
+        if (mynumrows != 6 || mynumcols != 1)
+            isvalidsize = false;
+    
+        rotated = mathop::transpose(invK)*rotated; 
+    }
+    
         
     myoperations = rotated.myoperations;
+    
+    if (isvalidsize == false)
+    {
+        std::cout << "Error in 'expression' object: trying to rotate a '" << type << "' type expression of dimension " << mynumrows << "x" << mynumcols << " (invalid dimension for this type)" << std::endl;
+        abort();
+    }
 }
 
 expression expression::at(int row, int col)
