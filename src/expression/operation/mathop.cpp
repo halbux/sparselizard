@@ -613,11 +613,11 @@ expression mathop::rotation(double alphax, double alphay, double alphaz, std::st
     if (type == "voigt")
     {
         c = std::cos(tx); s = std::sin(tx);
-        densematrix Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
+        densematrix Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
         c = std::cos(ty); s = std::sin(ty);
         densematrix Ky(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
         c = std::cos(tz); s = std::sin(tz);
-        densematrix Kz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
+        densematrix Kz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
 
         densematrix K = Kz.multiply(Ky.multiply(Kx));
         
