@@ -113,21 +113,21 @@ void sparselizard(void)
     expression alpha = dbtoneper(5.4);
     
     // Diagonal relative permittivity matrix for the piezo:
-    expression K(3,3,{7.4,9.3,7.6});
+    expression K(3,3,{7.4,7.4,8.0});
     K = K * 8.854e-12;
 
     // Coupling matrix [C/m^2] in Voigt notation for the piezo (6 rows, 3 columns).
     // The matrix is expressed in the usual coordinates, i.e. with z being the layer growth direction.
-    expression C(6,3,{0,0,0.024, 0,0,0.001, 0,0,-0.027, 0,0,0, 0,0,0, 0,0,0});
-    // To take into account that here y is the growth direction y and z must be flipped:
-    C.reorderrows({0,2,1,3,5,4}); C.reordercolumns({0,2,1});
+    expression C(6,3,{0,0,0.024, 0,0,0.024, 0,0,-0.027, 0,-0.015,0, -0.015,0,0, 0,0,0});
 
     // Hooke's matrix [Pa] in Voigt notation for the piezo.
     // The matrix is expressed in the usual coordinates, i.e. with z being the layer growth direction.
-    expression H(6,6, {3.8e9, 1.9e9,3.8e9, 0.9e9,0.9e9,1.2e9, 0,0,0,7e8, 0,0,0,0,9e8, 0,0,0,0,0,9e8});
-    // To take into account that here y is the growth direction y and z must be flipped:
-    H.reorderrows({0,2,1,3,5,4}); H.reordercolumns({0,2,1,3,5,4});
+    expression H(6,6, {3.8e9, 1.9e9,3.8e9, 0.9e9,0.9e9,1.2e9, 0,0,0,7e8, 0,0,0,0,7e8, 0,0,0,0,0,9e8});
 
+    // Take into account that here y is the growth direction and not z.
+    // Refer to the documentation to make sure you understand when to use 'rotate'!
+    K.rotate(-90,0,0); C.rotate(-90,0,0); H.rotate(-90,0,0);
+    
 
     formulation pmutmodel;
 
@@ -183,7 +183,7 @@ void sparselizard(void)
     clk.print("Total computation time:");
 
     // Code validation line. Can be removed.
-    std::cout << (pressureabove < 0.16326 && pressureabove > 0.16324);
+    std::cout << (pressureabove < 0.278699 && pressureabove > 0.278697);
 }
 
 // THE MESH BELOW IS FULLY STRUCTURED AND IS CREATED USING THE (BASIC) SPARSELIZARD GEOMETRY CREATION TOOL.
