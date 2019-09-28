@@ -575,7 +575,7 @@ expression mathop::trace(expression a)
     return output;
 }
 
-expression mathop::rotation(double alphax, double alphay, double alphaz)
+expression mathop::rotation(double alphax, double alphay, double alphaz, std::string type)
 {
     double pi = getpi();
     double ax = alphax*pi/180.0;
@@ -585,62 +585,58 @@ expression mathop::rotation(double alphax, double alphay, double alphaz)
     double tx,ty,tz,c,s;
     
     tx = ax; ty = ay; tz = az;
-    
-    c = std::cos(tx); s = std::sin(tx);
-    densematrix Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
-    c = std::cos(ty); s = std::sin(ty);
-    densematrix Ry(3,3, { c,0,s, 0,1,0, -s,0,c });
-    c = std::cos(tz); s = std::sin(tz);
-    densematrix Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
-    
-    densematrix R = Rz.multiply(Ry.multiply(Rx));
-    
-    double* Rval = R.getvalues();
-    
-    std::vector<expression> exprs(9);
-    for (int i = 0; i < 9; i++)
-    {
-        if (std::abs(Rval[i]) < 1e-12)
-            Rval[i] = 0;
-        exprs[i] = expression(Rval[i]);
-    }
-    expression Rexpr(3,3, exprs);
-    
-    return Rexpr;
-}
 
-expression mathop::voigtrotation(double alphax, double alphay, double alphaz)
-{
-    double pi = getpi();
-    double ax = alphax*pi/180.0;
-    double ay = alphay*pi/180.0;
-    double az = alphaz*pi/180.0;
-    
-    double tx,ty,tz,c,s;
-    
-    tx = ax; ty = ay; tz = az;
-    
-    c = std::cos(tx); s = std::sin(tx);
-    densematrix Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
-    c = std::cos(ty); s = std::sin(ty);
-    densematrix Ky(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
-    c = std::cos(tz); s = std::sin(tz);
-    densematrix Kz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
-    
-    densematrix K = Kz.multiply(Ky.multiply(Kx));
-    
-    double* Kval = K.getvalues();
-    
-    std::vector<expression> exprs(36);
-    for (int i = 0; i < 36; i++)
-    {
-        if (std::abs(Kval[i]) < 1e-12)
-            Kval[i] = 0;
-        exprs[i] = expression(Kval[i]);
+    if (type == "")
+    {    
+        c = std::cos(tx); s = std::sin(tx);
+        densematrix Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
+        c = std::cos(ty); s = std::sin(ty);
+        densematrix Ry(3,3, { c,0,s, 0,1,0, -s,0,c });
+        c = std::cos(tz); s = std::sin(tz);
+        densematrix Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
+        
+        densematrix R = Rz.multiply(Ry.multiply(Rx));
+        
+        double* Rval = R.getvalues();
+        
+        std::vector<expression> exprs(9);
+        for (int i = 0; i < 9; i++)
+        {
+            if (std::abs(Rval[i]) < 1e-12)
+                Rval[i] = 0;
+            exprs[i] = expression(Rval[i]);
+        }
+        expression Rexpr(3,3, exprs);
+        
+        return Rexpr;
     }
-    expression Kexpr(6,6, exprs);
+    if (type == "voigt")
+    {
+        c = std::cos(tx); s = std::sin(tx);
+        densematrix Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,2.0*c*s,0,0, 0,s*s,c*c,-2.0*c*s,0,0, 0,-c*s,c*s,c*c-s*s,0,0, 0,0,0,0,c,-s, 0,0,0,0,s,c });
+        c = std::cos(ty); s = std::sin(ty);
+        densematrix Ky(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
+        c = std::cos(tz); s = std::sin(tz);
+        densematrix Kz(6,6, { c*c,s*s,0,0,0,2.0*c*s, s*s,c*c,0,0,0,-2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, -c*s,c*s,0,0,0,c*c-s*s });
+        
+        densematrix K = Kz.multiply(Ky.multiply(Kx));
+        
+        double* Kval = K.getvalues();
+        
+        std::vector<expression> exprs(36);
+        for (int i = 0; i < 36; i++)
+        {
+            if (std::abs(Kval[i]) < 1e-12)
+                Kval[i] = 0;
+            exprs[i] = expression(Kval[i]);
+        }
+        expression Kexpr(6,6, exprs);
+        
+        return Kexpr;
+    }
     
-    return Kexpr;
+    std::cout << "Error in 'mathop' namespace: rotation expected a type '' or 'voigt'" << std::endl;
+    abort();
 }
 
 expression mathop::detjac(void)

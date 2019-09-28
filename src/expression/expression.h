@@ -156,8 +156,8 @@ class expression
         // Print the expression:
         void print(void);
         
-        // Rotate by ax, ay and az degrees around the x, y and z axis respectively.
-        void rotate(double ax, double ay, double az, std::string type = "tensor3x3");
+        // Read the function documentation before using it!
+        void rotate(double ax, double ay, double az);
         
         expression at(int row, int col);
         

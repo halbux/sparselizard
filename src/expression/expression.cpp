@@ -1356,116 +1356,44 @@ void expression::print(void)
     std::cout << std::endl;
 }
 
-void expression::rotate(double ax, double ay, double az, std::string type)
+void expression::rotate(double ax, double ay, double az)
 {
-    std::vector<std::string> types = {"tensor3x3", "elasticity6x6", "compliance6x6", "stress6x1", "strain6x1", "piezo3x6", "piezo6x3"};
-    
-    bool isfound = false;
-    for (int i = 0; i < types.size(); i++)
+    if (mynumrows != 3 && mynumrows != 6 || mynumcols != 1 && mynumcols != 3 && mynumcols != 6)
     {
-        if (types[i] == type)
-        {
-            isfound = true;
-            break;
-        }
-    }
-    if (isfound == false)
-    {
-        std::cout << "Error in 'expression' object: rotation for " << mynumrows << "x" << mynumcols << " expression of type '" << type << "' is not defined" << std::endl;
-        std::cout << "Defined types are " << std::endl;
-        for (int i = 0; i < types.size()-1; i++)
-            std::cout << "'" << types[i] << "', ";
-        std::cout << types[types.size()-1] << "'";
+        std::cout << "Error in 'expression' object: trying to rotate an expression of dimension " << mynumrows << "x" << mynumcols << " (not defined)" << std::endl;
         abort();
     }
     
-    // Define the rotation matrices:
-    expression R = mathop::rotation(ax, ay, az);
-    expression invR = mathop::transpose(R);
-    expression K = mathop::voigtrotation(ax, ay, az);
-    expression invK = mathop::inverse(K);
+	
+    // Define the rotation matrices needed:
+    expression R,RT,K,KT;
     
-    // Simplify invK and remove the roundoff noise:
-    for (int i = 0; i < invK.countrows()*invK.countcolumns(); i++)
+    if (mynumrows == 3 || mynumcols == 3)
     {
-        invK.myoperations[i] = invK.myoperations[i]->simplify({});
-        // The operation here is always a constant:
-        if (std::abs(invK.myoperations[i]->getvalue()) < 1e-12)
-            invK.myoperations[i] = shared_ptr<opconstant>(new opconstant(0));
+        R = mathop::rotation(ax, ay, az);
+        RT = mathop::transpose(R);
+    }
+    if (mynumrows == 6 || mynumcols == 6)
+    {
+        K = mathop::rotation(ax, ay, az, "voigt");
+        KT = mathop::transpose(K);
     }
     
     
     ///// Rotate the matrix in this expression:
     
-    bool isvalidsize = true;
-    
     expression rotated = *this;
+    if (mynumrows == 3)
+        rotated = R*rotated;
+    if (mynumrows == 6)
+        rotated = K*rotated;
+
+    if (mynumcols == 3)
+        rotated = rotated*RT;
+    if (mynumcols == 6)
+        rotated = rotated*KT;
     
-    // Tensor 3x3:
-    if (type == types[0])
-    {
-        if (mynumrows != 3 || mynumcols != 3)
-            isvalidsize = false;
-    
-        rotated = R*rotated*invR; 
-    }
-    // Elasticity matrix 6x6:
-    if (type == types[1])
-    {
-        if (mynumrows != 6 || mynumcols != 6)
-            isvalidsize = false;
-    
-        rotated = K*rotated*mathop::transpose(K); 
-    }
-    // Compliance matrix 6x6:
-    if (type == types[2])
-    {
-        if (mynumrows != 6 || mynumcols != 6)
-            isvalidsize = false;
-    
-        rotated = mathop::transpose(invK)*rotated*invK; 
-    }
-    // Stress tensor in Voigt form 6x1:
-    if (type == types[3])
-    {
-        if (mynumrows != 6 || mynumcols != 1)
-            isvalidsize = false;
-    
-        rotated = K*rotated; 
-    }
-    // Strain tensor in Voigt form 6x1:
-    if (type == types[4])
-    {
-        if (mynumrows != 6 || mynumcols != 1)
-            isvalidsize = false;
-    
-        rotated = mathop::transpose(invK)*rotated; 
-    }
-    // Piezo in Voigt form 3x6:
-    if (type == types[5])
-    {
-        if (mynumrows != 3 || mynumcols != 6)
-            isvalidsize = false;
-    
-        rotated = R*rotated*mathop::transpose(K); 
-    }
-    // Piezo in Voigt form 6x3:
-    if (type == types[6])
-    {
-        if (mynumrows != 6 || mynumcols != 3)
-            isvalidsize = false;
-    
-        rotated = K*rotated*invR; 
-    }
-    
-        
     myoperations = rotated.myoperations;
-    
-    if (isvalidsize == false)
-    {
-        std::cout << "Error in 'expression' object: trying to rotate a '" << type << "' type expression of dimension " << mynumrows << "x" << mynumcols << " (invalid dimension for this type)" << std::endl;
-        abort();
-    }
 }
 
 expression expression::at(int row, int col)
