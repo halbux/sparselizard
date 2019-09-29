@@ -10,11 +10,11 @@ using namespace mathop;
 void sparselizard(void)
 {	
     // The domain regions as defined in 'bilayer.geo':
-    int pztlayer = 1, polysiliconlayer = 2, electrode = 3, ground = 4, clamp = 6, freeside = 7, elecbox = 8, mecabox = 9;
+    int pztlayer = 1, siliconlayer = 2, electrode = 3, ground = 4, clamp = 6, freeside = 7, elecbox = 8, mecabox = 9;
     
     mesh mymesh("bilayer.msh");
     
-    int wholedomain = regionunion({pztlayer, polysiliconlayer});
+    int wholedomain = regionunion({pztlayer, siliconlayer});
     
     // Harmonic analysis. Set the fundamental frequency [Hz]:
     setfundamentalfrequency(1e4);
@@ -37,8 +37,8 @@ void sparselizard(void)
     v.setconstraint(ground, 0);	
     
     
-    // Young's modulus, Poisson's ratio and the density of polysilicon:
-    double E = 169e9, nu = 0.22, rhopolysi = 2320;
+    // Silicon and PZT density [kg/m^3]:
+    double rhosi = 2330, rhopzt = 7500;
     
     // Diagonal relative permittivity matrix for PZT:
     expression K(3,3,{1704,1704,1433});
@@ -47,20 +47,22 @@ void sparselizard(void)
     // Coupling matrix [C/m^2] for PZT (6 rows, 3 columns):
     expression C(6,3,{0,0,-6.62, 0,0,-6.62, 0,0,23.24, 0,17.03,0, 17.03,0,0, 0,0,0});
     
-    // Anisotropic Hooke's matrix [Pa] for PZT. Ordering is [exx,eyy,ezz,gyz,gxz,gxy] (Voigt form).
+    // Anisotropic Hooke's matrix [Pa] for Silicon and PZT. Ordering is [exx,eyy,ezz,gyz,gxz,gxy] (Voigt form).
     // Only the lower triangular part (top to bottom and left to right) is provided since it is symmetric.
-    expression H(6,6, {1.27e11, 8.02e10,1.27e11, 8.46e10,8.46e10,1.17e11, 0,0,0,2.29e10, 0,0,0,0,2.29e10, 0,0,0,0,0,2.34e10});
+    expression Hsi(6,6, {194.5e9, 35.7e9,194.5e9, 64.1e9,64.1e9,165.7e9, 0,0,0,79.6e9, 0,0,0,0,79.6e9, 0,0,0,0,0,50.9e9});
+    expression Hpzt(6,6, {1.27e11, 8.02e10,1.27e11, 8.46e10,8.46e10,1.17e11, 0,0,0,2.29e10, 0,0,0,0,2.29e10, 0,0,0,0,0,2.34e10});
     
-    // PZT density [kg/m^3]:
-    double rhopzt = 7500;
+    // Rotate the Silicon and PZT cristal first by -30 degrees around y then by 45 degrees around z.
+    // Refer to the documentation to make sure you understand when to use 'rotate'!
+    Hsi.rotate(0,-30,45); Hpzt.rotate(0,-30,45); C.rotate(0,-30,45); K.rotate(0,-30,45);
     
     
     formulation piezo;
     
-    // Standard isotropic elasticity in the polysilicon (not piezoelectric):
-    piezo += integral(polysiliconlayer, predefinedelasticity(dof(u), tf(u), E, nu) );
+    // Standard isotropic elasticity in the silicon (not piezoelectric):
+    piezo += integral(siliconlayer, predefinedelasticity(dof(u), tf(u), Hsi) );
     // Inertia term:
-    piezo += integral(polysiliconlayer, -rhopolysi*dtdt(dof(u))*tf(u) );
+    piezo += integral(siliconlayer, -rhosi*dtdt(dof(u))*tf(u) );
     
     // The classical weak formulation for piezoelectricity below can be found e.g. in paper:
     //
@@ -68,19 +70,17 @@ void sparselizard(void)
     
     // Define the mechanical equations of the problem in the piezo.
     // strain(u) returns the strain vector [exx,eyy,ezz,gyz,gxz,gxy] of u.
-    piezo += integral(pztlayer, -( H*strain(dof(u)) )*strain(tf(u)) - ( C*grad(dof(v)) )*strain(tf(u)) );
+    piezo += integral(pztlayer, -( Hpzt*strain(dof(u)) )*strain(tf(u)) - ( C*grad(dof(v)) )*strain(tf(u)) );
     // Inertia term for PZT:
     piezo += integral(pztlayer, -rhopzt*dtdt(dof(u))*tf(u) );
     // Define the electrical equations of the problem in the piezo:
     piezo += integral(pztlayer, ( transpose(C)*strain(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
     
-    piezo.generate();
+    solve(piezo);
     
-    vec sol = solve(piezo.A(), piezo.b());
-    
-    // Transfer the data from the solution vector to the v and u fields:
-    u.setdata(wholedomain, sol);
-    v.setdata(pztlayer, sol);
+    // Display the peak displacement:
+    double umax = norm(u.harmonic(2)).max(wholedomain, 5)[0];
+    std::cout << umax << std::endl;
     
     // Write the deflection and electric potential on the volume boundary.
     u.write(mecabox, "u.pos", 2);
@@ -90,7 +90,7 @@ void sparselizard(void)
     v.write(elecbox, "vtime.pos", 1, 50);
     
     // Code validation line. Can be removed.
-    std::cout << (compz(u.harmonic(2)).integrate(electrode, 5) < -1.3622e-15 && compz(u.harmonic(2)).integrate(electrode, 5) > -1.3623e-15);
+    std::cout << (umax < 1.7386e-07 && umax > 1.7384e-07);
 }
 
 int main(void)

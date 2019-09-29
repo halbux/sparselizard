@@ -1,7 +1,7 @@
 // PZT thickness [um]:
 pztthickness = 10;
-// Polysilicon thickness [um]:
-polysiliconthickness = 20;
+// Silicon thickness [um]:
+siliconthickness = 20;
 
 // Bilayer length [um]:
 length = 200;
@@ -10,8 +10,8 @@ width = 100;
 
 
 SetFactory("OpenCASCADE");
-Box(1) = {0, 0, polysiliconthickness, length, width, pztthickness};
-Box(2) = {0, 0, 0, length, width, polysiliconthickness};
+Box(1) = {0, 0, siliconthickness, length, width, pztthickness};
+Box(2) = {0, 0, 0, length, width, siliconthickness};
 
 Physical Volume(1) = 1;
 Physical Volume(2) = 2;
