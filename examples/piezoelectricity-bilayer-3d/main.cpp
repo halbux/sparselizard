@@ -83,7 +83,7 @@ void sparselizard(void)
     
     // Display the peak displacement:
     double umax = norm(u.harmonic(2)).max(wholedomain, 5)[0];
-    std::cout << umax << std::endl;
+    std::cout << "Peak deflection is " << umax << " m" << std::endl;
     
     // Write the deflection and electric potential on the volume boundary.
     u.write(mecabox, "u.pos", 2);
