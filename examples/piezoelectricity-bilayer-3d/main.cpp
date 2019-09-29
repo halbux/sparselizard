@@ -2,7 +2,7 @@
 // the PZT (a piezoelectric material) is sandwiched between two electrically actuated electrodes.
 //
 // The anisotropic behavior of both silicon and PZT is fully taken into account.
-// The silicon and PZT crystals are rotated to align with an arbitrary orientation.
+// The silicon and PZT crystals are rotated to align with a selected orientation.
 
 
 #include "sparselizardbase.h"
