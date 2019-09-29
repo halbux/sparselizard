@@ -1,5 +1,8 @@
-// This code simulates the harmonic mechanical deflection of a 3D polysilicon - PZT microbilayer when 
+// This code simulates the harmonic mechanical deflection of a 3D monocrystalline silicon - PZT microbilayer when 
 // the PZT (a piezoelectric material) is sandwiched between two electrically actuated electrodes.
+//
+// The anisotropic behavior of both silicon and PZT is fully taken into account.
+// The silicon and PZT cristal is rotated to align to a given (arbitrary) orientation.
 
 
 #include "sparselizardbase.h"
