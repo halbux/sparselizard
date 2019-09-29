@@ -86,11 +86,11 @@ void sparselizard(void)
     std::cout << "Peak deflection is " << umax << " m" << std::endl;
     
     // Write the deflection and electric potential on the volume boundary.
-    u.write(mecabox, "u.pos", 2);
-    v.write(elecbox, "v.pos", 1);
+    u.write(mecabox, "u.vtk", 2);
+    v.write(elecbox, "v.vtk", 1);
     // Harmonic fields can be saved in time. Use 50 time steps:
-    u.write(mecabox, "utime.pos", 2, 50);
-    v.write(elecbox, "vtime.pos", 1, 50);
+    u.write(mecabox, "utime.vtk", 2, 50);
+    v.write(elecbox, "vtime.vtk", 1, 50);
     
     // Code validation line. Can be removed.
     std::cout << (umax < 1.7386e-07 && umax > 1.7384e-07);
