@@ -55,7 +55,7 @@ void sparselizard(void)
     expression Hsi(6,6, {194.5e9, 35.7e9,194.5e9, 64.1e9,64.1e9,165.7e9, 0,0,0,79.6e9, 0,0,0,0,79.6e9, 0,0,0,0,0,50.9e9});
     expression Hpzt(6,6, {1.27e11, 8.02e10,1.27e11, 8.46e10,8.46e10,1.17e11, 0,0,0,2.29e10, 0,0,0,0,2.29e10, 0,0,0,0,0,2.34e10});
     
-    // Rotate the silicon and PZT crystal first by -30 degrees around y then by 45 degrees around z.
+    // Rotate the silicon and PZT crystals first by -30 degrees around y then by 45 degrees around z.
     // Refer to the documentation to make sure you understand when to use 'rotate'!
     Hsi.rotate(0,-30,45); Hpzt.rotate(0,-30,45); C.rotate(0,-30,45); K.rotate(0,-30,45);
     
