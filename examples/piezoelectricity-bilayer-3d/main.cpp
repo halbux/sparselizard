@@ -62,7 +62,7 @@ void sparselizard(void)
     
     formulation piezo;
     
-    // Standard isotropic elasticity in the silicon (not piezoelectric):
+    // Orthotropic elasticity in the silicon (not piezoelectric):
     piezo += integral(siliconlayer, predefinedelasticity(dof(u), tf(u), Hsi) );
     // Inertia term:
     piezo += integral(siliconlayer, -rhosi*dtdt(dof(u))*tf(u) );
