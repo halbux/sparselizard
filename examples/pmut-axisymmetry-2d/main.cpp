@@ -120,7 +120,7 @@ void sparselizard(void)
     // The matrix is expressed in the usual coordinates, i.e. with z being the layer growth direction.
     expression C(6,3,{0,0,0.024, 0,0,0.024, 0,0,-0.027, 0,-0.015,0, -0.015,0,0, 0,0,0});
 
-    // Hooke's matrix [Pa] in Voigt notation for the piezo.
+    // Elasticity matrix [Pa] in Voigt notation for the piezo.
     // The matrix is expressed in the usual coordinates, i.e. with z being the layer growth direction.
     expression H(6,6, {3.8e9, 1.9e9,3.8e9, 0.9e9,0.9e9,1.2e9, 0,0,0,7e8, 0,0,0,0,7e8, 0,0,0,0,0,9e8});
 
