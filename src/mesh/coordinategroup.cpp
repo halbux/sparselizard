@@ -131,6 +131,11 @@ void coordinategroup::select(double x, double y, double z, double r)
     }
 }
 
+int coordinategroup::countcoordinates(void)
+{
+    return mynumcoords;
+}
+
 int coordinategroup::countgroups(void)
 {
     return selectedgroups.size()/3;
