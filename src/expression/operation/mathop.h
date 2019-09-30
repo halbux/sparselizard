@@ -190,12 +190,12 @@ namespace mathop
     // Isotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
     // General anisotropic linear elasticity:
-    expression predefinedelasticity(expression dofu, expression tfu, expression hookesmatrix, std::string myoption = "");
+    expression predefinedelasticity(expression dofu, expression tfu, expression elasticitymatrix, std::string myoption = "");
 
     // Isotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
     expression predefinedelasticity(expression dofu, expression tfu, field u, expression Eyoung, expression nupoisson, expression prestress, std::string myoption = "");
     // General anisotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
-    expression predefinedelasticity(expression dofu, expression tfu, field u, expression hookesmatrix, expression prestress, std::string myoption = "");
+    expression predefinedelasticity(expression dofu, expression tfu, field u, expression elasticitymatrix, expression prestress, std::string myoption = "");
 
     expression predefinedelectrostaticforce(expression tfu, expression E, expression epsilon);
     expression predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon);
