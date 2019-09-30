@@ -1,13 +1,13 @@
 #include "contribution.h"
 
 
-contribution::contribution(shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; }
+contribution::contribution(std::shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; }
 
-void contribution::setdofs(std::vector<shared_ptr<operation>> dofs) { mydofs = dofs; }
-void contribution::settfs(std::vector<shared_ptr<operation>> tfs) { mytfs = tfs; }
-void contribution::setcoeffs(std::vector<shared_ptr<operation>> coeffs) { mycoeffs = coeffs; }
-void contribution::setdoffield(shared_ptr<rawfield> input) { doffield = input; }
-void contribution::settffield(shared_ptr<rawfield> input) { tffield = input; }
+void contribution::setdofs(std::vector<std::shared_ptr<operation>> dofs) { mydofs = dofs; }
+void contribution::settfs(std::vector<std::shared_ptr<operation>> tfs) { mytfs = tfs; }
+void contribution::setcoeffs(std::vector<std::shared_ptr<operation>> coeffs) { mycoeffs = coeffs; }
+void contribution::setdoffield(std::shared_ptr<rawfield> input) { doffield = input; }
+void contribution::settffield(std::shared_ptr<rawfield> input) { tffield = input; }
 void contribution::setmeshdeformation(expression meshdeform) { mymeshdeformation = {meshdeform}; }
 void contribution::setintegrationphysicalregion(int physreg) { integrationphysreg = physreg; }
 void contribution::setdofphysicalregion(int physreg) { dofphysreg = physreg; }
@@ -15,7 +15,7 @@ void contribution::settfphysicalregion(int physreg) { tfphysreg = physreg; }
 void contribution::setintegrationorderdelta(int integrorderdelta) { integrationorderdelta = integrorderdelta; }
 void contribution::setnumfftcoeffs(int numcoeffs) { numfftcoeffs = numcoeffs; }
 
-void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, bool computeconstraints)
+void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat, bool computeconstraints)
 {   
     // Get the harmonics in the dof and tf fields. Get the max harmonic numbers as well.
     std::vector<int> tfharms = tffield->getharmonics();
@@ -114,7 +114,7 @@ void contribution::generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, 
             std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
 
             // Compute the Jacobian for the variable change to the reference element.
-            shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeformationptr));
+            std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeformationptr));
             densematrix detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();

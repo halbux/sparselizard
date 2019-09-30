@@ -27,13 +27,13 @@ class optf: public operation
         // For printing purposes:
         int fieldcomponent = -1;
         
-        shared_ptr<rawfield> myfield;
+        std::shared_ptr<rawfield> myfield;
         
         int myphysicalregion;
     
     public:
         
-        optf(shared_ptr<rawfield> fieldin, int physreg = -1) { myfield = fieldin; myphysicalregion = physreg; };
+        optf(std::shared_ptr<rawfield> fieldin, int physreg = -1) { myfield = fieldin; myphysicalregion = physreg; };
         
         void setspacederivative(int whichderivative);
         void increasetimederivativeorder(int amount);
@@ -48,7 +48,7 @@ class optf: public operation
         
         bool isharmonicone(std::vector<int> disjregs);
         
-        shared_ptr<rawfield> getfieldpointer(void) { return myfield; };
+        std::shared_ptr<rawfield> getfieldpointer(void) { return myfield; };
         bool isphysicalregiondefined(void) { return (myphysicalregion != -1); };
         int getphysicalregion(void) { return myphysicalregion; };
         int getspacederivative(void) { return spacederivative; };

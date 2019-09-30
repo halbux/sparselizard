@@ -45,24 +45,24 @@ class universe
         // CLEANS::
         static void forbidreuse(void);
         
-        static shared_ptr<jacobian> computedjacobian;
+        static std::shared_ptr<jacobian> computedjacobian;
         
         // Store all operations that must be reused:
-        static std::vector<shared_ptr<operation>> oppointers;
-        static std::vector<shared_ptr<operation>> oppointersfft;
+        static std::vector<std::shared_ptr<operation>> oppointers;
+        static std::vector<std::shared_ptr<operation>> oppointersfft;
         // Store all computed values:
         static std::vector< std::vector<std::vector<densematrix>> > opcomputed;
         static std::vector< densematrix > opcomputedfft;
         
         // Returns -1 if not yet precomputed.
-        static int getindexofprecomputedvalue(shared_ptr<operation> op);
-        static int getindexofprecomputedvaluefft(shared_ptr<operation> op);
+        static int getindexofprecomputedvalue(std::shared_ptr<operation> op);
+        static int getindexofprecomputedvaluefft(std::shared_ptr<operation> op);
         // Returns a copy to avoid any modification of the data stored here:
         static std::vector<std::vector<densematrix>> getprecomputed(int index);
         static densematrix getprecomputedfft(int index);
         // Sets a copy to avoid any modification of the data stored here:
-        static void setprecomputed(shared_ptr<operation> op, std::vector<std::vector<densematrix>> val);
-        static void setprecomputedfft(shared_ptr<operation> op, densematrix val);
+        static void setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densematrix>> val);
+        static void setprecomputedfft(std::shared_ptr<operation> op, densematrix val);
         
         // If set to true the Gauss points weights product is not performed when assembling a formulation:
         static bool skipgausspointweightproduct;

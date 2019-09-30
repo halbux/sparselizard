@@ -12,7 +12,7 @@ void mat::errorifpointerisnull(void)
 
 mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
-    rawmatptr = shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
+    rawmatptr = std::shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
     rawmatptr->process();
     rawmatptr->clearfragments();
@@ -36,7 +36,7 @@ mat mat::copy(void)
     Mat A = getpetsc();
     Mat output;
     MatConvert(A, MATSAME, MAT_INITIAL_MATRIX, &output);
-    return mat(shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
+    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
 }
 
 
@@ -49,7 +49,7 @@ mat mat::operator*(double input)
     Mat output;
     MatDuplicate(A, MAT_SHARE_NONZERO_PATTERN, &output);
     MatAXPY(output, input, A, SAME_NONZERO_PATTERN);
-    return mat(shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
+    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
 }
 
 mat mat::operator*(mat input)
@@ -58,7 +58,7 @@ mat mat::operator*(mat input)
     Mat B = input.getpetsc();
     Mat output;
     MatMatMult(A, B, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &output);
-    return mat(shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
+    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
 }
 
 mat mat::operator+(mat input)
@@ -86,7 +86,7 @@ vec mat::operator*(vec input)
     Vec output;
     VecDuplicate(x, &output);
     MatMult(A, x, output);
-    return vec(shared_ptr<rawvec>(new rawvec(  rawmatptr->getdofmanager(), output  )));
+    return vec(std::shared_ptr<rawvec>(new rawvec(  rawmatptr->getdofmanager(), output  )));
 }
 
 

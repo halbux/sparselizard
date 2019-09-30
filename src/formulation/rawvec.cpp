@@ -1,7 +1,7 @@
 #include "rawvec.h"
 
 
-rawvec::rawvec(shared_ptr<dofmanager> dofmngr)
+rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
 {
     mydofmanager = dofmngr;
     
@@ -63,10 +63,10 @@ void rawvec::removeconstraints(void)
     delete[] dofrenumbering;
 }
 
-void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
+void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
 {    
     mydofmanager->selectfield(constrainedfield);
-    std::vector<shared_ptr<integration>> fieldconstraints = constrainedfield->getconstraints();
+    std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getconstraints();
 
     // Loop on all disjoint regions:
     for (int d = 0; d < disjregs.size(); d++)
@@ -91,7 +91,7 @@ void rawvec::updateconstraints(shared_ptr<rawfield> constrainedfield, std::vecto
             }
 
             // Loop on all disjoint regions who share the same constraint-computation-formulation:
-            shared_ptr<integration> currentconstraint = fieldconstraints[disjreg];
+            std::shared_ptr<integration> currentconstraint = fieldconstraints[disjreg];
             for (int i = d; i < disjregs.size(); i++)
             {
                 if (mydofmanager->isdefined(disjregs[i], 0) && fieldconstraints[disjregs[i]] == currentconstraint)
@@ -170,7 +170,7 @@ double rawvec::getvalue(int address)
     return outval[0];
 }
 
-void rawvec::setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op)
+void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op)
 {
     mydofmanager->selectfield(selectedfield);
 
@@ -187,7 +187,7 @@ void rawvec::setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnum
     setvalues(addressestoset, vals, op);
 }
 
-densematrix rawvec::getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
+densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
 {
     mydofmanager->selectfield(selectedfield);
     
@@ -303,7 +303,7 @@ void rawvec::print(void)
     std::cout << std::endl;
 }
 
-void rawvec::setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield)
+void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield)
 {
     mydofmanager->selectfield(inputfield);
     inputvec->mydofmanager->selectfield(inputfield);

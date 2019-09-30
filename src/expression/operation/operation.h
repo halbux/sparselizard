@@ -74,7 +74,7 @@ class operation : public std::enable_shared_from_this<operation>
         virtual double getvalue(void) {};
         
         // Get the field pointer of expressions including a field:
-        virtual shared_ptr<rawfield> getfieldpointer(void);
+        virtual std::shared_ptr<rawfield> getfieldpointer(void);
         
         // Remove the term of a sum or product:
         virtual void removeterm(int whichterm) {};

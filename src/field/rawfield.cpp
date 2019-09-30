@@ -59,7 +59,7 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     if (numberofsubfields > 1)
     {
         for (int i = 0; i < numberofsubfields; i++)
-            mysubfields.push_back({ shared_ptr<rawfield>(new rawfield(mytypename, harmonicnumbers, ismultiharm)) });
+            mysubfields.push_back({ std::shared_ptr<rawfield>(new rawfield(mytypename, harmonicnumbers, ismultiharm)) });
     }
     else
     {
@@ -67,14 +67,14 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         {
             myharmonics.resize(*max_element(harmonicnumbers.begin(), harmonicnumbers.end())+1);
             for (int h = 0; h < harmonicnumbers.size(); h++)
-                myharmonics[harmonicnumbers[h]] = { shared_ptr<rawfield>(new rawfield(mytypename, {}, ismultiharm)) };
+                myharmonics[harmonicnumbers[h]] = { std::shared_ptr<rawfield>(new rawfield(mytypename, {}, ismultiharm)) };
         }    
         else
         {
             // Set an order 1 interpolation order by default:
             interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), 1);
             // Set all unconstrained by default:
-            myconstraints = std::vector<shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
+            myconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
             
             myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
 
@@ -432,8 +432,8 @@ spanningtree* rawfield::getspanningtree(void)
 void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 {
     // Extract the info from the vector with selected field:
-    shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
-    shared_ptr<rawvec> selectedvec = myvec.getrawvector();
+    std::shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
+    std::shared_ptr<rawvec> selectedvec = myvec.getrawvector();
         
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
@@ -538,8 +538,8 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op)
 {
     // Extract the info from the vector with selected field:
-    shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
-    shared_ptr<rawvec> selectedvec = myvec.getrawvector();
+    std::shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
+    std::shared_ptr<rawvec> selectedvec = myvec.getrawvector();
         
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
@@ -625,7 +625,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     }
 }
 
-shared_ptr<rawfield> rawfield::comp(int component)
+std::shared_ptr<rawfield> rawfield::comp(int component)
 {   
     // If there is a single component and the first one is requested:
     if (countcomponents() == 1 && component == 0)
@@ -645,11 +645,11 @@ shared_ptr<rawfield> rawfield::comp(int component)
     return mysubfields[component][0];
 }
 
-shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
+std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
 {
     if (mysubfields.size() != 0)
     {
-        shared_ptr<rawfield> harmsrawfield(new rawfield());
+        std::shared_ptr<rawfield> harmsrawfield(new rawfield());
         *harmsrawfield = *this;
         // Replace every subfield by a new one with only the requested harmonics:
         for (int i = 0; i < mysubfields.size(); i++)
@@ -673,11 +673,11 @@ shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
         // In case we want several harmonics a new raw field container is created.
         int maxharmnum = *max_element(harmonicnumbers.begin(), harmonicnumbers.end());
 
-        shared_ptr<rawfield> harmsrawfield(new rawfield());
+        std::shared_ptr<rawfield> harmsrawfield(new rawfield());
         *harmsrawfield = *this;
 
         // Set a brand new harmonic vector:
-        harmsrawfield->myharmonics = std::vector<std::vector<shared_ptr<rawfield>>>(maxharmnum+1, std::vector<shared_ptr<rawfield>>(0));
+        harmsrawfield->myharmonics = std::vector<std::vector<std::shared_ptr<rawfield>>>(maxharmnum+1, std::vector<std::shared_ptr<rawfield>>(0));
         
         // Add only the requested harmonics:
         for (int i = 0; i < harmonicnumbers.size(); i++)
@@ -757,9 +757,9 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
 }
 
 
-std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> rawfield::getallsons(void)
+std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> rawfield::getallsons(void)
 {
-    std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> output = {};
+    std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> output = {};
     
     if (mysubfields.size() > 0)
     {
@@ -767,7 +767,7 @@ std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> rawfield::getalls
         {
             if (mysubfields[i].size() > 0)
             {
-                std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> cur = mysubfields[i][0]->getallsons();
+                std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> cur = mysubfields[i][0]->getallsons();
                 for (int f = 0; f < cur.size(); f++)
                 {
                     cur[f].first[0] = i;
@@ -784,7 +784,7 @@ std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> rawfield::getalls
         {
             if (myharmonics[h].size() > 0)
             {
-                std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> cur = myharmonics[h][0]->getallsons();
+                std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> cur = myharmonics[h][0]->getallsons();
                 for (int f = 0; f < cur.size(); f++)
                 {
                     cur[f].first[1] = h;
@@ -822,7 +822,7 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
 
     // Get all sons:
-    std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> allsons = getallsons();
+    std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> allsons = getallsons();
     int numsons = allsons.size();
     
     
@@ -867,8 +867,8 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
     int doubledatasize = extradata.size();
     for (int i = 0; i < numsons; i++)
     {
-        shared_ptr<rawfield> curson = allsons[i].second;
-        shared_ptr<coefmanager> curcoefmanager = curson->mycoefmanager;
+        std::shared_ptr<rawfield> curson = allsons[i].second;
+        std::shared_ptr<coefmanager> curcoefmanager = curson->mycoefmanager;
     
         // For every son provide info for each disjoint region as {order, doublevecrangebegin}:
         for (int d = 0; d < numdisjregs; d++)
@@ -1046,12 +1046,12 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     // Calculate the number of sons:
     int numsons = (intdata.size() - indexinintvec) / (2*numdisjregs);
     // Get all the sons in this rawfield:
-    std::vector<std::pair<std::vector<int>, shared_ptr<rawfield>>> allsons = getallsons();
+    std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> allsons = getallsons();
     
     for (int i = 0; i < numsons; i++)
     {
-        shared_ptr<rawfield> curson = allsons[i].second;
-        shared_ptr<coefmanager> curcoefmanager = curson->mycoefmanager;
+        std::shared_ptr<rawfield> curson = allsons[i].second;
+        std::shared_ptr<coefmanager> curcoefmanager = curson->mycoefmanager;
     
         for (int d = 0; d < numdisjregs; d++)
         {

@@ -32,14 +32,14 @@ class mat
     private:
         
         // The actual matrix:
-        shared_ptr<rawmat> rawmatptr = NULL;
+        std::shared_ptr<rawmat> rawmatptr = NULL;
         
         void errorifpointerisnull(void);
             
     public:
                     
         mat(void) {};
-        mat(shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
+        mat(std::shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
      
         // Create a matrix with structure based on a formulation and with initial values:
         mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
@@ -54,7 +54,7 @@ class mat
         
         void reuselu(void);
         
-        shared_ptr<rawmat> getpointer(void) { return rawmatptr; };
+        std::shared_ptr<rawmat> getpointer(void) { return rawmatptr; };
         
         Mat getpetsc(void);
         

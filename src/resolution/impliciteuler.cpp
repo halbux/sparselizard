@@ -43,8 +43,8 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
         outputeverynthtimestep = 1;
         
     // Get all fields in the formulation:
-    shared_ptr<dofmanager> dofmngr = myformulation.getdofmanager();
-    std::vector<shared_ptr<rawfield>> allfields = dofmngr->getfields();
+    std::shared_ptr<dofmanager> dofmngr = myformulation.getdofmanager();
+    std::vector<std::shared_ptr<rawfield>> allfields = dofmngr->getfields();
     // Set all fields in the formulation to the initial solution:
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, x|field(allfields[i]));

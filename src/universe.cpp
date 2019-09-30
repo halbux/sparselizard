@@ -41,15 +41,15 @@ void universe::forbidreuse(void)
 }
 
 
-shared_ptr<jacobian> universe::computedjacobian = NULL;
+std::shared_ptr<jacobian> universe::computedjacobian = NULL;
 
 
-std::vector<shared_ptr<operation>> universe::oppointers = {};
-std::vector<shared_ptr<operation>> universe::oppointersfft = {};
+std::vector<std::shared_ptr<operation>> universe::oppointers = {};
+std::vector<std::shared_ptr<operation>> universe::oppointersfft = {};
 std::vector< std::vector<std::vector<densematrix>> > universe::opcomputed = {};
 std::vector< densematrix > universe::opcomputedfft = {};
 
-int universe::getindexofprecomputedvalue(shared_ptr<operation> op)
+int universe::getindexofprecomputedvalue(std::shared_ptr<operation> op)
 {
     for (int i = 0; i < oppointers.size(); i++)
     {
@@ -59,7 +59,7 @@ int universe::getindexofprecomputedvalue(shared_ptr<operation> op)
     return -1;
 }
 
-int universe::getindexofprecomputedvaluefft(shared_ptr<operation> op)
+int universe::getindexofprecomputedvaluefft(std::shared_ptr<operation> op)
 {
     for (int i = 0; i < oppointersfft.size(); i++)
     {
@@ -85,7 +85,7 @@ densematrix universe::getprecomputedfft(int index)
     return (opcomputedfft[index]).copy();
 }
 
-void universe::setprecomputed(shared_ptr<operation> op, std::vector<std::vector<densematrix>> val)
+void universe::setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densematrix>> val)
 {
     oppointers.push_back(op);
     opcomputed.push_back(val);
@@ -96,7 +96,7 @@ void universe::setprecomputed(shared_ptr<operation> op, std::vector<std::vector<
     }
 }
 
-void universe::setprecomputedfft(shared_ptr<operation> op, densematrix val)
+void universe::setprecomputedfft(std::shared_ptr<operation> op, densematrix val)
 {
     oppointersfft.push_back(op);
     opcomputedfft.push_back(val.copy());

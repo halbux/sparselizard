@@ -8,7 +8,7 @@
 // by 'rawfieldptr' and to which most of the functions are redirected.
 // The purpose of this object is to wrap the 'rawfield' object for a 
 // convenient user experience.
-// An additional advantage is that the shared_ptr type pointer ensures
+// An additional advantage is that the std::shared_ptr type pointer ensures
 // the pointed 'rawfield' object is always available when there is
 // at least one field using it.
         
@@ -35,7 +35,7 @@ class field
     private:
 
         // The actual field:
-        shared_ptr<rawfield> rawfieldptr = NULL;
+        std::shared_ptr<rawfield> rawfieldptr = NULL;
 
     public:
 
@@ -48,7 +48,7 @@ class field
         field(std::string fieldtypename, spanningtree spantree);
         field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree);
         // The constructor below should not be used by the user:
-        field(shared_ptr<rawfield> rawfieldpointer) { rawfieldptr = rawfieldpointer; };
+        field(std::shared_ptr<rawfield> rawfieldpointer) { rawfieldptr = rawfieldpointer; };
 
         // Give the number of components in the field.
         int countcomponents(void);
@@ -109,7 +109,7 @@ class field
         // Transfer data from and to the current field:
         void setdata(int physreg, vec myvec, std::string op = "set");
 
-        shared_ptr<rawfield> getpointer(void) { return rawfieldptr; };
+        std::shared_ptr<rawfield> getpointer(void) { return rawfieldptr; };
 
         // Select a component.
         field comp(int component);

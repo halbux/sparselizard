@@ -8,7 +8,7 @@
 // by 'rawshapeptr' and to which most of the functions are redirected.
 // The purpose of this object is to wrap the 'rawshape' object for a 
 // convenient user experience.
-// An additional advantage is that the shared_ptr type pointer ensures
+// An additional advantage is that the std::shared_ptr type pointer ensures
 // the pointed 'rawshape' object is always available when there is
 // at least one shape using it.
 

@@ -29,12 +29,12 @@ class rawvec
     private:
 
         Vec myvec = PETSC_NULL;
-        shared_ptr<dofmanager> mydofmanager = NULL;
+        std::shared_ptr<dofmanager> mydofmanager = NULL;
     
     public:
             
-        rawvec(shared_ptr<dofmanager> dofmngr);
-        rawvec(shared_ptr<dofmanager> dofmngr, Vec input) { mydofmanager = dofmngr; myvec = input; };
+        rawvec(std::shared_ptr<dofmanager> dofmngr);
+        rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input) { mydofmanager = dofmngr; myvec = input; };
         
         ~rawvec(void);
         
@@ -45,7 +45,7 @@ class rawvec
         
         // Update the indexes that correspond to constrained 
         // values of a rawfield on given disjoint regions. 
-        void updateconstraints(shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
+        void updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
         void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
@@ -56,8 +56,8 @@ class rawvec
         // Get value at a single index:
         double getvalue(int address);
         
-        void setvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
-        densematrix getvalues(shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
+        void setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
+        densematrix getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
         
         // Write and load raw vec data:
         void write(std::string filename);
@@ -65,11 +65,11 @@ class rawvec
         
         void print(void);
         
-        shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
+        std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         Vec getpetsc(void) { return myvec; };
         
         // Transfer data between the 'inputvec' vector and this vector:
-        void setdata(shared_ptr<rawvec> inputvec, int disjreg, shared_ptr<rawfield> inputfield);
+        void setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield);
         
 };
 

@@ -856,7 +856,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         elementselector myselector(mydisjregs, isorientationdependent);
         do
         {
-            shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeform));
+            std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeform));
 
             densematrix detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
@@ -1595,7 +1595,7 @@ expression expression::determinant(void)
     int row = 0;
     for (int col = 0; col < mynumcols; col++)
     {
-        shared_ptr<operation> subdeterm = removerowandcol(row, col).determinant().myoperations[0];
+        std::shared_ptr<operation> subdeterm = removerowandcol(row, col).determinant().myoperations[0];
 
         if ((row+col)%2 == 0)
             determ->addterm( std::shared_ptr<opproduct>(new opproduct( {myoperations[row*mynumcols+col], subdeterm} )) );
@@ -1618,7 +1618,7 @@ expression expression::cofactormatrix(void)
     {
         for (int col = 0; col < mynumcols; col++)
         {
-            shared_ptr<operation> op = removerowandcol(row,col).determinant().myoperations[0];
+            std::shared_ptr<operation> op = removerowandcol(row,col).determinant().myoperations[0];
 
             if ((row+col)%2 == 0)
                 cofactors.myoperations[row*mynumcols+col] = op;
@@ -1978,9 +1978,9 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
         // coefficient by multiplying it by a constant 1 to get a product:
         if (sumterms[i]->istf())
         {
-            shared_ptr<opproduct> op(new opproduct);
+            std::shared_ptr<opproduct> op(new opproduct);
             op->multiplybyterm(sumterms[i]);
-            op->multiplybyterm(shared_ptr<operation>(new opconstant(1)));
+            op->multiplybyterm(std::shared_ptr<operation>(new opconstant(1)));
             sumterms[i] = op;
         }
         // In a valid formulation term sumterms[i] must now always be a product:
@@ -2144,7 +2144,7 @@ expression expression::operator+(expression input)
         abort();
     }
     for (int i = 0; i < mynumrows*mynumcols; i++)
-        output.myoperations[i] = shared_ptr<opsum>(new opsum( {myoperations[i], input.myoperations[i]} ));
+        output.myoperations[i] = std::shared_ptr<opsum>(new opsum( {myoperations[i], input.myoperations[i]} ));
     return output;
 }
 

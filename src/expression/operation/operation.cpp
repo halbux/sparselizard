@@ -63,7 +63,7 @@ bool operation::isharmonicone(std::vector<int> disjregs)
     return true;
 }
 
-shared_ptr<rawfield> operation::getfieldpointer(void)
+std::shared_ptr<rawfield> operation::getfieldpointer(void)
 {
     std::cout << "Error in 'operation' object: cannot get the field pointer" << std::endl;
     std::cout << "Operation was:" << std::endl;

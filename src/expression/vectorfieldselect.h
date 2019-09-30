@@ -21,15 +21,15 @@ class vectorfieldselect
 
     private:
        
-        shared_ptr<rawvec> myrawvec;
-        shared_ptr<rawfield> myrawfield;
+        std::shared_ptr<rawvec> myrawvec;
+        std::shared_ptr<rawfield> myrawfield;
         
     public:
         
-        vectorfieldselect(shared_ptr<rawvec> vecin, shared_ptr<rawfield> fieldin) { myrawvec = vecin; myrawfield = fieldin; };
+        vectorfieldselect(std::shared_ptr<rawvec> vecin, std::shared_ptr<rawfield> fieldin) { myrawvec = vecin; myrawfield = fieldin; };
         
-        shared_ptr<rawvec> getrawvector(void) { return myrawvec; };
-        shared_ptr<rawfield> getrawfield(void) { return myrawfield; };
+        std::shared_ptr<rawvec> getrawvector(void) { return myrawvec; };
+        std::shared_ptr<rawfield> getrawfield(void) { return myrawfield; };
         
         void setdata(int physreg, field myfield, std::string op = "set");
         

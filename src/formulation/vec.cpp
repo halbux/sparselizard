@@ -1,7 +1,7 @@
 #include "vec.h"
 
 
-vec::vec(formulation formul) { rawvecptr = shared_ptr<rawvec>(new rawvec(formul.getdofmanager())); }
+vec::vec(formulation formul) { rawvecptr = std::shared_ptr<rawvec>(new rawvec(formul.getdofmanager())); }
 
 void vec::errorifpointerisnull(void)
 {
@@ -24,12 +24,12 @@ void vec::updateconstraints(void)
     // Set 'disjregs' to [0 1 2 ...]:
        std::iota(disjregs.begin(), disjregs.end(), 0);
     
-    std::vector<shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
+    std::vector<std::shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
         rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
-    shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
+    std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
     std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
     rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
     
@@ -86,7 +86,7 @@ vec vec::copy(void)
     Vec output;
     VecDuplicate(x, &output);
     VecCopy(x, output);
-    return vec(shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
+    return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
 }
 
 double vec::norm(std::string type)
@@ -118,7 +118,7 @@ vec vec::operator*(double input)
     Vec output;
     VecDuplicate(x, &output);
     VecAXPY(output, input, x);
-    return vec(shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
+    return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
 }
 
 vec vec::operator+(vec input)

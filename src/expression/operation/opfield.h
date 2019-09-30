@@ -27,11 +27,11 @@ class opfield: public operation
         // For printing purposes:
         int fieldcomponent = -1;
 
-        shared_ptr<rawfield> myfield;
+        std::shared_ptr<rawfield> myfield;
 
     public:
 
-        opfield(shared_ptr<rawfield> fieldin) { myfield = fieldin; };
+        opfield(std::shared_ptr<rawfield> fieldin) { myfield = fieldin; };
 
         void setspacederivative(int whichderivative);
         void setkietaphiderivative(int whichderivative);
@@ -50,7 +50,7 @@ class opfield: public operation
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
-        shared_ptr<rawfield> getfieldpointer(void) { return myfield; };
+        std::shared_ptr<rawfield> getfieldpointer(void) { return myfield; };
         int getformfunctioncomponent(void) { return formfunctioncomponent; };
         int getfieldcomponent(void) { return fieldcomponent; };
         int getspacederivative(void) { return spacederivative; };

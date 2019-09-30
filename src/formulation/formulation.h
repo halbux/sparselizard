@@ -30,14 +30,14 @@ class formulation
     private:
         
         // myvec is the right handside vector rhs.
-        shared_ptr<rawvec> myvec = NULL;
+        std::shared_ptr<rawvec> myvec = NULL;
         // - mymat[0] is the stiffness matrix K
         // - mymat[1] is the damping matrix C
         // - mymat[2] is the mass matrix M
-        std::vector<shared_ptr<rawmat>> mymat = {NULL, NULL, NULL};
+        std::vector<std::shared_ptr<rawmat>> mymat = {NULL, NULL, NULL};
         
         // The link between the dof number and its row and column in the matrix:
-        shared_ptr<dofmanager> mydofmanager;
+        std::shared_ptr<dofmanager> mydofmanager;
         
         // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
@@ -73,7 +73,7 @@ class formulation
         void generate(std::vector<int> contributionnumbers);
         void generate(int contributionnumber);
         
-        shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
+        std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         
         // Get the assembled matrices or get the right hanside vector.
         // Choose to discard or not all values after getting the vector/matrix.

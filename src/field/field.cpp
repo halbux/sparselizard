@@ -1,7 +1,7 @@
 #include "field.h"
 
 
-field::field(std::string fieldtypename) { rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false)); }
+field::field(std::string fieldtypename) { rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false)); }
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers) 
 { 
     // Make sure all harmonic numbers are positive and non zero:
@@ -14,7 +14,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
         }
     }
     if (harmonicnumbers.size() > 0)
-        rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
+        rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
     else
     {
         std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
@@ -23,7 +23,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
 }
 field::field(std::string fieldtypename, spanningtree spantree)
 {
-    rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
+    rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
     rawfieldptr->setspanningtree(spantree);
 }
 
@@ -39,7 +39,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, 
         }
     }
     if (harmonicnumbers.size() > 0)
-        rawfieldptr = shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
+        rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
     else
     {
         std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;

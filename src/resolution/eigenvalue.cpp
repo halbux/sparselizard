@@ -112,7 +112,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
             double eigvalr, eigvali;
             
             // Create the 'eigvecr' and 'eigveci' vectors based on the dofmanager in myA:
-            shared_ptr<rawvec> rawr(new rawvec(myA.getpointer()->getdofmanager())); shared_ptr<rawvec> rawi( new rawvec(myA.getpointer()->getdofmanager()));
+            std::shared_ptr<rawvec> rawr(new rawvec(myA.getpointer()->getdofmanager())); std::shared_ptr<rawvec> rawi( new rawvec(myA.getpointer()->getdofmanager()));
             vec eigvecr(rawr); vec eigveci(rawi);
             
             EPSGetEigenpair( eps, i, &eigvalr, &eigvali, eigvecr.getpetsc(), eigveci.getpetsc() );
@@ -187,7 +187,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
             double eigvalr, eigvali;
             
             // Create the 'eigvecr' and 'eigveci' vectors based on the dofmanager in mymats[0]:
-            shared_ptr<rawvec> rawr(new rawvec(mymats[0].getpointer()->getdofmanager())); shared_ptr<rawvec> rawi( new rawvec(mymats[0].getpointer()->getdofmanager()));
+            std::shared_ptr<rawvec> rawr(new rawvec(mymats[0].getpointer()->getdofmanager())); std::shared_ptr<rawvec> rawi( new rawvec(mymats[0].getpointer()->getdofmanager()));
             vec eigvecr(rawr); vec eigveci(rawi);
             
             PEPGetEigenpair( pep, i, &eigvalr, &eigvali, eigvecr.getpetsc(), eigveci.getpetsc() );
