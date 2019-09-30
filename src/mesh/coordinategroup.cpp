@@ -1,4 +1,5 @@
 #include "coordinategroup.h"
+#include "universe.h"
 
 
 coordinategroup::coordinategroup(std::vector<double>& coords)
