@@ -45,7 +45,8 @@ class coordinategroup
         coordinategroup(std::vector<double>& coords);
 
         void select(double x, double y, double z, double maxelemsize);
-
+        
+        int countcoordinates(void);
         int countgroups(void);
                 
         std::vector<int>* getgroupindexes(int groupnum);
