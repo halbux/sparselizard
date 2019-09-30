@@ -996,7 +996,7 @@ expression mathop::predefinedviscousforce(expression dofv, expression tfv, expre
 
 expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
 {
-    // Hooke's matrix:
+    // Elasticity matrix:
     expression H(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
     expression coef = E/(1+nu)/(1-2*nu);
     coef.reuseit();
@@ -1073,7 +1073,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
 
 expression mathop::predefinedelasticity(expression dofu, expression tfu, field u, expression E, expression nu, expression prestress, std::string myoption)
 {
-    // Hooke's matrix:
+    // Elasticity matrix:
     expression H(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
     expression coef = E/(1+nu)/(1-2*nu);
     coef.reuseit();
