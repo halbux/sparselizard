@@ -50,7 +50,7 @@ void sparselizard(void)
     // Coupling matrix [C/m^2] for PZT (6 rows, 3 columns):
     expression C(6,3,{0,0,-6.62, 0,0,-6.62, 0,0,23.24, 0,17.03,0, 17.03,0,0, 0,0,0});
     
-    // Anisotropic Hooke's matrix [Pa] for silicon and PZT. Ordering is [exx,eyy,ezz,gyz,gxz,gxy] (Voigt form).
+    // Anisotropic elasticity matrix [Pa] for silicon and PZT. Ordering is [exx,eyy,ezz,gyz,gxz,gxy] (Voigt form).
     // Only the lower triangular part (top to bottom and left to right) is provided since it is symmetric.
     expression Hsi(6,6, {194.5e9, 35.7e9,194.5e9, 64.1e9,64.1e9,165.7e9, 0,0,0,79.6e9, 0,0,0,0,79.6e9, 0,0,0,0,0,50.9e9});
     expression Hpzt(6,6, {1.27e11, 8.02e10,1.27e11, 8.46e10,8.46e10,1.17e11, 0,0,0,2.29e10, 0,0,0,0,2.29e10, 0,0,0,0,0,2.34e10});
