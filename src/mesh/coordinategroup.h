@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <vector>
-#include "universe.h"
 
 class coordinategroup
 {

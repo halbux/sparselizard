@@ -429,12 +429,11 @@ int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<do
 #include "universe.h"
 #include "disjointregions.h"
 #include "lagrangeformfunction.h"
-#include "coordinategroup.h"
 
-void myalgorithm::getreferencecoordinates(std::vector<double>& xyzcoords, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
+void myalgorithm::getreferencecoordinates(coordgroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
     // Preallocate the input containers:
-    int numcoords = xyzcoords.size()/3;
+    int numcoords = coordgroup.countcoordinates();
     elems.resize(numcoords);
     for (int i = 0; i < numcoords; i++)
         elems[i] = -1;
@@ -462,9 +461,6 @@ void myalgorithm::getreferencecoordinates(std::vector<double>& xyzcoords, int di
     std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
     // Get the radius of the sphere centered at the barycenter and surrounding all nodes in an element:
     std::vector<double>* sphereradius = myelems->getsphereradius(elemtypenum);
-    
-    // Group elements into x, y and z slices:
-    coordinategroup coordgroup(xyzcoords);
 
     // Parameter that gives the distance (in multiples of the max barycenter-element node distance)
     // starting from which one can safely assume to always be outside the element for any point.
