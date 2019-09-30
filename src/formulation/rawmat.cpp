@@ -270,9 +270,9 @@ void rawmat::print(void)
     std::cout << std::endl;
 }
 
-shared_ptr<rawmat> rawmat::extractaccumulated(void)
+std::shared_ptr<rawmat> rawmat::extractaccumulated(void)
 {
-    shared_ptr<rawmat> output(new rawmat(mydofmanager));
+    std::shared_ptr<rawmat> output(new rawmat(mydofmanager));
     
     output->accumulatedrowindices = accumulatedrowindices;
     output->accumulatedcolindices = accumulatedcolindices;

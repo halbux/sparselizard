@@ -4,11 +4,11 @@
 std::vector<std::vector<densematrix>> opdetjac::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Compute the Jacobian terms or reuse if available in the universe.
-    shared_ptr<jacobian> myjac;
+    std::shared_ptr<jacobian> myjac;
     if (universe::isreuseallowed && universe::computedjacobian != NULL)
         myjac = universe::computedjacobian;
     else
-        myjac = shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
+        myjac = std::shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
     
     if (universe::isreuseallowed)
         universe::computedjacobian = myjac;
@@ -20,11 +20,11 @@ std::vector<std::vector<densematrix>> opdetjac::interpolate(elementselector& ele
 densematrix opdetjac::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Compute the Jacobian terms or reuse if available in the universe.
-    shared_ptr<jacobian> myjac;
+    std::shared_ptr<jacobian> myjac;
     if (universe::isreuseallowed && universe::computedjacobian != NULL)
         myjac = universe::computedjacobian;
     else
-        myjac = shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
+        myjac = std::shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
     
     if (universe::isreuseallowed)
         universe::computedjacobian = myjac;

@@ -58,8 +58,8 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
         outputeverynthtimestep = 1;
         
     // Get all fields in the formulation:
-    shared_ptr<dofmanager> dofmngr = myformulation.getdofmanager();
-    std::vector<shared_ptr<rawfield>> allfields = dofmngr->getfields();
+    std::shared_ptr<dofmanager> dofmngr = myformulation.getdofmanager();
+    std::vector<std::shared_ptr<rawfield>> allfields = dofmngr->getfields();
     // Set all fields in the formulation to the initial displacement:
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, u|field(allfields[i]));

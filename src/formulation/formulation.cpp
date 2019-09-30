@@ -1,7 +1,7 @@
 #include "formulation.h"
 
 
-formulation::formulation(void) { mydofmanager = shared_ptr<dofmanager>(new dofmanager); }
+formulation::formulation(void) { mydofmanager = std::shared_ptr<dofmanager>(new dofmanager); }
 
 void formulation::operator+=(integration integrationobject)
 {
@@ -14,11 +14,11 @@ void formulation::operator+=(integration integrationobject)
     
     // The element dimension is required to decompose space derivatives 
     // into the ki, eta and phi derivatives in the reference element.
-    std::vector< std::vector<std::vector<shared_ptr<operation>>> > coeffdoftf = myexpression.extractdoftfpolynomial(elementdimension);
+    std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = myexpression.extractdoftfpolynomial(elementdimension);
 
-    std::vector<std::vector<shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
-    std::vector<std::vector<shared_ptr<operation>>> dofs = coeffdoftf[1];
-    std::vector<std::vector<shared_ptr<operation>>> tfs = coeffdoftf[2];
+    std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
+    std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
+    std::vector<std::vector<std::shared_ptr<operation>>> tfs = coeffdoftf[2];
 
     // Loop on all slices:
     for (int slice = 0; slice < tfs.size(); slice++)
@@ -26,8 +26,8 @@ void formulation::operator+=(integration integrationobject)
         // In a given slice all dof and tf fields are the same, have the 
         // same applied time derivatives and are selected on a same 
         // physical region for all entries.
-        shared_ptr<rawfield> doffield = dofs[slice][0]->getfieldpointer();
-        shared_ptr<rawfield> tffield = tfs[slice][0]->getfieldpointer();
+        std::shared_ptr<rawfield> doffield = dofs[slice][0]->getfieldpointer();
+        std::shared_ptr<rawfield> tffield = tfs[slice][0]->getfieldpointer();
         
         // Get the time derivative of the dof field (if any) to add the
         // contribution to the K, C or M matrix. For a multiharmonic dof
@@ -109,9 +109,9 @@ void formulation::generate(int m, int contributionnumber)
         return;
         
     if (m == 0 && myvec == NULL)
-        myvec = shared_ptr<rawvec>(new rawvec(mydofmanager));
+        myvec = std::shared_ptr<rawvec>(new rawvec(mydofmanager));
     if (m > 0 && mymat[m-1] == NULL)
-        mymat[m-1] = shared_ptr<rawmat>(new rawmat(mydofmanager));
+        mymat[m-1] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
 
     std::vector<contribution> contributionstogenerate = mycontributions[m][contributionnumber];
     for (int i = 0; i < contributionstogenerate.size(); i++)
@@ -183,7 +183,7 @@ mat formulation::A(bool keepfragments, bool skipdiagonalones) { return K(keepfra
 vec formulation::rhs(bool keepvector)
 {
     if (myvec == NULL)
-        myvec = shared_ptr<rawvec>(new rawvec(mydofmanager));
+        myvec = std::shared_ptr<rawvec>(new rawvec(mydofmanager));
     
     vec output;   
     if (keepvector == false)
@@ -207,9 +207,9 @@ mat formulation::M(bool keepfragments, bool skipdiagonalones) { return getmatrix
 mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
 {
     if (mymat[KCM] == NULL)
-        mymat[KCM] = shared_ptr<rawmat>(new rawmat(mydofmanager));
+        mymat[KCM] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
         
-    shared_ptr<rawmat> rawout = mymat[KCM]->extractaccumulated();
+    std::shared_ptr<rawmat> rawout = mymat[KCM]->extractaccumulated();
     
     if (keepfragments == false)
         mymat[KCM]->clearfragments();

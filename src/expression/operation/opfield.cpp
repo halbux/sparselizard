@@ -94,11 +94,11 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             // phi derivatives in the reference element and invjac() terms.
 
             // Compute the Jacobian terms or reuse if available in the universe.
-            shared_ptr<jacobian> myjac;
+            std::shared_ptr<jacobian> myjac;
             if (universe::isreuseallowed && universe::computedjacobian != NULL)
                 myjac = universe::computedjacobian;
             else
-                myjac = shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
+                myjac = std::shared_ptr<jacobian>(new jacobian(elemselect, evaluationcoordinates, meshdeform));
 
             if (universe::isreuseallowed)
                 universe::computedjacobian = myjac;

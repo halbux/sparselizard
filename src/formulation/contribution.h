@@ -42,16 +42,16 @@ class contribution
 
     private:
     
-        shared_ptr<dofmanager> mydofmanager;
+        std::shared_ptr<dofmanager> mydofmanager;
         
         // All elementary coef*dof*tf terms to assemble and add together:
-        std::vector<shared_ptr<operation>> mydofs = {};
-        std::vector<shared_ptr<operation>> mytfs = {};
-        std::vector<shared_ptr<operation>> mycoeffs = {};
+        std::vector<std::shared_ptr<operation>> mydofs = {};
+        std::vector<std::shared_ptr<operation>> mytfs = {};
+        std::vector<std::shared_ptr<operation>> mycoeffs = {};
         
         // The dof and tf field for all terms above. A NULL dof means rhs contribution:
-        shared_ptr<rawfield> doffield = NULL;
-        shared_ptr<rawfield> tffield = NULL;
+        std::shared_ptr<rawfield> doffield = NULL;
+        std::shared_ptr<rawfield> tffield = NULL;
 
         int integrationphysreg = -1;
         int dofphysreg = -1;
@@ -71,13 +71,13 @@ class contribution
 
     public:
     
-        contribution(shared_ptr<dofmanager> dofmngr);
+        contribution(std::shared_ptr<dofmanager> dofmngr);
         
-        void setdofs(std::vector<shared_ptr<operation>> dofs);
-        void settfs(std::vector<shared_ptr<operation>> tfs);
-        void setcoeffs(std::vector<shared_ptr<operation>> coeffs);
-        void setdoffield(shared_ptr<rawfield> input);
-        void settffield(shared_ptr<rawfield> input);
+        void setdofs(std::vector<std::shared_ptr<operation>> dofs);
+        void settfs(std::vector<std::shared_ptr<operation>> tfs);
+        void setcoeffs(std::vector<std::shared_ptr<operation>> coeffs);
+        void setdoffield(std::shared_ptr<rawfield> input);
+        void settffield(std::shared_ptr<rawfield> input);
         void setmeshdeformation(expression meshdeform);
         void setintegrationphysicalregion(int physreg);
         void setdofphysicalregion(int physreg);
@@ -87,7 +87,7 @@ class contribution
         
         // Generate the contribution and store it in the 
         // vec (for rhs contributions) or in the mat.
-        void generate(shared_ptr<rawvec> myvec, shared_ptr<rawmat> mymat, bool computeconstraints = true);
+        void generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat, bool computeconstraints = true);
         
 // Add this to reduce the size of the system to solve:
 //void removebubblemode(void);

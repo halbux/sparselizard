@@ -29,7 +29,7 @@ class dofmanager
         int numberofdofs = 0;
         
         // All the fields in the structure:
-        std::vector<shared_ptr<rawfield>> myfields = {};
+        std::vector<std::shared_ptr<rawfield>> myfields = {};
         // The currently selected field (if any) is myfields[selectedfieldnumber]:
         int selectedfieldnumber = -1;
         
@@ -51,10 +51,10 @@ class dofmanager
         
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
-        void addtostructure(shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
-        void addtostructure(shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
+        void addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
+        void addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
         // Always select the field before accessing the dof structure.
-        void selectfield(shared_ptr<rawfield> selectedfield);
+        void selectfield(std::shared_ptr<rawfield> selectedfield);
         
         // Get all disjoint regions on which the selected field has dofs:
         std::vector<int> getdisjointregionsofselectedfield(void);
@@ -76,9 +76,9 @@ class dofmanager
         // Return a new dofmanager object that does not include the Dirichlet constraints.
         // 'dofrenumbering' must have a size equal to the number of dofs before the call.
         // Removed dofs are renumbered as -1.
-        shared_ptr<dofmanager> removeconstraints(int* dofrenumbering);
+        std::shared_ptr<dofmanager> removeconstraints(int* dofrenumbering);
         
-        std::vector<shared_ptr<rawfield>> getfields(void) { return myfields; };
+        std::vector<std::shared_ptr<rawfield>> getfields(void) { return myfields; };
         
         int countdofs(void) { return numberofdofs; };
         
@@ -95,7 +95,7 @@ class dofmanager
         // - adress -1 is used for constrained fields (requires 'useminusonetag' true)
         // - adress -2 is used for field dofs not in 'fieldphysreg' 
         //
-        intdensematrix getadresses(shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
+        intdensematrix getadresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
                                                         
 };
 

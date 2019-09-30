@@ -30,7 +30,7 @@ class vec
     private:
 
         // The actual vector:
-        shared_ptr<rawvec> rawvecptr = NULL;
+        std::shared_ptr<rawvec> rawvecptr = NULL;
         
         void errorifpointerisnull(void);
     
@@ -38,7 +38,7 @@ class vec
             
         vec(void) {};
         vec(formulation formul);
-        vec(shared_ptr<rawvec> inputrawvec) { rawvecptr = inputrawvec; };
+        vec(std::shared_ptr<rawvec> inputrawvec) { rawvecptr = inputrawvec; };
      
         int size(void);
         
@@ -57,7 +57,7 @@ class vec
         
         vectorfieldselect operator|(field selectedfield);
         
-        shared_ptr<rawvec> getpointer(void) { return rawvecptr; };
+        std::shared_ptr<rawvec> getpointer(void) { return rawvecptr; };
         
         // Transfer data from a field to this vector.
         // Only the data corresponding to the physical region is transferred.

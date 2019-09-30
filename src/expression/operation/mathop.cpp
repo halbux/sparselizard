@@ -742,7 +742,7 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
     Vec bpetsc = b.getpetsc();
     Mat Apetsc = A.getpetsc();
 
-    vec sol(shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
+    vec sol(std::shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
@@ -861,7 +861,7 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
 void mathop::solve(formulation formul)
 {
     // Get all fields in the formulation:
-    std::vector<shared_ptr<rawfield>> allfields = formul.getdofmanager()->getfields();
+    std::vector<std::shared_ptr<rawfield>> allfields = formul.getdofmanager()->getfields();
 
     // Remove leftovers (if any):
     mat A = formul.A(); vec b = formul.b();

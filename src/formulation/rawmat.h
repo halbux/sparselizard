@@ -43,12 +43,12 @@ class rawmat
         bool lureuse = false;
         bool ludefined = false;
         
-        shared_ptr<dofmanager> mydofmanager = NULL;
+        std::shared_ptr<dofmanager> mydofmanager = NULL;
             
     public:
                     
-        rawmat(shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; };
-        rawmat(shared_ptr<dofmanager> dofmngr, Mat input) { mydofmanager = dofmngr; mymat = input; };
+        rawmat(std::shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; };
+        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input) { mydofmanager = dofmngr; mymat = input; };
 
         ~rawmat(void);
      
@@ -83,9 +83,9 @@ class rawmat
         void print(void);
 
         // Extract a new initialised rawmat that has all accumulated data. 
-        shared_ptr<rawmat> extractaccumulated(void);
+        std::shared_ptr<rawmat> extractaccumulated(void);
         
-        shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
+        std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         Mat getpetsc(void) { return mymat; };
         
         KSP* getksp(void) { return &myksp; };

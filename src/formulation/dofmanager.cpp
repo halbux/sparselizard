@@ -1,7 +1,7 @@
 #include "dofmanager.h"
 
 
-void dofmanager::addtostructure(shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions)
+void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions)
 {  
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
 
@@ -59,7 +59,7 @@ void dofmanager::addtostructure(shared_ptr<rawfield> fieldtoadd, std::vector<int
     }
 }
 
-void dofmanager::addtostructure(shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
+void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     // Get all disjoint regions in the physical region with (-1):
     std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
@@ -67,7 +67,7 @@ void dofmanager::addtostructure(shared_ptr<rawfield> fieldtoadd, int physicalreg
     addtostructure(fieldtoadd, disjregs);
 }
 
-void dofmanager::selectfield(shared_ptr<rawfield> selectedfield)
+void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
 {
     selectedfieldnumber = -1;
     for (int i = 0; i < myfields.size(); i++)
@@ -345,13 +345,13 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
 }
 
 
-shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
+std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
 {
     // Set a default -1 renumbering:
     for (int i = 0; i < numberofdofs; i++)
         dofrenumbering[i] = -1;
     
-    shared_ptr<dofmanager> newdofmanager(new dofmanager);
+    std::shared_ptr<dofmanager> newdofmanager(new dofmanager);
     *(newdofmanager.get()) = *this;
     newdofmanager->numberofdofs = 0;
     
@@ -411,7 +411,7 @@ void dofmanager::print(void)
 }
 
 
-intdensematrix dofmanager::getadresses(shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
+intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
 {
     elements* myelements = universe::mymesh->getelements();
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
