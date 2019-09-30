@@ -430,7 +430,7 @@ int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<do
 #include "disjointregions.h"
 #include "lagrangeformfunction.h"
 
-void myalgorithm::getreferencecoordinates(coordgroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
+void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
     // Preallocate the input containers:
     int numcoords = coordgroup.countcoordinates();
