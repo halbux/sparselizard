@@ -432,16 +432,6 @@ int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<do
 
 void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
-    // Preallocate the input containers:
-    int numcoords = coordgroup.countcoordinates();
-    elems.resize(numcoords);
-    for (int i = 0; i < numcoords; i++)
-        elems[i] = -1;
-    kietaphis.resize(3*numcoords);
-    std::vector<bool> isfound(numcoords);
-    for (int i = 0; i < numcoords; i++)
-        isfound[i] = false;
-    
     disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
     elements* myelems = universe::mymesh->getelements();
     
@@ -496,7 +486,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                 double curx = curgroupcoords->at(3*c+0), cury = curgroupcoords->at(3*c+1), curz = curgroupcoords->at(3*c+2);
 
                 // Only process when not yet found and when the coordinate is close enough to the element barycenter.
-                if (isfound[curindex] == true || std::abs(curx-xbary) > maxelemsize || std::abs(cury-ybary) > maxelemsize || std::abs(curz-zbary) > maxelemsize) {}
+                if (elems[curindex] == -1 || std::abs(curx-xbary) > maxelemsize || std::abs(cury-ybary) > maxelemsize || std::abs(curz-zbary) > maxelemsize) {}
                 else
                 {
                     // Reset initial guess:
@@ -516,11 +506,10 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                         // Check if the (ki,eta,phi) coordinates are inside the element:
                         if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
                         {
-                            isfound[curindex] = true;
                             kietaphis[3*curindex+0] = kietaphi[0]; 
                             kietaphis[3*curindex+1] = kietaphi[1]; 
                             kietaphis[3*curindex+2] = kietaphi[2];
-                            elems[curindex] = e;
+                            elems[curindex] = curelem;
                         }
                     }
                 }
