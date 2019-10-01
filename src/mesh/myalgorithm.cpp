@@ -486,7 +486,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                 double curx = curgroupcoords->at(3*c+0), cury = curgroupcoords->at(3*c+1), curz = curgroupcoords->at(3*c+2);
 
                 // Only process when not yet found and when the coordinate is close enough to the element barycenter.
-                if (elems[curindex] == -1 || std::abs(curx-xbary) > maxelemsize || std::abs(cury-ybary) > maxelemsize || std::abs(curz-zbary) > maxelemsize) {}
+                if (elems[curindex] != -1 || std::abs(curx-xbary) > maxelemsize || std::abs(cury-ybary) > maxelemsize || std::abs(curz-zbary) > maxelemsize) {}
                 else
                 {
                     // Reset initial guess:
