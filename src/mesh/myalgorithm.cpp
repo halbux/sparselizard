@@ -464,7 +464,9 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     {
         double curelem = rangebegin+e;
         
-        std::vector<polynomial> poly = {};
+        std::vector<polynomial> poly(elemdim);
+        for (int j = 0; j < elemdim; j++)
+            poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
     
         double maxelemsize = alpha*sphereradius->at(curelem);
         double xbary = barycenters->at(3*curelem+0), ybary = barycenters->at(3*curelem+1), zbary = barycenters->at(3*curelem+2);
@@ -492,14 +494,6 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     // Reset initial guess:
                     std::vector<double> kietaphi = {0.0,0.0,0.0};
                     std::vector<double> rhs = {curx, cury, curz};
-
-                    // Only create once for all coordinates the polynomials and only for the required elements:
-                    if (poly.size() == 0)
-                    {
-                        poly.resize(elemdim);
-                        for (int j = 0; j < elemdim; j++)
-                            poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
-                    }
 
                     if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
                     {
