@@ -67,7 +67,8 @@ namespace myalgorithm
     int getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize = 2, double tol = 1e-12, int maxit = 20);
 
     // Get the reference coordinates and the element indexes in disjoint region 'disjreg' corresponding to each (x,y,z) coordinate provided as argument. 
-    // If the ith coordinate (xi,yi,zi) cannot be found in any element of the disjoint region then elems[i] is set to -1.
+    // If the ith coordinate (xi,yi,zi) cannot be found in any element of the disjoint region then elems[i] is unchanged.
+    // Any coordinate for which elems[i] is not -1 is ignored. 'elems' and 'kietaphis' must be preallocated to size numcoords and 3*numcoords.
     void getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis);
  
     // Split the 'tosplit' vector into 'blocklen' vectors of length tosplit.size()/blocklen.
