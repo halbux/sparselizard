@@ -4,9 +4,9 @@
 //
 // The piezoresistivity matrix was obtained from paper "Review: Semiconductor Piezoresistance for Microsystems", A. Barlian et al.
 //
-// Taking care of geometrical nonlinearity and prestress can be easily done by calling the appropriate 'predefinedelasticity'
-// function, creating a nonlinear iteration to solve the mechanical problem and using the 'greenlagrangestrain' function instead
-// of the 'strain' function to correctly compute the strains (see documentation and examples).
+// Taking care of geometrical nonlinearity (not needed here) and prestress can be easily done by calling the appropriate 
+// 'predefinedelasticity' function, creating a nonlinear iteration to solve the mechanical problem and using the 
+// 'greenlagrangestrain' function instead of the 'strain' function to correctly compute the strains (see documentation and examples).
 
 
 #include "sparselizardbase.h"
