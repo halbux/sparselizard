@@ -894,13 +894,15 @@ expression mathop::dbtoneper(expression toconvert)
 
 expression mathop::strain(expression input)
 {
-    if ((input.countrows() != 2 && input.countrows() != 3) || input.countcolumns() != 1)
+    if ((input.countrows() != 2 && input.countrows() != 3) || (input.countcolumns() != 1 && input.countrows() != input.countcolumns()))
     {
-        std::cout << "Error in 'mathop' namespace: can only compute the strains of a 2x1 or 3x1 column vector" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only compute the strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
         abort();
     }
 
-    expression gradu = mathop::grad(input);
+    expression gradu = input;
+    if (input.countcolumns() == 1)
+        gradu = mathop::grad(input);
 
     if (input.countrows() == 2)
         return expression(3,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(1,0) + gradu.at(0,1)});
@@ -908,12 +910,22 @@ expression mathop::strain(expression input)
         return expression(6,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(2,2), gradu.at(2,1) + gradu.at(1,2), gradu.at(0,2) + gradu.at(2,0), gradu.at(0,1) + gradu.at(1,0)});
 }
 
-expression mathop::greenlagrangestrain(expression gradu)
+expression mathop::greenlagrangestrain(expression input)
 {
+    if ((input.countrows() != 2 && input.countrows() != 3) || (input.countcolumns() != 1 && input.countrows() != input.countcolumns()))
+    {
+        std::cout << "Error in 'mathop' namespace: can only compute the green-lagrange strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
+        abort();
+    }
+
+    expression gradu = input;
+    if (input.countcolumns() == 1)
+        gradu = mathop::grad(input);
+
     // This can be called since gradu is nonlinear in u and can thus not include a dof or tf:
     gradu.reuseit();
 
-    if (gradu.countrows() == 2 && gradu.countcolumns() == 2)
+    if (input.countrows() == 2)
     {
         expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(1,0,gradu);
         expression dycompxu = entry(0,1,gradu), dycompyu = entry(1,1,gradu);
@@ -925,7 +937,7 @@ expression mathop::greenlagrangestrain(expression gradu)
         output.reuseit();
         return output;
     }
-    if (gradu.countrows() == 3 && gradu.countcolumns() == 3)
+    if (input.countrows() == 3)
     {
         expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(1,0,gradu), dxcompzu = entry(2,0,gradu);
         expression dycompxu = entry(0,1,gradu), dycompyu = entry(1,1,gradu), dycompzu = entry(2,1,gradu);
@@ -941,9 +953,6 @@ expression mathop::greenlagrangestrain(expression gradu)
         output.reuseit();
         return output;
     }
-
-    std::cout << "Error in 'mathop' namespace: expected a 2x2 or 3x3 matrix as input for greenlagrangestrain()" << std::endl;
-    abort();
 }
 
 expression mathop::vonmises(expression stress)
