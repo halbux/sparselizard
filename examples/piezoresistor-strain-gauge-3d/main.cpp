@@ -1,6 +1,6 @@
 // This example shows how to set up a piezoresistive - elasticity simulation for a given silicon crystal orientation.
 // As the silicon cantilever deflects the conduction current adapts due to a piezoresistive-induced change of the resistivity.
-// The example also shows how to perform a mesh-to-mesh field interpolation.
+// The example also shows how to perform a field interpolation between two non-matching meshes.
 //
 // The piezoresistivity matrix was obtained from paper "Review: Semiconductor Piezoresistance for Microsystems", A. Barlian et al.
 //
