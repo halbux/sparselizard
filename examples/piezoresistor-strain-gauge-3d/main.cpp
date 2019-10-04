@@ -51,8 +51,8 @@ void sparselizard(void)
     Pi = Pi * rhounstressed;
     
     // Bring the Pi matrix to a 45 degrees crystal orientation:
-    //expression K = rotation(45,0,0, "voigt");
-    //Pi = K*Pi*inv(K);
+    expression K = rotation(0,0,45, "voigt");
+    Pi = K*Pi*inverse(K);
     
     // Anisotropic elasticity matrix [Pa] for silicon. Ordering is [exx,eyy,ezz,gyz,gxz,gxy] (Voigt form).
     // Only the lower triangular part (top to bottom and left to right) is provided since it is symmetric.
