@@ -644,7 +644,7 @@ std::vector<expression> mathop::rotation(double alphax, double alphay, double al
         c = std::cos(tz); s = std::sin(tz);
         densematrix invKz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
 
-        densematrix invK = Kx.multiply(Ky.multiply(Kz));
+        densematrix invK = invKx.multiply(invKy.multiply(invKz));
         
         double* invKval = invK.getvalues();
         
