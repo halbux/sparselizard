@@ -125,8 +125,8 @@ void sparselizard(void)
     expression H(6,6, {3.8e9, 1.9e9,3.8e9, 0.9e9,0.9e9,1.2e9, 0,0,0,7e8, 0,0,0,0,7e8, 0,0,0,0,0,9e8});
 
     // Take into account that here y is the growth direction and not z.
-    // Refer to the documentation to make sure you understand when to use 'rotate'!
-    K.rotate(-90,0,0); C.rotate(-90,0,0); H.rotate(-90,0,0);
+    // Refer to the documentation to make sure you understand how to use 'rotate'!
+    K.rotate(-90,0,0); C.rotate(-90,0,0,"K","RT"); H.rotate(-90,0,0,"K","KT");
     
 
     formulation pmutmodel;

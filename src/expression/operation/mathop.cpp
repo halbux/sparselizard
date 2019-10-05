@@ -575,7 +575,7 @@ expression mathop::trace(expression a)
     return output;
 }
 
-expression mathop::rotation(double alphax, double alphay, double alphaz, std::string type)
+std::vector<expression> mathop::rotation(double alphax, double alphay, double alphaz, std::string type)
 {
     double pi = getpi();
     double ax = alphax*pi/180.0;
@@ -583,11 +583,11 @@ expression mathop::rotation(double alphax, double alphay, double alphaz, std::st
     double az = alphaz*pi/180.0;
     
     double tx,ty,tz,c,s;
-    
-    tx = ax; ty = ay; tz = az;
 
     if (type == "")
     {    
+        tx = ax; ty = ay; tz = az;
+    
         c = std::cos(tx); s = std::sin(tx);
         densematrix Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
         c = std::cos(ty); s = std::sin(ty);
@@ -608,10 +608,36 @@ expression mathop::rotation(double alphax, double alphay, double alphaz, std::st
         }
         expression Rexpr(3,3, exprs);
         
-        return Rexpr;
+        
+        tx = -ax; ty = -ay; tz = -az;
+    
+        c = std::cos(tx); s = std::sin(tx);
+        densematrix invRx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
+        c = std::cos(ty); s = std::sin(ty);
+        densematrix invRy(3,3, { c,0,s, 0,1,0, -s,0,c });
+        c = std::cos(tz); s = std::sin(tz);
+        densematrix invRz(3,3, { c,-s,0, s,c,0, 0,0,1 });
+        
+        densematrix invR = Rx.multiply(Ry.multiply(Rz));
+        
+        double* invRval = invR.getvalues();
+        
+        std::vector<expression> invexprs(9);
+        for (int i = 0; i < 9; i++)
+        {
+            if (std::abs(invRval[i]) < 1e-12)
+                invRval[i] = 0;
+            invexprs[i] = expression(invRval[i]);
+        }
+        expression invRexpr(3,3, invexprs);
+        
+        
+        return std::vector<expression>{Rexpr, invRexpr};
     }
     if (type == "voigt")
     {
+        tx = ax; ty = ay; tz = az;
+    
         c = std::cos(tx); s = std::sin(tx);
         densematrix Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
         c = std::cos(ty); s = std::sin(ty);
@@ -632,7 +658,31 @@ expression mathop::rotation(double alphax, double alphay, double alphaz, std::st
         }
         expression Kexpr(6,6, exprs);
         
-        return Kexpr;
+        
+        tx = -ax; ty = -ay; tz = -az;
+    
+        c = std::cos(tx); s = std::sin(tx);
+        densematrix invKx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
+        c = std::cos(ty); s = std::sin(ty);
+        densematrix invKy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
+        c = std::cos(tz); s = std::sin(tz);
+        densematrix invKz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
+
+        densematrix invK = Kx.multiply(Ky.multiply(Kz));
+        
+        double* invKval = invK.getvalues();
+        
+        std::vector<expression> invexprs(36);
+        for (int i = 0; i < 36; i++)
+        {
+            if (std::abs(invKval[i]) < 1e-12)
+                invKval[i] = 0;
+            invexprs[i] = expression(invKval[i]);
+        }
+        expression invKexpr(6,6, invexprs);
+        
+        
+        return std::vector<expression>{Kexpr, invKexpr};
     }
     
     std::cout << "Error in 'mathop' namespace: rotation expected a type '' or 'voigt'" << std::endl;

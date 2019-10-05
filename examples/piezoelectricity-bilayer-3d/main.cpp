@@ -56,8 +56,8 @@ void sparselizard(void)
     expression Hpzt(6,6, {1.27e11, 8.02e10,1.27e11, 8.46e10,8.46e10,1.17e11, 0,0,0,2.29e10, 0,0,0,0,2.29e10, 0,0,0,0,0,2.34e10});
     
     // Rotate the silicon and PZT crystals first by -30 degrees around y then by 45 degrees around z.
-    // Refer to the documentation to make sure you understand when to use 'rotate'!
-    Hsi.rotate(0,-30,45); Hpzt.rotate(0,-30,45); C.rotate(0,-30,45); K.rotate(0,-30,45);
+    // Refer to the documentation to make sure you understand how to use 'rotate'!
+    Hsi.rotate(0,-30,45,"K","KT"); Hpzt.rotate(0,-30,45,"K","KT"); C.rotate(0,-30,45,"K","RT"); K.rotate(0,-30,45);
     
     
     formulation piezo;

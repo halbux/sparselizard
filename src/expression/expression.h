@@ -157,7 +157,7 @@ class expression
         void print(void);
         
         // Read the function documentation before using it!
-        void rotate(double ax, double ay, double az);
+        void rotate(double ax, double ay, double az, std::string leftop = "", std::string rightop = "");
         
         expression at(int row, int col);
         
