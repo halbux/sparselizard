@@ -1368,7 +1368,7 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
         std::cout << "Error in 'expression' object: left product can only be 'R', 'RT, 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
         abort();
     }
-    if (rightop != "R" && rightop != "RT" && rightop != "R-1" && rightop != "R-T" && rightop != "K" && rightop != "KT" && rightop != "K-1" && rightop != "K-T")
+    if (rightop != "" && rightop != "R" && rightop != "RT" && rightop != "R-1" && rightop != "R-T" && rightop != "K" && rightop != "KT" && rightop != "K-1" && rightop != "K-T")
     {
         std::cout << "Error in 'expression' object: right product can only be '', 'R', 'RT, 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
         abort();
