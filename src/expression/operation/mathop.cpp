@@ -608,31 +608,7 @@ std::vector<expression> mathop::rotation(double alphax, double alphay, double al
         }
         expression Rexpr(3,3, exprs);
         
-        
-        tx = -ax; ty = -ay; tz = -az;
-    
-        c = std::cos(tx); s = std::sin(tx);
-        densematrix invRx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
-        c = std::cos(ty); s = std::sin(ty);
-        densematrix invRy(3,3, { c,0,s, 0,1,0, -s,0,c });
-        c = std::cos(tz); s = std::sin(tz);
-        densematrix invRz(3,3, { c,-s,0, s,c,0, 0,0,1 });
-        
-        densematrix invR = Rx.multiply(Ry.multiply(Rz));
-        
-        double* invRval = invR.getvalues();
-        
-        std::vector<expression> invexprs(9);
-        for (int i = 0; i < 9; i++)
-        {
-            if (std::abs(invRval[i]) < 1e-12)
-                invRval[i] = 0;
-            invexprs[i] = expression(invRval[i]);
-        }
-        expression invRexpr(3,3, invexprs);
-        
-        
-        return std::vector<expression>{Rexpr, invRexpr};
+        return std::vector<expression>{Rexpr, transpose(Rexpr)};
     }
     if (type == "voigt")
     {
