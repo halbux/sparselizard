@@ -1377,13 +1377,13 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     // Define the rotation matrices needed:
     expression R,RT,K,KT,invK,invKT;
     
-    if (leftop[0] == 'R' || rightop[0] == 'R')
+    if (leftop[0] == 'R' || rightop != "" && rightop[0] == 'R')
     {
         R = mathop::rotation(ax, ay, az)[0];
         RT = mathop::transpose(R);   
     }
         
-    if (leftop[0] == 'K' || rightop[0] == 'K')
+    if (leftop[0] == 'K' || rightop != "" && rightop[0] == 'K')
     {
         std::vector<expression> Ks = mathop::rotation(ax, ay, az, "voigt");
         K = Ks[0]; invK = Ks[1];
