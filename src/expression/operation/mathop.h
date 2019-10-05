@@ -122,9 +122,9 @@ namespace mathop
     // Get the trace of a square matrix:
     expression trace(expression a);
     
-    // Get the rotation matrix for a 3x3 tensor with (x,y,z) component ordering
-    // or a 6x6 tensor in Voigt form. Input angles are in degrees.
-    expression rotation(double alphax, double alphay, double alphaz, std::string type = "");
+    // Get the rotation matrix and its inverse for a 3x3 tensor with (x,y,z) component 
+    // ordering or a 6x6 tensor in Voigt form. Input angles are in degrees.
+    std::vector<expression> rotation(double alphax, double alphay, double alphaz, std::string type = "");
 
     // Get the determinant of the physical to reference element variable change Jacobian:
     expression detjac(void);

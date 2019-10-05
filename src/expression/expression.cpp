@@ -1356,42 +1356,82 @@ void expression::print(void)
     std::cout << std::endl;
 }
 
-void expression::rotate(double ax, double ay, double az)
+void expression::rotate(double ax, double ay, double az, std::string leftop, std::string rightop)
 {
-    if (mynumrows != 3 && mynumrows != 6 || mynumcols != 1 && mynumcols != 3 && mynumcols != 6)
+    if (leftop == "")
+        leftop = "R";
+    if (rightop == "" && mynumcols > 1)
+        rightop = "RT";
+
+    if (leftop != "R" && leftop != "RT" && leftop != "R-1" && leftop != "R-T" && leftop != "K" && leftop != "KT" && leftop != "K-1" && leftop != "K-T")
     {
-        std::cout << "Error in 'expression' object: trying to rotate an expression of dimension " << mynumrows << "x" << mynumcols << " (not defined)" << std::endl;
+        std::cout << "Error in 'expression' object: left product can only be 'R', 'RT, 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
         abort();
     }
-    
+    if (rightop != "R" && rightop != "RT" && rightop != "R-1" && rightop != "R-T" && rightop != "K" && rightop != "KT" && rightop != "K-1" && rightop != "K-T")
+    {
+        std::cout << "Error in 'expression' object: right product can only be '', 'R', 'RT, 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
+        abort();
+    }
 	
     // Define the rotation matrices needed:
-    expression R,RT,K,KT;
+    expression R,RT,K,KT,invK,invKT;
     
-    if (mynumrows == 3 || mynumcols == 3)
+    if (leftop[0] == 'R' || rightop[0] == 'R')
     {
-        R = mathop::rotation(ax, ay, az);
-        RT = mathop::transpose(R);
+        R = mathop::rotation(ax, ay, az)[0];
+        RT = mathop::transpose(R);   
     }
-    if (mynumrows == 6 || mynumcols == 6)
+        
+    if (leftop[0] == 'K' || rightop[0] == 'K')
     {
-        K = mathop::rotation(ax, ay, az, "voigt");
+        std::vector<expression> Ks = mathop::rotation(ax, ay, az, "voigt");
+        K = Ks[0]; invK = Ks[1];
         KT = mathop::transpose(K);
+        invKT = mathop::transpose(invK);
     }
     
     
     ///// Rotate the matrix in this expression:
     
     expression rotated = *this;
-    if (mynumrows == 3)
+    
+    if (leftop == "R")
         rotated = R*rotated;
-    if (mynumrows == 6)
+    if (leftop == "RT")
+        rotated = RT*rotated;
+    if (leftop == "R-1")
+        rotated = RT*rotated;
+    if (leftop == "R-T")
+        rotated = R*rotated;
+    if (leftop == "K")
         rotated = K*rotated;
+    if (leftop == "KT")
+        rotated = KT*rotated;
+    if (leftop == "K-1")
+        rotated = invK*rotated;
+    if (leftop == "K-T")
+        rotated = invKT*rotated;
 
-    if (mynumcols == 3)
+    if (rightop == "R")
+        rotated = rotated*R;
+    if (rightop == "RT")
         rotated = rotated*RT;
-    if (mynumcols == 6)
+    if (rightop == "R-1")
+        rotated = rotated*RT;
+    if (rightop == "R-T")
+        rotated = rotated*R;
+    if (rightop == "K")
+        rotated = rotated*K;
+    if (rightop == "KT")
         rotated = rotated*KT;
+    if (rightop == "K-1")
+        rotated = rotated*invK;
+    if (rightop == "K-T")
+        rotated = rotated*invKT;
+        
+    for (int i = 0; i < rotated.myoperations.size(); i++)
+        rotated.myoperations[i]->simplify({});
     
     myoperations = rotated.myoperations;
 }
