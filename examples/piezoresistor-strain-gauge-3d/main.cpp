@@ -61,7 +61,7 @@ void sparselizard(void)
     
     // Resistivity change for the stressed silicon crystal (piezoelectric):
     expression rhos = Pi * H*strain(ugauge);
-    // Add the unstressed resistivity tensor in Voigt form:
+    // Add the unstressed diagonal resistivity tensor in Voigt form:
     rhos = rhos + expression(6,1,{rhounstressed,rhounstressed,rhounstressed,0,0,0});
     
     // Bring the resistivity from Voigt to 3x3 tensor form for inversion.
