@@ -14,6 +14,7 @@
 
 using namespace mathop;
 
+// First arguments give the geometry size, last arguments give the number of nodes for meshing.
 mesh createmesh(double length, double width, double thsi, double tracetilt, double ltrace, double wtrace, double rtrace, double thtrace, int numtraces, int nx, int ny, int nz, int nltrace, int nwtrace, int nthtrace);
 
 void sparselizard(void)
@@ -118,7 +119,7 @@ void sparselizard(void)
     std::cout << "Input current = " << I << " A at a peak deflection of " << norm(u).max(silicon,3)[0]*1e6 << " um" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (I < 1e10 && I > -1e10);
+    std::cout << (I < 6.10165e-07 && I > 6.10163e-07);
 }
 
 mesh createmesh(double length, double width, double thsi, double tracetilt, double ltrace, double wtrace, double rtrace, double thtrace, int numtraces, int nx, int ny, int nz, int nltrace, int nwtrace, int nthtrace)
