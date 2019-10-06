@@ -103,7 +103,7 @@ void sparselizard(void)
     
     // Expression for the electric field E [V/m] and current density j [A/m^2]:
     expression E = -grad(v);
-    expression j = inverse(rho) * E;
+    expression j = sigma * E;
     
     // Write the fields to file:
     u.write(silicon, "u.vtk", 2);
