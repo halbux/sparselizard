@@ -28,9 +28,10 @@ void sparselizard(void)
     
     // Nodal shape functions 'h1' for v (the electric potential) and u 
     // (the membrane displacement). Three components are used for u.
+    // Field u is the displacement field in the silicon, field ugauge in the strain gauge.
     field u("h1xyz"), ugauge("h1xyz"), v("h1");
     
-    // Use interpolation order 2 on 'wholedomain' for u and for v:
+    // Use interpolation order 2 for u and for v:
     u.setorder(silicon, 2);
     ugauge.setorder(trace, 2);
     v.setorder(trace, 2);
