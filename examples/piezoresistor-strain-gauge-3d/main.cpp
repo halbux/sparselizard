@@ -110,7 +110,7 @@ void sparselizard(void)
     
     
     // Output the total current [A] flowing through the electrode.
-    // The current density must be integrated on the whole electrode surface.
+    // The normal current density must be integrated on the whole electrode surface.
     // Since j requires calculating volume derivatives its evaluation must be performed on the 'trace' volume region.
     double I = (-normal(electrode)*on(trace, j)).integrate(electrode, 4);
     std::cout << "Input current = " << I << " A at a peak deflection of " << norm(u).max(silicon,3)[0]*1e6 << " um" << std::endl;
