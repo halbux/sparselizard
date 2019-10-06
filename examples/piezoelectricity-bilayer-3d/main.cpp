@@ -33,7 +33,7 @@ void sparselizard(void)
     u.setorder(wholedomain, 2);
     v.setorder(pztlayer, 1);
     
-    // Clamp on surface 'sur' (i.e. 0 valued-Dirichlet conditions):
+    // Clamp on surface 'clamp' (i.e. 0 valued-Dirichlet conditions):
     u.setconstraint(clamp);
     
     v.harmonic(2).setconstraint(electrode, 10);	
