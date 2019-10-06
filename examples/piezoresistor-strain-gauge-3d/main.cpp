@@ -59,9 +59,9 @@ void sparselizard(void)
     expression H(6,6, {194.5e9, 35.7e9,194.5e9, 64.1e9,64.1e9,165.7e9, 0,0,0,79.6e9, 0,0,0,0,79.6e9, 0,0,0,0,0,50.9e9});
     
     // Resistivity change for the stressed silicon crystal (piezoelectric):
-    expression rhos = Pi * H*strain(ugauge);
+    expression deltarho = Pi * H*strain(ugauge);
     // Add the unstressed diagonal resistivity tensor in Voigt form:
-    rhos = rhos + expression(6,1,{rhounstressed,rhounstressed,rhounstressed,0,0,0});
+    expression rhos = deltarho + expression(6,1,{rhounstressed,rhounstressed,rhounstressed,0,0,0});
     
     // Bring the resistivity from Voigt to 3x3 tensor form for inversion.
     // Only the lower triangular part is provided since the tensor is here symmetric.
