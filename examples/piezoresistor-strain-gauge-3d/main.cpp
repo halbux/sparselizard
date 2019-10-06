@@ -25,7 +25,6 @@ void sparselizard(void)
     mesh mymesh = createmesh(200e-6, 100e-6, 10e-6, 30, 60e-6, 2e-6, 1e-6, 2e-6, 6, 20, 10, 5, 10, 4, 3);
     mymesh.write("straingauge.msh");
     
-    
     // Nodal shape functions 'h1' for v (the electric potential) and u 
     // (the mechanical displacement). Three components are used for u. Field u is 
     // the displacement field in the silicon, field ugauge in the strain gauge.
@@ -41,7 +40,6 @@ void sparselizard(void)
     
     v.setconstraint(electrode, 10);	
     v.setconstraint(ground, 0);	
-    
     
     // Piezoresistivity 'Pi' [1/Pa] matrix aligned with the silicon crystal.
     // In this case it is symmetric and thus only the lower triangular part is provided:
