@@ -1358,14 +1358,21 @@ void expression::print(void)
 
 void expression::rotate(double ax, double ay, double az, std::string leftop, std::string rightop)
 {
-    if (leftop == "")
+   // Correctly transform a 3x3 and 3x1 by default:
+    if (leftop == "default")
         leftop = "R";
-    if (rightop == "" && mynumcols > 1)
-        rightop = "RT";
-
-    if (leftop != "R" && leftop != "RT" && leftop != "R-1" && leftop != "R-T" && leftop != "K" && leftop != "KT" && leftop != "K-1" && leftop != "K-T")
+    if (rightop == "default")
     {
-        std::cout << "Error in 'expression' object: in 'rotate' left product can only be 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
+        if (mynumcols > 1)
+            rightop = "RT";
+        else
+            rightop = "";
+    }
+    
+
+    if (leftop != "" && leftop != "R" && leftop != "RT" && leftop != "R-1" && leftop != "R-T" && leftop != "K" && leftop != "KT" && leftop != "K-1" && leftop != "K-T")
+    {
+        std::cout << "Error in 'expression' object: in 'rotate' left product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
         abort();
     }
     if (rightop != "" && rightop != "R" && rightop != "RT" && rightop != "R-1" && rightop != "R-T" && rightop != "K" && rightop != "KT" && rightop != "K-1" && rightop != "K-T")
@@ -1377,13 +1384,13 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     // Define the rotation matrices needed:
     expression R,RT,K,KT,invK,invKT;
     
-    if (leftop[0] == 'R' || rightop != "" && rightop[0] == 'R')
+    if (leftop != "" && leftop[0] == 'R' || rightop != "" && rightop[0] == 'R')
     {
         R = mathop::rotation(ax, ay, az)[0];
         RT = mathop::transpose(R);   
     }
         
-    if (leftop[0] == 'K' || rightop != "" && rightop[0] == 'K')
+    if (leftop != "" && leftop[0] == 'K' || rightop != "" && rightop[0] == 'K')
     {
         std::vector<expression> Ks = mathop::rotation(ax, ay, az, "voigt");
         K = Ks[0]; invK = Ks[1];
