@@ -23,7 +23,7 @@ void sparselizard(void)
     setfundamentalfrequency(1e4);
     
     // Nodal shape functions 'h1' for v (the electric potential) and u 
-    // (the membrane displacement). Three components are used for u.
+    // (the mechanical displacement). Three components are used for u.
     // Use harmonic 2, i.e. u(x,t) = U(x)*sin(2pi*f0*t) for u and 
     // v(x,t) = V(x)*sin(2pi*f0*t) for v.
     //
