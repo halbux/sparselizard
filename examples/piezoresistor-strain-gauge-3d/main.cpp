@@ -21,7 +21,7 @@ void sparselizard(void)
 {	
     int silicon = 1, trace = 2, electrode = 3, ground = 4, clamp = 5;
     
-    // Create the bilayer mesh:
+    // Create the two non-matching meshes:
     mesh mymesh = createmesh(200e-6, 100e-6, 10e-6, 30, 60e-6, 2e-6, 1e-6, 2e-6, 6, 20, 10, 5, 10, 4, 3);
     mymesh.write("straingauge.msh");
     
