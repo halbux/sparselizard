@@ -27,7 +27,7 @@ void sparselizard(void)
     
     
     // Nodal shape functions 'h1' for v (the electric potential) and u 
-    // (the displacement). Three components are used for u. Field u is 
+    // (the mechanical displacement). Three components are used for u. Field u is 
     // the displacement field in the silicon, field ugauge in the strain gauge.
     field u("h1xyz"), ugauge("h1xyz"), v("h1");
     
