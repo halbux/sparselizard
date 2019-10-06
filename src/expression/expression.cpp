@@ -1358,6 +1358,12 @@ void expression::print(void)
 
 void expression::rotate(double ax, double ay, double az, std::string leftop, std::string rightop)
 {
+    if (isscalar())
+    {
+        std::cout << "Error in 'expression' object: cannot rotate a scalar expression" << std::endl;
+        abort();
+    }
+	
    // Correctly transform a 3x3 and 3x1 by default:
     if (leftop == "default")
         leftop = "R";
