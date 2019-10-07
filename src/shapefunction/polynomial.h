@@ -9,10 +9,13 @@
 
 #include <iostream>
 #include <vector>
+#include "polynomials.h"
 
 
 class polynomial
 {
+    friend class polynomials;
+    
     private:
 
         // 'mycoefficients[i][j][k]' gives the coefficient of the monomial ki^i*eta^j*phi^k
