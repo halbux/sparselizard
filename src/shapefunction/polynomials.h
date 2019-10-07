@@ -18,10 +18,17 @@ class polynomials
     private:
 
         std::vector<polynomial> mypolys = {};
+        
+        // Size in the ki, eta and phi direction:
+        int mykilen = 0, myetalen = 0, myphilen = 0, mynummonomials = 0;;
+        std::vector<double> mycoeffs = {};
 
     public:
 
         polynomials(std::vector<polynomial> input);
+        
+        // Evaluate at a single {ki,eta,phi} point:
+        void evalatsingle(const std::vector<double>& evaluationpoint, std::vector<double>& evaled);
         
 };
 
