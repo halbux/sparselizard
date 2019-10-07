@@ -114,7 +114,7 @@ polynomial polynomial::operator*(polynomial tomultiply)
     polynomial output({});
     
     // Loop on all coefficients of 'tomultiply' (descendingly to reduce the number of .resize calls on 'output):
-    for (int kiorder = tomultiply.mycoefficients.size()-1; kiorder >= 0; kiorder--) /////// START FROM HIGHEST ORDER TO SMALLEST TO AVOID USELESS PREALLOCATIONS!
+    for (int kiorder = tomultiply.mycoefficients.size()-1; kiorder >= 0; kiorder--)
     {    
         for (int etaorder = tomultiply.mycoefficients[kiorder].size()-1; etaorder >= 0; etaorder--)
         {
