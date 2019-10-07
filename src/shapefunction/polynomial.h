@@ -10,7 +10,6 @@
 #include <iostream>
 #include <vector>
 
-
 class polynomial
 {
     private:
