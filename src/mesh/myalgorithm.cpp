@@ -406,6 +406,140 @@ int myalgorithm::getroot(std::vector<polynomial>& poly, std::vector<double>& rhs
     return 1;
 }
 
+int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vector<double>& guess, double boxsize, double tol, int maxit)
+{
+    int it = 0;
+    double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
+    
+    // Limit the jumps to a fraction of the box size:
+    double maxjump = 0.45;
+
+    switch (polys.count())
+    {
+        case 1:
+        {
+            while (std::abs(deltaki) > tol)
+            {
+                if (it < maxit)
+                {
+                    std::vector<double> evaled;
+                    polys.evalatsingle(guess, evaled);
+                
+                    double f = evaled[0] - rhs[0];
+                    double jac11 = evaled[1];
+                    
+                    deltaki = -1.0/jac11 * f;
+                    
+                    double scaling = maxjump*boxsize / ( std::abs(deltaki) );
+                    if (scaling < 1.0)
+                        deltaki *= scaling;
+                    
+                    guess[0] += deltaki;
+                    
+                    if (std::abs(guess[0]) > boxsize)
+                        return 0;
+                }
+                else
+                    return -1;
+                it++;
+            }
+            break;
+        }
+        case 2:
+        {
+            while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol)
+            {
+                if (it < maxit)
+                {
+                    std::vector<double> evaled;
+                    polys.evalatsingle(guess, evaled);
+                    
+                    double f = evaled[0] - rhs[0];
+                    double g = evaled[3] - rhs[1];
+                    
+                    double jac11 = evaled[1];
+                    double jac12 = evaled[2];
+                    double jac21 = evaled[4];
+                    double jac22 = evaled[5];
+                    
+                    double invdet = 1.0/(jac11*jac22 - jac12*jac21);
+                    
+                    deltaki = -invdet * (jac22*f - jac12*g);
+                    deltaeta = -invdet * (-jac21*f + jac11*g);
+                    
+                    double scaling = maxjump*boxsize / ( std::abs(deltaki)+std::abs(deltaeta) );
+                    if (scaling < 1.0)
+                    {
+                        deltaki *= scaling;
+                        deltaeta *= scaling;
+                    }
+                    
+                    guess[0] += deltaki;
+                    guess[1] += deltaeta;
+                    
+                    if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize)
+                        return 0;
+                }
+                else
+                    return -1;
+                it++;
+            }
+            break;
+        }
+        case 3:
+        {
+            while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol || std::abs(deltaphi) > tol)
+            {
+                if (it < maxit)
+                {
+                    std::vector<double> evaled;
+                    polys.evalatsingle(guess, evaled);
+                    
+                    double f = evaled[0] - rhs[0];
+                    double g = evaled[4] - rhs[1];
+                    double h = evaled[8] - rhs[2];
+                    
+                    double jac11 = evaled[1];
+                    double jac12 = evaled[2];
+                    double jac13 = evaled[3];
+                    double jac21 = evaled[5];
+                    double jac22 = evaled[6];
+                    double jac23 = evaled[7];
+                    double jac31 = evaled[9];
+                    double jac32 = evaled[10];
+                    double jac33 = evaled[11];
+                    
+                    double invdet = 1.0/(jac11*jac22*jac33 - jac11*jac23*jac32 - jac12*jac21*jac33 + jac12*jac23*jac31 + jac13*jac21*jac32 - jac13*jac22*jac31);
+                    
+                    deltaki = -invdet * ((jac22*jac33 - jac23*jac32)*f - (jac12*jac33 - jac13*jac32)*g + (jac12*jac23 - jac13*jac22)*h);
+                    deltaeta = -invdet * (-(jac21*jac33 - jac23*jac31)*f + (jac11*jac33 - jac13*jac31)*g - (jac11*jac23 - jac13*jac21)*h);
+                    deltaphi = -invdet * ((jac21*jac32 - jac22*jac31)*f - (jac11*jac32 - jac12*jac31)*g + (jac11*jac22 - jac12*jac21)*h);
+                    
+                    double scaling = maxjump*boxsize / ( std::abs(deltaki)+std::abs(deltaeta)+std::abs(deltaphi) );
+                    if (scaling < 1.0)
+                    {
+                        deltaki *= scaling;
+                        deltaeta *= scaling;
+                        deltaphi *= scaling;
+                    }
+                    
+                    guess[0] += deltaki;
+                    guess[1] += deltaeta;
+                    guess[2] += deltaphi;
+                    
+                    if (std::abs(guess[0]) > boxsize || std::abs(guess[1]) > boxsize || std::abs(guess[2]) > boxsize)
+                        return 0;
+                }
+                else
+                    return -1;
+                it++;
+            }
+            break;
+        }
+    }
+    return 1;
+}
+
 int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize, double tol, int maxit)
 {
     int numguesses = initialguesses.size()/3;

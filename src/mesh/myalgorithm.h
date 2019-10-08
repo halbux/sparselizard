@@ -13,6 +13,7 @@
 #include <cmath>
 #include <algorithm>
 #include "polynomial.h"
+#include "polynomials.h"
 #include "coordinategroup.h"
 
 namespace myalgorithm
@@ -58,10 +59,12 @@ namespace myalgorithm
     void csrtoijk(int numberofrows, int* csrrows, int* ijkrows);
     
     // Get a single solution {ki,eta,phi} of a system of one up to three polynomials {poly1,poly2,...} equaled to the rhs.
+    // The polynomials in 'polys' must be ordered as {poly1,dkipoly1,detapoly1,...,poly2,dkipoly2,...}.
     // After convergence 1 is returned and the solution is placed in 'initialguess'. If at any iteration either ki, eta or phi
     // is farther away than 'boxsize' from the origin then the function stops and returns 0. Value -1 is returned in any other case.
     // The initial guess is supposed to be inside the box.
     int getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 2, double tol = 1e-12, int maxit = 20);
+    int getroot(polynomials& polys, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 2, double tol = 1e-12, int maxit = 20);
 
     // Attempt to get the above mentionned root with multiple initial guesses provided in format {ki1,eta1,phi1,ki2,eta2,phi2,...}.
     int getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize = 2, double tol = 1e-12, int maxit = 20);
