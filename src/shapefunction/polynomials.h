@@ -24,7 +24,8 @@ class polynomials
         std::vector<double> mycoeffs = {};
 
     public:
-
+    
+        polynomials(void) {};
         polynomials(std::vector<polynomial> input);
     
         int count(void) { return mypolys.size(); };
