@@ -598,7 +598,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     {
         double curelem = rangebegin+e;
         
-        std::vector<polynomial> poly = {};
+        polynomials polys;
         
         double maxelemsize = alpha*sphereradius->at(curelem);
         double xbary = barycenters->at(3*curelem+0), ybary = barycenters->at(3*curelem+1), zbary = barycenters->at(3*curelem+2);
@@ -628,14 +628,19 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     std::vector<double> rhs = {curx, cury, curz};
 
                     // Only create once for all coordinates the polynomials and only for the required elements:
-                    if (poly.size() == 0)
+                    if (polys.count() == 0)
                     {
-                        poly.resize(elemdim);
+                        std::vector<polynomial> curpols( elemdim*(elemdim+1) );
                         for (int j = 0; j < elemdim; j++)
-                            poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
+                        {
+                            curpols[j*(elemdim+1)+0] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
+                            for (int d = 0; d < elemdim; d++)
+                                curpols[j*(elemdim+1)+1+d] = curpols[j*(elemdim+1)+0].derivative(d);
+                        }
+                        polys = polynomials(curpols);
                     }
                     
-                    if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
+                    if (myalgorithm::getroot(polys, rhs, kietaphi) == 1)
                     {
                         // Check if the (ki,eta,phi) coordinates are inside the element:
                         if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
