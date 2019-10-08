@@ -84,3 +84,12 @@ void polynomials::evalatsingle(const std::vector<double>& evaluationpoint, std::
     }
 }
 
+void polynomials::print(void)
+{
+    std::cout << "Number of polynomials is " << mypolys.size() << " with " << mynummonomials << " monomials (" << mykilen << "x" << myetalen << "x" << myphilen << ")" << std::endl;
+    std::cout << "Coefficients are:" << std::endl;
+    for (int i = 0; i < mycoeffs.size(); i++)
+        std::cout << mycoeffs[i] << " ";
+    std::cout << std::endl;
+}
+

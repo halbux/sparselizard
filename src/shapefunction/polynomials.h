@@ -30,6 +30,9 @@ class polynomials
         // Evaluate at a single {ki,eta,phi} point:
         void evalatsingle(const std::vector<double>& evaluationpoint, std::vector<double>& evaled);
         
+        
+        void print(void);
+        
 };
 
 #endif
