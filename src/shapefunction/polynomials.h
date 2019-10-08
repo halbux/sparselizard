@@ -26,6 +26,8 @@ class polynomials
     public:
 
         polynomials(std::vector<polynomial> input);
+    
+        int count(void) { return mypolys.size(); };
         
         // Evaluate at a single {ki,eta,phi} point:
         void evalatsingle(const std::vector<double>& evaluationpoint, std::vector<double>& evaled);
