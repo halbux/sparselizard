@@ -416,7 +416,7 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
 
     switch (polys.count())
     {
-        case 1:
+        case 2:
         {
             while (std::abs(deltaki) > tol)
             {
@@ -445,7 +445,7 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
             }
             break;
         }
-        case 2:
+        case 6:
         {
             while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol)
             {
@@ -486,7 +486,7 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
             }
             break;
         }
-        case 3:
+        case 12:
         {
             while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol || std::abs(deltaphi) > tol)
             {
