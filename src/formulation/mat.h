@@ -40,7 +40,9 @@ class mat
                     
         mat(void) {};
         mat(std::shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
-     
+        
+        // Create a pre-filled matrix:
+        mat(int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
         // Create a matrix with structure based on a formulation and with initial values:
         mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
      

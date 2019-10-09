@@ -40,6 +40,9 @@ class vec
         vec(formulation formul);
         vec(std::shared_ptr<rawvec> inputrawvec) { rawvecptr = inputrawvec; };
      
+        // Create a pre-filled vector:
+        vec(int vecsize, intdensematrix addresses, densematrix vals);
+     
         int size(void);
         
         // Remove the entries associated to Dirichlet constraints:

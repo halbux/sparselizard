@@ -10,6 +10,14 @@ void mat::errorifpointerisnull(void)
     }
 }
 
+mat::mat(int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
+{
+    rawmatptr = std::shared_ptr<rawmat>(new rawmat(std::shared_ptr<dofmanager>(new dofmanager(matsize))));
+    rawmatptr->accumulate(rowadresses, coladresses, vals);
+    rawmatptr->process();
+    rawmatptr->clearfragments();
+}
+
 mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));

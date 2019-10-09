@@ -12,6 +12,12 @@ void vec::errorifpointerisnull(void)
     }
 }
 
+vec::vec(int vecsize, intdensematrix addresses, densematrix vals)
+{
+    rawvecptr = std::shared_ptr<rawvec>(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(vecsize))));
+    rawvecptr->setvalues(addresses, vals, "set");
+}
+
 int vec::size(void) { errorifpointerisnull(); return rawvecptr->size(); }
 
 void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
