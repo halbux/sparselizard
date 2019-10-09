@@ -49,6 +49,9 @@ class dofmanager
         
     public:
         
+        dofmanager(void) {};
+        dofmanager(int numdofs) { numberofdofs = numdofs; };
+        
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
