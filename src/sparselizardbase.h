@@ -19,6 +19,7 @@
 #include "resolution.h"
 #include "densematrix.h"
 #include "intdensematrix.h"
+#include "spline.h"
 
 class sparselizardbase
 {
