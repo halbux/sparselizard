@@ -28,6 +28,7 @@ splines::splines(std::vector<double>& xin, std::vector<double>& yin)
         xvals[i] = xin[reorderingvector[i]];
         yvals[i] = yin[reorderingvector[i]];
     }
+    xmin = xvals[0]; xmax = xvals[len-1];
     
     // Create the A matrix and b rhs:
     intdensematrix Arows(3*len-2,1), Acols(3*len-2,1);
@@ -68,20 +69,112 @@ splines::splines(std::vector<double>& xin, std::vector<double>& yin)
     
     vec k = mathop::solve(A,b);
     densematrix kv = k.getvalues(intdensematrix(len,1,0,1));
+    double* kvals = kv.getvalues();
     
     
-    densematrix myy0,myy1,mya,myb;
+    // Compute the spline parameters a and b:
+    mya = densematrix(len,1);
+    myb = densematrix(len,1);
+    double* aparamvals = mya.getvalues();
+    double* bparamvals = myb.getvalues();
     
+    for (int i = 1; i < len; i++)
+    {
+        aparamvals[i] = kvals[i-1]*(xvals[i]-xvals[i-1])-(yvals[i]-yvals[i-1]);
+        bparamvals[i] = -kvals[i]*(xvals[i]-xvals[i-1])+(yvals[i]-yvals[i-1]);
+    }
 }
 
 densematrix splines::evalat(densematrix input)
 {
-        //errorifoutofrange = outofrangeerror;//////////////////NO! ALWAYS GIVE OUT OF RANGE ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    int numin = input.count();
+    double* inputvals = input.getvalues();
 
+    std::vector<double> invals;
+    input.getvalues(invals);
+    
+    // Sort the input data ascendingly:
+    std::vector<int> reorderingvector;
+    myalgorithm::stablesort(0, invals, reorderingvector);
+    for (int i = 0; i < numin; i++)
+        inputvals[i] = invals[reorderingvector[i]];
+    double inmin = inputvals[0]; double inmax = inputvals[numin-1];
+    
+    // Error if request is out of range:
+    if (inmin < xmin || inmax > xmax)
+    {
+        std::cout << "Error in 'splines' object: data requested in interval (" << inmin << ", " << inmax << ") "  << " is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
+        abort();
+    }
+    
+    
+    std::vector<double> outvec(numin);
+    
+    // Get the corresponding data via spline interpolation.
+    double* xvals = myx.getvalues(); double* yvals = myy.getvalues();
+    double* avals = mya.getvalues(); double* bvals = myb.getvalues();
+    
+    // First find the corresponding spline:
+    int curspline = 1;
+    for (int i = 0; i < numin; i++)
+    {
+        double cur = inputvals[i];
+        // Find the spline:
+        while (xvals[curspline] < cur)
+            curspline++;
+        // Interpolate on the spline:
+        double tx = (cur-xvals[curspline-1])/(xvals[curspline]-xvals[curspline-1]);
+        outvec[i] = (1.0-tx)*yvals[curspline-1] + tx*yvals[curspline] + tx*(1.0-tx)*((1.0-tx)*avals[curspline]+tx*bvals[curspline]);
+    }
+    
+    // Unsort the data:
+    densematrix output(numin,1);
+    double* outputvals = output.getvalues();
+    
+    for (int i = 0; i < numin; i++)
+        outputvals[reorderingvector[i]] = outvec[i];
+    
+    return output;
 }
 
-void splines::write(std::string filename, int numevalsperspline)
+void splines::write(std::string filename, int numsplits)
 {
+    if (numsplits < 0)
+    {
+        std::cout << "Error in 'splines' object: cannot write with " << numsplits << " splits" << std::endl;
+        abort();
+    }
 
+    // Get the x positions:
+    double* xvalues = myx.getvalues();
+    
+    densematrix xsplit(1+(myx.count()-1)*(numsplits+1),1);
+    double* xsplitvals = xsplit.getvalues();
+    double step = 1.0/(numsplits+1.0);
+    
+    xsplitvals[0] = xvalues[0];
+    
+    int index = 0;
+    for (int i = 0; i < myx.count()-1; i++)
+    {
+        for (int j = 0; j < numsplits+1; j++)
+        {
+            xsplitvals[index] = xvalues[i]+j*step;
+            index++;
+        }
+    }
+    densematrix evaled = evalat(xsplit);
+    double* evaledvals = evaled.getvalues();
+    
+    
+    // Write to file:
+    std::vector<double> data(2*xsplit.count());
+    for (int i = 0; i < xsplit.count(); i++)
+    {
+        data[2*i+0] = xsplitvals[i];
+        data[2*i+1] = evaledvals[i];
+    }
+    
+    mathop::writevector(filename, data, '\n', false);
 }
 
