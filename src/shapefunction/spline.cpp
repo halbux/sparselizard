@@ -23,6 +23,11 @@ spline::spline(std::string filename, char delimiter)
     set(xin,yin);
 }
 
+spline::spline(std::vector<double>& xin, std::vector<double>& yin)
+{
+    set(xin,yin);
+}
+
 void spline::set(std::vector<double>& xin, std::vector<double>& yin)
 {
     if (xin.size() != yin.size())
