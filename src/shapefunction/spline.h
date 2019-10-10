@@ -23,7 +23,7 @@ class spline
 
     private:
 
-        double noisethreshold = 1e-8;
+        double noisethreshold = 1e-10;
 
         double xmin, xmax;
         // The x and y axis data (sorted ascendingly):
