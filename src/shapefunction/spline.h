@@ -6,8 +6,8 @@
 // This objects holds a cubic natural spline interpolation of a dataset.
 
 
-#ifndef SPLINES_H
-#define SPLINES_H
+#ifndef SPLINE_H
+#define SPLINE_H
 
 #include <iostream>
 #include <vector>
@@ -18,7 +18,7 @@
 #include "mat.h"
 #include "vec.h"
 
-class splines
+class spline
 {
 
     private:
@@ -31,8 +31,8 @@ class splines
     
     public:
     
-        splines(void) {};
-        splines(std::string filename, char delimiter = '\n');
+        spline(void) {};
+        spline(std::string filename, char delimiter = '\n');
         
         void set(std::vector<double>& xin, std::vector<double>& yin);
         

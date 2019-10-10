@@ -1,13 +1,13 @@
-#include "splines.h"
+#include "spline.h"
 
 
-splines::splines(std::string filename, char delimiter)
+spline::spline(std::string filename, char delimiter)
 {
     std::vector<double> data = mathop::loadvector(filename, delimiter, false);
     
     if (data.size()%2 != 0)
     {
-        std::cout << "Error in 'splines' object: expected a vector length multiple of 2 in '" << filename << "' (format {x1,y1,x2,y2,...})" << std::endl;
+        std::cout << "Error in 'spline' object: expected a vector length multiple of 2 in '" << filename << "' (format {x1,y1,x2,y2,...})" << std::endl;
         abort();
     }
     
@@ -23,17 +23,17 @@ splines::splines(std::string filename, char delimiter)
     set(xin,yin);
 }
 
-void splines::set(std::vector<double>& xin, std::vector<double>& yin)
+void spline::set(std::vector<double>& xin, std::vector<double>& yin)
 {
     if (xin.size() != yin.size())
     {
-        std::cout << "Error in 'splines' object: x and y dataset sizes do not match" << std::endl;
+        std::cout << "Error in 'spline' object: x and y dataset sizes do not match" << std::endl;
         abort();
     }   
     int len = xin.size();
     if (len < 2)
     {
-        std::cout << "Error in 'splines' object: expected at least two data points" << std::endl;
+        std::cout << "Error in 'spline' object: expected at least two data points" << std::endl;
         abort();
     }   
     
@@ -107,7 +107,7 @@ void splines::set(std::vector<double>& xin, std::vector<double>& yin)
     }
 }
 
-densematrix splines::evalat(densematrix input)
+densematrix spline::evalat(densematrix input)
 {
     int numin = input.count();
     double* inputvals = input.getvalues();
@@ -125,7 +125,7 @@ densematrix splines::evalat(densematrix input)
     // Error if request is out of range:
     if (inmin < xmin || inmax > xmax)
     {
-        std::cout << "Error in 'splines' object: data requested in interval (" << inmin << ", " << inmax << ") "  << " is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
+        std::cout << "Error in 'spline' object: data requested in interval (" << inmin << ", " << inmax << ") "  << " is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
         abort();
     }
     
@@ -159,11 +159,11 @@ densematrix splines::evalat(densematrix input)
     return output;
 }
 
-void splines::write(std::string filename, int numsplits, char delimiter)
+void spline::write(std::string filename, int numsplits, char delimiter)
 {
     if (numsplits < 0)
     {
-        std::cout << "Error in 'splines' object: cannot write with " << numsplits << " splits" << std::endl;
+        std::cout << "Error in 'spline' object: cannot write with " << numsplits << " splits" << std::endl;
         abort();
     }
 
