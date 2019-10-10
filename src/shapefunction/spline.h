@@ -3,7 +3,7 @@
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
 //
-// This objects holds a cubic natural spline interpolation of a dataset.
+// This object holds a cubic natural spline interpolation of a dataset.
 
 
 #ifndef SPLINE_H
