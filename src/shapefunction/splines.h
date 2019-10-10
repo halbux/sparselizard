@@ -23,10 +23,11 @@ class splines
 
     private:
 
+        double xmin, xmax;
         // The x and y axis data (sorted ascendingly):
         densematrix myx, myy;
         // The spline parameters:
-        densematrix myy0,myy1,mya,myb;
+        densematrix mya, myb;
     
     public:
 
@@ -34,7 +35,7 @@ class splines
         
         densematrix evalat(densematrix input);
         
-        void write(std::string filename, int numevalsperspline);
+        void write(std::string filename, int numsplits);
     
 };
 
