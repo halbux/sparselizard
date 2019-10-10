@@ -50,12 +50,24 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     // First sort ascendingly according to x:
     std::vector<int> reorderingvector;
     myalgorithm::stablesort(0, xin, reorderingvector);
-    for (int i = 0; i < reorderingvector.size(); i++)
+    for (int i = 0; i < len; i++)
     {
         xvals[i] = xin[reorderingvector[i]];
         yvals[i] = yin[reorderingvector[i]];
     }
     xmin = xvals[0]; xmax = xvals[len-1];
+    
+    double absnoise = noisethreshold*std::abs(xmax-xmin);
+    xmin -= absnoise; xmax += absnoise;
+    for (int i = 1; i < len; i++)
+    {
+        if (xvals[i]-xvals[i-1] < absnoise)
+        {
+            std::cout << "Error in 'spline' object: distance between two samples is " << (xvals[i]-xvals[i-1]) << " (below noise level " << absnoise << ")" << std::endl;
+            abort();
+        }
+    }
+    
     
     // Create the A matrix and b rhs:
     intdensematrix Arows(3*len-2,1), Acols(3*len-2,1);

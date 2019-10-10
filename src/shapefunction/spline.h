@@ -23,6 +23,8 @@ class spline
 
     private:
 
+        double noisethreshold = 1e-8;
+
         double xmin, xmax;
         // The x and y axis data (sorted ascendingly):
         densematrix myx, myy;
