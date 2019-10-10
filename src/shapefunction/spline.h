@@ -33,6 +33,7 @@ class spline
     
         spline(void) {};
         spline(std::string filename, char delimiter = '\n');
+        spline(std::vector<double>& xin, std::vector<double>& yin);
         
         void set(std::vector<double>& xin, std::vector<double>& yin);
         
