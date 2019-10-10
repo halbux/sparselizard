@@ -198,7 +198,7 @@ void spline::write(std::string filename, int numsplits, char delimiter)
     {
         for (int j = 0; j < numsplits+1; j++)
         {
-            xsplitvals[index] = xvalues[i]+j*step*(xvalues[i+1]-xvalues[i]);
+            xsplitvals[index] = xvalues[i]+(j+1.0)*step*(xvalues[i+1]-xvalues[i]);
             index++;
         }
     }
