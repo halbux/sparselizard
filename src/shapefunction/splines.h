@@ -30,12 +30,15 @@ class splines
         densematrix mya, myb;
     
     public:
-
-        splines(std::vector<double>& xin, std::vector<double>& yin);
+    
+        splines(void) {};
+        splines(std::string filename, char delimiter = '\n');
+        
+        void set(std::vector<double>& xin, std::vector<double>& yin);
         
         densematrix evalat(densematrix input);
         
-        void write(std::string filename, int numsplits);
+        void write(std::string filename, int numsplits, char delimiter = '\n');
     
 };
 

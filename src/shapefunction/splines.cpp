@@ -1,17 +1,39 @@
 #include "splines.h"
 
 
-splines::splines(std::vector<double>& xin, std::vector<double>& yin)
+splines::splines(std::string filename, char delimiter)
+{
+    std::vector<double> data = mathop::loadvector(filename, delimiter, false);
+    
+    if (data.size()%2 != 0)
+    {
+        std::cout << "Error in 'splines' object: expected a vector length multiple of 2 in '" << filename << "' (format {x1,y1,x2,y2,...})" << std::endl;
+        abort();
+    }
+    
+    std::vector<double> xin(data.size()/2);
+    std::vector<double> yin(data.size()/2);
+    
+    for (int i = 0; i < data.size()/2; i++)
+    {
+        xin[i] = data[2*i+0];
+        yin[i] = data[2*i+1];
+    }
+    
+    set(xin,yin);
+}
+
+void splines::set(std::vector<double>& xin, std::vector<double>& yin)
 {
     if (xin.size() != yin.size())
     {
-        std::cout << "Error in 'spline' object: x and y dataset sizes do not match" << std::endl;
+        std::cout << "Error in 'splines' object: x and y dataset sizes do not match" << std::endl;
         abort();
     }   
     int len = xin.size();
     if (len < 2)
     {
-        std::cout << "Error in 'spline' object: expected at least two data points" << std::endl;
+        std::cout << "Error in 'splines' object: expected at least two data points" << std::endl;
         abort();
     }   
     
@@ -137,7 +159,7 @@ densematrix splines::evalat(densematrix input)
     return output;
 }
 
-void splines::write(std::string filename, int numsplits)
+void splines::write(std::string filename, int numsplits, char delimiter)
 {
     if (numsplits < 0)
     {
@@ -175,6 +197,6 @@ void splines::write(std::string filename, int numsplits)
         data[2*i+1] = evaledvals[i];
     }
     
-    mathop::writevector(filename, data, '\n', false);
+    mathop::writevector(filename, data, delimiter, false);
 }
 
