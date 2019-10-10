@@ -193,12 +193,12 @@ void spline::write(std::string filename, int numsplits, char delimiter)
     
     xsplitvals[0] = xvalues[0];
     
-    int index = 0;
+    int index = 1;
     for (int i = 0; i < myx.count()-1; i++)
     {
         for (int j = 0; j < numsplits+1; j++)
         {
-            xsplitvals[index] = xvalues[i]+j*step;
+            xsplitvals[index] = xvalues[i]+j*step*(xvalues[i+1]-xvalues[i]);
             index++;
         }
     }
