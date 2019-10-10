@@ -30,7 +30,7 @@ class splines
     
     public:
 
-        splines(std::vector<double> xin, std::vector<double> yin);
+        splines(std::vector<double>& xin, std::vector<double>& yin);
         
         densematrix evalat(densematrix input);
         
