@@ -142,7 +142,7 @@ densematrix spline::evalat(densematrix input)
     // Error if request is out of range:
     if (inmin < xmin || inmax > xmax)
     {
-        std::cout << "Error in 'spline' object: data requested in interval (" << inmin << ", " << inmax << ") "  << " is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
+        std::cout << "Error in 'spline' object: data requested in interval (" << inmin << ", " << inmax << ") is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
         abort();
     }
     
