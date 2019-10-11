@@ -12,11 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "myalgorithm.h"
 #include "densematrix.h"
-#include "mathop.h"
-#include "mat.h"
-#include "vec.h"
 
 class spline
 {
