@@ -187,7 +187,7 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
 
     if (condexpr.myoperations[0]->isdofincluded() || condexpr.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
+        std::cout << "Error in 'expression' object: conditional expression arguments cannot include a dof() or tf()" << std::endl;
         abort();
     }
 
@@ -199,7 +199,7 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
     {
         if (exprtrue.myoperations[i]->isdofincluded() || exprtrue.myoperations[i]->istfincluded() || exprfalse.myoperations[i]->isdofincluded() || exprfalse.myoperations[i]->istfincluded())
         {
-            std::cout << "Error in 'expression object': conditional expression arguments cannot include a dof() or tf()" << std::endl;
+            std::cout << "Error in 'expression' object: conditional expression arguments cannot include a dof() or tf()" << std::endl;
             abort();
         }
         myoperations[i] = std::shared_ptr<opcondition>(new opcondition(condexpr.myoperations[0], exprtrue.myoperations[i], exprfalse.myoperations[i]));
@@ -210,12 +210,12 @@ expression::expression(spline spl, expression arg)
 {
     if (arg.isscalar() == false)
     {
-        std::cout << "Error in 'expression object': expected a scalar expression as argument for the spline interpolation" << std::endl;
+        std::cout << "Error in 'expression' object: expected a scalar expression as argument for the spline interpolation" << std::endl;
         abort();
     }
     if (arg.myoperations[0]->isdofincluded() || arg.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression object': spline argument cannot include a dof() or tf()" << std::endl;
+        std::cout << "Error in 'expression' object: spline argument cannot include a dof() or tf()" << std::endl;
         abort();
     }
     mynumrows = 1; mynumcols = 1;
@@ -232,7 +232,7 @@ expression expression::getrow(int rownum)
 {
     if (rownum < 0 || rownum >= mynumrows)
     {
-        std::cout << "Error in 'expression object': cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+        std::cout << "Error in 'expression' object: cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
         abort();
     }
 
@@ -251,7 +251,7 @@ expression expression::getcolumn(int colnum)
 {
     if (colnum < 0 || colnum >= mynumcols)
     {
-        std::cout << "Error in 'expression object': cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+        std::cout << "Error in 'expression' object: cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
         abort();
     }
 
@@ -1240,7 +1240,7 @@ void expression::reuseit(bool istobereused)
             myoperations[i]->reuseit(istobereused);
         else
         {
-            std::cout << "Error in 'expression object': cannot reuse an expression including a dof() or tf()" << std::endl;
+            std::cout << "Error in 'expression' object: cannot reuse an expression including a dof() or tf()" << std::endl;
             abort();
         }
     }
