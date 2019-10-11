@@ -142,7 +142,7 @@ densematrix spline::evalat(densematrix input)
     double absnoise = noisethreshold*std::abs(xmax-xmin);
     if (inmin < xmin-absnoise || inmax > xmax+absnoise)
     {
-        std::cout << "Error in 'spline' object: data requested in interval (" << inmin << ", " << inmax << ") is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
+        std::cout << "Error in 'spline' object: data requested in interval (" << inmin << "," << inmax << ") is out of the provided data range (" << xmin << "," << xmax << ")" << std::endl;
         abort();
     }
     
