@@ -159,7 +159,7 @@ densematrix spline::evalat(densematrix input)
     {
         double cur = inputvals[i];
         // Find the spline:
-        while (xvals[curspline] < cur+absnoise)
+        while (xvals[curspline] < cur-absnoise)
             curspline++;
         // Interpolate on the spline:
         double tx = (cur-xvals[curspline-1])/(xvals[curspline]-xvals[curspline-1]);
