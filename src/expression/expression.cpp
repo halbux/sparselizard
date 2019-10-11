@@ -208,7 +208,7 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
 
 expression::expression(spline spl, expression arg)
 {
-    if (isscalar() == false)
+    if (arg.isscalar() == false)
     {
         std::cout << "Error in 'expression object': expected a scalar expression as argument for the spline interpolation" << std::endl;
         abort();
