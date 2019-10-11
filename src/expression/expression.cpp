@@ -219,7 +219,7 @@ expression::expression(spline spl, expression arg)
         abort();
     }
     mynumrows = 1; mynumcols = 1;
-    myoperations = {std::shared_ptr<operation>(new opspline(spl,arg.myoperations[0]))};
+    myoperations = {std::shared_ptr<opspline>(new opspline(spl,arg.myoperations[0]))};
 }
 
 expression::expression(std::shared_ptr<operation> input)
