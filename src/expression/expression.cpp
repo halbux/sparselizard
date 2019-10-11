@@ -213,6 +213,11 @@ expression::expression(spline spl, expression arg)
         std::cout << "Error in 'expression object': expected a scalar expression as argument for the spline interpolation" << std::endl;
         abort();
     }
+    if (arg.myoperations[0]->isdofincluded() || arg.myoperations[0]->istfincluded())
+    {
+        std::cout << "Error in 'expression object': spline arguments cannot include a dof() or tf()" << std::endl;
+        abort();
+    }
     mynumrows = 1; mynumcols = 1;
     myoperations = {std::shared_ptr<operation>(new opspline(spl,arg.myoperations[0]))};
 }
