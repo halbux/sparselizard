@@ -1,4 +1,8 @@
 #include "spline.h"
+#include "mathop.h"
+#include "mat.h"
+#include "vec.h"
+#include "myalgorithm.h"
 
 
 spline::spline(std::string filename, char delimiter)
