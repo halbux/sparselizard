@@ -171,7 +171,7 @@ densematrix spline::evalat(densematrix input)
     }
     
     // Unsort the data:
-    densematrix output(numin,1);
+    densematrix output(input.countrows(),input.countcolumns());
     double* outputvals = output.getvalues();
     
     for (int i = 0; i < numin; i++)
