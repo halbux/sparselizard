@@ -58,7 +58,6 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     xmin = xvals[0]; xmax = xvals[len-1];
     
     double absnoise = noisethreshold*std::abs(xmax-xmin);
-    xmin -= absnoise; xmax += absnoise;
     for (int i = 1; i < len; i++)
     {
         if (xvals[i]-xvals[i-1] < absnoise)
@@ -140,7 +139,8 @@ densematrix spline::evalat(densematrix input)
     double inmin = inputvals[0]; double inmax = inputvals[numin-1];
     
     // Error if request is out of range:
-    if (inmin < xmin || inmax > xmax)
+    double absnoise = noisethreshold*std::abs(xmax-xmin);
+    if (inmin < xmin-absnoise || inmax > xmax+absnoise)
     {
         std::cout << "Error in 'spline' object: data requested in interval (" << inmin << ", " << inmax << ") is out of the provided data range (" << xmin << ", " << xmax << ")" << std::endl;
         abort();
@@ -159,7 +159,7 @@ densematrix spline::evalat(densematrix input)
     {
         double cur = inputvals[i];
         // Find the spline:
-        while (xvals[curspline] < cur)
+        while (xvals[curspline] < cur+absnoise)
             curspline++;
         // Interpolate on the spline:
         double tx = (cur-xvals[curspline-1])/(xvals[curspline]-xvals[curspline-1]);
