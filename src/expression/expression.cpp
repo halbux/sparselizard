@@ -215,7 +215,7 @@ expression::expression(spline spl, expression arg)
     }
     if (arg.myoperations[0]->isdofincluded() || arg.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression object': spline arguments cannot include a dof() or tf()" << std::endl;
+        std::cout << "Error in 'expression object': spline argument cannot include a dof() or tf()" << std::endl;
         abort();
     }
     mynumrows = 1; mynumcols = 1;
