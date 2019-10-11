@@ -32,6 +32,7 @@
 #include "shape.h"
 #include "myalgorithm.h"
 #include "iointerface.h"
+#include "spline.h"
 
 
 class vec;
@@ -82,6 +83,8 @@ class expression
         // If true the expression value is the expression as second argument, if false it is the 
         // expression provided as third argument.
         expression(expression condexpr, expression exprtrue, expression exprfalse);
+        // Expression based on a spline interpolation of a discrete function of argument 'arg':
+        expression(spline spl, expression arg);
         
         // Define a 1x1 expression from an operation:
         expression(std::shared_ptr<operation>);
