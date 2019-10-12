@@ -27,7 +27,7 @@ spline::spline(std::string filename, char delimiter)
     set(xin,yin);
 }
 
-spline::spline(std::vector<double>& xin, std::vector<double>& yin)
+spline::spline(std::vector<double> xin, std::vector<double> yin)
 {
     set(xin,yin);
 }
@@ -125,6 +125,16 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
         aparamvals[i] = kvals[i-1]*(xvals[i]-xvals[i-1])-(yvals[i]-yvals[i-1]);
         bparamvals[i] = -kvals[i]*(xvals[i]-xvals[i-1])+(yvals[i]-yvals[i-1]);
     }
+}
+
+std::vector<double> spline::evalat(std::vector<double> input)
+{
+    densematrix indm(input.size(),1, input);
+    densematrix outdm = evalat(indm);
+    std::vector<double> output;
+    outdm.getvalues(output);
+    
+    return output;
 }
 
 densematrix spline::evalat(densematrix input)
