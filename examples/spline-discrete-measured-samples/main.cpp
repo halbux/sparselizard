@@ -1,3 +1,10 @@
+// This example shows how to import discrete experimental data and transform it into
+// a continuous data range usable in general expressions in sparselizard.
+// The measured data must first be smoothed externally before being sampled at enough
+// points to obtain a good interpolation with the cubic splines used in the 'spline' object.
+// The sampling points should not be placed too close to each other to avoid numerical issues.
+
+
 #include "sparselizardbase.h"
 
 
