@@ -127,6 +127,12 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     }
 }
 
+double spline::evalat(double input)
+{
+    std::vector<double> invec = {input};
+    return evalat(invec)[0];
+}
+
 std::vector<double> spline::evalat(std::vector<double> input)
 {
     densematrix indm(input.size(),1, input);
