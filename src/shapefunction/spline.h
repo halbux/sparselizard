@@ -31,10 +31,11 @@ class spline
     
         spline(void) {};
         spline(std::string filename, char delimiter = '\n');
-        spline(std::vector<double>& xin, std::vector<double>& yin);
+        spline(std::vector<double> xin, std::vector<double> yin);
         
         void set(std::vector<double>& xin, std::vector<double>& yin);
         
+        std::vector<double> evalat(std::vector<double> input);
         densematrix evalat(densematrix input);
         
         void write(std::string filename, int numsplits, char delimiter = '\n');
