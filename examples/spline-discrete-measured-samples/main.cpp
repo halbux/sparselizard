@@ -30,7 +30,8 @@ void sparselizard(void)
   
     // Load the measured Young's modulus versus temperature data samples in a spline object:
     spline measureddata("steel-stiffness-temperature.txt");
-    // Define the expression giving Young's modulus [Pa] as a natural cubic spline interpolation of the temperature data:
+    // Define the expression giving Young's modulus [Pa] as a function of the temperature field T.
+    // This internally uses a natural cubic spline interpolation of the loaded data samples.
     expression E(measureddata, T);
 
     // nu is Poisson's ratio []. 
