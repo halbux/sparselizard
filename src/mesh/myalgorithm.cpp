@@ -580,19 +580,13 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
     element myel(elemtypenum, elemorder);
     
+    double alpha = 1.0+1.0e-10;
     
     // Get the element barycenter coordinates:
     std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
-    // Get the radius of the sphere centered at the barycenter and surrounding all nodes in an element:
-    std::vector<double>* sphereradius = myelems->getsphereradius(elemtypenum);
+    // Get the dimensions of the box centered at the barycenter and surrounding all nodes in an element:
+    std::vector<double>* boxdimensions = myelems->getboxdimensions(elemtypenum);
 
-    // Parameter that gives the distance (in multiples of the max barycenter-element node distance)
-    // starting from which one can safely assume to always be outside the element for any point.
-    // For straight elements this always holds for alpha equal to 1 (plus roundoff safety):
-    double alpha = 1+1e-10;
-    if (elemorder > 1)
-        alpha = 2.0;
-        
     // Loop on all elements in the disjoint region:
     for (int e = 0; e < numelems; e++)
     {
@@ -600,11 +594,11 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
         
         polynomials polys;
         
-        double maxelemsize = alpha*sphereradius->at(curelem);
-        double xbary = barycenters->at(3*curelem+0), ybary = barycenters->at(3*curelem+1), zbary = barycenters->at(3*curelem+2);
+        std::vector<double> elemdist = {alpha*boxdimensions->at(3*curelem+0), alpha*boxdimensions->at(3*curelem+1), alpha*boxdimensions->at(3*curelem+2)};
+        double xbary = barycenters->at(3*curelem+0); double ybary = barycenters->at(3*curelem+1); double zbary = barycenters->at(3*curelem+2);
     
         // Loop on all candidate groups:
-        coordgroup.select(xbary,ybary,zbary, maxelemsize);
+        coordgroup.select(xbary,ybary,zbary, *std::max_element(elemdist.begin(),elemdist.end()));
         for (int g = 0; g < coordgroup.countgroups(); g++)
         {
             std::vector<int>* curgroupindexes = coordgroup.getgroupindexes(g);
@@ -620,7 +614,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                 double curx = curgroupcoords->at(3*c+0), cury = curgroupcoords->at(3*c+1), curz = curgroupcoords->at(3*c+2);
 
                 // Only process when not yet found and when the coordinate is close enough to the element barycenter.
-                if (elems[curindex] != -1 || std::abs(curx-xbary) > maxelemsize || std::abs(cury-ybary) > maxelemsize || std::abs(curz-zbary) > maxelemsize) {}
+                if (elems[curindex] != -1 || std::abs(curx-xbary) > elemdist[0] || std::abs(cury-ybary) > elemdist[1] || std::abs(curz-zbary) > elemdist[2]) {}
                 else
                 {
                     // Reset initial guess:
@@ -630,10 +624,15 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     // Only create once for all coordinates the polynomials and only for the required elements:
                     if (polys.count() == 0)
                     {
+                        // The x, y, z coordinate polynomial used to calculate the reference coordinate is
+                        // selected to maximize the element dimension in this coordinate direction:
+                        std::vector<int> coordranking;
+                        myalgorithm::stablesort(0, elemdist, coordranking);
+                    
                         std::vector<polynomial> curpols( elemdim*(elemdim+1) );
                         for (int j = 0; j < elemdim; j++)
                         {
-                            curpols[j*(elemdim+1)+0] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, j));
+                            curpols[j*(elemdim+1)+0] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, coordranking[j]));
                             for (int d = 0; d < elemdim; d++)
                                 curpols[j*(elemdim+1)+1+d] = curpols[j*(elemdim+1)+0].derivative(d);
                         }
