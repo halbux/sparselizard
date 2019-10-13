@@ -593,6 +593,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
         double curelem = rangebegin+e;
         
         polynomials polys;
+        std::vector<int> coordranking = {0,1,2};
         
         std::vector<double> elemdist = {alpha*boxdimensions->at(3*curelem+0), alpha*boxdimensions->at(3*curelem+1), alpha*boxdimensions->at(3*curelem+2)};
         double xbary = barycenters->at(3*curelem+0); double ybary = barycenters->at(3*curelem+1); double zbary = barycenters->at(3*curelem+2);
@@ -626,7 +627,6 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     {
                         // The x, y, z coordinate polynomial used to calculate the reference coordinate is
                         // selected to maximize the element dimension in this coordinate direction:
-                        std::vector<int> coordranking;
                         myalgorithm::stablesort(0, elemdist, coordranking);
                     
                         std::vector<polynomial> curpols( elemdim*(elemdim+1) );
@@ -638,6 +638,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                         }
                         polys = polynomials(curpols);
                     }
+                    rhs = {rhs[coordranking[0]],rhs[coordranking[1]],rhs[coordranking[2]]};
                     
                     if (myalgorithm::getroot(polys, rhs, kietaphi) == 1)
                     {
