@@ -593,7 +593,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
         double curelem = rangebegin+e;
         
         polynomials polys;
-        std::vector<int> coordranking = {0,1,2};
+        std::vector<int> coordranking = {};
         
         std::vector<double> elemdist = {alpha*boxdimensions->at(3*curelem+0), alpha*boxdimensions->at(3*curelem+1), alpha*boxdimensions->at(3*curelem+2)};
         double xbary = barycenters->at(3*curelem+0); double ybary = barycenters->at(3*curelem+1); double zbary = barycenters->at(3*curelem+2);
