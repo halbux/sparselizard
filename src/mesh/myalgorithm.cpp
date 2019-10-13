@@ -628,7 +628,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                         // The x, y, z coordinate polynomial used to calculate the reference coordinate is
                         // selected to maximize the element dimension in this coordinate direction:
                         myalgorithm::stablesort(0, elemdist, coordranking);
-                        coordranking = {coordranking[2],coordranking[1].coordranking[0]};
+                        coordranking = {coordranking[2],coordranking[1],coordranking[0]};
                     
                         std::vector<polynomial> curpols( elemdim*(elemdim+1) );
                         for (int j = 0; j < elemdim; j++)
