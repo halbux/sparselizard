@@ -43,37 +43,23 @@ int elements::add(int elementtypenumber, int curvatureorder, std::vector<int>& n
 
 void elements::shift(double xshift, double yshift, double zshift)
 {
-    for (int i = 0; i < barycenters.size(); i++)
-    {
-        for (int j = 0; j < barycenters[i].size()/3; j++)
-        {
-            barycenters[i][3*j+0] += xshift;
-            barycenters[i][3*j+1] += yshift;
-            barycenters[i][3*j+2] += zshift;
-        }
-    }
+    barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
 }
 
 void elements::rotate(double alphax, double alphay, double alphaz)
 {
-    for (int i = 0; i < barycenters.size(); i++)
-    {
-        if (barycenters[i].size() > 0)
-            geotools::rotate(alphax, alphay, alphaz, &barycenters[i]);
-    }
+    barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
 }
 
 void elements::scale(double xscale, double yscale, double zscale)
 {
-    for (int i = 0; i < barycenters.size(); i++)
-    {
-        for (int j = 0; j < barycenters[i].size()/3; j++)
-        {
-            barycenters[i][3*j+0] *= xscale;
-            barycenters[i][3*j+1] *= yscale;
-            barycenters[i][3*j+2] *= zscale;
-        }
-    }
+    barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
 }
 
 int elements::getsubelement(int subelementtypenumber, int elementtypenumber, int elementnumber, int subelementindex)
@@ -238,6 +224,36 @@ std::vector<double>* elements::getsphereradius(int elementtypenumber)
     }
     
     return &(sphereradius[elementtypenumber]);
+}
+
+std::vector<double>* elements::getboxdimensions(int elementtypenumber)
+{
+    std::vector<double>* mybarys = getbarycenters(elementtypenumber);
+    
+    // If not yet populated for the element type:
+    if (boxdimensions[elementtypenumber].size() == 0)
+    {
+        boxdimensions[elementtypenumber].resize(3*count(elementtypenumber));
+    
+        for (int i = 0; i < count(elementtypenumber); i++)
+        {
+            for (int c = 0; c < 3; c++)
+            {
+                std::vector<double> curnodescoords = getnodecoordinates(elementtypenumber, i, c);
+                
+                double maxdist = 0;
+                for (int j = 0; j < curnodescoords.size(); j++)
+                {
+                    double curdist = std::abs(mybarys->at(3*i+c)-curnodescoords[j]);
+                    if (curdist > maxdist)
+                        maxdist = curdist;
+                }
+                boxdimensions[elementtypenumber][3*i+c] = maxdist;
+            }
+        }
+    }
+    
+    return &(boxdimensions[elementtypenumber]);
 }
 
 void elements::printnumber(void)

@@ -66,6 +66,10 @@ class elements
         // the barycenter) that surrounds all nodes of the ith element of type 'typenum'.
         // All nodes of the curved element are considered (but the barycenter is the one of the straight element).
         std::vector<std::vector<double>> sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
+        // boxdimensions[typenum][3*i] gives the x, y and z distance between the element barycenter and the
+        // smallest box (centered on the barycenter) that surrounds all nodes of the ith element of type 'typenum'.
+        // All nodes of the curved element are considered (but the barycenter is the one of the straight element).
+        std::vector<std::vector<double>> boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
         
         // Entries in 'edgesatnodes' from index 'adressedgesatnodes[i]' to 'adressedgesatnodes[i+1]-1' are all 
         // edges touching node i. Only the edge corner nodes (not the curvature nodes) have touching edges.
@@ -116,6 +120,9 @@ class elements
         // Get a pointer to the sphereradius[elementtypenumber] vector.
         // The 'sphereradius' container is populated for the element type if empty. 
         std::vector<double>* getsphereradius(int elementtypenumber);
+        // Get a pointer to the boxdimensions[elementtypenumber] vector.
+        // The 'boxdimensions' container is populated for the element type if empty. 
+        std::vector<double>* getboxdimensions(int elementtypenumber);
         
         // Print elements data for debug:
         void printnumber(void);
