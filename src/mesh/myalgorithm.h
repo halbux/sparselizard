@@ -26,6 +26,8 @@ namespace myalgorithm
     // The sorting is not affected by roundoff noise up to a threshold.
     // The sorting algorithm is stable.
     void stablecoordinatesort(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& reorderingvector);
+    // Same as above but first sort according to a vector of integers:
+    void stablecoordinatesort(std::vector<double> noisethreshold, std::vector<int>& elems, std::vector<double>& coordinates, std::vector<int>& reorderingvector);
     
     // 'removeduplicatedcoordinates' outputs a vector that can be used to 
     // renumber the nodes so that all duplicates are removed:
