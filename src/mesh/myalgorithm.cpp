@@ -580,9 +580,9 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
     element myel(elemtypenum, elemorder);
     
-    double alpha = 1.0+1.0e-6;
+    double alpha = 1.0+1.0e-8;
     if (elemorder > 1)
-        alpha = 1.2;
+        alpha = 1.1;
     
     // Get the element barycenter coordinates:
     std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
