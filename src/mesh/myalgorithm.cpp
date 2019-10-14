@@ -581,6 +581,8 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     element myel(elemtypenum, elemorder);
     
     double alpha = 1.0+1.0e-6;
+    if (elemorder > 1)
+        alpha = 1.2;
     
     // Get the element barycenter coordinates:
     std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
