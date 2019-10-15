@@ -16,15 +16,13 @@ class referencecoordinategroup
 
     private:
 
-        double noisethreshold = 1e-10;
+        double noisethreshold = 1e-8;
         
         int mynumcoords = 0;
         coordinategroup mycoordgroup;
         
         std::vector<int> mydisjregs = {};
         
-        std::vector<int> myreorderingvector = {};
-        std::vector<int> myunorderingvector = {};
         std::vector<int> myelems = {};
         std::vector<double> mykietaphis = {};
         
@@ -32,12 +30,16 @@ class referencecoordinategroup
         int myrangebegin = 0;
         int myrangelength = 0;
         
+        // To find back the original coordinate numbers:
+        std::vector<int> myunorderingvector = {};
+        
         std::vector<double> mycurrefcoords = {};
         std::vector<int> mycurcoordnums = {};
         std::vector<int> mycurelems = {};
     
     public:
-
+    
+        referencecoordinategroup(void) {};
         referencecoordinategroup(std::vector<double>& coords);
         
         void evalat(std::vector<int> inputdisjregs);
