@@ -35,8 +35,7 @@ namespace myalgorithm
     // The output gives the number of non-duplicated nodes.
     int removeduplicatedcoordinates(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& renumberingvector);
     
-    // 'stablesort' is like 'stablecoordinatesort' but instead of sorting 
-    // according to coordinates it sorts according to 'tosort', a vector of ints.
+    // This is for a vector of ints:
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
     // This is for a vector of doubles:
     void stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector);
