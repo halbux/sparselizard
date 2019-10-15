@@ -6,17 +6,20 @@ referencecoordinategroup::referencecoordinategroup(std::vector<double>& coords)
 {
     mynumcoords = coords.size()/3;
     mycoordgroup = coordinategroup(coords);
-    
-    myelems = std::vector<int>(mynumcoords,-1);
-    mykietaphis = std::vector<double>(3*mynumcoords,0.0);
 }
 
 void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
 {
     mydisjregs = inputdisjregs;
     
+    myelems = std::vector<int>(mynumcoords,-1);
+    mykietaphis = std::vector<double>(3*mynumcoords,0.0);
+    
     for (int d = 0; d < mydisjregs.size(); d++)
         myalgorithm::getreferencecoordinates(mycoordgroup, mydisjregs[d], myelems, mykietaphis);
+        
+    int myrangebegin = 0;
+    int myrangelength = 0;
 }
 
 void referencecoordinategroup::group(void)
@@ -38,7 +41,7 @@ void referencecoordinategroup::group(void)
     for (int i = 0; i < mynumcoords; i++)
         myunorderingvector[myreorderingvector[i]] = i;
     
-    // Move past the nagtive element numbers:
+    // Move past the negative element numbers:
     while (myelems[myrangebegin] < 0)
         myrangebegin++;
 }
