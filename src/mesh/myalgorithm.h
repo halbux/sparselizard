@@ -39,6 +39,8 @@ namespace myalgorithm
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
     // This is for a vector of doubles:
     void stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector);
+    // Same but sort by blocks of size 'blocklen':
+    void stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector, int blocklen);
     
     // 'stablesortparallel' sorts in parallel according to tosort[0] then 
     // according to tosrt[1],... ALL int* arrays have size 'numentries'.
