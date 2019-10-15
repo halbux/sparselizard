@@ -140,6 +140,29 @@ void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort,
         });
 }
 
+void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector, int blocklen)
+{
+    if (reorderingvector.size() != tosort.size()/blocklen)
+        reorderingvector.resize(tosort.size()/blocklen);
+    
+    // Set 'reorderingvector' to [0 1 2 ...]:
+    std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
+    // Sort 'reorderingvector' according to 'tosort':
+    // The < operator is overloaded by a lambda function.
+    std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+        { 
+            for (int i = 0; i < blocklen; i++)
+            {
+                if (tosort[elem1] < tosort[elem2] - noisethreshold)
+                    return true;
+                if (tosort[elem1] > tosort[elem2] + noisethreshold)
+                    return false;
+            }
+            // For identical entries make a COHERENT decision for a stable sorting.
+            return elem1 < elem2;
+        });
+}
+
 #if defined(__linux__)
 #include <parallel/algorithm>
 #endif
