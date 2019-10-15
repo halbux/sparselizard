@@ -26,9 +26,8 @@ class referencecoordinategroup
         std::vector<int> myelems = {};
         std::vector<double> mykietaphis = {};
         
-        // Working range begin and end:
+        // Working index:
         int myrangebegin = 0;
-        int myrangelength = 0;
         
         // To find back the original coordinate numbers:
         std::vector<int> myunorderingvector = {};
