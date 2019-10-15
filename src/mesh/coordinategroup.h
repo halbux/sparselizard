@@ -40,7 +40,8 @@ class coordinategroup
         std::vector<int> selectedgroups = {};
     
     public:
-
+    
+        coordinategroup(void) {};
         coordinategroup(std::vector<double>& coords);
 
         void select(double x, double y, double z, double maxelemsize);
