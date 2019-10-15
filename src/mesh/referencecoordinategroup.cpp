@@ -19,7 +19,6 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
         myalgorithm::getreferencecoordinates(mycoordgroup, mydisjregs[d], myelems, mykietaphis);
         
     int myrangebegin = 0;
-    int myrangelength = 0;
 }
 
 void referencecoordinategroup::group(void)
@@ -48,7 +47,6 @@ void referencecoordinategroup::group(void)
 
 bool referencecoordinategroup::next(void)
 {
-    myrangebegin += myrangelength; 
     if (myrangebegin >= mynumcoords)
         return false;
         
@@ -60,7 +58,7 @@ bool referencecoordinategroup::next(void)
     mycurrefcoords.resize(3*numrefcoords);
     for (int i = 0; i < 3*numrefcoords; i++)
         mycurrefcoords[i] = mykietaphis[myrangebegin+i];
-    int curelem = myelems[index-1];
+    int curelem = myelems[myrangebegin];
         
     // Find all consecutive elements with close enough reference coordinates:
     int curelemindex = myrangebegin+numrefcoords; bool continueit = true;
@@ -70,8 +68,9 @@ bool referencecoordinategroup::next(void)
         {
             double kiref = mycurrefcoords[3*i+0]; double etaref = mycurrefcoords[3*i+1]; double phiref = mycurrefcoords[3*i+2];
             double kicur = mykietaphis[3*(curelemindex+i)+0]; double etacur = mykietaphis[3*(curelemindex+i)+1]; double phicur = mykietaphis[3*(curelemindex+i)+2];
-            if (myelems[curelemindex] != curelem || std::abs(kiref-kicur) > noisethreshold || std::abs(etaref-etacur) > noisethreshold || std::abs(phiref-phicur) > noisethreshold)
+            if (myelems[curelemindex+i] != curelem || std::abs(kiref-kicur) > noisethreshold || std::abs(etaref-etacur) > noisethreshold || std::abs(phiref-phicur) > noisethreshold)
             {
+                curelemindex -= numrefcoords;
                 continueit = false;
                 break;
             }
@@ -82,13 +81,13 @@ bool referencecoordinategroup::next(void)
     // Get the list of elements of same reference coordinates:
     int numelemsinrange = (curelemindex-myrangebegin)/numrefcoords;
     mycurelems.resize(numelemsinrange);
-    for (int i = 0; i < mycurelems.size(); i++)
-        mycurelems[i] = myelems[myrangebegin+i];
+    for (int i = 0; i < numelemsinrange; i++)
+        mycurelems[i] = myelems[myrangebegin+numrefcoords*i];
     
     // Get the numbers of the reference coordinates:
     mycurcoordnums.resize(numelemsinrange*numrefcoords);
     for (int i = 0; i < mycurcoordnums.size(); i++)
-        mycurcoordnums[i] = myunorderingvector[i];
+        mycurcoordnums[i] = myunorderingvector[myrangebegin+i];
     
 
     myrangebegin = curelemindex;
