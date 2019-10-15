@@ -3,15 +3,15 @@
 
 void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
 {
-    // There is a x, y and z coordinate for every nodes:
+    // There is a x, y and z coordinate for every node:
     int numberofnodes = coordinates.size()/3;
     
     // 'reorderingvector' gives the relation between the indexes before and after node sorting:
     if (reorderingvector.size() != numberofnodes)
         reorderingvector.resize(numberofnodes);
     // Set 'reorderingvector' to [0 1 2 ...]:
-       std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
-       // Sort 'reorderingvector' according to 'coordinates' with x > y > z priority order:
+    std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
+    // Sort 'reorderingvector' according to 'coordinates' with x > y > z priority order:
     // The < operator is overloaded by a lambda function.
     std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
         { 
@@ -37,7 +37,6 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
 
 void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<int>& elems, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
 {
-    // There is a x, y and z coordinate for every nodes:
     int numberofnodes = elems.size();
     
     // 'reorderingvector' gives the relation between the indexes before and after node sorting:
