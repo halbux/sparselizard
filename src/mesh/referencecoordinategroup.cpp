@@ -168,6 +168,10 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
 
 bool referencecoordinategroup::next(void)
 {
+    // Skip empty blocks:
+    while (mynumrefcoords < myelems.size() && myelems[mynumrefcoords].size() == 0)
+        mynumrefcoords++;
+        
     if (mynumrefcoords >= myelems.size())
         return false;
         
