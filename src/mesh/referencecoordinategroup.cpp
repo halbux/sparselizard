@@ -152,11 +152,14 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
     
         for (int i = 0; i < reordvec.size(); i++)
         {
-            myelems[n][i] = myelemsreordered[reordvec[i]];
-            mycoordnums[n][i] = mycoordnumsreordered[reordvec[i]];
-            mykietaphis[n][3*i+0] = mykietaphisreordered[3*reordvec[i]+0];
-            mykietaphis[n][3*i+1] = mykietaphisreordered[3*reordvec[i]+1];
-            mykietaphis[n][3*i+2] = mykietaphisreordered[3*reordvec[i]+2];
+            for (int j = 0; j < n; j++)
+            {
+                myelems[n][n*i+j] = myelemsreordered[n*reordvec[i]+j];
+                mycoordnums[n][n*i+j] = mycoordnumsreordered[n*reordvec[i]+j];
+                mykietaphis[n][3*(n*i+j)+0] = mykietaphisreordered[3*(n*reordvec[i]+j)+0];
+                mykietaphis[n][3*(n*i+j)+1] = mykietaphisreordered[3*(n*reordvec[i]+j)+1];
+                mykietaphis[n][3*(n*i+j)+2] = mykietaphisreordered[3*(n*reordvec[i]+j)+2];
+            }
         }
     }
     
