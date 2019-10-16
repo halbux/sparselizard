@@ -117,11 +117,11 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
     
             for (int j = 0; j < n; j++)
             {
-                myelems[n][curindexes[n]] = elems[first+i];
-                mycoordnums[n][curindexes[n]] = coordnums[first+i];
-                mykietaphis[n][3*curindexes[n]+0] = kietaphis[3*(first+i)+0];
-                mykietaphis[n][3*curindexes[n]+1] = kietaphis[3*(first+i)+1];
-                mykietaphis[n][3*curindexes[n]+2] = kietaphis[3*(first+i)+2];
+                myelems[n][curindexes[n]] = elems[first+j];
+                mycoordnums[n][curindexes[n]] = coordnums[first+j];
+                mykietaphis[n][3*curindexes[n]+0] = kietaphis[3*(first+j)+0];
+                mykietaphis[n][3*curindexes[n]+1] = kietaphis[3*(first+j)+1];
+                mykietaphis[n][3*curindexes[n]+2] = kietaphis[3*(first+j)+2];
                 
                 curindexes[n]++;
             }
