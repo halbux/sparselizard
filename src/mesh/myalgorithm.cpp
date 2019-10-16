@@ -153,9 +153,9 @@ void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort,
         { 
             for (int i = 0; i < blocklen; i++)
             {
-                if (tosort[elem1] < tosort[elem2] - noisethreshold)
+                if (tosort[elem1*blocklen+i] < tosort[elem2*blocklen+i] - noisethreshold)
                     return true;
-                if (tosort[elem1] > tosort[elem2] + noisethreshold)
+                if (tosort[elem1*blocklen+i] > tosort[elem2*blocklen+i] + noisethreshold)
                     return false;
             }
             // For identical entries make a COHERENT decision for a stable sorting.
