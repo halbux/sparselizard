@@ -30,7 +30,7 @@ class referencecoordinategroup
         
         
         // Current position status:
-        int myrangebegin, mynumrefcoords;
+        int myrangebegin = 0, mynumrefcoords = 0;
         
         std::vector<double> mycurrefcoords = {};
         std::vector<int> mycurcoordnums = {};
