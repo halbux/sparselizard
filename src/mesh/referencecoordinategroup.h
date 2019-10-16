@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <vector>
+#include "myalgorithm.h"
 #include "coordinategroup.h"
 
 class referencecoordinategroup
@@ -18,19 +19,18 @@ class referencecoordinategroup
 
         double noisethreshold = 1e-8;
         
-        int mynumcoords = 0;
         coordinategroup mycoordgroup;
         
         std::vector<int> mydisjregs = {};
         
-        std::vector<int> myelems = {};
-        std::vector<double> mykietaphis = {};
+        // One entry per number of reference coordinates in an element:
+        std::vector<std::vector<int>> myelems = {};
+        std::vector<std::vector<int>> mycoordnums = {};
+        std::vector<std::vector<double>> mykietaphis = {};
         
-        // Working index:
-        int myrangebegin = 0;
         
-        // To find back the original coordinate numbers:
-        std::vector<int> myunorderingvector = {};
+        // Current position status:
+        int myrangebegin, mynumrefcoords;
         
         std::vector<double> mycurrefcoords = {};
         std::vector<int> mycurcoordnums = {};
@@ -41,9 +41,8 @@ class referencecoordinategroup
         referencecoordinategroup(void) {};
         referencecoordinategroup(std::vector<double>& coords);
         
+        // All disjoint regions should hold the same element type number:
         void evalat(std::vector<int> inputdisjregs);
-        
-        void group(void);
         
         bool next(void);
         
