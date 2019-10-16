@@ -148,7 +148,7 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
             mykietaphisreordered[3*i+2] = mykietaphis[n][3*reordvec[i]+2];
         }
         // Sort by blocks of n coordinates:
-        myalgorithm::stablesort(noisethreshold, mykietaphisreordered, reordvec, n);
+        myalgorithm::stablesort(noisethreshold, mykietaphisreordered, reordvec, 3*n);
     
         for (int i = 0; i < reordvec.size(); i++)
         {
