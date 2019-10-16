@@ -182,7 +182,7 @@ bool referencecoordinategroup::next(void)
     // Get all reference coordinates in the first element:
     mycurrefcoords.resize(3*mynumrefcoords);
     for (int i = 0; i < 3*mynumrefcoords; i++)
-        mycurrefcoords[i] = curkep->at(myrangebegin+i);
+        mycurrefcoords[i] = curkep->at(3*myrangebegin+i);
     int curelem = curels->at(myrangebegin);
         
     // Find all consecutive elements with close enough reference coordinates:
