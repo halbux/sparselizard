@@ -183,7 +183,6 @@ bool referencecoordinategroup::next(void)
     mycurrefcoords.resize(3*mynumrefcoords);
     for (int i = 0; i < 3*mynumrefcoords; i++)
         mycurrefcoords[i] = curkep->at(3*myrangebegin+i);
-    int curelem = curels->at(myrangebegin);
         
     // Find all consecutive elements with close enough reference coordinates:
     int curelemindex = myrangebegin+mynumrefcoords; bool continueit = true;
@@ -193,7 +192,7 @@ bool referencecoordinategroup::next(void)
         {
             double kiref = mycurrefcoords[3*i+0]; double etaref = mycurrefcoords[3*i+1]; double phiref = mycurrefcoords[3*i+2];
             double kicur = curkep->at(3*(curelemindex+i)+0); double etacur = curkep->at(3*(curelemindex+i)+1); double phicur = curkep->at(3*(curelemindex+i)+2);
-            if (curels->at(curelemindex) != curelem || std::abs(kiref-kicur) > noisethreshold || std::abs(etaref-etacur) > noisethreshold || std::abs(phiref-phicur) > noisethreshold)
+            if (std::abs(kiref-kicur) > noisethreshold || std::abs(etaref-etacur) > noisethreshold || std::abs(phiref-phicur) > noisethreshold)
             {
                 curelemindex -= mynumrefcoords;
                 continueit = false;
