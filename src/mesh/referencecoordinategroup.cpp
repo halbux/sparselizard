@@ -136,9 +136,9 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
         std::vector<int> reordvec;
         myalgorithm::stablecoordinatesort({noisethreshold,noisethreshold,noisethreshold}, myelems[n], mykietaphis[n], reordvec);
 
-        std::vector<int> myelemsreordered(myelems.size());
-        std::vector<int> mycoordnumsreordered(myelems.size());
-        std::vector<double> mykietaphisreordered(3*myelems.size());
+        std::vector<int> myelemsreordered(myelems[n].size());
+        std::vector<int> mycoordnumsreordered(myelems[n].size());
+        std::vector<double> mykietaphisreordered(3*myelems[n].size());
         for (int i = 0; i < reordvec.size(); i++)
         {
             myelemsreordered[i] = myelems[n][reordvec[i]];
