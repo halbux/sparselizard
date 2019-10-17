@@ -1,6 +1,42 @@
 #include "elementselector.h"
 
 
+void elementselector::prepare(bool isorientationdependent)
+{
+    // Sort the elements according to their total orientation.
+    // Do it only if orientation dependent otherwise the disjoint
+    // regions will not be sorted according to the order defined in
+    // 'disjointregionnumbers'.
+    if (isorientationdependent == true)
+    {
+        std::vector<int> renumberingvector;
+        myalgorithm::stablesort(totalorientations, renumberingvector);
+
+        std::vector<int> totalorientationsbackup = totalorientations;
+        std::vector<int> disjointregionsbackup = disjointregions;
+        std::vector<int> elemsbackup = elems;
+        for (int i = 0; i < totalorientations.size(); i++)
+        {
+            totalorientations[i] = totalorientationsbackup[renumberingvector[i]];
+            disjointregions[i] = disjointregionsbackup[renumberingvector[i]];
+            elems[i] = elemsbackup[renumberingvector[i]];
+        }
+    }
+    
+    // Set the range begin and end:
+    currentrangebegin = 0; currentrangeend = 0;
+    currenttotalorientation = totalorientations[currentrangebegin];
+    
+    if (isorientationdependent == false)
+        currentrangeend = totalorientations.size() - 1;
+    else
+    {
+        while (currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
+            currentrangeend++;
+        currentrangeend--;
+    }   
+}    
+
 elementselector::elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent)
 {
     // Have a coherent disjoint region ordering:
@@ -34,54 +70,32 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
         currentindex += numelemindisjreg;
     }
     
-    // Sort the elements according to their total orientation.
-    // Do it only if orientation dependent otherwise the disjoint
-    // regions will not be sorted according to the order defined in
-    // 'disjointregionnumbers'.
-    if (isorientationdependent == true)
-    {
-        std::vector<int> renumberingvector;
-        myalgorithm::stablesort(totalorientations, renumberingvector);
-
-        std::vector<int> totalorientationsbackup = totalorientations;
-        std::vector<int> disjointregionsbackup = disjointregions;
-        std::vector<int> elemsbackup = elems;
-        for (int i = 0; i < totalorientations.size(); i++)
-        {
-            totalorientations[i] = totalorientationsbackup[renumberingvector[i]];
-            disjointregions[i] = disjointregionsbackup[renumberingvector[i]];
-            elems[i] = elemsbackup[renumberingvector[i]];
-        }
-    }
-    
-    // Set the range begin and end:
-    currentrangebegin = 0;
-    currenttotalorientation = totalorientations[currentrangebegin];
-    
-    if (isorientationdependent == false)
-        currentrangeend = totalorientations.size() - 1;
-    else
-    {
-        while (currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
-            currentrangeend++;
-        currentrangeend--;
-    }   
+    prepare(isorientationdependent);
 }    
 
-elementselector::elementselector(int disjointregionnumber, int elemindex)
+elementselector::elementselector(std::vector<int> disjointregionnumbers, std::vector<int>& elemnums, bool isorientationdependent)
 {
+    // Have a coherent disjoint region ordering:
+    std::sort(disjointregionnumbers.begin(), disjointregionnumbers.end());
+    
+    mydisjointregionnumbers = disjointregionnumbers;
+
+    // Create 'disjointregions', 'totalorientations' and 'elems':
+    disjointregions.resize(elemnums.size());
+    totalorientations.resize(elemnums.size());
+    elems.resize(elemnums.size());
+    
+    int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
+    
     elements* myelements = universe::mymesh->getelements();
+    for (int i = 0; i < elemnums.size(); i++)
+    {
+        disjointregions[i] = myelements->getdisjointregion(myelementtypenumber, elemnums[i]);
+        totalorientations[i] = myelements->gettotalorientation(myelementtypenumber, elemnums[i]);
+        elems[i] = elemnums[i];
+    }
     
-    int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(disjointregionnumber);
-    int rangebegin = universe::mymesh->getdisjointregions()->getrangebegin(disjointregionnumber);
-    
-    mydisjointregionnumbers = {disjointregionnumber};
-    
-    currenttotalorientation = myelements->gettotalorientation(myelementtypenumber, rangebegin+elemindex);
- 
-    disjointregions = {disjointregionnumber};
-    totalorientations = {currenttotalorientation};
-    elems = {rangebegin+elemindex};
+    prepare(isorientationdependent);
 }
 
 int elementselector::getelementdimension(void)

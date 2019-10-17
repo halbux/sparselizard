@@ -660,7 +660,8 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 isfound[coordindex] = true;
 
                                 // Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
-                                elementselector myselector(disjregs[i], current-rangebegin);
+                                std::vector<int> elemens = {current};
+                                elementselector myselector({disjregs[i]}, elemens);
 
                                 if (numtimeevals == -1)
                                 {
@@ -740,8 +741,9 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                                 isfound[coordindex] = true;
 
                                 // Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
-                                elementselector myselector(disjregs[i], current-rangebegin);
-
+                                std::vector<int> elemens = {current};
+                                elementselector myselector({disjregs[i]}, elemens);
+                                
                                 if (numtimeevals == -1)
                                 {
                                     // Clean storage before allowing reuse:
