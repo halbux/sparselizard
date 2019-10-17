@@ -17,7 +17,7 @@ class referencecoordinategroup
 
     private:
 
-        double noisethreshold = 1e-8;
+        double noisethreshold = 1e-10;
         
         coordinategroup mycoordgroup;
         
