@@ -125,12 +125,9 @@ void sparselizard(void)
     // calculated in the volume (and not on the input face) 
     // one can not simply call (normal(input)*j).integrate(input,4)
     // since with this a surface gradient will be calculated.
-    field jx("h1");
-    jx.setvalue(volume, compx(j));
-    
-    
-    // Compute the current I and the electric resistance R between input and output:
-    double I = jx.integrate(input, 4);
+    // 'on()' is called to force the ealuation in the volume.
+    double I = on(volume, normal(input)*j).integrate(input, 4);
+    // Compute the electric resistance R between input and output:
     double R = appliedvoltage/I;
     
     std::cout << std::endl << "Resistance is " << R << " Ohm. Current is " << I << " A" << std::endl;
@@ -145,7 +142,7 @@ void sparselizard(void)
     T.write(volume, "T.pos");
     
     // Code validation line. Can be removed.
-    std::cout << (peaktemperature < 618.446 && peaktemperature > 618.444);
+    std::cout << (peaktemperature < 618.446 && peaktemperature > 618.444 && I < 1851.30 && I > 1851.28);
 }
 
 mesh createmesh(void)
