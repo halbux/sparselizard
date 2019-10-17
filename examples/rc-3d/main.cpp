@@ -73,8 +73,6 @@ void sparselizard(void)
     // since with this a surface gradient will be calculated.
     // 'on()' is called to force the evaluation in the volume.
     
-    
-    // Compute the current I flowing between the electrode and the ground:
     double Iinphase = (-normal(electrode) * on(conductor, sigma*(-grad(v.harmonic(2)))) ).integrate(electrode, 4);
     double Iquadrature = (-normal(electrode) * on(conductor, sigma*(-grad(v.harmonic(3)))) ).integrate(electrode, 4);
     double normI = sqrt(Iinphase*Iinphase + Iquadrature*Iquadrature);
