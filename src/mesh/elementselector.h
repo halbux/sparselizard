@@ -44,12 +44,16 @@ class elementselector
         // Their disjoint region:
         std::vector<int> disjointregions;
         
+        
+        // Prepare the containers:
+        void prepare(bool isorientationdependent);
+        
     public:
     
         // All disjoint region numbers must correspond to a same element type.
         elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent = true);
-        // Select a single element:
-        elementselector(int disjointregionnumber, int elemindex);
+        // Select a set of elements of same type:
+        elementselector(std::vector<int> disjointregionnumbers, std::vector<int>& elemnums, bool isorientationdependent = true);
         
         int getelementdimension(void);
         int getelementtypenumber(void);
