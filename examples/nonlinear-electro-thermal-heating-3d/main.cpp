@@ -126,7 +126,7 @@ void sparselizard(void)
     // one can not simply call (normal(input)*j).integrate(input,4)
     // since with this a surface gradient will be calculated.
     // 'on()' is called to force the evaluation in the volume.
-    double I = on(volume, normal(input)*j).integrate(input, 4);
+    double I = (normal(input)*on(volume, j)).integrate(input, 4);
     // Compute the electric resistance R between input and output:
     double R = appliedvoltage/I;
     
