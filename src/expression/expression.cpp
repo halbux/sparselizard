@@ -546,279 +546,96 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
     // Preallocate the input containers:
     int numcoords = xyzcoord.size()/3;
-    isfound.resize(numcoords);
-    for (int i = 0; i < numcoords; i++)
-        isfound[i] = false;
+    isfound = std::vector<bool>(numcoords,false);
 
     interpolated = {};
     if (numtimeevals != -1)
         interpolated = {std::vector<double>(numcoords*numtimeevals)};
     std::vector<int> harmoniclist = {};
-
-    // Sort the coordinates vector:
-    std::vector<int> reorderingvector = {};
-    std::vector<double> noisethres = universe::mymesh->getnodes()->getnoisethreshold();
-    myalgorithm::stablecoordinatesort(noisethres, xyzcoord, reorderingvector);
-    std::vector<double> xyz = xyzcoord;
-    for (int i = 0; i < numcoords; i++)
-    {
-        xyz[3*i+0] = xyzcoord[3*reorderingvector[i]+0];
-        xyz[3*i+1] = xyzcoord[3*reorderingvector[i]+1];
-        xyz[3*i+2] = xyzcoord[3*reorderingvector[i]+2];
-    }
-
-    disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
-    elements* myelems = universe::mymesh->getelements();
     
-    std::vector<double> kietaphi, rhs;
-
-    int elemorder = myelems->getcurvatureorder();
-
-    // Parameter that gives the distance (in multiples of the max barycenter-element node distance)
-    // starting from which one can safely assume to always be outside the element for any point.
-    // For straight elements this always holds for alpha equal to 1 (plus roundoff safety):
-    double alpha = 1+1e-10;
-    if (elemorder > 1)
-        alpha = 2.0;
-
-
-    for (int i = 0; i < disjregs.size(); i++)
+    
+    referencecoordinategroup rcg(xyzcoord);
+    
+    // Send all disjoint regions with same element type number together:
+    disjointregionselector mydisjregselector(disjregs, {});
+    for (int i = 0; i < mydisjregselector.countgroups(); i++)
     {
-        int elemtypenum = mydisjregs->getelementtypenumber(disjregs[i]);
-        int elemdim = mydisjregs->getelementdimension(disjregs[i]);
-
-        lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
-        element myel(elemtypenum, elemorder);
+        std::vector<int> curdisjregs = mydisjregselector.getgroup(i);
         
-        // Initial guesses for the root calculation call:
-        // gausspoints mygausspoints(elemtypenum, 2);
-        // std::vector<double> gplist = mygausspoints.getcoordinates();
-
-        // Get the element barycenter coordinates:
-        std::vector<double>* barycenters = myelems->getbarycenters(elemtypenum);
-        // Get the radius of the sphere centered at the barycenter and surrounding all nodes in an element:
-        std::vector<double>* sphereradius = myelems->getsphereradius(elemtypenum);
-
-        // Loop on all elements in the disjoint region:
-        int rangebegin = mydisjregs->getrangebegin(disjregs[i]), rangeend = mydisjregs->getrangeend(disjregs[i]);
-        for (int current = rangebegin; current <= rangeend; current++)
+        rcg.evalat(curdisjregs);
+    
+        // Simplify all coeffs for faster computation later on.
+        // Also check if orientation matters.
+        myoperations[0] = myoperations[0]->simplify(curdisjregs);
+        bool isorientationdependent = (myoperations[0]->isvalueorientationdependent(curdisjregs) || (meshdeform != NULL && meshdeform->isvalueorientationdependent(curdisjregs)));
+        
+        while (rcg.next())
         {
-            double maxelemsize = alpha*sphereradius->at(current);
-            double xbary = barycenters->at(3*current+0), ybary = barycenters->at(3*current+1), zbary = barycenters->at(3*current+2);
-
-            std::vector<polynomial> poly = {};
-
-            // Get the index of the coordinate whose x is closest to the barycenter of the current element (using bisection):
-            int first = 0, last = numcoords-1;
-            int startindex;
-
-            while (first < last-1)
+            std::vector<double> kietaphi = rcg.getreferencecoordinates();
+            std::vector<int> coordindexes = rcg.getcoordinatenumber();
+            std::vector<int> elemens = rcg.getelements();
+            
+            for (int c = 0; c < coordindexes.size(); c++)
+                isfound[coordindexes[c]] = true;
+        
+            // Loop on all total orientations (if required):
+            elementselector myselector(curdisjregs, elemens, isorientationdependent);
+            do 
             {
-                if ((last+first)%2 == 0)
-                    startindex = (last+first)/2;
-                else
-                    startindex = (last+first-1)/2;
-
-                if (xyz[3*startindex+0]-xbary > noisethres[0])
-                    last = startindex;
-                else
-                    first = startindex;
-            }
-            // This is required for cases where first = last-1:
-            if (std::abs(xyz[3*last+0]-xbary) >= std::abs(xyz[3*first+0]-xbary))
-                startindex = first;
-            else
-                startindex = last;
-
-            // Move away in the increasing index direction from 'startindex':
-            for (int coordindex = startindex; coordindex < numcoords; coordindex++)
-            {
-                // If out of range in x it will not be found here.
-                if (std::abs(xyz[3*coordindex+0]-xbary) < maxelemsize)
+                if (numtimeevals == -1)
                 {
-                    // Only process when not yet found and when the coordinate is close enough to the element barycenter.
-                    if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
+                    // Clean storage before allowing reuse:
+                    universe::forbidreuse();
+                    universe::allowreuse();
+                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                    universe::forbidreuse();
+
+                    if (interpolated.size() > 0)
+                    {
+                        for (int h = 0; h < harmoniclist.size(); h++)
+                        {
+                            for (int c = 0; c < coordindexes.size(); c++)
+                                interpolated[harmoniclist[h]][coordindexes[c]] = interp[harmoniclist[h]][0].getvalues()[c];
+                        }
+                    }
                     else
                     {
-                        // Reset initial guess:
-                        kietaphi = {0.0,0.0,0.0};
-                        rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
-
-                        // Only create once for all coordinates the polynomials and only for the required elements:
-                        if (poly.size() == 0)
+                        // Preallocate all harmonics:
+                        interpolated = std::vector<std::vector<double>>(interp.size(), std::vector<double>(0));
+                        for (int h = 0; h < interp.size(); h++)
                         {
-                            poly.resize(elemdim);
-                            for (int j = 0; j < elemdim; j++)
-                                poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
-                        }
-
-                        if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
-                        {
-                            // Check if the (ki,eta,phi) coordinates are inside the element:
-                            if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                            if (interp[h].size() > 0)
                             {
-                                isfound[coordindex] = true;
-
-                                // Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
-                                std::vector<int> elemens = {current};
-                                elementselector myselector({disjregs[i]}, elemens);
-
-                                if (numtimeevals == -1)
-                                {
-                                    // Clean storage before allowing reuse:
-                                    universe::forbidreuse();
-                                    universe::allowreuse();
-                                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
-                                    universe::forbidreuse();
-
-                                    if (interpolated.size() > 0)
-                                    {
-                                        for (int h = 0; h < harmoniclist.size(); h++)
-                                            interpolated[harmoniclist[h]][coordindex] = interp[harmoniclist[h]][0].getvalues()[0];
-                                    }
-                                    else
-                                    {
-                                        // Preallocate all harmonics:
-                                        interpolated = std::vector<std::vector<double>>(interp.size(), std::vector<double>(0));
-                                        for (int h = 0; h < interp.size(); h++)
-                                        {
-                                            if (interp[h].size() > 0)
-                                            {
-                                                harmoniclist.push_back(h);
-                                                interpolated[h] = std::vector<double>(numcoords);
-                                                interpolated[h][coordindex] = interp[h][0].getvalues()[0];
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // Clean storage before allowing reuse:
-                                    universe::forbidreuse();
-                                    universe::allowreuse();
-                                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
-                                    universe::forbidreuse();
-
-                                    for (int tim = 0; tim < numtimeevals; tim++)
-                                        interpolated[0][numcoords*tim+coordindex] = interp.getvalues()[tim];
-                                }
+                                harmoniclist.push_back(h);
+                                interpolated[h] = std::vector<double>(numcoords);
+                                for (int c = 0; c < coordindexes.size(); c++)
+                                    interpolated[h][coordindexes[c]] = interp[h][0].getvalues()[c];
                             }
                         }
                     }
                 }
                 else
-                    break;
-            }
-
-
-            // Move away in the decreasing index direction from 'startindex':
-            for (int coordindex = startindex-1; coordindex >= 0; coordindex--)
-            {
-                // If out of range in x it will not be found here.
-                if (std::abs(xyz[3*coordindex+0]-xbary) < maxelemsize)
                 {
-                    // Only process when not yet found and when the coordinate is close enough to the element barycenter.
-                    if (isfound[coordindex] || std::abs(xyz[3*coordindex+1]-ybary) > maxelemsize || std::abs(xyz[3*coordindex+2]-zbary) > maxelemsize) {}
-                    else
+                    // Clean storage before allowing reuse:
+                    universe::forbidreuse();
+                    universe::allowreuse();
+                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                    universe::forbidreuse();
+
+                    for (int tim = 0; tim < numtimeevals; tim++)
                     {
-                        // Reset initial guess:
-                        kietaphi = {0.0,0.0,0.0};
-                        rhs = {xyz[3*coordindex+0], xyz[3*coordindex+1], xyz[3*coordindex+2]};
-
-                        // Only create once for all coordinates the polynomials and only for the required elements:
-                        if (poly.size() == 0)
-                        {
-                            poly.resize(elemdim);
-                            for (int j = 0; j < elemdim; j++)
-                                poly[j] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, current, j));
-                        }
-
-                        if (myalgorithm::getroot(poly, rhs, kietaphi) == 1)
-                        {
-                            // Check if the (ki,eta,phi) coordinates are inside the element:
-                            if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
-                            {
-                                isfound[coordindex] = true;
-
-                                // Evaluate the expression on that element at the (ki,eta,phi) reference coordinate:
-                                std::vector<int> elemens = {current};
-                                elementselector myselector({disjregs[i]}, elemens);
-                                
-                                if (numtimeevals == -1)
-                                {
-                                    // Clean storage before allowing reuse:
-                                    universe::forbidreuse();
-                                    universe::allowreuse();
-                                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
-                                    universe::forbidreuse();
-
-                                    if (interpolated.size() > 0)
-                                    {
-                                        for (int h = 0; h < harmoniclist.size(); h++)
-                                            interpolated[harmoniclist[h]][coordindex] = interp[harmoniclist[h]][0].getvalues()[0];
-                                    }
-                                    else
-                                    {
-                                        // Preallocate all harmonics:
-                                        interpolated = std::vector<std::vector<double>>(interp.size(), std::vector<double>(0));
-                                        for (int h = 0; h < interp.size(); h++)
-                                        {
-                                            if (interp[h].size() > 0)
-                                            {
-                                                harmoniclist.push_back(h);
-                                                interpolated[h] = std::vector<double>(numcoords);
-                                                interpolated[h][coordindex] = interp[h][0].getvalues()[0];
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // Clean storage before allowing reuse:
-                                    universe::forbidreuse();
-                                    universe::allowreuse();
-                                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
-                                    universe::forbidreuse();
-
-                                    for (int tim = 0; tim < numtimeevals; tim++)
-                                        interpolated[0][numcoords*tim+coordindex] = interp.getvalues()[tim];
-                                }
-                            }
-                        }
+                        for (int c = 0; c < coordindexes.size(); c++)
+                            interpolated[0][numcoords*tim+coordindexes[c]] = interp.getvalues()[coordindexes.size()*tim+coordindexes[c]];
                     }
                 }
-                else
-                    break;
             }
+            while (myselector.next());   
         }
     }
-
-
-    // Unsort the containers:
-    std::vector<std::vector<double>> interpolatedcopy = interpolated;
-    std::vector<bool> isfoundcopy = isfound;
-    for (int i = 0; i < numcoords; i++)
-        isfound[reorderingvector[i]] = isfoundcopy[i];
-    if (numtimeevals == -1)
-    {
-        // Provide a non-empty interpolation vector even in case nothing was found:
-        if (interpolated.size() == 0)
-            interpolated = {{},std::vector<double>(numcoords)};
-
-        for (int h = 0; h < harmoniclist.size(); h++)
-        {
-            for (int i = 0; i < numcoords; i++)
-                interpolated[harmoniclist[h]][reorderingvector[i]] = interpolatedcopy[harmoniclist[h]][i];
-        }
-    }
-    else
-    {
-        for (int tim = 0; tim < numtimeevals; tim++)
-        {
-            for (int i = 0; i < numcoords; i++)
-                interpolated[0][numcoords*tim+reorderingvector[i]] = interpolatedcopy[0][numcoords*tim+i];
-        }
-    }
+    
+    // Provide a non-empty interpolation vector even in case nothing was found:
+    if (interpolated.size() == 0)
+        interpolated = {{},std::vector<double>(numcoords)};
 }
 
 

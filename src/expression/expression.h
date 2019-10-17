@@ -33,6 +33,7 @@
 #include "myalgorithm.h"
 #include "iointerface.h"
 #include "spline.h"
+#include "referencecoordinategroup.h"
 
 
 class vec;
