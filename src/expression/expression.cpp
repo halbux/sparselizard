@@ -450,7 +450,7 @@ std::vector<double> expression::interpolate(int physreg, const std::vector<doubl
 
     if (xyz.size() != 3)
     {
-        std::cout << "Error in 'expression' object: expected a coordinate vector of length 3" << std::endl;
+        std::cout << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
         abort();
     }
 
@@ -471,7 +471,7 @@ std::vector<double> expression::interpolate(int physreg, expression meshdeform, 
 
     if (xyz.size() != 3)
     {
-        std::cout << "Error in 'expression' object: expected a coordinate vector of length 3" << std::endl;
+        std::cout << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
         abort();
     }
 
@@ -526,12 +526,6 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
-    }
-
-    if (universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension() != problemdimension)
-    {
-        std::cout << "Error in 'expression' object: expected a physical region with " << problemdimension << "D elements in 'interpolate'" << std::endl;
         abort();
     }
 
@@ -625,7 +619,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     for (int tim = 0; tim < numtimeevals; tim++)
                     {
                         for (int c = 0; c < coordindexes.size(); c++)
-                            interpolated[0][numcoords*tim+coordindexes[c]] = interp.getvalues()[coordindexes.size()*tim+coordindexes[c]];
+                            interpolated[0][numcoords*tim+coordindexes[c]] = interp.getvalues()[coordindexes.size()*tim+c];
                     }
                 }
             }
@@ -635,7 +629,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     
     // Provide a non-empty interpolation vector even in case nothing was found:
     if (interpolated.size() == 0)
-        interpolated = {{},std::vector<double>(numcoords)};
+        interpolated = {{},std::vector<double>(numcoords,0)};
 }
 
 
