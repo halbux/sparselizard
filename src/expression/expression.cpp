@@ -544,8 +544,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
     interpolated = {};
     if (numtimeevals != -1)
-        interpolated = {std::vector<double>(numcoords*numtimeevals)};
-    std::vector<int> harmoniclist = {};
+        interpolated = {std::vector<double>(numcoords*numtimeevals,0.0)};
     
     
     referencecoordinategroup rcg(xyzcoord);
@@ -584,27 +583,18 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
                     universe::forbidreuse();
 
-                    if (interpolated.size() > 0)
+                    if (interpolated.size() < interp.size())
+                        interpolated.resize(interp.size());
+                    
+                    for (int h = 0; h < interp.size(); h++)
                     {
-                        for (int h = 0; h < harmoniclist.size(); h++)
+                        if (interp[h].size() > 0)
                         {
+                            if (interpolated[h].size() == 0)
+                                interpolated[h] = std::vector<double>(numcoords,0.0);
+                        
                             for (int c = 0; c < coordindexes.size(); c++)
-                                interpolated[harmoniclist[h]][coordindexes[c]] = interp[harmoniclist[h]][0].getvalues()[c];
-                        }
-                    }
-                    else
-                    {
-                        // Preallocate all harmonics:
-                        interpolated = std::vector<std::vector<double>>(interp.size(), std::vector<double>(0));
-                        for (int h = 0; h < interp.size(); h++)
-                        {
-                            if (interp[h].size() > 0)
-                            {
-                                harmoniclist.push_back(h);
-                                interpolated[h] = std::vector<double>(numcoords);
-                                for (int c = 0; c < coordindexes.size(); c++)
-                                    interpolated[h][coordindexes[c]] = interp[h][0].getvalues()[c];
-                            }
+                                interpolated[h][coordindexes[c]] = interp[h][0].getvalues()[c];
                         }
                     }
                 }
