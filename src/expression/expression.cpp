@@ -567,6 +567,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
             std::vector<double> kietaphi = rcg.getreferencecoordinates();
             std::vector<int> coordindexes = rcg.getcoordinatenumber();
             std::vector<int> elemens = rcg.getelements();
+            int numrefcoords = kietaphi.size()/3;
             
             for (int c = 0; c < coordindexes.size(); c++)
                 isfound[coordindexes[c]] = true;
@@ -575,6 +576,8 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
             elementselector myselector(curdisjregs, elemens, isorientationdependent);
             do 
             {
+                std::vector<int> origindexes = myselector.getoriginalindexes();
+            
                 if (numtimeevals == -1)
                 {
                     // Clean storage before allowing reuse:
@@ -592,9 +595,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                         {
                             if (interpolated[h].size() == 0)
                                 interpolated[h] = std::vector<double>(numcoords,0.0);
-                        
-                            for (int c = 0; c < coordindexes.size(); c++)
-                                interpolated[h][coordindexes[c]] = interp[h][0].getvalues()[c];
+                                
+                            for (int e = 0; e < origindexes.size(); e++)
+                            {
+                                for (int c = 0; c < numrefcoords; c++)
+                                    interpolated[h][coordindexes[origindexes[e]*numrefcoords+c]] = interp[h][0].getvalues()[e*numrefcoords+c];
+                            }
                         }
                     }
                 }
@@ -608,8 +614,11 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
                     for (int tim = 0; tim < numtimeevals; tim++)
                     {
-                        for (int c = 0; c < coordindexes.size(); c++)
-                            interpolated[0][numcoords*tim+coordindexes[c]] = interp.getvalues()[coordindexes.size()*tim+c];
+                        for (int e = 0; e < origindexes.size(); e++)
+                        {
+                            for (int c = 0; c < numrefcoords; c++)
+                                interpolated[0][numcoords*tim+coordindexes[origindexes[e]*numrefcoords+c]] = interp.getvalues()[origindexes.size()*numrefcoords*tim+e*numrefcoords+c];
+                        }
                     }
                 }
             }
