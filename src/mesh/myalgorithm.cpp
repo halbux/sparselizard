@@ -659,9 +659,11 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
         polynomials polys;
         std::vector<int> coordranking = {};
         
-        std::vector<double> elemdist = {alpha*boxdimensions->at(3*curelem+0), alpha*boxdimensions->at(3*curelem+1), alpha*boxdimensions->at(3*curelem+2)};
         double xbary = barycenters->at(3*curelem+0); double ybary = barycenters->at(3*curelem+1); double zbary = barycenters->at(3*curelem+2);
-    
+        std::vector<double> elemdist = {alpha*boxdimensions->at(3*curelem+0), alpha*boxdimensions->at(3*curelem+1), alpha*boxdimensions->at(3*curelem+2)};
+        // To avoid noise related issues:
+        elemdist[0] += std::abs(xbary*1e-8); elemdist[1] += std::abs(ybary*1e-8); elemdist[2] += std::abs(zbary*1e-8);
+        
         // Loop on all candidate groups:
         coordgroup.select(xbary,ybary,zbary, *std::max_element(elemdist.begin(),elemdist.end()));
         for (int g = 0; g < coordgroup.countgroups(); g++)
