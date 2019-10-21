@@ -43,6 +43,8 @@ class elementselector
         std::vector<int> totalorientations;
         // Their disjoint region:
         std::vector<int> disjointregions;
+        // Their original indexes:
+        std::vector<int> originalindexes;
         
         
         // Prepare the containers:
@@ -81,6 +83,8 @@ class elementselector
         // elements that are at the same time in the current total 
         // orientation and in the selected disjoint regions.
         std::vector<int> getelementindexes(void);
+        
+        std::vector<int> getoriginalindexes(void);
 
         // Extract a new element selector from the selection.
         elementselector extractselection(void);
