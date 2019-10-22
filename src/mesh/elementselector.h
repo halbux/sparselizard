@@ -84,6 +84,7 @@ class elementselector
         // orientation and in the selected disjoint regions.
         std::vector<int> getelementindexes(void);
         
+        // Get the indexes in the original ordering provided:
         std::vector<int> getoriginalindexes(void);
 
         // Extract a new element selector from the selection.
