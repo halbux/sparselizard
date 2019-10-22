@@ -92,6 +92,9 @@ namespace myalgorithm
     // Return "s" for an argument bigger than 1, return "" otherwise:
     std::string getplurals(int count);
     
+    // Get the ranking of the coordinates in terms of the quality of the information they provide to link reference and real coordinate on a surface: 
+    std::vector<int> getcoordinateranking(int elementtypenumber, int elementnumber);
+    
 };
 
 #endif

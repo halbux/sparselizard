@@ -809,3 +809,22 @@ std::string myalgorithm::getplurals(int count)
         return "";
 }
 
+std::vector<int> myalgorithm::getcoordinateranking(int elementtypenumber, int elementnumber)
+{
+    elements* myelems = universe::mymesh->getelements();
+
+    std::vector<double> xcoords = myelems->getnodecoordinates(elementtypenumber, elementnumber, 0);
+    std::vector<double> ycoords = myelems->getnodecoordinates(elementtypenumber, elementnumber, 1);
+    std::vector<double> zcoords = myelems->getnodecoordinates(elementtypenumber, elementnumber, 2);
+   
+    std::vector<double> a = {xcoords[1]-xcoords[0], ycoords[1]-ycoords[0], zcoords[1]-zcoords[0]};
+    std::vector<double> b = {xcoords[2]-xcoords[1], ycoords[2]-ycoords[1], zcoords[2]-zcoords[1]};
+    
+    std::vector<double> crossprod = {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]};
+    
+    std::vector<int> coordranking;
+    myalgorithm::stablesort(0, crossprod, coordranking);
+    
+    return coordranking;
+}
+
