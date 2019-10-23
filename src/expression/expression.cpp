@@ -1726,7 +1726,14 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
     expression onexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
+    {
+        if (myoperations[i]->isdofincluded() || myoperations[i]->istfincluded())
+        {
+            std::cout << "Error in 'expression' object: argument of 'on' cannot include a dof or tf" << std::endl;
+            abort();
+        }
         onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i], errorifnotfound));
+    }
 
     return onexpr;
 }
