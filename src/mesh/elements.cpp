@@ -256,6 +256,29 @@ std::vector<double>* elements::getboxdimensions(int elementtypenumber)
     return &(boxdimensions[elementtypenumber]);
 }
 
+std::vector<double> elements::getnormal(int elementtypenumber, int elementnumber)
+{
+    std::vector<double>* nodecoordinates = mynodes->getcoordinates();
+    
+    element myelement(elementtypenumber, mycurvatureorder);
+    int curvednumberofnodes = myelement.countcurvednodes();
+    
+    int node0 = subelementsinelements[elementtypenumber][0][elementnumber*curvednumberofnodes+0];
+    int node1 = subelementsinelements[elementtypenumber][0][elementnumber*curvednumberofnodes+1];
+    int node2 = subelementsinelements[elementtypenumber][0][elementnumber*curvednumberofnodes+2];
+    
+    double x0 = nodecoordinates->at(3*node0+0); double y0 = nodecoordinates->at(3*node0+1); double z0 = nodecoordinates->at(3*node0+2);
+    double x1 = nodecoordinates->at(3*node1+0); double y1 = nodecoordinates->at(3*node1+1); double z1 = nodecoordinates->at(3*node1+2);
+    double x2 = nodecoordinates->at(3*node2+0); double y2 = nodecoordinates->at(3*node2+1); double z2 = nodecoordinates->at(3*node2+2);
+    
+    std::vector<double> a = {x1-x0, y1-y0, z1-z0};
+    std::vector<double> b = {x2-x1, y2-y1, z2-z1};
+    
+    std::vector<double> crossprod = {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]};
+    
+    return crossprod;
+}
+
 void elements::printnumber(void)
 {
     std::cout << std::endl;

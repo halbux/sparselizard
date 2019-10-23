@@ -124,6 +124,9 @@ class elements
         // The 'boxdimensions' container is populated for the element type if empty. 
         std::vector<double>* getboxdimensions(int elementtypenumber);
         
+        // Get the normal (not normed) to a straight face element:
+        std::vector<double> getnormal(int elementtypenumber, int elementnumber);
+        
         // Print elements data for debug:
         void printnumber(void);
         void printsubelements(void);
