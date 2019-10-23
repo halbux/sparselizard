@@ -628,6 +628,8 @@ int myalgorithm::getrootmultiguess(std::vector<polynomial>& poly, std::vector<do
 
 void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
+    int problemdimension = universe::mymesh->getmeshdimension();
+    
     disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
     elements* myelems = universe::mymesh->getelements();
     
@@ -692,10 +694,18 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     // Only create once for all coordinates the polynomials and only for the required elements:
                     if (polys.count() == 0)
                     {
-                        // The x, y, z coordinate polynomial used to calculate the reference coordinate is
-                        // selected to maximize the element dimension in this coordinate direction:
-                        myalgorithm::stablesort(0, elemdist, coordranking);
-                        coordranking = {coordranking[2],coordranking[1],coordranking[0]};
+                        // The coordinate polynomial used to calculate the reference coordinate must be carefully selected:
+                        if (problemdimension == 3 && elemdim == 2)
+                        {
+                            std::vector<double> curnormal = myelems->getnormal(elemtypenum, curelem);
+                            curnormal = {std::abs(curnormal[0]), std::abs(curnormal[1]), std::abs(curnormal[2])};
+                            myalgorithm::stablesort(0, curnormal, coordranking);
+                        }
+                        else
+                        {
+                            myalgorithm::stablesort(0, elemdist, coordranking);
+                            coordranking = {coordranking[2],coordranking[1],coordranking[0]};
+                        }
                     
                         std::vector<polynomial> curpols( elemdim*(elemdim+1) );
                         for (int j = 0; j < elemdim; j++)
@@ -807,24 +817,5 @@ std::string myalgorithm::getplurals(int count)
         return "s";
     else
         return "";
-}
-
-std::vector<int> myalgorithm::getcoordinateranking(int elementtypenumber, int elementnumber)
-{
-    elements* myelems = universe::mymesh->getelements();
-
-    std::vector<double> xcoords = myelems->getnodecoordinates(elementtypenumber, elementnumber, 0);
-    std::vector<double> ycoords = myelems->getnodecoordinates(elementtypenumber, elementnumber, 1);
-    std::vector<double> zcoords = myelems->getnodecoordinates(elementtypenumber, elementnumber, 2);
-   
-    std::vector<double> a = {xcoords[1]-xcoords[0], ycoords[1]-ycoords[0], zcoords[1]-zcoords[0]};
-    std::vector<double> b = {xcoords[2]-xcoords[1], ycoords[2]-ycoords[1], zcoords[2]-zcoords[1]};
-    
-    std::vector<double> crossprod = {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]};
-    
-    std::vector<int> coordranking;
-    myalgorithm::stablesort(0, crossprod, coordranking);
-    
-    return coordranking;
 }
 
