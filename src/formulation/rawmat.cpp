@@ -150,10 +150,8 @@ void rawmat::process(void)
     }
     
     // Stitch all fragments together while removing negative indexes.
-    int* stitchedrowindices = new int[veclen];
-    int* stitchedcolindices = new int[veclen];
-    double* stitchedvals = new double[veclen];
-
+    std::vector<std::tuple<int,int,double>> tupl(veclen);
+    
     int ind = 0;
     for (int i = 0; i < accumulatedvals.size(); i++)
     {
@@ -165,17 +163,16 @@ void rawmat::process(void)
         {
             if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
             {
-                stitchedrowindices[ind] = accumulatedrowindicesptr[j];
-                stitchedcolindices[ind] = accumulatedcolindicesptr[j];
-                stitchedvals[ind] = valsptr[j];
+                std::get<0>(tupl[ind]) = accumulatedrowindicesptr[j];
+                std::get<1>(tupl[ind]) = accumulatedcolindicesptr[j];
+                std::get<2>(tupl[ind]) = valsptr[j];
                 ind++;            
             }
         }
     }
     
-    // Sort the vectors according to the row then according to the column. 
-    // 'reorderingvector' will tell us how to reorder.
-    int* reorderingvector = myalgorithm::stablesortparallel({stitchedrowindices, stitchedcolindices}, veclen);
+    // Sort according to the rows then according to the columns:
+    myalgorithm::tuple3sort(tupl);
         
     // Get the number of nonzeros:
     nnz = 0;
@@ -183,7 +180,7 @@ void rawmat::process(void)
         nnz = 1;
     for (int i = 1; i < veclen; i++)
     {
-        if (stitchedrowindices[reorderingvector[i]] != stitchedrowindices[reorderingvector[i-1]] || stitchedcolindices[reorderingvector[i]] != stitchedcolindices[reorderingvector[i-1]])
+        if (std::get<0>(tupl[i]) != std::get<0>(tupl[i-1]) || std::get<1>(tupl[i]) != std::get<1>(tupl[i-1]))
             nnz++;
     }
 
@@ -201,17 +198,17 @@ void rawmat::process(void)
     for (int i = 0; i < veclen; i++)
     {
         // Same row:
-        if (i > 0 && stitchedrowindices[reorderingvector[i]] == stitchedrowindices[reorderingvector[i-1]])
+        if (i > 0 && std::get<0>(tupl[i]) == std::get<0>(tupl[i-1]))
         {
             // Same row and column:
-            if (stitchedcolindices[reorderingvector[i]] == stitchedcolindices[reorderingvector[i-1]])
-                finalvals[ind] += stitchedvals[reorderingvector[i]];
+            if (std::get<1>(tupl[i]) == std::get<1>(tupl[i-1]))
+                finalvals[ind] += std::get<2>(tupl[i]);
             else
             {
                 // New column:
                 ind++;
-                finalvals[ind] = stitchedvals[reorderingvector[i]];
-                finalcolindices[ind] = stitchedcolindices[reorderingvector[i]];
+                finalvals[ind] = std::get<2>(tupl[i]);
+                finalcolindices[ind] = std::get<1>(tupl[i]);
             }
         }
         else
@@ -220,20 +217,16 @@ void rawmat::process(void)
             row++; ind++;
         
             // If empty row move to the next not empty one:
-            int newrow = stitchedrowindices[reorderingvector[i]];
+            int newrow = std::get<0>(tupl[i]);
             while (row < newrow) { finalrowindices[row] = ind; row++; }
             
-            finalvals[ind] = stitchedvals[reorderingvector[i]];
-            finalcolindices[ind] = stitchedcolindices[reorderingvector[i]];
+            finalvals[ind] = std::get<2>(tupl[i]);
+            finalcolindices[ind] = std::get<1>(tupl[i]);
             finalrowindices[row] = ind;
         }
     }
     while (row < countrows()) { row++; finalrowindices[row] = nnz; }
     
-    delete[] stitchedrowindices;
-    delete[] stitchedcolindices;
-    delete[] stitchedvals;
-    delete[] reorderingvector;
     
     MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, countrows(), countcolumns(), finalrowindices, finalcolindices, finalvals, &mymat);
     
