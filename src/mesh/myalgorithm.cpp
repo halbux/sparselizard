@@ -254,7 +254,7 @@ void myalgorithm::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
     #endif
     
     // The < operator is overloaded by a lambda function.
-    std::sort(tosort.begin(), tosort.end(), [&](const std::tuple<int,int,double> elem1, const std::tuple<int,int,double> elem2)
+    sort(tosort.begin(), tosort.end(), [&](const std::tuple<int,int,double> elem1, const std::tuple<int,int,double> elem2)
         { 
             if (std::get<0>(elem1) < std::get<0>(elem2))
                 return true;
