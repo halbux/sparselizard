@@ -46,6 +46,7 @@ namespace myalgorithm
     // according to tosrt[1],... ALL int* arrays have size 'numentries'.
     // The output is a reordering vector.
     int* stablesortparallel(std::vector<int*> tosort, int numentries);
+    void tuple3sort(std::vector<std::tuple<int,int,double>>& tosort);
     
     // The output 'slices[i]' gives the indexes of all values of 'toslice' that are in the interval between minval+i*delta and minval+(i+1)*delta.
     // Value minval must be smaller than the smallest value in 'toslice' and minval+numslices*delta must be larger than the largest value.

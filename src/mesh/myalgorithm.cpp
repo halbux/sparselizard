@@ -244,6 +244,29 @@ int* myalgorithm::stablesortparallel(std::vector<int*> tosort, int numentries)
     return reorderingvector;
 }
 
+void myalgorithm::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
+{
+    // Parallel sort on Linux only for now:
+    #if defined(__linux__)
+    using namespace __gnu_parallel;
+    #else
+    using namespace std;
+    #endif
+    
+    // The < operator is overloaded by a lambda function.
+    std::sort(tosort.begin(), tosort.end(), [&](const std::tuple<int,int,double> elem1, const std::tuple<int,int,double> elem2)
+        { 
+            if (std::get<0>(elem1) < std::get<0>(elem2))
+                return true;
+            if (std::get<0>(elem1) > std::get<0>(elem2))
+                return false;
+            if (std::get<1>(elem1) < std::get<1>(elem2))
+                return true;
+            if (std::get<1>(elem1) >= std::get<1>(elem2))
+                return false;
+        });
+}
+
 void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices)
 {
     int num = toslice.size();
