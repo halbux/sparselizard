@@ -760,6 +760,13 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
         std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
         abort();
     }
+    
+    // For as long as MUMPS is the only option!
+    if (A.countnnz() > std::pow(2,31))
+    {
+        std::cout << "Error in 'mathop' namespace: trying to call MUMPS on a matrix A with " << A.countnnz() << " nonzeros (max allowed is 2^31)" << std::endl;
+        abort();
+    }
 
     // The copy of the rhs is returned in case there is no nonzero entry in A:
     if (A.countnnz() == 0)
