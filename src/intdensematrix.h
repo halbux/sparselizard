@@ -19,8 +19,8 @@ class intdensematrix
 
     private:
         
-        int numrows = 0;
-        int numcols = 0;
+        long long int numrows = 0;
+        long long int numcols = 0;
         
         std::shared_ptr<int> myvalues = NULL;
         
@@ -29,20 +29,20 @@ class intdensematrix
         // Set empty matrix:
         intdensematrix(void) {};
         // Set number of rows and columns:
-        intdensematrix(int numberofrows, int numberofcolumns);
+        intdensematrix(long long int numberofrows, long long int numberofcolumns);
         // Initialise to a value:
-        intdensematrix(int numberofrows, int numberofcolumns, int initvalue);
+        intdensematrix(long long int numberofrows, long long int numberofcolumns, int initvalue);
         // Initialise with a vector (row major):
-        intdensematrix(int numberofrows, int numberofcolumns, const std::vector<int> valvec);
+        intdensematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<int> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
-        intdensematrix(int numberofrows, int numberofcolumns, int init, int step);
+        intdensematrix(long long int numberofrows, long long int numberofcolumns, int init, int step);
         
-        int countrows(void) { return numrows; };
-        int countcolumns(void) { return numcols; };
-        int count(void) { return numrows*numcols; };
+        long long int countrows(void) { return numrows; };
+        long long int countcolumns(void) { return numcols; };
+        long long int count(void) { return numrows*numcols; };
         
         // Count the number of positive or zero integer values:
-        int countpositive(void);
+        long long int countpositive(void);
 
         void print(void);
         void printsize(void);
