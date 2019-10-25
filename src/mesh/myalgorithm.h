@@ -43,10 +43,6 @@ namespace myalgorithm
     // Same but sort by blocks of size 'blocklen':
     void stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector, int blocklen);
     
-    // 'stablesortparallel' sorts in parallel according to tosort[0] then 
-    // according to tosrt[1],... ALL int* arrays have size 'numentries'.
-    // The output is a reordering vector.
-    int* stablesortparallel(std::vector<int*> tosort, int numentries);
     void tuple3sort(std::vector<std::tuple<int,int,double>>& tosort);
     
     // The output 'slices[i]' gives the indexes of all values of 'toslice' that are in the interval between minval+i*delta and minval+(i+1)*delta.
