@@ -1,4 +1,5 @@
 #include "rawmat.h"
+#include <tuple>
 
 
 rawmat::~rawmat(void) 
