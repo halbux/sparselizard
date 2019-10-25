@@ -1,5 +1,4 @@
 #include "myalgorithm.h"
-#include <tuple>
 
 
 void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
