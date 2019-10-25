@@ -9,7 +9,7 @@ rawmat::~rawmat(void)
         KSPDestroy(&myksp);
 }
 
-int rawmat::countrows(void) 
+long long int rawmat::countrows(void) 
 { 
     if (mydofmanager == NULL)
         return 0;
@@ -17,7 +17,7 @@ int rawmat::countrows(void)
         return mydofmanager->countdofs();
 }
 
-int rawmat::countcolumns(void) 
+long long int rawmat::countcolumns(void) 
 { 
     if (mydofmanager == NULL)
         return 0;
@@ -29,13 +29,13 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
 {
     int* entriestozeroptr = entriestozero.getvalues();
 
-    int numentries = entriestozero.count();
+    long long int numentries = entriestozero.count();
     if (numentries > 0)
     {
         // First build a vector for direct access:
         std::vector<bool> istozero(mydofmanager->countdofs(), false);
 
-        for (int i = 0; i < numentries; i++)
+        for (long long int i = 0; i < numentries; i++)
             istozero[entriestozeroptr[i]] = true;
             
         if (zerorows)
@@ -43,7 +43,7 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
             for (int i = 0; i < accumulatedrowindices.size(); i++)
             {
                 int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-                for (int j = 0; j < accumulatedrowindices[i].count(); j++)
+                for (long long int j = 0; j < accumulatedrowindices[i].count(); j++)
                 {
                     if (accumulatedrowindicesptr[j] >= 0 && istozero[accumulatedrowindicesptr[j]])
                         accumulatedrowindicesptr[j] = -1;
@@ -55,7 +55,7 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
             for (int i = 0; i < accumulatedcolindices.size(); i++)
             {
                 int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
-                for (int j = 0; j < accumulatedcolindices[i].count(); j++)
+                for (long long int j = 0; j < accumulatedcolindices[i].count(); j++)
                 {
                     if (accumulatedcolindicesptr[j] >= 0 && istozero[accumulatedcolindicesptr[j]])
                         accumulatedcolindicesptr[j] = -1;
@@ -114,7 +114,7 @@ void rawmat::removeconstraints(void)
     int* myrows = petscrows.getvalues();
     int* mycols = petsccols.getvalues();
     
-    for (int i = 0; i < petscrows.count(); i++)
+    for (long long int i = 0; i < petscrows.count(); i++)
     {
         myrows[i] = dofrenumbering[myrows[i]];
         mycols[i] = dofrenumbering[mycols[i]];
@@ -137,13 +137,13 @@ void rawmat::process(void)
 {
     // Concatenate all accumulated fragments!
     // Remove negative indexes. First get the overall length.
-    int veclen = 0;
+    long long int veclen = 0;
     for (int i = 0; i < accumulatedvals.size(); i++)
     {
         int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
         int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
         
-        for (int j = 0; j < accumulatedvals[i].count(); j++)
+        for (long long int j = 0; j < accumulatedvals[i].count(); j++)
         {
             if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
                 veclen++;            
@@ -153,14 +153,14 @@ void rawmat::process(void)
     // Stitch all fragments together while removing negative indexes.
     std::vector<std::tuple<int,int,double>> tupl(veclen);
     
-    int ind = 0;
+    long long int ind = 0;
     for (int i = 0; i < accumulatedvals.size(); i++)
     {
         double* valsptr = accumulatedvals[i].getvalues();
         int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
         int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
         
-        for (int j = 0; j < accumulatedvals[i].count(); j++)
+        for (long long int j = 0; j < accumulatedvals[i].count(); j++)
         {
             if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
             {
@@ -179,7 +179,7 @@ void rawmat::process(void)
     nnz = 0;
     if (veclen > 0)
         nnz = 1;
-    for (int i = 1; i < veclen; i++)
+    for (long long int i = 1; i < veclen; i++)
     {
         if (std::get<0>(tupl[i]) != std::get<0>(tupl[i-1]) || std::get<1>(tupl[i]) != std::get<1>(tupl[i-1]))
             nnz++;
@@ -196,7 +196,7 @@ void rawmat::process(void)
 
     int row = -1; 
     ind = -1;
-    for (int i = 0; i < veclen; i++)
+    for (long long int i = 0; i < veclen; i++)
     {
         // Same row:
         if (i > 0 && std::get<0>(tupl[i]) == std::get<0>(tupl[i-1]))

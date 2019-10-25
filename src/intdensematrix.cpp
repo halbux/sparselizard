@@ -1,55 +1,55 @@
 #include "intdensematrix.h"
 
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns)
+intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
 }
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, int initvalue)
+intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, int initvalue)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
     
-    for (int i = 0; i < numcols*numrows; i++)
+    for (long long int i = 0; i < numcols*numrows; i++)
         myvaluesptr[i] = initvalue;
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, const std::vector<int> valvec)
+intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<int> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
     
-    for (int i = 0; i < numcols*numrows; i++)
+    for (long long int i = 0; i < numcols*numrows; i++)
         myvaluesptr[i] = valvec[i];
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(int numberofrows, int numberofcolumns, int init, int step)
+intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, int init, int step)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
     
-    for (int i = 0; i < numcols*numrows; i++)
+    for (long long int i = 0; i < numcols*numrows; i++)
         myvaluesptr[i] = init+i*step;
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-int intdensematrix::countpositive(void)
+long long int intdensematrix::countpositive(void)
 {
     int* myvaluesptr = myvalues.get();
     
-    int numpositive = 0;
-    for (int i = 0; i < numrows*numcols; i++)
+    long long int numpositive = 0;
+    for (long long int i = 0; i < numrows*numcols; i++)
     {
         if (myvaluesptr[i] >= 0)
             numpositive++;            
@@ -61,9 +61,9 @@ void intdensematrix::print(void)
 {
     int* myvaluesptr = myvalues.get();
     
-    for (int i = 0; i < numrows; i++)
+    for (long long int i = 0; i < numrows; i++)
     {
-        for (int j = 0; j < numcols; j++)
+        for (long long int j = 0; j < numcols; j++)
             std::cout << myvaluesptr[i*numcols+j] << " ";
         std::cout << std::endl;
     }
@@ -86,11 +86,11 @@ intdensematrix intdensematrix::duplicateallrowstogether(int n)
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
         
-    int matsize = numrows*numcols;
+    long long int matsize = numrows*numcols;
     
     for (int duplicate = 0; duplicate < n; duplicate++)
     {
-        for (int i = 0; i < matsize; i++)
+        for (long long int i = 0; i < matsize; i++)
             outvaluesptr[matsize*duplicate + i] = myvaluesptr[i];
     }
     
@@ -104,11 +104,11 @@ intdensematrix intdensematrix::duplicaterowsonebyone(int n)
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
     
-    for (int row = 0; row < numrows; row++)
+    for (long long int row = 0; row < numrows; row++)
     {
         for (int duplicate = 0; duplicate < n; duplicate++)
         {
-            for (int col = 0; col < numcols; col++)
+            for (long long int col = 0; col < numcols; col++)
                 outvaluesptr[row*(numcols*n) + duplicate*numcols + col] = myvaluesptr[row*numcols+col];
         }
     }

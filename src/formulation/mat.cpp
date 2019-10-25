@@ -10,7 +10,7 @@ void mat::errorifpointerisnull(void)
     }
 }
 
-mat::mat(int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
+mat::mat(long long int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(std::shared_ptr<dofmanager>(new dofmanager(matsize))));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
@@ -26,10 +26,10 @@ mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix c
     rawmatptr->clearfragments();
 }
 
-int mat::countrows(void) { errorifpointerisnull(); return rawmatptr->countrows(); }
-int mat::countcolumns(void) { errorifpointerisnull(); return rawmatptr->countcolumns(); }
+long long int mat::countrows(void) { errorifpointerisnull(); return rawmatptr->countrows(); }
+long long int mat::countcolumns(void) { errorifpointerisnull(); return rawmatptr->countcolumns(); }
         
-int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->countnnz(); }
+long long int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->countnnz(); }
 
 void mat::removeconstraints(void) { errorifpointerisnull(); rawmatptr->removeconstraints(); };
 
