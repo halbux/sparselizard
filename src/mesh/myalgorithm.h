@@ -11,6 +11,7 @@
 #include <iostream>
 #include <numeric>
 #include <cmath>
+#include <tuple>
 #include <algorithm>
 #include "polynomial.h"
 #include "polynomials.h"
