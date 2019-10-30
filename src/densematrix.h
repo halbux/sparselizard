@@ -134,7 +134,7 @@ class densematrix
         // [Arow1*Brow1  Arow1*Brow2  ... Arow2*Brow1...].
         densematrix multiplyallrows(densematrix input);
 
-        // This special product is called by a elem x (gp x ffd) matrix A where the columns are grouped by ffd blocks of gp columns.
+        // This special product is called by an el x (gp x ffd) matrix A where the columns are grouped by ffd blocks of gp columns.
         // The 'tfval' matrix has size fft x gp. The returned matrix has size el x (gp x ffd x fft) and corresponds to [A*fft1 A*fft2 ...].
         densematrix dofinterpoltimestf(densematrix tfval);
         
