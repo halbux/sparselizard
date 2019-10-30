@@ -565,13 +565,13 @@ densematrix densematrix::dofinterpoltimestf(densematrix tfval)
 
 void densematrix::multiplycolumns(densematrix input)
 {
-    int collen = input.countcolumns();
-    int numblocks = numcols/collen;
+    long long int collen = input.countcolumns();
+    long long int numblocks = numcols/collen;
 
     double* myvaluesptr = myvalues.get();
     double* invaluesptr = input.myvalues.get();
     
-    int ind = 0;
+    long long int ind = 0;
     for (long long int i = 0; i < numrows; i++)
     {
         for (long long int b = 0; b < numblocks; b++)
