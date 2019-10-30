@@ -208,9 +208,8 @@ intdensematrix intdensematrix::extractcols(std::vector<int> selected)
     int* outvals = output.getvalues();
     for (long long int i = 0; i < numrows; i++)
     {
-        long long int col = selected[i];
         for (long long int j = 0; j < numselected; j++)
-            outvals[i*numselected+j] = vals[i*numcols+col];
+            outvals[i*numselected+j] = vals[i*numcols+selected[j]];
     }
 
     return output;
