@@ -81,6 +81,22 @@ int* intdensematrix::getvalues(void)
     return myvalues.get();
 }
 
+intdensematrix intdensematrix::transpose(void)
+{
+    intdensematrix output(numcols, numrows);
+
+    int* myvaluesptr = myvalues.get();
+    int* outvaluesptr = output.myvalues.get();
+
+    for (long long int row = 0; row < numrows; row++)
+    {
+        for (long long int col = 0; col < numcols; col++)
+            outvaluesptr[col*numrows+row] = myvaluesptr[row*numcols+col];
+    }
+
+    return output;
+}
+
 intdensematrix intdensematrix::duplicateallrowstogether(int n)
 {
     intdensematrix output(numrows*n, numcols);
@@ -115,6 +131,24 @@ intdensematrix intdensematrix::duplicaterowsonebyone(int n)
         }
     }
     
+    return output;
+}
+
+intdensematrix intdensematrix::extractrows(std::vector<int> selected)
+{
+    long long int numselected = selected.size();
+
+    intdensematrix output(numselected, numcols);
+
+    int* vals = getvalues();
+    int* outvals = output.getvalues();
+    for (long long int i = 0; i < numselected; i++)
+    {
+        long long int row = selected[i];
+        for (long long int j = 0; j < numcols; j++)
+            outvals[i*numcols+j] = vals[row*numcols+j];
+    }
+
     return output;
 }
     
