@@ -59,14 +59,16 @@ long long int intdensematrix::countpositive(void)
 
 void intdensematrix::print(void)
 {
+    printsize();
+
     int* myvaluesptr = myvalues.get();
-    
     for (long long int i = 0; i < numrows; i++)
     {
         for (long long int j = 0; j < numcols; j++)
             std::cout << myvaluesptr[i*numcols+j] << " ";
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
 void intdensematrix::printsize(void)
