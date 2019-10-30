@@ -531,6 +531,60 @@ densematrix densematrix::multiplyallrows(densematrix input)
     return output;
 }
 
+densematrix densematrix::dofinterpoltimestf(densematrix tfval)
+{
+    long long int fft = tfval.countrows();
+    long long int gp = tfval.countcolumns();
+    long long int elem = numrows;
+    long long int ffd = numcols/gp;
+    
+    densematrix output(elem, gp*ffd*fft);
+    
+    double* myvaluesptr = myvalues.get();
+    double* tfvaluesptr = tfval.myvalues.get();
+    double* outmyvaluesptr = output.myvalues.get();
+
+    long long int ind = 0;
+    for (long long int ielem = 0; ielem < elem; ielem++)
+    {
+        for (long long int ifft = 0; ifft < fft; ifft++)
+        {
+            for (long long int iffd = 0; iffd < ffd; iffd++)
+            {
+                for (long long int igp = 0; igp < gp; igp++)
+                {
+                    outmyvaluesptr[ind] = myvaluesptr[ ielem*numcols+iffd*gp+igp ] * tfvaluesptr[ifft*gp+igp];
+                    ind++;
+                }
+            }
+        }
+    }
+
+    return output;
+}
+
+void densematrix::multiplycolumns(densematrix input)
+{
+    int collen = input.countcolumns();
+    int numblocks = numcols/collen;
+
+    double* myvaluesptr = myvalues.get();
+    double* invaluesptr = input.myvalues.get();
+    
+    int ind = 0;
+    for (long long int i = 0; i < numrows; i++)
+    {
+        for (long long int b = 0; b < numblocks; b++)
+        {
+            for (long long int c = 0; c < collen; c++)
+            {
+                myvaluesptr[ind] *= invaluesptr[i*collen+c];
+                ind++;
+            }
+        }
+    }
+}
+
 densematrix densematrix::duplicatevertically(int n)
 {
     densematrix output(numrows*n, numcols);
