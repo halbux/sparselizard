@@ -65,6 +65,9 @@ class elementselector
         // Select the next total orientation. Returns false if there is none.
         bool next(void);
         
+        // Count total number of elements:
+        int count(void) { return elems.size(); };
+        
         // Count number of elements in current orientation:
         int countincurrentorientation(void) { return currentrangeend - currentrangebegin + 1; };
         
