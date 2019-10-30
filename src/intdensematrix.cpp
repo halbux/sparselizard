@@ -134,6 +134,52 @@ intdensematrix intdensematrix::duplicaterowsonebyone(int n)
     return output;
 }
 
+intdensematrix intdensematrix::duplicateallcolstogether(int n)
+{
+    intdensematrix output(numrows, numcols*n);
+
+    int* myvaluesptr = myvalues.get();
+    int* outvaluesptr = output.myvalues.get();
+
+    long long int ind = 0;
+    for (long long int i = 0; i < numrows; i++)
+    {
+        for (int duplicate = 0; duplicate < n; duplicate++)
+        {
+            for (long long int j = 0; j < numcols; j++)
+            {
+                outvaluesptr[ind] = myvaluesptr[i*numcols+j];
+                ind++;   
+            }
+        }
+    }
+
+    return output;
+}
+
+intdensematrix intdensematrix::duplicatecolsonebyone(int n)
+{
+    intdensematrix output(numrows, numcols*n);
+
+    int* myvaluesptr = myvalues.get();
+    int* outvaluesptr = output.myvalues.get();
+
+    long long int ind = 0;
+    for (long long int i = 0; i < numrows; i++)
+    {
+        for (long long int j = 0; j < numcols; j++)
+        {
+            for (int duplicate = 0; duplicate < n; duplicate++)
+            {
+                outvaluesptr[ind] = myvaluesptr[i*numcols+j];
+                ind++;   
+            }
+        }
+    }
+
+    return output;
+}
+
 intdensematrix intdensematrix::extractrows(std::vector<int> selected)
 {
     long long int numselected = selected.size();
@@ -147,6 +193,24 @@ intdensematrix intdensematrix::extractrows(std::vector<int> selected)
         long long int row = selected[i];
         for (long long int j = 0; j < numcols; j++)
             outvals[i*numcols+j] = vals[row*numcols+j];
+    }
+
+    return output;
+}
+
+intdensematrix intdensematrix::extractcols(std::vector<int> selected)
+{
+    long long int numselected = selected.size();
+
+    intdensematrix output(numrows, numselected);
+
+    int* vals = getvalues();
+    int* outvals = output.getvalues();
+    for (long long int i = 0; i < numrows; i++)
+    {
+        long long int col = selected[i];
+        for (long long int j = 0; j < numselected; j++)
+            outvals[i*numselected+j] = vals[i*numcols+col];
     }
 
     return output;

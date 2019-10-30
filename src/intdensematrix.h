@@ -62,9 +62,13 @@ class intdensematrix
         // (p*n)xq where every row of matrix A has been duplicated n 
         // times as follows [row1; row1; row1;  ... row2; row2; row2; ...].
         intdensematrix duplicaterowsonebyone(int n);
-        
-        // Extract a set of rows from the matrix:
+        // Same for columns:
+        intdensematrix duplicateallcolstogether(int n);
+        intdensematrix duplicatecolsonebyone(int n);
+
+        // Extract a set of rows/columns from the matrix:
         intdensematrix extractrows(std::vector<int> selected);
+        intdensematrix extractcols(std::vector<int> selected);
 
 };
 
