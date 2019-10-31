@@ -86,7 +86,7 @@ void dofinterpolate::eval(void)
         dofinterpolorders[i] = mydoffield->getinterpolationorder(ondisjregs[i]);
 
 
-    // Group disj. regs. with same element types and same dof interpolation order.
+    // Group disj. regs. with same element type and same dof interpolation order.
     disjointregionselector mydisjregselector(ondisjregs, {dofinterpolorders});
     for (int i = 0; i < mydisjregselector.countgroups(); i++)
     {    
