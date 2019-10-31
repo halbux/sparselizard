@@ -50,7 +50,7 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     rcg = referencecoordinategroup(myxyzcoords);
 
 
-    // Calculate the maximum number of shape functions over all disjoint regions for preallocation. /////////////////// WRITE A FCT IN DOFMANAGER FOR THAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Calculate the maximum number of shape functions over all disjoint regions for preallocation.
     mymaxnumff = 0;
     for (int i = 0; i < ondisjregs.size(); i++)
     {
