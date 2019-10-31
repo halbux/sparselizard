@@ -153,8 +153,11 @@ void dofinterpolate::eval(void)
 
                     // Rows are shape functions and columns are evaluation points:
                     std::vector<densematrix> evaled(mydofops.size());
-                    for (int df = 0; df < mydofops.size(); df++)
-                        evaled[df] = hfc.tomatrix(totalorient, doforder, mydofops[df]->getkietaphiderivative(), mydofops[df]->getformfunctioncomponent());
+                    if (h == 0)
+                    {
+                        for (int df = 0; df < mydofops.size(); df++)
+                            evaled[df] = hfc.tomatrix(totalorient, doforder, mydofops[df]->getkietaphiderivative(), mydofops[df]->getformfunctioncomponent());
+                    }
                     
                     // Loop on all selected elements:
                     for (int e = 0; e < elems.size(); e++)
