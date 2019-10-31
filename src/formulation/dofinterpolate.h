@@ -53,7 +53,7 @@ class dofinterpolate
         // Max number of shape functions over all disjoint regions.
         int mymaxnumff = 0;
         
-        // One matrix per dof field.
+        // One matrix per dof operation.
         // Rows are the elements in the calling region. 
         // Number of columns is maxnumff*numevalpoints (blocks of numevalpoints side by side).
         std::vector<densematrix> myvals = {};
@@ -72,7 +72,7 @@ class dofinterpolate
 
         dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr, std::vector<int> othersidedisjreg);
         
-        densematrix getvalues(elementselector& elemselec, int dofindex);
+        densematrix getvalues(elementselector& elemselec, int dofopindex);
         intdensematrix getadresses(elementselector& elemselec, int harmnum);
                                             
 };

@@ -12,37 +12,32 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     
     // Make a copy to avoid changing the original:
     elementselector elsel = elemselec;
-    
+    elsel.selectallelements();
+    std::vector<int> origindexes = elsel.getoriginalindexes();
     
     // Calculate the x, y and z coordinates of each reference coordinate to create the rcg object:
     field x("x"), y("y"), z("z");
     
     myxyzcoords = std::vector<double>(3* elsel.count() * mynumrefcoords);
 
-    do
+    densematrix xevaled = (expression(x).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
+    densematrix yevaled = (expression(y).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
+    densematrix zevaled = (expression(z).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
+
+    double* xvals = xevaled.getvalues(); double* yvals = yevaled.getvalues(); double* zvals = zevaled.getvalues();
+
+    int ind = 0;
+    for (int e = 0; e < elsel.count(); e++)
     {
-        std::vector<int> origindexes = elsel.getoriginalindexes();
-    
-        densematrix xevaled = (expression(x).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
-        densematrix yevaled = (expression(y).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
-        densematrix zevaled = (expression(z).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
-
-        double* xvals = xevaled.getvalues(); double* yvals = yevaled.getvalues(); double* zvals = zevaled.getvalues();
-
-        int ind = 0;
-        for (int e = 0; e < elsel.countinselection(); e++)
+        for (int j = 0; j < mynumrefcoords; j++)
         {
-            for (int j = 0; j < mynumrefcoords; j++)
-            {
-                myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+0] = xvals[ind];
-                myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+1] = yvals[ind];
-                myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+2] = zvals[ind];
-                ind++;
-            }
+            myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+0] = xvals[ind];
+            myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+1] = yvals[ind];
+            myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+2] = zvals[ind];
+            ind++;
         }
-        
     }
-    while (elsel.next());
+        
     
     // Initialise to no coordinate found:
     isfound = std::vector<bool>(myxyzcoords.size()/3, false);
@@ -218,9 +213,9 @@ void dofinterpolate::eval(void)
 }
 
 
-densematrix dofinterpolate::getvalues(elementselector& elemselec, int dofindex)
+densematrix dofinterpolate::getvalues(elementselector& elemselec, int dofopindex)
 {
-    return myvals[dofindex].extractrows(elemselec.getoriginalindexes());
+    return myvals[dofopindex].extractrows(elemselec.getoriginalindexes());
 }
 
 intdensematrix dofinterpolate::getadresses(elementselector& elemselec, int harmnum)

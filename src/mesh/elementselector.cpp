@@ -132,6 +132,15 @@ bool elementselector::next(void)
     return true;
 }    
 
+void elementselector::selectallelements(void)
+{
+    // Set the range begin and end:
+    currentrangebegin = 0; currentrangeend = totalorientations.size() - 1;
+    currenttotalorientation = totalorientations[currentrangebegin];
+    
+    selecteddisjointregions = {};
+}
+
 void elementselector::selectdisjointregions(std::vector<int> disjregs) 
 { 
     std::sort(disjregs.begin(), disjregs.end()); 

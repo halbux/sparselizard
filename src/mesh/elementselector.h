@@ -72,6 +72,8 @@ class elementselector
         int countincurrentorientation(void) { return currentrangeend - currentrangebegin + 1; };
         
         
+        void selectallelements(void);
+        
         // Select specific disjoint regions. Set to {} for no selection. The 
         // selected disjoint regions must all be in 'mydisjointregionnumbers'. 
         void selectdisjointregions(std::vector<int> disjregs);
