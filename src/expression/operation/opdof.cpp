@@ -62,7 +62,35 @@ void opdof::print(void)
     else
         std::cout << nonecompxcompycompz[fieldcomponent];
 
-    std::cout << "dof(";
+    if (myison)
+        std::cout << "ondof(" << myonphysreg << ", ";
+    else
+        std::cout << "dof(";
     myfield->print();
     std::cout << ")";
 }
+
+
+void opdof::on(int physreg, expression* coordshift, bool errorifnotfound)
+{
+    if (myphysicalregion != -1)
+    {
+        std::cout << "Error in 'opdof' object: restricting the dof on a region is not allowed in the on() context" << std::endl;
+        abort();
+    }
+
+    myison = true;
+    
+    myonphysreg = physreg;
+    myerrorifnotfound = errorifnotfound;
+    // Reset in case of multiple on calls:
+    mycoordshift = {};
+    if (coordshift != NULL)
+        mycoordshift = {*coordshift};
+}
+
+std::vector<expression> opdof::getcoordshift(void)
+{
+    return mycoordshift;
+}
+

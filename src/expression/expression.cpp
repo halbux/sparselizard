@@ -1727,12 +1727,49 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-        if (myoperations[i]->isdofincluded() || myoperations[i]->istfincluded())
+        if (myoperations[i]->istfincluded())
         {
-            std::cout << "Error in 'expression' object: argument of 'on' cannot include a dof or tf" << std::endl;
+            std::cout << "Error in 'expression' object: argument of 'on' cannot include a test function tf()" << std::endl;
             abort();
         }
-        onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i], errorifnotfound));
+        if (myoperations[i]->isdofincluded() == false)
+            onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i], errorifnotfound));
+        else
+        {
+            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftfpolynomial').
+            field dummy("h1");
+            expression curexpr = expression(onexpr.myoperations[i]) * mathop::tf(dummy);
+            curexpr.expand();
+        
+            int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
+            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftfpolynomial(elementdimension);
+            // Do not retrieve the info for the tf:
+            std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
+            std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
+            
+            std::vector<std::shared_ptr<operation>> allterms = {};
+            for (int i = 0; i < dofs.size(); i++)
+            {
+                for (int j = 0; j < dofs[i].size(); j++)
+                {
+                    // The coefficient is a new opon object:
+                    std::shared_ptr<operation> curcoef(new opon(physreg, coordshift, coeffs[i][j]->copy(), errorifnotfound));
+                    // The dof gets the on tag:
+                    std::shared_ptr<operation> curdof, curterm;
+                    if (dofs[i][j]->getfieldpointer() != NULL)
+                    {
+                        curdof = dofs[i][j]->copy();
+                        curdof->on(physreg, coordshift, errorifnotfound);
+                        curterm = std::shared_ptr<opproduct>(new opproduct({curcoef,curdof}));
+                    }
+                    else
+                        curterm = curcoef;
+                    
+                    allterms.push_back(curterm);
+                }
+            }
+            onexpr.myoperations[i] = std::shared_ptr<opsum>(new opsum(allterms));
+        }
     }
 
     return onexpr;

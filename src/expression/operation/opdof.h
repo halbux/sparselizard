@@ -30,6 +30,14 @@ class opdof: public operation
         std::shared_ptr<rawfield> myfield;
         
         int myphysicalregion;
+        
+        
+        // In case of dof interpolation:
+        bool myison = false;
+        int myonphysreg;
+        bool myerrorifnotfound;
+        // Empty if not shifted:
+        std::vector<expression> mycoordshift;
     
     public:
         
@@ -61,6 +69,14 @@ class opdof: public operation
         std::shared_ptr<operation> copy(void);
         
         void print(void);
+        
+        // For dof interpolation:
+        bool ison(void) { return myison; };
+        
+        void on(int physreg, expression* coordshift, bool errorifnotfound);
+        int getonphysicalregion(void) { return myonphysreg; };
+        std::vector<expression> getcoordshift(void);
+        bool giveerrorifnotfound(void) { return myerrorifnotfound; };
 
 };
 
