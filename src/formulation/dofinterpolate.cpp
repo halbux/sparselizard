@@ -61,8 +61,8 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     // Preallocate the matrix containers:
     int totalnumels = elsel.count();
     myvals = std::vector<densematrix>(mydofops.size());
-    for (int ff = 0; ff < mydofops.size(); ff++)
-        myvals[ff] = densematrix(totalnumels, mymaxnumff*mynumrefcoords);
+    for (int i = 0; i < mydofops.size(); i++)
+        myvals[i] = densematrix(totalnumels, mymaxnumff*mynumrefcoords);
     // Preallocate the adresses matrix for each harmonic:
     std::vector<int> dofharms = mydoffield->getharmonics();
     mydofnums = std::vector<std::vector<intdensematrix>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<intdensematrix>(0));
