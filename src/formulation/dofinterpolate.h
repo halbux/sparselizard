@@ -18,13 +18,7 @@
 #include "disjointregionselector.h"
 #include "elementselector.h"
 #include "hierarchicalformfunction.h"
-#include "polynomial.h"
-#include "polynomials.h"
 #include <memory>
-
-//// TO CHECK:
-//
-////////// MAKE SURE A DOF AND ON DOF CANNOT BE MERGED IN THE SAME TERM!!!!!!!!!!!!!
 
 class dofinterpolate
 {
