@@ -68,7 +68,7 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     mydofnums = std::vector<std::vector<intdensematrix>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<intdensematrix>(0));
    
     for (int h = 0; h < dofharms.size(); h++)
-        mydofnums[dofharms[h]]= {intdensematrix(totalnumels, mymaxnumff*mynumrefcoords, -2)};
+        mydofnums[dofharms[h]] = {intdensematrix(totalnumels, mymaxnumff*mynumrefcoords, -2)};
            
 
     eval();
