@@ -1,12 +1,13 @@
 #include "dofinterpolate.h"
 
-
-dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr, std::vector<int> othersidedisjreg)
+/////////////////////////////////////////////////////// + WRITE FCT TO GIVE ERROR IF EITHER NOT ALL DOF OPS ARE ON OR PHYSREG DIFFERENT OR COORDSHIOFT OR ERRORBOOL DIFFERENT!!!!!!!!!!
+dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr)
 {
     mydoffield = dofops[0]->getfieldpointer();
     mydofops = dofops;
     mydofmanager = dofmngr;
-    ondisjregs = othersidedisjreg;
+    onphysreg = dofops[0]->getonphysicalregion();
+    std::vector<int> ondisjregs = ((universe::mymesh->getphysicalregions())->get(onphysreg))->getdisjointregions();
     myrefcoords = refcoords;
     mynumrefcoords = myrefcoords.size()/3;
     
@@ -78,6 +79,8 @@ void dofinterpolate::eval(void)
 {
     elements* myelements = universe::mymesh->getelements();
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+
+    std::vector<int> ondisjregs = ((universe::mymesh->getphysicalregions())->get(onphysreg))->getdisjointregions();
 
     std::vector<int> dofharms = mydoffield->getharmonics();
     
@@ -205,7 +208,7 @@ void dofinterpolate::eval(void)
         {    
             if (isfound[i] == false)
             {
-                std::cout << "Error in 'dofinterpolate' object: trying to interpolate at a point outside of the requested region or interpolation algorithm failed to converge" << std::endl;
+                std::cout << "Error in 'dofinterpolate' object: trying to interpolate at a point outside of the region " << onphysreg << " or interpolation algorithm failed to converge" << std::endl;
                 std::cout << "Error was at (x,y,z) = (" << myxyzcoords[3*i+0] << ", " << myxyzcoords[3*i+1] << ", " << myxyzcoords[3*i+2] << ")" << std::endl;
                 abort();
             }

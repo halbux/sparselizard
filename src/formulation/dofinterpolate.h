@@ -34,8 +34,8 @@ class dofinterpolate
         // Dof manager of the calling formulation:
         std::shared_ptr<dofmanager> mydofmanager = NULL;
         
-        // All disjoint regions on the dof side (can have different element types and dof orders).
-        std::vector<int> ondisjregs = {};
+        // Physical region on the dof side (can include different element types and dof orders).
+        int onphysreg = -1;
         
         // Reference evaluation coordinates.
         std::vector<double> myrefcoords = {};
@@ -70,7 +70,7 @@ class dofinterpolate
         
         dofinterpolate(void) {};
 
-        dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr, std::vector<int> othersidedisjreg);
+        dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr);
         
         densematrix getvalues(elementselector& elemselec, int dofopindex);
         intdensematrix getadresses(elementselector& elemselec, int harmnum);
