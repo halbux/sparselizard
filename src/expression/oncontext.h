@@ -38,7 +38,7 @@ class oncontext
         bool iserrorifnotfound(void);
         
         // Compare two oncontexes:
-        bool isequal(oncontext& tocompare);
+        bool isequal(oncontext* tocompare);
             
 };
 

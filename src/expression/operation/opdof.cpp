@@ -1,6 +1,15 @@
 #include "opdof.h"
 
 
+opdof::opdof(std::shared_ptr<rawfield> fieldin, int physreg)
+{
+    myfield = fieldin;
+    myphysicalregion = physreg;
+    
+    oncontext ctxt;
+    myoncontext = {ctxt};
+}
+
 void opdof::setspacederivative(int whichderivative)
 {
     // Make sure a single space derivative is applied.
@@ -63,7 +72,7 @@ void opdof::print(void)
         std::cout << nonecompxcompycompz[fieldcomponent];
 
     if (ison())
-        std::cout << "ondof(" << myonphysreg << ", ";
+        std::cout << "ondof(" << myoncontext[0].getphysicalregion() << ", ";
     else
         std::cout << "dof(";
     myfield->print();
@@ -73,7 +82,7 @@ void opdof::print(void)
 
 bool opdof::ison(void)
 {
-    return (myoncontext.size() != 0 && myoncontext[0].isdefined());
+    return myoncontext[0].isdefined();
 }
 
 void opdof::setoncontext(oncontext& cntxt)

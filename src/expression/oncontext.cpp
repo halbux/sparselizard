@@ -38,28 +38,28 @@ bool oncontext::iserrorifnotfound(void)
     return myerrorifnotfound;
 }
 
-bool oncontext::isequal(oncontext& tocompare)
+bool oncontext::isequal(oncontext* tocompare)
 {
     bool isitequal = true;
     
-    if (myisdefined != tocompare.myisdefined)
+    if (myisdefined != tocompare->myisdefined)
         isitequal = false;
     
-    if (myphysreg != tocompare.myphysreg)
+    if (myphysreg != tocompare->myphysreg)
         isitequal = false;
         
-    if (myerrorifnotfound != tocompare.myerrorifnotfound)
+    if (myerrorifnotfound != tocompare->myerrorifnotfound)
         isitequal = false;
     
     // Compare the coordinate shift expressions:
-    if (mycoordshift.size() != tocompare.mycoordshift.size())
+    if (mycoordshift.size() != tocompare->mycoordshift.size())
         isitequal = false;
     else
     {
         if (mycoordshift.size() != 0)
         {
             expression cs1 = mycoordshift[0];
-            expression cs2 = tocompare.mycoordshift[0];
+            expression cs2 = tocompare->mycoordshift[0];
         
             // Compare the two expressions:
             if (cs1.countrows() != cs2.countrows() || cs1.countcolumns() != cs2.countcolumns())

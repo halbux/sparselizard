@@ -1959,8 +1959,12 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                 // The pointed field, the physical region and the time derivative must be identical:
                 if (dofs[slice][0]->getfieldpointer() == currentdof->getfieldpointer() && tfs[slice][0]->getfieldpointer() == currenttf->getfieldpointer() && dofs[slice][0]->getphysicalregion() == currentdof->getphysicalregion() && tfs[slice][0]->getphysicalregion() == currenttf->getphysicalregion() && dofs[slice][0]->gettimederivative() == currentdof->gettimederivative() && tfs[slice][0]->gettimederivative() == currenttf->gettimederivative())
                 {
-                    currentslice = slice;
-                    break;
+                    // Make sure the on context is the same (if any):
+                    if (dofs[slice][0]->getfieldpointer() == NULL || ( dofs[slice][0]->getoncontext()->isequal(currentdof->getoncontext()) ))
+                    {
+                        currentslice = slice;
+                        break;
+                    }
                 }
             }
             // If the slice does not yet exist create it.

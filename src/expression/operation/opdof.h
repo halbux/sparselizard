@@ -33,18 +33,11 @@ class opdof: public operation
         
         
         // In case of dof interpolation:
-        bool myison = false;
-        int myonphysreg;
-        bool myerrorifnotfound;
-        // Empty if not shifted:
-        std::vector<expression> mycoordshift;
-        
-        // In case of dof interpolation:
         std::vector<oncontext> myoncontext = {};
     
     public:
         
-        opdof(std::shared_ptr<rawfield> fieldin, int physreg = -1) { myfield = fieldin; myphysicalregion = physreg; };
+        opdof(std::shared_ptr<rawfield> fieldin, int physreg = -1);
         
         void setspacederivative(int whichderivative);
         void increasetimederivativeorder(int amount);
