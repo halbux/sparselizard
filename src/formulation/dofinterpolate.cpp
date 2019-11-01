@@ -1,6 +1,6 @@
 #include "dofinterpolate.h"
 
-/////////////////////////////////////////////////////// + WRITE FCT TO GIVE ERROR IF EITHER NOT ALL DOF OPS ARE ON OR PHYSREG DIFFERENT OR COORDSHIOFT OR ERRORBOOL DIFFERENT!!!!!!!!!!
+
 dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr)
 {
     mydoffield = dofops[0]->getfieldpointer();
@@ -11,33 +11,55 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     myrefcoords = refcoords;
     mynumrefcoords = myrefcoords.size()/3;
     
-    // Make a copy to avoid changing the original:
+    // Copy the element selector to keep it unchanged:
     elementselector elsel = elemselec;
     elsel.selectallelements();
-    std::vector<int> origindexes = elsel.getoriginalindexes();
+    std::vector<int> originalindexes = elsel.getoriginalindexes();
+    
     
     // Calculate the x, y and z coordinates of each reference coordinate to create the rcg object:
-    field x("x"), y("y"), z("z");
+    myxyzcoords = std::vector<double>(3* elemselec.count() * mynumrefcoords);
     
-    myxyzcoords = std::vector<double>(3* elsel.count() * mynumrefcoords);
-
-    densematrix xevaled = (expression(x).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
-    densematrix yevaled = (expression(y).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
-    densematrix zevaled = (expression(z).getoperationinarray(0,0))->interpolate(elsel, myrefcoords, NULL)[1][0];
-
-    double* xvals = xevaled.getvalues(); double* yvals = yevaled.getvalues(); double* zvals = zevaled.getvalues();
-
-    int ind = 0;
-    for (int e = 0; e < elsel.count(); e++)
+    field x("x"), y("y"), z("z");
+    expression xdef, ydef, zdef;
+    xdef = x; ydef = y; zdef = z;
+    
+    std::vector<expression> coordshift = dofops[0]->getcoordshift();
+    if (coordshift.size() > 0)
     {
-        for (int j = 0; j < mynumrefcoords; j++)
+        xdef = x+mathop::compx(coordshift[0]);
+        if (coordshift[0].countrows() > 1)
+            ydef = y+mathop::compy(coordshift[0]);
+        if (coordshift[0].countrows() > 2)
+            zdef = z+mathop::compz(coordshift[0]);
+    }   
+
+    bool isorientationdependent = (coordshift.size() > 0 && (&(coordshift[0]))->isvalueorientationdependent(elsel.getdisjointregions()));
+    std::vector<int> allelnums = elsel.getelementnumbers();
+    elementselector cselsel(elsel.getdisjointregions(), allelnums, isorientationdependent);
+    do
+    {
+        std::vector<int> csorigindexes = cselsel.getoriginalindexes();
+
+        densematrix xevaled = xdef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
+        densematrix yevaled = ydef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
+        densematrix zevaled = zdef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
+
+        double* xvals = xevaled.getvalues(); double* yvals = yevaled.getvalues(); double* zvals = zevaled.getvalues();
+
+        int ind = 0;
+        for (int e = 0; e < cselsel.countinselection(); e++)
         {
-            myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+0] = xvals[ind];
-            myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+1] = yvals[ind];
-            myxyzcoords[3*(origindexes[e]*mynumrefcoords+j)+2] = zvals[ind];
-            ind++;
+            for (int j = 0; j < mynumrefcoords; j++)
+            {
+                myxyzcoords[3*(originalindexes[csorigindexes[e]]*mynumrefcoords+j)+0] = xvals[ind];
+                myxyzcoords[3*(originalindexes[csorigindexes[e]]*mynumrefcoords+j)+1] = yvals[ind];
+                myxyzcoords[3*(originalindexes[csorigindexes[e]]*mynumrefcoords+j)+2] = zvals[ind];
+                ind++;
+            }
         }
     }
+    while (cselsel.next());
         
     
     // Initialise to no coordinate found:
@@ -60,7 +82,7 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     
     
     // Preallocate the matrix containers:
-    int totalnumels = elsel.count();
+    int totalnumels = elemselec.count();
     myvals = std::vector<densematrix>(mydofops.size());
     for (int i = 0; i < mydofops.size(); i++)
         myvals[i] = densematrix(totalnumels, mymaxnumff*mynumrefcoords);
