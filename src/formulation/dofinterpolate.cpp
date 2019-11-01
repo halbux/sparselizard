@@ -3,10 +3,12 @@
 
 dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr)
 {
+    oncontext* myoncontext = dofops[0]->getoncontext();
+
     mydoffield = dofops[0]->getfieldpointer();
     mydofops = dofops;
     mydofmanager = dofmngr;
-    onphysreg = dofops[0]->getonphysicalregion();
+    onphysreg = myoncontext->getphysicalregion();
     std::vector<int> ondisjregs = ((universe::mymesh->getphysicalregions())->get(onphysreg))->getdisjointregions();
     myrefcoords = refcoords;
     mynumrefcoords = myrefcoords.size()/3;
@@ -24,17 +26,18 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     expression xdef, ydef, zdef;
     xdef = x; ydef = y; zdef = z;
     
-    std::vector<expression> coordshift = dofops[0]->getcoordshift();
-    if (coordshift.size() > 0)
+    if (myoncontext->isshifted())
     {
-        xdef = x+mathop::compx(coordshift[0]);
-        if (coordshift[0].countrows() > 1)
-            ydef = y+mathop::compy(coordshift[0]);
-        if (coordshift[0].countrows() > 2)
-            zdef = z+mathop::compz(coordshift[0]);
+        expression shiftexpr = *(myoncontext->getshift());
+    
+        xdef = x+mathop::compx(shiftexpr);
+        if (shiftexpr.countrows() > 1)
+            ydef = y+mathop::compy(shiftexpr);
+        if (shiftexpr.countrows() > 2)
+            zdef = z+mathop::compz(shiftexpr);
     }   
 
-    bool isorientationdependent = (coordshift.size() > 0 && (&(coordshift[0]))->isvalueorientationdependent(elsel.getdisjointregions()));
+    bool isorientationdependent = (myoncontext->isshifted() && myoncontext->getshift()->isvalueorientationdependent(elsel.getdisjointregions()));
     std::vector<int> allelnums = elsel.getelementnumbers();
     elementselector cselsel(elsel.getdisjointregions(), allelnums, isorientationdependent);
     do

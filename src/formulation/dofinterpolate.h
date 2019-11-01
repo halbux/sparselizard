@@ -18,6 +18,7 @@
 #include "disjointregionselector.h"
 #include "elementselector.h"
 #include "hierarchicalformfunction.h"
+#include "oncontext.h"
 #include <memory>
 
 class dofinterpolate

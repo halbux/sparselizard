@@ -38,6 +38,9 @@ class opdof: public operation
         bool myerrorifnotfound;
         // Empty if not shifted:
         std::vector<expression> mycoordshift;
+        
+        // In case of dof interpolation:
+        std::vector<oncontext> myoncontext = {};
     
     public:
         
@@ -70,13 +73,11 @@ class opdof: public operation
         
         void print(void);
         
-        // For dof interpolation:
-        bool ison(void) { return myison; };
         
-        void on(int physreg, expression* coordshift, bool errorifnotfound);
-        int getonphysicalregion(void) { return myonphysreg; };
-        std::vector<expression> getcoordshift(void);
-        bool giveerrorifnotfound(void) { return myerrorifnotfound; };
+        // In case of dof interpolation:
+        bool ison(void);
+        void setoncontext(oncontext& cntxt);
+        oncontext* getoncontext(void);
 
 };
 

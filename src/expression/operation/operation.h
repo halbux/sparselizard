@@ -20,10 +20,12 @@
 #include "selector.h"
 #include "elementselector.h"
 #include "hierarchicalformfunction.h"
+#include "oncontext.h"
 
 // ALL SON-OPERATIONS ARE INCLUDED AT THE END OF THIS HEADER.
 
 class rawfield;
+class oncontext;
 
 class operation : public std::enable_shared_from_this<operation>
 {
@@ -129,12 +131,11 @@ class operation : public std::enable_shared_from_this<operation>
         // Evaluate an operation that only contains x, y and/or z fields without derivatives.
         virtual std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
+        
         // For dof interpolation:
         virtual bool ison(void) {};
-        virtual void on(int physreg, expression* coordshift, bool errorifnotfound) {};
-        virtual int getonphysicalregion(void) {};
-        virtual std::vector<expression> getcoordshift(void) {};
-        virtual bool giveerrorifnotfound(void) {};
+        virtual void setoncontext(oncontext& cntxt) {};
+        virtual oncontext* getoncontext(void) {};
 };
 
 #include "opabs.h"

@@ -1,4 +1,5 @@
 #include "expression.h"
+#include "oncontext.h"
 
 
 expression::expression(field input)
@@ -1759,7 +1760,8 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
                     if (dofs[i][j]->getfieldpointer() != NULL)
                     {
                         curdof = dofs[i][j]->copy();
-                        curdof->on(physreg, coordshift, errorifnotfound);
+                        oncontext ctxt(physreg, coordshift, errorifnotfound);
+                        curdof->setoncontext(ctxt);
                         curterm = std::shared_ptr<opproduct>(new opproduct({curcoef,curdof}));
                     }
                     else
