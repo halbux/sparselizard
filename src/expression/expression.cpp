@@ -1771,6 +1771,7 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
                 }
             }
             onexpr.myoperations[i] = std::shared_ptr<opsum>(new opsum(allterms));
+            onexpr.myoperations[i]->simplify({});
         }
     }
 

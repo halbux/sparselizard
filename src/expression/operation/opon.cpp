@@ -237,7 +237,10 @@ std::shared_ptr<operation> opon::simplify(std::vector<int> disjregs)
 {
     myarg = myarg->simplify(disjregs);
 
-    return shared_from_this();
+    if (myarg->isconstant())
+        return std::shared_ptr<operation>(new opconstant(myarg->getvalue()));
+    else
+        return shared_from_this();
 }
 
 std::shared_ptr<operation> opon::copy(void)
