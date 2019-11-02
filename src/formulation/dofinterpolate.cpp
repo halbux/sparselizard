@@ -158,10 +158,6 @@ void dofinterpolate::eval(void)
             std::vector<int> elemens = rcg.getelements();
             int numrefcoords = kietaphi.size()/3;
             
-            // Keep track of which coordinates were found:
-            for (int c = 0; c < coordindexes.size(); c++)
-                isfound[coordindexes[c]] = true;
-        
             // Evaluate the shape functions for all total orientations and all reference derivatives:
             hfc.evaluate(kietaphi);
             
@@ -193,6 +189,10 @@ void dofinterpolate::eval(void)
                         for (int ep = 0; ep < numrefcoords; ep++)
                         {
                             int callingindex = coordindexes[origindexes[e]*numrefcoords+ep];
+                            
+                            if (isfound[callingindex])
+                                continue;
+                            
                             int callingevalpt = callingindex%mynumrefcoords;
                             int callingelem = (callingindex-callingevalpt)/mynumrefcoords;
                             int rowstart = callingelem * mymaxnumff*mynumrefcoords;
@@ -223,6 +223,9 @@ void dofinterpolate::eval(void)
                 }
                 while (myselector.next());
             }
+            // Keep track of which coordinates were found:
+            for (int c = 0; c < coordindexes.size(); c++)
+                isfound[coordindexes[c]] = true;
         }
     }
     
