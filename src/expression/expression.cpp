@@ -1734,7 +1734,7 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             abort();
         }
         if (myoperations[i]->isdofincluded() == false)
-            onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, myoperations[i], errorifnotfound));
+            onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, onexpr.myoperations[i], errorifnotfound));
         else
         {
             // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftfpolynomial').
