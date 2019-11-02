@@ -52,7 +52,7 @@ void formulation::operator+=(integration integrationobject)
         tfphysreg = integrationphysreg;
 
         // Add the dofs to the dofmanager:
-        if (doffield != NULL)
+        if (doffield != NULL && dofs[slice][0]->ison() == false)
         {
             std::vector<int> dofharms = doffield->getharmonics();
             for (int h = 0; h < dofharms.size(); h++)
