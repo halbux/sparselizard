@@ -1749,17 +1749,17 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
             
             std::vector<std::shared_ptr<operation>> allterms = {};
-            for (int i = 0; i < dofs.size(); i++)
+            for (int m = 0; m < dofs.size(); m++)
             {
-                for (int j = 0; j < dofs[i].size(); j++)
+                for (int n = 0; n < dofs[m].size(); n++)
                 {
                     // The coefficient is a new opon object:
-                    std::shared_ptr<operation> curcoef(new opon(physreg, coordshift, coeffs[i][j]->copy(), errorifnotfound));
+                    std::shared_ptr<operation> curcoef(new opon(physreg, coordshift, coeffs[m][n]->copy(), errorifnotfound));
                     // The dof gets the on tag:
                     std::shared_ptr<operation> curdof, curterm;
-                    if (dofs[i][j]->getfieldpointer() != NULL)
+                    if (dofs[m][n]->getfieldpointer() != NULL)
                     {
-                        curdof = dofs[i][j]->copy();
+                        curdof = dofs[m][n]->copy();
                         oncontext ctxt(physreg, coordshift, errorifnotfound);
                         curdof->setoncontext(ctxt);
                         curterm = std::shared_ptr<opproduct>(new opproduct({curcoef,curdof}));
