@@ -1766,12 +1766,13 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
                     }
                     else
                         curterm = curcoef;
-                    
+			
+                    curterm->simplify({});
+			
                     allterms.push_back(curterm);
                 }
             }
             onexpr.myoperations[i] = std::shared_ptr<opsum>(new opsum(allterms));
-            onexpr.myoperations[i]->simplify({});
         }
     }
 
