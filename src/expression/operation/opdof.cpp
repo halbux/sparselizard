@@ -87,6 +87,12 @@ bool opdof::ison(void)
 
 void opdof::setoncontext(oncontext& cntxt)
 {
+    if (myphysicalregion != -1 && cntxt.isdefined())
+    {
+        std::cout << "Error in 'opdof' object: restricting the dof to a region is not allowed in the 'on' context" << std::endl;
+        abort();
+    }
+
     myoncontext = {cntxt};
 }
 
