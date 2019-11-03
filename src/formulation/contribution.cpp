@@ -1,4 +1,5 @@
 #include "contribution.h"
+#include "dofinterpolate.h"
 
 
 contribution::contribution(std::shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; }
@@ -17,6 +18,8 @@ void contribution::setnumfftcoeffs(int numcoeffs) { numfftcoeffs = numcoeffs; }
 
 void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat, bool computeconstraints)
 {   
+    bool isdofinterpolate = (doffield != NULL && mydofs[0]->ison());
+
     // Get the harmonics in the dof and tf fields. Get the max harmonic numbers as well.
     std::vector<int> tfharms = tffield->getharmonics();
     int maxtfharm = *std::max_element(tfharms.begin(), tfharms.end());
@@ -103,6 +106,9 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         
         // Loop on all total orientations (if required):
         elementselector myselector(mydisjregs, isorientationdependent);
+        dofinterpolate mydofinterp;
+        if (isdofinterpolate)
+            mydofinterp = dofinterpolate(evaluationpoints, myselector, mydofs, mydofmanager);
         do 
         {
             std::vector<int> elementnumbers = myselector.getelementnumbers();
@@ -149,8 +155,16 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     tfformfunctionvalue.multiplycolumns(weights);
                 if (doffield != NULL)
                 {
-                    dofformfunctionvalue = dofval.tomatrix(myselector.gettotalorientation(), dofinterpolationorder, mydofs[term]->getkietaphiderivative(), mydofs[term]->getformfunctioncomponent());
-                    doftimestestfun = tfformfunctionvalue.multiplyallrows(dofformfunctionvalue);
+                    if (isdofinterpolate)
+                    {
+                        dofformfunctionvalue = mydofinterp.getvalues(myselector, term);
+                        doftimestestfun = dofformfunctionvalue.dofinterpoltimestf(tfformfunctionvalue);
+                    }
+                    else
+                    {
+                        dofformfunctionvalue = dofval.tomatrix(myselector.gettotalorientation(), dofinterpolationorder, mydofs[term]->getkietaphiderivative(), mydofs[term]->getformfunctioncomponent());
+                        doftimestestfun = tfformfunctionvalue.multiplyallrows(dofformfunctionvalue);
+                    }
                 }
                 else
                     doftimestestfun = tfformfunctionvalue;
@@ -163,7 +177,14 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     {
                         currentcoeff[h][0].multiplyelementwise(detjac);
                         currentcoeff[h][0].transpose();
-                        currentcoeff[h][0] = doftimestestfun.multiply(currentcoeff[h][0]);
+                        
+                        if (isdofinterpolate)
+                        {
+                            doftimestestfun.multiplycolumns(currentcoeff[h][0]);
+                            currentcoeff[h][0] = doftimestestfun;  
+                        }
+                        else
+                            currentcoeff[h][0] = doftimestestfun.multiply(currentcoeff[h][0]);
                     }
                 }
                 
@@ -223,13 +244,30 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     intdensematrix testfunadresses = mydofmanager->getadresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg, computeconstraints);
                     intdensematrix dofadresses;
                     if (doffield != NULL)
-                        dofadresses = mydofmanager->getadresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg, false);
-
+                    {
+                        if (isdofinterpolate)
+                            dofadresses = mydofinterp.getadresses(myselector, currentdofharm);
+                        else
+                            dofadresses = mydofmanager->getadresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg, false);
+                    }
+                    
                     ///// Duplicate the tf and dof adresses to get an adress matrix of the size of the stiffness matrix.
                     if (doffield != NULL)
                     {
-                        intdensematrix duplicateddofadresses = dofadresses.duplicateallrowstogether(tfformfunctionvalue.countrows());
-                        intdensematrix duplicatedtestfunadresses = testfunadresses.duplicaterowsonebyone(dofformfunctionvalue.countrows());
+                        intdensematrix duplicateddofadresses;
+                        if (isdofinterpolate)
+                            duplicateddofadresses = dofadresses.duplicateallcolstogether(tfformfunctionvalue.countrows());
+                        else
+                            duplicateddofadresses = dofadresses.duplicateallrowstogether(tfformfunctionvalue.countrows());
+                            
+                        intdensematrix duplicatedtestfunadresses;
+                        if (isdofinterpolate)
+                        {
+                            duplicatedtestfunadresses = testfunadresses.transpose();
+                            duplicatedtestfunadresses = duplicatedtestfunadresses.duplicatecolsonebyone(dofadresses.countcolumns());
+                        }
+                        else
+                            duplicatedtestfunadresses = testfunadresses.duplicaterowsonebyone(dofformfunctionvalue.countrows());
                         
                         mymat->accumulate(duplicatedtestfunadresses, duplicateddofadresses, stiffnesses[currenttfharm][currentdofharm][0]);
                     }
