@@ -123,7 +123,7 @@ void dofinterpolate::eval(void)
         // Calculate the reference coordinate positions:
         rcg.evalat(disjregs);
         
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjregs[0]);        
+        int elementtypenumber = mydisjointregions->getelementtypenumber(disjregs[0]);        
         int doforder = mydoffield->getinterpolationorder(disjregs[0]);
 
 
