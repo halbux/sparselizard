@@ -180,8 +180,9 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                         if (isdofinterpolate)
                         {
-                            doftimestestfun.multiplycolumns(currentcoeff[h][0]);
-                            currentcoeff[h][0] = doftimestestfun;  
+                            densematrix dttf = doftimestestfun.copy();
+                            dttf.multiplycolumns(currentcoeff[h][0]);
+                            currentcoeff[h][0] = dttf;  
                         }
                         else
                             currentcoeff[h][0] = doftimestestfun.multiply(currentcoeff[h][0]);
