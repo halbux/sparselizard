@@ -230,7 +230,7 @@ void dofinterpolate::eval(void)
     }
     
     // Do something if some coordinates were not found:
-    if (errorifnotfound)
+    if (mydofops[0]->getoncontext()->iserrorifnotfound())
     {
         for (int i = 0; i < isfound.size(); i++)
         {    

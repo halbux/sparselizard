@@ -25,8 +25,6 @@ class dofinterpolate
 {
     private:
     
-        bool errorifnotfound = true;
-        
         // The dof field:
         std::shared_ptr<rawfield> mydoffield = NULL;
         // Dof operations on the above doffield. Same doffield for all operations!
