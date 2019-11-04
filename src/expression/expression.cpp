@@ -1273,7 +1273,7 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
         rotated = rotated*invKT;
         
     for (int i = 0; i < rotated.myoperations.size(); i++)
-        rotated.myoperations[i]->simplify({});
+        rotated.myoperations[i] = rotated.myoperations[i]->simplify({});
     
     myoperations = rotated.myoperations;
 }
@@ -1767,11 +1767,13 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
                     else
                         curterm = curcoef;
 			
-                    curterm->simplify({});
+                    curterm = curterm->simplify({});
 			
                     allterms.push_back(curterm);
                 }
             }
+            if (allterms.size() == 0)
+                allterms = {std::shared_ptr<opconstant>(new opconstant(0.0))};
             onexpr.myoperations[i] = std::shared_ptr<opsum>(new opsum(allterms));
         }
     }
@@ -1880,7 +1882,10 @@ void expression::expand(void)
 std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftfpolynomial(int elementdimension)
 {
     // Simplify the operation:
-    myoperations[0]->simplify({});
+    myoperations[0] = myoperations[0]->simplify({});
+    
+    if (myoperations[0]->isconstant() && myoperations[0]->getvalue() == 0)
+        return std::vector< std::vector<std::vector<std::shared_ptr<operation>>> >(3, std::vector<std::vector<std::shared_ptr<operation>>>(0));
 
     // To make sure the format of the expression is ok.
     // Otherwise an error is thrown at the end.
