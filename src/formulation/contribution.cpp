@@ -90,7 +90,8 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         if (doffield != NULL)
         {
             dofformfunction = selector::select(elementtypenumber, doffield->gettypename());
-            dofval = *(universe::gethff(doffield->gettypename(), elementtypenumber, dofinterpolationorder, evaluationpoints));
+            if (not(isdofinterpolate))
+                dofval = *(universe::gethff(doffield->gettypename(), elementtypenumber, dofinterpolationorder, evaluationpoints));
         }
         
         // Simplify all coeffs for faster computation later on.
