@@ -1955,6 +1955,9 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             if (currenttf->getfieldpointer() == NULL)
             {
                 std::cout << "Error in 'expression' object: malformed expression provided to the formulation (the test function is missing)" << std::endl;
+                std::cout << "Expression was:" << std::endl;
+                myoperations[0]->print();
+                std::cout << std::endl;
                 abort();
             }
 
@@ -2062,6 +2065,9 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     {
         std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
         std::cout << "The expression should be rewritable into a sum of products of the form coef*dof*tf (derivatives allowed)" << std::endl;
+        std::cout << "Expression was:" << std::endl;
+        myoperations[0]->print();
+        std::cout << std::endl;
         abort();
     }
 
