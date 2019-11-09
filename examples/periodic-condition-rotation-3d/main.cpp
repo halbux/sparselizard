@@ -64,7 +64,7 @@ void sparselizard(void)
     elasticity += periodiccondition(gamma1, gamma2, u, {0,0,0}, {0,0,60});
 
 
-    // Generate, sole and store the solution to field u:
+    // Generate, solve and store the solution to field u:
     solve(elasticity);
 
     // Write the deflection to ParaView .vtk format. Write with an order 2 interpolation.
