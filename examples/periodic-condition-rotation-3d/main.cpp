@@ -3,7 +3,7 @@
 // The central micromembrane is surrounded by 6 identical ones, one every 60 degrees.
 // Assuming a periodic vibration with 60 degrees periodicity allows to reduce the problem to only a 1/6 of the geometry.
 // 
-// In the .nas mesh used the meshes on both faces of the periodic condition doe not match.
+// In the .nas mesh used the meshes on both faces of the periodic condition do not match.
 
 
 #include "sparselizardbase.h"
