@@ -204,6 +204,7 @@ class expression
         expression atan(void);
         expression abs(void);
         expression log10(void);
+        expression mod(double modval);
         
         expression on(int physreg, expression* coordshift, bool errorifnotfound);
         

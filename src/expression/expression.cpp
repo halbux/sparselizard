@@ -1715,6 +1715,16 @@ expression expression::log10(void)
     return log10expr;
 }
 
+expression expression::mod(double modval)
+{
+    expression modexpr = this->getcopy();
+
+    for (int i = 0; i < mynumrows*mynumcols; i++)
+        modexpr.myoperations[i] = std::shared_ptr<opmod>(new opmod(myoperations[i], modval));
+
+    return modexpr;
+}
+
 expression expression::on(int physreg, expression* coordshift, bool errorifnotfound)
 {
     int problemdimension = universe::mymesh->getmeshdimension();

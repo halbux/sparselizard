@@ -119,6 +119,7 @@ class densematrix
         void acos(void);
         void atan(void);
         void log10(void);
+        void mod(double modval);
 
         // Get the max value:
         double max(void);

@@ -457,6 +457,14 @@ void densematrix::log10(void)
         myvaluesptr[i] = std::log10(myvaluesptr[i]);
 }
 
+void densematrix::mod(double modval)
+{
+    double* myvaluesptr = myvalues.get();
+
+    for (long long int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] = std::fmod(myvaluesptr[i], modval);
+}
+
 double densematrix::max(void)
 {
     errorifempty();
