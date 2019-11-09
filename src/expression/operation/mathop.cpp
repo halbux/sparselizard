@@ -1063,8 +1063,11 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
     expression tfu = tf(u);
     expression dofu = dof(u);
     
-    tfu.resize(3,1);
-    tfu.resize(3,1);
+    if (numcomp > 1)
+    {
+        tfu.resize(3,1);
+        tfu.resize(3,1);
+    }
     
     // For a translation:
     if (dat2.size() == 1)
@@ -1094,24 +1097,24 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
         invmapexpr.rotate(-dat2[0], 0, 0);
         invmapexpr = invmapexpr + array3x1(dat1[0],dat1[1],dat1[2]) - array3x1(x,y,z);
 
-        tfu.rotate(0,0, -dat2[2]);
-        tfu.rotate(0, -dat2[1], 0);
-        tfu.rotate(-dat2[0], 0, 0);
-        
-        dofu.rotate(0,0, -dat2[2]);
-        dofu.rotate(0, -dat2[1], 0);
-        dofu.rotate(-dat2[0], 0, 0);
+        if (numcomp > 1)
+            {
+            tfu.rotate(0,0, -dat2[2]);
+            tfu.rotate(0, -dat2[1], 0);
+            tfu.rotate(-dat2[0], 0, 0);
+            
+            dofu.rotate(0,0, -dat2[2]);
+            dofu.rotate(0, -dat2[1], 0);
+            dofu.rotate(-dat2[0], 0, 0);
+        }
     }
     
-    tfu.resize(numcomp,1);
-    dofu.resize(numcomp,1);
-    
-    // Scalars are unchanged by a rotation:
-    if (numcomp == 1)
+    if (numcomp > 1)
     {
-        tfu = tf(u);
-        dofu = dof(u);
+        tfu.resize(numcomp,1);
+        dofu.resize(numcomp,1);
     }
+    
     
     // Create the integration object to output:
     std::vector<integration> output(3);
