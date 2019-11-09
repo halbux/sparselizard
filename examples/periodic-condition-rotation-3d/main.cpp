@@ -84,7 +84,7 @@ void sparselizard(void)
 
 void processmesh(void)
 {
-    // Define the central electrode, outer electrode and clamp regions as well as the regions to apply the periodic conditions.
+    // Define the central electrode, outer electrode and clamp regions as well as the regions to apply the periodic condition.
     int elecc = 1, eleco = 2, clamp = 3, side1 = 4, side2 = 5;
 
     mesh mymesh1;
