@@ -34,6 +34,7 @@ fi
 # Copy the example to the main directory: 
 cp examples/$i/main.cpp ./;
 cp examples/$i/*.msh ./ 2>/dev/null;
+cp examples/$i/*.nas ./ 2>/dev/null;
 cp examples/$i/*.txt ./ 2>/dev/null;
 
 # Compile the current example
@@ -65,6 +66,8 @@ echo 'ALL OK!';
 
 # CLEAN:
 
+rm *.msh;
+rm *.nas;
 rm *.pos;
 rm *.vtk;
 rm *.vtu;
