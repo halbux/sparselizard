@@ -34,6 +34,8 @@ class integration
         // Set it true if this object corresponds to project zero.
         bool isprojectionofzero = false;
         
+        integration(void) {};
+        
         integration(int physreg, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
         integration(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
         // For the multiharmonic computation an extra integer is required 
