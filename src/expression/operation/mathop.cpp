@@ -1066,7 +1066,7 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
     if (numcomp > 1)
     {
         tfu.resize(3,1);
-        tfu.resize(3,1);
+        dofu.resize(3,1);
     }
     
     // For a translation:
@@ -1098,7 +1098,7 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
         invmapexpr = invmapexpr + array3x1(dat1[0],dat1[1],dat1[2]) - array3x1(x,y,z);
 
         if (numcomp > 1)
-            {
+        {
             tfu.rotate(0,0, -dat2[2]);
             tfu.rotate(0, -dat2[1], 0);
             tfu.rotate(-dat2[0], 0, 0);
