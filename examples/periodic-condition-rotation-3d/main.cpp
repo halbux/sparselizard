@@ -15,7 +15,7 @@ void processmesh(void);
 
 void sparselizard(void)
 {	
-    // Name the regions for the inner and outer electrode, the clamp and the regions 'gamma' on which to apply the periodic conditions:
+    // Name the regions for the inner and outer electrode, the clamp and the regions 'gamma' on which to apply the periodic condition:
     int electrodein = 1, electrodeout = 2, clamp = 3, gamma1 = 4, gamma2 = 5, cavity = 3000007, solid = 3000008, all = 3000009;
 
     // Define all regions needed in the source .nas mesh and save it in .msh format.
