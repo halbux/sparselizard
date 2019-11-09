@@ -85,7 +85,7 @@ void sparselizard(void)
 void processmesh(void)
 {
     // Define the central electrode, outer electrode and clamp regions as well as the regions to apply the periodic condition.
-    int elecc = 1, eleco = 2, clamp = 3, side1 = 4, side2 = 5;
+    int elecc = 1, eleco = 2, clamp = 3, gamma1 = 4, gamma2 = 5;
 
     mesh mymesh1;
 
@@ -104,7 +104,7 @@ void processmesh(void)
     mymesh2.boxselection(elecc, 3000001, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
     mymesh2.boxselection(eleco, 3000006, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
     mymesh2.boxselection(clamp, all, 2, {-10,10,-10,10,-1e-10,1e-10});
-    mymesh2.boxselection(side1, all, 2, {-10,10,-1e-10,1e-10,-10,10});
+    mymesh2.boxselection(gamma1, all, 2, {-10,10,-1e-10,1e-10,-10,10});
 
     mymesh2.load("cmutperiodic.msh", 0);
 
@@ -114,7 +114,7 @@ void processmesh(void)
 
     mesh mymesh3;
 
-    mymesh3.boxselection(side2, all, 2, {-10,10,-1e-10,1e-10,-10,10});
+    mymesh3.boxselection(gamma2, all, 2, {-10,10,-1e-10,1e-10,-10,10});
 
     mymesh3.load("cmutperiodic.msh", 0);
 
