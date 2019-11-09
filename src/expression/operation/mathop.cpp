@@ -1030,6 +1030,99 @@ expression mathop::predefinedviscousforce(expression dofv, expression tfv, expre
 
 ////////// PREDEFINED FORMULATIONS
 
+std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, int lagmultorder)
+{
+    if (dat1.size() != 3)
+    {
+        std::cout << "Error in 'mathop' namespace: expected a vector of length 3 as fourth argument" << std::endl;
+        abort();
+    }
+    if (dat2.size() != 1 && dat2.size() != 3)
+    {
+        std::cout << "Error in 'mathop' namespace: expected a vector of length 1 or 3 as fifth argument" << std::endl;
+        abort();
+    }
+
+    // Create the Lagrange multiplier field:
+    std::shared_ptr<rawfield> ptr = u.getpointer();
+    std::string fieldtype = ptr->gettypename();
+    int numsubfields = ptr->countsubfields();
+    if (numsubfields == 2)
+        fieldtype = fieldtype+"xy";
+    if (numsubfields == 3)
+        fieldtype = fieldtype+"xyz";
+    std::vector<int> harms = ptr->getharmonics();
+
+    field lambda(fieldtype, harms);
+    lambda.setorder(gamma1, lagmultorder);
+    
+    int numcomp = expression(lambda).countrows();
+
+    // Create the face to face mapping expression:
+    expression mapexpr, invmapexpr;
+    expression tfu = tf(u);
+    expression dofu = dof(u);
+    
+    tfu.resize(3,1);
+    tfu.resize(3,1);
+    
+    // For a translation:
+    if (dat2.size() == 1)
+    {
+        // First norm the direction vector:
+        double normval = std::sqrt(dat1[0]*dat1[0] + dat1[1]*dat1[1] + dat1[2]*dat1[2]);
+        dat1[0] = dat1[0]/normval; dat1[1] = dat1[1]/normval; dat1[2] = dat1[2]/normval;
+        
+        double shiftlen = dat2[0];
+    
+        mapexpr = array3x1(shiftlen*dat1[0], shiftlen*dat1[1], shiftlen*dat1[2]);
+        invmapexpr = -mapexpr;
+    }
+
+    // For a rotation:
+    if (dat2.size() == 3)
+    {
+        field x("x"), y("y"), z("z");
+        
+        mapexpr = array3x1(x-dat1[0],y-dat1[1],z-dat1[2]);
+        mapexpr.rotate(dat2[0], dat2[1], dat2[2]);
+        mapexpr = mapexpr + array3x1(dat1[0],dat1[1],dat1[2]) - array3x1(x,y,z);
+        
+        invmapexpr = array3x1(x-dat1[0],y-dat1[1],z-dat1[2]);
+        invmapexpr.rotate(0,0, -dat2[2]);
+        invmapexpr.rotate(0, -dat2[1], 0);
+        invmapexpr.rotate(-dat2[0], 0, 0);
+        invmapexpr = invmapexpr + array3x1(dat1[0],dat1[1],dat1[2]) - array3x1(x,y,z);
+
+        tfu.rotate(0,0, -dat2[2]);
+        tfu.rotate(0, -dat2[1], 0);
+        tfu.rotate(-dat2[0], 0, 0);
+        
+        dofu.rotate(0,0, -dat2[2]);
+        dofu.rotate(0, -dat2[1], 0);
+        dofu.rotate(-dat2[0], 0, 0);
+    }
+    
+    tfu.resize(numcomp,1);
+    dofu.resize(numcomp,1);
+    
+    // Scalars are unchanged by a rotation:
+    if (numcomp == 1)
+    {
+        tfu = tf(u);
+        dofu = dof(u);
+    }
+    
+    // Create the integration object to output:
+    std::vector<integration> output(3);
+    
+    output[0] = integral(gamma1, dof(lambda)*tf(u));
+    output[1] = integral(gamma2, -on(gamma1, invmapexpr, dof(lambda)) * tfu);
+    output[2] = integral(gamma1, (dof(u) - on(gamma2, mapexpr, dofu)) * tf(lambda));
+
+    return output;
+}
+
 expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
 {
     // Elasticity matrix:

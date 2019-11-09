@@ -187,6 +187,8 @@ namespace mathop
 
 
     ////////// PREDEFINED FORMULATIONS
+    
+    std::vector<integration> periodiccondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, int lagmultorder = 1);
 
     // Isotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
