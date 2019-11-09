@@ -59,6 +59,7 @@ class formulation
         
         // The following adds the contribution defined in the integration object.
         void operator+=(integration integrationobject);
+        void operator+=(std::vector<integration> integrationobject);
         
         int countdofs(void);
         

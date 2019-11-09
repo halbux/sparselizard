@@ -3,6 +3,12 @@
 
 formulation::formulation(void) { mydofmanager = std::shared_ptr<dofmanager>(new dofmanager); }
 
+void formulation::operator+=(std::vector<integration> integrationobject)
+{
+    for (int i = 0; i < integrationobject.size(); i++)
+        *this += integrationobject[i];
+}
+
 void formulation::operator+=(integration integrationobject)
 {
     int integrationphysreg = integrationobject.getphysicalregion();
