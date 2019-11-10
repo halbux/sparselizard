@@ -53,8 +53,8 @@ void sparselizard(void)
     elasticity += integral(solid, predefinedelasticity(dof(u), tf(u), E, nu));
     // Add a pressure load at frequency f0 on both inner and outer electrodes:
     double p = 1e5;
-    elasticity += integral(electrodein, -p*compz(tf(u)));
-    elasticity += integral(electrodeout, -p*compz(tf(u)));
+    elasticity += integral(electrodein, -p*compz(tf(u.harmonic(2))));
+    elasticity += integral(electrodeout, -p*compz(tf(u.harmonic(2))));
     // Add the inertia term:
     elasticity += integral(solid, -rho*dtdt(dof(u))*tf(u));
 
