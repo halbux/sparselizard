@@ -51,10 +51,10 @@ void sparselizard(void)
 
     // The linear elasticity formulation is classical and thus predefined:
     elasticity += integral(solid, predefinedelasticity(dof(u), tf(u), E, nu));
-    // Add a pressure load at frequency f0 on both inner and outer electrodes:
+    // Add a pressure load at frequency f0 on both the inner and outer electrode:
     double p = 1e5;
-    elasticity += integral(electrodein, -p*compz(tf(u.harmonic(2))));
-    elasticity += integral(electrodeout, -p*compz(tf(u.harmonic(2))));
+    elasticity += integral(electrodein, -p*compz(tf(u)));
+    elasticity += integral(electrodeout, -p*compz(tf(u)));
     // Add the inertia term:
     elasticity += integral(solid, -rho*dtdt(dof(u))*tf(u));
 
