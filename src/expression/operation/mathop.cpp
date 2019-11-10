@@ -1045,15 +1045,7 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
 
     // Create the Lagrange multiplier field:
     std::shared_ptr<rawfield> ptr = u.getpointer();
-    std::string fieldtype = ptr->gettypename();
-    int numsubfields = ptr->countsubfields();
-    if (numsubfields == 2)
-        fieldtype = fieldtype+"xy";
-    if (numsubfields == 3)
-        fieldtype = fieldtype+"xyz";
-    std::vector<int> harms = ptr->getharmonics();
-
-    field lambda(fieldtype, harms);
+    field lambda(ptr->gettypename(false), ptr->getharmonics());
     lambda.setorder(gamma1, lagmultorder);
     
     int numcomp = expression(lambda).countrows();

@@ -189,6 +189,21 @@ void rawfield::print(void)
         std::cout << myname;
 }
 
+std::string rawfield::gettypename(bool familyonly)
+{
+    std::string out = mytypename;
+
+    if (familyonly == false)
+    {
+        if (mysubfields.size() == 2)
+            out = out+"xy";
+        if (mysubfields.size() == 3)
+            out = out+"xyz";
+    }
+    
+    return out;
+}
+
 void rawfield::setorder(int physreg, int interpolorder)
 {
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")

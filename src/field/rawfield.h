@@ -116,7 +116,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void print(void);
         // Set the raw field name:
         void setname(std::string name) { myname = name; };
-        std::string gettypename(void) { return mytypename; };
+        std::string gettypename(bool familyonly = true);
 
         void setorder(int physreg, int interpolorder);
         
