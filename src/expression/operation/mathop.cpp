@@ -1057,8 +1057,8 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
     
     if (numcomp > 1)
     {
-        tfu.resize(3,1);
-        dofu.resize(3,1);
+        tfu = tfu.resize(3,1);
+        dofu = dofu.resize(3,1);
     }
     
     // For a translation:
@@ -1103,8 +1103,8 @@ std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field
     
     if (numcomp > 1)
     {
-        tfu.resize(numcomp,1);
-        dofu.resize(numcomp,1);
+        tfu = tfu.resize(numcomp,1);
+        tfu = dofu.resize(numcomp,1);
     }
     
     
