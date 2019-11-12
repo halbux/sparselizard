@@ -1060,12 +1060,12 @@ std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, fi
 {
     if (dat1.size() != 3)
     {
-        std::cout << "Error in 'mathop' namespace: in 'periodiccondition' expected a vector of length 3 as fourth argument" << std::endl;
+        std::cout << "Error in 'mathop' namespace: in 'periodicitycondition' expected a vector of length 3 as fourth argument" << std::endl;
         abort();
     }
     if (dat2.size() != 1 && dat2.size() != 3)
     {
-        std::cout << "Error in 'mathop' namespace: in 'periodiccondition' expected a vector of length 1 or 3 as fifth argument" << std::endl;
+        std::cout << "Error in 'mathop' namespace: in 'periodicitycondition' expected a vector of length 1 or 3 as fifth argument" << std::endl;
         abort();
     }
 
