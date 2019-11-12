@@ -61,7 +61,7 @@ void sparselizard(void)
 
     // Add the periodic condition between gamma1 and gamma2.
     // Region gamma2 is obtained from gamma1 by a 60 degrees rotation around z (rotation center is the origin).
-    elasticity += periodiccondition(gamma1, gamma2, u, {0,0,0}, {0,0,60});
+    elasticity += periodicitycondition(gamma1, gamma2, u, {0,0,0}, {0,0,60});
 
 
     // Generate, solve and store the solution to field u:

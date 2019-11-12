@@ -1056,7 +1056,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     return output;
 }
 
-std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, int lagmultorder)
+std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, int lagmultorder)
 {
     if (dat1.size() != 3)
     {
