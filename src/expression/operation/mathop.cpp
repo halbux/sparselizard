@@ -1035,6 +1035,13 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
     std::shared_ptr<rawfield> ptr2 = u2.getpointer();
     
+    // Dofs on gamma1 and gamma2 must be different:
+    if (ptr1 == ptr2)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected different fields for u1 and u2" << std::endl;
+        abort();
+    }
+    
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
     {
