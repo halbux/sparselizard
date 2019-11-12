@@ -1030,6 +1030,32 @@ expression mathop::predefinedviscousforce(expression dofv, expression tfv, expre
 
 ////////// PREDEFINED FORMULATIONS
 
+std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
+{
+    std::shared_ptr<rawfield> ptr1 = u1.getpointer();
+    std::shared_ptr<rawfield> ptr2 = u2.getpointer();
+    
+    // Make sure the fields are similar:
+    if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
+        abort();
+    }
+    
+    // Create the Lagrange multiplier field:
+    field lambda(ptr1->gettypename(false), ptr1->getharmonics());
+    lambda.setorder(gamma1, lagmultorder);
+
+    // Create the integration object to output:
+    std::vector<integration> output(3);
+    
+    output[0] = integral(gamma1, dof(lambda)*tf(u1));
+    output[1] = integral(gamma2, -on(gamma1, dof(lambda), errorifnotfound) * tf(u2));
+    output[2] = integral(gamma1, (dof(u1) - on(gamma2, dof(u2), errorifnotfound)) * tf(lambda));
+
+    return output;
+}
+
 std::vector<integration> mathop::periodiccondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, int lagmultorder)
 {
     if (dat1.size() != 3)
