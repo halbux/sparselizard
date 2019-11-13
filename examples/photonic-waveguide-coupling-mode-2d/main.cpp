@@ -1,43 +1,44 @@
-// This code simulates the coupling between 2 dielectric photonic waveguide.
-// To do so, we need to evaluate the propagation modes of the waveguides whoose 
-// cross sectional geometry is represented in 2D.
-// Propagation is supposed to be along the z axis.
-// The geometry considered is a rectangular waveguide burried in a clad.
-// An optically isotropic material is considered here.
-// To solve this eigenvalue problem and lift undtermination regarding the Z component,
-// a split of the electric field into transverses and longitudinal components is needed.
-// Since the desired mode is supposed to be confined in the wageguide
-// a perfect conductor BC type set at the outer boundary is valid, as long as 
-// the domain is big enough compared to the waveguide dimensions.
+// This code simulates the eigenmodes of two nearby rectangular SiN dielectric photonic 
+// waveguides burried in a SiO2 clad. To do so the 2D cross sectional geometry is 
+// considered and the propagation is assumed to be along the z axis.
+// To solve this eigenvalue problem in 2D while taking into account the z component
+// the electric field is split into a transverse and a longitudinal part.
+// Since the searched modes are confined in and around the waveguide, a perfect 
+// conductor boundary condition is valid, as long as the domain is large compared 
+// to the waveguide dimensions.
+//
+// More details can be found in 'NASA technical paper 3485'.
+//
+//
+// The waveguides are 500 nm wide and 250 nm heigh. Their spacing is 100 nm.
+//       _____________________________________________________
+//      |                                                     |
+//      |   SiO2      ___________     ___________             |
+//      |            |           |   |           |            |
+//      |            |    SiN    |   |    SiN    |            |
+//      |            |___________|   |___________|            |
+//      |                                                     |
+//      |_____________________________________________________|
 //
 // Credits: R. Haouari
 
 #include "sparselizardbase.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 
 using namespace mathop;
-
-// A gives the waveguide width
-// B gives the waveguide height
-// D is the distance bewteen waveguides
-mesh createmesh(double a, double b, double d);
 
 void sparselizard(void)
 {	
     // Give names to the physical region numbers :
-    int wavg1 = 1, wavg2=2, cross = 3,bound=4, wavg_bound=5;
-    //Create mesh
-    mesh mymesh = createmesh(.5e-6,.25e-6,100e-9);
-    mymesh.write("opticalwaveguide.msh");
-    //Create new regions through boolean operation:
-    int clad=regionexclusion(cross, regionunion({wavg1,wavg2})), edges=regionunion({bound,wavg_bound});
-    //recover the edges lost from the regionexclusion process 
-    clad=regionunion({clad,wavg_bound});
-    //geometry edge plotting
-    expression(1).write(edges,"edge.vtu");
+    int wavg1 = 1, wavg2 = 2, clad = 3, all = 4, bound = 5, wgskin = 6;
+
+    mesh mymesh;
+    mymesh.regionskin(bound, all);
+    mymesh.load("optical_waveguide.msh");
+    
+    int waveguides = regionunion({wavg1, wavg2});
+    
+    // Waveguide boundary plotting:
+    expression(1).write(regionintersection({waveguides, clad}), "skin.vtu");
 
 
     wallclock clk;
@@ -45,12 +46,11 @@ void sparselizard(void)
     // Edge shape functions 'hcurl' for the tranverse electric field Et.
     // Nodal shape functions 'h1' for the longitudinal electric field El.
     // Fields x, y and z are the x, y and z coordinate fields.
-    field Et("hcurl"), El ("h1"), x("x"), y("y"),z("z"),nor("h1xyz");
+    field Et("hcurl"), El ("h1"), x("x"), y("y"),z("z");
 
     // Use interpolation order 2 on the whole domain:
-    Et.setorder(cross, 2);
-    El.setorder(cross, 2);
-    nor.setorder(bound,2);
+    Et.setorder(all, 2);
+    El.setorder(all, 2);
 
     //unit vectors used for projection along the X Y Z directions
     expression ex(3,1,{1,0,0});
@@ -64,8 +64,8 @@ void sparselizard(void)
     n|clad=1.4;
     n|wavg1=2;
     n|wavg2=2;
-    epsr|cross=n*n;
-    mur|cross=1;
+    epsr|all=n*n;
+    mur|all=1;
     // light property
     double lmb = 680e-9, c = 299792458, f0=c/lmb,k0 = 2*getpi()/lmb;
     std::cout<<endl<<"lmb= "<< lmb*1e9<<" nm   f0= "<<f0<<" Hz   k0= "<<k0<<" m-1    "<<endl<<endl;
@@ -92,11 +92,11 @@ void sparselizard(void)
 
     formulation mode;
 
-    mode += integral(cross, curl(dof(Et))*curl(tf(Et))- k0*k0*mur*epsr*(dof(Et))*tf(Et));
-    mode += integral(cross, dtdtgradEl*tf(Et)+ dtdt(dof(Et))*tf(Et));
+    mode += integral(all, curl(dof(Et))*curl(tf(Et))- k0*k0*mur*epsr*(dof(Et))*tf(Et));
+    mode += integral(all, dtdtgradEl*tf(Et)+ dtdt(dof(Et))*tf(Et));
 
-    mode += integral(cross, dtdtgradEl*gradtfEl+dtdt(dof(Et))*gradtfEl);
-    mode += integral(cross, -k0*k0*mur*epsr*dtdt(dof(El))*tf(El));	
+    mode += integral(all, dtdtgradEl*gradtfEl+dtdt(dof(Et))*gradtfEl);
+    mode += integral(all, -k0*k0*mur*epsr*dtdt(dof(El))*tf(El));	
 
     // Generate the algebraic system Ax = b:
     mode.generate();
@@ -140,8 +140,8 @@ void sparselizard(void)
         if( myrealeigenvalues[i] < 0 )
         {
             // Transfer the data from the ith eigenvector to field Et and El:
-            Et.setdata(cross, myrealeigenvectors[i]);
-            El.setdata(cross, myrealeigenvectors[i]);
+            Et.setdata(all, myrealeigenvectors[i]);
+            El.setdata(all, myrealeigenvectors[i]);
 
             //compute propagation constant and effective refractive index
             btc=sqrt(abs(myrealeigenvalues[i]));
@@ -164,36 +164,6 @@ void sparselizard(void)
 
     std::cout<<endl;
     clk.print("Total time elapsed:");
-}
-
-mesh createmesh(double a, double b, double d)
-{
-    // Give names to the physical region numbers:
-    int wavg1 = 1, wavg2=2, cross = 3,bound=4, wavg_bound=5;
-
-    int sclx=7,scly=7;//choose odd integer number !!!
-    double dx=sclx*a, dy=scly*b;
-
-    // Number of mesh layers in the waveguide:
-    int nx = 21,ny=21;
-
-
-    // whole cross-section
-    shape whole("quadrangle", cross , {-dx/2,-dy/2,0, dx/2,-dy/2,0, dx/2,dy/2,0, -dx/2,dy/2,0}, {sclx*(nx-1)+1,scly*(ny-1)+1,sclx*(nx-1)+1,scly*(ny-1)+1});
-    shape guide1("quadrangle", wavg1 , {-a-d/2,-b/2,0, -d/2,-b/2,0, -d/2,b/2,0, -a-d/2,b/2,0}, {nx,ny,nx,ny});
-    shape guide2("quadrangle", wavg2 , {d/2,-b/2,0, a+d/2,-b/2,0, a+d/2,b/2,0, d/2,b/2,0}, {nx,ny,nx,ny});
-
-
-    // Provide to the mesh all shapes of interest:
-    mesh mymesh;
-
-    mymesh.regionskin(bound,cross);
-    mymesh.regionskin(wavg_bound,wavg1);
-    mymesh.regionskin(wavg_bound,wavg2);
-
-    mymesh.load({whole,guide1,guide2});
-
-    return mymesh;
 }
 
 int main(void)
