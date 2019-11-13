@@ -10,7 +10,7 @@
 // More details can be found in 'NASA technical paper 3485'.
 //
 //
-// The waveguides are 500 nm wide and 250 nm heigh. Their spacing is 100 nm.
+// The waveguides are 500 nm wide and 250 nm high. Their spacing is 100 nm.
 //       _____________________________________________________
 //      |                                                     |
 //      |   SiO2      ___________     ___________             |
