@@ -9,6 +9,8 @@
 // Since the desired mode is supposed to be confined in the wageguide
 // a perfect conductor BC type set at the outer boundary is valid, as long as 
 // the domain is big enough compared to the waveguide dimensions.
+//
+// Credits: R. Haouari
 
 #include "sparselizardbase.h"
 #include <iostream>
