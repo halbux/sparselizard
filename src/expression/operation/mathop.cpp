@@ -1063,6 +1063,109 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     return output;
 }
 
+std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
+{
+    std::shared_ptr<rawfield> ptr1 = u1.getpointer();
+    std::shared_ptr<rawfield> ptr2 = u2.getpointer();
+    
+    // Dofs on gamma1 and gamma2 must be different:
+    if (ptr1 == ptr2)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected different fields for u1 and u2" << std::endl;
+        abort();
+    }
+    
+    // Make sure the fields are similar:
+    if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
+        abort();
+    }
+    
+    if (rotcent.size() != 3)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected a vector of length 3 as fifth argument" << std::endl;
+        abort();
+    }
+    
+    if (factor != -1 && factor != 1)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the factor must be -1 or 1" << std::endl;
+        abort();
+    }
+    
+    // Create the Lagrange multiplier field:
+    field lambda(ptr1->gettypename(false), ptr1->getharmonics());
+    lambda.setorder(gamma1, lagmultorder);
+    
+    int numcomp = expression(lambda).countrows();
+
+    // Create the face to face mapping expression:
+    expression mapexpr, invmapexpr;
+    expression tfu = tf(u2);
+    expression dofu = dof(u2);
+    
+    if (numcomp > 1)
+    {
+        tfu = tfu.resize(3,1);
+        dofu = dofu.resize(3,1);
+    }
+    
+    field x("x"), y("y"), z("z");
+    
+    expression centered = array3x1(x-rotcent[0],y-rotcent[1],z);
+    
+    expression radius = sqrt( compx(centered)*compx(centered) + compy(centered)*compy(centered) );
+    
+    mapexpr = centered;
+    mapexpr.rotate(0,0,rotangz);
+    // Calculate the angle for the rotated coordinates:
+    expression mapangle = acos( compx(mapexpr)/radius );
+    mapangle = ifpositive(compy(mapexpr), mapangle, -mapangle);
+    // Take the angular modulo:
+	expression mapmod = mapexpr;
+	mapmod.rotate(0,0,-angzmod);
+    mapexpr = ifpositive(mapangle - angzmod*getpi()/180.0, mapmod, mapexpr);
+    expression doffact = ifpositive(mapangle - angzmod*getpi()/180.0, factor, 1.0);
+    mapexpr = mapexpr + array3x1(rotcent[0],rotcent[1],0) - array3x1(x,y,z);
+    
+    invmapexpr = centered;
+    invmapexpr.rotate(0,0,-rotangz);
+    // Calculate the angle for the rotated coordinates:
+    expression invmapangle = acos( compx(invmapexpr)/radius );
+    invmapangle = ifpositive(compy(invmapexpr), invmapangle, -invmapangle);
+    // Take the angular modulo:
+	expression invmapmod = invmapexpr;
+	invmapmod.rotate(0,0,angzmod);
+    invmapexpr = ifpositive(-invmapangle, invmapmod, invmapexpr);
+    expression tffact = ifpositive(-invmapangle, factor, 1.0);
+    invmapexpr = invmapexpr + array3x1(rotcent[0],rotcent[1],0) - array3x1(x,y,z);
+    
+    if (numcomp > 1)
+    {
+        tfu.rotate(0,0, -rotangz);
+    //    tfu = ifpositive(invmapangle-origangle - angzmod, invmapmod, invmapexpr);
+        
+        dofu.rotate(0,0, -rotangz);
+    }
+    
+    if (numcomp > 1)
+    {
+        tfu = tfu.resize(numcomp,1);
+        dofu = dofu.resize(numcomp,1);
+    }
+    
+    
+    // Create the integration object to output:
+    std::vector<integration> output(3);
+    
+    output[0] = integral(gamma1, dof(lambda)*tf(u1));
+    output[1] = integral(gamma2, -on(gamma1, invmapexpr, dof(lambda)) * tffact * tfu);
+    output[2] = integral(gamma1, (dof(u1) - doffact * on(gamma2, mapexpr, dofu)) * tf(lambda));
+
+    return output;
+}
+
 std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
 {
     if (dat1.size() != 3)
