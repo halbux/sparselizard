@@ -1143,10 +1143,15 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     
     if (numcomp > 1)
     {
-        tfu.rotate(0,0, -rotangz);
-    //    tfu = ifpositive(invmapangle-origangle - angzmod, invmapmod, invmapexpr);
-        
-        dofu.rotate(0,0, -rotangz);
+        expression rotmat, theta;
+    
+        theta = ifpositive(mapangle - angzmod*getpi()/180.0, mapangle-angzmod*getpi()/180.0, mapangle);
+        rotmat = array3x3(cos(theta),-sin(theta),0, sin(theta),cos(theta),0, 0,0,1);
+        dofu = rotmat*dofu;
+    
+        theta = ifpositive(-invmapangle, invmapangle+angzmod*getpi()/180.0, invmapangle);
+        rotmat = array3x3(cos(theta),-sin(theta),0, sin(theta),cos(theta),0, 0,0,1);
+        tfu = rotmat*tfu;
     }
     
     if (numcomp > 1)
