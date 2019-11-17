@@ -1064,7 +1064,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
 }
 
 std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
-{
+{       
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
     std::shared_ptr<rawfield> ptr2 = u2.getpointer();
     
@@ -1091,6 +1091,18 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     if (factor != -1 && factor != 1)
     {
         std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the factor must be -1 or 1" << std::endl;
+        abort();
+    }
+
+    if (angzmod < 0.0 || angzmod > 360.0)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the angular modulo should be in range [0,360]" << std::endl;
+        abort();
+    }
+
+    if (rotangz < 0.0 || rotangz > angzmod)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the rotation angle should be in range [0,angzmod]" << std::endl;
         abort();
     }
     
