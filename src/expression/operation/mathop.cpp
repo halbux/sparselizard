@@ -1123,8 +1123,8 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     expression mapangle = acos( compx(mapexpr)/radius );
     mapangle = ifpositive(compy(mapexpr), mapangle, -mapangle);
     // Take the angular modulo:
-	expression mapmod = mapexpr;
-	mapmod.rotate(0,0,-angzmod);
+    expression mapmod = mapexpr;
+    mapmod.rotate(0,0,-angzmod);
     mapexpr = ifpositive(mapangle - angzmod*getpi()/180.0, mapmod, mapexpr);
     expression doffact = ifpositive(mapangle - angzmod*getpi()/180.0, factor, 1.0);
     mapexpr = mapexpr + array3x1(rotcent[0],rotcent[1],0) - array3x1(x,y,z);
@@ -1135,8 +1135,8 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     expression invmapangle = acos( compx(invmapexpr)/radius );
     invmapangle = ifpositive(compy(invmapexpr), invmapangle, -invmapangle);
     // Take the angular modulo:
-	expression invmapmod = invmapexpr;
-	invmapmod.rotate(0,0,angzmod);
+    expression invmapmod = invmapexpr;
+    invmapmod.rotate(0,0,angzmod);
     invmapexpr = ifpositive(-invmapangle, invmapmod, invmapexpr);
     expression tffact = ifpositive(-invmapangle, factor, 1.0);
     invmapexpr = invmapexpr + array3x1(rotcent[0],rotcent[1],0) - array3x1(x,y,z);
