@@ -50,7 +50,7 @@ void sparselizard(void)
 	// 
 	// curl h = 0
 	// 
-	// One can thus define a magnetic scalar potential 'phi' such that h = -grad(phi)
+	// One can thus define a magnetic scalar potential 'phi' such that h = -grad(phi).
 	//
 	// Considering also that div(b) = 0 we get
 	//
