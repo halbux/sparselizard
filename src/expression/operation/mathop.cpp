@@ -1032,6 +1032,15 @@ expression mathop::predefinedviscousforce(expression dofv, expression tfv, expre
 
 std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
 {
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
+    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
+    if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
+    {
+        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
+        abort();
+    }
+    
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
     std::shared_ptr<rawfield> ptr2 = u2.getpointer();
     
@@ -1065,6 +1074,15 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
 
 std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
 {       
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
+    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
+    if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
+    {
+        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
+        abort();
+    }
+
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
     std::shared_ptr<rawfield> ptr2 = u2.getpointer();
     
@@ -1185,6 +1203,15 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
 
 std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
 {
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
+    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
+    if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
+    {
+        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'periodicitycondition'" << std::endl;
+        abort();
+    }
+    
     if (dat1.size() != 3)
     {
         std::cout << "Error in 'mathop' namespace: in 'periodicitycondition' expected a vector of length 3 as fourth argument" << std::endl;
