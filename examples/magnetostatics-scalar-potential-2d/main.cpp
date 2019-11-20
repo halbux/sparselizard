@@ -2,7 +2,7 @@
 // A steel region above the magnets is perturbing the magnetic field lines.
 //
 // The magnetic scalar potential is used to solve this problem. This is valid since there are no current sources.
-// The permanent magnets are treated as pre-magnetised pieces of non-magnetic material (since all magnetic domains are already fully oriented).
+// The permanent magnets are treated as pre-magnetized pieces of non-magnetic material (since all magnetic domains are already fully oriented).
 
 
 #include "sparselizardbase.h"
@@ -54,12 +54,12 @@ void sparselizard(void)
 	//
 	// Considering also that div(b) = 0 we get
 	//
-	// div(mur*(-grad(phi))) = 0
+	// div(mu*(-grad(phi))) = 0
 	//
-	// with b = mur * h.
+	// with b = mu * h.
 	//
 	// In the permanent magnet region b = mu0 * (h + m),
-	// i.e. the material is non-magnetic but it is pre-magnetised by the magnetisation vector m [A/m].
+	// i.e. the material is non-magnetic but it is pre-magnetized by the magnetization vector m [A/m].
 	// We thus get:
 	// div(mu0*(-grad(phi)) + mu0*m) = 0
 	// 
@@ -91,9 +91,9 @@ void sparselizard(void)
 	norm(-grad(phi)).write(wholedomain, "hnorm.pos", 2);
 	(-grad(phi)).write(wholedomain, "h.pos");
 		
-	// Evaluate the magnetic field 1cm above the center of the magnet array:
+	// Evaluate the magnetic field 1.5cm above the center of the magnet array:
 	std::vector<double> magfieldnorm = norm(-grad(phi)).interpolate(wholedomain, {0,0.02,0});
-	std::cout << "Magnetic field 1cm above the array center: " << magfieldnorm[0] << " A/m" << std::endl;
+	std::cout << "Magnetic field 1.5cm above the array center: " << magfieldnorm[0] << " A/m" << std::endl;
 
 	// Write 20 magnetic field lines starting on the top side of the magnet array:
 	shape ln("line", -1, {-0.025,0.01,0, 0.025,0.01,0}, 20);
