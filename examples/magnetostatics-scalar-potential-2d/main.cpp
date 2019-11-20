@@ -63,9 +63,7 @@ void sparselizard(void)
 	// We thus get:
 	// div(mu0*(-grad(phi)) + mu0*m) = 0
 	// 
-	// For a permanent magnet with a 1 Tesla magnetic induction b in the y direction we have:
-	//
-	// m = [0, 1 Tesla / mu0] or about [0, 800e3] A/m
+	// A permanent magnet with a [0, 800e3] A/m magnetization is considered.
 
 	// The weak form corresponding to the above equations:
 	magnetostatic += integral(wholedomain, -grad(dof(phi)) * mu * grad(tf(phi)) );
