@@ -801,10 +801,7 @@ void elements::tostandardorientation(void)
 {
     // Only straight elements are supported for now:
     if (getcurvatureorder() != 1)
-    {
-        std::cout << "Note: curved elements are not reoriented for now (some functions may thus perform slower)" << std::endl;
         return;
-    }
 
     // Loop on all element types except the point element (type 0):
     for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
