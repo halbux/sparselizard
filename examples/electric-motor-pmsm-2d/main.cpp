@@ -4,7 +4,7 @@
 //
 // Anti-periodicity is used to reduce the computational domain to only 45 degrees of 
 // the total geometry (the motor has 4 pairs of poles). In order to link the rotor and
-// stator domain at their interface a general Mortar-based continuity condition is used.
+// stator domains at their interface a general Mortar-based continuity condition is used.
 // This allows to work with the non-matching mesh at the interface when the rotor moves.  
 
 
