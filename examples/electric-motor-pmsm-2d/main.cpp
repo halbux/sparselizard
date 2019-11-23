@@ -117,14 +117,14 @@ double sparselizard(double alpha)
 
 
     std::string alphastring = std::to_string((int)alpha);
-    azstat.write(stator, "astator"+alphastring+".pos", 2);
-    curl(astat).write(stator, "bstator"+alphastring+".pos", 2);
+    azstat.write(stator, "astator"+alphastring+".vtk", 2);
+    curl(astat).write(stator, "bstator"+alphastring+".vtk", 2);
 
     // Write the rotor fields on the rotated mesh:
     mymesh.rotate(0,0,alpha);
 
-    azrot.write(rotor, "arotor"+alphastring+".pos", 2);
-    curl(arot).write(rotor, "brotor"+alphastring+".pos", 2);
+    azrot.write(rotor, "arotor"+alphastring+".vtk", 2);
+    curl(arot).write(rotor, "brotor"+alphastring+".vtk", 2);
 
     // Rotate back to the original position:
     mymesh.rotate(0,0,-alpha);
