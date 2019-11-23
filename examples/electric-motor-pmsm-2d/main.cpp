@@ -28,8 +28,8 @@ double sparselizard(double alpha)
     int rotor = regionunion({rotmagmat, magnet, magnetgap, gaprot});
     int windings = regionunion({winda, windb, windc});
     int stator = regionunion({gapstat, windslot, statmagmat, windings});
-    int nonmag = regionunion({magnet,magnetgap, gaprot, gapstat, windslot, windings});
-    int rotstatinterface = regionintersection({rotor,stator});
+    int nonmag = regionunion({magnet, magnetgap, gaprot, gapstat, windslot, windings});
+    int rotstatinterface = regionintersection({rotor, stator});
 
     // Define the number of pole pairs (4 in the geometry used):
     int numpolepairs = 4;
