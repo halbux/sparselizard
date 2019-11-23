@@ -60,7 +60,7 @@ double sparselizard(double alpha)
     azrot.setconstraint(inarc);
     azstat.setconstraint(outarc);
 
-    // The remanent induction field in the magnet is 1.0 Tesla perpendicular to the magnet:
+    // The remanent induction field in the magnet is 0.5 Tesla perpendicular to the magnet:
     expression normedradialdirection = array3x1(x,y,0)/sqrt(x*x+y*y);
     expression bremanent = 0.5 * normedradialdirection;     
 
