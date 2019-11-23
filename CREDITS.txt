@@ -1,4 +1,4 @@
-Alexandre Halbach   <alexandre.halbach at gmail.com>    University of Liege, Belgium
+Alexandre Halbach   <alexandre.halbach at gmail.com>
 
 Sincere thanks 
 to Maxime Spirlet for all his technical help,
