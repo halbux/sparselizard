@@ -608,8 +608,8 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
         
         double xbary = barycenters->at(3*curelem+0); double ybary = barycenters->at(3*curelem+1); double zbary = barycenters->at(3*curelem+2);
         std::vector<double> elemdist = {alpha*boxdimensions->at(3*curelem+0), alpha*boxdimensions->at(3*curelem+1), alpha*boxdimensions->at(3*curelem+2)};
-        // To avoid noise related issues:
-        double noisedist = 1.0e-8*(elemdist[0]+elemdist[1]+elemdist[2]);
+        // To avoid noise related issues and to work with rotating interfaces:
+        double noisedist = 0.1*(elemdist[0]+elemdist[1]+elemdist[2]);
         elemdist[0] += noisedist; elemdist[1] += noisedist; elemdist[2] += noisedist;
         
         // Loop on all candidate groups:
