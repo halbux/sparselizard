@@ -34,7 +34,7 @@ double sparselizard(double alpha)
     // Define the number of pole pairs (4 in the geometry used):
     int numpolepairs = 4;
 
-    // Periodicity regions gamma1 and gamm2 for the rotor and the stator:
+    // Anti-periodicity regions gamma1 and gamm2 for the rotor and the stator:
     int rotgamma1 = regionintersection({rotor, gamma1});
     int rotgamma2 = regionintersection({rotor, gamma2});
     int statgamma1 = regionintersection({stator, gamma1});
