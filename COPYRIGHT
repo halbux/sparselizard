@@ -1,6 +1,2 @@
-This code is at its origin a fork (origin: gitlab.onelab.info) of a GPL-licensed
-code developed by Alexandre Halbach at University of Liege, Belgium in the applied
-and computational electromagnetics departement (ACE).
-It therefore follows the same GPL license as the originally forked code. 
-The copyright of the original code goes to University of Liege and licensing
-of the original forked code must be discussed with them.
+Copyright (C) 2017 A. Halbach and C. Geuzaine, University of Liege
+Copyright (C) 2018-2019 A. Halbach, IMEC
