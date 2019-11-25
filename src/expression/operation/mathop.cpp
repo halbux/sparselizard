@@ -1107,8 +1107,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     }
 
     // Create the Lagrange multiplier field:
-    std::shared_ptr<rawfield> ptr = u1.getpointer();
-    field lambda(ptr->gettypename(false), ptr->getharmonics());
+    field lambda(ptr1->gettypename(false), ptr1->getharmonics());
     lambda.setorder(gamma1, lagmultorder);
     
     int numcomp = expression(lambda).countrows();
