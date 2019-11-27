@@ -36,6 +36,8 @@ class nodes
         // Get the coordinates:
         std::vector<double>* getcoordinates(void);
         
+        std::vector<bool> isinphysicalregion(int physreg);
+        
         void shift(int physreg, double xshift, double yshift, double zshift);
         void rotate(int physreg, double alphax, double alphay, double alphaz);
         void scale(int physreg, double xscale, double yscale, double zscale);
