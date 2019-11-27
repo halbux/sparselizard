@@ -87,9 +87,9 @@ class elements
         // is changed. 'elementtypenumber' is the UNCURVED element type number.
         int add(int elementtypenumber, int curvatureorder, std::vector<int>& nodelist);
         
-        void shift(double xshift, double yshift, double zshift);
-        void rotate(double alphax, double alphay, double alphaz);
-        void scale(double xscale, double yscale, double zscale);
+        void shift(int physreg, double xshift, double yshift, double zshift);
+        void rotate(int physreg, double alphax, double alphay, double alphaz);
+        void scale(int physreg, double xscale, double yscale, double zscale);
         
         // 'getsubelement' returns the number of the 'subelementindex'th 
         // subelement of type 'subelementtypenumber' in element number 

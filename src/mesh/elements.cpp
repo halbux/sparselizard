@@ -41,21 +41,21 @@ int elements::add(int elementtypenumber, int curvatureorder, std::vector<int>& n
     return subelementsinelements[elementtypenumber][0].size()/nodelist.size() - 1;
 }
 
-void elements::shift(double xshift, double yshift, double zshift)
+void elements::shift(int physreg, double xshift, double yshift, double zshift)
 {
     barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
     sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
     boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
 }
 
-void elements::rotate(double alphax, double alphay, double alphaz)
+void elements::rotate(int physreg, double alphax, double alphay, double alphaz)
 {
     barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
     sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
     boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
 }
 
-void elements::scale(double xscale, double yscale, double zscale)
+void elements::scale(int physreg, double xscale, double yscale, double zscale)
 {
     barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
     sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));

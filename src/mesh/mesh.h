@@ -80,10 +80,13 @@ class mesh
         void write(std::string name, int verbosity = 1);        
         
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
+        void shift(int physreg, double x, double y, double z);
         void shift(double x, double y, double z);
         // 'rotate' rotates the mesh by ax, ay and az degrees around the x, y and z axis respectively.
+        void rotate(int physreg, double ax, double ay, double az);
         void rotate(double ax, double ay, double az);
         // 'scale' scales the mesh in the 'x', 'y' and 'z' direction.
+        void scale(int physreg, double x, double y, double z);
         void scale(double x, double y, double z);
         
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.

@@ -311,22 +311,40 @@ void mesh::write(std::string name, int verbosity)
         writetime.print("Time to write the mesh: ");
 }
 
+void mesh::shift(int physreg, double x, double y, double z)
+{
+    mynodes.shift(physreg, x, y, z);
+    myelements.shift(physreg, x, y, z);
+}
+
 void mesh::shift(double x, double y, double z)
 {
-    mynodes.shift(x, y, z);
-    myelements.shift(x, y, z);
+    mynodes.shift(-1, x, y, z);
+    myelements.shift(-1, x, y, z);
+}
+
+void mesh::rotate(int physreg, double ax, double ay, double az)
+{
+    mynodes.rotate(physreg, ax, ay, az);
+    myelements.rotate(physreg, ax, ay, az);
 }
 
 void mesh::rotate(double ax, double ay, double az)
 {
-    mynodes.rotate(ax, ay, az);
-    myelements.rotate(ax, ay, az);
+    mynodes.rotate(-1, ax, ay, az);
+    myelements.rotate(-1, ax, ay, az);
+}
+
+void mesh::scale(int physreg, double x, double y, double z)
+{
+    mynodes.scale(physreg, x, y, z);
+    myelements.scale(physreg, x, y, z);
 }
 
 void mesh::scale(double x, double y, double z)
 {
-    mynodes.scale(x, y, z);
-    myelements.scale(x, y, z);
+    mynodes.scale(-1, x, y, z);
+    myelements.scale(-1, x, y, z);
 }
 
 int mesh::getmeshdimension(void)

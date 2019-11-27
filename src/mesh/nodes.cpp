@@ -24,32 +24,148 @@ std::vector<double>* nodes::getcoordinates(void)
     return &mycoordinates;
 }
 
-void nodes::shift(double xshift, double yshift, double zshift)
+void nodes::shift(int physreg, double xshift, double yshift, double zshift)
 {
     int numberofnodes = count();
     
-    for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
+    std::vector<bool> toshift;
+
+    if (physreg < 0)
+        toshift = std::vector<bool>(numberofnodes, true);
+    else
     {
-        mycoordinates[3*nodenumber+0] += xshift;
-        mycoordinates[3*nodenumber+1] += yshift;
-        mycoordinates[3*nodenumber+2] += zshift;
+        toshift = std::vector<bool>(numberofnodes, false);
+    
+        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+        elements* myelements = universe::mymesh->getelements();
+    
+        // Get only the disjoint regions with highest dimension elements:
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+        {
+            int disjreg = selecteddisjregs[i];
+            int numelems = mydisjointregions->countelements(disjreg);
+            int elemtypenum = mydisjointregions->getelementtypenumber(disjreg);
+            int rangebegin = mydisjointregions->getrangebegin(disjreg);
+            int curvatureorder = myelements->getcurvatureorder();
+            
+            element myelem(elemtypenum, curvatureorder);
+
+            for (int e = 0; e < numelems; e++)
+            {
+                for (int n = 0; n < myelem.countcurvednodes(); n++)
+                    toshift[myelements->getsubelement(0, elemtypenum, rangebegin+e, n)] = true;
+            }
+        }
+    }
+    
+    for (int n = 0; n < numberofnodes; n++)
+    {
+        if (toshift[n])
+        {
+            mycoordinates[3*n+0] += xshift;
+            mycoordinates[3*n+1] += yshift;
+            mycoordinates[3*n+2] += zshift;
+        }
     }
 }
 
-void nodes::rotate(double alphax, double alphay, double alphaz)
-{
-    geotools::rotate(alphax, alphay, alphaz, &mycoordinates);
-}
-
-void nodes::scale(double xscale, double yscale, double zscale)
+void nodes::rotate(int physreg, double alphax, double alphay, double alphaz)
 {
     int numberofnodes = count();
     
-    for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
+    std::vector<bool> torotate;
+
+    if (physreg < 0)
+        torotate = std::vector<bool>(numberofnodes, true);
+    else
     {
-        mycoordinates[3*nodenumber+0] *= xscale;
-        mycoordinates[3*nodenumber+1] *= yscale;
-        mycoordinates[3*nodenumber+2] *= zscale;
+        torotate = std::vector<bool>(numberofnodes, false);
+    
+        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+        elements* myelements = universe::mymesh->getelements();
+    
+        // Get only the disjoint regions with highest dimension elements:
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+        {
+            int disjreg = selecteddisjregs[i];
+            int numelems = mydisjointregions->countelements(disjreg);
+            int elemtypenum = mydisjointregions->getelementtypenumber(disjreg);
+            int rangebegin = mydisjointregions->getrangebegin(disjreg);
+            int curvatureorder = myelements->getcurvatureorder();
+            
+            element myelem(elemtypenum, curvatureorder);
+
+            for (int e = 0; e < numelems; e++)
+            {
+                for (int n = 0; n < myelem.countcurvednodes(); n++)
+                    torotate[myelements->getsubelement(0, elemtypenum, rangebegin+e, n)] = true;
+            }
+        }
+    }
+    
+    std::vector<double> rotated = mycoordinates;
+    geotools::rotate(alphax, alphay, alphaz, &rotated);
+    
+    for (int n = 0; n < numberofnodes; n++)
+    {
+        if (torotate[n])
+        {
+            mycoordinates[3*n+0] = rotated[3*n+0];
+            mycoordinates[3*n+1] = rotated[3*n+1];
+            mycoordinates[3*n+2] = rotated[3*n+2];
+        }
+    }
+}
+
+void nodes::scale(int physreg, double xscale, double yscale, double zscale)
+{
+    int numberofnodes = count();
+    
+    std::vector<bool> toscale;
+
+    if (physreg < 0)
+        toscale = std::vector<bool>(numberofnodes, true);
+    else
+    {
+        toscale = std::vector<bool>(numberofnodes, false);
+    
+        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+        elements* myelements = universe::mymesh->getelements();
+    
+        // Get only the disjoint regions with highest dimension elements:
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+        {
+            int disjreg = selecteddisjregs[i];
+            int numelems = mydisjointregions->countelements(disjreg);
+            int elemtypenum = mydisjointregions->getelementtypenumber(disjreg);
+            int rangebegin = mydisjointregions->getrangebegin(disjreg);
+            int curvatureorder = myelements->getcurvatureorder();
+            
+            element myelem(elemtypenum, curvatureorder);
+
+            for (int e = 0; e < numelems; e++)
+            {
+                for (int n = 0; n < myelem.countcurvednodes(); n++)
+                    toscale[myelements->getsubelement(0, elemtypenum, rangebegin+e, n)] = true;
+                    
+            }
+        }
+    }
+    
+    for (int n = 0; n < numberofnodes; n++)
+    {
+        if (toscale[n])
+        {
+            mycoordinates[3*n+0] *= xscale;
+            mycoordinates[3*n+1] *= yscale;
+            mycoordinates[3*n+2] *= zscale;
+        }
     }
 }
 
