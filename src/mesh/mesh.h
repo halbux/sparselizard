@@ -64,6 +64,7 @@ class mesh
 
         mesh(void);
         mesh(std::string filename, int verbosity = 1, bool legacyreader = true);
+        mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity = 1);
         mesh(std::vector<shape> inputshapes, int verbosity = 1);
         
         nodes* getnodes(void);
@@ -72,9 +73,11 @@ class mesh
         disjointregions* getdisjointregions(void);
 
         // Load from file name:
-        void load(std::string name, int verbosity = 1, bool legacyreader = true);    
+        void load(std::string name, int verbosity = 1, bool legacyreader = true);   
+        // Load from multiple files:
+        void load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity = 1);
         // Load from shape vector:
-        void load(std::vector<shape> inputshapes, int verbosity = 1);    
+        void load(std::vector<shape> inputshapes, int verbosity = 1);
 
         // Write to file name:
         void write(std::string name, int verbosity = 1);        

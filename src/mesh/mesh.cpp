@@ -107,6 +107,12 @@ mesh::mesh(std::string filename, int verbosity, bool legacyreader) : myelements(
     load(filename, verbosity, legacyreader);
 }
 
+mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
+{
+    universe::mymesh = this;
+    load(mergeduplicates, meshfiles, verbosity);
+}
+
 mesh::mesh(std::vector<shape> inputshapes, int verbosity) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
 {
     universe::mymesh = this;
@@ -175,6 +181,90 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
     {
         std::cout << "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" << std::endl;
         abort();
+    }
+}
+
+void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
+{
+    int numfiles = meshfiles.size();
+    if (numfiles == 0)
+    {
+        std::cout << "Error in 'mesh' object: expected at least one mesh file to load" << std::endl;
+        abort();
+    }
+    
+    std::vector< std::vector<std::vector<shape>> > allshapes(numfiles, std::vector<std::vector<shape>>(0));
+    
+    int meshdim = -1;
+
+    int maxphysreg = 0;
+    for (int i = 0; i < numfiles; i++)
+    {
+        allshapes[i] = mathop::loadshape(meshfiles[i]);
+        
+        for (int d = 0; d < 4; d++)
+        {
+            int curcount = allshapes[i][d].size();
+        
+            if (i == 0 && curcount > 0)
+                meshdim = d;
+                
+            if (i > 0 && allshapes[i][meshdim].size() == 0 || i > 0 && d > meshdim && allshapes[i][d].size() > 0)
+            {
+                std::cout << "Error in 'mesh' object: expected a " << meshdim << "D mesh in '" << meshfiles[i] << "'" << std::endl;
+                abort();
+            }
+        
+            for (int s = 0; s < curcount; s++)
+            {
+                int curphysreg = allshapes[i][d][s].getphysicalregion();
+                if (maxphysreg < curphysreg)
+                    maxphysreg = curphysreg;
+            }
+        }
+    }
+    
+    // Amount to shift each mesh file to make sure they do not overlap:
+    std::vector<double> shiftvec(numfiles,0.0);
+    
+    std::vector<shape> flat = {};
+    std::vector<double> prevcoordbounds;
+    for (int i = 0; i < numfiles; i++)
+    {
+        shape curunion("union", maxphysreg+1+i, allshapes[i][meshdim]);
+        
+        if (mergeduplicates == false)
+        {
+            std::vector<double> coords = curunion.getcoords();
+            std::vector<double> curcoordbounds = myalgorithm::getcoordbounds(coords);
+            if (i > 0)
+                shiftvec[i] = shiftvec[i-1] + prevcoordbounds[1]-curcoordbounds[0] + 0.1*(prevcoordbounds[1]-prevcoordbounds[0]);
+            prevcoordbounds = curcoordbounds;
+        }
+        
+        // Do not shift recursively.
+        if (mergeduplicates == false)
+            curunion.getpointer()->shift(shiftvec[i],0,0, false);
+        flat.push_back(curunion);
+    
+        for (int d = 0; d < 4; d++)
+        {
+            for (int s = 0; s < allshapes[i][d].size(); s++)
+            {
+                if (mergeduplicates == false)
+                    allshapes[i][d][s].getpointer()->shift(shiftvec[i],0,0, false);
+                flat.push_back(allshapes[i][d][s]);
+            }
+        }
+    }
+    
+    this->load(flat, verbosity);
+    
+    // Shift back to the original position:
+    if (mergeduplicates == false)
+    {
+        for (int i = 0; i < numfiles; i++)
+            this->shift(maxphysreg+1+i, -shiftvec[i],0,0);
     }
 }
 
