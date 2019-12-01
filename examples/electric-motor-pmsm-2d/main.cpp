@@ -105,8 +105,8 @@ double sparselizard(double alpha)
 
     solve(magnetostatics);
 
-    az.write(all, "a"+std::to_string((int)alpha)+".pos", 2);
-    curl(a).write(all, "b"+std::to_string((int)alpha)+".pos", 2);
+    az.write(all, "a"+std::to_string((int)alpha)+".vtu", 2);
+    curl(a).write(all, "b"+std::to_string((int)alpha)+".vtu", 2);
 
 
     // The MAGNETOSTATIC FORCE acting on the rotor is computed below.
