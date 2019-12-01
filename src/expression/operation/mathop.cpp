@@ -1098,9 +1098,9 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
         abort();
     }
 
-    if (angzmod < 0.0 || angzmod > 360.0)
+    if (angzmod < 0.0 || angzmod > 180.0)
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the angular modulo should be in range [0,360]" << std::endl;
+        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the angular modulo should be in range [0,180]" << std::endl;
         abort();
     }
 
