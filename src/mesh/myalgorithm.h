@@ -64,11 +64,11 @@ namespace myalgorithm
     // After convergence 1 is returned and the solution is placed in 'initialguess'. If at any iteration either ki, eta or phi
     // is farther away than 'boxsize' from the origin then the function stops and returns 0. Value -1 is returned in any other case.
     // The initial guess is supposed to be inside the box.
-    int getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 2, double tol = 1e-12, int maxit = 20);
-    int getroot(polynomials& polys, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 2, double tol = 1e-12, int maxit = 20);
+    int getroot(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 2, double tol = 1e-10, int maxit = 20);
+    int getroot(polynomials& polys, std::vector<double>& rhs, std::vector<double>& initialguess, double boxsize = 2, double tol = 1e-10, int maxit = 20);
 
     // Attempt to get the above mentionned root with multiple initial guesses provided in format {ki1,eta1,phi1,ki2,eta2,phi2,...}.
-    int getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize = 2, double tol = 1e-12, int maxit = 20);
+    int getrootmultiguess(std::vector<polynomial>& poly, std::vector<double>& rhs, std::vector<double>& initialguesses, std::vector<double>& kietaphi, double boxsize = 2, double tol = 1e-10, int maxit = 20);
 
     // Get the reference coordinates and the element numbers corresponding to each (x,y,z) coordinate provided as argument. 
     // If the ith coordinate (xi,yi,zi) cannot be found in any element of the disjoint region then elems[i] is unchanged.
