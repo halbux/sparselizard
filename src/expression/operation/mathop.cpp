@@ -1044,13 +1044,6 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
     std::shared_ptr<rawfield> ptr2 = u2.getpointer();
     
-    // Dofs on gamma1 and gamma2 must be different:
-    if (ptr1 == ptr2)
-    {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected different fields for u1 and u2" << std::endl;
-        abort();
-    }
-    
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
     {
@@ -1072,97 +1065,6 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     return output;
 }
 
-std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, std::vector<double> rotang, int lagmultorder)
-{
-    int problemdimension = universe::mymesh->getmeshdimension();
-    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
-    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
-    if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
-    {
-        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
-        abort();
-    }
-    
-    std::shared_ptr<rawfield> ptr1 = u1.getpointer();
-    std::shared_ptr<rawfield> ptr2 = u2.getpointer();
-    
-    // Dofs on gamma1 and gamma2 must be different:
-    if (ptr1 == ptr2)
-    {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected different fields for u1 and u2" << std::endl;
-        abort();
-    }
-    
-    // Make sure the fields are similar:
-    if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
-    {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
-        abort();
-    }
-    
-    if (rotcent.size() != 3 || rotang.size() != 3)
-    {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected a vector of length 3 as fifth and sixth argument" << std::endl;
-        abort();
-    }
-
-    // Create the Lagrange multiplier field:
-    field lambda(ptr1->gettypename(false), ptr1->getharmonics());
-    lambda.setorder(gamma1, lagmultorder);
-    
-    int numcomp = expression(lambda).countrows();
-
-    // Create the face to face mapping expression:
-    expression mapexpr, invmapexpr;
-    expression tfu = tf(u2);
-    expression dofu = dof(u2);
-    
-    if (numcomp > 1)
-    {
-        tfu = tfu.resize(3,1);
-        dofu = dofu.resize(3,1);
-    }
-    
-    field x("x"), y("y"), z("z");
-    
-    mapexpr = array3x1(x-rotcent[0],y-rotcent[1],z-rotcent[2]);
-    mapexpr.rotate(rotang[0], rotang[1], rotang[2]);
-    mapexpr = mapexpr + array3x1(rotcent[0],rotcent[1],rotcent[2]) - array3x1(x,y,z);
-    
-    invmapexpr = array3x1(x-rotcent[0],y-rotcent[1],z-rotcent[2]);
-    invmapexpr.rotate(0,0, -rotang[2]);
-    invmapexpr.rotate(0, -rotang[1], 0);
-    invmapexpr.rotate(-rotang[0], 0, 0);
-    invmapexpr = invmapexpr + array3x1(rotcent[0],rotcent[1],rotcent[2]) - array3x1(x,y,z);
-
-    if (numcomp > 1)
-    {
-        tfu.rotate(0,0, -rotang[2]);
-        tfu.rotate(0, -rotang[1], 0);
-        tfu.rotate(-rotang[0], 0, 0);
-        
-        dofu.rotate(0,0, -rotang[2]);
-        dofu.rotate(0, -rotang[1], 0);
-        dofu.rotate(-rotang[0], 0, 0);
-    }
-    
-    if (numcomp > 1)
-    {
-        tfu = tfu.resize(numcomp,1);
-        dofu = dofu.resize(numcomp,1);
-    }
-    
-    
-    // Create the integration object to output:
-    std::vector<integration> output(3);
-    
-    output[0] = integral(gamma1, dof(lambda)*tf(u1));
-    output[1] = integral(gamma2, -on(gamma1, invmapexpr, dof(lambda)) * tfu);
-    output[2] = integral(gamma1, (dof(u1) - on(gamma2, mapexpr, dofu)) * tf(lambda));
-
-    return output;
-}
-
 std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
 {       
     int problemdimension = universe::mymesh->getmeshdimension();
@@ -1176,13 +1078,6 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
 
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
     std::shared_ptr<rawfield> ptr2 = u2.getpointer();
-    
-    // Dofs on gamma1 and gamma2 must be different:
-    if (ptr1 == ptr2)
-    {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected different fields for u1 and u2" << std::endl;
-        abort();
-    }
     
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
