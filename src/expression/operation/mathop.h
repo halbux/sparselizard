@@ -189,7 +189,6 @@ namespace mathop
     ////////// PREDEFINED FORMULATIONS
     
     std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder = 1, bool errorifnotfound = true);
-    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, std::vector<double> rotang, int lagmultorder = 1);
     std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor = 1.0, int lagmultorder = 1);
     std::vector<integration> periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor = 1.0, int lagmultorder = 1);
 
