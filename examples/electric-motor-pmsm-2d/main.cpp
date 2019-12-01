@@ -109,7 +109,7 @@ double sparselizard(double alpha)
     curl(a).write(all, "b"+std::to_string((int)alpha)+".vtu", 2);
 
 
-    // The MAGNETOSTATIC FORCE acting on the rotor is computed below.
+    // The magnetostatic force acting on the rotor is computed below.
 
     // This field will hold the x and y component of the magnetic forces:
     field magforce("h1xy");
