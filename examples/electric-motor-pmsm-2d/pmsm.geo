@@ -1,5 +1,8 @@
 pi = 3.14159265359;
 
+// Rotor [1] or stator [0] part of the geometry:
+isrotor = 1;
+
 // Central shaft radius [m]:
 rshaft = 0.025;
 // Rotor magnetic material radius [m]:
@@ -199,21 +202,29 @@ Plane Surface(13) = {13};
 
 // Physical region tags:
 rotmagmat = 1; magnet = 2; magnetgap = 3; gaprot = 4; gapstat = 5; statmagmat = 6; windslot = 7; winda = 8; windb = 9; windc = 10;
-gamma1 = 11; gamma2 = 12; inarc = 13; outarc = 14;
+gammarot = 11; gammastat = 12; gamma1rot = 13; gamma2rot = 14; gamma1stat = 15; gamma2stat = 16; inarc = 17; outarc = 18;
 
-Physical Surface(1) = {1};
-Physical Surface(2) = {3};
-Physical Surface(3) = {2,4};
-Physical Surface(4) = {5};
-Physical Surface(5) = {6};
-Physical Surface(6) = {13};
-Physical Surface(7) = {7,8,9};
-Physical Surface(8) = {10};
-Physical Surface(9) = {11};
-Physical Surface(10) = {12};
-
-Physical Line(11) = {17,18,19,20,21};
-Physical Line(12) = {22,23,24,25,26};
-Physical Line(13) = {1};
-Physical Line(14) = {16};
+If (isrotor == 1)
+    Physical Surface(1) = {1};
+    Physical Surface(2) = {3};
+    Physical Surface(3) = {2,4};
+    Physical Surface(4) = {5};
+    
+    Physical Line(11) = {8};
+    Physical Line(13) = {17,18,19};
+    Physical Line(14) = {22,23,24};
+    Physical Line(17) = {1};
+Else
+    Physical Surface(5) = {6};
+    Physical Surface(6) = {13};
+    Physical Surface(7) = {7,8,9};
+    Physical Surface(8) = {10};
+    Physical Surface(9) = {11};
+    Physical Surface(10) = {12};
+    
+    Physical Line(12) = {8};
+    Physical Line(15) = {20,21};
+    Physical Line(16) = {25,26};
+    Physical Line(18) = {16};
+EndIf
 

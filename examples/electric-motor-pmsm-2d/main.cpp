@@ -19,26 +19,21 @@ double sparselizard(double alpha)
 {	
     // Give names to the physical region numbers :
     int rotmagmat = 1, magnet = 2, magnetgap = 3, gaprot = 4, gapstat = 5, statmagmat = 6, windslot = 7, winda = 8, windb = 9, windc = 10;
-    int gamma1 = 11, gamma2 = 12, inarc = 13, outarc = 14;
+    int gammarot = 11, gammastat = 12, gamma1rot = 13, gamma2rot = 14, gamma1stat = 15, gamma2stat = 16, inarc = 17, outarc = 18;
 
     // Load the mesh. Set verbosity to 0.
-    mesh mymesh("pmsm.msh", 0);
+    mesh mymesh(false, {"rotor.msh", "stator.msh"},0);
 
     // Define new physical regions for convenience:
     int rotor = regionunion({rotmagmat, magnet, magnetgap, gaprot});
     int windings = regionunion({winda, windb, windc});
     int stator = regionunion({gapstat, windslot, statmagmat, windings});
     int nonmag = regionunion({magnet, magnetgap, gaprot, gapstat, windslot, windings});
-    int rotstatinterface = regionintersection({rotor, stator});
-
-    // Define the number of pole pairs (4 in the geometry used):
-    int numpolepairs = 4;
-
-    // Anti-periodicity regions gamma1 and gamm2 for the rotor and the stator:
-    int rotgamma1 = regionintersection({rotor, gamma1});
-    int rotgamma2 = regionintersection({rotor, gamma2});
-    int statgamma1 = regionintersection({stator, gamma1});
-    int statgamma2 = regionintersection({stator, gamma2});
+    int gamma1 = regionunion({gamma1rot,gamma1stat});
+    int gamma2 = regionunion({gamma2rot,gamma2stat});
+    int all = regionunion({rotor,stator});
+    
+    mymesh.rotate(rotor, 0,0,alpha);
 
     // Peak winding current [A] times number of turns:
     double Imax = 300;
@@ -47,18 +42,17 @@ double sparselizard(double alpha)
 
 
     // Nodal shape functions 'h1' for the z component of the vector potential.
-    field azrot("h1"), azstat("h1"), x("x"), y("y"), z("z");
+    field az("h1"), x("x"), y("y"), z("z");
 
     // In 2D the vector potential only has a z component:
-    expression arot = array3x1(0,0,azrot), astat = array3x1(0,0,azstat);
+    expression a = array3x1(0,0,az);
 
     // Use interpolation order 2:
-    azrot.setorder(rotor, 2);
-    azstat.setorder(stator, 2);
+    az.setorder(all, 2);
 
     // Put a magnetic wall at the inner rotor and outer stator boundaries:
-    azrot.setconstraint(inarc);
-    azstat.setconstraint(outarc);
+    az.setconstraint(inarc);
+    az.setconstraint(outarc);
 
     // The remanent induction field in the magnet is 0.5 Tesla perpendicular to the magnet:
     expression normedradialdirection = array3x1(x,y,0)/sqrt(x*x+y*y);
@@ -75,8 +69,7 @@ double sparselizard(double alpha)
     //
     parameter mu;
 
-    mu|rotor = 2000.0*mu0;
-    mu|stator = 2000.0*mu0;
+    mu|all = 2000.0*mu0;
     // Overwrite on non-magnetic regions:
     mu|nonmag = mu0;
 
@@ -84,11 +77,10 @@ double sparselizard(double alpha)
     formulation magnetostatics;
 
     // The strong form of the magnetostatic formulation is curl( 1/mu * curl(a) ) = j, with b = curl(a):
-    magnetostatics += integral(rotor, 1/mu* curl(dof(arot)) * curl(tf(arot)) );
-    magnetostatics += integral(stator, 1/mu* curl(dof(astat)) * curl(tf(astat)) );
+    magnetostatics += integral(all, 1/mu* curl(dof(a)) * curl(tf(a)) );
 
     // Add the remanent magnetization of the rotor magnet:
-    magnetostatics += integral(magnet, -1/mu* bremanent * curl(tf(arot)));
+    magnetostatics += integral(magnet, -1/mu* bremanent * curl(tf(a)));
 
     // Add the current density source js [A/m2] in the z direction in the stator windings.
     // A three-phased actuation is used. The currents are dephased by the mechanical angle
@@ -103,31 +95,18 @@ double sparselizard(double alpha)
     jsz|windb = Imax/windarea * sin( (phase + 4.0*alpha - 60.0) * getpi()/180.0);
     jsz|windc = Imax/windarea * sin( (phase + 4.0*alpha - 120.0) * getpi()/180.0);
 
-    magnetostatics += integral(windings, array3x1(0,0,jsz) * tf(astat));
+    magnetostatics += integral(windings, array3x1(0,0,jsz) * tf(a));
 
     // Rotor-stator continuity condition (including antiperiodicity settings with factor '-1'):
-    magnetostatics += continuitycondition(rotstatinterface, rotstatinterface, azrot, azstat, {0,0,0}, alpha, 45, -1);
-
+    magnetostatics += continuitycondition(gammastat, gammarot, az, az, {0,0,0}, alpha, 45.0, -1.0);
     // Rotor and stator antiperiodicity condition:
-    magnetostatics += periodicitycondition(rotgamma1, rotgamma2, azrot, {0,0,0}, {0,0,45}, -1);
-    magnetostatics += periodicitycondition(statgamma1, statgamma2, azstat, {0,0,0}, {0,0,45}, -1);
+    magnetostatics += periodicitycondition(gamma1, gamma2, az, {0,0,0}, {0,0,45.0}, -1.0);
 
 
     solve(magnetostatics);
 
-
-    std::string alphastring = std::to_string((int)alpha);
-    azstat.write(stator, "astator"+alphastring+".vtk", 2);
-    curl(astat).write(stator, "bstator"+alphastring+".vtk", 2);
-
-    // Write the rotor fields on the rotated mesh:
-    mymesh.rotate(0,0,alpha);
-
-    azrot.write(rotor, "arotor"+alphastring+".vtk", 2);
-    curl(arot).write(rotor, "brotor"+alphastring+".vtk", 2);
-
-    // Rotate back to the original position:
-    mymesh.rotate(0,0,-alpha);
+    az.write(all, "a"+std::to_string((int)alpha)+".pos", 2);
+    curl(a).write(all, "b"+std::to_string((int)alpha)+".pos", 2);
 
 
     // The MAGNETOSTATIC FORCE acting on the rotor is computed below.
@@ -140,8 +119,8 @@ double sparselizard(double alpha)
     formulation forceprojection;
 
     forceprojection += integral(statmagmat, dof(magforce)*tf(magforce));
-    expression Hstat = 1/mu * curl(astat);
-    forceprojection += integral(stator, - predefinedmagnetostaticforce(tf(magforce, statmagmat), Hstat, mu));
+    expression H = 1/mu * curl(a);
+    forceprojection += integral(stator, - predefinedmagnetostaticforce(tf(magforce, statmagmat), H, mu));
 
     solve(forceprojection);
 
