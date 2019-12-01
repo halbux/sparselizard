@@ -21,8 +21,8 @@ double sparselizard(double alpha)
     int rotmagmat = 1, magnet = 2, magnetgap = 3, gaprot = 4, gapstat = 5, statmagmat = 6, windslot = 7, winda = 8, windb = 9, windc = 10;
     int gammarot = 11, gammastat = 12, gamma1rot = 13, gamma2rot = 14, gamma1stat = 15, gamma2stat = 16, inarc = 17, outarc = 18;
 
-    // Load the mesh. Set verbosity to 0.
-    mesh mymesh(false, {"rotor.msh", "stator.msh"},0);
+    // Load the rotor and stator mesh without merging the interface. Set verbosity to 0.
+    mesh mymesh(false, {"rotor.msh", "stator.msh"}, 0);
 
     // Define new physical regions for convenience:
     int rotor = regionunion({rotmagmat, magnet, magnetgap, gaprot});
