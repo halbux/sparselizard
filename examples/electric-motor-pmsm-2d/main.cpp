@@ -119,8 +119,7 @@ double sparselizard(double alpha)
     formulation forceprojection;
 
     forceprojection += integral(statmagmat, dof(magforce)*tf(magforce));
-    expression H = 1/mu * curl(a);
-    forceprojection += integral(stator, - predefinedmagnetostaticforce(tf(magforce, statmagmat), H, mu));
+    forceprojection += integral(stator, - predefinedmagnetostaticforce(tf(magforce, statmagmat), 1/mu*curl(a), mu));
 
     solve(forceprojection);
 
