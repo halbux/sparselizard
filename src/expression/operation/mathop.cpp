@@ -1136,7 +1136,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     mapexpr = centered;
     // Calculate the angle for the gamma1 coordinates:
     expression mapangle = acos( compx(mapexpr)/radius );
-    mapangle = ifpositive(compy(mapexpr), mapangle, -mapangle);
+    mapangle = ifpositive(compy(mapexpr), mapangle, 2.0*getpi()-mapangle);
     // Take the angular modulo:
     expression mapmod = mapexpr;
     mapmod.rotate(0,0,angzmod);
@@ -1147,7 +1147,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     invmapexpr = centered;
     // Calculate the angle for the gamma2 coordinates:
     expression invmapangle = acos( compx(invmapexpr)/radius );
-    invmapangle = ifpositive(compy(invmapexpr), invmapangle, -invmapangle);
+    invmapangle = ifpositive(compy(invmapexpr), invmapangle, 2.0*getpi()-invmapangle);
     // Take the angular modulo:
     expression invmapmod = invmapexpr;
     invmapmod.rotate(0,0,-angzmod);
