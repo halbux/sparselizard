@@ -2,7 +2,7 @@
 // rotating PMSM (permanent magnet synchronous) electric motor. The motor torque is 
 // calculated based on the virtual work principle for an increasing mechanical angle.
 //
-// Anti-periodicity is used to reduce the computational domain to only 45 degrees of 
+// Antiperiodicity is used to reduce the computational domain to only 45 degrees of 
 // the total geometry (the motor has 4 pairs of poles). In order to link the rotor and
 // stator domains at their interface a general Mortar-based continuity condition is used.
 // This allows to work with the non-matching mesh at the interface when the rotor moves.  
@@ -114,7 +114,7 @@ double sparselizard(double alpha)
     // This field will hold the x and y component of the magnetic forces:
     field magforce("h1xy");
 
-    // The magnetic force is projected on field 'magforce' on the solid rotor region.
+    // The magnetic force is projected on field 'magforce' on the solid stator region.
     // This is done with a formulation of the type dof*tf - force calculation = 0.
     formulation forceprojection;
 
