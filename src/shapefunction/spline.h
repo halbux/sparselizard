@@ -35,6 +35,9 @@ class spline
         
         void set(std::vector<double>& xin, std::vector<double>& yin);
         
+        double getxmin(void) { return xmin; };
+        double getxmax(void) { return xmax; };
+        
         double evalat(double input);
         std::vector<double> evalat(std::vector<double> input);
         densematrix evalat(densematrix input);
