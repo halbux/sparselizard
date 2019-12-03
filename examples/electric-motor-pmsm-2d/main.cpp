@@ -95,7 +95,7 @@ double sparselizard(double alpha)
     jsz|windb = Imax/windarea * sin( (phase + 4.0*alpha - 60.0) * getpi()/180.0);
     jsz|windc = Imax/windarea * sin( (phase + 4.0*alpha - 120.0) * getpi()/180.0);
 
-    magnetostatics += integral(windings, array3x1(0,0,jsz) * tf(a));
+    magnetostatics += integral(windings, -array3x1(0,0,jsz) * tf(a));
 
     // Rotor-stator continuity condition (including antiperiodicity settings with factor '-1'):
     magnetostatics += continuitycondition(gammastat, gammarot, az, az, {0,0,0}, alpha, 45.0, -1.0);
