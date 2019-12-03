@@ -141,17 +141,22 @@ int main(void)
     SlepcInitialize(0,{},0,0);
 
     wallclock clk;
+    
+    double torque;
 
     std::cout << "Mechanical angle [degrees] and torque [Nm]:" << std::endl;
     for (double alpha = 0.0; alpha <= 45.0; alpha += 1.0)
     {
-        double torque = sparselizard(alpha);
+        torque = sparselizard(alpha);
         std::cout << alpha << " " << torque << std::endl;   
     }
 
     clk.print("Total run time:");
 
     SlepcFinalize();
+    
+    // Code validation line. Can be removed:
+    std::cout << (torque < 3.58709 && torque > 3.58707);
 
     return 0;
 }
