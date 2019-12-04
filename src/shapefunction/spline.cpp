@@ -34,6 +34,8 @@ spline::spline(std::vector<double> xin, std::vector<double> yin)
 
 void spline::set(std::vector<double>& xin, std::vector<double>& yin)
 {
+    derivativeorder = 0;
+    
     if (xin.size() != yin.size())
     {
         std::cout << "Error in 'spline' object: x and y dataset sizes do not match" << std::endl;
