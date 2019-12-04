@@ -26,6 +26,8 @@ class spline
         densematrix myx, myy;
         // The spline parameters:
         densematrix mya, myb;
+        
+        int derivativeorder = 0;
     
     public:
     
@@ -34,6 +36,8 @@ class spline
         spline(std::vector<double> xin, std::vector<double> yin);
         
         void set(std::vector<double>& xin, std::vector<double>& yin);
+        
+        spline getderivative(void);
         
         double getxmin(void) { return xmin; };
         double getxmax(void) { return xmax; };

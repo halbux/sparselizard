@@ -127,6 +127,15 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     }
 }
 
+spline spline::getderivative(void)
+{
+    spline spl;
+    spl = *this;
+    spl.derivativeorder++;
+
+    return spl;
+}
+
 double spline::evalat(double input)
 {
     std::vector<double> invec = {input};
@@ -182,8 +191,21 @@ densematrix spline::evalat(densematrix input)
         while (xvals[curspline] < cur-absnoise)
             curspline++;
         // Interpolate on the spline:
-        double tx = (cur-xvals[curspline-1])/(xvals[curspline]-xvals[curspline-1]);
-        outvec[i] = (1.0-tx)*yvals[curspline-1] + tx*yvals[curspline] + tx*(1.0-tx)*((1.0-tx)*avals[curspline]+tx*bvals[curspline]);
+        double dx = xvals[curspline]-xvals[curspline-1];
+        double tx = (cur-xvals[curspline-1])/dx;
+        double a = avals[curspline];
+        double b = bvals[curspline];
+        
+        if (derivativeorder == 0)
+            outvec[i] = (1.0-tx)*yvals[curspline-1] + tx*yvals[curspline] + tx*(1.0-tx)*((1.0-tx)*a+tx*b);
+        if (derivativeorder == 1)
+            outvec[i] = 1.0/dx * (yvals[curspline]-yvals[curspline-1] + (1.0-2.0*tx)*(a*(1.0-tx)+b*tx) + tx*(1.0-tx)*(b-a));
+        if (derivativeorder == 2)
+            outvec[i] = 2.0/(dx*dx) * (b-2.0*a + (a-b)*3.0*tx);
+        if (derivativeorder == 3)
+            outvec[i] = 6.0/(dx*dx*dx) * (a-b);
+        if (derivativeorder > 3)
+            outvec[i] = 0.0;
     }
     
     // Unsort the data:
