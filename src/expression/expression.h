@@ -86,6 +86,8 @@ class expression
         expression(expression condexpr, expression exprtrue, expression exprfalse);
         // Expression based on a spline interpolation of a discrete function of argument 'arg':
         expression(spline spl, expression arg);
+        // Splines going through a set of points:
+        expression(std::vector<double> splinedata, expression arg);
         
         // Define a 1x1 expression from an operation:
         expression(std::shared_ptr<operation>);
