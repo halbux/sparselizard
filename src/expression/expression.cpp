@@ -223,38 +223,49 @@ expression::expression(spline spl, expression arg)
     myoperations = {std::shared_ptr<opspline>(new opspline(spl,arg.myoperations[0]))};
 }
 
-expression::expression(std::vector<double> splinedata, expression arg)
+expression::expression(std::vector<double> pos, std::vector<expression> exprs, expression tocompare)
 {
-    if (splinedata.size()%2 != 0)
+    int numintervals = pos.size()+1;
+    if (numintervals != exprs.size())
     {
-        std::cout << "Error in 'expression' object: expected a vector length multiple of two" << std::endl;
+        std::cout << "Error in 'expression' object: expected " << numintervals << " expressions to define the " << numintervals << " intervals from -infinity to +infinity" << std::endl;
         abort();
     }
-    if (arg.isscalar() == false)
+    if (tocompare.isscalar() == false)
     {
-        std::cout << "Error in 'expression' object: expected a scalar expression as argument for the spline interpolation" << std::endl;
+        std::cout << "Error in 'expression' object: expected a scalar expression as interval variable" << std::endl;
         abort();
     }
-    if (arg.myoperations[0]->isdofincluded() || arg.myoperations[0]->istfincluded())
+    if (tocompare.myoperations[0]->isdofincluded() || tocompare.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression' object: spline argument cannot include a dof() or tf()" << std::endl;
+        std::cout << "Error in 'expression' object: interval variable cannot include a dof() or tf()" << std::endl;
         abort();
     }
-    
-    int num = splinedata.size()/2;
-    std::vector<double> xvals(num);
-    std::vector<double> yvals(num);
-    
-    for (int i = 0; i < num; i++)
+    // Make sure the positions are sorted ascendingly:
+    for (int i = 1; i < pos.size(); i++)
     {
-        xvals[i] = splinedata[2*i+0];
-        yvals[i] = splinedata[2*i+1];
+        if (pos[i] <= pos[i-1])
+        {
+            std::cout << "Error in 'expression' object: positions for intervals must be sorted ascendingly" << std::endl;
+            abort(); 
+        }
     }
     
-    spline spl(xvals, yvals);
+    expression expr = exprs[0];
     
-    mynumrows = 1; mynumcols = 1;
-    myoperations = {std::shared_ptr<opspline>(new opspline(spl,arg.myoperations[0]))};
+    tocompare.reuseit();
+    if (numintervals > 1)
+    {
+        std::vector<double> posoneless = pos; posoneless.pop_back();
+        std::vector<expression> exprsoneless = exprs; exprsoneless.pop_back();
+        
+        expression oneless(posoneless, exprsoneless, tocompare);
+        
+        expr = mathop::ifpositive(tocompare-pos[numintervals-2], exprs[numintervals-1], oneless);
+    }
+    
+    mynumrows = expr.mynumrows; mynumcols = expr.mynumcols;
+    myoperations = expr.myoperations;
 }
 
 expression::expression(std::shared_ptr<operation> input)
