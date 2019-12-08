@@ -16,7 +16,7 @@ void processmesh(void);
 void sparselizard(void)
 {	
     // Name the regions for the inner and outer electrode, the clamp and the regions 'gamma' on which to apply the periodic condition:
-    int electrodein = 1, electrodeout = 2, clamp = 3, gamma1 = 4, gamma2 = 5, cavity = 3000007, solid = 3000008, all = 3000009;
+    int electrodein = 1, electrodeout = 2, clamp = 3, gamma1 = 4, gamma2 = 5, cavity = 4007, solid = 4008, all = 4009;
 
     // Define all regions needed in the source .nas mesh and save it in .msh format.
     processmesh();
@@ -87,22 +87,26 @@ void processmesh(void)
     // Define the central electrode, outer electrode and clamp regions as well as the regions to apply the periodic condition.
     int elecc = 1, eleco = 2, clamp = 3, gamma1 = 4, gamma2 = 5;
 
+    setphysicalregionshift(1000);
+
     mesh mymesh1;
 
     mymesh1.load("cmutperiodic.nas", 0);
 
-    int vac = regionunion({3000001,3000005});
-    int solid = regionunion({3000002,3000003,3000004,3000006});
+    int vac = regionunion({4001,4005});
+    int solid = regionunion({4002,4003,4004,4006});
     int all = regionunion({vac,solid});
 
     // Rotate the mesh to easily select the bottom side for the periodic condition:
     mymesh1.rotate(0,0,30);
     mymesh1.write("cmutperiodic.msh", 0);
+    
+    setphysicalregionshift(0);
 
     mesh mymesh2;
 
-    mymesh2.boxselection(elecc, 3000001, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
-    mymesh2.boxselection(eleco, 3000006, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
+    mymesh2.boxselection(elecc, 4001, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
+    mymesh2.boxselection(eleco, 4006, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
     mymesh2.boxselection(clamp, all, 2, {-10,10,-10,10,-1e-10,1e-10});
     mymesh2.boxselection(gamma1, all, 2, {-10,10,-1e-10,1e-10,-10,10});
 

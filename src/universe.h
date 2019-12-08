@@ -39,6 +39,9 @@ class universe
         static double fundamentalfrequency;
         static double getfundamentalfrequency(void);
         
+        // Shift the physical region numbers by (physregdim+1) x physregshift when loading a mesh:
+        static int physregshift;
+        
         // To allow reusing computed things:
         static bool isreuseallowed;
         static void allowreuse(void);

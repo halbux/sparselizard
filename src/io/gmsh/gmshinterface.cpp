@@ -1,4 +1,5 @@
 #include "gmshinterface.h"
+#include "universe.h"
 
 
 void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
@@ -88,6 +89,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
             // Get the uncurved element type number:
             int currentelementtype = elementobject.gettypenumber();
             int curvatureorder = elementobject.getcurvatureorder();
+            int elemdim = elementobject.getelementdimension();
             
             // Read now the number of parameters (integers). First parameter is the physical region, we skip the other ones:
             int numberofparameters = std::stoi(stringobject.getstringtonextwhitespace());
@@ -102,7 +104,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
                     stringobject.jumptonextwhitespace();
             }
             // Get the physical region object associated to 'currentphysicalregionnumber':
-            physicalregion* currentphysicalregion = myphysicalregions.get(currentphysicalregionnumber);
+            physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(elemdim+1) + currentphysicalregionnumber);
             // Read now the node number list in the element. The number of nodes depends on the element:
             std::vector<int>  nodesincurrentelement(elementobject.countcurvednodes());
             for (int j = 0; j < elementobject.countcurvednodes(); j++)

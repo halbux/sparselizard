@@ -191,6 +191,8 @@ void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency 
 void mathop::settime(double t) { universe::currenttimestep = t; }
 double mathop::gettime(void) { return universe::currenttimestep; }
 
+void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
+
 expression mathop::t(void) { expression exp; return exp.time(); }
 
 void mathop::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)

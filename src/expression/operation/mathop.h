@@ -55,6 +55,8 @@ namespace mathop
     void setfundamentalfrequency(double f);
     void settime(double t);
     double gettime(void);
+    
+    void setphysicalregionshift(int shiftamount);
 
     // The time variable:
     expression t(void);

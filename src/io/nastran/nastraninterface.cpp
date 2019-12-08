@@ -1,13 +1,9 @@
 #include "nastraninterface.h"
+#include "universe.h"
 
 
 void nastraninterface::readfromfile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
-    // Depending on the software that has generated the .nas file the physical region numbers for regions with elements of different dimensions can overlap.
-    // A number large enough is used to shift the regions of different dimensions by an amount equal to physregnumshift x dim:
-    int physregnumshift = 1e6;
-    
-
     std::string currentline;
 
     // 'file' cannot take a std::string argument --> name.c_str():
@@ -37,7 +33,7 @@ void nastraninterface::readfromfile(std::string name, nodes& mynodes, elements& 
                     int curelemtypenum = myelem.gettypenumber();
                     int elemdim = myelem.getelementdimension();
 
-                    physicalregion* currentphysicalregion = myphysicalregions.get(physregnumshift*elemdim + curphysregnum);
+                    physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(elemdim+1) + curphysregnum);
 
                     // Add the element and its physical region:
                     int elementindexincurrenttype = myelements.add(curelemtypenum, myelem.getcurvatureorder(), nodesincurrentelement);
