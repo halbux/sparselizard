@@ -1,4 +1,5 @@
 #include "petscmesh.h"
+#include "universe.h"
 
 
 void petscmesh::reordernodes(int ourtypenum, std::vector<int>& toreorder)
@@ -171,7 +172,7 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                 int elementindexincurrenttype = myelements.add(elemtypenum, curvatureorder, nodesinelem);
                 
                 // Get the physical region and add the element:
-                physicalregion* currentphysicalregion = myphysicalregions.get(curphysreg);
+                physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(dim+1) + curphysreg);
                 currentphysicalregion->addelement(elemtypenum, elementindexincurrenttype);
             }
                 
