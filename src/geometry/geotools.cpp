@@ -85,9 +85,9 @@ void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<d
 
     // Convert input degrees to radians:
     double pi = 3.1415926535897932384;
-    double ax = alphax*2*pi/360;
-    double ay = alphay*2*pi/360;
-    double az = alphaz*2*pi/360;
+    double ax = alphax*pi/180.0;
+    double ay = alphay*pi/180.0;
+    double az = alphaz*pi/180.0;
     
     // Define the rotation matrix R = Rz*Ry*Rx:
     double cx = std::cos(ax); double sx = std::sin(ax);
