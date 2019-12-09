@@ -89,16 +89,20 @@ void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<d
     double ay = alphay*2*pi/360;
     double az = alphaz*2*pi/360;
     
-    // Define the rotation matrix R = Rx*Ry*Rz:
-    double Rxx = std::cos(ay)*std::cos(az); 
-    double Rxy = -std::cos(ay)*std::sin(az); 
-    double Rxz = std::sin(ay); 
-    double Ryx = std::cos(ax)*std::sin(az) + std::cos(az)*std::sin(ax)*std::sin(ay); 
-    double Ryy = std::cos(ax)*std::cos(az) - std::sin(ax)*std::sin(ay)*std::sin(az); 
-    double Ryz = -std::cos(ay)*std::sin(ax); 
-    double Rzx = std::sin(ax)*std::sin(az) - std::cos(ax)*std::cos(az)*std::sin(ay); 
-    double Rzy = std::cos(az)*std::sin(ax) + std::cos(ax)*std::sin(ay)*std::sin(az); 
-    double Rzz = std::cos(ax)*std::cos(ay); 
+    // Define the rotation matrix R = Rz*Ry*Rx:
+    double cx = std::cos(ax); double sx = std::sin(ax);
+    double cy = std::cos(ay); double sy = std::sin(ay);
+    double cz = std::cos(az); double sz = std::sin(az);
+    
+    double Rxx = cy*cz;
+    double Rxy = cz*sx*sy - cx*sz;
+    double Rxz = sx*sz + cx*cz*sy;
+    double Ryx = cy*sz; 
+    double Ryy = cx*cz + sx*sy*sz; 
+    double Ryz = cx*sy*sz - cz*sx; 
+    double Rzx = -sy; 
+    double Rzy = cy*sx; 
+    double Rzz = cx*cy; 
 
     // Compute R*[coordx; coordy; coordz]:
     for (int nodenumber = 0; nodenumber < numberofnodes; nodenumber++)
