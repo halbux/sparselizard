@@ -74,9 +74,9 @@ double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::v
     // Plane equation is ax + by + cz = d.
     // Setting x or y to zero gives the angle we need:
     if (xy == "xrot")
-        return -360/2/pi*std::atan(-vnormal[1]/vnormal[2]);
+        return -180.0/pi*std::atan(-vnormal[1]/vnormal[2]);
     if (xy == "yrot")
-        return 360/2/pi*std::atan(-vnormal[0]/vnormal[2]);
+        return 180.0/pi*std::atan(-vnormal[0]/vnormal[2]);
 }
 
 void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<double>* coords)
