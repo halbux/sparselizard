@@ -388,7 +388,7 @@ densematrix jacobian::getinvjac(int row, int column)
                 invjac11 = invjac[3*0+0].getvalues();
 
                 for (int i = 0; i < numberofelements*numberofgausspoints; i++)
-                    invjac11[i] = 1/jac11[i];
+                    invjac11[i] = 1.0/jac11[i];
                 break;
             case 2:
                 invjac[3*0+0] = densematrix(numberofelements,numberofgausspoints);
