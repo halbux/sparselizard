@@ -105,7 +105,7 @@ void sparselizard(void)
     // Compute the 5 eigenvalues closest to the target magnitude bt^2 (propagation constant^2).
     // We are looking for modes around neff_target, the target effective refractive index.
     double neff_target = 1.6, bt = k0*neff_target, bt2 = std::pow(bt,2.0);
-    std::cout<<"Target is neff = " << neff_target << ", beta = " << bt << " rad/m" << std::endl << std::endl;
+    std::cout << "Target is neff = " << neff_target << ", beta = " << bt << " rad/m" << std::endl << std::endl;
     // Propagation mode eigenvalue is purely imaginary (i*bt), we thus target -bt^2:
     eig.compute(5, -bt2);
 
