@@ -40,55 +40,46 @@ void sparselizard(void)
     // Waveguide boundary plotting:
     expression(1).write(regionintersection({waveguides, clad}), "skin.vtu");
 
-
     wallclock clk;
 
     // Edge shape functions 'hcurl' for the tranverse electric field Et.
     // Nodal shape functions 'h1' for the longitudinal electric field El.
-    // Fields x, y and z are the x, y and z coordinate fields.
-    field Et("hcurl"), El ("h1"), x("x"), y("y"),z("z");
+    field Et("hcurl"), El("h1");
 
     // Use interpolation order 2 on the whole domain:
     Et.setorder(all, 2);
     El.setorder(all, 2);
 
-    //unit vectors used for projection along the X Y Z directions
-    expression ex(3,1,{1,0,0});
-    expression ey(3,1,{0,1,0});
-    expression ez(3,1,{0,0,1});
-    expression ex2(2,1,{1,0});
-    expression ey2(2,1,{0,1});
+    // Material properties definition
+    parameter n, epsr, mur;
+    n|clad = 1.4;
+    n|wavg1 = 2.0;
+    n|wavg2 = 2.0;
+    epsr|all = n*n;
+    mur|all = 1.0;
+    
+    // Light property
+    double lambda = 680e-9, c = 299792458, f0 = c/lambda, k0 = 2.0*getpi()/lambda;
+    std::cout << std::endl << "lambda = " << lambda*1e9 <<" nm, f0 = " << f0 << " Hz, k0 = " << k0 << " 1/m" << std::endl << std::endl;
 
-    // material properties definition
-    parameter n,epsr,mur;
-    n|clad=1.4;
-    n|wavg1=2;
-    n|wavg2=2;
-    epsr|all=n*n;
-    mur|all=1;
-    // light property
-    double lmb = 680e-9, c = 299792458, f0=c/lmb,k0 = 2*getpi()/lmb;
-    std::cout<<endl<<"lmb= "<< lmb*1e9<<" nm   f0= "<<f0<<" Hz   k0= "<<k0<<" m-1    "<<endl<<endl;
-
-    // perfect conductor BC : nxE=0
+    // Perfect conductor boundary condition:
     El.setconstraint(bound);
     Et.setconstraint(bound);
 
-    // Weak formulation for the eigenvalue problem 
-    // for confined propagation of an EM wave in a waveguide:
+    // Weak formulation for the eigenvalue problem for confined propagation of an EM wave in a waveguide:
     //
-    // 1/mur*curl(Et)*curl(tfEt)-k0^2*epsr*Et*tEt = -bt^2/mur*( grad(El)*tfEt) + Et*tfEt )
+    // 1/mur*curl(Et)*curl(Et') - k0^2*epsr*Et*Et' = -bt^2/mur*( grad(El)*Et') + Et*Et' )
     //
-    // bt^2/mur*( grad(El)*grad(tfEl) + Et*grad(tfEl) ) = k0^2*bt^2*epsr* El*tfEl
+    // bt^2/mur*( grad(El)*grad(El') + Et*grad(El') ) = k0^2*bt^2*epsr* El*El'
     //
-    // the curl and grad operator are particylarized in the transverse plane, meaning X Y
-    // further, the bt constant, coming from the space derivation of exp(i*Bt*z) with be replace by a time derivative dt
+    // where curl() and grad() have a special definition in the transverse (xy) plane.
     //
+    // The bt constant coming from the space derivation of exp(i*bt*z) is replaced by a time derivative dt().
 
 
-    //expressions needed 
-    expression dtdtgradEl(3,1,{dtdt(grad(dof(El)))*ex2,dtdt(grad(dof(El)))*ey2,0});
-    expression gradtfEl(3,1,{grad(tf(El))*ex2,grad(tf(El))*ey2,0});
+    // Operators grad() and curl() in the transverse plane:
+    expression dtdtgradEl(3,1,{dtdt(dx(dof(El))), dtdt(dy(dof(El))), 0});
+    expression gradtfEl(3,1,{dx(tf(El)), dy(tf(El)), 0});
 
     formulation mode;
 
@@ -98,63 +89,57 @@ void sparselizard(void)
     mode += integral(all, dtdtgradEl*gradtfEl+dtdt(dof(Et))*gradtfEl);
     mode += integral(all, -k0*k0*mur*epsr*dtdt(dof(El))*tf(El));	
 
-    // Generate the algebraic system Ax = b:
     mode.generate();
 
-    // Get the stiffness, damping and mass matrix:
+    // Get the stiffness matrix K and mass matrix M:
     mat K = mode.K();
     mat M = mode.M();
 
-    // Remove the rows and columns corresponding to the 0 constraints:
+    // Remove the rows and columns corresponding to 0 constraints:
     K.removeconstraints();
     M.removeconstraints();
 
-    // Create the object to solve the eigenvalue problem 
-    eigenvalue eig(K,M); 
+    // Create the object to solve the eigenvalue problem:
+    eigenvalue eig(K, M); 
 
-    // Compute the 5 eigenvalues closest to the target magnitude bt^2 (propagation constant^2)
-    // basically we look for mode around neff_guess, guess of the effective refarctive index
-    double neff_guess=1.6, bt=k0*neff_guess, bt2=pow(bt,2);
-    std::cout<<"Look around neff = "<<neff_guess<<"    beta = "<<bt<<" rad/m"<<endl<<endl;
-    // propagation mode eigenvalue is purely imaginary : i*bt => look around -bt^2
+    // Compute the 5 eigenvalues closest to the target magnitude bt^2 (propagation constant^2).
+    // We are looking for modes around neff_target, the target effective refractive index.
+    double neff_target=1.6, bt = k0*neff_target, bt2 = std::pow(bt,2.0);
+    std::cout<<"Target is neff = " << neff_target << ", beta = " << bt << " rad/m" << std::endl << std::endl;
+    // Propagation mode eigenvalue is purely imaginary (i*bt), we thus target -bt^2:
     eig.compute(5, -bt2);
 
-    // Catalogue eigenvectors and eigenvalues:
+    // Get all eigenvectors and eigenvalues found:
     std::vector<vec> myrealeigenvectors = eig.geteigenvectorrealpart();
-    std::vector<vec> myimageigenvectors = eig.geteigenvectorimaginarypart();
-    std::vector<double> myrealeigenvalues=eig.geteigenvaluerealpart();
-    std::vector<double> myimageigenvalues=eig.geteigenvalueimaginarypart();
+    std::vector<double> myrealeigenvalues = eig.geteigenvaluerealpart();
 
-    int md=1;
-    double btc;
+
     std::vector<double> neffcs;
-
-
-    std::cout << "Modes retrieved:" <<endl<<endl;
-
-    expression Etotal = array3x1(Et*ex, Et*ey, El);
+    
+    expression Etotal = array3x1(compx(Et), compy(Et), El);
 
     // Loop on all eigenvalues found:
+    int index = 1;
     for (int i = 0; i < myrealeigenvalues.size(); i++)
     {
-        if( myrealeigenvalues[i] < 0 )
+        if (myrealeigenvalues[i] < 0)
         {
-            // Transfer the data from the ith eigenvector to field Et and El:
+            // Transfer the data from the ith eigenvector to fields Et and El:
             Et.setdata(all, myrealeigenvectors[i]);
             El.setdata(all, myrealeigenvectors[i]);
 
-            //compute propagation constant and effective refractive index
-            btc=sqrt(abs(myrealeigenvalues[i]));
-            double neffc=btc/k0;
-            // We need to separate into clad and waveguide regions to keep the discontinuity:
-            Etotal.write(clad, "Eclad_"+ std::to_string(md) +".vtu", 2);
-            Etotal.write(regionunion({wavg1,wavg2}), "Ewav_"+ std::to_string(md) +".vtu", 2);
-            // display retrieved mode information
-            std::cout<<"beta["<<md<<"] = "<<btc<<" rad/m    neff = "<<neffc<<endl;
+            // Compute the propagation constant and the effective refractive index:
+            double btc = std::sqrt(std::abs(myrealeigenvalues[i]));
+            double neffc = btc/k0;
+            // We need to write separately on the clad and waveguide regions to visualize the discontinuity:
+            Etotal.write(clad, "Eclad_"+ std::to_string(index) +".vtu", 2);
+            Etotal.write(regionunion({wavg1,wavg2}), "Ewav_"+ std::to_string(index) +".vtu", 2);
+            // Display mode information:
+            std::cout << "Mode " << index << ": beta = " << btc << " rad/m, neff = " << neffc << std::endl;
 
             neffcs.push_back(neffc);
             
-            md++;
+            index++;
         }
     }
 
@@ -162,8 +147,11 @@ void sparselizard(void)
     grouptimesteps("Eclad.pvd", "Eclad_", 1, neffcs);
     grouptimesteps("Ewav.pvd", "Ewav_", 1, neffcs);
 
-    std::cout<<endl;
+    std::cout << std::endl;
     clk.print("Total time elapsed:");
+
+    // Code validation line. Can be removed.
+    std::cout << (neffcs[0] < 1.65780 && neffcs[0] > 1.65778);
 }
 
 int main(void)
