@@ -29,7 +29,7 @@ using namespace mathop;
 void sparselizard(void)
 {	
     // Give names to the physical region numbers :
-    int wavg1 = 1, wavg2 = 2, clad = 3, all = 4, bound = 5, wgskin = 6;
+    int wavg1 = 1, wavg2 = 2, clad = 3, all = 4, bound = 5;
 
     mesh mymesh;
     mymesh.regionskin(bound, all);
