@@ -1,5 +1,5 @@
 // This code simulates the eigenmodes of two nearby rectangular SiN dielectric photonic 
-// waveguides burried in a SiO2 clad. To do so the 2D cross sectional geometry is 
+// waveguides buried in a SiO2 clad. To do so the 2D cross sectional geometry is 
 // considered and the propagation is assumed to be along the z axis.
 // To solve this eigenvalue problem in 2D while taking into account the z component
 // the electric field is split into a transverse and a longitudinal part.
