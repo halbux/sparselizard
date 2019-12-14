@@ -349,6 +349,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
         xcoord = (x.getpointer()->interpolate(0, 0, elemselect, evaluationcoordinates))[1][0];
         if (meshdeform != NULL)
             xcoord.add((meshdeform->getoperationinarray(0,0)->interpolate(0, elemselect, evaluationcoordinates))[1][0]);
+        jac[3*2+2] = xcoord;
     }
 }
 
@@ -462,6 +463,12 @@ densematrix jacobian::getinvjac(int row, int column)
                     invjac33[i] = (jac11[i] * jac22[i] - jac12[i] * jac21[i]) /detjacval[i];
                 }
                 break;
+        }
+        
+        if (universe::isaxisymmetric)
+        {
+			invjac[3*2+2] = jac[3*2+2].copy();
+            invjac[3*2+2].invert();
         }
     }
 

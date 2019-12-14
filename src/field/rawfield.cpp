@@ -25,14 +25,6 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         std::cout << "Error in 'rawfield' object: first load mesh before defining a field that is not the x, y or z coordinate" << std::endl;
         abort();
     }
-    
-    // Edge shape functions cannot be used with axisymmetry for now:
-    if (universe::isaxisymmetric && fieldtypename == "hcurl")
-    {
-        std::cout << "Error in 'rawfield' object: using hcurl (edge) shape functions with axisymmetry is not allowed." << std::endl;
-        std::cout << "Consider using an alternative formulation with h1 (nodal) shape functions." << std::endl;
-        abort();
-    }
 
     // If the field type name ends with xy (or xyz) there are 2 (or 3) dof components.
     // 'xy' or 'xyz' can only be used on scalar form function type (e.g. not on hcurl).

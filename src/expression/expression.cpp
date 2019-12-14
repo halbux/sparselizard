@@ -1884,7 +1884,12 @@ expression expression::invjac(void)
         case 1:
             return expression(3,3,{invjac(0,0),0,0,   0,1,0,   0,0,1});
         case 2:
-            return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,1});
+        {
+            if (universe::isaxisymmetric)
+                return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,invjac(2,2)});
+            else
+                return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,1});
+        }
         case 3:
             return expression(3,3,{invjac(0,0),invjac(0,1),invjac(0,2),   invjac(1,0),invjac(1,1),invjac(1,2),   invjac(2,0),invjac(2,1),invjac(2,2)});
     }
@@ -1898,7 +1903,12 @@ expression expression::jac(void)
         case 1:
             return expression(3,3,{jac(0,0),0,0,   0,1,0,   0,0,1});
         case 2:
-            return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,1});
+        {
+            if (universe::isaxisymmetric)
+                return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,jac(2,2)});
+            else
+                return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,1});
+        }
         case 3:
             return expression(3,3,{jac(0,0),jac(0,1),jac(0,2),   jac(1,0),jac(1,1),jac(1,2),   jac(2,0),jac(2,1),jac(2,2)});
     }
