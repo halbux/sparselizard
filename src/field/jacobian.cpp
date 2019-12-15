@@ -104,6 +104,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                         jac21[i] = -jac12[i];
                         jac22[i] =  jac11[i];
                         jac23[i] =  0;
+		    }
                     else
                     {
                         jac21[i] = 0;
