@@ -216,8 +216,7 @@ class expression
         expression invjac(int row, int col);
         expression jac(int row, int col);
         expression detjac(void);
-        // Get the whole 3x3 matrix (with zeros everywhere but on the 
-        // 1x1 submatrix in 1D and on the 2x2 submatrix in 2D). 
+        // Get the whole 3x3 Jacobian matrix:
         expression invjac(void);
         expression jac(void);
         
