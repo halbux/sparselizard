@@ -353,7 +353,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
         xcoord = (x.getpointer()->interpolate(0, 0, elemselect, evaluationcoordinates))[1][0];
         if (meshdeform != NULL)
             xcoord.add((meshdeform->getoperationinarray(0,0)->interpolate(0, elemselect, evaluationcoordinates))[1][0]);
-        jac[3*2+2] = xcoord;
+        jac[3*2+2] = xcoord.copy();
     }
 }
 
