@@ -471,7 +471,7 @@ densematrix jacobian::getinvjac(int row, int column)
         
         if (universe::isaxisymmetric)
         {
-			invjac[3*2+2] = jac[3*2+2].copy();
+            invjac[3*2+2] = jac[3*2+2].copy();
             invjac[3*2+2].invert();
         }
     }
