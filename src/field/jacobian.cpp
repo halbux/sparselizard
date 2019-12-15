@@ -98,12 +98,15 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 for (int i = 0; i < numberofelements*numberofgausspoints; i++)
                 {
                     // Second row perpendicular to first row --> [-b a 0] for row 1 = [a b c]
-                    // In case the second row computed with [-b a 0] gives [0 0 0] then [0 -c b] is used instead.
-                    jac21[i] = -jac12[i];
-                    jac22[i] =  jac11[i];
-                    jac23[i] =  0;
-                    if (jac21[i] == 0 && jac22[i] == 0)
+                    // In case the second row computed with [-b a 0] has a smaller norm than [0 -c b] the latter is used instead.
+                    if ( std::sqrt(jac11[i]*jac11[i] + jac12[i]*jac12[i]) > std::sqrt(jac12[i]*jac12[i] + jac13[i]*jac13[i]) )
                     {
+                        jac21[i] = -jac12[i];
+                        jac22[i] =  jac11[i];
+                        jac23[i] =  0;
+                    else
+                    {
+                        jac21[i] = 0;
                         jac22[i] = -jac13[i];
                         jac23[i] =  jac12[i];
                     }
