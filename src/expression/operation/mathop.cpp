@@ -668,12 +668,6 @@ std::vector<expression> mathop::rotation(double alphax, double alphay, double al
     abort();
 }
 
-expression mathop::detjac(void)
-{
-    expression expr;
-    return expr.detjac();
-}
-
 integration mathop::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     return integration(physreg, tointegrate, integrationorderdelta, blocknumber);

@@ -129,9 +129,6 @@ namespace mathop
     // ordering or a 6x6 tensor in Voigt form. Input angles are in degrees.
     std::vector<expression> rotation(double alphax, double alphay, double alphaz, std::string type = "");
 
-    // Get the determinant of the physical to reference element variable change Jacobian:
-    expression detjac(void);
-
     integration integral(int physreg, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
     integration integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
     // For the multiharmonic resolution an extra integer is required
