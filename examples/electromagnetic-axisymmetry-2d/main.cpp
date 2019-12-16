@@ -33,7 +33,7 @@ void sparselizard(void)
     // Use interpolation order 2 on the whole domain:
     E.setorder(sur, 2);
 
-    double freq = 10.0e9, c = 3.0e8, k = 2.0*getpi()*freq/c;
+    double freq = 10.0e9, c = 299792458, k = 2.0*getpi()*freq/c;
 
     E.setconstraint(right, array3x1(0,y,0));
     // Perfect conductor boundary conditions:
@@ -55,7 +55,7 @@ void sparselizard(void)
     std::cout << "Max electric field norm is " << maxE << " V/m" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (maxE < 0.140330 && maxE > 0.140326);
+    std::cout << (maxE < 0.138395 && maxE > 0.138393);
 }
 
 int main(void)
