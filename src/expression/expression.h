@@ -55,10 +55,7 @@ class expression
         // expression operation defined at row i, column j.
         std::vector<std::shared_ptr<operation>> myoperations = {};
         
-        // Is this expression the projection on the physical element of a 
-        // vector form function based-field defined in the reference element?
-        // If no then 'unprojectedfield' has size zero.
-        std::vector<expression> unprojectedfield = {};
+        std::vector<std::pair<std::string,expression>> inrefcoord = {};
         
         
         // FUNCTIONS TO BE CALLED BY THE PUBLIC FUNCTIONS:
@@ -184,8 +181,7 @@ class expression
         expression kietaphiderivative(int whichderivative);
         expression timederivative(int derivativeorder);
         
-        bool isprojectedfield(void) { return (unprojectedfield.size() > 0); };
-        expression getunprojectedfield(void);
+        std::vector<std::pair<std::string,expression>> getinrefcoord(void);
         
         expression transpose(void);
         // Get the submatrix obtained by removing a row and a column:

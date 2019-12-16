@@ -466,8 +466,13 @@ expression mathop::div(expression input)
 
 expression mathop::curl(expression input)
 {
-    bool ishcurlfield = input.isprojectedfield();
-    input = input.getunprojectedfield();
+    bool ishcurlfield = false;
+    std::vector<std::pair<std::string,expression>> inrefcoord = input.getinrefcoord();
+    if (inrefcoord.size() > 0)
+    {
+        ishcurlfield = ((inrefcoord[0].first) == "hcurl");
+        input = inrefcoord[0].second;
+    }
 
     if (input.countcolumns() > 1 || input.countrows() > 3)
     {

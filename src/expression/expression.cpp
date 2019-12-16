@@ -27,11 +27,10 @@ expression::expression(field input)
         }
     }
 
-    // Project from the reference element to the physical one a 1 form (hcurl):
-    if (input.getpointer()->countformfunctioncomponents() > 1)
+    // Transform from the reference element to the physical one a hcurl field:
+    if (input.getpointer()->gettypename() == "hcurl")
     {
-        unprojectedfield = {*this};
-        // A 1 form E is projected as invjac*E:
+        inrefcoord = {std::make_pair("hcurl", *this)};
         myoperations = ( invjac()*(*this) ).myoperations;
     }
 }
@@ -1433,36 +1432,34 @@ expression expression::kietaphiderivative(int whichderivative)
 
 expression expression::timederivative(int derivativeorder)
 {
-  expression derivated = getunprojectedfield();
+    expression derivated = *this;
+    if (inrefcoord.size() > 0)
+        derivated = inrefcoord[0].second;
 
-  for (int i = 0; i < mynumrows*mynumcols; i++)
-  {
-    if (derivated.myoperations[i]->isconstant())
-      derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
-    else
+    for (int i = 0; i < mynumrows*mynumcols; i++)
     {
-      std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
-      op->increasetimederivativeorder(derivativeorder);
-      derivated.myoperations[i] = op;
+        if (derivated.myoperations[i]->isconstant())
+            derivated.myoperations[i] = std::shared_ptr<operation>(new opconstant(0));
+        else
+        {
+            std::shared_ptr<operation> op = derivated.myoperations[i]->copy();
+            op->increasetimederivativeorder(derivativeorder);
+            derivated.myoperations[i] = op;
+        }
     }
-  }
 
-  // Project from the reference element to the physical one a 1 form (hcurl):
-  if (unprojectedfield.size() == 1)
-  {
-    derivated.unprojectedfield = {derivated};
-    // A 1 form E is projected as invjac*E:
-    derivated.myoperations = ( invjac()*(derivated) ).myoperations;
-  }
-  return derivated;
+    // Transform from the reference element to the physical one a hcurl field:
+    if (inrefcoord.size() > 0 && inrefcoord[0].first == "hcurl")
+    {
+        derivated.inrefcoord = {std::make_pair("hcurl",derivated)};
+        derivated.myoperations = ( invjac()*derivated ).myoperations;
+    }
+    return derivated;
 }
 
-expression expression::getunprojectedfield(void)
+std::vector<std::pair<std::string,expression>> expression::getinrefcoord(void)
 {
-    if (unprojectedfield.size() == 0)
-        return *this;
-    else
-        return unprojectedfield[0];
+    return inrefcoord;
 }
 
 expression expression::transpose(void)
@@ -1606,7 +1603,9 @@ expression expression::pow(expression input)
 
 expression expression::dof(int physreg)
 {
-    expression doftag = getunprojectedfield();
+    expression doftag = *this;
+    if (inrefcoord.size() > 0)
+        doftag = inrefcoord[0].second;
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
@@ -1632,20 +1631,21 @@ expression expression::dof(int physreg)
         }
     }
 
-    // Project from the reference element to the physical one a 1 form (hcurl):
-    if (unprojectedfield.size() == 1)
+    // Transform from the reference element to the physical one a hcurl field:
+    if (inrefcoord.size() > 0 && inrefcoord[0].first == "hcurl")
     {
-        doftag.unprojectedfield = {doftag};
-        // A 1 form E is projected as invjac*E:
-        doftag.myoperations = ( invjac()*(doftag) ).myoperations;
+        doftag.inrefcoord = {std::make_pair("hcurl",doftag)};
+        doftag.myoperations = ( invjac()*doftag ).myoperations;
     }
     return doftag;
 }
 
 expression expression::tf(int physreg)
 {
-    expression tftag = getunprojectedfield();
-
+    expression tftag = *this;
+    if (inrefcoord.size() > 0)
+        tftag = inrefcoord[0].second;
+        
     for (int i = 0; i < mynumrows*mynumcols; i++)
     {
         if (tftag.myoperations[i]->isconstant() && tftag.myoperations[i]->getvalue() == 0)
@@ -1670,12 +1670,11 @@ expression expression::tf(int physreg)
         }
     }
 
-    // Project from the reference element to the physical one a 1 form (hcurl):
-    if (unprojectedfield.size() == 1)
+    // Transform from the reference element to the physical one a hcurl field:
+    if (inrefcoord.size() > 0 && inrefcoord[0].first == "hcurl")
     {
-        tftag.unprojectedfield = {tftag};
-        // A 1 form E is projected as invjac*E:
-        tftag.myoperations = ( invjac()*(tftag) ).myoperations;
+        tftag.inrefcoord = {std::make_pair("hcurl",tftag)};
+        tftag.myoperations = ( invjac()*tftag ).myoperations;
     }
     return tftag;
 }
@@ -1917,7 +1916,7 @@ expression expression::jac(void)
 expression expression::getcopy(void)
 {
     expression output = *this;
-    output.unprojectedfield = {};
+    output.inrefcoord = {};
 
     return output;
 }
