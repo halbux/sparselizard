@@ -377,7 +377,7 @@ std::vector<double> expression::max(int physreg, expression meshdeform, int refi
 std::vector<double> expression::min(int physreg, int refinement, std::vector<double> xyzrange)
 {
     // The actual min value is minus the max value found:
-    std::vector<double> output = (-(*this)).max(physreg, NULL, refinement, xyzrange);
+    std::vector<double> output = (-this->getcopy()).max(physreg, NULL, refinement, xyzrange);
     if (output.size() > 0)
         output[0] = -output[0];
     return output;
@@ -386,7 +386,7 @@ std::vector<double> expression::min(int physreg, int refinement, std::vector<dou
 std::vector<double> expression::min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
     // The actual min value is minus the max value found:
-    std::vector<double> output =  (-(*this)).max(physreg, &meshdeform, refinement, xyzrange);
+    std::vector<double> output =  (-this->getcopy()).max(physreg, &meshdeform, refinement, xyzrange);
     if (output.size() > 0)
         output[0] = -output[0];
     return output;
@@ -955,7 +955,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     // For simplicity the code below is written only for 3x1 expressions:
     if (mynumrows == 1)
     {
-        expression(3,1,{*this,0,0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
+        expression(3,1,{this->getcopy(),0,0}).streamline(physreg, filename, startcoords, stepsize, downstreamonly);
         return;
     }
     if (mynumrows == 2)
@@ -1151,7 +1151,7 @@ vec expression::atbarycenter(int physreg, field onefield)
     // When there is a single Gauss point it is at the barycenter --> set integration order to 0.
     // The default integration order is 1 (order of a 'one' field) + 2 :
     formulation formul;
-    formul += integration(physreg, - mathop::tf(onefield)*(*this) / mathop::abs(detjac()), -3);
+    formul += integration(physreg, - mathop::tf(onefield)*(this->getcopy()) / mathop::abs(detjac()), -3);
 
     universe::skipgausspointweightproduct = true;
     formul.generate();
@@ -1204,9 +1204,9 @@ vec expression::integrateonelements(int physreg, expression* meshdeform, field o
     formulation formul;
     // The default integration order is 1 (order of a 'one' field) + 2 :
     if (meshdeform == NULL)
-        formul += integration(physreg, - mathop::tf(onefield)*(*this), -3+integrationorder);
+        formul += integration(physreg, - mathop::tf(onefield)*(this->getcopy()), -3+integrationorder);
     else
-        formul += integration(physreg, *meshdeform, - mathop::tf(onefield)*(*this), -3+integrationorder);
+        formul += integration(physreg, *meshdeform, - mathop::tf(onefield)*(this->getcopy()), -3+integrationorder);
 
     formul.generate();
 
@@ -1280,7 +1280,7 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     
     ///// Rotate the matrix in this expression:
     
-    expression rotated = *this;
+    expression rotated = this->getcopy();
     
     if (leftop == "R")
         rotated = R*rotated;
@@ -1432,7 +1432,7 @@ expression expression::kietaphiderivative(int whichderivative)
 
 expression expression::timederivative(int derivativeorder)
 {
-    expression derivated = *this;
+    expression derivated = this->getcopy();
     if (inrefcoord.size() > 0)
         derivated = inrefcoord[0].second;
 
@@ -1603,7 +1603,7 @@ expression expression::pow(expression input)
 
 expression expression::dof(int physreg)
 {
-    expression doftag = *this;
+    expression doftag = this->getcopy();
     if (inrefcoord.size() > 0)
         doftag = inrefcoord[0].second;
 
@@ -1642,7 +1642,7 @@ expression expression::dof(int physreg)
 
 expression expression::tf(int physreg)
 {
-    expression tftag = *this;
+    expression tftag = this->getcopy();
     if (inrefcoord.size() > 0)
         tftag = inrefcoord[0].second;
         
