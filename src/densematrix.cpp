@@ -610,6 +610,29 @@ densematrix densematrix::duplicatevertically(int n)
     return output;
 }
 
+densematrix densematrix::duplicatehorizontally(int n)
+{
+    densematrix output(numrows, numcols*n);
+    
+    double* myvaluesptr = myvalues.get();
+    double* outmyvaluesptr = output.myvalues.get();
+    
+    long long int ind = 0;
+    for (long long int i = 0; i < numrows; i++)
+    {
+        for (int duplicate = 0; duplicate < n; duplicate++)
+        {
+            for (long long int j = 0; j < numcols; j++)
+            {
+                outmyvaluesptr[ind] = myvaluesptr[i*numcols+j];
+                ind++;   
+            }
+        }
+    }
+    
+    return output;
+}
+
 densematrix densematrix::extractrows(std::vector<int> selected)
 {
     long long int numselected = selected.size();

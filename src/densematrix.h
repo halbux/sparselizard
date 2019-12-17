@@ -144,6 +144,8 @@ class densematrix
         
         // A becomes [A; A; A; ...] n times.
         densematrix duplicatevertically(int n);
+        // A becomes [A A A ...] n times.
+        densematrix duplicatehorizontally(int n);
 
         // Extract a set of rows/columns from the matrix:
         densematrix extractrows(std::vector<int> selected);
