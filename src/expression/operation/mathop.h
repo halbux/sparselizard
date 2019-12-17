@@ -56,6 +56,8 @@ namespace mathop
     void settime(double t);
     double gettime(void);
     
+    expression getmeshsize(void);
+    
     void setphysicalregionshift(int shiftamount);
 
     // The time variable:

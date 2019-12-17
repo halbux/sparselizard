@@ -191,6 +191,12 @@ void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency 
 void mathop::settime(double t) { universe::currenttimestep = t; }
 double mathop::gettime(void) { return universe::currenttimestep; }
 
+expression mathop::getmeshsize(void)
+{
+    std::shared_ptr<opmeshsize> op(new opmeshsize());
+    return expression(op);
+}
+
 void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
 
 expression mathop::t(void) { expression exp; return exp.time(); }
