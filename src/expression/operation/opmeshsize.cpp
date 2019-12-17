@@ -21,6 +21,7 @@ std::vector<std::vector<densematrix>> opmeshsize::interpolate(elementselector& e
     std::shared_ptr<opdetjac> op(new opdetjac);
 
     densematrix output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
+    output.abs();
     output = output.multiply(weightsmat);
     output = output.duplicatehorizontally(evaluationcoordinates.size()/3);
 
@@ -51,6 +52,7 @@ densematrix opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselect
     std::shared_ptr<opdetjac> op(new opdetjac);
 
     densematrix output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
+    output.abs();
     output = output.multiply(weightsmat);
     output = output.duplicatehorizontally(evaluationcoordinates.size()/3);
     output = output.flatten();
