@@ -1634,9 +1634,7 @@ expression mathop::predefinedstokes(expression dofv, expression tfv, expression 
         std::cout << "Error in 'mathop' namespace: 'predefinedstokes' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
-    if (universe::isaxisymmetric)
-        problemdimension++;
-    if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
+    if (dofv.countcolumns() != 1 || dofv.countrows() < problemdimension || tfv.countcolumns() != 1 || tfv.countrows() < problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstokes'" << std::endl;
         abort();
@@ -1659,9 +1657,7 @@ expression mathop::predefinednavierstokes(expression dofv, expression tfv, expre
         std::cout << "Error in 'mathop' namespace: 'predefinednavierstokes' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
-    if (universe::isaxisymmetric)
-        problemdimension++;
-    if (dofv.countcolumns() != 1 || dofv.countrows() != problemdimension || tfv.countcolumns() != 1 || tfv.countrows() != problemdimension || v.countcolumns() != 1 || v.countrows() != problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
+    if (dofv.countcolumns() != 1 || dofv.countrows() < problemdimension || tfv.countcolumns() != 1 || tfv.countrows() < problemdimension || v.countcolumns() != 1 || v.countrows() < problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
         abort();
@@ -1673,4 +1669,47 @@ expression mathop::predefinednavierstokes(expression dofv, expression tfv, expre
         output = output - rho*dt(dofv)*tfv;
 
     return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) +  predefinedinertialforce(dofv, tfv, v, rho) );
+}
+
+
+expression mathop::predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression diffusivity, bool includetimederivs, bool isdensityconstant)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    
+    diffusivity.reuseit();
+
+    if (not(doff.isscalar()) || not(tff.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns())
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedadvectiondiffusion'" << std::endl;
+        abort();
+    }
+
+    expression output = (diffusivity*grad(doff)) * grad(tff) + v*grad(doff)*tff;
+
+    if (includetimederivs)
+        output = output + dt(doff)*tff;
+
+    // div(v) is zero for incompressible fluids:
+    if (isdensityconstant == false)
+        output = output + doff*div(v)*tff;
+
+    return output;
+}
+
+expression mathop::predefineddiffusion(expression doff, expression tff, expression diffusivity, bool includetimederivs)
+{
+    diffusivity.reuseit();
+
+    if (not(doff.isscalar()) || not(tff.isscalar()) || diffusivity.countrows() != diffusivity.countcolumns())
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefineddiffusion'" << std::endl;
+        abort();
+    }
+    
+    expression output = (diffusivity*grad(doff)) * grad(tff) ;
+
+    if (includetimederivs)
+        output = output + dt(doff)*tff;
+
+    return output;
 }

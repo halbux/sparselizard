@@ -214,6 +214,10 @@ namespace mathop
     expression predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs = false, bool isdensityconstant = true, bool isviscosityconstant = true);
     // Navier-Stokes flow for Newtonian fluids:
     expression predefinednavierstokes(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs = false, bool isdensityconstant = true, bool isviscosityconstant = true);
+    
+    // Advection-diffusion equations:
+    expression predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression diffusivity, bool includetimederivs = false, bool isdensityconstant = true);
+    expression predefineddiffusion(expression doff, expression tff, expression diffusivity, bool includetimederivs = false);
 };
 
 #endif
