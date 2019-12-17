@@ -15,9 +15,11 @@ class opmeshsize: public operation
         
         bool reuse = false;
         
-        int myintegrationorder = 6;
+        int myintegrationorder;
         
     public:
+        
+        opmeshsize(int integrationorder) { myintegrationorder = integrationorder; };
         
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);

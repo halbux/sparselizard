@@ -64,7 +64,7 @@ densematrix opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselect
 
 std::shared_ptr<operation> opmeshsize::copy(void)
 {
-    std::shared_ptr<opmeshsize> op(new opmeshsize());
+    std::shared_ptr<opmeshsize> op(new opmeshsize(myintegrationorder));
     *op = *this;
     op->reuse = false;
     return op;

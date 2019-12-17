@@ -191,9 +191,9 @@ void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency 
 void mathop::settime(double t) { universe::currenttimestep = t; }
 double mathop::gettime(void) { return universe::currenttimestep; }
 
-expression mathop::getmeshsize(void)
+expression mathop::getmeshsize(int integrationorder)
 {
-    std::shared_ptr<opmeshsize> op(new opmeshsize());
+    std::shared_ptr<opmeshsize> op(new opmeshsize(integrationorder));
     return expression(op);
 }
 
