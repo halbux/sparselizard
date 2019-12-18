@@ -1720,7 +1720,7 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
     return output;
 }
 
-expression mathop::stabilization(expression doff, expression tff, expression v, std::string stabtype, double strength)
+expression mathop::predefinedstabilization(expression doff, expression tff, expression v, std::string stabtype, double strength)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );       
