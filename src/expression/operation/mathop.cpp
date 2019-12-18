@@ -1712,7 +1712,7 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
         abort();
     }
     
-    expression output = (diffusivity*grad(doff)) * grad(tff) ;
+    expression output = (diffusivity*grad(doff)) * grad(tff);
 
     if (includetimederivs)
         output = output + dt(doff)*tff;
