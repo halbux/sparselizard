@@ -1719,3 +1719,47 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
 
     return output;
 }
+
+expression mathop::stabilization(expression doff, expression tff, expression v, std::string stabtype, double strength)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );       
+     
+    // Isotropic diffusion term:
+    if(stabtype == "isotropic")
+    {
+        expression delta = strength * meshsize * norm(v);
+        return ( delta*grad(doff)*grad(tff) );
+    }
+    // Streamline diffusion, anisotropic:
+    if(stabtype == "anisotropic")
+    {
+        expression delta = strength * meshsize / norm(v);
+        return ( delta*(v*grad(doff))*(v*grad(tff)) );
+    }
+    // Crosswind diffusion:
+    if(stabtype == "crosswind")
+    {
+        // V is v*transpose(v) with flipped signs on the diagonal:
+        expression temp = v*transpose(v);
+        std::vector<expression> exprs(v.countrows()*v.countrows());
+        for (int m = 0; m < v.countrows(); m++)
+        {
+            for (int n = 0; n < v.countrows(); n++)
+            {
+                if (m == n)
+                    exprs[m*v.countrows()+n] = -temp.at(m,n);
+                else
+                    exprs[m*v.countrows()+n] = temp.at(m,n);
+            }
+        }
+        expression V(v.countrows(),v.countrows(), exprs);
+    
+        expression delta = strength * pow(meshsize,1.5) / pow(norm(v),2.0);
+        return ( delta * transpose(grad(doff)) * V * grad(tff) );
+    }
+
+    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'isotropic', 'anisotropic', 'crosswind')"  << std::endl;
+    abort();
+}
+
