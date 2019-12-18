@@ -1720,25 +1720,34 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
     return output;
 }
 
-expression mathop::predefinedstabilization(expression doff, expression tff, expression v, std::string stabtype, double strength)
+expression mathop::predefinedstabilization(expression f, expression v, std::string stabtype, double delta1)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
-    expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );       
+    expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
+     
+    expression doff = dof(f);
+    expression tff = tf(f);
+     
+    if (not(doff.isscalar()) || not(tff.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension)
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
+        abort();
+    }
      
     // Isotropic diffusion term:
-    if(stabtype == "isotropic")
+    if(stabtype == "iso")
     {
-        expression delta = strength * meshsize * norm(v);
+        expression delta = delta1 * meshsize * norm(v);
         return ( delta*grad(doff)*grad(tff) );
     }
     // Streamline diffusion, anisotropic:
-    if(stabtype == "anisotropic")
+    if(stabtype == "aniso")
     {
-        expression delta = strength * meshsize / norm(v);
+        expression delta = delta1 * meshsize / norm(v);
         return ( delta*(v*grad(doff))*(v*grad(tff)) );
     }
     // Crosswind diffusion:
-    if(stabtype == "crosswind")
+    if(stabtype == "cw")
     {
         // V is v*transpose(v) with flipped signs on the diagonal:
         expression temp = v*transpose(v);
@@ -1755,11 +1764,62 @@ expression mathop::predefinedstabilization(expression doff, expression tff, expr
         }
         expression V(v.countrows(),v.countrows(), exprs);
     
-        expression delta = strength * pow(meshsize,1.5) / pow(norm(v),2.0);
+        expression delta = delta1 * pow(meshsize,1.5) / pow(norm(v),2.0);
         return ( delta * transpose(grad(doff)) * V * grad(tff) );
     }
+    
+    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'spg', 'supg')"  << std::endl;
+    abort();
+}
+    
+    
+expression mathop::predefinedstabilization(expression f, expression v, std::string stabtype, double delta1, double delta2, int physreg, expression diffusivity, bool includetimederivs)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
 
-    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'isotropic', 'anisotropic', 'crosswind')"  << std::endl;
+    expression doff = dof(f);
+    expression tff = tf(f);
+    
+    if (not(doff.isscalar()) || not(tff.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension)
+    {
+        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
+        abort();
+    }
+
+    // Streamline diffusion, Petrov-Galerkin:
+    if (stabtype == "spg")
+    {
+        expression output = delta1*meshsize/norm(v);
+        expression residual = -predefinedadvectiondiffusion(doff, tff, v, diffusivity, false, true);
+
+        if (includetimederivs)
+            output = output*(residual - delta2*dt(doff)*v*grad(tff));
+        else
+            output = output*residual;
+
+        return output;
+    }
+
+    // Streamline diffusion, upwind Petrov-Galerkin:
+    if (stabtype == "supg")
+    {
+        double dm = diffusivity.integrate(physreg,2)/expression(1).integrate(physreg,2);
+        expression delta = delta1 * meshsize/norm(v)-dm/pow(norm(v),2.0);
+
+        expression residual = -predefinedadvectiondiffusion(doff, tff, v, diffusivity, false, true);
+        expression output = residual;
+        
+        if (includetimederivs)
+            output = output-delta2*dt(doff)*v*grad(tff);
+
+        output = delta*output;
+        output = ifpositive(delta,1.0,0.0) * output;
+        
+        return output;
+    }
+
+    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'spg', 'supg')"  << std::endl;
     abort();
 }
 
