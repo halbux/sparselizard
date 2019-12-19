@@ -1759,9 +1759,9 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
             for (int n = 0; n < v.countrows(); n++)
             {
                 if (m == n)
-                    exprs[m*v.countrows()+n] = -temp.at(m,n);
-                else
                     exprs[m*v.countrows()+n] = temp.at(m,n);
+                else
+                    exprs[m*v.countrows()+n] = -temp.at(m,n);
             }
         }
         expression V(v.countrows(),v.countrows(), exprs);
