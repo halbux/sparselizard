@@ -1823,7 +1823,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
 
     // Average viscosity:
     expression vm = mu;
-    expression delta = delta1/(sqrt(pow(norm(v)/meshsize,2) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
+    expression delta = delta1/(sqrt(pow(norm(v)/meshsize,2.0) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
 
     expression residual = -grad(dof(p))*grad(tf(p)) - predefinedinertialforce(dof(v),grad(tf(p)), v, rho) - predefinedviscousforce(dof(v), v, mu, true, true)*v*grad(tf(p));
     expression output = residual;
