@@ -1735,21 +1735,21 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     }
      
     // Isotropic diffusion term:
-    if(stabtype == "iso")
+    if (stabtype == "iso")
     {
         expression delta = delta1 * meshsize * norm(v);
         return ( delta*grad(doff)*grad(tff) );
     }
     
     // Streamline diffusion, anisotropic:
-    if(stabtype == "aniso")
+    if (stabtype == "aniso")
     {
         expression delta = delta1 * meshsize / norm(v);
         return ( delta*(v*grad(doff))*(v*grad(tff)) );
     }
     
     // Crosswind diffusion:
-    if(stabtype == "cw")
+    if (stabtype == "cw")
     {
         // V is v*transpose(v) with flipped signs on the diagonal:
         expression temp = v*transpose(v);
