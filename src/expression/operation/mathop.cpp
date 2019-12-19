@@ -1751,7 +1751,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     // Crosswind diffusion:
     if (stabtype == "cw")
     {
-        // V is v*transpose(v) with flipped signs on the diagonal:
+        // V is -v*transpose(v) with flipped signs on the diagonal:
         expression temp = v*transpose(v);
         std::vector<expression> exprs(v.countrows()*v.countrows());
         for (int m = 0; m < v.countrows(); m++)
