@@ -2,7 +2,8 @@
 //
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
-
+//
+// Thanks to R. Haouari for the stabilization terms.
 
 #ifndef MATHOP_H
 #define MATHOP_H
