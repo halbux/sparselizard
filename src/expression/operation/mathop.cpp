@@ -1815,7 +1815,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
     expression dofp = dof(p);
     expression tfp = tf(p);
      
-    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || mu.countrows() != mu.countcolumns() || not(rho.isscalar()))
+    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || not(mu.isscalar()) || not(rho.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
