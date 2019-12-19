@@ -222,8 +222,8 @@ namespace mathop
     expression predefineddiffusion(expression doff, expression tff, expression diffusivity, bool includetimederivs = false);
     
     // Stabilization for advection-diffusion problems:
-    expression predefinedstabilization(expression f, expression v, std::string stabtype, double delta1);
-    expression predefinedstabilization(expression f, expression v, std::string stabtype, double delta1, double delta2, int physreg, expression diffusivity, bool includetimederivs);
+    expression predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, double delta1, double delta2 = 0.0, bool includetimederivs = false);
+    expression predefinedstabilization(expression p, expression v, expression mu, expression rho, double delta1, bool includetimederivs = false);
 };
 
 #endif
