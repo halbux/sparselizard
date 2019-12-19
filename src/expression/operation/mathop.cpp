@@ -1773,7 +1773,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     // Streamline diffusion, Petrov-Galerkin:
     if (stabtype == "spg")
     {
-        expression output = delta1 * meshsize/norm(v);
+        expression output = delta1 * meshsize / norm(v);
         expression residual = -predefinedadvectiondiffusion(doff, tff, v, diffusivity, false, true);
 
         if (includetimederivs)
