@@ -1722,6 +1722,8 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
 
 expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, double delta1, double delta2, bool includetimederivs)
 {
+    v.reuseit(); diffusivity.reuseit();
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
      
@@ -1809,6 +1811,8 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
 
 expression mathop::predefinedstabilization(expression p, expression v, expression mu, expression rho, double delta1, bool includetimederivs)
 {
+    v.reuseit(); mu.reuseit(); rho.reuseit();
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
      
