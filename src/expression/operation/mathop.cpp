@@ -1790,7 +1790,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     if (stabtype == "supg")
     {
         // Average diffusivity:
-        expression dm = diffusivity;
+        expression dm = trace(diffusivity)/diffusivity.countrows();
         expression delta = delta1 * meshsize/norm(v)-dm/pow(norm(v),2.0);
 
         expression residual = -predefinedadvectiondiffusion(doff, tff, v, diffusivity, false, true);
