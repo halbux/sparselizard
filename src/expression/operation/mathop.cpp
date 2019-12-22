@@ -1720,7 +1720,7 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
     return output;
 }
 
-expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, double delta1, double delta2, bool includetimederivs)
+expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression sources, expression delta1, expression delta2, bool includetimederivs)
 {
     v.reuseit(); diffusivity.reuseit();
     
@@ -1730,7 +1730,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     expression doff = dof(f);
     expression tff = tf(f);
      
-    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns())
+    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta1.isscalar()) || not(delta2.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
@@ -1768,20 +1768,28 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         }
         expression V(v.countrows(),v.countrows(), exprs);
     
-        expression delta = delta1 * pow(meshsize,1.5) / pow(norm(v),2.0);
-        return ( delta * transpose(grad(doff)) * V * grad(tff) );
+        // Average diffusivity:
+        expression dm = trace(diffusivity)/diffusivity.countrows();
+    
+        expression residual = v*grad(doff) + sources;
+    
+        expression bp = abs(v*grad(f))/norm(grad(f));
+        expression gp = 0.5*meshsize*bp/dm;
+        expression delta = ifpositive(delta1-1.0/gp,1,0)*0.5*meshsize*(delta1-1.0/gp)*abs(residual)/norm(grad(f));
+        
+        return ( delta/pow(norm(v),2.0)*transpose(grad(doff))*V*grad(tff) );
     }
     
     // Streamline diffusion, Petrov-Galerkin:
     if (stabtype == "spg")
     {
         expression output = delta1 * meshsize / norm(v);
-        expression residual = -predefinedadvectiondiffusion(doff, tff, v, diffusivity, false, true);
+        expression residual = v*grad(doff) + sources;
 
         if (includetimederivs)
-            output = output*(residual - delta2*dt(doff)*v*grad(tff));
+            output = output * (residual+delta2*dt(doff))*v*grad(tff);
         else
-            output = output*residual;
+            output = output * residual*v*grad(tff);
 
         return output;
     }
@@ -1793,13 +1801,14 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         expression dm = trace(diffusivity)/diffusivity.countrows();
         expression delta = delta1 * meshsize/norm(v)-dm/pow(norm(v),2.0);
 
-        expression residual = -predefinedadvectiondiffusion(doff, tff, v, diffusivity, false, true);
+        expression residual = v*grad(doff) + sources;
         expression output = residual;
         
         if (includetimederivs)
-            output = output-delta2*dt(doff)*v*grad(tff);
+            output = delta * (output-delta2*dt(doff))*v*grad(tff);
+        else
+            output = delta * output*v*grad(tff);
 
-        output = delta*output;
         output = ifpositive(delta,1.0,0.0) * output;
         
         return output;
@@ -1809,7 +1818,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     abort();
 }
 
-expression mathop::predefinedstabilization(expression p, expression v, expression mu, expression rho, double delta1, bool includetimederivs)
+expression mathop::predefinedstabilization(expression p, expression v, expression mu, expression rho, expression delta1, bool includetimederivs)
 {
     mu.reuseit(); rho.reuseit();
     
@@ -1819,7 +1828,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
     expression dofp = dof(p);
     expression tfp = tf(p);
      
-    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || not(mu.isscalar()) || not(rho.isscalar()))
+    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || not(mu.isscalar()) || not(rho.isscalar()) || not(delta1.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
