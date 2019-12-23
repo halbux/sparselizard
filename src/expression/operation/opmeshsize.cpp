@@ -20,7 +20,11 @@ std::vector<std::vector<densematrix>> opmeshsize::interpolate(elementselector& e
 
     std::shared_ptr<opdetjac> op(new opdetjac);
 
+    bool wasreuseallowed = universe::isreuseallowed;
+    universe::isreuseallowed = false;
     densematrix output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
+    universe::isreuseallowed = wasreuseallowed;
+    
     output.abs();
     output = output.multiply(weightsmat);
     output = output.duplicatehorizontally(evaluationcoordinates.size()/3);
@@ -51,7 +55,11 @@ densematrix opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselect
 
     std::shared_ptr<opdetjac> op(new opdetjac);
 
+    bool wasreuseallowed = universe::isreuseallowed;
+    universe::isreuseallowed = false;
     densematrix output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
+    universe::isreuseallowed = wasreuseallowed;
+    
     output.abs();
     output = output.multiply(weightsmat);
     output = output.duplicatehorizontally(evaluationcoordinates.size()/3);
