@@ -219,11 +219,11 @@ namespace mathop
     expression predefinednavierstokes(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs = false, bool isdensityconstant = true, bool isviscosityconstant = true);
     
     // Advection-diffusion equations:
-    expression predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression diffusivity, bool includetimederivs = false, bool isdensityconstant = true);
-    expression predefineddiffusion(expression doff, expression tff, expression diffusivity, bool includetimederivs = false);
+    expression predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression alpha, expression beta, expression gamma, bool isdivvzero = true);
+    expression predefineddiffusion(expression doff, expression tff, expression alpha, expression beta, expression gamma);
     
     // Stabilization for advection-diffusion problems:
-    expression predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression sources, expression delta1, expression delta2, bool includetimederivs = false);
+    expression predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression residual, expression delta1, expression delta2, bool includetimederivs = false);
     expression predefinedstabilization(expression p, expression v, expression mu, expression rho, expression delta1, bool includetimederivs = false);
 };
 

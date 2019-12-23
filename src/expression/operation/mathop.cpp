@@ -1678,49 +1678,41 @@ expression mathop::predefinednavierstokes(expression dofv, expression tfv, expre
 }
 
 
-expression mathop::predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression diffusivity, bool includetimederivs, bool isdensityconstant)
+expression mathop::predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression alpha, expression beta, expression gamma, bool isdivvzero)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
-    
-    diffusivity.reuseit();
 
-    if (not(doff.isscalar()) || not(tff.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns())
+    bool isvsizevalid = ( v.countcolumns() == 1 && (v.iszero() || v.countrows() >= problemdimension) );
+
+    if (not(doff.isscalar()) || not(tff.isscalar()) || not(isvsizevalid) || alpha.countrows() != alpha.countcolumns() || not(beta.isscalar()) || not(gamma.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedadvectiondiffusion'" << std::endl;
         abort();
     }
 
-    expression output = (diffusivity*grad(doff)) * grad(tff) + v*grad(doff)*tff;
+    expression output = (alpha*grad(doff)) * grad(tff);
 
-    if (includetimederivs)
-        output = output + dt(doff)*tff;
-
-    // div(v) is zero for incompressible fluids:
-    if (isdensityconstant == false)
-        output = output + doff*div(v)*tff;
-
-    return output;
-}
-
-expression mathop::predefineddiffusion(expression doff, expression tff, expression diffusivity, bool includetimederivs)
-{
-    diffusivity.reuseit();
-
-    if (not(doff.isscalar()) || not(tff.isscalar()) || diffusivity.countrows() != diffusivity.countcolumns())
+    if (not(v.iszero()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefineddiffusion'" << std::endl;
-        abort();
+        output = output + v*grad(doff)*tff;
+        if (isdivvzero == false)
+            output = output + doff*div(v)*tff;
     }
-    
-    expression output = (diffusivity*grad(doff)) * grad(tff);
 
-    if (includetimederivs)
-        output = output + dt(doff)*tff;
+    if (beta.iszero() == false)
+        output = output + beta*dt(doff)*tff;
+    if (gamma.iszero() == false)
+        output = output - gamma*doff*tff;
 
     return output;
 }
 
-expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression sources, expression delta1, expression delta2, bool includetimederivs)
+expression mathop::predefineddiffusion(expression doff, expression tff, expression alpha, expression beta, expression gamma)
+{
+    return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, gamma, true);
+}
+
+expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression residual, expression delta1, expression delta2, bool includetimederivs)
 {
     v.reuseit(); diffusivity.reuseit();
     
@@ -1729,6 +1721,12 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
      
     expression doff = dof(f);
     expression tff = tf(f);
+    
+    if (not(residual.isscalar()) || residual.getoperationinarray(0,0)->istfincluded())
+    {
+        std::cout << "Error in 'mathop' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
+        abort();
+    }
      
     if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta1.isscalar()) || not(delta2.isscalar()))
     {
@@ -1771,8 +1769,6 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
-        expression residual = v*grad(doff) + sources;
-    
         expression bp = abs(v*grad(f))/norm(grad(f));
         expression gp = 0.5*meshsize*bp/dm;
         expression delta = ifpositive(delta1-1.0/gp,1,0)*0.5*meshsize*(delta1-1.0/gp)*abs(residual)/norm(grad(f));
@@ -1784,7 +1780,6 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     if (stabtype == "spg")
     {
         expression output = delta1 * meshsize / norm(v);
-        expression residual = v*grad(doff) + sources;
 
         if (includetimederivs)
             output = output * (residual+delta2*dt(doff))*v*grad(tff);
@@ -1801,7 +1796,6 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         expression dm = trace(diffusivity)/diffusivity.countrows();
         expression delta = delta1 * meshsize/norm(v)-dm/pow(norm(v),2.0);
 
-        expression residual = v*grad(doff) + sources;
         expression output = residual;
         
         if (includetimederivs)
