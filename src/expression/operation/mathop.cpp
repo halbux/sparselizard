@@ -1850,7 +1850,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
 
     if (residual.countcolumns() != 1 || residual.countrows() < problemdimension)
     {
-        std::cout << "Error in 'mathop' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
+        std::cout << "Error in 'mathop' namespace: expected a column vector expression without test function for the residual in 'predefinedstabilization'" << std::endl;
         abort();
     }
      
