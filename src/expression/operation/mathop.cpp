@@ -1848,7 +1848,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
     expression dofp = dof(p);
     expression tfp = tf(p);
 
-    if (not(residual.isscalar()) || residual.getoperationinarray(0,0)->istfincluded())
+    if (residual.countcolumns() != 1 || residual.countrows() != v.countrows())
     {
         std::cout << "Error in 'mathop' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
         abort();
