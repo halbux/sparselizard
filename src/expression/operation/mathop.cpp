@@ -1864,7 +1864,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
     expression vm = trace(mu)/mu.countrows();
     expression delta = delta1/(sqrt(pow(norm(v)/meshsize,2.0) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
 
-    expression output = residual;
+    expression output = residual*grad(tfp);
     
     if (includetimederivs)
         output = output-rho*dt(v)*grad(tfp);
