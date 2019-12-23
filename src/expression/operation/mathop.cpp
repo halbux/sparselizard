@@ -1838,7 +1838,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     abort();
 }
 
-expression mathop::predefinedstabilization(expression p, expression v, expression mu, expression rho, expression delta1, bool includetimederivs)
+expression mathop::predefinedstabilization(expression p, expression v, expression mu, expression rho, expression residual, expression delta1, bool includetimederivs)
 {
     mu.reuseit(); rho.reuseit();
     
@@ -1858,7 +1858,6 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
     expression vm = mu;
     expression delta = delta1/(sqrt(pow(norm(v)/meshsize,2.0) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
 
-    expression residual = -grad(dof(p))*grad(tf(p)) - predefinedinertialforce(dof(v),grad(tf(p)), v, rho) - predefinedviscousforce(dof(v), v, mu, true, true)*v*grad(tf(p));
     expression output = residual;
     
     if (includetimederivs)
