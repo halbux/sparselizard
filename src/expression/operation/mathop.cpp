@@ -1867,7 +1867,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
     expression output = residual*grad(tfp);
     
     if (includetimederivs)
-        output = output-rho*dt(v)*grad(tfp);
+        output = output-rho*dt(dof(v))*grad(tfp);
     output = output*delta;
 
     return output;
