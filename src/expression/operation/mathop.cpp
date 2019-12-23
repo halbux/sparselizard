@@ -1769,6 +1769,32 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
+        expression delta = delta1*pow(meshsize,1.5);
+        
+        return ( delta/pow(norm(v),2.0)*transpose(grad(doff))*V*grad(tff) );
+    }
+    
+    // Crosswind shockwave diffusion:
+    if (stabtype == "cws")
+    {
+        // V is -v*transpose(v) with flipped signs on the diagonal:
+        expression temp = v*transpose(v);
+        std::vector<expression> exprs(v.countrows()*v.countrows());
+        for (int m = 0; m < v.countrows(); m++)
+        {
+            for (int n = 0; n < v.countrows(); n++)
+            {
+                if (m == n)
+                    exprs[m*v.countrows()+n] = temp.at(m,n);
+                else
+                    exprs[m*v.countrows()+n] = -temp.at(m,n);
+            }
+        }
+        expression V(v.countrows(),v.countrows(), exprs);
+    
+        // Average diffusivity:
+        expression dm = trace(diffusivity)/diffusivity.countrows();
+    
         expression bp = abs(v*grad(f))/norm(grad(f));
         expression gp = 0.5*meshsize*bp/dm;
         expression delta = ifpositive(delta1-1.0/gp,1,0)*0.5*meshsize*(delta1-1.0/gp)*abs(residual)/norm(grad(f));
@@ -1808,7 +1834,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         return output;
     }
 
-    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'spg', 'supg')"  << std::endl;
+    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
     abort();
 }
 
