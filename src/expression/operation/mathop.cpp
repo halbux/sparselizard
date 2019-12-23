@@ -1808,7 +1808,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         expression output = delta1 * meshsize / norm(v);
 
         if (includetimederivs)
-            output = output * (residual+delta2*dt(doff))*v*grad(tff);
+            output = output * (residual-delta2*dt(doff))*v*grad(tff);
         else
             output = output * residual*v*grad(tff);
 
