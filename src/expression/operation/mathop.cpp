@@ -1712,7 +1712,7 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
     return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, gamma, true);
 }
 
-expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression residual, expression delta1, expression delta2, bool includetimederivs)
+expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression residual, expression delta1, expression delta2)
 {
     v.reuseit(); diffusivity.reuseit();
     
@@ -1807,7 +1807,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     {
         expression output = delta1 * meshsize / norm(v);
 
-        if (includetimederivs)
+        if (not(delta2.iszero()))
             output = output * (residual-delta2*dt(doff))*v*grad(tff);
         else
             output = output * residual*v*grad(tff);
@@ -1824,7 +1824,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
 
         expression output = residual;
         
-        if (includetimederivs)
+        if (not(delta2.iszero()))
             output = delta * (output-delta2*dt(doff))*v*grad(tff);
         else
             output = delta * output*v*grad(tff);
