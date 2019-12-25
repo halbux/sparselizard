@@ -1719,6 +1719,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     // Avoid zero division issues for zero norm(v):
     double eps = 1e-30;
     expression invnormv = ifpositive(norm(v) - eps, 1.0/norm(v), 0.0);
+    invnormv.reuseit();
     
     int problemdimension = universe::mymesh->getmeshdimension();
     expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
