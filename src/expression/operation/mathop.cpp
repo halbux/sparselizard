@@ -1716,6 +1716,10 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
 {
     v.reuseit(); diffusivity.reuseit();
     
+    // Avoid zero division issues for zero norm(v):
+    double eps = 1e-30;
+    expression invnormv = ifpositive(norm(v) - eps, 1.0/norm(v), 0.0);
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
      
@@ -1744,7 +1748,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     // Streamline diffusion, anisotropic:
     if (stabtype == "aniso")
     {
-        expression delta = delta1 * meshsize / norm(v);
+        expression delta = delta1 * meshsize * invnormv;
         return ( delta*(v*grad(doff))*(v*grad(tff)) );
     }
     
@@ -1771,7 +1775,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     
         expression delta = delta1*pow(meshsize,1.5);
         
-        return ( delta/pow(norm(v),2.0)*transpose(grad(doff))*V*grad(tff) );
+        return ( delta*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
     }
     
     // Crosswind shockwave diffusion:
@@ -1795,17 +1799,25 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
-        expression bp = abs(v*grad(f))/norm(grad(f));
+        // Avoid zero division issues for zero grad(f):
+        expression gradf = grad(f);
+        gradf.reuseit();
+        expression invnormgradf = ifpositive(norm(gradf) - eps, 1.0/norm(gradf), 0.0);
+    
+        expression bp = abs(v*gradf)*invnormgradf;
         expression gp = 0.5*meshsize*bp/dm;
-        expression delta = ifpositive(delta1-1.0/gp,1,0)*0.5*meshsize*(delta1-1.0/gp)*abs(residual)/norm(grad(f));
         
-        return ( delta/pow(norm(v),2.0)*transpose(grad(doff))*V*grad(tff) );
+        expression subtraction = ifpositive(abs(gp) - eps, delta1-1.0/gp, 0.0);
+        
+        expression delta = ifpositive(subtraction,1,0)*0.5*meshsize*subtraction*abs(residual)*invnormgradf;
+        
+        return ( delta*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
     }
     
     // Streamline diffusion, Petrov-Galerkin:
     if (stabtype == "spg")
     {
-        expression output = delta1 * meshsize / norm(v);
+        expression output = delta1 * meshsize * invnormv;
 
         if (not(delta2.iszero()))
             output = output * (residual-delta2*dt(doff))*v*grad(tff);
@@ -1820,7 +1832,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     {
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
-        expression delta = delta1 * meshsize/norm(v)-dm/pow(norm(v),2.0);
+        expression delta = delta1 * meshsize*invnormv-dm*pow(invnormv,2.0);
 
         expression output = residual;
         
