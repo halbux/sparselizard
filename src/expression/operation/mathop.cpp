@@ -1821,7 +1821,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     // Streamline diffusion, Petrov-Galerkin:
     if (stabtype == "spg")
     {
-        return delta1 * meshsize * invnormv * residual*v*grad(tff);
+        return ( delta1 * meshsize * invnormv * residual*v*grad(tff) );
     }
 
     // Streamline diffusion, upwind Petrov-Galerkin:
