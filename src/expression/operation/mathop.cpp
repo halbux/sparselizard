@@ -1712,7 +1712,7 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
     return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, gamma, true);
 }
 
-expression mathop::predefinedstabilization(std::string stabtype, expression f, expression v, expression diffusivity, expression residual, expression delta1, expression delta2)
+expression mathop::predefinedstabilization(std::string stabtype, expression delta1, expression f, expression v, expression diffusivity, expression residual)
 {
     v.reuseit(); diffusivity.reuseit();
     
@@ -1733,7 +1733,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         abort();
     }
      
-    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta1.isscalar()) || not(delta2.isscalar()))
+    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta1.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
@@ -1821,14 +1821,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
     // Streamline diffusion, Petrov-Galerkin:
     if (stabtype == "spg")
     {
-        expression output = delta1 * meshsize * invnormv;
-
-        if (not(delta2.iszero()))
-            output = output * (residual-delta2*dt(doff))*v*grad(tff);
-        else
-            output = output * residual*v*grad(tff);
-
-        return output;
+        return delta1 * meshsize * invnormv * residual*v*grad(tff);
     }
 
     // Streamline diffusion, upwind Petrov-Galerkin:
@@ -1838,12 +1831,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         expression dm = trace(diffusivity)/diffusivity.countrows();
         expression delta = delta1 * meshsize*invnormv-dm*pow(invnormv,2.0);
 
-        expression output;
-        
-        if (not(delta2.iszero()))
-            output = delta * (residual-delta2*dt(doff))*v*grad(tff);
-        else
-            output = delta * residual*v*grad(tff);
+        expression output = delta * residual*v*grad(tff);
 
         return ifpositive(delta,output,0.0);
     }
