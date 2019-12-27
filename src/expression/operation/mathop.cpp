@@ -1838,16 +1838,14 @@ expression mathop::predefinedstabilization(std::string stabtype, expression f, e
         expression dm = trace(diffusivity)/diffusivity.countrows();
         expression delta = delta1 * meshsize*invnormv-dm*pow(invnormv,2.0);
 
-        expression output = residual;
+        expression output;
         
         if (not(delta2.iszero()))
-            output = delta * (output-delta2*dt(doff))*v*grad(tff);
+            output = delta * (residual-delta2*dt(doff))*v*grad(tff);
         else
-            output = delta * output*v*grad(tff);
+            output = delta * residual*v*grad(tff);
 
-        output = ifpositive(delta,1.0,0.0) * output;
-        
-        return output;
+        return ifpositive(delta,output,0.0);
     }
 
     std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
