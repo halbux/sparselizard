@@ -1830,7 +1830,8 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
         expression delta = delta1 * meshsize*invnormv-dm*pow(invnormv,2.0);
-
+        delta.reuseit();
+        
         expression output = delta * residual*v*grad(tff);
 
         return ifpositive(delta,output,0.0);
