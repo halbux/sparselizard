@@ -1834,7 +1834,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         
         expression output = del * residual*v*grad(tff);
 
-        return ifpositive(del,output,0.0);
+        return ( ifpositive(del,1.0,0.0) * output );
     }
 
     std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
