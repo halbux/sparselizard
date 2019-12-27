@@ -1712,7 +1712,7 @@ expression mathop::predefineddiffusion(expression doff, expression tff, expressi
     return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, gamma, true);
 }
 
-expression mathop::predefinedstabilization(std::string stabtype, expression delta1, expression f, expression v, expression diffusivity, expression residual)
+expression mathop::predefinedstabilization(std::string stabtype, expression delta, expression f, expression v, expression diffusivity, expression residual)
 {
     v.reuseit(); diffusivity.reuseit();
     
@@ -1733,7 +1733,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         abort();
     }
      
-    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta1.isscalar()))
+    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
@@ -1742,15 +1742,15 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     // Isotropic diffusion term:
     if (stabtype == "iso")
     {
-        expression delta = delta1 * meshsize * norm(v);
-        return ( delta*grad(doff)*grad(tff) );
+        expression del = delta * meshsize * norm(v);
+        return ( del*grad(doff)*grad(tff) );
     }
     
     // Streamline diffusion, anisotropic:
     if (stabtype == "aniso")
     {
-        expression delta = delta1 * meshsize * invnormv;
-        return ( delta*(v*grad(doff))*(v*grad(tff)) );
+        expression del = delta * meshsize * invnormv;
+        return ( del*(v*grad(doff))*(v*grad(tff)) );
     }
     
     // Crosswind diffusion:
@@ -1774,9 +1774,9 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
-        expression delta = delta1*pow(meshsize,1.5);
+        expression del = delta*pow(meshsize,1.5);
         
-        return ( delta*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
+        return ( del*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
     }
     
     // Crosswind shockwave diffusion:
@@ -1810,18 +1810,18 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         expression gp = 0.5*meshsize*bp/dm;
         gp.reuseit();
         
-        expression subtraction = ifpositive(abs(gp) - eps, delta1-1.0/gp, 0.0);
+        expression subtraction = ifpositive(abs(gp) - eps, delta-1.0/gp, 0.0);
         subtraction.reuseit();
         
-        expression delta = ifpositive(subtraction,1,0)*0.5*meshsize*subtraction*abs(residual)*invnormgradf;
+        expression del = ifpositive(subtraction,1,0)*0.5*meshsize*subtraction*abs(residual)*invnormgradf;
         
-        return ( delta*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
+        return ( del*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
     }
     
     // Streamline diffusion, Petrov-Galerkin:
     if (stabtype == "spg")
     {
-        return ( delta1 * meshsize * invnormv * residual*v*grad(tff) );
+        return ( delta * meshsize * invnormv * residual*v*grad(tff) );
     }
 
     // Streamline diffusion, upwind Petrov-Galerkin:
@@ -1829,19 +1829,19 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     {
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
-        expression delta = delta1 * meshsize*invnormv-dm*pow(invnormv,2.0);
-        delta.reuseit();
+        expression del = delta * meshsize*invnormv-dm*pow(invnormv,2.0);
+        del.reuseit();
         
-        expression output = delta * residual*v*grad(tff);
+        expression output = del * residual*v*grad(tff);
 
-        return ifpositive(delta,output,0.0);
+        return ifpositive(del,output,0.0);
     }
 
     std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
     abort();
 }
 
-expression mathop::predefinedstabilization(expression p, expression v, expression mu, expression rho, expression residual, expression delta1, bool includetimederivs)
+expression mathop::predefinedstabilization(expression delta, expression p, expression v, expression mu, expression rho, expression residual, bool includetimederivs)
 {
     mu.reuseit(); rho.reuseit();
     
@@ -1857,7 +1857,7 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
         abort();
     }
      
-    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || mu.countrows() != mu.countcolumns() || not(rho.isscalar()) || not(delta1.isscalar()))
+    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || mu.countrows() != mu.countcolumns() || not(rho.isscalar()) || not(delta.isscalar()))
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
@@ -1865,13 +1865,13 @@ expression mathop::predefinedstabilization(expression p, expression v, expressio
 
     // Average viscosity:
     expression vm = trace(mu)/mu.countrows();
-    expression delta = delta1/(sqrt(pow(norm(v)/meshsize,2.0) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
+    expression del = delta/(sqrt(pow(norm(v)/meshsize,2.0) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
 
     expression output = residual*grad(tfp);
     
     if (includetimederivs)
         output = output-rho*dt(dof(v))*grad(tfp);
-    output = output*delta;
+    output = output*del;
 
     return output;
 }
