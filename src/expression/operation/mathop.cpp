@@ -392,6 +392,23 @@ expression mathop::compz(expression input) { return comp(2,input); }
 
 expression mathop::entry(int row, int col, expression input) { return input.at(row,col); }
 
+expression mathop::eye(int size)
+{
+    if (size < 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot create a " << size << "x" << size << " identity matrix" << std::endl;
+        abort();
+    }
+
+    std::vector<expression> exprs(size);
+    for (int i = 0; i < size; i++)
+        exprs[i] = 1.0;
+        
+    expression output(size, size, exprs);
+    
+    return output;
+}
+
 expression mathop::transpose(expression input) { return input.transpose(); }
 expression mathop::inverse(expression input) { return input.invert(); }
 expression mathop::determinant(expression input) { return input.determinant(); }

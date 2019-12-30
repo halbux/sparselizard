@@ -109,6 +109,8 @@ namespace mathop
     expression compz(expression input);
 
     expression entry(int row, int col, expression input);
+    
+    expression eye(int size);
 
     expression transpose(expression input);
     expression inverse(expression input);
