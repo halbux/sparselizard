@@ -1750,7 +1750,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         abort();
     }
      
-    if (not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns() || not(delta.isscalar()))
+    if (not(delta.isscalar()) || not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns())
     {
         std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
