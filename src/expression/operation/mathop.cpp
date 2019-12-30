@@ -1773,9 +1773,6 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     // Crosswind diffusion:
     if (stabtype == "cw")
     {
-        // Average diffusivity:
-        expression dm = trace(diffusivity)/diffusivity.countrows();
-    
         expression del = delta*pow(meshsize,1.5);
         
         expression V = eye(v.countrows()) - pow(invnormv,2.0) * v*transpose(v);
