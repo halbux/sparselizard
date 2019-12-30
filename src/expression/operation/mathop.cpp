@@ -1783,6 +1783,12 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     // Crosswind shockwave diffusion:
     if (stabtype == "cws")
     {
+        if (residual.getoperationinarray(0,0)->isdofincluded())
+        {
+            std::cout << "Error in 'mathop' namespace: the residual cannot include a dof for cws in 'predefinedstabilization'" << std::endl;
+            abort();
+        }
+    
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
