@@ -1825,7 +1825,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         return ( ifpositive(del,1.0,0.0) * output );
     }
 
-    std::cout << "Error in 'mathop' namespace: unknown stabilization method " << stabtype << " (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
+    std::cout << "Error in 'mathop' namespace: unknown stabilization method '" << stabtype << "' (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
     abort();
 }
 
