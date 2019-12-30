@@ -1792,14 +1792,14 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         expression invnormgradf = ifpositive(norm(gradf) - eps, 1.0/norm(gradf), 0.0);
         invnormgradf.reuseit();
     
-        expression bp = abs(v*gradf)*invnormgradf;
-        expression gp = 0.5*meshsize*bp/dm;
+        expression vp = abs(v*gradf)*invnormgradf;
+        expression gp = 0.5*meshsize*vp/dm;
         gp.reuseit();
         
         expression subtraction = ifpositive(abs(gp) - eps, delta-1.0/gp, 0.0);
         subtraction.reuseit();
         
-        expression del = ifpositive(subtraction,1,0)*0.5*meshsize*subtraction*abs(residual)*invnormgradf;
+        expression del = ifpositive(subtraction,1.0,0.0)*0.5*meshsize*subtraction*abs(residual)*invnormgradf;
         
         expression V = eye(v.countrows()) - pow(invnormv,2.0) * v*transpose(v);
         
