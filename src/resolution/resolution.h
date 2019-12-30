@@ -9,6 +9,7 @@
 #include "eigenvalue.h"
 #include "genalpha.h"
 #include "impliciteuler.h"
+#include "backdiffform.h"
 
 class resolution
 {
