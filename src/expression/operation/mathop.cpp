@@ -1773,47 +1773,19 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     // Crosswind diffusion:
     if (stabtype == "cw")
     {
-        // V is -v*transpose(v) with flipped signs on the diagonal:
-        expression temp = v*transpose(v);
-        std::vector<expression> exprs(v.countrows()*v.countrows());
-        for (int m = 0; m < v.countrows(); m++)
-        {
-            for (int n = 0; n < v.countrows(); n++)
-            {
-                if (m == n)
-                    exprs[m*v.countrows()+n] = temp.at(m,n);
-                else
-                    exprs[m*v.countrows()+n] = -temp.at(m,n);
-            }
-        }
-        expression V(v.countrows(),v.countrows(), exprs);
-    
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
         expression del = delta*pow(meshsize,1.5);
         
-        return ( del*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
+        expression V = eye(v.countrows()) - pow(invnormv,2.0) * v*transpose(v);
+        
+        return ( del * transpose(grad(doff))*V*grad(tff) );
     }
     
     // Crosswind shockwave diffusion:
     if (stabtype == "cws")
     {
-        // V is -v*transpose(v) with flipped signs on the diagonal:
-        expression temp = v*transpose(v);
-        std::vector<expression> exprs(v.countrows()*v.countrows());
-        for (int m = 0; m < v.countrows(); m++)
-        {
-            for (int n = 0; n < v.countrows(); n++)
-            {
-                if (m == n)
-                    exprs[m*v.countrows()+n] = temp.at(m,n);
-                else
-                    exprs[m*v.countrows()+n] = -temp.at(m,n);
-            }
-        }
-        expression V(v.countrows(),v.countrows(), exprs);
-    
         // Average diffusivity:
         expression dm = trace(diffusivity)/diffusivity.countrows();
     
@@ -1832,7 +1804,9 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         
         expression del = ifpositive(subtraction,1,0)*0.5*meshsize*subtraction*abs(residual)*invnormgradf;
         
-        return ( del*pow(invnormv,2.0)*transpose(grad(doff))*V*grad(tff) );
+        expression V = eye(v.countrows()) - pow(invnormv,2.0) * v*transpose(v);
+        
+        return ( del * transpose(grad(doff))*V*grad(tff) );
     }
     
     // Streamline diffusion, Petrov-Galerkin:
