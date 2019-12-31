@@ -222,7 +222,7 @@ namespace mathop
     
     // Advection-diffusion equations:
     expression predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression alpha, expression beta, expression gamma, bool isdivvzero = true);
-    expression predefineddiffusion(expression doff, expression tff, expression alpha, expression beta, expression gamma);
+    expression predefineddiffusion(expression doff, expression tff, expression alpha, expression beta);
     
     // Stabilization for advection-diffusion problems:
     expression predefinedstabilization(std::string stabtype, expression delta, expression f, expression v, expression diffusivity, expression residual);

@@ -1709,7 +1709,7 @@ expression mathop::predefinedadvectiondiffusion(expression doff, expression tff,
 
     expression output = (alpha*grad(doff)) * grad(tff);
 
-    if (not(v.iszero()))
+    if (not(gamma.iszero()) && not(v.iszero()))
     {
         output = output + v*grad(doff)*tff;
         if (isdivvzero == false)
@@ -1718,15 +1718,13 @@ expression mathop::predefinedadvectiondiffusion(expression doff, expression tff,
 
     if (beta.iszero() == false)
         output = output + beta*dt(doff)*tff;
-    if (gamma.iszero() == false)
-        output = output - gamma*doff*tff;
 
     return output;
 }
 
-expression mathop::predefineddiffusion(expression doff, expression tff, expression alpha, expression beta, expression gamma)
+expression mathop::predefineddiffusion(expression doff, expression tff, expression alpha, expression beta)
 {
-    return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, gamma, true);
+    return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, 0.0, true);
 }
 
 expression mathop::predefinedstabilization(std::string stabtype, expression delta, expression f, expression v, expression diffusivity, expression residual)
