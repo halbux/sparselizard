@@ -1711,9 +1711,9 @@ expression mathop::predefinedadvectiondiffusion(expression doff, expression tff,
 
     if (not(gamma.iszero()) && not(v.iszero()))
     {
-        output = output + v*grad(doff)*tff;
+        output = output + gamma*v*grad(doff)*tff;
         if (isdivvzero == false)
-            output = output + doff*div(v)*tff;
+            output = output + gamma*doff*div(v)*tff;
     }
 
     if (beta.iszero() == false)
