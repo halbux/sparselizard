@@ -1732,7 +1732,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     v.reuseit(); diffusivity.reuseit();
     
     // Avoid zero division issues for zero norm(v):
-    double eps = 1e-20;
+    double eps = 1e-50;
     expression invnormv = ifpositive(norm(v) - eps, 1.0/norm(v), 0.0);
     invnormv.reuseit();
     
