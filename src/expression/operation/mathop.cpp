@@ -1833,38 +1833,3 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     abort();
 }
 
-expression mathop::predefinedstabilization(expression delta, expression p, expression v, expression mu, expression rho, expression residual, bool includetimederivs)
-{
-    mu.reuseit(); rho.reuseit();
-    
-    int problemdimension = universe::mymesh->getmeshdimension();
-    expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
-     
-    expression dofp = dof(p);
-    expression tfp = tf(p);
-
-    if (residual.countcolumns() != 1 || residual.countrows() < problemdimension)
-    {
-        std::cout << "Error in 'mathop' namespace: expected a column vector expression without test function for the residual in 'predefinedstabilization'" << std::endl;
-        abort();
-    }
-     
-    if (not(p.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || mu.countrows() != mu.countcolumns() || not(rho.isscalar()) || not(delta.isscalar()))
-    {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
-        abort();
-    }
-
-    // Average viscosity:
-    expression vm = trace(mu)/mu.countrows();
-    expression del = delta/(sqrt(pow(norm(v)/meshsize,2.0) + pow(3.0*vm/(rho*pow(meshsize,2.0)),2.0)));
-
-    expression output = residual*grad(tfp);
-    
-    if (includetimederivs)
-        output = output-rho*dt(dof(v))*grad(tfp);
-    output = output*del;
-
-    return output;
-}
-
