@@ -1,4 +1,4 @@
-// sparselizard - Copyright (C) 2017- A. Halbach
+// sparselizard - Copyright (C) see copyright file.
 //
 // Contributions kindly provided by R. Haouari.
 //

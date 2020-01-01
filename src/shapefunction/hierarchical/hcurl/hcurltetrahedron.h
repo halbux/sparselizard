@@ -1,4 +1,4 @@
-// sparselizard - Copyright (C) 2017- A. Halbach
+// sparselizard - Copyright (C) see copyright file.
 //
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
