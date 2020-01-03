@@ -1,5 +1,5 @@
 // This is a sandbox example to get a feeling with the stabilization methods
-// proposed in sparselizard for advection-dominated advection diffusion problems.
+// proposed in sparselizard for advection-dominated advection-diffusion problems.
 //
 // The geometry is a square of side 'a' with 'n' mesh points in the x and y direction.
 
