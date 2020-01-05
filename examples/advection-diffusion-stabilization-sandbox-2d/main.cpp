@@ -94,7 +94,6 @@ void sparselizard()
     c.write(sur, "caniso.vtu", 2);
 
 
-
     // Define the strong form residual to be used by the stabilization methods below:
     expression dofres = v*grad(dof(c));
     expression res = v*grad(c);
@@ -108,6 +107,7 @@ void sparselizard()
     adcomb += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     adcomb += integral(sur, predefinedstabilization("supg", deltas, c, v, 1e-6, dofres));
     adcomb += integral(sur, predefinedstabilization("cws", deltac, c, v, 1e-6, res));
+    
     c.setvalue(sur, cinit);
     vec initcomb(adcomb);
     initcomb.setdata(sur, c);
