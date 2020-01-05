@@ -65,7 +65,7 @@ void sparselizard()
     std::cout << std::endl << "Isotropic:" << std::endl;
     formulation adiso;
 
-    adiso += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    adiso += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     adiso += integral(sur, predefinedstabilization("iso", delta, c, v, 0.0, 0.0));
 
     c.setvalue(sur, cinit);
@@ -81,7 +81,7 @@ void sparselizard()
     std::cout << std::endl << "Streamline anisotropic:" << std::endl;
     formulation adaniso;
 
-    adaniso += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    adaniso += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     adaniso += integral(sur, predefinedstabilization("aniso", delta, c, v, 0.0, 0.0));
 
     c.setvalue(sur, cinit);
@@ -105,7 +105,7 @@ void sparselizard()
     std::cout << std::endl << "Streamline and crosswind combined:" << std::endl;
     formulation adcomb;
 
-    adcomb += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    adcomb += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     adcomb += integral(sur, predefinedstabilization("supg", deltas, c, v, 1e-6, dofres));
     adcomb += integral(sur, predefinedstabilization("cws", deltac, c, v, 1e-6, res));
     c.setvalue(sur, cinit);
