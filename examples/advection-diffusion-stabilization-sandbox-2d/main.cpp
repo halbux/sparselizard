@@ -40,71 +40,62 @@ void sparselizard()
     // Tuning factor for the stabilization:
     double delta = 0.1;
     
-    // End time for the simulation:
-    double tend = 5.0;	
+    // Timestep and end time for the simulation:
+    double ts = 0.1, tend = 5.0;	
     
     // This will hold the solution vectors for every timestep:
     std::vector<vec> sol;
 
 
     std::cout << std::endl << "No stabilization:" << std::endl;
-    formulation diffnostab;
+    formulation adnostab;
 
-    diffnostab += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
-    // No normal gradient on horizontal sides:
-    diffnostab += integral(up, compy(grad(dof(c)))*tf(c));
-    diffnostab += integral(down, compy(grad(dof(c)))*tf(c));
-
+    adnostab += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    
     c.setvalue(sur, cinit);
-    vec init(diffnostab);
+    vec init(adnostab);
     init.setdata(sur, c);
-    genalpha genanostab(diffnostab, init, vec(diffnostab), vec(diffnostab), {true,true,true,true});
+    genalpha genanostab(adnostab, init, vec(adnostab), vec(adnostab), {true,true,true,true});
     genanostab.setparameter(0.75);
-    sol = genanostab.runlinear(0, 0.1, tend, 2)[0];
+    sol = genanostab.runlinear(0, ts, tend, 2)[0];
     c.setdata(sur, sol[sol.size()-1]);
     c.write(sur, "cnostab.vtu", 2);
 
 
     std::cout << std::endl << "Isotropic:" << std::endl;
-    formulation diffiso;
+    formulation adiso;
 
-    diffiso += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
-    // No normal gradient on horizontal sides:
-    diffiso += integral(up,compy(grad(dof(c)))*tf(c));
-    diffiso += integral(down,compy(grad(dof(c)))*tf(c));
-    diffiso += integral(sur, predefinedstabilization("iso", delta, c, v, 0.0, 0.0));
+    adiso += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    adiso += integral(sur, predefinedstabilization("iso", delta, c, v, 0.0, 0.0));
 
     c.setvalue(sur, cinit);
-    vec initiso(diffiso);
+    vec initiso(adiso);
     initiso.setdata(sur, c);
-    genalpha genaiso(diffiso, initiso, vec(diffiso), vec(diffiso), {true,true,true,true});
+    genalpha genaiso(adiso, initiso, vec(adiso), vec(adiso), {true,true,true,true});
     genaiso.setparameter(0.75);
-    sol = genaiso.runlinear(0, 0.1, tend, 2)[0];
+    sol = genaiso.runlinear(0, ts, tend, 2)[0];
     c.setdata(sur, sol[sol.size()-1]);
     c.write(sur, "ciso.vtu", 2);
 
 
     std::cout << std::endl << "Streamline anisotropic:" << std::endl;
-    formulation diffaniso;
+    formulation adaniso;
 
-    diffaniso += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
-    // No normal gradient on horizontal sides:
-    diffaniso += integral(up,compy(grad(dof(c)))*tf(c));
-    diffaniso += integral(down,compy(grad(dof(c)))*tf(c));
-    diffaniso += integral(sur, predefinedstabilization("aniso", delta, c, v, 0.0, 0.0));
+    adaniso += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    adaniso += integral(sur, predefinedstabilization("aniso", delta, c, v, 0.0, 0.0));
 
     c.setvalue(sur, cinit);
-    vec initaniso(diffaniso);
+    vec initaniso(adaniso);
     initaniso.setdata(sur, c);
-    genalpha genaaniso(diffaniso, initaniso, vec(diffaniso), vec(diffaniso), {true,true,true,true});
+    genalpha genaaniso(adaniso, initaniso, vec(adaniso), vec(adaniso), {true,true,true,true});
     genaaniso.setparameter(0.75);
-    sol = genaaniso.runlinear(0, 0.1, tend, 2)[0];
+    sol = genaaniso.runlinear(0, ts, tend, 2)[0];
     c.setdata(sur, sol[sol.size()-1]);
     c.write(sur, "caniso.vtu", 2);
 
 
 
-    // Define the strong form resual to be used by the stabilization methods below:
+    // Define the strong form residual to be used by the stabilization methods below:
     expression dofres = v*grad(dof(c));
     expression res = v*grad(c);
 
@@ -112,21 +103,18 @@ void sparselizard()
     double deltas = 0.1, deltac = 0.001;
 
     std::cout << std::endl << "Streamline and crosswind combined:" << std::endl;
-    formulation diffcomb;
+    formulation adcomb;
 
-    diffcomb += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
-    // No normal gradient on horizontal sides:
-    diffcomb += integral(up,compy(grad(dof(c)))*tf(c));
-    diffcomb += integral(down,compy(grad(dof(c)))*tf(c));
-    diffcomb += integral(sur, predefinedstabilization("supg", deltas, c, v, 1e-6, dofres));
-    diffcomb += integral(sur, predefinedstabilization("cws", deltac, c, v, 1e-6, res));
+    adcomb += integral(sur,predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
+    adcomb += integral(sur, predefinedstabilization("supg", deltas, c, v, 1e-6, dofres));
+    adcomb += integral(sur, predefinedstabilization("cws", deltac, c, v, 1e-6, res));
     c.setvalue(sur, cinit);
-    vec initcomb(diffcomb);
+    vec initcomb(adcomb);
     initcomb.setdata(sur, c);
 
-    genalpha genacomb(diffcomb, initcomb, vec(diffcomb), vec(diffcomb), {true,true,true,true});
+    genalpha genacomb(adcomb, initcomb, vec(adcomb), vec(adcomb), {true,true,true,true});
     genacomb.setparameter(0.75);
-    sol = genacomb.runlinear(0, 0.1, tend, 2)[0];
+    sol = genacomb.runlinear(0, ts, tend, 2)[0];
     c.setdata(sur, sol[sol.size()-1]);
     c.write(sur, "ccombined.vtu", 2);
     
