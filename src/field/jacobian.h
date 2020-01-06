@@ -12,9 +12,15 @@
 //
 // The Jacobian matrix is defined as follows:
 //
-//           dkix   dkiy   dkiz
-//           detax  detay  detaz
-//           dphix  dphiy  dphiz
+//           dx/dki   dy/dki   dz/dki
+//           dx/deta  dy/deta  dz/deta
+//           dx/dphi  dy/dphi  dz/dphi
+//
+// Its inverse therefore equals:
+//
+//           dki/dx   deta/dx  dphi/dx
+//           dki/dy   deta/dy  dphi/dy
+//           dki/dz   deta/dz  dphi/dz
 //
 
 #ifndef JACOBIAN_H
