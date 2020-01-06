@@ -424,7 +424,8 @@ expression mathop::grad(expression input)
     // Cylindrical transformation of the gradient of a vector (different than of a scalar):
     if (universe::isaxisymmetric && input.countrows() > 1)
     {
-        field x("x");
+        // Coordinate x on the deformed mesh:
+        expression x = input.jac(2,2);
         // The output must be a nx3 matrix:
         if (input.countrows() == 2)
             return expression(2,3, {compx(dx(input)),compx(dy(input)),0, compy(dx(input)),compy(dy(input)),0});
@@ -463,7 +464,8 @@ expression mathop::div(expression input)
 
     if (universe::isaxisymmetric)
     {
-        field x("x");
+        // Coordinate x on the deformed mesh:
+        expression x = input.jac(2,2);
         switch (input.countrows())
         {
             case 1:
@@ -508,7 +510,8 @@ expression mathop::curl(expression input)
     {
         if (universe::isaxisymmetric)
         {
-            field x("x");
+            // Coordinate x on the deformed mesh:
+            expression x = input.jac(2,2);
             switch (input.countrows())
             {
                 case 1:
