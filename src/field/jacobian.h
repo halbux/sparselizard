@@ -9,6 +9,12 @@
 // If requested the calculations are carried out on the mesh deformed by
 // the provided vector expression 'meshdeform'. The expression must be 
 // constant in time (harmonic 1).
+//
+// The Jacobian matrix is defined as follows:
+//
+//           dkix   dkiy   dkiz
+//           detax  detay  detaz
+//           dphix  dphiy  dphiz
 
 #ifndef JACOBIAN_H
 #define JACOBIAN_H
