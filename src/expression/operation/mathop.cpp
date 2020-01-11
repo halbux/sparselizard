@@ -208,7 +208,7 @@ expression mathop::getfieldorder(field input)
         abort();
     }
     
-    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(1)));
+    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(rf->getfirstharmonic())));
     return expression(op);
 }
 
