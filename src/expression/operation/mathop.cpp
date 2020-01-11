@@ -199,7 +199,7 @@ expression mathop::getmeshsize(int integrationorder)
 
 expression mathop::getfieldorder(field input)
 {
-    shared_ptr<rawfield> rf = input.getpointer();
+    std::shared_ptr<rawfield> rf = input.getpointer();
     
     if (rf->countsubfields() > 1)
     {
