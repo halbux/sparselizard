@@ -31,7 +31,7 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
     if (reuse && universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), {{},{output}});
 
-    // The mesh size is on the cos0 harmonic:
+    // The field order is on the cos0 harmonic:
     return {{},{output}};
 }
 
