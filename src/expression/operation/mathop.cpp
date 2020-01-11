@@ -197,6 +197,21 @@ expression mathop::getmeshsize(int integrationorder)
     return expression(op);
 }
 
+expression mathop::getfieldorder(field input)
+{
+    shared_ptr<rawfield> rf = input.getpointer();
+    
+    if (rf->countsubfields() > 1)
+    {
+        std::cout << "Error in 'mathop' namespace: field provided to 'getfieldorder' cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
+        std::cout << "You could instead provide the x subfield using yourfield.compx()" << std::endl;
+        abort();
+    }
+    
+    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(1)));
+    return expression(op);
+}
+
 void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
 
 expression mathop::t(void) { expression exp; return exp.time(); }

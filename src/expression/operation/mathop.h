@@ -58,6 +58,7 @@ namespace mathop
     double gettime(void);
     
     expression getmeshsize(int integrationorder);
+    expression getfieldorder(field input);
     
     void setphysicalregionshift(int shiftamount);
 
