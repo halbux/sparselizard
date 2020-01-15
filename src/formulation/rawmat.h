@@ -47,8 +47,8 @@ class rawmat
             
     public:
                     
-        rawmat(std::shared_ptr<dofmanager> dofmngr) { mydofmanager = dofmngr; };
-        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input) { mydofmanager = dofmngr; mymat = input; };
+        rawmat(std::shared_ptr<dofmanager> dofmngr);
+        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input);
 
         ~rawmat(void);
      

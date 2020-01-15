@@ -34,7 +34,7 @@ class rawvec
     public:
             
         rawvec(std::shared_ptr<dofmanager> dofmngr);
-        rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input) { mydofmanager = dofmngr; myvec = input; };
+        rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input);
         
         ~rawvec(void);
         
