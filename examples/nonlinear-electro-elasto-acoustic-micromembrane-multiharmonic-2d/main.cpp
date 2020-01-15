@@ -75,9 +75,10 @@ void sparselizard(void)
     // - 1 for the electric potential v
     //
     // Default order is 1.
-    
-    u.setorder(pillars, 2);
+
     u.setorder(membrane, 3);
+    u.setorder(pillars, 2);
+    u.setorder(insulator, 1);
     p.setorder(fluid, 2);
     
     // Clamp and ground all harmonics (i.e. 0 valued-Dirichlet conditions for u and v):
@@ -217,7 +218,7 @@ void sparselizard(void)
     (scaling*p).write(fluid, "p.pos", 3, 50);
     
     // Code validation line. Can be removed.
-    std::cout << (solup.norm() < 0.0002539 && solup.norm() > 0.0002537);
+    std::cout << (solup.norm() < 0.0002516 && solup.norm() > 0.0002515);
 }
 
 int main(void)
