@@ -43,15 +43,20 @@ void sparselizard(void)
     formulation elasticity;
     
     // The linear elasticity formulation with geometric nonlinearity for small strains is predefined:
-    elasticity += integral(botlayer, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0));
+    elasticity += integral(botlayer, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0), 0, 1);
     // The top layer is prestressed with 10 MPa in the x and y direction (sigma xx and yy):
     expression prestress(6,1,{10e6,10e6,0,0,0,0});
-    elasticity += integral(toplayer, predefinedelasticity(dof(u), tf(u), u, E, nu, prestress));
+    elasticity += integral(toplayer, predefinedelasticity(dof(u), tf(u), u, E, nu, prestress), 0, 1);
     // Add the atmospheric pressure force at the top face (perpendicular to it).
     // With u provided as second argument all calculations are performed on the deformed 
     // mesh for this term (thus the normal is updated with the deflection).
     double pressure = 1e5;
-    elasticity += integral(top, u, -pressure*normal(top)*tf(u));
+    elasticity += integral(top, u, -pressure*normal(top)*tf(u), 0, 1);
+    
+    // Add the inertia terms to the formulation (required for eigenvalue computation).
+    // The contribution below has a different tag (2) to be able to exclude it from 
+    // the first .generate(1) call where the inertia terms should not be included.
+    elasticity += integral(vol, -rho*dtdt(dof(u))*tf(u), 0, 2);
     
     
     ///// STEP 1: GET THE STATIC DEFLECTION WITH A NONLINEAR LOOP:
@@ -63,7 +68,7 @@ void sparselizard(void)
     while (relres > 1e-5)
     {
         // Generate and get the algebraic matrix A and vector b of the static Ax = b problem:
-        elasticity.generate();
+        elasticity.generate(1);
         
         mat A = elasticity.A();
         vec b = elasticity.b();
@@ -87,11 +92,7 @@ void sparselizard(void)
     
     ///// STEP 2: COMPUTE THE EIGENFREQUENCIES AND EIGENMODES AROUND THE STATIC DEFLECTION:
     
-    // Add the inertia terms to the formulation (required for eigenvalue computation):
-    elasticity += integral(vol, -rho*dtdt(dof(u))*tf(u));
-    
-    
-    elasticity.generate();
+    elasticity.generate({1,2});
     
     // Get the stiffness and mass matrix:
     mat K = elasticity.K();
