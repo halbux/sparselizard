@@ -29,6 +29,8 @@ class formulation
 {
     private:
         
+        bool isstructurelocked = false;
+        
         // myvec is the right handside vector rhs.
         std::shared_ptr<rawvec> myvec = NULL;
         // - mymat[0] is the stiffness matrix K

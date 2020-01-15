@@ -11,6 +11,12 @@ void formulation::operator+=(std::vector<integration> integrationobject)
 
 void formulation::operator+=(integration integrationobject)
 {
+    if (isstructurelocked)
+    {
+        std::cout << "Error in 'formulation' object: cannot add contributions after a generation step" << std::endl;
+        abort();
+    }
+
     int integrationphysreg = integrationobject.getphysicalregion();
     int elementdimension = universe::mymesh->getphysicalregions()->get(integrationphysreg)->getelementdimension();
     int integrationorderdelta = integrationobject.getintegrationorderdelta();
@@ -104,6 +110,8 @@ int formulation::countdofs(void)
 
 void formulation::generate(int m, int contributionnumber)
 {
+    isstructurelocked = true;
+    
     if (contributionnumber < 0)
     {
         std::cout << "Error in 'formulation' object: cannot generate a negative contribution number" << std::endl;
