@@ -3,9 +3,7 @@
 
 rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
 {
-    // Make a local copy of the dof manager:
-    mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
-    *mydofmanager = *dofmngr;
+    mydofmanager = dofmngr;
 
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
@@ -14,9 +12,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
 
 rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
 {
-    // Make a local copy of the dof manager:
-    mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
-    *mydofmanager = *dofmngr;
+    mydofmanager = dofmngr;
 
     myvec = input;
 }
