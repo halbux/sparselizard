@@ -4,16 +4,12 @@
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)
 {
-    // Make a local copy of the dof manager:
-    mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
-    *mydofmanager = *dofmngr;
+    mydofmanager = dofmngr;
 }
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input)
 {
-    // Make a local copy of the dof manager:
-    mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
-    *mydofmanager = *dofmngr;
+    mydofmanager = dofmngr;
     
     mymat = input;
 }
