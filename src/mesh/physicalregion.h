@@ -28,11 +28,12 @@ class physicalregion
 
         // 'includesdisjointregion[i]' is true if disjoint region i is in the physical region.
         std::vector<bool> includesdisjointregion;
-        // List of all element numbers for every type in every physical region defined in the loaded mesh file.
+        // List of all element numbers in the physical region.
         std::vector<std::vector<int>> elementlist = std::vector<std::vector<int>>(8, std::vector<int>(0));
         
     public:
         
+        physicalregion(void) {};
         physicalregion(disjointregions&, int physicalregionnumber, int physicalregionindex);
         
         int getnumber(void);
