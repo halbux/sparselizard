@@ -121,10 +121,15 @@ int rawfield::getfirstharmonic(void)
 {
     if (mysubfields.size() == 0)
     {
-        for (int h = 0; h < myharmonics.size(); h++)
+        if (myharmonics.size() == 0)
+            return 1;
+        else
         {
-            if (myharmonics[h].size() == 1)
-                return h;
+            for (int h = 0; h < myharmonics.size(); h++)
+            {
+                if (myharmonics[h].size() == 1)
+                    return h;
+            }
         }
     }
     else
