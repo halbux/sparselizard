@@ -164,8 +164,10 @@ class elements
         
         // To call only after all renumbering and reordering steps:
         void definedisjointregions(void);
-        // Reorder and renumber the elements by disjoint regions:
+        // Reorder and renumber the elements by disjoint regions.
         void reorderbydisjointregions(void);
+        // Same but here the renumbering used is provided in 'elementrenumbering' upon return.
+        void reorderbydisjointregions(std::vector<std::vector<int>>& elementrenumbering);
         void definedisjointregionsranges(void);
         
         // Get a vector whose index i is true if node i is a corner node:

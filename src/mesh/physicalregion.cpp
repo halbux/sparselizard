@@ -51,7 +51,6 @@ void physicalregion::definewithdisjointregions(void)
 
     for (int i = 0; i < mydisjointregions->count(); i++)
         includesdisjointregion[i] = mydisjointregions->isinphysicalregion(i, myphysicalregionindex);
-    elementlist = {};
 }
 
 void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)

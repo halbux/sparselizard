@@ -740,22 +740,36 @@ void elements::definedisjointregions(void)
 
 void elements::reorderbydisjointregions(void)
 {
+    std::vector<std::vector<int>> elementrenumbering;
+    reorderbydisjointregions(elementrenumbering);
+}
+
+void elements::reorderbydisjointregions(std::vector<std::vector<int>>& elementrenumbering)
+{
+    elementrenumbering.resize(8);
+    
     for (int typenum = 0; typenum <= 7; typenum++)
     {
         std::vector<int> elementreordering;
         myalgorithm::stablesort(indisjointregion[typenum], elementreordering);
         
-        std::vector<int> elementrenumbering(count(typenum));
+        elementrenumbering[typenum] = std::vector<int>(count(typenum));
         for (int i = 0; i < count(typenum); i++)
-            elementrenumbering[elementreordering[i]] = i;
+            elementrenumbering[typenum][elementreordering[i]] = i;
         
         reorder(typenum, elementreordering);
-        renumber(typenum, elementrenumbering);
+        renumber(typenum, elementrenumbering[typenum]);
 
         // Reorder 'indisjointregion' as well:
         std::vector<int> indisjointregionpart = indisjointregion[typenum];
         for (int i = 0; i < indisjointregion[typenum].size(); i++)
             indisjointregion[typenum][i] = indisjointregionpart[elementreordering[i]]; 
+
+        for (int physregindex = 0; physregindex < myphysicalregions->count(); physregindex++)
+        {
+            physicalregion* currentphysicalregion = myphysicalregions->getatindex(physregindex);
+            currentphysicalregion->renumberelements(typenum, elementrenumbering[typenum]);
+        }
     }
 }
 
