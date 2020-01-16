@@ -22,7 +22,9 @@
 #include "intdensematrix.h"
 #include "rawvec.h"
 #include "rawmat.h"
+#include "integration.h"
 
+class integration;
 class contribution;
 
 class formulation
