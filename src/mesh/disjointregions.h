@@ -47,6 +47,8 @@ class disjointregions
         int getelementdimension(int disjointregionnumber);
         
         bool isinphysicalregion(int disjointregionnumber, int physicalregionindex);
+        
+        void removephysicalregions(std::vector<bool> istoremove);
 
 };
 

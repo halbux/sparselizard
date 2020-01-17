@@ -71,5 +71,20 @@ bool disjointregions::isinphysicalregion(int disjointregionnumber, int physicalr
     return disjointregionsdefinition[disjointregionnumber][physicalregionindex];
 }
 
-
+void disjointregions::removephysicalregions(std::vector<bool> istoremove)
+{
+    for (int i = 0; i < disjointregionsdefinition.size(); i++)
+    {
+        int index = 0;
+        for (int j = 0; j < disjointregionsdefinition[i].size(); j++)
+        {
+            if (not(istoremove[j]))
+            {
+                disjointregionsdefinition[index] = disjointregionsdefinition[j];
+                index++;    
+            }
+        }
+        disjointregionsdefinition[i].resize(index);
+    }
+}
 

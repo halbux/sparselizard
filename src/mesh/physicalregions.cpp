@@ -145,6 +145,39 @@ int physicalregions::getindex(int physicalregionnumber)
     return -1;
 }
 
+void physicalregions::remove(std::vector<int> toremove)
+{
+    // Tag regions to remove:
+    std::vector<bool> istoremove(myphysicalregionnumbers.size(), false);
+
+    int numtokeep = myphysicalregionnumbers.size();
+    for (int i = 0; i < toremove.size(); i++)
+    {
+        int curindex = getindex(toremove[i]);
+        if (curindex != -1)
+        {
+            istoremove[curindex] = true;
+            numtokeep--;
+        }
+    }
+
+    int index = 0;
+    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    {
+        if (not(istoremove[i]))
+        {
+            myphysicalregions[index] = myphysicalregions[i];
+            myphysicalregionnumbers[index] = myphysicalregionnumbers[i];
+            
+            index++;
+        }
+    }
+    myphysicalregions.resize(numtokeep); 
+    myphysicalregionnumbers.resize(numtokeep);
+    
+    mydisjointregions->removephysicalregions(istoremove);
+}
+
 void physicalregions::errorundefined(std::vector<int> physregs)
 {
     for (int i = 0; i < physregs.size(); i++)

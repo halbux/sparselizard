@@ -52,6 +52,9 @@ class physicalregions
         // Get the index of the physical region number (-1 if undefined):
         int getindex(int physicalregionnumber);
         
+        // Remove physical regions (physical regions required for the compressed mesh structure should NOT be removed).
+        void remove(std::vector<int> toremove);
+        
         // Give an error if any of the physical regions is not defined:
         void errorundefined(std::vector<int> physregs);
 };
