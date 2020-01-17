@@ -9,9 +9,12 @@
 
 #include <iostream>
 #include "disjointregions.h"
+#include "physicalregions.h"
 #include <vector>
 #include <algorithm>
 #include "element.h"
+
+class physicalregions;
 
 class physicalregion
 {
@@ -22,9 +25,9 @@ class physicalregion
         int myelementdimension = -1;
         
         int myphysicalregionnumber;
-        int myphysicalregionindex;
         
         disjointregions* mydisjointregions;
+        physicalregions* myphysicalregions;
 
         // 'includesdisjointregion[i]' is true if disjoint region i is in the physical region.
         std::vector<bool> includesdisjointregion;
@@ -34,7 +37,7 @@ class physicalregion
     public:
         
         physicalregion(void) {};
-        physicalregion(disjointregions&, int physicalregionnumber, int physicalregionindex);
+        physicalregion(disjointregions&, physicalregions&, int physicalregionnumber);
         
         int getnumber(void);
         // Add an element of uncurved type 'elementtypenumber' to the physical region:

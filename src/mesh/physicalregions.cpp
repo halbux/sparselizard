@@ -99,7 +99,7 @@ physicalregion* physicalregions::get(int physicalregionnumber)
     }
     
     // If it could not be found append it:
-    physicalregion newphysicalregion(*mydisjointregions, physicalregionnumber, myphysicalregionnumbers.size());
+    physicalregion newphysicalregion(*mydisjointregions, *this, physicalregionnumber);
     myphysicalregions.push_back(newphysicalregion);
     myphysicalregionnumbers.push_back(physicalregionnumber);
     

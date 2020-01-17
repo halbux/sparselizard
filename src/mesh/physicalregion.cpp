@@ -1,11 +1,11 @@
 #include "physicalregion.h"
 
 
-physicalregion::physicalregion(disjointregions& inputdisjointregions, int physicalregionnumber, int physicalregionindex)
+physicalregion::physicalregion(disjointregions& inputdisjointregions, physicalregions& inputphysicalregions, int physicalregionnumber)
 {
     mydisjointregions = &inputdisjointregions;
+    myphysicalregions = &inputphysicalregions;
     myphysicalregionnumber = physicalregionnumber;
-    myphysicalregionindex = physicalregionindex;
 }
 
 int physicalregion::getnumber(void)
@@ -50,7 +50,7 @@ void physicalregion::definewithdisjointregions(void)
     std::fill(includesdisjointregion.begin(), includesdisjointregion.end(), false);
 
     for (int i = 0; i < mydisjointregions->count(); i++)
-        includesdisjointregion[i] = mydisjointregions->isinphysicalregion(i, myphysicalregionindex);
+        includesdisjointregion[i] = mydisjointregions->isinphysicalregion(i, myphysicalregions->getindex(myphysicalregionnumber));
 }
 
 void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)

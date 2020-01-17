@@ -14,6 +14,8 @@
 #include <algorithm>
 #include "myalgorithm.h"
 
+class physicalregion;
+
 class physicalregions
 {
 
