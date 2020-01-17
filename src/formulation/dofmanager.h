@@ -47,6 +47,9 @@ class dofmanager
         std::vector<std::vector<std::vector< int >>> rangebegin = {};
         std::vector<std::vector<std::vector< int >>> rangeend = {};
         
+        // Actual function to add to the structure. Must be private.
+        void addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
+        
     public:
         
         dofmanager(void) {};
@@ -54,7 +57,6 @@ class dofmanager
         
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
-        void addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
         // Always select the field before accessing the dof structure.
         void selectfield(std::shared_ptr<rawfield> selectedfield);
