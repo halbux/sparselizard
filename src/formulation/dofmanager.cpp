@@ -59,6 +59,9 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
     }
 }
 
+dofmanager::dofmanager(void) {}
+dofmanager::dofmanager(int numdofs) { numberofdofs = numdofs; }
+
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     // Get all disjoint regions in the physical region with (-1):
