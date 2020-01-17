@@ -39,7 +39,6 @@ class coefmanager
     coefmanager() {};
     coefmanager(std::string fieldtypename);
     
-    // Check if the form function is defined for the disjoint region (the latter is assumed to exist).
     bool isdefined(int disjreg, int formfunctionindex);
 
     // Update the number of form functions considered in every disjoint region. 
