@@ -80,7 +80,7 @@ void disjointregions::removephysicalregions(std::vector<bool> istoremove)
         {
             if (not(istoremove[j]))
             {
-                disjointregionsdefinition[index] = disjointregionsdefinition[j];
+                disjointregionsdefinition[i][index] = disjointregionsdefinition[i][j];
                 index++;    
             }
         }
