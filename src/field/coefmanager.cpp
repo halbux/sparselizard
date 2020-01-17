@@ -18,6 +18,11 @@ coefmanager::coefmanager(std::string fieldtypename)
         fitinterpolationorder(i, 1);
 }
 
+bool coefmanager::isdefined(int disjreg, int formfunctionindex)
+{
+    return (formfunctionindex < coefs[disjreg].size());
+}
+
 void coefmanager::fitinterpolationorder(int disjreg, int interpolationorder)
 {
     // Get the element type number in the current disjoint region:
