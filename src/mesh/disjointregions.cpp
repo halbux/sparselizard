@@ -88,3 +88,11 @@ void disjointregions::removephysicalregions(std::vector<bool> istoremove)
     }
 }
 
+void disjointregions::clear(void)
+{
+    rangebegin = {};
+    rangeend = {};
+    disjointregionsdefinition = {};
+    elementtypenumbers = {};
+}
+

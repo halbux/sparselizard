@@ -49,6 +49,9 @@ class disjointregions
         bool isinphysicalregion(int disjointregionnumber, int physicalregionindex);
         
         void removephysicalregions(std::vector<bool> istoremove);
+        
+        // Clear the content of this object:
+        void clear(void);
 
 };
 
