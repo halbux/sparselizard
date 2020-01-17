@@ -11,6 +11,17 @@ int disjointregions::countelements(int disjointregionnumber)
     return rangeend[disjointregionnumber] - rangebegin[disjointregionnumber] + 1;
 }
 
+int disjointregions::countelementsintype(int elementtypenumber)
+{
+    int numelems = 0;
+    for (int d = 0; d < elementtypenumbers.size(); d++)
+    {
+        if (elementtypenumbers[d] == elementtypenumber)
+            numelems += rangeend[d] - rangebegin[d] + 1;
+    }
+    return numelems;
+}
+
 int disjointregions::add(int elementtypenumber, std::vector<bool>& physicalregionsincludingit)
 {
     // Check if the disjoint region is already defined (loop is last to first for speedup):
