@@ -47,6 +47,7 @@ class dofmanager
         std::vector<std::vector<std::vector< int >>> rangebegin = {};
         std::vector<std::vector<std::vector< int >>> rangeend = {};
         
+    
         // Actual function to add to the structure. Must be private.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
         
