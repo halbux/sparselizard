@@ -55,7 +55,7 @@ class dofmanager
         
         // Synchronize with the hp-adapted mesh:
         void synchronize(void);
-        // To avoid deadlocks:
+        // To avoid infinite recursive calls:
         bool issynchronizing = false;
         
     
