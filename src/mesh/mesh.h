@@ -43,6 +43,7 @@ class mesh
         
         regiondefiner myregiondefiner;
         
+        int mynumber = 0;
         std::shared_ptr<meshtracker> mymeshtracker = NULL;
         
 
@@ -75,6 +76,7 @@ class mesh
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
         std::shared_ptr<meshtracker> getmeshtracker(void);
+        int getmeshnumber(void) { return mynumber; };
 
         // Load from file name:
         void load(std::string name, int verbosity = 1, bool legacyreader = true);   
