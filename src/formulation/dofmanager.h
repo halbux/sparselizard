@@ -18,7 +18,6 @@
 #include "intdensematrix.h"
 #include <memory>
 #include "selector.h"
-#include "meshtracker.h"
 
 class rawfield;
 
@@ -49,7 +48,7 @@ class dofmanager
         std::vector<std::vector<std::vector< int >>> rangeend = {};
         
         
-        std::shared_ptr<meshtracker> mymeshtracker = NULL;
+        int mymeshnumber = 0;
         
         // Track the calls to 'addtostructure'.
         std::vector<std::pair<int, std::shared_ptr<rawfield>>> mystructuretracker = {};

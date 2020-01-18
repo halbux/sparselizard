@@ -3,7 +3,7 @@
 
 void dofmanager::synchronize(void)
 {
-    if (issynchronizing || universe::mymesh->getmeshtracker() == mymeshtracker)
+    if (issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
         return;
     issynchronizing = true;    
 
@@ -20,7 +20,7 @@ void dofmanager::synchronize(void)
         addtostructure(mystructuretracker[i].second, mystructuretracker[i].first);
     
     
-    mymeshtracker = universe::mymesh->getmeshtracker();
+    mymeshnumber = universe::mymesh->getmeshnumber();
     issynchronizing = false;
 }
 
@@ -86,14 +86,14 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
 
 dofmanager::dofmanager(void)
 {
-    mymeshtracker = universe::mymesh->getmeshtracker();
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
 dofmanager::dofmanager(int numdofs)
 {
     numberofdofs = numdofs;
     
-    mymeshtracker = universe::mymesh->getmeshtracker();
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
 void dofmanager::donotsynchronize(void)
