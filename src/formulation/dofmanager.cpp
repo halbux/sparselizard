@@ -17,7 +17,7 @@ void dofmanager::synchronize(void)
 
     // Rebuild the structure:
     for (int i = 0; i < mystructuretracker.size(); i++)
-        addtostructure(mystructuretracker[i].second, mystructuretracker[i].first);
+        addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
     
     mymeshnumber = universe::mymesh->getmeshnumber();
@@ -107,7 +107,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physic
     
     // Keep track of the calls to 'addtostructure':
     if (issynchronizing == false)
-        mystructuretracker.push_back(std::make_pair(physicalregionnumber, fieldtoadd));
+        mystructuretracker.push_back(std::make_pair(fieldtoadd, physicalregionnumber));
 
     // Get all disjoint regions in the physical region with (-1):
     std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);

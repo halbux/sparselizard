@@ -51,7 +51,7 @@ class dofmanager
         int mymeshnumber = 0;
         
         // Track the calls to 'addtostructure'.
-        std::vector<std::pair<int, std::shared_ptr<rawfield>>> mystructuretracker = {};
+        std::vector<std::pair<std::shared_ptr<rawfield>, int>> mystructuretracker = {};
         
         // Synchronize with the hp-adapted mesh:
         void synchronize(void);
