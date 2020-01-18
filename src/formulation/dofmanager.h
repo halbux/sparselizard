@@ -68,6 +68,8 @@ class dofmanager
         dofmanager(void);
         dofmanager(int numdofs);
         
+        void donotsynchronize(void);
+        
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);

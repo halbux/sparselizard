@@ -96,12 +96,18 @@ dofmanager::dofmanager(int numdofs)
     mymeshtracker = universe::mymesh->getmeshtracker();
 }
 
+void dofmanager::donotsynchronize(void)
+{
+    issynchronizing = true;
+}
+
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     synchronize();
     
     // Keep track of the calls to 'addtostructure':
-    mystructuretracker.push_back(std::make_pair(physicalregionnumber, fieldtoadd));
+    if (issynchronizing == false)
+        mystructuretracker.push_back(std::make_pair(physicalregionnumber, fieldtoadd));
 
     // Get all disjoint regions in the physical region with (-1):
     std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
