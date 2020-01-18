@@ -36,7 +36,7 @@ class parameter
 
         // myexpressions[disjreg][i*mynumcols+j] stores the ith row, jth 
         // columns of the parameter expression defined on disjreg.
-        std::vector<std::vector<std::shared_ptr<operation>>> myoperations;
+        std::vector<std::vector<std::shared_ptr<operation>>> myoperations = {};
 
         // Store a number associated to the operation on a given disjoint 
         // region. The operations on the disjoint regions on which the 
@@ -44,7 +44,18 @@ class parameter
         // number because they are the same. This enables to interpolate on 
         // groups of disjoint regions that share the same operation number.
         int maxopnum = -1;
-        std::vector<int> opnums;
+        std::vector<int> opnums = {};
+        
+        
+       int mymeshnumber = 0;
+        
+        // Track the calls to 'set'.
+        std::vector<std::pair<int, expression>> mystructuretracker = {};
+        
+        // Synchronize with the hp-adapted mesh:
+        void synchronize(void);
+        // To avoid infinite recursive calls:
+        bool issynchronizing = false;
 
 
         // Give an error if the parameter is undefined on at least one disj. reg.
@@ -62,10 +73,10 @@ class parameter
         // It can also only store expression arrays of a same dimension. 
         void set(int physreg, expression);
 
-        std::shared_ptr<operation> get(int disjreg, int row, int col) { errorifundefined({disjreg}); return myoperations[disjreg][row*mynumcols+col]; };
+        std::shared_ptr<operation> get(int disjreg, int row, int col);
 
-        int countrows(void) { return mynumrows; };
-        int countcolumns(void) { return mynumcols; };
+        int countrows(void);
+        int countcolumns(void);
 
         parameterselectedregion operator|(int physreg);
 

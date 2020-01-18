@@ -1,8 +1,31 @@
 #include "parameter.h"
 
 
+void parameter::synchronize(void)
+{
+    if (issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+        return;
+    issynchronizing = true;    
+
+
+    // Flush the structure:
+    myoperations = {};
+    int maxopnum = -1;
+    std::vector<int> opnums = {};
+
+    // Rebuild the structure:
+    for (int i = 0; i < mystructuretracker.size(); i++)
+        set(mystructuretracker[i].first, mystructuretracker[i].second);
+    
+    
+    mymeshnumber = universe::mymesh->getmeshnumber();
+    issynchronizing = false;
+}
+
 void parameter::errorifundefined(std::vector<int> disjregs)
 {
+    synchronize();
+
     for (int i = 0; i < disjregs.size(); i++)
     {
         if (myoperations[disjregs[i]].size() == 1 && myoperations[disjregs[i]][0] == NULL)
@@ -15,6 +38,8 @@ void parameter::errorifundefined(std::vector<int> disjregs)
 
 std::vector<int> parameter::getopnums(std::vector<int> disjregs)
 {
+    synchronize();
+    
     std::vector<int> output(disjregs.size());
     for (int i = 0; i < disjregs.size(); i++)
         output[i] = opnums[disjregs[i]];
@@ -35,6 +60,12 @@ parameter::parameter(int numrows, int numcols) : myoperations((universe::mymesh-
 
 void parameter::set(int physreg, expression input)
 {
+    synchronize();
+    
+    // Keep track of the calls to 'set':
+    if (issynchronizing == false)
+        mystructuretracker.push_back(std::make_pair(physreg, input));
+        
     if (mynumrows != input.countrows() || mynumcols != input.countcolumns())
     {
         std::cout << "Error in 'parameter' object: trying to set the " << mynumrows << "x" << mynumcols << " sized parameter to a size " << input.countrows() << "x" << input.countcolumns() << std::endl;
@@ -66,13 +97,39 @@ void parameter::set(int physreg, expression input)
     }
 }
 
+std::shared_ptr<operation> parameter::get(int disjreg, int row, int col)
+{
+    synchronize();
+    
+    errorifundefined({disjreg});
+    return myoperations[disjreg][row*mynumcols+col];
+}
+
+int parameter::countrows(void)
+{
+    synchronize();
+    
+    return mynumrows;
+}
+
+int parameter::countcolumns(void)
+{
+    synchronize();
+    
+    return mynumcols;
+}
+
 parameterselectedregion parameter::operator|(int physreg)
 {
+    synchronize();
+    
     return parameterselectedregion(this, physreg);
 }
 
 std::vector<std::vector<densematrix>> parameter::interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
+    synchronize();
+    
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
@@ -130,6 +187,8 @@ std::vector<std::vector<densematrix>> parameter::interpolate(int row, int col, e
 
 densematrix parameter::multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
+    synchronize();
+    
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
@@ -178,6 +237,8 @@ densematrix parameter::multiharmonicinterpolate(int row, int col, int numtimeeva
     
 void parameter::simplify(int row, int col, int disjreg)
 {
+    synchronize();
+    
     // Make sure the parameter has been defined:
     errorifundefined({disjreg});
     
@@ -186,6 +247,8 @@ void parameter::simplify(int row, int col, int disjreg)
 
 void parameter::print(void)
 {
+    synchronize();
+    
     std::cout << std::endl;
     std::cout << "Printing parameter of size " << mynumrows << "x" << mynumcols;
     std::cout << std::endl;
@@ -212,7 +275,8 @@ void parameter::print(void)
 
 
 
-vec parameter::atbarycenter(int physreg, field onefield) { return ((expression)*this).atbarycenter(physreg, onefield); }
+vec parameter::atbarycenter(int physreg, field onefield)
+{ return ((expression)*this).atbarycenter(physreg, onefield); }
 
 std::vector<double> parameter::max(int physreg, int refinement, std::vector<double> xyzrange)
 { return ((expression)*this).max(physreg, refinement, xyzrange); }
