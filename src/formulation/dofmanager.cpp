@@ -1,8 +1,33 @@
 #include "dofmanager.h"
 
 
+void dofmanager::synchronize(void)
+{
+    if (issynchronizing || universe::mymesh->getmeshtracker() == mymeshtracker)
+        return;
+    issynchronizing = true;    
+
+
+    // Flush the structure:
+    numberofdofs = 0;
+    std::vector<std::shared_ptr<rawfield>> myfields = {};
+    selectedfieldnumber = -1;
+    std::vector<std::vector<std::vector< int >>> rangebegin = {};
+    std::vector<std::vector<std::vector< int >>> rangeend = {};
+
+    // Rebuild the structure:
+    for (int i = 0; i < mystructuretracker.size(); i++)
+        addtostructure(mystructuretracker[i].second, mystructuretracker[i].first);
+    
+    
+    mymeshtracker = universe::mymesh->getmeshtracker();
+    issynchronizing = false;
+}
+
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions)
 {  
+    synchronize();
+    
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
 
     // Find the field index of 'fieldtoadd' (if present):
@@ -59,11 +84,25 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
     }
 }
 
-dofmanager::dofmanager(void) {}
-dofmanager::dofmanager(int numdofs) { numberofdofs = numdofs; }
+dofmanager::dofmanager(void)
+{
+    mymeshtracker = universe::mymesh->getmeshtracker();
+}
+
+dofmanager::dofmanager(int numdofs)
+{
+    numberofdofs = numdofs;
+    
+    mymeshtracker = universe::mymesh->getmeshtracker();
+}
 
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
+    synchronize();
+    
+    // Keep track of the calls to 'addtostructure':
+    mystructuretracker.push_back(std::make_pair(physicalregionnumber, fieldtoadd));
+
     // Get all disjoint regions in the physical region with (-1):
     std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
     
@@ -72,6 +111,8 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physic
 
 void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
 {
+    synchronize();
+    
     selectedfieldnumber = -1;
     for (int i = 0; i < myfields.size(); i++)
     {
@@ -90,6 +131,8 @@ void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
 
 std::vector<int> dofmanager::getdisjointregionsofselectedfield(void)
 {
+    synchronize();
+    
     int totalnumdisjreg = universe::mymesh->getdisjointregions()->count();
     
     std::vector<int> output(totalnumdisjreg);
@@ -107,11 +150,31 @@ std::vector<int> dofmanager::getdisjointregionsofselectedfield(void)
     return output;
 }
 
-int dofmanager::getrangebegin(int disjreg, int formfunc) { return rangebegin[selectedfieldnumber][disjreg][formfunc]; }
-int dofmanager::getrangeend(int disjreg, int formfunc) { return rangeend[selectedfieldnumber][disjreg][formfunc]; }
+int dofmanager::getrangebegin(int disjreg, int formfunc)
+{
+    synchronize();
+    
+    return rangebegin[selectedfieldnumber][disjreg][formfunc];
+}
 
+int dofmanager::getrangeend(int disjreg, int formfunc)
+{
+    synchronize();
+    
+    return rangeend[selectedfieldnumber][disjreg][formfunc];
+}
+
+bool dofmanager::isdefined(int disjreg, int formfunc)
+{
+    synchronize();
+    
+    return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
+}
+        
 int dofmanager::countconstraineddofs(void)
 {
+    synchronize();
+    
     int numconstraineddofs = 0;
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
@@ -128,6 +191,8 @@ int dofmanager::countconstraineddofs(void)
 
 intdensematrix dofmanager::getconstrainedindexes(void)
 {
+    synchronize();
+    
     intdensematrix output(1,countconstraineddofs());
     int* myval = output.getvalues();
     
@@ -156,6 +221,8 @@ intdensematrix dofmanager::getconstrainedindexes(void)
 
 int dofmanager::countgaugeddofs(void)
 {
+    synchronize();
+    
     int numgaugeddofs = 0;
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
@@ -192,6 +259,8 @@ int dofmanager::countgaugeddofs(void)
 
 intdensematrix dofmanager::getgaugedindexes(void)
 {
+    synchronize();
+    
     intdensematrix output(1,countgaugeddofs());
     int* myval = output.getvalues();
     
@@ -232,6 +301,8 @@ intdensematrix dofmanager::getgaugedindexes(void)
 
 std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(void)
 {
+    synchronize();
+    
     // This will have an entry for every field and every disjoint node region that is conditionally constrained:
     std::vector<intdensematrix> indexmat = {};
     std::vector<densematrix> condvalvec = {};
@@ -350,6 +421,8 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
 
 std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
 {
+    synchronize();
+    
     // Set a default -1 renumbering:
     for (int i = 0; i < numberofdofs; i++)
         dofrenumbering[i] = -1;
@@ -393,8 +466,24 @@ std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
     return newdofmanager;
 }
 
+std::vector<std::shared_ptr<rawfield>> dofmanager::getfields(void)
+{
+    synchronize();
+    
+    return myfields;
+}
+
+int dofmanager::countdofs(void)
+{
+    synchronize();
+    
+    return numberofdofs;
+}
+        
 void dofmanager::print(void)
 {
+    synchronize();
+    
     std::cout << "Showing the content of the dof manager (" << numberofdofs << " dofs in total):" << std::endl << std::endl;
     
     for (int i = 0; i < myfields.size(); i++)
@@ -416,6 +505,8 @@ void dofmanager::print(void)
 
 intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
 {
+    synchronize();
+    
     elements* myelements = universe::mymesh->getelements();
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
 
@@ -485,7 +576,4 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
 
     return output;
 }
-    
-
-
 

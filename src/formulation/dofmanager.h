@@ -18,6 +18,7 @@
 #include "intdensematrix.h"
 #include <memory>
 #include "selector.h"
+#include "meshtracker.h"
 
 class rawfield;
 
@@ -47,6 +48,17 @@ class dofmanager
         std::vector<std::vector<std::vector< int >>> rangebegin = {};
         std::vector<std::vector<std::vector< int >>> rangeend = {};
         
+        
+        std::shared_ptr<meshtracker> mymeshtracker = NULL;
+        
+        // Track the calls to 'addtostructure'.
+        std::vector<std::pair<int, std::shared_ptr<rawfield>>> mystructuretracker = {};
+        
+        // Synchronize with the hp-adapted mesh:
+        void synchronize(void);
+        // To avoid deadlocks:
+        bool issynchronizing = false;
+        
     
         // Actual function to add to the structure.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vector<int> selecteddisjointregions);
@@ -68,7 +80,7 @@ class dofmanager
         int getrangebegin(int disjreg, int formfunc);
         int getrangeend(int disjreg, int formfunc);
         
-        bool isdefined(int disjreg, int formfunc) { return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); };
+        bool isdefined(int disjreg, int formfunc);
         
         int countconstraineddofs(void);
         intdensematrix getconstrainedindexes(void);
@@ -84,9 +96,9 @@ class dofmanager
         // Removed dofs are renumbered as -1.
         std::shared_ptr<dofmanager> removeconstraints(int* dofrenumbering);
         
-        std::vector<std::shared_ptr<rawfield>> getfields(void) { return myfields; };
+        std::vector<std::shared_ptr<rawfield>> getfields(void);
         
-        int countdofs(void) { return numberofdofs; };
+        int countdofs(void);
         
         void print(void);
         
