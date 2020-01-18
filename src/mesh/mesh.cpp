@@ -123,6 +123,7 @@ nodes* mesh::getnodes(void) {return &mynodes;}
 elements* mesh::getelements(void) {return &myelements;}
 physicalregions* mesh::getphysicalregions(void) {return &myphysicalregions;}
 disjointregions* mesh::getdisjointregions(void) {return &mydisjointregions;}
+std::shared_ptr<meshtracker> mesh::getmeshtracker(void) { return mymeshtracker; }
 
 void mesh::load(std::string name, int verbosity, bool legacyreader)
 {

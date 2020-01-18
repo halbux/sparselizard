@@ -26,6 +26,7 @@
 #include "rawshape.h"
 #include "regiondefiner.h"
 #include "petscmesh.h"
+#include "meshtracker.h"
 
 class nodes;
 class elements;
@@ -41,6 +42,8 @@ class mesh
         disjointregions mydisjointregions;
         
         regiondefiner myregiondefiner;
+        
+        std::shared_ptr<meshtracker> mymeshtracker = NULL;
         
 
         std::string filename = "";
@@ -71,6 +74,7 @@ class mesh
         elements* getelements(void);
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
+        std::shared_ptr<meshtracker> getmeshtracker(void);
 
         // Load from file name:
         void load(std::string name, int verbosity = 1, bool legacyreader = true);   
