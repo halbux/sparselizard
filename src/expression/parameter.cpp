@@ -9,9 +9,9 @@ void parameter::synchronize(void)
 
 
     // Flush the structure:
-    myoperations = {};
-    int maxopnum = -1;
-    std::vector<int> opnums = {};
+    myoperations = std::vector<std::vector<std::shared_ptr<operation>>>(universe::mymesh->getdisjointregions()->count(), std::vector<std::shared_ptr<operation>>(1, NULL));
+    maxopnum = -1;
+    opnums = std::vector<int>(universe::mymesh->getdisjointregions()->count(),-1);
 
     // Rebuild the structure:
     for (int i = 0; i < mystructuretracker.size(); i++)
