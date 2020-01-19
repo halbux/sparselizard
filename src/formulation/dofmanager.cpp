@@ -11,6 +11,7 @@ void dofmanager::synchronize(void)
     // Flush the structure:
     numberofdofs = 0;
     std::vector<std::shared_ptr<rawfield>> myfields = {};
+    int selectedfieldnumberbkp = selectedfieldnumber;
     selectedfieldnumber = -1;
     std::vector<std::vector<std::vector< int >>> rangebegin = {};
     std::vector<std::vector<std::vector< int >>> rangeend = {};
@@ -19,6 +20,8 @@ void dofmanager::synchronize(void)
     for (int i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
+    // Select the same field again:
+    selectedfieldnumber = selectedfieldnumberbkp;
     
     mymeshnumber = universe::mymesh->getmeshnumber();
     issynchronizing = false;
