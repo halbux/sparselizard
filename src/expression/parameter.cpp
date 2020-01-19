@@ -50,12 +50,16 @@ parameter::parameter(void) : myoperations((universe::mymesh->getdisjointregions(
 { 
     mynumrows = 1; 
     mynumcols = 1; 
+    
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
 parameter::parameter(int numrows, int numcols) : myoperations((universe::mymesh->getdisjointregions())->count(), std::vector<std::shared_ptr<operation>>(numrows*numcols, NULL)), opnums((universe::mymesh->getdisjointregions())->count(),-1)
 { 
     mynumrows = numrows; 
     mynumcols = numcols; 
+    
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
 void parameter::set(int physreg, expression input)
