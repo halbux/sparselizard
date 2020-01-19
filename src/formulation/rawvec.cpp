@@ -1,13 +1,94 @@
 #include "rawvec.h"
 
 
+void rawvec::synchronize(void)
+{
+    if (issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker() || mydofmanager == NULL)
+        return;
+    issynchronizing = true; 
+
+    
+    // Extract all the values from the vector:
+    intdensematrix adresses(size(),1, 0,1);
+    densematrix alloldvals = getvalues(adresses);
+    double* alloldvalsptr = alloldvals.getvalues();
+    
+    // Create new petsc object (needed since number of dofs can change):
+    VecDestroy(&myvec);
+    VecCreate(PETSC_COMM_SELF, &myvec);
+    VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
+    VecSetFromOptions(myvec);    
+    
+
+    // We need to know in which disjoint region every old element number was:
+    std::vector<std::vector<int>> inolddisjregs;
+    mymeshtracker->getindisjointregions(inolddisjregs);
+    // We also need to know how the mesh structure was before:
+    disjointregions* olddisjregs = mymeshtracker->getdisjointregions();
+
+    
+    // Get the map to renumber the current elements to the ones in the mesh as in the current rawvec status:
+    std::vector<std::vector<int>> numberback;
+    universe::mymesh->getmeshtracker()->getrenumbering(mymeshtracker, numberback);
+    
+    // The fields are unchanged:
+    std::vector<std::shared_ptr<rawfield>> curfields = mydofmanager->getfields();
+
+
+    for (int i = 0; i < curfields.size(); i++)
+    {
+        for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
+        {
+            int elemtypenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
+            int rb = universe::mymesh->getdisjointregions()->getrangebegin(d);
+        
+            densematrix vals(universe::mymesh->getdisjointregions()->countelements(d), 1, 0.0);
+            double* myvals = vals.getvalues();
+        
+            for (int ff = 0; ff < mydofmanager->countformfunctions(d); ff++)
+            {
+                for (int e = 0; e < vals.countrows(); e++)
+                {
+                    // Find the corresponding index and value in 'alloldvalsptr':
+                    int oldelemnum = numberback[elemtypenum][rb+e];
+                    int oldelemdisjreg = inolddisjregs[elemtypenum][oldelemnum];
+                    int oldelemindex = oldelemnum - olddisjregs->getrangebegin(oldelemdisjreg);
+                    
+                    // Value will be 0 if not in the previous vector:
+                    if (mycurrentstructure[0].isdefined(oldelemdisjreg, ff))
+                    {
+                        int olddofrb = mycurrentstructure[0].getrangebegin(oldelemdisjreg, ff);
+                        myvals[e] = alloldvalsptr[olddofrb+oldelemindex];
+                    }
+                }
+                
+                setvalues(curfields[i], d, ff, vals, "set");
+            }
+        }
+    }    
+    
+    
+    // Update the dof manager to the current one:
+    mycurrentstructure = {*mydofmanager};
+    mycurrentstructure[0].donotsynchronize();
+    
+    // Update the mesh tracker to the current one:
+    mymeshtracker = universe::mymesh->getmeshtracker();
+    issynchronizing = false;
+}
+
 rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
 {
     mydofmanager = dofmngr;
 
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
-    VecSetFromOptions(myvec);    
+    VecSetFromOptions(myvec);   
+    
+    mymeshtracker = universe::mymesh->getmeshtracker();
+    
+    mycurrentstructure = {*dofmngr};
+    mycurrentstructure[0].donotsynchronize();
 }
 
 rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
@@ -15,12 +96,19 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
     mydofmanager = dofmngr;
 
     myvec = input;
+    
+    mymeshtracker = universe::mymesh->getmeshtracker();
+    
+    mycurrentstructure = {*dofmngr};
+    mycurrentstructure[0].donotsynchronize();
 }
 
 rawvec::~rawvec(void) { VecDestroy(&myvec); }
 
 int rawvec::size(void) 
 { 
+    synchronize();
+
     if (mydofmanager == NULL)
         return 0;
     else
@@ -29,6 +117,8 @@ int rawvec::size(void)
 
 void rawvec::removeconstraints(void)
 {
+    synchronize();
+    
     int numdofs = mydofmanager->countdofs();
     int numconstraineddofs = mydofmanager->countconstraineddofs();
     if (numconstraineddofs == 0)
@@ -72,6 +162,8 @@ void rawvec::removeconstraints(void)
 
 void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
 {    
+    synchronize();
+    
     mydofmanager->selectfield(constrainedfield);
     std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getconstraints();
 
@@ -114,7 +206,9 @@ void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::
 }
 
 void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op)
-{            
+{           
+    synchronize();
+     
     double* myval = valsmat.getvalues();
     int* myad = addresses.getvalues();
 
@@ -150,6 +244,8 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
 
 void rawvec::setvalue(int address, double value, std::string op)
 {            
+    synchronize();
+    
     if (address < 0)
         return;
     
@@ -161,6 +257,8 @@ void rawvec::setvalue(int address, double value, std::string op)
 
 densematrix rawvec::getvalues(intdensematrix addresses)
 {
+    synchronize();
+    
     int numentries = addresses.count();
     densematrix valmat(numentries,1);
     VecGetValues(myvec, numentries, addresses.getvalues(), valmat.getvalues());
@@ -170,6 +268,8 @@ densematrix rawvec::getvalues(intdensematrix addresses)
 
 double rawvec::getvalue(int address)
 {
+    synchronize();
+    
     int ads[1] = {address};
     double outval[1];
     VecGetValues(myvec, 1, ads, outval);
@@ -179,6 +279,8 @@ double rawvec::getvalue(int address)
 
 void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op)
 {
+    synchronize();
+    
     mydofmanager->selectfield(selectedfield);
 
     // Do nothing if the entries are not in the vector:
@@ -196,6 +298,8 @@ void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregi
 
 densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
 {
+    synchronize();
+    
     mydofmanager->selectfield(selectedfield);
     
     // Return an empty matrix if the entries are not in the vector:
@@ -219,6 +323,8 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
 
 void rawvec::write(std::string filename)
 {
+    synchronize();
+    
     if (mydofmanager == NULL)
     {
         std::cout << "Error in 'rawvec' object: cannot write vec (structure is not defined)" << std::endl;
@@ -256,6 +362,8 @@ void rawvec::write(std::string filename)
 
 void rawvec::load(std::string filename)
 {
+    synchronize();
+    
     if (mydofmanager == NULL)
     {
         std::cout << "Error in 'rawvec' object: cannot load vec (structure is not defined)" << std::endl;
@@ -296,7 +404,9 @@ void rawvec::load(std::string filename)
 }
      
 void rawvec::print(void)
-{          
+{         
+    synchronize();
+     
     std::cout << std::endl;
     if (mydofmanager == NULL)
         std::cout << "Undefined vector" << std::endl;
@@ -312,6 +422,8 @@ void rawvec::print(void)
 
 void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield)
 {
+    synchronize();
+    
     mydofmanager->selectfield(inputfield);
     inputvec->mydofmanager->selectfield(inputfield);
         
@@ -350,7 +462,4 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
         ff++;
     }
 }
-
-
-
 

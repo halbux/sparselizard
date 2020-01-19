@@ -100,6 +100,7 @@ class dofmanager
         std::vector<std::shared_ptr<rawfield>> getfields(void);
         
         int countdofs(void);
+        int countformfunctions(int disjointregion);
         
         void print(void);
         

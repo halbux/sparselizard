@@ -485,6 +485,13 @@ int dofmanager::countdofs(void)
     
     return numberofdofs;
 }
+
+int dofmanager::countformfunctions(int disjointregion)
+{
+    synchronize();
+    
+    return rangebegin[selectedfieldnumber][disjointregion].size();
+}
         
 void dofmanager::print(void)
 {

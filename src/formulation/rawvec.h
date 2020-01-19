@@ -19,6 +19,7 @@
 #include "petsc.h"
 #include "petscvec.h"
 #include "mathop.h"
+#include "meshtracker.h"
 
 class vectorfieldselect;
 class dofmanager;
@@ -30,6 +31,16 @@ class rawvec
 
         Vec myvec = PETSC_NULL;
         std::shared_ptr<dofmanager> mydofmanager = NULL;
+        
+
+        std::shared_ptr<meshtracker> mymeshtracker = NULL;
+        std::vector<dofmanager> mycurrentstructure = {};
+        
+        // Synchronize with the hp-adapted mesh:
+        void synchronize(void);
+        // To avoid infinite recursive calls:
+        bool issynchronizing = false;
+        
     
     public:
             
