@@ -92,6 +92,24 @@ class rawfield : public std::enable_shared_from_this<rawfield>
 
         // isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
         std::vector<bool> isitgauged;
+        
+        
+        
+        bool ispadaptive = false;
+        bool ispadaptivetrigger = false;
+        
+        std::shared_ptr<meshtracker> mymeshtracker = NULL;
+
+        // Track the calls to 'setorder', 'setconstraint', 'setconditionalconstraint', 'setgauge'.
+        std::vector<std::pair<int, int>> myordertracker = {};
+        std::vector<std::tuple<int, int, expression, expression, int>> myconstrainttracker = {};
+        std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
+        std::vector<int> mygaugetracker = {};
+        
+        // Synchronize with the hp-adapted mesh:
+        void synchronize(std::vector<int> physregsfororder = {});
+        // To avoid infinite recursive calls:
+        bool issynchronizing = false;
 
             
     public:

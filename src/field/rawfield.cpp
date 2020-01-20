@@ -1,6 +1,62 @@
 #include "rawfield.h"
 
 
+void rawfield::synchronize(std::vector<int> physregsfororder)
+{
+    // The coordinate fields can be used even before the mesh is loaded (cannot call the meshtracker).
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "")
+        return;
+        
+    if (issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker() || mysubfields.size() != 0 || myharmonics.size() != 0)
+        return;
+    issynchronizing = true; 
+
+    
+    // Flush the containers:
+    interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), 1);
+    myconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
+    myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
+    isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    
+    // Rebuild the containers:
+    if (physregsfororder.size() == 0)
+    {
+        for (int i = 0; i < myordertracker.size(); i++)
+            setorder(myordertracker[i].first, myordertracker[i].second);
+    }
+    else
+    {
+        // For p-adaptive fields:
+        for (int i = physregsfororder.size()-1; i >= 0; i--)
+        {
+            if (physregsfororder[i] != -1)
+                setorder(physregsfororder[i], i);
+        }
+    }
+    for (int i = 0; i < myconstrainttracker.size(); i++)
+    {
+        expression meshdef = std::get<2>(myconstrainttracker[i]);
+        expression* meshdefptr = &meshdef;
+        if (meshdef.countrows() == 0)
+            meshdefptr = NULL;
+        setconstraint(std::get<0>(myconstrainttracker[i]), std::get<1>(myconstrainttracker[i]), meshdefptr, std::get<3>(myconstrainttracker[i]), std::get<4>(myconstrainttracker[i]));
+    }
+    for (int i = 0; i < myconditionalconstrainttracker.size(); i++)
+        setconditionalconstraint(std::get<0>(myconditionalconstrainttracker[i]), std::get<1>(myconditionalconstrainttracker[i]), std::get<2>(myconditionalconstrainttracker[i]));
+    for (int i = 0; i < mygaugetracker.size(); i++)
+        setgauge(mygaugetracker[i]);
+        
+    // Regrow the spanning tree (if any):
+    
+    
+    // Update the coef manager (if any):
+        
+        
+    // Update the mesh tracker to the current one:
+    mymeshtracker = universe::mymesh->getmeshtracker();
+    issynchronizing = false;
+}
+
 rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm)
 {
     multiharmonic = ismultiharm;
@@ -80,6 +136,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
 
 int rawfield::countcomponents(void)
 {
+    synchronize();
+
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
         return 1;
         
@@ -89,6 +147,8 @@ int rawfield::countcomponents(void)
 
 int rawfield::countformfunctioncomponents(void)
 {
+    synchronize();
+    
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
         return 1;
     
@@ -99,6 +159,8 @@ int rawfield::countformfunctioncomponents(void)
 
 std::vector<int> rawfield::getharmonics(void)
 {
+    synchronize();
+    
     if (mysubfields.size() == 0)
     {
         std::vector<int> harms = {};
@@ -119,6 +181,8 @@ std::vector<int> rawfield::getharmonics(void)
 
 int rawfield::getfirstharmonic(void)
 {
+    synchronize();
+    
     if (mysubfields.size() == 0)
     {
         if (myharmonics.size() == 0)
@@ -138,6 +202,8 @@ int rawfield::getfirstharmonic(void)
 
 bool rawfield::isharmonicincluded(int harmonic)
 {
+    synchronize();
+    
     if (mysubfields.size() == 0)
         return (harmonic == 1 && myharmonics.size() == 0) || (harmonic > 0 && harmonic < myharmonics.size() && myharmonics[harmonic].size() > 0);
     else
@@ -146,6 +212,8 @@ bool rawfield::isharmonicincluded(int harmonic)
 
 void rawfield::printharmonics(void)
 {
+    synchronize();
+    
     if (multiharmonic == false)
     {
         std::cout << "Field is not multiharmonic" << std::endl;
@@ -180,6 +248,8 @@ void rawfield::printharmonics(void)
 
 void rawfield::print(void)
 {
+    synchronize();
+    
     if (myname.size() == 0)
         std::cout << "field";
     else
@@ -188,6 +258,8 @@ void rawfield::print(void)
 
 std::string rawfield::gettypename(bool familyonly)
 {
+    synchronize();
+    
     std::string out = mytypename;
 
     if (familyonly == false)
@@ -203,6 +275,12 @@ std::string rawfield::gettypename(bool familyonly)
 
 void rawfield::setorder(int physreg, int interpolorder)
 {
+    synchronize();
+    
+    // Keep track of the calls to 'setorder':
+    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
+        myordertracker.push_back(std::make_pair(physreg, interpolorder));
+        
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
     {
         std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
@@ -233,6 +311,8 @@ void rawfield::setorder(int physreg, int interpolorder)
 
 void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
+    synchronize();
+    
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot set the value for the x, y or z coordinate" << std::endl;
@@ -272,6 +352,8 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
 
 void rawfield::setvalue(int physreg)
 {
+    synchronize();
+    
     switch (countcomponents())
     {
         case 1:
@@ -288,6 +370,17 @@ void rawfield::setvalue(int physreg)
 
 void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
+    synchronize();
+    
+    // Keep track of the calls to 'setconstraint':
+    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+        expression meshdef;
+        if (meshdeform != NULL)
+            meshdef = *meshdeform;
+        myconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, meshdef, input, extraintegrationdegree));
+    }
+        
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
@@ -340,6 +433,8 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
 
 void rawfield::setconstraint(int physreg)
 {
+    synchronize();
+    
     switch (countcomponents())
     {
         case 1:
@@ -356,6 +451,12 @@ void rawfield::setconstraint(int physreg)
 
 void rawfield::setconditionalconstraint(int physreg, expression condexpr, expression valexpr)
 {
+    synchronize();
+    
+    // Keep track of the calls to 'setconditionalconstraint':
+    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
+        myconditionalconstrainttracker.push_back(std::make_tuple(physreg, condexpr, valexpr));
+    
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
@@ -394,6 +495,12 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
 
 void rawfield::setgauge(int physreg)
 {
+    synchronize();
+    
+    // Keep track of the calls to 'setgauge':
+    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
+        mygaugetracker.push_back(physreg);
+        
     // Set the gauge on the subfields (if any):
     for (int i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setgauge(physreg);
@@ -416,6 +523,8 @@ void rawfield::setgauge(int physreg)
 
 void rawfield::setspanningtree(spanningtree spantree)
 {
+    synchronize();
+    
     // Set the spanning tree on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setspanningtree(spantree);
@@ -432,6 +541,8 @@ void rawfield::setspanningtree(spanningtree spantree)
 
 spanningtree* rawfield::getspanningtree(void)
 {
+    synchronize();
+    
     if (myspanningtree.size() == 1)
         return &myspanningtree[0];
     else
@@ -443,11 +554,15 @@ spanningtree* rawfield::getspanningtree(void)
 
 std::shared_ptr<rawfield> rawfield::getpointer(void)
 {
+    synchronize();
+   
     return shared_from_this();
 }
 
 void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 {
+    synchronize();
+    
     // Extract the info from the vector with selected field:
     std::shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
     std::shared_ptr<rawvec> selectedvec = myvec.getrawvector();
@@ -554,6 +669,8 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
 void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op)
 {
+    synchronize();
+    
     // Extract the info from the vector with selected field:
     std::shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
     std::shared_ptr<rawvec> selectedvec = myvec.getrawvector();
@@ -644,6 +761,8 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
 
 std::shared_ptr<rawfield> rawfield::comp(int component)
 {   
+    synchronize();
+    
     // If there is a single component and the first one is requested:
     if (countcomponents() == 1 && component == 0)
         return shared_from_this();
@@ -664,11 +783,15 @@ std::shared_ptr<rawfield> rawfield::comp(int component)
 
 std::shared_ptr<rawfield> rawfield::harmonic(int harmonicnumber)
 {
+    synchronize();
+    
     return harmonic(std::vector<int>{harmonicnumber});
 }
 
 std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
 {
+    synchronize();
+    
     if (mysubfields.size() != 0)
     {
         std::shared_ptr<rawfield> harmsrawfield(new rawfield());
@@ -727,31 +850,43 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
 
 bool rawfield::isconstrained(int disjreg)
 {
+    synchronize();
+    
     return not(myconstraints[disjreg] == NULL);
 }
 
 std::vector<std::shared_ptr<integration>> rawfield::getconstraints(void)
 {
+    synchronize();
+    
     return myconstraints;
 }
 
 bool rawfield::isconditionallyconstrained(int disjreg)
 {
+    synchronize();
+    
     return (myconditionalconstraints[disjreg].size() > 0);
 }
 
 std::vector<std::vector<expression>> rawfield::getconditionalconstraints(void)
 {
+    synchronize();
+    
     return myconditionalconstraints;
 }
 
 bool rawfield::isgauged(int disjreg) 
 { 
+    synchronize();
+    
     return isitgauged[disjreg];
 }
 
 int rawfield::getinterpolationorder(int disjreg) 
 { 
+    synchronize();
+    
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
         return 1;
         
@@ -774,6 +909,8 @@ int rawfield::getinterpolationorder(int disjreg)
 
 void rawfield::errornotsameinterpolationorder(int disjreg)
 {
+    synchronize();
+    
     if (mysubfields.size() == 0)
     {
         if (myharmonics.size() > 0)
@@ -801,6 +938,8 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
 
 std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> rawfield::getallsons(void)
 {
+    synchronize();
+    
     std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> output = {};
     
     if (mysubfields.size() > 0)
@@ -845,6 +984,8 @@ std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> rawfield::ge
 
 void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::vector<double> extradata)
 {
+    synchronize();
+    
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot write field type '" << mytypename << "' to raw format" << std::endl;
@@ -981,6 +1122,8 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
 
 std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 {
+    synchronize();
+    
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
     
     
@@ -1136,6 +1279,8 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 
 std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
+    synchronize();
+    
     int elementdimension = elemselect.getelementdimension();
     int problemdimension = universe::mymesh->getmeshdimension();
     int numberofelements = elemselect.countinselection();
@@ -1199,6 +1344,8 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
 
 std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
+    synchronize();
+    
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
@@ -1244,6 +1391,8 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
 
 densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementlist)
 {   
+    synchronize();
+    
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();  
     elements* myelements = universe::mymesh->getelements();
     
@@ -1322,6 +1471,8 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
 
 std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates)
 {   
+    synchronize();
+    
     elements* myelements = universe::mymesh->getelements();
 
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
