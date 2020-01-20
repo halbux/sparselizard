@@ -49,11 +49,11 @@ void rawvec::synchronize(void)
             int elemtypenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
             int rb = universe::mymesh->getdisjointregions()->getrangebegin(d);
         
-            densematrix vals(universe::mymesh->getdisjointregions()->countelements(d), 1, 0.0);
-            double* myvals = vals.getvalues();
-        
             for (int ff = 0; ff < numff; ff++)
             {
+                densematrix vals(universe::mymesh->getdisjointregions()->countelements(d), 1, 0.0);
+                double* myvals = vals.getvalues();
+            
                 for (int e = 0; e < vals.countrows(); e++)
                 {
                     // Find the corresponding index and value in 'alloldvalsptr':
