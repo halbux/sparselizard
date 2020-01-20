@@ -9,7 +9,7 @@ void rawvec::synchronize(void)
 
     
     // Extract all the values from the vector:
-    intdensematrix adresses(size(),1, 0,1);
+    intdensematrix adresses(mycurrentstructure[0].countdofs(),1, 0,1);
     densematrix alloldvals = getvalues(adresses);
     double* alloldvalsptr = alloldvals.getvalues();
     
