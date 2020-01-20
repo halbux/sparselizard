@@ -39,13 +39,17 @@ void rawvec::synchronize(void)
     {
         for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
         {
+            int numff = mydofmanager->countformfunctions(d);
+            if (numff == 0)
+                continue;
+            
             int elemtypenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
             int rb = universe::mymesh->getdisjointregions()->getrangebegin(d);
         
             densematrix vals(universe::mymesh->getdisjointregions()->countelements(d), 1, 0.0);
             double* myvals = vals.getvalues();
         
-            for (int ff = 0; ff < mydofmanager->countformfunctions(d); ff++)
+            for (int ff = 0; ff < numff; ff++)
             {
                 for (int e = 0; e < vals.countrows(); e++)
                 {
