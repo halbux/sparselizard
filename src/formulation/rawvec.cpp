@@ -59,11 +59,11 @@ void rawvec::synchronize(void)
                     // Find the corresponding index and value in 'alloldvalsptr':
                     int oldelemnum = numberback[elemtypenum][rb+e];
                     int oldelemdisjreg = inolddisjregs[elemtypenum][oldelemnum];
-                    int oldelemindex = oldelemnum - olddisjregs->getrangebegin(oldelemdisjreg);
                     
                     // Value will be 0 if not in the previous vector:
                     if (mycurrentstructure[0].isdefined(oldelemdisjreg, ff))
                     {
+                        int oldelemindex = oldelemnum - olddisjregs->getrangebegin(oldelemdisjreg);
                         int olddofrb = mycurrentstructure[0].getrangebegin(oldelemdisjreg, ff);
                         myvals[e] = alloldvalsptr[olddofrb+oldelemindex];
                     }
