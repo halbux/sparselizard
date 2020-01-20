@@ -37,6 +37,9 @@ void rawvec::synchronize(void)
 
     for (int i = 0; i < curfields.size(); i++)
     {
+        mycurrentstructure[0].selectfield(curfields[i]);
+        mydofmanager->selectfield(curfields[i]);
+    
         for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
         {
             int numff = mydofmanager->countformfunctions(d);
