@@ -424,6 +424,20 @@ void rawvec::print(void)
     std::cout << std::endl;
 }
 
+std::shared_ptr<dofmanager> rawvec::getdofmanager(void)
+{
+    synchronize();
+    
+    return mydofmanager;
+}
+
+Vec rawvec::getpetsc(void)
+{
+    synchronize();
+    
+    return myvec;
+}
+
 void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield)
 {
     synchronize();

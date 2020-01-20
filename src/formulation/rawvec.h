@@ -76,8 +76,8 @@ class rawvec
         
         void print(void);
         
-        std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
-        Vec getpetsc(void) { return myvec; };
+        std::shared_ptr<dofmanager> getdofmanager(void);
+        Vec getpetsc(void);
         
         // Transfer data between the 'inputvec' vector and this vector:
         void setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield);
