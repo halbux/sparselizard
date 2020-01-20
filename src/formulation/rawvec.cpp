@@ -158,6 +158,10 @@ void rawvec::removeconstraints(void)
     setvalues(newaddresses, vals, "set");
     
     delete[] dofrenumbering;
+    
+    // The current structure tracker must be updated to the new dof manager:
+    mycurrentstructure = {*mydofmanager};
+    mycurrentstructure[0].donotsynchronize();
 }
 
 void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
