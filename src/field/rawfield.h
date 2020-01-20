@@ -138,7 +138,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // This should only be called on a field without subfields or harmonics:
         spanningtree* getspanningtree(void);
         
-        std::shared_ptr<rawfield> getpointer(void) { return shared_from_this(); };
+        std::shared_ptr<rawfield> getpointer(void);
 
         // Transfer data from a solution vector to the field.
         // Get from all regions with physreg set to -1. 'op' can be 'add' or 'set'. 
@@ -151,15 +151,15 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::shared_ptr<rawfield> comp(int component);
         // Select a single or several harmonics. 
         // Outputs all components corresponding to that harmonic.
-        std::shared_ptr<rawfield> harmonic(int harmonicnumber) { return harmonic(std::vector<int>{harmonicnumber}); };
+        std::shared_ptr<rawfield> harmonic(int harmonicnumber);
         std::shared_ptr<rawfield> harmonic(const std::vector<int> harmonicnumbers);
         
         // Only valid for fields without subfields.
-        bool isconstrained(int disjreg) { return not(myconstraints[disjreg] == NULL); };
-        std::vector<std::shared_ptr<integration>> getconstraints(void) { return myconstraints; };
+        bool isconstrained(int disjreg);
+        std::vector<std::shared_ptr<integration>> getconstraints(void);
         
-        bool isconditionallyconstrained(int disjreg) { return (myconditionalconstraints[disjreg].size() > 0); };
-        std::vector<std::vector<expression>> getconditionalconstraints(void) { return myconditionalconstraints; };
+        bool isconditionallyconstrained(int disjreg);
+        std::vector<std::vector<expression>> getconditionalconstraints(void);
 
         bool isgauged(int disjreg);
 

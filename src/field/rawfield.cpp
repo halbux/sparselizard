@@ -441,6 +441,11 @@ spanningtree* rawfield::getspanningtree(void)
     }
 }
 
+std::shared_ptr<rawfield> rawfield::getpointer(void)
+{
+    return shared_from_this();
+}
+
 void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 {
     // Extract the info from the vector with selected field:
@@ -657,6 +662,11 @@ std::shared_ptr<rawfield> rawfield::comp(int component)
     return mysubfields[component][0];
 }
 
+std::shared_ptr<rawfield> rawfield::harmonic(int harmonicnumber)
+{
+    return harmonic(std::vector<int>{harmonicnumber});
+}
+
 std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
 {
     if (mysubfields.size() != 0)
@@ -713,6 +723,26 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
         std::cout << "Error in 'rawfield' object: in .harmonic cannot get harmonic in constant field (does not exist)" << std::endl; 
         abort();
     }
+}
+
+bool rawfield::isconstrained(int disjreg)
+{
+    return not(myconstraints[disjreg] == NULL);
+}
+
+std::vector<std::shared_ptr<integration>> rawfield::getconstraints(void)
+{
+    return myconstraints;
+}
+
+bool rawfield::isconditionallyconstrained(int disjreg)
+{
+    return (myconditionalconstraints[disjreg].size() > 0);
+}
+
+std::vector<std::vector<expression>> rawfield::getconditionalconstraints(void)
+{
+    return myconditionalconstraints;
 }
 
 bool rawfield::isgauged(int disjreg) 
