@@ -40,6 +40,7 @@ class coefmanager
     coefmanager(std::string fieldtypename);
     
     bool isdefined(int disjreg, int formfunctionindex);
+    int countformfunctions(int disjreg);
 
     // Update the number of form functions considered in every disjoint region. 
     // To be called every time the interpolation order of the field changes.
