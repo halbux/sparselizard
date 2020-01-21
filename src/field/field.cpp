@@ -143,11 +143,16 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
             abort();   
         }
     }
-    for (int i = 1; i < orders.size(); i++)
+    for (int i = 0; i < orders.size(); i++)
     {
-        if (orders[i] < orders[i-1])
+        if (orders[i] < 0)
         {
-            std::cout << "Error in 'field' object: in 'setorder' interpolation orders must be provided in increasing order" << std::endl;
+            std::cout << "Error in 'field' object: in 'setorder' interpolation order cannot be negative" << std::endl;
+            abort();   
+        }
+        if (orders[i] == 0 && rawfieldptr->gettypename() != "hcurl")
+        {
+            std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order 0 for shape function " << rawfieldptr->gettypename() << std::endl;
             abort();   
         }
     }
