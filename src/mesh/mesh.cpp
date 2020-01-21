@@ -184,6 +184,7 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
         abort();
     }
     
+    mynumber = 0;
     mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
     mymeshtracker->updatedisjointregions(&mydisjointregions);
 }
@@ -271,6 +272,7 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
             this->shift(maxphysreg+1+i, -shiftvec[i],0,0);
     }
     
+    mynumber = 0;
     mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
     mymeshtracker->updatedisjointregions(&mydisjointregions);
 }
@@ -393,6 +395,7 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
         abort();
     }
     
+    mynumber = 0;
     mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
     mymeshtracker->updatedisjointregions(&mydisjointregions);
 }
