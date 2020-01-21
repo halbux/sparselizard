@@ -143,6 +143,11 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
             abort();   
         }
     }
+    if (thresholds[0] > noiselevel || thresholds[thresholds.size()-1] < 1.0-noiselevel)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' thresholds 0.0 and 1.0 must be included" << std::endl;
+        abort();   
+    }
     for (int i = 0; i < orders.size(); i++)
     {
         if (orders[i] < 0)
