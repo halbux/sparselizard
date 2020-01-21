@@ -62,7 +62,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     disjointregions* olddisjregs = mymeshtracker->getdisjointregions();
 
     
-    // Get the map to renumber the current elements to the ones in the mesh as in the current rawvec status:
+    // Get the map to renumber the current elements to the ones in the mesh as in the old status:
     std::vector<std::vector<int>> numberback;
     universe::mymesh->getmeshtracker()->getrenumbering(mymeshtracker, numberback);
 
