@@ -124,7 +124,7 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
     }
     if (thresholds.size() != orders.size()+1)
     {
-        std::cout << "Error in 'field' object: in 'setorder' expected a threshold vector of size " << orders.size()+1 << " for the order vector of size " << orders.size() << " provided (0.0 and 1.0 must be included)" << std::endl;
+        std::cout << "Error in 'field' object: in 'setorder' expected a threshold vector of size " << orders.size()+1 << " for the order vector of size " << orders.size() << " provided (thresholds 0.0 and 1.0 must be included)" << std::endl;
         abort();   
     }
     for (int i = 0; i < thresholds.size(); i++)
