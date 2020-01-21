@@ -187,6 +187,7 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
     mynumber = 0;
     mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
     mymeshtracker->updatedisjointregions(&mydisjointregions);
+    mypadaptdata = {};
 }
 
 void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
@@ -275,6 +276,7 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
     mynumber = 0;
     mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
     mymeshtracker->updatedisjointregions(&mydisjointregions);
+    mypadaptdata = {};
 }
 
 void mesh::load(std::vector<shape> inputshapes, int verbosity)
@@ -398,6 +400,7 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
     mynumber = 0;
     mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
     mymeshtracker->updatedisjointregions(&mydisjointregions);
+    mypadaptdata = {};
 }
 
 
@@ -481,6 +484,31 @@ void mesh::boxselection(int newphysreg, int physregtobox, int selecteddim, std::
 void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
 {
     myregiondefiner.sphereselection(newphysreg, selecteddim, centercoords, radius, physregtosphere);
+}
+
+
+void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
+{
+    int index = -1;
+    for (int i = 0; i < mypadaptdata.size(); i++)
+    {
+        std::shared_ptr<rawfield> currawfield = std::get<0>(mypadaptdata[i]);
+        if (currawfield.get() == inrawfield.get())
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (index != -1)
+        mypadaptdata[index] = std::make_tuple(inrawfield, criterion, thresholds, orders, mincritrange);
+    else
+        mypadaptdata.push_back(std::make_tuple(inrawfield, criterion, thresholds, orders, mincritrange));
+}
+
+void mesh::adaptp(void)
+{
+    
 }
 
 

@@ -27,6 +27,7 @@
 #include "regiondefiner.h"
 #include "petscmesh.h"
 #include "meshtracker.h"
+#include "rawfield.h"
 
 class nodes;
 class elements;
@@ -45,6 +46,8 @@ class mesh
         
         int mynumber = 0;
         std::shared_ptr<meshtracker> mymeshtracker = NULL;
+        // For p-adaptivity:
+        std::vector<std::tuple<std::shared_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double>> mypadaptdata = {};
         
 
         std::string filename = "";
@@ -106,6 +109,9 @@ class mesh
         void boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
         void sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
         
+        // For p-adaptivity:
+        void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double mincritrange);
+        void adaptp(void);
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
         void writewithdisjointregions(std::string);
