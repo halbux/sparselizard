@@ -33,13 +33,11 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
                 setorder(physregsfororder[i], i);
         }
     }
-    for (int i = 0; i < myconstrainttracker.size(); i++)
+    for (int i = 0; i < myconstraintphysregtracker.size(); i++)
     {
-        expression meshdef = std::get<2>(myconstrainttracker[i]);
-        expression* meshdefptr = &meshdef;
-        if (meshdef.countrows() == 0)
-            meshdefptr = NULL;
-        setconstraint(std::get<0>(myconstrainttracker[i]), std::get<1>(myconstrainttracker[i]), meshdefptr, std::get<3>(myconstrainttracker[i]), std::get<4>(myconstrainttracker[i]));
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(myconstraintphysregtracker[i]))->getdisjointregions(-1);
+        for (int j = 0; j < selecteddisjregs.size(); j++)
+            myconstraints[selecteddisjregs[j]] = myconstraintcalctracker[i];
     }
     for (int i = 0; i < myconditionalconstrainttracker.size(); i++)
         setconditionalconstraint(std::get<0>(myconditionalconstrainttracker[i]), std::get<1>(myconditionalconstrainttracker[i]), std::get<2>(myconditionalconstrainttracker[i]));
@@ -119,6 +117,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         }    
         else
         {
+            mymeshtracker = universe::mymesh->getmeshtracker();
+        
             // Set an order 1 interpolation order by default:
             interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), 1);
             // Set all unconstrained by default:
@@ -372,15 +372,6 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
 {
     synchronize();
     
-    // Keep track of the calls to 'setconstraint':
-    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
-    {
-        expression meshdef;
-        if (meshdeform != NULL)
-            meshdef = *meshdeform;
-        myconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, meshdef, input, extraintegrationdegree));
-    }
-        
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
@@ -414,6 +405,12 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
             
         if (myharmonics.size() == 0)
         {
+            if (issynchronizing == false)
+            {
+                myconstraintphysregtracker.push_back(physreg);
+                myconstraintcalctracker.push_back(constraintcomputation);
+            }
+        
             for (int i = 0; i < selecteddisjregs.size(); i++)
                 myconstraints[selecteddisjregs[i]] = constraintcomputation;
         }
@@ -423,6 +420,12 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
             {
                 if (myharmonics[h].size() > 0)
                 {
+                    if (issynchronizing == false)
+                    {
+                        myharmonics[h][0]->myconstraintphysregtracker.push_back(physreg);
+                        myharmonics[h][0]->myconstraintcalctracker.push_back(constraintcomputation);
+                    }
+                
                     for (int i = 0; i < selecteddisjregs.size(); i++)
                         myharmonics[h][0]->myconstraints[selecteddisjregs[i]] = constraintcomputation;
                 }
