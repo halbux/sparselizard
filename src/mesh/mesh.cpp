@@ -183,6 +183,9 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
         std::cout << "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" << std::endl;
         abort();
     }
+    
+    mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
+    mymeshtracker->updatedisjointregions(&mydisjointregions);
 }
 
 void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
@@ -267,6 +270,9 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
         for (int i = 0; i < numfiles; i++)
             this->shift(maxphysreg+1+i, -shiftvec[i],0,0);
     }
+    
+    mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
+    mymeshtracker->updatedisjointregions(&mydisjointregions);
 }
 
 void mesh::load(std::vector<shape> inputshapes, int verbosity)
@@ -386,6 +392,9 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
         std::cout << "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" << std::endl;
         abort();
     }
+    
+    mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
+    mymeshtracker->updatedisjointregions(&mydisjointregions);
 }
 
 
