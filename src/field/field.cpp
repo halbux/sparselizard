@@ -89,7 +89,7 @@ void field::setorder(expression criterion, std::vector<field> triggers, int lowo
         abort();   
     }
 
-    int numorders = loworder-highorder+1;
+    int numorders = highorder-loworder+1;
     std::vector<double> thresholds(numorders+1);
     thresholds[0] = 0;
     for (int i = 1; i < thresholds.size()-1; i++)
