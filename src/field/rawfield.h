@@ -138,6 +138,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::string gettypename(bool familyonly = true);
 
         void setorder(int physreg, int interpolorder);
+        void setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange);
         
         void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:

@@ -71,6 +71,90 @@ void field::setorder(int physreg, int interpolorder)
     rawfieldptr->setorder(physreg, interpolorder); 
 }
 
+void field::setorder(expression criterion, std::vector<field> triggers, int loworder, int highorder, double mincritrange)
+{
+    if (loworder < 0)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' cannot use negative minimum interpolation order " << loworder << std::endl;
+        abort();   
+    }
+    if (loworder == 0 && rawfieldptr->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order 0 for shape function " << rawfieldptr->gettypename() << std::endl;
+        abort();   
+    }
+    if (highorder < loworder)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' the lowest order cannot be larger than the highest order" << std::endl;
+        abort();   
+    }
+
+    int numorders = loworder-highorder+1;
+    std::vector<double> thresholds(numorders+1);
+    thresholds[0] = 0;
+    for (int i = 1; i < thresholds.size()-1; i++)
+        thresholds[i] = 1.0/numorders * i;
+    thresholds[thresholds.size()-1] = 1.0;
+
+    std::vector<int> orders(numorders);
+    for (int i = 0; i < numorders; i++)
+        orders[i] = loworder + i;
+        
+    setorder(criterion, triggers, thresholds, orders, mincritrange);
+}
+
+void field::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
+{
+    double noiselevel = 1e-8;
+
+    if (triggers.size() == 0)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' expected at least one field to trigger the p-adaptation" << std::endl;
+        abort();   
+    }
+    if (not(criterion.isscalar()))
+    {
+        std::cout << "Error in 'field' object: in 'setorder' expected a scalar criterion to set an adaptive field order" << std::endl;
+        abort();   
+    }
+    if (orders.size() == 0)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' order vector cannot be empty" << std::endl;
+        abort();   
+    }
+    if (thresholds.size() != orders.size()+1)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' expected a threshold vector of size " << orders.size()+1 << " for the order vector of size " << orders.size() << " provided (0.0 and 1.0 must be included)" << std::endl;
+        abort();   
+    }
+    for (int i = 0; i < thresholds.size(); i++)
+    {
+        if (thresholds[i] < 0.0-noiselevel || thresholds[i] > 1.0+noiselevel)
+        {
+            std::cout << "Error in 'field' object: in 'setorder' thresholds must be between 0.0 and 1.0" << std::endl;
+            abort();   
+        }
+    }
+    for (int i = 1; i < thresholds.size(); i++)
+    {
+        if (thresholds[i] < thresholds[i-1]-noiselevel)
+        {
+            std::cout << "Error in 'field' object: in 'setorder' thresholds must be provided in increasing order" << std::endl;
+            abort();   
+        }
+    }
+    for (int i = 1; i < orders.size(); i++)
+    {
+        if (orders[i] < orders[i-1])
+        {
+            std::cout << "Error in 'field' object: in 'setorder' interpolation orders must be provided in increasing order" << std::endl;
+            abort();   
+        }
+    }
+    
+    rawfieldptr->setorder(criterion, triggers, thresholds, orders, mincritrange); 
+}
+
 void field::setvalue(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree); }
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree); }
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree) { rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree); }

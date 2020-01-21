@@ -354,6 +354,11 @@ void rawfield::setorder(int physreg, int interpolorder)
     }
 }
 
+void rawfield::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
+{
+
+}
+
 void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     synchronize();
