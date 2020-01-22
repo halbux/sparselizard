@@ -421,7 +421,7 @@ void rawfield::settriggerflag(bool istrig)
     }
 }
 
-void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree, bool ismeshadaptallowed)
+void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     synchronize();
     
@@ -438,12 +438,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
     
     // Set the values on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-    {
-        if (i == mysubfields.size()-1)
-            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, ismeshadaptallowed);
-        else
-            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, false);
-    }
+        mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
 
     if (mysubfields.size() == 0)
     {
@@ -463,11 +458,8 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
             solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
         }
         
-        setdata(physreg, solvec|thisfield, "set", false); 
+        thisfield.setdata(physreg, solvec);
     }
-    
-    if (ismeshadaptallowed && ispadaptivetrigger > 0 && issynchronizing == false)
-        universe::mymesh->adaptp();
 }
 
 void rawfield::setvalue(int physreg)
@@ -682,7 +674,7 @@ std::shared_ptr<rawfield> rawfield::getpointer(void)
     return shared_from_this();
 }
 
-void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, bool ismeshadaptallowed)
+void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 {
     synchronize();
     
@@ -707,7 +699,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
     if (mysubfields.size() > 0)
     {
         for (int i = 0; i < mysubfields.size(); i++)
-            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op, ismeshadaptallowed);
+            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op);
     }
     else
     {
@@ -724,7 +716,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
             for (int h = 0; h < myharmonics.size(); h++)
             {
                 if (myharmonics[h].size() > 0)
-                    myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op, ismeshadaptallowed);
+                    myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op);
             }
         }
         else
@@ -791,9 +783,6 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
             }
         }
     }
-    
-    if (ismeshadaptallowed && ispadaptivetrigger > 0 && issynchronizing == false)
-        universe::mymesh->adaptp();
 }
 
 void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op)
@@ -1402,9 +1391,6 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
             }
         }
     }
-    
-    if (ispadaptivetrigger > 0 && issynchronizing == false)
-        universe::mymesh->adaptp();
     
     return extradata;
 }
