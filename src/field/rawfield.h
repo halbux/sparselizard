@@ -117,6 +117,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Synchronize with the hp-adapted mesh:
         void synchronize(std::vector<int> physregsfororder = {});
         
+        bool istrigger(void);
+        
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
         rawfield(void) {};
         

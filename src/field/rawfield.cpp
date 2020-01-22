@@ -100,6 +100,27 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     issynchronizing = false;
 }
 
+bool rawfield::istrigger(void)
+{
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+        return (ispadaptivetrigger > 0);
+
+    bool isitatrigger = false;
+    for (int i = 0; i < mysubfields.size(); i++)
+    {
+        if (mysubfields[i][0]->istrigger())
+            return true;
+    }
+    
+    for (int h = 0; h < myharmonics.size(); h++)
+    {
+        if (myharmonics[h].size() > 0 && myharmonics[h][0]->istrigger())
+            return true;
+    }
+
+    return false;
+}
+
 rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm)
 {
     multiharmonic = ismultiharm;
@@ -458,7 +479,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
             solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
         }
         
-        thisfield.setdata(physreg, solvec);
+        setdata(physreg, solvec|thisfield, "set");
     }
 }
 
