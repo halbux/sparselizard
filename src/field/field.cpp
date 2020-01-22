@@ -169,7 +169,6 @@ void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
     
-    // This changes the field value:
     if (rawfieldptr->istrigger())
         universe::mymesh->adaptp();
 }
@@ -178,7 +177,6 @@ void field::setvalue(int physreg, expression meshdeform, expression input, int e
 {
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
     
-    // This changes the field value:
     if (rawfieldptr->istrigger())
         universe::mymesh->adaptp();
 }
@@ -187,7 +185,6 @@ void field::setvalue(int physreg, int numfftharms, expression input, int extrain
 {
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
     
-    // This changes the field value:
     if (rawfieldptr->istrigger())
         universe::mymesh->adaptp();
 }
@@ -196,7 +193,6 @@ void field::setvalue(int physreg, int numfftharms, expression meshdeform, expres
 {
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
     
-    // This changes the field value:
     if (rawfieldptr->istrigger())
         universe::mymesh->adaptp();
 }
@@ -205,7 +201,6 @@ void field::setvalue(int physreg)
 {
     rawfieldptr->setvalue(physreg);
     
-    // This changes the field value:
     if (rawfieldptr->istrigger())
         universe::mymesh->adaptp();
 }
@@ -239,7 +234,6 @@ void field::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
     rawfieldptr->setdata(physreg, myvec, op); 
     
-    // This changes the field value:
     if (rawfieldptr->istrigger())
         universe::mymesh->adaptp();
 }
@@ -248,10 +242,6 @@ void field::setdata(int physreg, vec myvec, std::string op)
 {  
     field thisfield = *this;
     setdata(physreg, myvec|thisfield, op);
-    
-    // This changes the field value:
-    if (rawfieldptr->istrigger())
-        universe::mymesh->adaptp();
 }
 
 field field::comp(int component) 
@@ -352,7 +342,6 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     {
         std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
         
-        // This changes the field value:
         if (rawfieldptr->istrigger())
             universe::mymesh->adaptp();
         
@@ -363,7 +352,6 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     {
         std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
         
-        // This changes the field value:
         if (rawfieldptr->istrigger())
             universe::mymesh->adaptp();
             
