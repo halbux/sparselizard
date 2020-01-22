@@ -386,8 +386,8 @@ void rawfield::setorder(expression criterion, std::vector<field> triggers, std::
         universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, mincritrange);
         
         // Reset the trigger flag on the previous triggers:
-        for (int i = 0; i < triggers.size(); i++)
-            triggers[i].getpointer()->settriggerflag(false);
+        for (int i = 0; i < myadapttriggers.size(); i++)
+            myadapttriggers[i]->settriggerflag(false);
         myadapttriggers = {};
         // Set the trigger on the fields:
         for (int i = 0; i < triggers.size(); i++)
@@ -413,6 +413,8 @@ void rawfield::settriggerflag(bool istrig)
             ispadaptivetrigger++;
         else
             ispadaptivetrigger--;
+        if (ispadaptivetrigger < 0)
+            ispadaptivetrigger = 0;
     }
 }
 
