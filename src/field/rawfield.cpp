@@ -421,7 +421,7 @@ void rawfield::settriggerflag(bool istrig)
     }
 }
 
-void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree, bool isinternalcall)
+void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree, bool ismeshadaptallowed)
 {
     synchronize();
     
@@ -438,7 +438,12 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
     
     // Set the values on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, true);
+    {
+        if (i == mysubfields.size()-1)
+            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, true);
+        else
+            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, false);
+    }
 
     if (mysubfields.size() == 0)
     {
@@ -458,10 +463,10 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
             solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
         }
         
-        setdata(physreg, solvec|thisfield, "set", true); 
+        setdata(physreg, solvec|thisfield, "set", ismeshadaptallowed); 
     }
     
-    if (not(isinternalcall) && ispadaptivetrigger > 0 && issynchronizing == false)
+    if (ismeshadaptallowed && ispadaptivetrigger > 0 && issynchronizing == false)
         universe::mymesh->adaptp();
 }
 
@@ -677,7 +682,7 @@ std::shared_ptr<rawfield> rawfield::getpointer(void)
     return shared_from_this();
 }
 
-void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, bool isinternalcall)
+void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, bool ismeshadaptallowed)
 {
     synchronize();
     
@@ -702,7 +707,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
     if (mysubfields.size() > 0)
     {
         for (int i = 0; i < mysubfields.size(); i++)
-            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op, true);
+            mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op, ismeshadaptallowed);
     }
     else
     {
@@ -719,7 +724,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
             for (int h = 0; h < myharmonics.size(); h++)
             {
                 if (myharmonics[h].size() > 0)
-                    myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op, true);
+                    myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op, ismeshadaptallowed);
             }
         }
         else
@@ -787,7 +792,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
         }
     }
     
-    if (not(isinternalcall) && ispadaptivetrigger > 0 && issynchronizing == false)
+    if (ismeshadaptallowed && ispadaptivetrigger > 0 && issynchronizing == false)
         universe::mymesh->adaptp();
 }
 

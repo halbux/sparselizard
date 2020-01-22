@@ -144,7 +144,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         void settriggerflag(bool istrig);
         
-        void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0, bool isinternalcall = false);
+        void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0, bool ismeshadaptallowed = true);
         // Set a zero value:
         void setvalue(int physreg);
         
@@ -166,7 +166,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
 
         // Transfer data from a solution vector to the field.
         // Get from all regions with physreg set to -1. 'op' can be 'add' or 'set'. 
-        void setdata(int physreg, vectorfieldselect myvec, std::string op = "set", bool isinternalcall = false);
+        void setdata(int physreg, vectorfieldselect myvec, std::string op = "set", bool ismeshadaptallowed = true);
         
         // Transfer data from the rawfield to a vectorfieldselect:
         void transferdata(int physreg, vectorfieldselect myvec, std::string op);
