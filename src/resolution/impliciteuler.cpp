@@ -46,7 +46,7 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
     std::vector<std::shared_ptr<rawfield>> allfields = myformulation.getdofmanager()->getfields();
     // Set all fields in the formulation to the initial solution:
     for (int i = 0; i < allfields.size(); i++)
-        allfields[i]->setdata(-1, x|field(allfields[i]));
+        field(allfields[i]).setdata(-1, x);
     
     vec rhs; mat K, C, leftmat;
     
@@ -120,7 +120,7 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
             
             // Update all fields in the formulation:
             for (int i = 0; i < allfields.size(); i++)
-                allfields[i]->setdata(-1, xnext|field(allfields[i]));
+                field(allfields[i]).setdata(-1, xnext);
             
             relchange = (xnext-xtolcalc).norm()/xnext.norm();
             

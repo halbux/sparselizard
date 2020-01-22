@@ -76,7 +76,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             abort();
         }
         // Set the field value to the field time derivative value on all regions:
-        myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|myfield);
+        field(myfield).setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]);
     }
 
     std::vector<std::vector<densematrix>> output;
@@ -150,7 +150,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             abort();
         }
         // Set the field value back to its initial value on all regions:
-        myfield->setdata(-1, (universe::xdtxdtdtx)[0][0]|myfield);
+        field(myfield).setdata(-1, (universe::xdtxdtdtx)[0][0]);
     }
 
     if (myfield->ismultiharmonic() && timederivativeorder > 0)

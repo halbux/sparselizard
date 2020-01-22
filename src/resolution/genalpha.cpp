@@ -61,7 +61,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
     std::vector<std::shared_ptr<rawfield>> allfields = myformulation.getdofmanager()->getfields();
     // Set all fields in the formulation to the initial displacement:
     for (int i = 0; i < allfields.size(); i++)
-        allfields[i]->setdata(-1, u|field(allfields[i]));
+        field(allfields[i]).setdata(-1, u);
     
     vec rhs; mat K, C, M, leftmat, matu, matv, mata;
     
@@ -165,7 +165,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             
             // Update all fields in the formulation:
             for (int i = 0; i < allfields.size(); i++)
-                allfields[i]->setdata(-1, unext|field(allfields[i]));
+                field(allfields[i]).setdata(-1, unext);
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
