@@ -463,7 +463,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
             solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
         }
         
-        setdata(physreg, solvec|thisfield, "set", ismeshadaptallowed); 
+        setdata(physreg, solvec|thisfield, "set", false); 
     }
     
     if (ismeshadaptallowed && ispadaptivetrigger > 0 && issynchronizing == false)
