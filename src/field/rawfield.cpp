@@ -414,7 +414,10 @@ void rawfield::settriggerflag(bool istrig)
         else
             ispadaptivetrigger--;
         if (ispadaptivetrigger < 0)
-            ispadaptivetrigger = 0;
+        {
+            std::cout << "Error in 'rawfield' object: trigger flag cannot be negative" << std::endl;
+            abort();
+        }
     }
 }
 
