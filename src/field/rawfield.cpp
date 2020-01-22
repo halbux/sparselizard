@@ -105,7 +105,6 @@ bool rawfield::istrigger(void)
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
         return (ispadaptivetrigger > 0);
 
-    bool isitatrigger = false;
     for (int i = 0; i < mysubfields.size(); i++)
     {
         if (mysubfields[i][0]->istrigger())
