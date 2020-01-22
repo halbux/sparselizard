@@ -440,7 +440,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
     for (int i = 0; i < mysubfields.size(); i++)
     {
         if (i == mysubfields.size()-1)
-            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, true);
+            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, ismeshadaptallowed);
         else
             mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree, false);
     }
