@@ -703,82 +703,85 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op, boo
     {
         for (int i = 0; i < mysubfields.size(); i++)
             mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op, true);
-        return;
     }
-    
-    // The raw fields must include the same harmonic numbers:
-    if (getharmonics() != selectedrawfield->getharmonics())
-    {
-        std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" << std::endl;
-        abort();
-    }
-    
-    // Get the data of every harmonic:
-    if (myharmonics.size() > 0)
-    {
-        for (int h = 0; h < myharmonics.size(); h++)
-        {
-            if (myharmonics[h].size() > 0)
-                myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op, true);
-        }
-        return;
-    }
-    // Extract the actual field from non-multiharmonic fields:
-    if (selectedrawfield->multiharmonic == false)
-        selectedrawfield = selectedrawfield->harmonic(1);
-    
-    // Get the data for a single field.
-    
-    // Get ALL disjoint regions in the physical region:
-    std::vector<int> selecteddisjregs;
-    if (physreg != -1)
-        selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
     else
     {
-        std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
-        dofmngr->selectfield(shared_from_this());
-        selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
-    }
-
-    for (int i = 0; i < selecteddisjregs.size(); i++)
-    {
-        int disjreg = selecteddisjregs[i];
-
-        // In case the order of this raw field is higher than the order of 
-        // the selected raw field we have to set to zero the higher orders.
-        if (op == "set" && interpolationorder[disjreg] > selectedrawfield->interpolationorder[disjreg])
+        // The raw fields must include the same harmonic numbers:
+        if (getharmonics() != selectedrawfield->getharmonics())
         {
-            // Decrease the order to forget the higher orders...
-            mycoefmanager->fitinterpolationorder(disjreg, selectedrawfield->interpolationorder[disjreg]);
-            // ... then reset the previous order:
-            mycoefmanager->fitinterpolationorder(disjreg, interpolationorder[disjreg]);
+            std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" << std::endl;
+            abort();
         }
-
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjreg);
-        int elementdimension = (universe::mymesh->getdisjointregions())->getelementdimension(disjreg);
-        int numelem = (universe::mymesh->getdisjointregions())->countelements(disjreg);
-
-        std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
-        // The interpolation order for this field and the selected fields might be different.
-        int numformfunctionsperelement = std::min(myformfunction->count(interpolationorder[disjreg], elementdimension, 0), myformfunction->count(selectedrawfield->interpolationorder[disjreg], elementdimension, 0));
-
-        for (int ff = 0; ff < numformfunctionsperelement; ff++)
+        
+        // Get the data of every harmonic:
+        if (myharmonics.size() > 0)
         {
-            densematrix values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
-            double* vals = values.getvalues();
-            
-            // Transfer nothing if 'values' is empty:
-            if (vals != NULL)
+            for (int h = 0; h < myharmonics.size(); h++)
             {
-                if (op == "set")
+                if (myharmonics[h].size() > 0)
+                    myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op, true);
+            }
+        }
+        else
+        {
+            // Extract the actual field from non-multiharmonic fields:
+            if (selectedrawfield->multiharmonic == false)
+                selectedrawfield = selectedrawfield->harmonic(1);
+            
+            // Get the data for a single field.
+            
+            // Get ALL disjoint regions in the physical region:
+            std::vector<int> selecteddisjregs;
+            if (physreg != -1)
+                selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+            else
+            {
+                std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
+                dofmngr->selectfield(shared_from_this());
+                selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
+            }
+
+            for (int i = 0; i < selecteddisjregs.size(); i++)
+            {
+                int disjreg = selecteddisjregs[i];
+
+                // In case the order of this raw field is higher than the order of 
+                // the selected raw field we have to set to zero the higher orders.
+                if (op == "set" && interpolationorder[disjreg] > selectedrawfield->interpolationorder[disjreg])
                 {
-                    for (int elem = 0; elem < numelem; elem++)
-                        mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
+                    // Decrease the order to forget the higher orders...
+                    mycoefmanager->fitinterpolationorder(disjreg, selectedrawfield->interpolationorder[disjreg]);
+                    // ... then reset the previous order:
+                    mycoefmanager->fitinterpolationorder(disjreg, interpolationorder[disjreg]);
                 }
-                if (op == "add")
+
+                int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjreg);
+                int elementdimension = (universe::mymesh->getdisjointregions())->getelementdimension(disjreg);
+                int numelem = (universe::mymesh->getdisjointregions())->countelements(disjreg);
+
+                std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
+                // The interpolation order for this field and the selected fields might be different.
+                int numformfunctionsperelement = std::min(myformfunction->count(interpolationorder[disjreg], elementdimension, 0), myformfunction->count(selectedrawfield->interpolationorder[disjreg], elementdimension, 0));
+
+                for (int ff = 0; ff < numformfunctionsperelement; ff++)
                 {
-                    for (int elem = 0; elem < numelem; elem++)
-                        mycoefmanager->setcoef(disjreg, ff, elem, mycoefmanager->getcoef(disjreg, ff, elem) + vals[elem]);
+                    densematrix values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
+                    double* vals = values.getvalues();
+                    
+                    // Transfer nothing if 'values' is empty:
+                    if (vals != NULL)
+                    {
+                        if (op == "set")
+                        {
+                            for (int elem = 0; elem < numelem; elem++)
+                                mycoefmanager->setcoef(disjreg, ff, elem, vals[elem]);
+                        }
+                        if (op == "add")
+                        {
+                            for (int elem = 0; elem < numelem; elem++)
+                                mycoefmanager->setcoef(disjreg, ff, elem, mycoefmanager->getcoef(disjreg, ff, elem) + vals[elem]);
+                        }
+                    }
                 }
             }
         }
