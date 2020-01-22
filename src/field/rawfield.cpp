@@ -36,7 +36,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         for (int i = physregsfororder.size()-1; i >= 0; i--)
         {
             if (physregsfororder[i] != -1)
-                setorder(physregsfororder[i], i);
+                setorder(physregsfororder[i], i, false);
         }
     }
     for (int i = 0; i < myconstraintphysregtracker.size(); i++)
@@ -322,7 +322,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
 {
     if (iscalledbyuser && ispadaptive)
     {
-        std::cout << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called anymore on fields once they are set to p-adaptivity" << std::endl;
+        std::cout << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called on fields set to p-adaptivity" << std::endl;
         abort();
     }
 
