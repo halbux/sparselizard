@@ -318,8 +318,14 @@ std::string rawfield::gettypename(bool familyonly)
     return out;
 }
 
-void rawfield::setorder(int physreg, int interpolorder)
+void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
 {
+    if (iscalledbyuser && ispadaptive)
+    {
+        std::cout << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called anymore on fields once they are set to p-adaptivity" << std::endl;
+        abort();
+    }
+
     synchronize();
     
     // Keep track of the calls to 'setorder':
@@ -356,7 +362,58 @@ void rawfield::setorder(int physreg, int interpolorder)
 
 void rawfield::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
 {
+    synchronize();
+    
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
+    {
+        std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
+        abort();
+    }
 
+    // Set the interpolation order on the sub fields:
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setorder(criterion, triggers, thresholds, orders, mincritrange);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setorder(criterion, triggers, thresholds, orders, mincritrange);
+    }
+
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+        ispadaptive = true;
+        
+        universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, mincritrange);
+        
+        // Reset the trigger flag on the previous triggers:
+        for (int i = 0; i < triggers.size(); i++)
+            triggers[i].getpointer()->settriggerflag(false);
+        myadapttriggers = {};
+        // Set the trigger on the fields:
+        for (int i = 0; i < triggers.size(); i++)
+        {
+            myadapttriggers.push_back(triggers[i].getpointer());
+            triggers[i].getpointer()->settriggerflag(true);
+        }
+    }
+}
+
+void rawfield::settriggerflag(bool istrig)
+{
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->settriggerflag(istrig);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->settriggerflag(istrig);
+    }
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+        if (istrig)
+            ispadaptivetrigger++;
+        else
+            ispadaptivetrigger--;
+    }
 }
 
 void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)

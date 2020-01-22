@@ -96,7 +96,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         
         bool ispadaptive = false;
-        bool ispadaptivetrigger = false;
+        int ispadaptivetrigger = 0;
         
         std::shared_ptr<meshtracker> mymeshtracker = NULL;
 
@@ -106,6 +106,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<std::shared_ptr<integration>> myconstraintcalctracker = {};
         std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
         std::vector<int> mygaugetracker = {};
+        
+        std::vector<std::shared_ptr<rawfield>> myadapttriggers = {};
         
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
@@ -137,8 +139,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void setname(std::string name) { myname = name; };
         std::string gettypename(bool familyonly = true);
 
-        void setorder(int physreg, int interpolorder);
+        void setorder(int physreg, int interpolorder, bool iscalledbyuser = true);
         void setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange);
+        
+        void settriggerflag(bool istrig);
         
         void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:
