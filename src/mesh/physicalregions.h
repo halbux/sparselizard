@@ -34,6 +34,7 @@ class physicalregions
         int createunion(const std::vector<int> input);
         int createintersection(const std::vector<int> input);
         int createexclusion(int input, int toexclude);
+        int createunionofall(void);
         
         int getmaxphysicalregionnumber(void);
         

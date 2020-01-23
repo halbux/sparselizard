@@ -25,6 +25,11 @@ int mathop::regionexclusion(int physreg, int toexclude)
     return (universe::mymesh->getphysicalregions())->createexclusion(physreg, toexclude);
 }
 
+int mathop::regionall(void)
+{
+    return (universe::mymesh->getphysicalregions())->createunionofall();
+}
+
 void mathop::printvector(std::vector<double> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;

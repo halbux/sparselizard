@@ -1,4 +1,5 @@
 #include "physicalregions.h"
+#include "universe.h"
 
 
 physicalregions::physicalregions(disjointregions& inputdisjointregions)
@@ -82,6 +83,22 @@ int physicalregions::createexclusion(int input, int toexclude)
     newphysreg->setdisjointregions(disjregs);
     
     return newphysregnum;
+}
+
+int physicalregions::createunionofall(void)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    
+    std::vector<int> tounite = {};
+    
+    // Get all regions of max dimension:
+    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    {
+        if (myphysicalregions[i].getelementdimension() == problemdimension)
+            tounite.push_back(myphysicalregionnumbers[i]);
+    }
+
+    return createunion(tounite);
 }
 
 int physicalregions::getmaxphysicalregionnumber(void)
