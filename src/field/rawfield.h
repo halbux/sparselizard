@@ -114,7 +114,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
 
     public:
   
-        // Synchronize with the hp-adapted mesh:
+        // Synchronize with the hp-adapted mesh.
+        // If provided, 'physregsfororder' must be {physreg1,orderpr1,physreg2,orderpr2,...} whith ORDERS SORTED ASCENDINGLY.
         void synchronize(std::vector<int> physregsfororder = {});
         
         bool istrigger(void);

@@ -33,11 +33,8 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     else
     {
         // For p-adaptive fields:
-        for (int i = physregsfororder.size()-1; i >= 0; i--)
-        {
-            if (physregsfororder[i] != -1)
-                setorder(physregsfororder[i], i, false);
-        }
+        for (int i = physregsfororder.size()/2-1; i >= 0; i--)
+            setorder(physregsfororder[2*i+0], physregsfororder[2*i+1], false);
     }
     for (int i = 0; i < myconstraintphysregtracker.size(); i++)
     {
