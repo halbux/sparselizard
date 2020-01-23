@@ -922,7 +922,7 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
         PCSetType(pc,PCILU);
     if (precondtype == "sor")
         PCSetType(pc,PCSOR);
-   if (precondtype == "gamg")
+    if (precondtype == "gamg")
         PCSetType(pc,PCGAMG);
 
     KSPSolve(*ksp, bpetsc, solpetsc);
