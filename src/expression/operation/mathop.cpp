@@ -863,9 +863,9 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
         std::cout << "Error in 'mathop' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
         abort();
     }
-    if (precondtype != "ilu" && precondtype != "sor")
+    if (precondtype != "ilu" && precondtype != "sor" && precondtype != "gamg")
     {
-        std::cout << "Error in 'mathop' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu' or 'sor')" << std::endl;
+        std::cout << "Error in 'mathop' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu', 'sor' or 'gamg')" << std::endl;
         abort();
     }
     if (A.countrows() != b.size())
@@ -922,6 +922,8 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
         PCSetType(pc,PCILU);
     if (precondtype == "sor")
         PCSetType(pc,PCSOR);
+   if (precondtype == "gamg")
+        PCSetType(pc,PCGAMG);
 
     KSPSolve(*ksp, bpetsc, solpetsc);
 
