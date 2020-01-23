@@ -508,9 +508,209 @@ void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::
 
 void mesh::adaptp(void)
 {
-    
-}
+    int num = mypadaptdata.size();
 
+
+    ///// Evaluate the criteria and the current interpolation orders:
+    
+    std::vector<vec> crits(num), oldords(num);
+    
+    int wholedomain = mathop::regionall();
+    
+    field one("one");
+    for (int i = 0; i < num; i++)
+    {
+        formulation critaverage;
+        critaverage += mathop::integral(wholedomain, -std::get<1>(mypadaptdata[i]) * mathop::tf(one) / mathop::getmeshsize(2) );
+        critaverage.generaterhs();
+        crits[i] = critaverage.rhs();
+        
+        formulation elorder;
+        elorder += mathop::integral(wholedomain, -mathop::getfieldorder(field(std::get<0>(mypadaptdata[i]))) * mathop::tf(one) / mathop::getmeshsize(2) );
+        elorder.generaterhs();
+        oldords[i] = elorder.rhs();
+    }
+    int totalnumelems = crits[0].size();
+
+    // Move to densematrix container:
+    std::vector<densematrix> critsmat(num), oldordsmat(num);
+    std::vector<intdensematrix> newordsmat(num);
+    intdensematrix ads(totalnumelems,1, 0, 1);
+    for (int i = 0; i < num; i++)
+    {
+        critsmat[i] = crits[i].getvalues(ads);
+        oldordsmat[i] = oldords[i].getvalues(ads);
+        newordsmat[i] = intdensematrix(totalnumelems,1);
+    }
+    
+    // Remove the above created region:
+    myphysicalregions.remove({wholedomain}, false);
+
+    // All vecs will have the same dofmanager:
+    std::shared_ptr<dofmanager> dofmngr = crits[0].getpointer()->getdofmanager();
+    dofmngr->selectfield(one.getpointer()->harmonic(1));
+    crits = {}; oldords = {};
+
+
+    ///// Calculate the new interpolation orders to use:
+    
+    int newmaxorder = 0;
+    
+    bool isidenticalorder = true;
+    for (int i = 0; i < num; i++)
+    {
+        std::vector<double> thresholds = std::get<2>(mypadaptdata[i]);
+        std::vector<int> orders = std::get<3>(mypadaptdata[i]);
+        double mincritrange = std::get<4>(mypadaptdata[i]);
+        
+        int minorder = *std::min_element(orders.begin(), orders.end());
+    
+        double* critsptr = critsmat[i].getvalues();
+        double* oldordsptr = oldordsmat[i].getvalues();
+        int* newordsptr = newordsmat[i].getvalues();
+    
+        std::vector<double> minmax = critsmat[i].minmax();
+        double cmin = minmax[0];
+        double cmax = minmax[1];
+        
+        double crange = cmax-cmin;
+        
+        // Convert the thresholds from % to criterion value:
+        for (int th = 0; th < thresholds.size(); th++)
+            thresholds[th] = cmin + thresholds[th] * crange;
+        
+        // In case the criterion range is not large enough the element orders are all set to minimum:
+        if (crange < mincritrange)
+        {
+            for (int e = 0; e < totalnumelems; e++)
+                newordsptr[e] = minorder;
+            newmaxorder = minorder;
+        }
+        else
+        {
+            for (int e = 0; e < totalnumelems; e++)
+            {
+                newordsptr[e] = orders[ myalgorithm::findinterval(critsptr[e], thresholds) ];
+                if (newordsptr[e] > newmaxorder)
+                    newmaxorder = newordsptr[e];
+            }
+        }
+        
+        for (int e = 0; e < totalnumelems; e++)
+        {
+            if (not(isidenticalorder) || std::abs(oldordsptr[e]-(double)newordsptr[e]) > 0.1)
+            {
+                isidenticalorder = false;
+                break;
+            }
+        }
+        
+    }
+    // Nothing to do if all new orders are identical to the old ones:
+    if (isidenticalorder)
+        return;
+        
+    
+    ///// Add the elements to new physical regions:
+    
+    int lastphysregnum = myphysicalregions.getmaxphysicalregionnumber();
+    int newlastpr = lastphysregnum;
+    
+    // newphysregsfororder[rawfield][order][elemtype].
+    std::vector<std::vector<std::vector<physicalregion*>>> newphysregsfororder(num, std::vector<std::vector<physicalregion*>>(newmaxorder+1, std::vector<physicalregion*>(8, NULL)));
+    
+    for (int i = 0; i < num; i++)
+    {
+        int* newordsptr = newordsmat[i].getvalues();
+        
+        for (int d = 0; d < mydisjointregions.count(); d++)
+        {
+            if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
+            {
+                int typenum = mydisjointregions.getelementtypenumber(d);
+                int numelems = mydisjointregions.countelements(d);
+                int rb = dofmngr->getrangebegin(d,0);
+                int rbe = mydisjointregions.getrangebegin(d);
+            
+                for (int e = 0; e < numelems; e++)
+                {
+                    int curorder = newordsptr[rb+e];
+        
+                    if (newphysregsfororder[i][curorder][typenum] == NULL)
+                    {
+                        newphysregsfororder[i][curorder][typenum] = myphysicalregions.get(newlastpr+1);
+                        newlastpr++;
+                    }
+                    
+                    newphysregsfororder[i][curorder][typenum]->addelement(typenum, rbe+e);
+                }
+            }
+        }
+    }
+    
+    
+    ///// Update the mesh:
+    
+    // The previous mesh tracker should not be touched:
+    std::shared_ptr<meshtracker> newmeshtracker(new meshtracker);
+    *newmeshtracker = *mymeshtracker;
+    mymeshtracker = newmeshtracker;
+    
+    mydisjointregions.clear();
+    
+    myelements.definedisjointregions();
+
+    std::vector<std::vector<int>> renumvec;
+    myelements.reorderbydisjointregions(renumvec);
+    
+    mymeshtracker->updaterenumbering(renumvec);
+
+    myelements.definedisjointregionsranges();
+    
+    // Define the physical regions based on the disjoint regions they contain:
+    for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
+    {
+        physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
+        currentphysicalregion->definewithdisjointregions();
+    }
+
+    
+    ///// Synchronize the rawfields and set their interpolation order:
+    
+    for (int i = 0; i < num; i++)
+    {
+        std::vector<int> curphysregsfororder = {};
+        
+        for (int o = 0; o < newphysregsfororder[i].size(); o++)
+        {   
+            for (int typenum = 0; typenum < 8; typenum++)
+            {
+                if (newphysregsfororder[i][o][typenum] != NULL)
+                {
+                    curphysregsfororder.push_back(newphysregsfororder[i][o][typenum]->getnumber());
+                    curphysregsfororder.push_back(o);
+                }
+            }
+        }
+        
+        // 'newphysregsfororder MUST BE IN INCREASING ORDER.
+        std::get<0>(mypadaptdata[i])->synchronize(curphysregsfororder);
+    }
+    
+
+    ///// Remove the physical regions created:
+    
+    std::vector<int> prtoremove(newlastpr-lastphysregnum);
+    for (int i = 0; i < prtoremove.size(); i++)
+        prtoremove[i] = lastphysregnum+1+i;
+    myphysicalregions.remove(prtoremove, true);
+    
+    
+    ///// New mesh version:
+    
+    mymeshtracker->updatedisjointregions(&mydisjointregions);
+    mynumber++;
+}
 
 void mesh::writewithdisjointregions(std::string name)
 {
