@@ -465,6 +465,25 @@ void densematrix::mod(double modval)
         myvaluesptr[i] = std::fmod(myvaluesptr[i], modval);
 }
 
+std::vector<double> densematrix::minmax(void)
+{
+    errorifempty();
+
+    double* myvaluesptr = myvalues.get();
+    
+    double minval = myvaluesptr[0];
+    double maxval = myvaluesptr[0];
+
+    for (long long int i = 1; i < numrows*numcols; i++)
+    {
+        if (myvaluesptr[i] > maxval)
+            maxval = myvaluesptr[i];
+        if (myvaluesptr[i] < minval)
+            minval = myvaluesptr[i];
+    }
+    return {minval, maxval};
+}
+
 double densematrix::max(void)
 {
     errorifempty();

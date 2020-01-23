@@ -121,6 +121,9 @@ class densematrix
         void log10(void);
         void mod(double modval);
 
+        // Get the min and max values in out[0] and out[1] respectively:
+        std::vector<double> minmax(void);
+
         // Get the max value:
         double max(void);
         // Get the max absolute value:
