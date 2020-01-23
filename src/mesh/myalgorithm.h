@@ -82,6 +82,10 @@ namespace myalgorithm
     // Norm each block in the vector:
     std::vector<double> normblocks(std::vector<double>& tonorm, int blocklen);
     
+    // Return the interval number in which 'val' is. The interval tics must be sorted ascendingly.
+    // Values out of bound are set to either the interval 0 or the last one. Size of 'tics' must be at least 2.
+    int findinterval(double val, std::vector<double>& tics);
+    
     // Get the file extension (dot included) in a string (works for any extension length):
     std::string getfileextension(std::string filename);
     // Get the file name without the path and the extension:

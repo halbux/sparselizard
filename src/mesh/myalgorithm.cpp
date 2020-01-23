@@ -718,6 +718,22 @@ std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blo
     return output;
 }
 
+int myalgorithm::findinterval(double val, std::vector<double>& tics)
+{
+    int numintervals = tics.size()-1;
+    // In first interval?
+    if (val <= tics[1])
+        return 0;
+    // In last interval?
+    if (val >= tics[numintervals-1])
+        return numintervals-1;
+    for (int i = 1; i < numintervals-1; i++)
+    {
+        if (val >= tics[i] && val <= tics[i+1])
+            return i;
+    }
+}
+
 std::string myalgorithm::getfileextension(std::string filename)
 {
     int index = -1;
