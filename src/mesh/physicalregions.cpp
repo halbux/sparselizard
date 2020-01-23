@@ -162,7 +162,7 @@ int physicalregions::getindex(int physicalregionnumber)
     return -1;
 }
 
-void physicalregions::remove(std::vector<int> toremove)
+void physicalregions::remove(std::vector<int> toremove, bool ispartofdisjregstructure)
 {
     // Tag regions to remove:
     std::vector<bool> istoremove(myphysicalregionnumbers.size(), false);
@@ -188,7 +188,8 @@ void physicalregions::remove(std::vector<int> toremove)
     myphysicalregions.resize(index); 
     myphysicalregionnumbers.resize(index);
     
-    mydisjointregions->removephysicalregions(istoremove);
+    if (ispartofdisjregstructure)
+        mydisjointregions->removephysicalregions(istoremove);
 }
 
 void physicalregions::errorundefined(std::vector<int> physregs)

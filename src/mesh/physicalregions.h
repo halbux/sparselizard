@@ -54,7 +54,7 @@ class physicalregions
         int getindex(int physicalregionnumber);
         
         // Remove physical regions (physical regions required for the compressed mesh structure should NOT be removed).
-        void remove(std::vector<int> toremove);
+        void remove(std::vector<int> toremove, bool ispartofdisjregstructure);
         
         // Give an error if any of the physical regions is not defined:
         void errorundefined(std::vector<int> physregs);
