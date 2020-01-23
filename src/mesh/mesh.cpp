@@ -605,7 +605,6 @@ void mesh::adaptp(void)
                 break;
             }
         }
-        
     }
     // Nothing to do if all new orders are identical to the old ones:
     if (isidenticalorder)
