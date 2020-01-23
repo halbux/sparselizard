@@ -693,7 +693,7 @@ void mesh::adaptp(void)
             }
         }
         
-        // 'newphysregsfororder MUST BE IN INCREASING ORDER.
+        // 'curphysregsfororder' MUST BE IN INCREASING ORDER.
         std::get<0>(mypadaptdata[i])->synchronize(curphysregsfororder);
     }
     
