@@ -584,7 +584,8 @@ void mesh::adaptp(void)
         {
             for (int e = 0; e < totalnumelems; e++)
                 newordsptr[e] = minorder;
-            newmaxorder = minorder;
+            if (minorder > newmaxorder)
+                newmaxorder = minorder;
         }
         else
         {
