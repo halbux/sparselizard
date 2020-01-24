@@ -508,6 +508,10 @@ void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::
 
 void mesh::adaptp(void)
 {
+    if (universe::ispadaptallowed = false)
+        return;
+
+
     int num = mypadaptdata.size();
 
 

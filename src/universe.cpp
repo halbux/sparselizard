@@ -21,6 +21,8 @@ double universe::getfundamentalfrequency(void)
 
 int universe::physregshift = 0;
 
+bool universe::ispadaptallowed = true;
+
 bool universe::isreuseallowed = false;
 
 void universe::allowreuse(void)

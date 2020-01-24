@@ -42,6 +42,8 @@ class universe
         // Shift the physical region numbers by (physregdim+1) x physregshift when loading a mesh:
         static int physregshift;
         
+        static bool ispadaptallowed;
+        
         // To allow reusing computed things:
         static bool isreuseallowed;
         static void allowreuse(void);
