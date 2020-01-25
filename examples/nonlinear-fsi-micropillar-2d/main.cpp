@@ -127,7 +127,7 @@ void sparselizard(void)
     v.write(fluid, umesh, "v.vtk", 2);
 
     // Code validation line. Can be removed.
-    std::cout << (umax < 8.3835e-06 && umax > 8.3833e-06);
+    std::cout << (umax < 8.3836e-06 && umax > 8.3832e-06);
 }
 
 int main(void)
