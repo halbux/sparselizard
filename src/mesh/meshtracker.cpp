@@ -1,4 +1,5 @@
 #include "meshtracker.h"
+#include "universe.h"
 
 
 meshtracker::meshtracker(void) {}
@@ -53,7 +54,7 @@ void meshtracker::getindisjointregions(std::vector<std::vector<int>>& indisjregs
     // Allocate the vectors:
     indisjregs.resize(8);
     for (int i = 0; i < 8; i++)
-        indisjregs[i].resize(mydisjointregions.countelementsintype(i));
+        indisjregs[i] = std::vector<int>(universe::mymesh->getelements()->count(i), -1); // Corner nodes will have -1
     
     int numdisjregs = mydisjointregions.count();
     for (int d = 0; d < numdisjregs; d++)
