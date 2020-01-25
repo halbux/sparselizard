@@ -30,7 +30,6 @@ class disjointregions
         
         int count(void);
         int countelements(int disjointregionnumber);
-        int countelementsintype(int elementtypenumber);
         
         // Add the disjoint region including elements of a given type number
         // and defined by 'physicalregionsincludingit'. 'physicalregionsincludingit[i]'
