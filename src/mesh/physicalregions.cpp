@@ -94,7 +94,7 @@ int physicalregions::createunionofall(void)
     // Get all regions of max dimension:
     for (int i = 0; i < myphysicalregionnumbers.size(); i++)
     {
-        if (myphysicalregions[i].getelementdimension() == problemdimension)
+        if (myphysicalregions[i]->getelementdimension() == problemdimension)
             tounite.push_back(myphysicalregionnumbers[i]);
     }
 
@@ -112,20 +112,20 @@ physicalregion* physicalregions::get(int physicalregionnumber)
     for (int i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (myphysicalregionnumbers[i] == physicalregionnumber)
-            return &myphysicalregions[i];
+            return myphysicalregions[i].get();
     }
     
     // If it could not be found append it:
-    physicalregion newphysicalregion(*mydisjointregions, *this, physicalregionnumber);
+    std::shared_ptr<physicalregion> newphysicalregion(new physicalregion(*mydisjointregions, *this, physicalregionnumber));
     myphysicalregions.push_back(newphysicalregion);
     myphysicalregionnumbers.push_back(physicalregionnumber);
     
-    return &(myphysicalregions[myphysicalregions.size()-1]);
+    return (myphysicalregions[myphysicalregions.size()-1]).get();
 }
 
 physicalregion* physicalregions::getatindex(int physicalregionindex)
 {
-    return &(myphysicalregions[physicalregionindex]);
+    return (myphysicalregions[physicalregionindex]).get();
 }
 
 int physicalregions::count(void)
@@ -137,7 +137,7 @@ int physicalregions::countelements(void)
 {
     int numelem = 0;
     for (int i = 0; i < myphysicalregions.size(); i++)
-        numelem += myphysicalregions[i].countelements();
+        numelem += myphysicalregions[i]->countelements();
     
     return numelem;
 }

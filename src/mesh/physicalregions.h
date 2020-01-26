@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 #include "physicalregion.h"
 #include "disjointregions.h"
 #include <algorithm>
@@ -21,7 +22,7 @@ class physicalregions
 
     private:
 
-        std::vector<physicalregion> myphysicalregions;
+        std::vector<std::shared_ptr<physicalregion>> myphysicalregions;
         std::vector<int> myphysicalregionnumbers;
         
         disjointregions* mydisjointregions;
