@@ -7,7 +7,20 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "")
         return;
         
-    if (issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker() || mysubfields.size() != 0 || myharmonics.size() != 0)
+    // Synchronize all subfields and harmonics:
+    if (mysubfields.size() != 0 || myharmonics.size() != 0)
+    {
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->synchronize();
+        for (int h = 0; h < myharmonics.size(); h++)
+        {
+            if (myharmonics[h].size() > 0)
+                myharmonics[h][0]->synchronize();
+        }
+        return;
+    }
+        
+    if (issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker())
         return;
     issynchronizing = true; 
     
