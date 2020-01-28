@@ -190,19 +190,15 @@ void spanningtree::growtree(int nodenumber)
     }
 }
 
-spanningtree::spanningtree(std::vector<int> physregs)
+void spanningtree::grow(void)
 {
-    myelements = universe::mymesh->getelements();
-    mydisjointregions = universe::mymesh->getdisjointregions();
-
-
     // Get a vector with all disjoint edge regions in the physical regions provided:
     isprioritydisjointregion = std::vector<bool>(mydisjointregions->count(), false);
 
-    for (int i = 0; i < physregs.size(); i++)
+    for (int i = 0; i < startphysregs.size(); i++)
     {
         // Get all disjoint edge regions in the current physical region:
-        std::vector<int> edgedisjregs = ((universe::mymesh->getphysicalregions())->get(physregs[i]))->getdisjointregions(1);
+        std::vector<int> edgedisjregs = ((universe::mymesh->getphysicalregions())->get(startphysregs[i]))->getdisjointregions(1);
 
         for (int j = 0; j < edgedisjregs.size(); j++)
             isprioritydisjointregion[edgedisjregs[j]] = true;
@@ -212,6 +208,16 @@ spanningtree::spanningtree(std::vector<int> physregs)
     growsubtrees();
     // Connect the subtrees together:
     connectsubtrees();
+}
+
+spanningtree::spanningtree(std::vector<int> physregs)
+{
+    startphysregs = physregs;
+    
+    myelements = universe::mymesh->getelements();
+    mydisjointregions = universe::mymesh->getdisjointregions();
+    
+    grow();
 }
 
 bool spanningtree::isintree(int index, int disjreg)

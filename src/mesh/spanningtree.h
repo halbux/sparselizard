@@ -19,6 +19,8 @@ class spanningtree
 
     private:
         
+        std::vector<int> startphysregs;
+        
         elements* myelements;
         disjointregions* mydisjointregions;
         
@@ -61,6 +63,8 @@ class spanningtree
         // Grow the tree starting at a given node.
         // The subtrees must have been defined before the call.
         void growtree(int nodenumber);
+        
+        void grow(void);
 
     public:
 
