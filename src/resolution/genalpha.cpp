@@ -56,6 +56,9 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
     
     if (outputeverynthtimestep <= 0)
         outputeverynthtimestep = 1;
+    
+    // Make all time derivatives available in the universe:
+    universe::xdtxdtdtx = {{u},{v},{a}};
         
     // Get all fields in the formulation:
     std::vector<std::shared_ptr<rawfield>> allfields = myformulation.getdofmanager()->getfields();
