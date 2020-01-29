@@ -235,6 +235,8 @@ spanningtree::spanningtree(std::vector<int> physregs)
     mydisjointregions = universe::mymesh->getdisjointregions();
     
     grow();
+    
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
 bool spanningtree::isintree(int index, int disjreg)
