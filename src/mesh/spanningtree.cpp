@@ -167,9 +167,6 @@ void spanningtree::growtree(int nodenumber)
     {
         int currentedge = edgecandidates[i];
 
-        // Get the disjoint edge region number of the current candidate:
-        int currentdisjreg = myelements->getdisjointregion(1, currentedge);
-
         if (isedgeintreeptr[currentedge])
             continue;
 
@@ -219,6 +216,17 @@ void spanningtree::synchronize(void)
 
     myelements = universe::mymesh->getelements();
     mydisjointregions = universe::mymesh->getdisjointregions();
+    
+    // Reset structure:
+    isedgeintree = NULL;
+    isedgeintreeptr = NULL;
+    numberofedgesintree = 0;
+    isprioritydisjointregion = {};
+    numberofsubtrees = 0;
+    insubtree = {};
+    edgesinsubtree = {};
+    issubtreeintree = {};
+    isnodeintree = {};
     
     grow();
     
