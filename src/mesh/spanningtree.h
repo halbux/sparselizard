@@ -65,6 +65,13 @@ class spanningtree
         void growtree(int nodenumber);
         
         void grow(void);
+        
+        
+        int mymeshnumber = 0;
+        // Synchronize with the hp-adapted mesh:
+        void synchronize(void);
+        // To avoid infinite recursive calls:
+        bool issynchronizing = false;
 
     public:
 

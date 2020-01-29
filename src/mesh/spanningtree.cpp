@@ -210,6 +210,23 @@ void spanningtree::grow(void)
     connectsubtrees();
 }
 
+void spanningtree::synchronize(void)
+{
+    if (issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+        return;
+    issynchronizing = true;    
+
+
+    myelements = universe::mymesh->getelements();
+    mydisjointregions = universe::mymesh->getdisjointregions();
+    
+    grow();
+    
+    
+    mymeshnumber = universe::mymesh->getmeshnumber();
+    issynchronizing = false;
+}
+
 spanningtree::spanningtree(std::vector<int> physregs)
 {
     startphysregs = physregs;
@@ -222,6 +239,8 @@ spanningtree::spanningtree(std::vector<int> physregs)
 
 bool spanningtree::isintree(int index, int disjreg)
 {
+    synchronize();
+    
     bool output = false;
     if (mydisjointregions->getelementtypenumber(disjreg) == 1)
         output = isedgeintreeptr[mydisjointregions->getrangebegin(disjreg)+index];
@@ -231,6 +250,8 @@ bool spanningtree::isintree(int index, int disjreg)
 
 int spanningtree::countedgesintree(int disjreg)
 {
+    synchronize();
+    
     int output = 0;
     if (mydisjointregions->getelementtypenumber(disjreg) == 1)
     {
@@ -249,11 +270,15 @@ int spanningtree::countedgesintree(int disjreg)
 
 int spanningtree::countedgesintree(void)
 {
+    synchronize();
+    
     return numberofedgesintree;
 }
 
 std::vector<int> spanningtree::getedgesintree(void)
 {
+    synchronize();
+    
     std::vector<int> output(numberofedgesintree);
 
     int index = 0;
@@ -271,6 +296,8 @@ std::vector<int> spanningtree::getedgesintree(void)
 
 void spanningtree::write(std::string filename)
 {
+    synchronize();
+    
     nodes* mynodes = universe::mymesh->getnodes();
     std::vector<double>* nodecoords = mynodes->getcoordinates();
     
