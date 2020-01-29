@@ -510,46 +510,62 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
 {
     // For point elements (i.e. nodes):
     if (elementtypenumber == 0)
-    {
         mynodes->reorder(elementreordering);
-        return;
-    }
-    
-    int numberofnodes = numberofsubelementsineveryelement[elementtypenumber][0];
-    int numberoflines = numberofsubelementsineveryelement[elementtypenumber][1];
-    int numberoftriangles = numberofsubelementsineveryelement[elementtypenumber][2];
-    int numberofquadrangles = numberofsubelementsineveryelement[elementtypenumber][3];
-    
-    std::vector<int> pointsinelementspart = subelementsinelements[elementtypenumber][0];
-    for (int i = 0; i < subelementsinelements[elementtypenumber][0].size()/numberofnodes; i++)
+    else
     {
-        for (int j = 0; j < numberofnodes; j++)
-            subelementsinelements[elementtypenumber][0][numberofnodes*i+j] = pointsinelementspart[numberofnodes*elementreordering[i]+j]; 
-    }
-    std::vector<int> linesinelementspart = subelementsinelements[elementtypenumber][1];
-    for (int i = 0; i < subelementsinelements[elementtypenumber][1].size()/numberoflines; i++)
-    {
-        for (int j = 0; j < numberoflines; j++)
-            subelementsinelements[elementtypenumber][1][numberoflines*i+j] = linesinelementspart[numberoflines*elementreordering[i]+j]; 
-    }
-    if (numberoftriangles != 0)
-    {
-        std::vector<int> trianglesinelementspart = subelementsinelements[elementtypenumber][2];
-        for (int i = 0; i < subelementsinelements[elementtypenumber][2].size()/numberoftriangles; i++)
+        int numberofnodes = numberofsubelementsineveryelement[elementtypenumber][0];
+        int numberoflines = numberofsubelementsineveryelement[elementtypenumber][1];
+        int numberoftriangles = numberofsubelementsineveryelement[elementtypenumber][2];
+        int numberofquadrangles = numberofsubelementsineveryelement[elementtypenumber][3];
+        
+        std::vector<int> pointsinelementspart = subelementsinelements[elementtypenumber][0];
+        for (int i = 0; i < subelementsinelements[elementtypenumber][0].size()/numberofnodes; i++)
         {
-            for (int j = 0; j < numberoftriangles; j++)
-                subelementsinelements[elementtypenumber][2][numberoftriangles*i+j] = trianglesinelementspart[numberoftriangles*elementreordering[i]+j]; 
+            for (int j = 0; j < numberofnodes; j++)
+                subelementsinelements[elementtypenumber][0][numberofnodes*i+j] = pointsinelementspart[numberofnodes*elementreordering[i]+j]; 
+        }
+        std::vector<int> linesinelementspart = subelementsinelements[elementtypenumber][1];
+        for (int i = 0; i < subelementsinelements[elementtypenumber][1].size()/numberoflines; i++)
+        {
+            for (int j = 0; j < numberoflines; j++)
+                subelementsinelements[elementtypenumber][1][numberoflines*i+j] = linesinelementspart[numberoflines*elementreordering[i]+j]; 
+        }
+        if (numberoftriangles != 0)
+        {
+            std::vector<int> trianglesinelementspart = subelementsinelements[elementtypenumber][2];
+            for (int i = 0; i < subelementsinelements[elementtypenumber][2].size()/numberoftriangles; i++)
+            {
+                for (int j = 0; j < numberoftriangles; j++)
+                    subelementsinelements[elementtypenumber][2][numberoftriangles*i+j] = trianglesinelementspart[numberoftriangles*elementreordering[i]+j]; 
+            }
+        }
+        if (numberofquadrangles != 0)
+        {
+            std::vector<int> quadranglesinelementspart = subelementsinelements[elementtypenumber][3];
+            for (int i = 0; i < subelementsinelements[elementtypenumber][3].size()/numberofquadrangles; i++)
+            {
+                for (int j = 0; j < numberofquadrangles; j++)
+                    subelementsinelements[elementtypenumber][3][numberofquadrangles*i+j] = quadranglesinelementspart[numberofquadrangles*elementreordering[i]+j]; 
+            }
         }
     }
-    if (numberofquadrangles != 0)
-    {
-        std::vector<int> quadranglesinelementspart = subelementsinelements[elementtypenumber][3];
-        for (int i = 0; i < subelementsinelements[elementtypenumber][3].size()/numberofquadrangles; i++)
-        {
-            for (int j = 0; j < numberofquadrangles; j++)
-                subelementsinelements[elementtypenumber][3][numberofquadrangles*i+j] = quadranglesinelementspart[numberofquadrangles*elementreordering[i]+j]; 
-        }
-    }
+    
+    
+    // Reorder 'indisjointregion':
+    std::vector<int> indisjointregionpart = indisjointregion[elementtypenumber];
+    for (int i = 0; i < indisjointregion[elementtypenumber].size(); i++)
+        indisjointregion[elementtypenumber][i] = indisjointregionpart[elementreordering[i]];
+
+    // Reorder 'totalorientations':
+    std::vector<int> totalorientationspart = totalorientations[elementtypenumber];
+    for (int i = 0; i < totalorientations[elementtypenumber].size(); i++)
+        totalorientations[elementtypenumber][i] = totalorientationspart[elementreordering[i]];
+
+    barycenters = {};
+    sphereradius = {};
+    boxdimensions = {};
+    adressedgesatnodes = {};
+    edgesatnodes = {};
 }
 
 void elements::explode(void)
@@ -759,11 +775,6 @@ void elements::reorderbydisjointregions(std::vector<std::vector<int>>& elementre
         
         reorder(typenum, elementreordering);
         renumber(typenum, elementrenumbering[typenum]);
-
-        // Reorder 'indisjointregion' as well:
-        std::vector<int> indisjointregionpart = indisjointregion[typenum];
-        for (int i = 0; i < indisjointregion[typenum].size(); i++)
-            indisjointregion[typenum][i] = indisjointregionpart[elementreordering[i]]; 
 
         for (int physregindex = 0; physregindex < myphysicalregions->count(); physregindex++)
         {
