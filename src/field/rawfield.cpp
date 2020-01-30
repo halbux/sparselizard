@@ -60,9 +60,6 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     for (int i = 0; i < mygaugetracker.size(); i++)
         setgauge(mygaugetracker[i]);
         
-    // Regrow the spanning tree (if any):
-    
-    
     // Update the coef manager:
     
     // We need to know in which disjoint region every old element number was:
