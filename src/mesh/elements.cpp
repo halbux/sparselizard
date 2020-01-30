@@ -560,7 +560,7 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
         totalorientations[elementtypenumber][i] = totalorientationspart[elementreordering[i]];
 
     std::vector<double> barycenterspart = barycenters[elementtypenumber];
-    for (int i = 0; i < barycenters[elementtypenumber].size(); i++)
+    for (int i = 0; i < barycenters[elementtypenumber].size()/3; i++)
     {
         barycenters[elementtypenumber][3*i+0] = barycenterspart[3*elementreordering[i]+0];
         barycenters[elementtypenumber][3*i+1] = barycenterspart[3*elementreordering[i]+1];
@@ -568,7 +568,7 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     }
     
     std::vector<double> sphereradiuspart = sphereradius[elementtypenumber];
-    for (int i = 0; i < sphereradius[elementtypenumber].size(); i++)
+    for (int i = 0; i < sphereradius[elementtypenumber].size()/3; i++)
     {
         sphereradius[elementtypenumber][3*i+0] = sphereradiuspart[3*elementreordering[i]+0];
         sphereradius[elementtypenumber][3*i+1] = sphereradiuspart[3*elementreordering[i]+1];
@@ -576,7 +576,7 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     }
     
     std::vector<double> boxdimensionspart = boxdimensions[elementtypenumber];
-    for (int i = 0; i < boxdimensions[elementtypenumber].size(); i++)
+    for (int i = 0; i < boxdimensions[elementtypenumber].size()/3; i++)
     {
         boxdimensions[elementtypenumber][3*i+0] = boxdimensionspart[3*elementreordering[i]+0];
         boxdimensions[elementtypenumber][3*i+1] = boxdimensionspart[3*elementreordering[i]+1];
