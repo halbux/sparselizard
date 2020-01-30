@@ -561,9 +561,9 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     for (int i = 0; i < totalorientations[elementtypenumber].size(); i++)
         totalorientations[elementtypenumber][i] = totalorientationspart[elementreordering[i]];
 
-    barycenters = {};
-    sphereradius = {};
-    boxdimensions = {};
+    barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
     adressedgesatnodes = {};
     edgesatnodes = {};
 }
