@@ -568,12 +568,8 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     }
     
     std::vector<double> sphereradiuspart = sphereradius[elementtypenumber];
-    for (int i = 0; i < sphereradius[elementtypenumber].size()/3; i++)
-    {
-        sphereradius[elementtypenumber][3*i+0] = sphereradiuspart[3*elementreordering[i]+0];
-        sphereradius[elementtypenumber][3*i+1] = sphereradiuspart[3*elementreordering[i]+1];
-        sphereradius[elementtypenumber][3*i+2] = sphereradiuspart[3*elementreordering[i]+2];
-    }
+    for (int i = 0; i < sphereradius[elementtypenumber].size(); i++)
+        sphereradius[elementtypenumber][i] = sphereradiuspart[elementreordering[i]];
     
     std::vector<double> boxdimensionspart = boxdimensions[elementtypenumber];
     for (int i = 0; i < boxdimensions[elementtypenumber].size()/3; i++)
