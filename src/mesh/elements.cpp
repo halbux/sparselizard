@@ -551,19 +551,38 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     }
     
     
-    // Reorder 'indisjointregion':
     std::vector<int> indisjointregionpart = indisjointregion[elementtypenumber];
     for (int i = 0; i < indisjointregion[elementtypenumber].size(); i++)
         indisjointregion[elementtypenumber][i] = indisjointregionpart[elementreordering[i]];
 
-    // Reorder 'totalorientations':
     std::vector<int> totalorientationspart = totalorientations[elementtypenumber];
     for (int i = 0; i < totalorientations[elementtypenumber].size(); i++)
         totalorientations[elementtypenumber][i] = totalorientationspart[elementreordering[i]];
 
-    barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    std::vector<double> barycenterspart = barycenters[elementtypenumber];
+    for (int i = 0; i < barycenters[elementtypenumber].size(); i++)
+    {
+        barycenters[elementtypenumber][3*i+0] = barycenterspart[3*elementreordering[i]+0];
+        barycenters[elementtypenumber][3*i+1] = barycenterspart[3*elementreordering[i]+1];
+        barycenters[elementtypenumber][3*i+2] = barycenterspart[3*elementreordering[i]+2];
+    }
+    
+    std::vector<double> sphereradiuspart = sphereradius[elementtypenumber];
+    for (int i = 0; i < sphereradius[elementtypenumber].size(); i++)
+    {
+        sphereradius[elementtypenumber][3*i+0] = sphereradiuspart[3*elementreordering[i]+0];
+        sphereradius[elementtypenumber][3*i+1] = sphereradiuspart[3*elementreordering[i]+1];
+        sphereradius[elementtypenumber][3*i+2] = sphereradiuspart[3*elementreordering[i]+2];
+    }
+    
+    std::vector<double> boxdimensionspart = boxdimensions[elementtypenumber];
+    for (int i = 0; i < boxdimensions[elementtypenumber].size(); i++)
+    {
+        boxdimensions[elementtypenumber][3*i+0] = boxdimensionspart[3*elementreordering[i]+0];
+        boxdimensions[elementtypenumber][3*i+1] = boxdimensionspart[3*elementreordering[i]+1];
+        boxdimensions[elementtypenumber][3*i+2] = boxdimensionspart[3*elementreordering[i]+2];
+    }
+    
     adressedgesatnodes = {};
     edgesatnodes = {};
 }
