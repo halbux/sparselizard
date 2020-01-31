@@ -211,12 +211,16 @@ void dofinterpolate::eval(void)
                             {
                                 int currentsubelem = myelements->getsubelement(associatedelementtype[ff], elementtypenumber, elems[e], num[ff]);
                                 int curdisjreg = myelements->getdisjointregion(associatedelementtype[ff], currentsubelem);
-                                // Use it to get the subelem index in the disjoint region:
-                                currentsubelem -= mydisjointregions->getrangebegin(curdisjreg);
+                                // In case of p-adaptivity some dofs can be missing and must be kept to the default negative adress.
+                                if (mydofmanager->isdefined(curdisjreg, formfunctionindex[ff]))
+                                {
+                                    // Use it to get the subelem index in the disjoint region:
+                                    currentsubelem -= mydisjointregions->getrangebegin(curdisjreg);
+                                    
+                                    int rb = mydofmanager->getrangebegin(curdisjreg, formfunctionindex[ff]);
                                 
-                                int rb = mydofmanager->getrangebegin(curdisjreg, formfunctionindex[ff]);
-                            
-                                dofnumsptr[rowstart+mynumrefcoords*ff+callingevalpt] = rb + currentsubelem;
+                                    dofnumsptr[rowstart+mynumrefcoords*ff+callingevalpt] = rb + currentsubelem;
+                                }
                             }
                         }
                     }         
