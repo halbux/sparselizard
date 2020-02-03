@@ -387,7 +387,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     }
 }
 
-void rawfield::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
+void rawfield::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
 {
     synchronize();
     
@@ -399,18 +399,18 @@ void rawfield::setorder(expression criterion, std::vector<field> triggers, std::
 
     // Set the interpolation order on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setorder(criterion, triggers, thresholds, orders, mincritrange);
+        mysubfields[i][0]->setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange);
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setorder(criterion, triggers, thresholds, orders, mincritrange);
+            myharmonics[i][0]->setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange);
     }
 
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
     {
         ispadaptive = true;
         
-        universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, mincritrange);
+        universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, thresdown, thresup, mincritrange);
         
         // Reset the trigger flag on the previous triggers:
         for (int i = 0; i < myadapttriggers.size(); i++)

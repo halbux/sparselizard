@@ -143,7 +143,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::string gettypename(bool familyonly = true);
 
         void setorder(int physreg, int interpolorder, bool iscalledbyuser = true);
-        void setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange);
+        void setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
         
         void settriggerflag(bool istrig);
         

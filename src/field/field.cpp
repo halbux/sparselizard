@@ -71,7 +71,7 @@ void field::setorder(int physreg, int interpolorder)
     rawfieldptr->setorder(physreg, interpolorder); 
 }
 
-void field::setorder(expression criterion, std::vector<field> triggers, int loworder, int highorder, double mincritrange)
+void field::setorder(expression criterion, std::vector<field> triggers, int loworder, int highorder, double thresdown, double thresup, double mincritrange)
 {
     if (loworder < 0)
     {
@@ -100,10 +100,10 @@ void field::setorder(expression criterion, std::vector<field> triggers, int lowo
     for (int i = 0; i < numorders; i++)
         orders[i] = loworder + i;
         
-    setorder(criterion, triggers, thresholds, orders, mincritrange);
+    setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange);
 }
 
-void field::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
+void field::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
 {
     double noiselevel = 1e-8;
 
@@ -161,8 +161,13 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
             abort();   
         }
     }
+    if (thresdown < 0.0 || thresdown > 1.0 || thresup < 0.0 || thresup > 1.0)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' thresholds must be between 0.0 and 1.0" << std::endl;
+        abort();   
+    }
     
-    rawfieldptr->setorder(criterion, triggers, thresholds, orders, mincritrange); 
+    rawfieldptr->setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange); 
 }
 
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)

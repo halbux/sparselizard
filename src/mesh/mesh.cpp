@@ -487,7 +487,7 @@ void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim,
 }
 
 
-void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double mincritrange)
+void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
 {
     int index = -1;
     for (int i = 0; i < mypadaptdata.size(); i++)
@@ -501,9 +501,9 @@ void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::
     }
 
     if (index != -1)
-        mypadaptdata[index] = std::make_tuple(inrawfield, criterion, thresholds, orders, mincritrange);
+        mypadaptdata[index] = std::make_tuple(inrawfield, criterion, thresholds, orders, thresdown, thresup, mincritrange);
     else
-        mypadaptdata.push_back(std::make_tuple(inrawfield, criterion, thresholds, orders, mincritrange));
+        mypadaptdata.push_back(std::make_tuple(inrawfield, criterion, thresholds, orders, thresdown, thresup, mincritrange));
 }
 
 void mesh::adaptp(void)
@@ -565,7 +565,9 @@ void mesh::adaptp(void)
     {
         std::vector<double> thresholds = std::get<2>(mypadaptdata[i]);
         std::vector<int> orders = std::get<3>(mypadaptdata[i]);
-        double mincritrange = std::get<4>(mypadaptdata[i]);
+        double thresdown = std::get<4>(mypadaptdata[i]);
+        double thresup = std::get<5>(mypadaptdata[i]);
+        double mincritrange = std::get<6>(mypadaptdata[i]);
         
         int minorder = *std::min_element(orders.begin(), orders.end());
     
@@ -595,7 +597,18 @@ void mesh::adaptp(void)
         {
             for (int e = 0; e < totalnumelems; e++)
             {
-                newordsptr[e] = orders[ myalgorithm::findinterval(critsptr[e], thresholds) ];
+                int interv = myalgorithm::findinterval(critsptr[e], thresholds);
+                newordsptr[e] = orders[interv];
+                
+                // Check if the criterion is beyond the down/up change threshold.
+                double intervsize = thresholds[interv+1]-thresholds[interv];
+                // Bring back to upper interval?
+                if (interv < thresholds.size()-2 && orders[interv+1] == oldordsptr[e] && critsptr[e] > thresholds[interv+1]-intervsize*thresdown)
+                    newordsptr[e] = oldordsptr[e];
+                // Bring back to lower interval?
+                if (interv > 0 && orders[interv-1] == oldordsptr[e] && critsptr[e] < thresholds[interv]+intervsize*thresup)
+                    newordsptr[e] = oldordsptr[e];
+                
                 if (newordsptr[e] > newmaxorder)
                     newmaxorder = newordsptr[e];
             }
