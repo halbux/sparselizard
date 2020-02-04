@@ -161,7 +161,7 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
             abort();   
         }
     }
-    if (thresdown < 0.0 || thresdown > 1.0 || thresup < 0.0 || thresup > 1.0)
+    if (thresdown < 0.0-noiselevel || thresdown > 1.0+noiselevel || thresup < 0.0-noiselevel || thresup > 1.0+noiselevel)
     {
         std::cout << "Error in 'field' object: in 'setorder' thresholds must be between 0.0 and 1.0" << std::endl;
         abort();   
