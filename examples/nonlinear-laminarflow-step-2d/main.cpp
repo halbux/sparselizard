@@ -64,9 +64,9 @@ void sparselizard(void)
     // The interpolation order of the pressure and velocity fields is adapted based on a criterion.
     // The v field will trigger the p-adaptivity at every time its value changes.
     // With the selected orders (1 to 3 for p and 2 to 4 for v) the BB condition is always satisfied.
-    expression crit = norm(grad(compx(v))) + norm(grad(compy(v)));
-    p.setorder(crit, {v}, 1, 3);
-    v.setorder(crit, {v}, 2, 4);
+    expression adaptcriterion = norm(grad(compx(v))) + norm(grad(compy(v)));
+    p.setorder(adaptcriterion, {v}, 1, 3);
+    v.setorder(adaptcriterion, {v}, 2, 4);
 
     // Define the weak formulation for incompressible laminar flow:
     formulation laminarflow;
