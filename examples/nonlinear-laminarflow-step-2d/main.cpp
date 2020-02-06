@@ -60,7 +60,6 @@ void sparselizard(void)
     // This must be added before the p-adaptivity 'setorder' calls below to compute the initial criterion.
     p.setorder(fluid, 1);
     v.setorder(fluid, 2);
-    // THE 3 LINES BELOW ARE THE ONLY LINES REQUIRED FOR P-ADAPTIVITY.
     // The interpolation order of the pressure and velocity fields is adapted based on a criterion.
     // The v field will trigger the p-adaptivity at every time its value changes.
     // With the selected orders (1 to 3 for p and 2 to 4 for v) the BB condition is always satisfied.
