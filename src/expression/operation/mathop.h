@@ -173,6 +173,10 @@ namespace mathop
     
     // Convert dB to Nepers:
     expression dbtoneper(expression toconvert);
+    
+    
+    // Set the data on all regions of all fields defined in the vec object:
+    void setdata(vec invec);
 
 
     ////////// PREDEFINED OPERATORS

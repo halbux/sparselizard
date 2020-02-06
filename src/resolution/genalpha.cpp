@@ -60,11 +60,8 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
     // Make all time derivatives available in the universe:
     universe::xdtxdtdtx = {{u},{v},{a}};
         
-    // Get all fields in the formulation:
-    std::vector<std::shared_ptr<rawfield>> allfields = myformulation.getdofmanager()->getfields();
     // Set all fields in the formulation to the initial displacement:
-    for (int i = 0; i < allfields.size(); i++)
-        field(allfields[i]).setdata(-1, u);
+    mathop::setdata(u);
     
     vec rhs; mat K, C, M, leftmat, matu, matv, mata;
     
@@ -167,8 +164,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             vnext = v + (timestep*(1-gamma))*a + (gamma*timestep)*anext;
             
             // Update all fields in the formulation:
-            for (int i = 0; i < allfields.size(); i++)
-                field(allfields[i]).setdata(-1, unext);
+            mathop::setdata(unext);
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             

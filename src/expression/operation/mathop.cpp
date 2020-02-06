@@ -965,6 +965,34 @@ expression mathop::dbtoneper(expression toconvert)
     return ( 0.1151292546497023 * toconvert );
 }
 
+void mathop::setdata(vec invec)
+{
+    // Get all fields in the vec structure:
+    std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
+    
+    // Check if there is any p-adaptivity trigger:
+    bool isanytrigger = false;
+    for (int i = 0; i < allfields.size(); i++)
+    {
+        if (allfields[i]->istrigger())
+        {
+            isanytrigger = true;
+            break;
+        }
+    }
+    
+    bool wasallowed = universe::ispadaptallowed;
+    universe::ispadaptallowed = false;
+    
+    for (int i = 0; i < allfields.size(); i++)
+        field(allfields[i]).setdata(-1, invec);
+
+    if (isanytrigger)
+        universe::mymesh->adaptp();
+
+    universe::ispadaptallowed = wasallowed;
+}
+
 
 ////////// PREDEFINED OPERATORS
 

@@ -45,11 +45,8 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
     // Make all time derivatives available in the universe:
     universe::xdtxdtdtx = {{x},{dtx},{}};
         
-    // Get all fields in the formulation:
-    std::vector<std::shared_ptr<rawfield>> allfields = myformulation.getdofmanager()->getfields();
     // Set all fields in the formulation to the initial solution:
-    for (int i = 0; i < allfields.size(); i++)
-        field(allfields[i]).setdata(-1, x);
+    mathop::setdata(x);
     
     vec rhs; mat K, C, leftmat;
     
@@ -122,8 +119,7 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
             dtxnext = 1.0/timestep*(xnext-x);
             
             // Update all fields in the formulation:
-            for (int i = 0; i < allfields.size(); i++)
-                field(allfields[i]).setdata(-1, xnext);
+            mathop::setdata(xnext);
             
             relchange = (xnext-xtolcalc).norm()/xnext.norm();
             
