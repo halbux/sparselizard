@@ -936,9 +936,6 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
 
 void mathop::solve(formulation formul)
 {
-    // Get all fields in the formulation:
-    std::vector<std::shared_ptr<rawfield>> allfields = formul.getdofmanager()->getfields();
-
     // Remove leftovers (if any):
     mat A = formul.A(); vec b = formul.b();
     // Generate:
