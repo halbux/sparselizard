@@ -947,8 +947,7 @@ void mathop::solve(formulation formul)
     vec sol = mathop::solve(formul.A(), formul.b());
 
     // Save to fields:
-    for (int i = 0; i < allfields.size(); i++)
-        field(allfields[i]).setdata(-1, sol);
+    setdata(sol);
 }
 
 void mathop::solve(std::vector<formulation> formuls)
