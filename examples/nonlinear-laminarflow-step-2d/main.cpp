@@ -95,7 +95,7 @@ void sparselizard(void)
         convergence = std::abs((norm(v).integrate(fluid,2) - measuresol)/norm(v).integrate(fluid,2));
         std::cout << "Relative solution change: " << convergence << std::endl;
         
-        // Write the fields to file. Write v with an order 2 interpolation.
+        // Write the fields to file. Write v with an order 3 interpolation.
         p.write(fluid, "p"+std::to_string(index)+".vtk");
         v.write(fluid, "v"+std::to_string(index)+".vtk", 3);
         getfieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(index)+".vtk");
