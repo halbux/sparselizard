@@ -967,6 +967,9 @@ expression mathop::dbtoneper(expression toconvert)
 
 void mathop::setdata(vec invec)
 {
+    if (invec.getpointer() == NULL)
+        return;
+    
     // Get all fields in the vec structure:
     std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
     
@@ -987,10 +990,10 @@ void mathop::setdata(vec invec)
     for (int i = 0; i < allfields.size(); i++)
         field(allfields[i]).setdata(-1, invec);
 
+    universe::ispadaptallowed = wasallowed;
+    
     if (isanytrigger)
         universe::mymesh->adaptp();
-
-    universe::ispadaptallowed = wasallowed;
 }
 
 
