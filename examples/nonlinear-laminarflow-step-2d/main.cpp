@@ -3,7 +3,9 @@
 // A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
 //
-// More information for this standard example can be found in:
+// P-adaptivity is used.
+//
+// More information for this benchmark example can be found in:
 //
 // "Finite element methods for the incompressible Navier-Stokes equations", A. Segal
 //
@@ -37,7 +39,7 @@ void sparselizard(void)
     int fluid = 1, inlet = 2, outlet = 3, skin = 4;
     // Height of the inlet [m]:
     double h1 = 1e-3;
-    mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 30, 150, 20, 50);
+    mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 5, 15, 8, 8);
     
     // Define the fluid wall (not including the inlet and outlet):
     int wall = regionexclusion(skin, regionunion({inlet,outlet}));
@@ -54,9 +56,17 @@ void sparselizard(void)
     // Set a 0 relative pressure at the outlet:
     p.setconstraint(outlet);
 
-    // Use an order 1 interpolation for p and 2 for v on the fluid region (satisfies the BB condition):
+    // Use an order 1 interpolation for p and 2 for v on the fluid region (satisfies the BB condition).
+    // This must be added before the p-adaptivity 'setorder' calls below to compute the initial criterion.
     p.setorder(fluid, 1);
     v.setorder(fluid, 2);
+    // THE 3 LINES BELOW ARE THE ONLY LINES REQUIRED FOR P-ADAPTIVITY.
+    // The interpolation order of the pressure and velocity fields is adapted based on a criterion.
+    // The v field will trigger the p-adaptivity at every time its value changes.
+    // With the selected orders (1 to 3 for p and 2 to 4 for v) the BB condition is always satisfied.
+    expression crit = norm(grad(compx(v))) + norm(grad(compy(v)));
+    p.setorder(crit, {v}, 1, 3);
+    v.setorder(crit, {v}, 2, 4);
 
     // Define the weak formulation for incompressible laminar flow:
     formulation laminarflow;
@@ -86,8 +96,9 @@ void sparselizard(void)
         std::cout << "Relative solution change: " << convergence << std::endl;
         
         // Write the fields to file. Write v with an order 2 interpolation.
-        p.write(fluid, "p.vtk");
-        v.write(fluid, "v.vtk", 2);
+        p.write(fluid, "p"+std::to_string(index)+".vtk");
+        v.write(fluid, "v"+std::to_string(index)+".vtk", 3);
+        getfieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(index)+".vtk");
 
         index++;
     }
@@ -101,7 +112,7 @@ void sparselizard(void)
     std::cout << std::endl << "Flowrate in/out for a unit width: " << flowratein << " / " << flowrateout << " m^3/s" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (vnorm*flowrateout < 2.64489e-05 && vnorm*flowrateout > 2.64485e-05);
+    std::cout << (vnorm*flowrateout < 2.60974e-05 && vnorm*flowrateout > 2.60970e-05);
 }
 
 mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2)
