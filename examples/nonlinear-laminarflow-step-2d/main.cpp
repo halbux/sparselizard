@@ -61,7 +61,7 @@ void sparselizard(void)
     p.setorder(fluid, 1);
     v.setorder(fluid, 2);
     // The interpolation order of the pressure and velocity fields is adapted based on a criterion.
-    // The v field will trigger the p-adaptivity at every time its value changes.
+    // The v field will trigger the p-adaptivity every time its value changes.
     // With the selected orders (1 to 3 for p and 2 to 4 for v) the BB condition is always satisfied.
     expression adaptcriterion = norm(grad(compx(v))) + norm(grad(compy(v)));
     p.setorder(adaptcriterion, {v}, 1, 3);
