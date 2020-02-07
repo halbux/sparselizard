@@ -141,6 +141,14 @@ double sparselizard(double alpha)
     // A minus sign gives the torque on the rotor (opposite sign than the stator torque).
     torque = - torque * 8.0 * 0.05;
 
+    // To compute the torque with Arkkio's formula replace the above by the code below.
+    //
+    // expression ez = array3x1(0,0,1);
+    // expression rer = array3x1(x,y,z);
+    // expression ret = crossproduct(ez,rer);
+    // double area = expression(1).integrate(gaprot, 5);
+    // double torque = 0.05 * (2.0*getpi()/area * curl(a)*rer * 1.0/mu0 * curl(a)*ret).integrate(gaprot, 5);
+    
     return torque;
 }
 
