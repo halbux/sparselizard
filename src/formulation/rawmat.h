@@ -44,6 +44,8 @@ class rawmat
         bool ludefined = false;
         
         std::shared_ptr<dofmanager> mydofmanager = NULL;
+        
+        int mymeshnumber = 0;
             
     public:
                     
@@ -85,10 +87,10 @@ class rawmat
         // Extract a new initialised rawmat that has all accumulated data. 
         std::shared_ptr<rawmat> extractaccumulated(void);
         
-        std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
-        Mat getpetsc(void) { return mymat; };
+        std::shared_ptr<dofmanager> getdofmanager(void);
+        Mat getpetsc(void);
         
-        KSP* getksp(void) { return &myksp; };
+        KSP* getksp(void);
 
 };
 
