@@ -226,7 +226,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
     std::shared_ptr<rawmat> rawout = mymat[KCM]->extractaccumulated();
     
     if (keepfragments == false)
-        mymat[KCM] == NULL;
+        mymat[KCM] = NULL;
         
         
     // Set the gauged indexes to all zero:
