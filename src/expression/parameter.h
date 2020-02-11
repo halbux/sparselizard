@@ -47,7 +47,7 @@ class parameter
         std::vector<int> opnums = {};
         
         
-       int mymeshnumber = 0;
+        int mymeshnumber = 0;
         
         // Track the calls to 'set'.
         std::vector<std::pair<int, expression>> mystructuretracker = {};
