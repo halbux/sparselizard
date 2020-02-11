@@ -6,7 +6,7 @@ cylinderxpos = 0.25;
 // Tiny misalignment:
 cylinderypos = boxwidth/2 + boxwidth/1000;
 
-lc = 0.04;
+lc = 0.02;
 lcfine = 0.002;
 
 Point(1) = {0,0,0, lc};
