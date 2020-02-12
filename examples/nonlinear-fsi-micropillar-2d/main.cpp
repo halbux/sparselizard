@@ -107,7 +107,7 @@ void sparselizard(void)
     fsi += integral(fsinterface, umesh, ( p * -normal(fsinterface) - on(fluid, mu*( grad(v) + transpose(grad(v)) ) ) * -normal(fsinterface) ) * tf(u) );
 
 
-    double uprev, umax = 1;
+    double uprev = 0, umax = 1;
     while (std::abs(umax-uprev)/std::abs(umax) > 1e-6)
     {
         // Solve the fluid-structure interaction and the Laplace formulation to smooth the mesh. 
