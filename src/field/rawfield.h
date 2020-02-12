@@ -121,7 +121,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         bool istrigger(void);
         
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
-        rawfield(void) {};
+        rawfield(void);
+        ~rawfield(void);
         
         bool ismultiharmonic(void) { return multiharmonic; };
         

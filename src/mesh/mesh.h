@@ -47,7 +47,7 @@ class mesh
         int mynumber = 0;
         std::shared_ptr<meshtracker> mymeshtracker = NULL;
         // For p-adaptivity:
-        std::vector<std::tuple<std::shared_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
+        std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
         
 
         std::string filename = "";
@@ -111,6 +111,7 @@ class mesh
         
         // For p-adaptivity:
         void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
+        void remove(rawfield* inrawfield);
         void adaptp(void);
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:

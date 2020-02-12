@@ -492,7 +492,7 @@ void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::
     int index = -1;
     for (int i = 0; i < mypadaptdata.size(); i++)
     {
-        std::shared_ptr<rawfield> currawfield = std::get<0>(mypadaptdata[i]);
+        std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
         if (currawfield.get() == inrawfield.get())
         {
             index = i;
@@ -500,10 +500,40 @@ void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::
         }
     }
 
+    std::weak_ptr<rawfield> inweak = inrawfield;
+
     if (index != -1)
-        mypadaptdata[index] = std::make_tuple(inrawfield, criterion, thresholds, orders, thresdown, thresup, mincritrange);
+        mypadaptdata[index] = std::make_tuple(inweak, criterion, thresholds, orders, thresdown, thresup, mincritrange);
     else
-        mypadaptdata.push_back(std::make_tuple(inrawfield, criterion, thresholds, orders, thresdown, thresup, mincritrange));
+        mypadaptdata.push_back(std::make_tuple(inweak, criterion, thresholds, orders, thresdown, thresup, mincritrange));
+}
+
+void mesh::remove(rawfield* inrawfield)
+{
+    int index = -1;
+    for (int i = 0; i < mypadaptdata.size(); i++)
+    {
+        std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
+        if (currawfield.get() == inrawfield)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (index != -1)
+    {
+        int curindex = 0;
+        for (int i = 0; i < mypadaptdata.size(); i++)
+        {
+            mypadaptdata[curindex] = mypadaptdata[i];
+
+            std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
+            if (currawfield.get() == inrawfield)
+                curindex++;
+        }
+        mypadaptdata.resize(mypadaptdata.size()-1);
+    }
 }
 
 void mesh::adaptp(void)
@@ -524,13 +554,15 @@ void mesh::adaptp(void)
     field one("one");
     for (int i = 0; i < num; i++)
     {
+        std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
+    
         formulation critaverage;
         critaverage += mathop::integral(wholedomain, -std::get<1>(mypadaptdata[i]) * mathop::tf(one) / mathop::getmeshsize(2) );
         critaverage.generaterhs();
         crits[i] = critaverage.rhs();
         
         formulation elorder;
-        elorder += mathop::integral(wholedomain, -mathop::getfieldorder(field(std::get<0>(mypadaptdata[i]))) * mathop::tf(one) / mathop::getmeshsize(2) );
+        elorder += mathop::integral(wholedomain, -mathop::getfieldorder(field(curraw)) * mathop::tf(one) / mathop::getmeshsize(2) );
         elorder.generaterhs();
         oldords[i] = elorder.rhs();
     }
@@ -711,8 +743,10 @@ void mesh::adaptp(void)
             }
         }
         
+        std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
+        
         // 'curphysregsfororder' MUST BE IN INCREASING ORDER.
-        std::get<0>(mypadaptdata[i])->synchronize(curphysregsfororder);
+        curraw->synchronize(curphysregsfororder);
     }
     
 

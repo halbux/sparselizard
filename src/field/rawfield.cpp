@@ -206,6 +206,19 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     return;
 }
 
+rawfield::rawfield(void) {}
+
+rawfield::~rawfield(void)
+{
+    if (universe::mymesh != NULL)
+        universe::mymesh->remove(this);
+
+    // Reset the adaptivity triggers:
+    for (int i = 0; i < myadapttriggers.size(); i++)
+        myadapttriggers[i]->settriggerflag(false);
+    myadapttriggers = {};
+}
+
 int rawfield::countcomponents(void)
 {
     synchronize();
