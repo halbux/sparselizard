@@ -529,7 +529,7 @@ void mesh::remove(rawfield* inrawfield)
             mypadaptdata[curindex] = mypadaptdata[i];
 
             std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
-            if (currawfield.get() == inrawfield)
+            if (currawfield.get() != inrawfield)
                 curindex++;
         }
         mypadaptdata.resize(mypadaptdata.size()-1);
