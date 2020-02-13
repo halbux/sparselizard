@@ -13,7 +13,7 @@ cd ~/SLlibs;
 
 echo '__________________________________________';
 echo 'FETCHING THE GMSH API';
-wget http://gmsh.info/bin/Linux/gmsh-4.5.2-Linux64.tgz;
+wget http://gmsh.info/bin/Linux/gmsh-4.5.2-Linux64-sdk.tgz;
 tar -xf *.tgz;
 rm gmsh*.tgz;
 mv gmsh* gmsh;
