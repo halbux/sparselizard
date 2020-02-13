@@ -514,14 +514,16 @@ void mesh::remove(rawfield* inrawfield)
     int curindex = 0;
     for (int i = 0; i < mypadaptdata.size(); i++)
     {
-        mypadaptdata[curindex] = mypadaptdata[i];
-
         std::weak_ptr<rawfield> curwp = std::get<0>(mypadaptdata[i]);
         if (not(curwp.expired()))
         {
             std::shared_ptr<rawfield> currawfield = curwp.lock();
             if (currawfield.get() != inrawfield)
+            {
+                if (curindex != i)
+                    mypadaptdata[curindex] = mypadaptdata[i];
                 curindex++;
+            }
         }
     }
     mypadaptdata.resize(curindex);
