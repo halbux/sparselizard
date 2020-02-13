@@ -510,30 +510,21 @@ void mesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::
 
 void mesh::remove(rawfield* inrawfield)
 {
-    int index = -1;
+    // Remove the pointed field and all expired fields:
+    int curindex = 0;
     for (int i = 0; i < mypadaptdata.size(); i++)
     {
-        std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
-        if (currawfield.get() == inrawfield)
-        {
-            index = i;
-            break;
-        }
-    }
+        mypadaptdata[curindex] = mypadaptdata[i];
 
-    if (index != -1)
-    {
-        int curindex = 0;
-        for (int i = 0; i < mypadaptdata.size(); i++)
+        std::weak_ptr<rawfield> curwp = std::get<0>(mypadaptdata[i]);
+        if (not(curwp.expired()))
         {
-            mypadaptdata[curindex] = mypadaptdata[i];
-
-            std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
+            std::shared_ptr<rawfield> currawfield = curwp.lock();
             if (currawfield.get() != inrawfield)
                 curindex++;
         }
-        mypadaptdata.resize(mypadaptdata.size()-1);
     }
+    mypadaptdata.resize(curindex);
 }
 
 void mesh::adaptp(void)
