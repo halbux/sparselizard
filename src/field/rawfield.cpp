@@ -210,7 +210,7 @@ rawfield::rawfield(void) {}
 
 rawfield::~rawfield(void)
 {
-    if (universe::mymesh != NULL)
+    if (universe::mymesh != NULL && mysubfields.size() == 0 && myharmonics.size() == 0)
         universe::mymesh->remove(this);
 
     // Reset the adaptivity triggers:
