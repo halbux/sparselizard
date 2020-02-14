@@ -2,6 +2,97 @@
 #include "universe.h"
 
 
+#ifndef HAVE_GMSHAPI
+void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
+{    
+    std::cout << "Error in 'gmshinterface' namespace: GMSH API is not available" << std::endl;
+    abort();
+}
+#endif
+#ifdef HAVE_GMSHAPI
+#include "gmsh.h"
+void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
+{    
+  
+    ////////// GET ALL PHYSICAL REGION TAGS:
+    
+    gmsh::vectorpair dimTags;
+    gmsh::model::getPhysicalGroups(dimTags, -1); // getEntities
+    //Comment this out to debug and find out the dimention tags
+    
+    std::cout<<"Dimension tags are,\n";
+    for (int i=0;i<dimTags.size();i++)
+    {
+        std::cout<<dimTags[i].first<<" "<<dimTags[i].second<<"\n";
+    }
+    //gmsh::model::mesh::setSize(dimTags, 3.0);
+  
+  
+    ////////// GET ALL NODES AND COORDINATES:
+    
+    std::vector<std::size_t> nodeTags;
+    std::vector<double> coord, parametricCoord;
+    
+    gmsh::model::mesh::getNodes(nodeTags, coord, parametricCoord, -1, -1, true);
+
+    
+    std::cout << nodeTags.size() << std::endl;
+    for (int i = 0; i < 10; i++)
+    {
+        std::cout << nodeTags[i] << " " << coord[3*i+0] << " " << coord[3*i+1] << " " << coord[3*i+2] << std::endl;
+    }
+    
+    
+    ////////// GET ENTITIES IN PHYSICAL REGIONS:
+    
+    int dim = 3;
+    int physreg = 12;
+    
+    std::vector<int> entitiesinphysreg;
+    
+    gmsh::model::getEntitiesForPhysicalGroup(dim, physreg, entitiesinphysreg);
+    
+    
+    mathop::printvector(entitiesinphysreg);
+    
+    abort();
+    
+    
+    ////////// GET ALL ELEMENTS IN EVERY PHYS REG:
+    
+    // + NEED TO KNOW CURVATURE ORDER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    std::vector<std::vector<std::size_t>> elemnodeTags, elementTags;
+    std::vector<int> elementTypes;
+    
+    int entitytag = 8;
+    
+    gmsh::model::mesh::getElements(elementTypes, elementTags, elemnodeTags, -1, entitytag);
+
+    
+    std::cout << "--> " << elementTypes.size() << std::endl;
+    for (int i = 0; i < elementTypes.size(); i++)
+    {
+        std::cout << elementTypes[i] << " " << std::endl;
+        
+        for (int j = 0; j < 3; j++)
+        {
+        
+            std::cout << elementTags[i][j] << std::endl;
+        
+        }
+    }
+    
+    
+    
+ 
+ 
+ 
+}
+#endif
+
+
+
 void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
     std::string currentline;
