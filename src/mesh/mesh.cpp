@@ -3,6 +3,12 @@
 
 void mesh::readfromfile(std::string name)
 {
+    if (name == "gmshapi")
+    {
+        gmshinterface::readfromapi(mynodes, myelements, myphysicalregions);
+        return;   
+    }
+    
     if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
     {
         gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
@@ -147,18 +153,14 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
     
     wallclock loadtime;
     
-    if (name == "gmshapi")
-        gmshinterface::readfromapi(mynodes, myelements, myphysicalregions);
+    if (legacyreader || name == "gmshapi")
+        readfromfile(name);
     else
     {
-        if (legacyreader)
-            readfromfile(name);
-        else
-        {
-            petscmesh pmesh(name);
-            pmesh.extract(mynodes, myelements, myphysicalregions);
-        }
+        petscmesh pmesh(name);
+        pmesh.extract(mynodes, myelements, myphysicalregions);
     }
+    
     myelements.explode();
     sortbybarycenters();
     removeduplicates();
