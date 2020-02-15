@@ -14,7 +14,7 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
 void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
 
-    ///// Get all nodes and coordinates:  /////////////// + ADD VERBOSITY ARG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ///// Get all nodes and coordinates:
     
     std::vector<std::size_t> nodeTags;
     std::vector<double> coords, parametricCoord;
@@ -61,7 +61,7 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
     {
         int dim = allphysregsdims[i];
         int currentphysicalregionnumber = allphysregs[i];
-        physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(dim+1) + currentphysicalregionnumber); //////////////////// PREALLOCATE ELEMENTS AND PHYSREG COMNTAINERS FOR HIGH PERFORMANCE LOADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(dim+1) + currentphysicalregionnumber);
         
         // Loop on all entities in the physical region:
         for (int j = 0; j < entitiesinphysreg[i].size(); j++)
