@@ -2,6 +2,101 @@
 #include "universe.h"
 
 
+#ifndef HAVE_GMSHAPI
+void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
+{    
+    std::cout << "Error in 'gmshinterface' namespace: GMSH API is not available" << std::endl;
+    abort();
+}
+#endif
+#ifdef HAVE_GMSHAPI
+#include "gmsh.h"
+void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
+{    
+
+    ///// Get all nodes and coordinates:
+    
+    std::vector<std::size_t> nodeTags;
+    std::vector<double> coords, parametricCoord;
+    gmsh::model::mesh::getNodes(nodeTags, coords, parametricCoord, -1, -1, false, false);
+
+    int maxnodetag = *std::max_element(nodeTags.begin(), nodeTags.end());
+    
+    int numberofnodes = coords.size()/3;
+    mynodes.setnumber(numberofnodes);
+    std::vector<double>* nodecoordinates = mynodes.getcoordinates();
+    // Renumbering in case the numbers are not consecutive/not starting from 0:
+    std::vector<int> noderenumbering(maxnodetag+1);
+    for (int i = 0; i < coords.size(); i++)
+        nodecoordinates->at(i) = coords[i];
+    for (int i = 0; i < numberofnodes; i++)
+        noderenumbering[nodeTags[i]] = i;
+        
+        
+    ///// Get all physical region numbers:
+    
+    gmsh::vectorpair dimTags;
+    gmsh::model::getPhysicalGroups(dimTags, -1);
+
+    int numphysregs = dimTags.size();
+    std::vector<int> allphysregsdims(numphysregs);
+    std::vector<int> allphysregs(numphysregs);
+    for (int i = 0; i < numphysregs; i++)
+    {
+        allphysregsdims[i] = dimTags[i].first;
+        allphysregs[i] = dimTags[i].second;
+    }
+        
+        
+    ///// Get the entities in each physical region:
+    
+    std::vector<std::vector<int>> entitiesinphysreg(numphysregs);
+    for (int i = 0; i < numphysregs; i++)
+        gmsh::model::getEntitiesForPhysicalGroup(allphysregsdims[i], allphysregs[i], entitiesinphysreg[i]);
+        
+        
+    ///// Get the elements in each physical region:
+    
+    for (int i = 0; i < numphysregs; i++)
+    {
+        int dim = allphysregsdims[i];
+        int currentphysicalregionnumber = allphysregs[i];
+        physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(dim+1) + currentphysicalregionnumber);
+        
+        // Loop on all entities in the physical region:
+        for (int j = 0; j < entitiesinphysreg[i].size(); j++)
+        {
+            std::vector<std::vector<std::size_t>> elemnodeTags, elementTags;
+            std::vector<int> elementTypes;
+
+            gmsh::model::mesh::getElements(elementTypes, elementTags, elemnodeTags, dim, entitiesinphysreg[i][j]);
+
+            for (int t = 0; t < elementTypes.size(); t++)
+            {
+                int currentcurvedelementtype = convertgmshelementtypenumber(elementTypes[t]);
+                element elementobject(currentcurvedelementtype);
+                // Get the uncurved element type number:
+                int currentelementtype = elementobject.gettypenumber();
+                int curvatureorder = elementobject.getcurvatureorder();
+                int numcurvednodes = elementobject.countcurvednodes();
+                std::vector<int> nodesincurrentelement(numcurvednodes);
+                    
+                for (int e = 0; e < elementTags[t].size(); e++)
+                {
+                    for (int n = 0; n < numcurvednodes; n++)
+                        nodesincurrentelement[n] = noderenumbering[ elemnodeTags[t][e*numcurvednodes+n] ];
+                
+                    int elementindexincurrenttype = myelements.add(currentelementtype, curvatureorder, nodesincurrentelement);
+                    currentphysicalregion->addelement(currentelementtype, elementindexincurrenttype);
+                }
+            }
+        }
+    }
+}
+#endif
+
+
+
 void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
     std::string currentline;

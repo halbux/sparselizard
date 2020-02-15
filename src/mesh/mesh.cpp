@@ -3,6 +3,12 @@
 
 void mesh::readfromfile(std::string name)
 {
+    if (name == "gmshapi")
+    {
+        gmshinterface::readfromapi(mynodes, myelements, myphysicalregions);
+        return;   
+    }
+    
     if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
     {
         gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
@@ -15,7 +21,7 @@ void mesh::readfromfile(std::string name)
     }
 
     std::cout << "Error: file '" << name << "' cannot be read by the legacy mesh reader." << std::endl;
-    std::cout << "Use the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
+    std::cout << "Use the GMSH API or the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
     abort();
 }
 
@@ -138,17 +144,23 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
     filename = name;
 
     if (verbosity > 0)
-        std::cout << "Loading mesh from file '" << name << "'" << std::endl;
+    {
+        if (name == "gmshapi")
+            std::cout << "Loading mesh from GMSH API" << std::endl;
+        else
+            std::cout << "Loading mesh from file '" << name << "'" << std::endl;
+    }
     
     wallclock loadtime;
     
-    if (legacyreader)
+    if (legacyreader || name == "gmshapi")
         readfromfile(name);
     else
     {
         petscmesh pmesh(name);
         pmesh.extract(mynodes, myelements, myphysicalregions);
     }
+    
     myelements.explode();
     sortbybarycenters();
     removeduplicates();

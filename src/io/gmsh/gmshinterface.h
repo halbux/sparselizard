@@ -28,6 +28,9 @@
 
 namespace gmshinterface
 {
+    // Load the mesh from the API to the 'nodes', 'elements' and 'physicalregions' objects.
+    void readfromapi(nodes&, elements&, physicalregions&);
+    
     // Load the .msh mesh to the 'nodes', 'elements' and 'physicalregions' objects.
     void readfromfile(std::string name, nodes&, elements&, physicalregions&);
     // Write to .msh mesh format:
