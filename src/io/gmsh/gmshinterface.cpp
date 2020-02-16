@@ -179,7 +179,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
             // The first number in the line is an integer (the element number). We skip it:
             stringobject.jumptonextwhitespace();
             // Read now the element type number and define the element object:
-            int currentcurvedelementtype = gmshinterface::convertgmshelementtypenumber(std::stoi(stringobject.getstringtonextwhitespace()));
+            int currentcurvedelementtype = convertgmshelementtypenumber(std::stoi(stringobject.getstringtonextwhitespace()));
             element elementobject(currentcurvedelementtype);
             // Get the uncurved element type number:
             int currentelementtype = elementobject.gettypenumber();
@@ -296,7 +296,7 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
                     // Write [element number in file, type number, number of parameters (2 here), physical region number, physical region number]:
                     // Note: physical region number appears twice. If a single parameter is provided the
                     // physical regions will not be displayable separately when the .msh file is opened in GMSH.
-                    meshfile << elementnumberinfile << " " << gmshinterface::converttogmshelementtypenumber(curvedtypenumber) << " 2 " << physicalregionnumber << " " << physicalregionnumber;
+                    meshfile << elementnumberinfile << " " << converttogmshelementtypenumber(curvedtypenumber) << " 2 " << physicalregionnumber << " " << physicalregionnumber;
                     // Write all nodes in the element.
                     for (int nodeindex = 0; nodeindex < numberofcurvednodes; nodeindex++)
                         meshfile << " " << myelements.getsubelement(0, typenumber, i, nodeindex) + 1; // +1 to start numbering nodes at 1
@@ -337,14 +337,14 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         
         // Open the view (overwrite if first time):
         if (activeelementtypes.size() == 1)
-            gmshinterface::openview(name, viewname, 0, i == 0);
+            openview(name, viewname, 0, i == 0);
         else
-            gmshinterface::openview(name, viewname + myelement.gettypename(), 0, i == 0);    
+            openview(name, viewname + myelement.gettypename(), 0, i == 0);    
         // Append the data to the view:
         if (datatowrite.isscalar())
-            gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
+            appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0]);
         else
-            gmshinterface::appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
+            appendtoview(name, elemtypenum, curcoords[0], curcoords[1], curcoords[2], curdata[0], curdata[1], curdata[2]);
         
         // Write the shape function polynomials:
         lagrangeformfunction mylagrange(elemtypenum, datatowrite.getinterpolorder(), {});
@@ -359,9 +359,9 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
             polygeo = mylagrangegeo.getformfunctionpolynomials();
         }
         
-        gmshinterface::writeinterpolationscheme(name, {poly, polygeo});
+        writeinterpolationscheme(name, {poly, polygeo});
         // Close the view:
-        gmshinterface::closeview(name);
+        closeview(name);
     }
 }
 
@@ -641,7 +641,7 @@ int gmshinterface::convertgmshelementtypenumber(int gmshtypenumber)
                 return 20;
                 
             default:
-                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element that is undefined in this code." << std::endl;
+                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element (" << gmshtypenumber << ") that is undefined in this code." << std::endl;
                 abort();
         }
     }
@@ -715,7 +715,7 @@ int gmshinterface::converttogmshelementtypenumber(int ourtypenumber)
                 return 90;
                 
             default:
-                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element that is undefined in this code." << std::endl;
+                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element (" << ourtypenumber << ")  that is undefined in this code." << std::endl;
                 abort();
         }
     }
