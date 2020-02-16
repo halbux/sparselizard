@@ -715,7 +715,7 @@ int gmshinterface::converttogmshelementtypenumber(int ourtypenumber)
                 return 90;
                 
             default:
-                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element (" << ourtypenumber << ")  that is undefined in this code." << std::endl;
+                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element that is undefined in this code." << std::endl;
                 abort();
         }
     }
