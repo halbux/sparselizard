@@ -122,7 +122,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         if (formatversion >= 4)
         {
             std::cout << "Error in 'gmshinterface': GMSH format " << formatversion << " is not supported in the legacy mesh reader." << std::endl;
-            std::cout << "Use the petsc mesh reader instead or export as GMSH 2 format." << std::endl;
+            std::cout << "Use the GMSH API, the petsc mesh reader or export as GMSH 2 format." << std::endl;
             abort();
         }
 
