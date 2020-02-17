@@ -72,7 +72,7 @@ void sparselizard(void)
     
     
     // Nodal shape functions 'h1' with 3 components.
-    // Field u is the membrane deflection.
+    // Field u is the mechanical deflection.
     field u("h1xyz");
 
     // Use interpolation order 2 on 'vol', the whole domain:
