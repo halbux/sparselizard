@@ -52,13 +52,6 @@ int hcurlprism::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder) 
 {    
-
-    if (maxorder > 1)
-    {
-        std::cout << "Due to missing shape functions in the reference PhD document the hcurl shape functions for prisms at order 2 and above cannot be used for now" << std::endl;
-        abort();
-    }
-
     element prism("prism");
     hierarchicalformfunctioncontainer val("hcurl", prism.gettypenumber());
 
@@ -287,10 +280,10 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                 }
                                 if (j == 0)
                                 {
-                                    if (f2 == f2star)
-                                        formfunc = (mu[f1]-mu[f4]).derivative(comp)*ui;
+                                    if (comp != 2)
+                                        formfunc.set({{{0.0}}});
                                     else
-                                        formfunc = (mu[f1]-mu[f2]).derivative(comp)*ui;
+                                        formfunc = ui;
                                     val.set(order,2,face,orientation,ffindex,comp,formfunc);
                                     
                                     ffindex = ffindex + 1;
