@@ -280,10 +280,10 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                 }
                                 if (j == 0)
                                 {
-                                    if (comp != 2)
-                                        formfunc.set({{{0.0}}});
+                                    if (f2 == f2star)
+                                        formfunc = (mu[f1]-mu[f4]).derivative(comp)*ui;
                                     else
-                                        formfunc = ui;
+                                        formfunc = (mu[f1]-mu[f2]).derivative(comp)*ui;
                                     val.set(order,2,face,orientation,ffindex,comp,formfunc);
                                     
                                     ffindex = ffindex + 1;
