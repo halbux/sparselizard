@@ -54,8 +54,10 @@ void sparselizard(void)
 	// Gauge the vector potential field on the whole volume:
 	a.setgauge(wholedomain);
 
-	// Use higher interpolation orders where needed. Use order 1 (default) everywhere else:
+	// Use higher interpolation orders where needed:
 	a.setorder(shield, 2);
+	a.setorder(conductor, 0);
+	a.setorder(air, 0);
 
 	// Put a magnetic wall (i.e. set field 'a' to 0) all around the domain (no magnetic flux can cross it):
 	a.setconstraint(contour);
