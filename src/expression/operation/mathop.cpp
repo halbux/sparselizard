@@ -1130,6 +1130,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     // Create the Lagrange multiplier field:
     field lambda(ptr1->gettypename(false), ptr1->getharmonics());
     lambda.setorder(gamma1, lagmultorder);
+    lambda.setorder(gamma2, lagmultorder);
 
     // Create the integration object to output:
     std::vector<integration> output(3);
@@ -1189,6 +1190,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     // Create the Lagrange multiplier field:
     field lambda(ptr1->gettypename(false), ptr1->getharmonics());
     lambda.setorder(gamma1, lagmultorder);
+    lambda.setorder(gamma2, lagmultorder);
     
     int numcomp = expression(lambda).countrows();
 
@@ -1282,6 +1284,7 @@ std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, fi
     std::shared_ptr<rawfield> ptr = u.getpointer();
     field lambda(ptr->gettypename(false), ptr->getharmonics());
     lambda.setorder(gamma1, lagmultorder);
+    lambda.setorder(gamma2, lagmultorder);
     
     int numcomp = expression(lambda).countrows();
 
