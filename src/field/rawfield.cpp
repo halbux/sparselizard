@@ -409,6 +409,15 @@ void rawfield::setorder(expression criterion, std::vector<field> triggers, std::
         std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
         abort();
     }
+    
+    // The criterion cannot be multiharmonic:
+    std::vector<int> alldisjregs((universe::mymesh->getdisjointregions())->count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    if (not(criterion.isharmonicone(alldisjregs)))
+    {
+        std::cout << "Error in 'rawfield' object: cannot have a multiharmonic criterion for p-adaptivity" << std::endl;
+        abort();
+    }
 
     // Set the interpolation order on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
