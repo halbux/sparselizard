@@ -32,7 +32,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
 
     
     // Flush the containers:
-    interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), 1);
+    interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);
     myconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
     isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
@@ -191,8 +191,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         {
             mymeshtracker = universe::mymesh->getmeshtracker();
         
-            // Set an order 1 interpolation order by default:
-            interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), 1);
+            // Set a -1 undefined interpolation order by default:
+            interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);
             // Set all unconstrained by default:
             myconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
             
@@ -363,6 +363,21 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     if (iscalledbyuser && ispadaptive)
     {
         std::cout << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called on fields set to p-adaptivity" << std::endl;
+        abort();
+    }
+    
+    // Interpolation order can only be set on highest dimension regions:
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int regdim = ((universe::mymesh->getphysicalregions())->get(physreg))->getelementdimension();
+    if (problemdimension != regdim)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set the interpolation order on a " << regdim << "D region in a " << problemdimension << "D problem (must be " << problemdimension << "D)" << std::endl;
+        abort();
+    }
+    // Interpolation orders must be provided in decreasing order by the user to guarantee field continuity at the interfaces:
+    if (iscalledbyuser && myordertracker.size() > 0 && myordertracker[myordertracker.size()-1].second < interpolorder)
+    {
+        std::cout << "Error in 'rawfield' object: interpolation orders must be set descendingly to guarantee field continuity at the region interfaces" << std::endl;
         abort();
     }
 
@@ -793,12 +808,12 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
                 // In case the order of this raw field is higher than the order of 
                 // the selected raw field we have to set to zero the higher orders.
-                if (op == "set" && interpolationorder[disjreg] > selectedrawfield->interpolationorder[disjreg])
+                if (op == "set" && getinterpolationorder(disjreg) > selectedrawfield->getinterpolationorder(disjreg))
                 {
                     // Decrease the order to forget the higher orders...
-                    mycoefmanager->fitinterpolationorder(disjreg, selectedrawfield->interpolationorder[disjreg]);
+                    mycoefmanager->fitinterpolationorder(disjreg, selectedrawfield->getinterpolationorder(disjreg));
                     // ... then reset the previous order:
-                    mycoefmanager->fitinterpolationorder(disjreg, interpolationorder[disjreg]);
+                    mycoefmanager->fitinterpolationorder(disjreg, getinterpolationorder(disjreg));
                 }
 
                 int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjreg);
@@ -807,7 +822,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
                 std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
                 // The interpolation order for this field and the selected fields might be different.
-                int numformfunctionsperelement = std::min(myformfunction->count(interpolationorder[disjreg], elementdimension, 0), myformfunction->count(selectedrawfield->interpolationorder[disjreg], elementdimension, 0));
+                int numformfunctionsperelement = std::min(myformfunction->count(getinterpolationorder(disjreg), elementdimension, 0), myformfunction->count(selectedrawfield->getinterpolationorder(disjreg), elementdimension, 0));
 
                 for (int ff = 0; ff < numformfunctionsperelement; ff++)
                 {
@@ -907,8 +922,8 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
 
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
         // The interpolation order for this field and the selected fields might be different.
-        int numformfunctionsinoriginfield = myformfunction->count(interpolationorder[disjreg], elementdimension, 0);
-        int numformfunctionsperelement = myformfunction->count(selectedrawfield->interpolationorder[disjreg], elementdimension, 0);
+        int numformfunctionsinoriginfield = myformfunction->count(getinterpolationorder(disjreg), elementdimension, 0);
+        int numformfunctionsperelement = myformfunction->count(selectedrawfield->getinterpolationorder(disjreg), elementdimension, 0);
 
         for (int ff = 0; ff < numformfunctionsperelement; ff++)
         {
@@ -1054,18 +1069,27 @@ int rawfield::getinterpolationorder(int disjreg)
 { 
     synchronize();
     
-    if (mytypename == "x" || mytypename == "y" || mytypename == "z")
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
         return 1;
         
     if (mysubfields.size() == 0)
     {
+        int toreturn;
+    
         if (myharmonics.size() == 0)
-            return interpolationorder[disjreg];
+            toreturn = interpolationorder[disjreg];
         else
         {
             errornotsameinterpolationorder(disjreg);
-            return myharmonics[getfirstharmonic()][0]->interpolationorder[disjreg];
+            toreturn = myharmonics[getfirstharmonic()][0]->interpolationorder[disjreg];
         }
+        if (toreturn == -1)
+        {
+            std::cout << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
+            std::cout << "Define it with field.setorder(region, order)" << std::endl;
+            abort();
+        }
+        return toreturn;
     }
     else
     { 
@@ -1085,7 +1109,7 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
             std::vector<int> harms = getharmonics();
             for (int h = 0; h < harms.size(); h++)
             {
-                if (myharmonics[harms[h]][0]->interpolationorder[disjreg] == myharmonics[harms[0]][0]->interpolationorder[disjreg])
+                if (myharmonics[harms[h]][0]->getinterpolationorder(disjreg) == myharmonics[harms[0]][0]->getinterpolationorder(disjreg))
                     continue;
                 else
                 {
@@ -1225,7 +1249,7 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
         {
             int disjreg = selecteddisjregs[d];
         
-            int interpolorder = curson->interpolationorder[disjreg];
+            int interpolorder = curson->getinterpolationorder(disjreg);
          
             // Get the element type number, element dimension and number of elements in the current disjoint region:
             int elementtypenumber = mydisjointregions->getelementtypenumber(disjreg);
