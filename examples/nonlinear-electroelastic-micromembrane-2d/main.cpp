@@ -39,12 +39,16 @@ void sparselizard(void)
     // - 1 elsewhere
     //
     // - 1 for the electric potential v
-    //
-    // Default order is 1.
     
     u.setorder(membrane, 3);
+    u.setorder(vacuumgap, 3);
     u.setorder(pillars, 2);
     u.setorder(insulator, 1);
+    
+    v.setorder(electricdomain, 1);
+    
+    umesh.setorder(solid, 1);
+    umesh.setorder(electricdomain, 1);
     
     // Clamp and ground (i.e. 0 valued-Dirichlet conditions for u and v):
     u.setconstraint(clamp);
@@ -146,7 +150,7 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << (compy(grad(v)).integrate(vacuumgap, u, 4) < 0.0022904 && compy(grad(v)).integrate(vacuumgap, u, 4) > 0.0022903);
+    std::cout << (compy(grad(v)).integrate(vacuumgap, u, 4) < 0.0022905 && compy(grad(v)).integrate(vacuumgap, u, 4) > 0.0022901);
 }
 
 int main(void)

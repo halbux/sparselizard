@@ -113,6 +113,7 @@ double sparselizard(double alpha)
 
     // This field will hold the x and y component of the magnetic forces:
     field magforce("h1xy");
+    magforce.setorder(all, 1);
 
     // The magnetic force is projected on field 'magforce' on the solid stator region.
     // This is done with a formulation of the type dof*tf - force calculation = 0.

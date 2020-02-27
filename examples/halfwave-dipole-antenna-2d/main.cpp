@@ -31,8 +31,9 @@ void sparselizard(void)
     field E("hcurl", {2,3});
     field Es = E.harmonic(2), Ec = E.harmonic(3);
     
-    // Use interpolation order 2 on the whole domain:
+    // Use interpolation order 2 on the non-conducting region:
     E.setorder(wholedomain, 2);
+    E.setorder(conductor, 1);
     
     // Define the speed of light [m/s] and the working frequency [Hz].
     // The total half-wave dipole antenna length is 15 cm. This corresponds to a 1GHz frequency:

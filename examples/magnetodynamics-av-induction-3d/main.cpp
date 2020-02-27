@@ -54,8 +54,9 @@ void sparselizard(void)
     // Gauge the vector potential field on the whole volume:
     a.setgauge(wholedomain);
     
-    // Select adapted interpolation orders for field a and v (default is 1):
-    a.setorder(wholedomain, 0); 
+    // Select adapted interpolation orders for field a and v:
+    a.setorder(wholedomain, 0);
+    v.setorder(wholedomain, 1);
     
     // Put a magnetic wall (i.e. set field a to 0) all around the domain (no magnetic flux can cross it):
     a.setconstraint(domainboundary);

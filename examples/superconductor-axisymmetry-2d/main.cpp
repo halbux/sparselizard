@@ -36,6 +36,9 @@ void sparselizard(void)
     // be expressed as a vector with only a non-zero z component:
     field az("h1"), x("x");
     
+    // Use interpolation order 1:
+    az.setorder(wholedomain, 1);
+    
     expression a = array3x1(0,0,az);
     
     // Put a magnetic wall (i.e. set field a to 0) all 

@@ -73,13 +73,18 @@ void sparselizard(void)
     // - 2 for the pressure field p
     //
     // - 1 for the electric potential v
-    //
-    // Default order is 1.
 
     u.setorder(membrane, 3);
+    u.setorder(vacuumgap, 3);
     u.setorder(pillars, 2);
     u.setorder(insulator, 1);
+    
     p.setorder(fluid, 2);
+    
+    v.setorder(electricdomain, 1);
+    
+    umesh.setorder(solid, 1);
+    umesh.setorder(electricdomain, 1);
     
     // Clamp and ground all harmonics (i.e. 0 valued-Dirichlet conditions for u and v):
     u.setconstraint(clamp);
@@ -218,7 +223,7 @@ void sparselizard(void)
     (scaling*p).write(fluid, "p.pos", 3, 50);
     
     // Code validation line. Can be removed.
-    std::cout << (solup.norm() < 0.0002516 && solup.norm() > 0.0002515);
+    std::cout << (solup.norm() < 0.000252599 && solup.norm() > 0.000252595);
 }
 
 int main(void)

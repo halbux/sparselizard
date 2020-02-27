@@ -35,8 +35,8 @@ void sparselizard(void)
     field v("h1"), T("h1");
     
     // Use an order 2 interpolation for both fields:
-    v.setorder(volume,2);
-    T.setorder(volume,2);
+    v.setorder(volume, 2);
+    T.setorder(volume, 2);
     
     // Apply the requested voltage to the input and ground the output:
     v.setconstraint(input, appliedvoltage);

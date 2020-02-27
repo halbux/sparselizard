@@ -17,7 +17,8 @@ void sparselizard(void)
     // Nodal shape functions 'h1' for the electric potential field:
     field v("h1");
 
-    // Use interpolation order 1 on the whole domain (default).
+    // Use interpolation order 1 on the whole domain:
+    v.setorder(line, 1);
     
     // Force 10 V on the left and 2 V on the right:
     v.setconstraint(left, 10);

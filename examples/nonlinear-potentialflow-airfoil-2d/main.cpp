@@ -22,6 +22,9 @@ void sparselizard(void)
     // grad(phi) is the fluid velocity. Field x is the x coordinate field.
     field phi("h1"), x("x");
     
+    // Use interpolation order 1:
+    phi.setorder(air, 1);
+    
     // Specific weight of air under some circumstances:
     double gamma = 1.4;
     

@@ -55,6 +55,10 @@ void sparselizard(void)
     // A spanning tree has to be provided to field 'a' for gauging.
     field a("hcurl", spantree), v("h1"), x("x"), y("y"), z("z");
     
+    // Use interpolation order 1:
+    a.setorder(wholedomain, 1);
+    v.setorder(wholedomain, 1);
+    
     // Gauge the vector potential field on the whole volume:
     a.setgauge(wholedomain);
     

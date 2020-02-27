@@ -78,7 +78,7 @@ void sparselizard(void)
     p.setorder(fluid, 1);
     T.setorder(KviT, 2);
     //Lagragian multipliers , vectorial form
-    L.setorder(botcoupl,2);
+    L.setorder(membrane,2);
 
     //gas material properties around equilibrium ( 293 K and 1 Bar ) - Linear approximation in comment
     //---------------------------------------------------------------------------------------------

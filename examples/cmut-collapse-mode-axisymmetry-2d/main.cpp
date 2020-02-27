@@ -52,6 +52,12 @@ void sparselizard(void)
     //
     field u("h1xyz"), v("h1"), umesh("h1xyz"), nodalforcebalance("h1xyz");
     
+    // Use interpolation order 1:
+    u.setorder(wholedomain, 1);
+    v.setorder(wholedomain, 1);
+    umesh.setorder(wholedomain, 1);
+    nodalforcebalance.setorder(wholedomain, 1);
+    
     // Clamp the insulator:
     u.setconstraint(insulator);
     
@@ -173,6 +179,10 @@ void sparselizard(void)
     // Fields uh and vh have a constant deflection plus a harmonic deflection (harmonics 1 and 2):
     // uh = uh1 + uh2 * sin(2*pi*f0*t), vh = vh1 + vh2 * sin(2*pi*f0*t)
     field uh("h1xyz", {1,2}), vh("h1", {1,2});
+    
+    // Use interpolation order 1:
+    uh.setorder(wholedomain, 1);
+    vh.setorder(wholedomain, 1);
     
     // Set the static deflection to the above solution:
     uh.harmonic(1).setdata(solid, solu|u);

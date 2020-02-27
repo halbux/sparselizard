@@ -22,8 +22,9 @@ void sparselizard(void)
     // Field T is the temperature [K] and x/y is the x/y coordinate.
     field u("h1xyz"), T("h1"), x("x"), y("y");
 
-    // Use interpolation order 2 on 'vol', the whole domain:
+    // Use interpolation order 2 for u and 1 for T on 'vol', the whole domain:
     u.setorder(vol, 2);
+    T.setorder(vol, 1);
     
     // Clamp on surface 'sur' (i.e. 0 valued-Dirichlet conditions):
     u.setconstraint(sur);

@@ -29,8 +29,9 @@ void sparselizard(void)
     double freq = 1e6;
     setfundamentalfrequency(freq);
     
-    // Use interpolation order 1 on the whole domain (default).
-    
+    // Use interpolation order 1 on the whole domain:
+    v.setorder(wholedomain, 1);
+
     // Force 1 V in-phase on the electrode and 0 V on the ground:
     double appliedvoltage = 1;
     v.harmonic(2).setconstraint(electrode, 1);

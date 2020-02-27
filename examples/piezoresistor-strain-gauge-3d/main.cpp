@@ -32,6 +32,7 @@ void sparselizard(void)
     
     // Use interpolation order 2 for u and for v:
     u.setorder(silicon, 2);
+    u.setorder(trace, 2);
     ugauge.setorder(trace, 2);
     v.setorder(trace, 2);
     
