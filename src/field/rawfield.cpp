@@ -41,7 +41,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     if (physregsfororder.size() == 0)
     {
         for (int i = 0; i < myordertracker.size(); i++)
-            setorder(myordertracker[i].first, myordertracker[i].second);
+            setorder(myordertracker[i].first, myordertracker[i].second, false);
     }
     else
     {
