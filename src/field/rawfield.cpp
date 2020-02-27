@@ -395,11 +395,11 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
         
     // Set the interpolation order on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setorder(physreg, interpolorder);
+        mysubfields[i][0]->setorder(physreg, interpolorder, iscalledbyuser);
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setorder(physreg, interpolorder);
+            myharmonics[i][0]->setorder(physreg, interpolorder, iscalledbyuser);
     }
         
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
