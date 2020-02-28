@@ -3,7 +3,7 @@
 
 void dofmanager::synchronize(void)
 {
-    if (issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+    if (isitmanaged == false || issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
         return;
     issynchronizing = true;    
 
@@ -96,7 +96,7 @@ dofmanager::dofmanager(int numdofs)
 {
     numberofdofs = numdofs;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    isitmanaged = false;
 }
 
 void dofmanager::donotsynchronize(void)

@@ -3,7 +3,7 @@
 
 void rawvec::synchronize(void)
 {
-    if (issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker() || mydofmanager == NULL)
+    if (mydofmanager == NULL || mydofmanager->ismanaged() == false || issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker())
         return;
     issynchronizing = true; 
 
@@ -92,10 +92,13 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
     VecSetFromOptions(myvec);   
     
-    mymeshtracker = universe::mymesh->getmeshtracker();
-    
-    mycurrentstructure = {*dofmngr};
-    mycurrentstructure[0].donotsynchronize();
+    if (mydofmanager->ismanaged())
+    {
+        mymeshtracker = universe::mymesh->getmeshtracker();
+        
+        mycurrentstructure = {*dofmngr};
+        mycurrentstructure[0].donotsynchronize();
+    }
 }
 
 rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
@@ -104,10 +107,13 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
 
     myvec = input;
     
-    mymeshtracker = universe::mymesh->getmeshtracker();
-    
-    mycurrentstructure = {*dofmngr};
-    mycurrentstructure[0].donotsynchronize();
+    if (mydofmanager->ismanaged())
+    {
+        mymeshtracker = universe::mymesh->getmeshtracker();
+        
+        mycurrentstructure = {*dofmngr};
+        mycurrentstructure[0].donotsynchronize();
+    }
 }
 
 rawvec::~rawvec(void) { VecDestroy(&myvec); }

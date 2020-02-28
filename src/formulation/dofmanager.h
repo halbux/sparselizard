@@ -47,6 +47,8 @@ class dofmanager
         std::vector<std::vector<std::vector< int >>> rangebegin = {};
         std::vector<std::vector<std::vector< int >>> rangeend = {};
         
+        bool isitmanaged = true;
+        
         
         int mymeshnumber = 0;
         
@@ -65,7 +67,10 @@ class dofmanager
     public:
         
         dofmanager(void);
+        // Unmanaged structure:
         dofmanager(int numdofs);
+        
+        bool ismanaged(void) { return isitmanaged; };
         
         void donotsynchronize(void);
         
