@@ -1,0 +1,72 @@
+# Makefile to build example and link to shared library
+#
+# ~~~
+# How to use this file
+#
+# > cd [example]
+# > make -f ../Makefile.example
+# > bash ../run.sh
+# ~~~
+
+##### THESE ARE THE REQUIRED LIBRARIES:
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Linux)
+LIBS = -L ~/SLlibs/petsc/arch-linux2-c-opt/lib -l openblas -l petsc -l slepc
+INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux2-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux2-c-opt/include/
+endif
+ifeq ($(UNAME), Darwin)
+LIBS = -L ~/SLlibs/petsc/arch-darwin-c-opt/lib -l openblas -l petsc -l slepc
+INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-darwin-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-darwin-c-opt/include/
+endif
+
+
+# $@ is the filename representing the target.
+# $< is the filename of the first prerequisite.
+# $^ the filenames of all the prerequisites.
+# $(@D) is the file path of the target file. 
+# D can be added to all of the above.
+
+CXX = g++ -fopenmp # openmp is used for parallel sorting on Linux
+CXX_FLAGS= -std=c++11 -O3 -Wno-return-type # Do not warn when not returning anything (e.g. in virtual functions)
+
+# base location of the source files
+PREFIX = ~/Desktop/sparselizard
+
+# add path to libsparselizard.so
+LIBS += -L ${PREFIX} -l sparselizard
+
+# List of all directories containing the headers:
+INCLUDES = \
+-I $(PREFIX)/src \
+-I $(PREFIX)/src/field \
+-I $(PREFIX)/src/expression \
+-I $(PREFIX)/src/expression/operation \
+-I $(PREFIX)/src/shapefunction \
+-I $(PREFIX)/src/formulation \
+-I $(PREFIX)/src/shapefunction/hierarchical \
+-I $(PREFIX)/src/shapefunction/hierarchical/h1 \
+-I $(PREFIX)/src/shapefunction/hierarchical/hcurl \
+-I $(PREFIX)/src/shapefunction/hierarchical/meca \
+-I $(PREFIX)/src/gausspoint \
+-I $(PREFIX)/src/shapefunction/lagrange \
+-I $(PREFIX)/src/mesh \
+-I $(PREFIX)/src/io \
+-I $(PREFIX)/src/io/gmsh \
+-I $(PREFIX)/src/io/paraview \
+-I $(PREFIX)/src/io/nastran \
+-I $(PREFIX)/src/resolution \
+-I $(PREFIX)/src/geometry
+
+# Final binary name:
+BIN = main
+
+all: $(OBJECTS)
+	# The main is always recompiled (it could have been replaced):
+	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o main.o
+	# Linking objects:
+	$(CXX) main.o $(OBJECTS) $(LIBS) -o $(BIN)
+	
+clean :
+	rm -f main main.o
