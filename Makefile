@@ -66,4 +66,4 @@ clean :
 # Make shared library
 LDFLAGS= -shared
 libsparselizard.so : $(OBJECTS)
-	 $(CXX) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CXX) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
