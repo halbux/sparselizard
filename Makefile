@@ -1,5 +1,3 @@
-##### THESE ARE THE REQUIRED LIBRARIES:
-
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
@@ -65,8 +63,7 @@ clean :
 	rm -rf $(BUILD_DIR)
 	rm -f $(BIN)
 
-# make shared library
+# Make shared library
 LDFLAGS= -shared
 libsparselizard.so : $(OBJECTS)
-	 $(CC) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
-
+	 $(CXX) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
