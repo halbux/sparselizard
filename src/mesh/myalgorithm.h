@@ -94,6 +94,9 @@ namespace myalgorithm
     // Return "s" for an argument bigger than 1, return "" otherwise:
     std::string getplurals(int count);
     
+    // Get a vector of equally spaced numbers:
+    std::vector<int> getequallyspaced(int start, int space, int amount);
+    
 };
 
 #endif

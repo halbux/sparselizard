@@ -780,3 +780,13 @@ std::string myalgorithm::getplurals(int count)
         return "";
 }
 
+std::vector<int> myalgorithm::getequallyspaced(int start, int space, int amount)
+{
+    std::vector<int> output(amount);
+    for (int i = 0; i < amount; i++)
+        output[i] = start + space*i;
+
+    return output;
+}
+
+
