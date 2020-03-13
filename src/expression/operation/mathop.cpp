@@ -87,12 +87,14 @@ std::vector<double> mathop::loadvector(std::string filename, char delimiter, boo
         if (sizeincluded)
         {
             std::getline(name, currentline, delimiter);
+            myalgorithm::osclean(currentline);
             output.resize(std::stoi(currentline));
         }
 
         int index = 0;
         while (std::getline(name, currentline, delimiter))
         {
+            myalgorithm::osclean(currentline);
             if (sizeincluded)
                 output[index] = std::stod(currentline);
             else

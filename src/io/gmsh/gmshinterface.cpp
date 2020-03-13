@@ -109,9 +109,11 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         double formatversion;
         while (std::getline(meshfile, currentline))
         {
+            myalgorithm::osclean(currentline);
             if (currentline == "$MeshFormat")
             {
                 std::getline(meshfile, currentline);
+                myalgorithm::osclean(currentline);
                 // Get version number:
                 mystring stringobject(currentline);
                 formatversion = std::stod(stringobject.getstringtonextwhitespace());
@@ -130,9 +132,11 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         int numberofnodes;
         while (std::getline(meshfile, currentline))
         {
+            myalgorithm::osclean(currentline);
             if (currentline == "$Nodes")
             {
                 std::getline(meshfile, currentline);
+                myalgorithm::osclean(currentline);
                 numberofnodes = std::stoi(currentline);
                 break;
             }
@@ -145,6 +149,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         for (int i = 0; i < numberofnodes; i++)
         {
             std::getline(meshfile, currentline);
+            myalgorithm::osclean(currentline);
             mystring stringobject(currentline);
             
             // The first number in the line is an integer (the node number). We skip it:
@@ -159,9 +164,11 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         int numberofelements;
         while (std::getline(meshfile, currentline))
         {
+            myalgorithm::osclean(currentline);
             if (currentline == "$Elements")
             {
                 std::getline(meshfile, currentline);
+                myalgorithm::osclean(currentline);
                 numberofelements = std::stoi(currentline);
                 break;
             }
@@ -174,6 +181,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         for (int i = 0; i < numberofelements; i++)
         {
             std::getline(meshfile, currentline);
+            myalgorithm::osclean(currentline);
             mystring stringobject(currentline);
             
             // The first number in the line is an integer (the element number). We skip it:

@@ -789,4 +789,11 @@ std::vector<int> myalgorithm::getequallyspaced(int start, int space, int amount)
     return output;
 }
 
+void myalgorithm::osclean(std::string& line)
+{
+    int siz = line.size();
+    if (siz > 0 && line[siz-1] == '\r')
+        line.resize(siz-1);
+}
+
 

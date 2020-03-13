@@ -16,6 +16,7 @@ void nastraninterface::readfromfile(std::string name, nodes& mynodes, elements& 
         nasdataline mydataline;
         while (std::getline(meshfile, currentline))
         {
+            myalgorithm::osclean(currentline);
             bool isready = mydataline.addline(currentline);
 
             if (isready == true)

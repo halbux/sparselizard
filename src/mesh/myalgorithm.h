@@ -97,6 +97,9 @@ namespace myalgorithm
     // Get a vector of equally spaced numbers:
     std::vector<int> getequallyspaced(int start, int space, int amount);
     
+    // Remove trailing CR (added in windows for newline):
+    void osclean(std::string& line);
+    
 };
 
 #endif
