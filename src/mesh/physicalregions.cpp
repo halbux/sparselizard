@@ -128,9 +128,20 @@ physicalregion* physicalregions::getatindex(int physicalregionindex)
     return (myphysicalregions[physicalregionindex]).get();
 }
 
-int physicalregions::count(void)
+int physicalregions::count(int dim)
 {
-    return myphysicalregionnumbers.size();
+    if (dim == -1)
+        return myphysicalregionnumbers.size();
+    else
+    {
+        int num = 0;
+        for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+        {
+            if (myphysicalregions[i]->getelementdimension() == dim)
+                num++;
+        }
+        return num;
+    }    
 }
 
 int physicalregions::countelements(void)
@@ -142,9 +153,24 @@ int physicalregions::countelements(void)
     return numelem;
 }
 
-std::vector<int> physicalregions::getallnumbers(void)
+std::vector<int> physicalregions::getallnumbers(int dim)
 {
-    return myphysicalregionnumbers;
+    if (dim == -1)
+        return myphysicalregionnumbers;
+    else
+    {
+        std::vector<int> out(count(dim));
+        int index = 0;
+        for (int i = 0; i < myphysicalregions.size(); i++)
+        {
+            if (myphysicalregions[i]->getelementdimension() == dim)
+            {   
+                out[index] = myphysicalregionnumbers[i];
+                index++;
+            }
+        }
+        return out;
+    }
 }
 
 int physicalregions::getnumber(int physicalregionindex)

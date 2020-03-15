@@ -104,6 +104,9 @@ class mesh
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
         int getmeshdimension(void);
         
+        // Get the physical regions of a given dimension (use -1 for all).
+        std::vector<int> getphysicalregionnumbers(int dim = -1);
+        
         // Additional region selection tools. Will become effective only after loading the mesh. Can reuse previous selections!
         void regionskin(int newphysreg, int physregtoskin);
         void boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);

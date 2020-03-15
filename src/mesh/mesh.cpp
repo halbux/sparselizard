@@ -483,6 +483,17 @@ int mesh::getmeshdimension(void)
     return maxelementdimension;
 }
 
+std::vector<int> mesh::getphysicalregionnumbers(int dim)
+{
+    if (dim < -1 || dim > 3)
+    {
+        std::cout << "Error in 'mesh' object: invalid input dimension '" << dim << "' in 'getphysicalregionnumbers'" << std::endl;
+        abort();
+    }
+
+    return myphysicalregions.getallnumbers(dim);
+}
+
 void mesh::regionskin(int newphysreg, int physregtoskin)
 {
     myregiondefiner.regionskin(newphysreg, physregtoskin);

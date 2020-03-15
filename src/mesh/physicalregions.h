@@ -43,12 +43,12 @@ class physicalregions
         physicalregion* get(int physicalregionnumber);
         // 'getatindex' does not create non-existent physical region objects.
         physicalregion* getatindex(int physicalregionindex);
-        // Get the number of physical regions:
-        int count(void);
+        // Get the number of physical regions of a given dimension (use -1 for all):
+        int count(int dim = -1);
         // Get the total number of elements in all physical regions:
         int countelements(void);
-        // Get all physical region numbers:
-        std::vector<int> getallnumbers(void);
+        // Get all physical region numbers of a given dimension (use -1 for all):
+        std::vector<int> getallnumbers(int dim = -1);
         // Get the physical region number of the physicalregionindex th physical region:
         int getnumber(int physicalregionindex);
         // Get the index of the physical region number (-1 if undefined):
