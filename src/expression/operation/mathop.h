@@ -99,6 +99,12 @@ namespace mathop
     expression ifpositive(expression condexpr, expression trueexpr, expression falseexpr);
     expression andpositive(std::vector<expression> exprs);
     expression orpositive(std::vector<expression> exprs);
+    
+    expression getmax(std::vector<expression> input);
+    expression getmax(expression a, expression b);
+    expression getmin(std::vector<expression> input);
+    expression getmin(expression a, expression b);
+    
 
     // Evaluate an expression on physical region 'physreg' using interpolation:
     expression on(int physreg, expression expr, bool errorifnotfound = true);

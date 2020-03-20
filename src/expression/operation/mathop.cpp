@@ -397,6 +397,57 @@ expression mathop::orpositive(std::vector<expression> exprs)
     return output;
 }
 
+expression mathop::getmax(std::vector<expression> input)
+{
+    int numargs = input.size();
+    
+    if (numargs == 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot take the max of an empty vector" << std::endl;
+        abort();
+    }    
+    
+    expression output = input[0];
+    for (int i = 1; i < numargs; i++)
+    {
+        output.reuseit(); input[i].reuseit();   
+        output = ifpositive(input[i]-output, input[i], output);
+    }   
+    
+    return output;
+}
+
+expression mathop::getmax(expression a, expression b)
+{
+    return getmax({a,b});
+}
+
+expression mathop::getmin(std::vector<expression> input)
+{
+   int numargs = input.size();
+    
+    if (numargs == 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot take the min of an empty vector" << std::endl;
+        abort();
+    }    
+    
+    expression output = input[0];
+    for (int i = 1; i < numargs; i++)
+    {
+        output.reuseit(); input[i].reuseit();   
+        output = ifpositive(input[i]-output, output, input[i]);
+    }   
+    
+    return output;
+}
+
+expression mathop::getmin(expression a, expression b)
+{
+    return getmin({a,b});
+}
+
+
 expression mathop::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
 expression mathop::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
 
