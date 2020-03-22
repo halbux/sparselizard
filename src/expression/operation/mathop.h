@@ -23,6 +23,7 @@ class integration;
 class mat;
 class vec;
 class field;
+class parameter;
 class formulation;
 class shape;
 
@@ -100,10 +101,12 @@ namespace mathop
     expression andpositive(std::vector<expression> exprs);
     expression orpositive(std::vector<expression> exprs);
     
-    expression getmax(std::vector<expression> input);
-    expression getmax(expression a, expression b);
-    expression getmin(std::vector<expression> input);
-    expression getmin(expression a, expression b);
+    expression max(expression a, expression b);
+    expression max(field a, field b);
+    expression max(parameter a, parameter b);
+    expression min(expression a, expression b);
+    expression min(field a, field b);
+    expression min(parameter a, parameter b);
     
 
     // Evaluate an expression on physical region 'physreg' using interpolation:

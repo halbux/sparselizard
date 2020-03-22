@@ -397,54 +397,46 @@ expression mathop::orpositive(std::vector<expression> exprs)
     return output;
 }
 
-expression mathop::getmax(std::vector<expression> input)
+expression mathop::max(expression a, expression b)
 {
-    int numargs = input.size();
+    a.reuseit(); b.reuseit();
     
-    if (numargs == 0)
-    {
-        std::cout << "Error in 'mathop' namespace: cannot take the max of an empty vector" << std::endl;
-        abort();
-    }    
-    
-    expression output = input[0];
-    for (int i = 1; i < numargs; i++)
-    {
-        output.reuseit(); input[i].reuseit();   
-        output = ifpositive(input[i]-output, input[i], output);
-    }   
-    
-    return output;
+    return ifpositive(a-b, a, b);
 }
 
-expression mathop::getmax(expression a, expression b)
+expression mathop::max(field a, field b)
 {
-    return getmax({a,b});
+    expression expra = a;
+    expression exprb = b;
+    return max(expra, exprb);
 }
 
-expression mathop::getmin(std::vector<expression> input)
+expression mathop::max(parameter a, parameter b)
 {
-   int numargs = input.size();
-    
-    if (numargs == 0)
-    {
-        std::cout << "Error in 'mathop' namespace: cannot take the min of an empty vector" << std::endl;
-        abort();
-    }    
-    
-    expression output = input[0];
-    for (int i = 1; i < numargs; i++)
-    {
-        output.reuseit(); input[i].reuseit();   
-        output = ifpositive(input[i]-output, output, input[i]);
-    }   
-    
-    return output;
+    expression expra = a;
+    expression exprb = b;
+    return max(expra, exprb);
 }
 
-expression mathop::getmin(expression a, expression b)
+expression mathop::min(expression a, expression b)
 {
-    return getmin({a,b});
+    a.reuseit(); b.reuseit();
+    
+    return ifpositive(a-b, b, a);
+}
+
+expression mathop::min(field a, field b)
+{
+    expression expra = a;
+    expression exprb = b;
+    return min(expra, exprb);
+}
+
+expression mathop::min(parameter a, parameter b)
+{
+    expression expra = a;
+    expression exprb = b;
+    return min(expra, exprb);
 }
 
 
