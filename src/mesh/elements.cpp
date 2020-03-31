@@ -375,11 +375,12 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
     densematrix ycoords(numelems, ncn);
     densematrix zcoords(numelems, ncn);
     
-    densematrix vals(numelems, ncn, elementtypenumber);
+    densematrix vals(numelems, ncn);
 
     double* xptr = xcoords.getvalues();
     double* yptr = ycoords.getvalues();
     double* zptr = zcoords.getvalues();
+    double* vptr = vals.getvalues();
     
     for (int e = 0; e < numelems; e++)
     {
@@ -392,6 +393,7 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
             xptr[e*ncn+n] = xc[n];
             yptr[e*ncn+n] = yc[n];
             zptr[e*ncn+n] = zc[n];
+            vptr[e*ncn+n] = elementnumbers[e];
         }
     }
     
