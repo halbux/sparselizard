@@ -364,6 +364,45 @@ void elements::printtotalorientations(void)
     std::cout << std::endl;
 }
 
+void elements::write(std::string filename, int elementtypenumber, std::vector<int> elementnumbers)
+{
+    int numelems = elementnumbers.size();
+    
+    element myelem(elementtypenumber, mycurvatureorder);
+    int ncn = myelem.countcurvednodes();
+    
+    densematrix xcoords(numelems, ncn);
+    densematrix ycoords(numelems, ncn);
+    densematrix zcoords(numelems, ncn);
+    
+    densematrix vals(numelems, ncn, elementtypenumber);
+
+    double* xptr = xcoords.getvalues();
+    double* yptr = ycoords.getvalues();
+    double* zptr = zcoords.getvalues();
+    
+    for (int e = 0; e < numelems; e++)
+    {
+        std::vector<double> xc = getnodecoordinates(elementtypenumber, elementnumbers[e], 0);
+        std::vector<double> yc = getnodecoordinates(elementtypenumber, elementnumbers[e], 1);
+        std::vector<double> zc = getnodecoordinates(elementtypenumber, elementnumbers[e], 2);
+        
+        for (int n = 0; n < ncn; n++)
+        {
+            xptr[e*ncn+n] = xc[n];
+            yptr[e*ncn+n] = yc[n];
+            zptr[e*ncn+n] = zc[n];
+        }
+    }
+    
+    iodata datatowrite(mycurvatureorder, mycurvatureorder, true, {});
+    
+    datatowrite.addcoordinates(elementtypenumber, xcoords, ycoords, zcoords);
+    datatowrite.adddata(elementtypenumber, {vals});
+    
+    iointerface::writetofile(filename, datatowrite);
+}
+
 std::vector<double> elements::computebarycenters(int elementtypenumber)
 {
     std::vector<double>* nodecoordinates = mynodes->getcoordinates();
