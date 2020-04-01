@@ -1,4 +1,5 @@
 #include "element.h"
+#include "lagrangeformfunction.h"
 
 
 element::element(std::string elementname)
@@ -1139,6 +1140,39 @@ int element::deducetypenumber(int elemdim, int numnodes)
         // Hexahedron:
         case 8:
             return 5;
+    }
+}
+
+std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords)
+{
+    if (mypolynomials.count() > 0)
+    {
+        int numnodes = nodecoords.size()/3;
+        int numrefs = refcoords.size()/3;
+        
+        std::vector<double> sf, evaluationpoint;
+        std::vector<double> output(3*numrefs, 0.0);        
+
+        for (int i = 0; i < numrefs; i++)
+        {
+            evaluationpoint = {refcoords[3*i+0],refcoords[3*i+1],refcoords[3*i+2]};
+            
+            mypolynomials.evalatsingle(evaluationpoint, sf);
+
+            for (int c = 0; c < numnodes; c++)
+            {
+                output[3*i+0] += nodecoords[3*c+0] * sf[c];
+                output[3*i+1] += nodecoords[3*c+1] * sf[c];
+                output[3*i+2] += nodecoords[3*c+2] * sf[c];
+            }
+        }
+        return output;
+    }
+    else
+    {
+        lagrangeformfunction lff(gettypenumber(), getcurvatureorder(), {});
+        mypolynomials = polynomials(lff.getformfunctionpolynomials());
+        return calculatecoordinates(refcoords, nodecoords);
     }
 }
 

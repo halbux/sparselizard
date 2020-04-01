@@ -12,6 +12,7 @@
 #include <math.h>
 #include <algorithm>
 #include "myalgorithm.h"
+#include "polynomials.h"
 
 // Element type numbers are as follows:
 //
@@ -282,6 +283,8 @@ class element
         int curvedtypenumber = -1;
         std::vector<int> curvednodelist = {};
         
+        polynomials mypolynomials;
+        
         // 'getnodesinsurface' does the actual work of 'getnodesintriangle' (below) if the
         // second argument is true and the third is false and of 'getnodesinquadrangle'
         // if the second is false and the third is true. No error check is performed here.
@@ -372,6 +375,9 @@ class element
         
         // Get the straight element type number corresponding to a number of nodes and dimension:
         int deducetypenumber(int elemdim, int numnodes);
+        
+        // Calculate the physical coordinates corresponding to a set of reference coordinates.
+        std::vector<double> calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords);
 };
 
 #endif
