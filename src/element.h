@@ -378,6 +378,10 @@ class element
         
         // Calculate the physical coordinates corresponding to a set of reference coordinates.
         std::vector<double> calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords);
+        
+        // Get the full-split subelement definition based on their corner reference coordinates.
+        // For tetrahedra provide the through-edge to be used in the cut (choose 0 for edge 0-4, 1 for 1-3, 2 for 2-5).
+        void fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int throughedgenum = -1);
 };
 
 #endif
