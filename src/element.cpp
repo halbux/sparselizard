@@ -1,4 +1,5 @@
 #include "element.h"
+#include "geotools.h"
 #include "lagrangeformfunction.h"
 
 
@@ -1229,6 +1230,26 @@ void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int t
             break;
         }
     }
+}
+
+int element::choosethroughedge(std::vector<double>& nodecoords)
+{
+    // Mid-edge reference coordinates:
+    std::vector<double> refcoords = {0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
+
+    std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
+    
+    double l04 = geotools::getdistance(0,4, calced);
+    double l13 = geotools::getdistance(1,3, calced);
+    double l25 = geotools::getdistance(2,5, calced);
+
+    // Select shortest edge:
+    if (l04 <= l13 && l04 <= l25)
+        return 0;
+    if (l13 <= l04 && l13 <= l25)
+        return 1;
+    if (l25 <= l04 && l25 <= l13)
+        return 2;
 }
 
 void element::write(std::string filename, std::vector<double> coords)

@@ -796,26 +796,3 @@ void myalgorithm::osclean(std::string& line)
         line.resize(siz-1);
 }
 
-int myalgorithm::choosethroughedge(std::vector<double>& nc)
-{
-    std::vector<double> pe0 = {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2])};
-    std::vector<double> pe1 = {0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2])};
-    std::vector<double> pe2 = {0.5*(nc[3*2+0]+nc[3*0+0]), 0.5*(nc[3*2+1]+nc[3*0+1]), 0.5*(nc[3*2+2]+nc[3*0+2])};
-    std::vector<double> pe3 = {0.5*(nc[3*0+0]+nc[3*3+0]), 0.5*(nc[3*0+1]+nc[3*3+1]), 0.5*(nc[3*0+2]+nc[3*3+2])};
-    std::vector<double> pe4 = {0.5*(nc[3*2+0]+nc[3*3+0]), 0.5*(nc[3*2+1]+nc[3*3+1]), 0.5*(nc[3*2+2]+nc[3*3+2])};
-    std::vector<double> pe5 = {0.5*(nc[3*1+0]+nc[3*3+0]), 0.5*(nc[3*1+1]+nc[3*3+1]), 0.5*(nc[3*1+2]+nc[3*3+2])};
-    
-    double l04 = std::sqrt( std::pow(pe0[0]-pe4[0],2) + std::pow(pe0[1]-pe4[1],2) + std::pow(pe0[2]-pe4[2],2) );
-    double l13 = std::sqrt( std::pow(pe1[0]-pe3[0],2) + std::pow(pe1[1]-pe3[1],2) + std::pow(pe1[2]-pe3[2],2) );
-    double l25 = std::sqrt( std::pow(pe2[0]-pe5[0],2) + std::pow(pe2[1]-pe5[1],2) + std::pow(pe2[2]-pe5[2],2) );
-
-    // Select shortest edge:
-    if (l04 <= l13 && l04 <= l25)
-        return 0;
-    if (l13 <= l04 && l13 <= l25)
-        return 1;
-    if (l25 <= l04 && l25 <= l13)
-        return 2;
-}
-
-

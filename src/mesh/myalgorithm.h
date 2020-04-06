@@ -99,10 +99,6 @@ namespace myalgorithm
     
     // Remove trailing CR (added in windows for newline):
     void osclean(std::string& line);
-    
-    // Select the through-edge to use to get the best quality uncurved tetrahedron split.
-    int choosethroughedge(std::vector<double>& cornernodecoords);
-    
 };
 
 #endif
