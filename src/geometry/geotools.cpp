@@ -39,6 +39,11 @@ double geotools::getdistance(std::vector<double> pt1coords, std::vector<double> 
     return std::sqrt( std::pow(pt1coords[0]-pt2coords[0],2) + std::pow(pt1coords[1]-pt2coords[1],2) + std::pow(pt1coords[2]-pt2coords[2],2) );
 }
 
+double geotools::getdistance(int pt1, int pt2, std::vector<double>& coords)
+{
+    return std::sqrt( std::pow(coords[3*pt1+0]-coords[3*pt2+0],2) + std::pow(coords[3*pt1+1]-coords[3*pt2+1],2) + std::pow(coords[3*pt1+2]-coords[3*pt2+2],2) );
+}
+
 double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::vector<double> p2, std::vector<double> p3)
 {
     double pi = 3.1415926535897932384;

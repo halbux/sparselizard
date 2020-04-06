@@ -29,6 +29,7 @@ namespace geotools
 
     // Get the distance between two points:
     double getdistance(std::vector<double> pt1coords, std::vector<double> pt2coords);
+    double getdistance(int pt1, int pt2, std::vector<double>& coords);
 
     // Get the angle (in degrees) which rotates the plane defined by the 3 input points
     // around the x (or y) axis to bring it parallel to the y axis (or x axis).
