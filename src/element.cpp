@@ -1231,3 +1231,38 @@ void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int t
     }
 }
 
+void element::write(std::string filename, std::vector<double> coords)
+{
+    int ncn = countcurvednodes();
+    int numelems = coords.size()/3/ncn;
+    
+    densematrix xcoords(numelems, ncn);
+    densematrix ycoords(numelems, ncn);
+    densematrix zcoords(numelems, ncn);
+    
+    densematrix vals(numelems, ncn);
+
+    double* xptr = xcoords.getvalues();
+    double* yptr = ycoords.getvalues();
+    double* zptr = zcoords.getvalues();
+    double* vptr = vals.getvalues();
+    
+    for (int e = 0; e < numelems; e++)
+    {
+        for (int n = 0; n < ncn; n++)
+        {
+            xptr[e*ncn+n] = coords[3*ncn*e+3*n+0];
+            yptr[e*ncn+n] = coords[3*ncn*e+3*n+1];
+            zptr[e*ncn+n] = coords[3*ncn*e+3*n+2];
+            vptr[e*ncn+n] = e;
+        }
+    }
+    
+    iodata datatowrite(getcurvatureorder(), getcurvatureorder(), true, {});
+    
+    datatowrite.addcoordinates(gettypenumber(), xcoords, ycoords, zcoords);
+    datatowrite.adddata(gettypenumber(), {vals});
+    
+    iointerface::writetofile(filename, datatowrite);
+}
+

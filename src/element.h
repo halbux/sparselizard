@@ -382,6 +382,10 @@ class element
         // Get the full-split subelement definition based on their corner reference coordinates.
         // For tetrahedra provide the through-edge to be used in the cut (choose 0 for edge 0-4, 1 for 1-3, 2 for 2-5).
         void fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int throughedgenum = -1);
+        
+        // Write to file multiple elements with provided coordinates for debug:
+        void write(std::string filename, std::vector<double> coords);
+        
 };
 
 #endif
