@@ -1177,6 +1177,17 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     }
 }
 
+void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, std::vector<double>& nodecoords)
+{
+    cornerrefcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
+
+    int throughedgenum = -1;
+    if (gettypenumber() == 4)
+        throughedgenum = choosethroughedge(nodecoords);
+    
+    fullsplit(cornerrefcoords, throughedgenum);
+}
+
 void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int throughedgenum)
 {
     cornerrefcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
