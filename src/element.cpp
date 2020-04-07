@@ -1201,13 +1201,95 @@ std::vector<int> element::fullsplitcount(int n)
     return cnt;
 }
 
-void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, std::vector<double>& nodecoords)
+void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, std::vector<std::vector<double>>& unsplitcoords)
 {
-    int throughedgenum = -1;
-    if (gettypenumber() == 4)
-        throughedgenum = choosethroughedge(nodecoords);
+    if (n == 0)
+    {
+        splitcoords = unsplitcoords;
+        return;
+    }
+    // Recursive call:
+    if (n > 1)
+    {
+        fullsplit(1, splitcoords, unsplitcoords);
+        std::vector<std::vector<double>> oncesplitcoords = splitcoords;
+        fullsplit(n-1, splitcoords, oncesplitcoords);
+        return;
+    }
     
-    fullsplit(cornerrefcoords, throughedgenum);
+    // Treat the single-split case below:
+    int co = getcurvatureorder();
+    std::vector<element> myelems(8);
+    std::vector<element> mystraightelems(8);
+    std::vector<int> nn(8);
+    std::vector<int> ncn(8);
+    std::vector<int> numelems(8);
+    std::vector<std::vector<double>> curvedrefcoords(8);
+    // Define only once for speedup:
+    for (int i = 0; i < 8; i++)
+    {
+        myelems[i] = element(i, co);
+        mystraightelems[i] = element(i);
+        nn[i] = myelems[i].countnodes();
+        ncn[i] = myelems[i].countcurvednodes();
+        numelems[i] = unsplitcoords[i].size()/3/ncn[i];
+    }
+    
+    // Preallocate:
+    splitcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
+    std::vector<int> numsplitelems(8,0);
+    for (int i = 0; i < 8; i++) 
+    {
+        std::vector<int> cnt = myelems[i].fullsplitcount(1);
+        for (int j = 0; j < 8; j++) 
+            numsplitelems[j] += numelems[i]*cnt[j];
+    }
+    for (int i = 0; i < 8; i++)
+        splitcoords[i] = std::vector<double>(3*ncn[i]*numsplitelems[i]);
+        
+    // Populate:
+    std::vector<int> curscpos(8,0);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int e = 0; e < numelems[i]; e++)
+        {
+            std::vector<double> coords(3*ncn[i]);
+            for (int j = 0; j < 3*ncn[i]; j++)
+                coords[j] = unsplitcoords[i][e*3*ncn[i]+j];
+    
+            int throughedgenum = -1;
+            if (i == 4)
+                throughedgenum = choosethroughedge(coords);
+            
+            std::vector<std::vector<double>> cornerrefcoords;
+            myelems[i].fullsplit(cornerrefcoords, throughedgenum);
+    
+            for (int j = 0; j < 8; j++)
+            {
+                int ne = cornerrefcoords[j].size()/3/nn[j];
+                for (int k = 0; k < ne; k++)
+                {
+                    if (curvedrefcoords[i].size() == 0)
+                    {
+                        lagrangeformfunction lff(i, co, {});
+                        curvedrefcoords[i] = lff.getnodecoordinates();
+                    }
+                
+                    std::vector<double> curcorncoords(3*nn[j]);
+                    for (int l = 0; l < 3*nn[j]; l++)
+                        curcorncoords[l] = cornerrefcoords[j][3*nn[j]*k+l];
+                    // Get all curved reference coordinates:
+                    std::vector<double> cursplit = mystraightelems[j].calculatecoordinates(curvedrefcoords[j], curcorncoords);
+                    // Get actual coordinates:
+                    cursplit = myelems[i].calculatecoordinates(cursplit, coords);
+    
+                    for (int l = 0; l < cursplit.size(); l++)
+                        splitcoords[j][curscpos[j]+l] = cursplit[l];
+                    curscpos[j] += cursplit.size();
+                }
+            }
+        }
+    }
 }
 
 void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int throughedgenum)
