@@ -1269,10 +1269,10 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
                 int ne = cornerrefcoords[j].size()/3/nn[j];
                 for (int k = 0; k < ne; k++)
                 {
-                    if (curvedrefcoords[i].size() == 0)
+                    if (curvedrefcoords[j].size() == 0)
                     {
-                        lagrangeformfunction lff(i, co, {});
-                        curvedrefcoords[i] = lff.getnodecoordinates();
+                        lagrangeformfunction lff(j, co, {});
+                        curvedrefcoords[j] = lff.getnodecoordinates();
                     }
                 
                     std::vector<double> curcorncoords(3*nn[j]);
