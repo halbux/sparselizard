@@ -1177,6 +1177,29 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     }
 }
 
+std::vector<int> element::fullsplitcount(void)
+{
+    switch (gettypenumber())
+    {
+        case 0:
+            return {1,0,0,0,0,0,0,0};
+        case 1:
+            return {0,2,0,0,0,0,0,0};
+        case 2:
+            return {0,0,4,0,0,0,0,0};
+        case 3:
+            return {0,0,0,4,0,0,0,0};
+        case 4:
+            return {0,0,0,0,8,0,0,0};
+        case 5:
+            return {0,0,0,0,0,8,0,0};
+        case 6:
+            return {0,0,0,0,0,0,8,0};
+        case 7:
+            return {0,0,0,0,4,0,0,6};
+    }
+}
+
 void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, std::vector<double>& nodecoords)
 {
     int throughedgenum = -1;

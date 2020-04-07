@@ -379,6 +379,8 @@ class element
         // Calculate the physical coordinates corresponding to a set of reference coordinates.
         std::vector<double> calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords);
         
+        // Count the number of elements of each type in the full-split element:
+        std::vector<int> fullsplitcount(void);
         // Full-split the element whose node coordinates are provided as argument:
         void fullsplit(std::vector<std::vector<double>>& cornerrefcoords, std::vector<double>& nodecoords);
         // Get the full-split subelement definition based on their corner reference coordinates.
