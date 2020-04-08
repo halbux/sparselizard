@@ -1206,8 +1206,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
     {
         std::vector<std::vector<double>> cursplitcoords;
         fullsplit(1, cursplitcoords, unsplitcoords);
-        std::vector<double> oncesplitcoords = cursplitcoords[gettypenumber()];
-        fullsplit(n-1, splitcoords, oncesplitcoords);
+        fullsplit(n-1, splitcoords, cursplitcoords[gettypenumber()]);
         // Treat the tetrahedra from the split pyramids:
         if (gettypenumber() == 7)
         {
