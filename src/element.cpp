@@ -1193,95 +1193,128 @@ std::vector<int> element::fullsplitcount(int n)
     return output;
 }
 
-void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, std::vector<std::vector<double>>& unsplitcoords)
+void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, std::vector<double>& unsplitcoords)
 {
     if (n == 0)
     {
-        splitcoords = unsplitcoords;
+        splitcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
+        splitcoords[gettypenumber()] = unsplitcoords;
         return;
     }
     // Recursive call:
     if (n > 1)
     {
-        fullsplit(1, splitcoords, unsplitcoords);
-        std::vector<std::vector<double>> oncesplitcoords = splitcoords;
+        std::vector<std::vector<double>> cursplitcoords;
+        fullsplit(1, cursplitcoords, unsplitcoords);
+        std::vector<double> oncesplitcoords = cursplitcoords[gettypenumber()];
         fullsplit(n-1, splitcoords, oncesplitcoords);
+        // Treat the tetrahedra from the split pyramids:
+        if (gettypenumber() == 7)
+        {
+            std::vector<std::vector<double>> tetsplitcoords;
+            fullsplit(n-1, tetsplitcoords, cursplitcoords[4]);
+            int cursize = splitcoords[4].size();
+            int sizetoadd = tetsplitcoords[4].size();
+            splitcoords[4].resize(cursize+sizetoadd);
+            for (int i = 0; i < sizetoadd; i++)
+                splitcoords[4][cursize+i] = tetsplitcoords[4][i];
+        }
         return;
     }
     
-    // Treat the single-split case below:
+    int tn = gettypenumber();
     int co = getcurvatureorder();
-    std::vector<element> myelems(8);
-    std::vector<element> mystraightelems(8);
-    std::vector<int> nn(8);
-    std::vector<int> ncn(8);
-    std::vector<int> numelems(8);
-    std::vector<std::vector<double>> curvedrefcoords(8);
-    // Define only once for speedup:
-    for (int i = 0; i < 8; i++)
-    {
-        myelems[i] = element(i, co);
-        mystraightelems[i] = element(i);
-        nn[i] = myelems[i].countnodes();
-        ncn[i] = myelems[i].countcurvednodes();
-        numelems[i] = unsplitcoords[i].size()/3/ncn[i];
-    }
+    int nn = countnodes();
+    int ncn = countcurvednodes();
+    int ne = unsplitcoords.size()/3/ncn;
+    std::vector<int> splitcount = fullsplitcount(1);
+    int ns = splitcount[tn];
+    element straighelem(tn);
+    
+    lagrangeformfunction lff(tn, co, {});
+    std::vector<double> curvedrefcoords = lff.getnodecoordinates();
     
     // Preallocate:
     splitcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
-    std::vector<int> numsplitelems(8,0);
-    for (int i = 0; i < 8; i++) 
-    {
-        std::vector<int> cnt = myelems[i].fullsplitcount(1);
-        for (int j = 0; j < 8; j++) 
-            numsplitelems[j] += numelems[i]*cnt[j];
-    }
-    for (int i = 0; i < 8; i++)
-        splitcoords[i] = std::vector<double>(3*ncn[i]*numsplitelems[i]);
+    splitcoords[tn] = std::vector<double>(3*ncn*ns*ne);
+    // Define only once:
+    std::vector< std::vector<std::vector<double>> > cornerrefcoords(3);
+    int numcases = 1;
+    if (tn == 4)
+        numcases = 3;
+    for (int c = 0; c < numcases; c++)
+        fullsplit(cornerrefcoords[c], c);
         
-    // Populate:
-    std::vector<int> curscpos(8,0);
-    for (int i = 0; i < 8; i++)
+    std::vector< std::vector<std::vector<double>> > curvedsubcoords(numcases, std::vector<std::vector<double>>(ns));
+    for (int i = 0; i < ns; i++)
     {
-        for (int e = 0; e < numelems[i]; e++)
+        for (int c = 0; c < numcases; c++)
         {
-            std::vector<double> coords(3*ncn[i]);
-            for (int j = 0; j < 3*ncn[i]; j++)
-                coords[j] = unsplitcoords[i][e*3*ncn[i]+j];
+            std::vector<double> cc(3*nn);
+            for (int j = 0; j < 3*nn; j++)
+                cc[j] = cornerrefcoords[c][tn][3*nn*i+j];
+            curvedsubcoords[c][i] = straighelem.calculatecoordinates(curvedrefcoords, cc);
+        }
+    }
     
-            int throughedgenum = -1;
-            if (i == 4)
-                throughedgenum = choosethroughedge(coords);
-            
-            std::vector<std::vector<double>> cornerrefcoords;
-            myelems[i].fullsplit(cornerrefcoords, throughedgenum);
+    // Populate:
+    int index = 0;
+    for (int e = 0; e < ne; e++)
+    {
+        std::vector<double> coords(3*ncn);
+        for (int i = 0; i < 3*ncn; i++)
+            coords[i] = unsplitcoords[3*ncn*e+i];
     
-            for (int j = 0; j < 8; j++)
+        int throughedgenum = 0;
+        if (tn == 4)
+            throughedgenum = choosethroughedge(coords);
+        
+        for (int i = 0; i < ns; i++)
+        {
+            std::vector<double> cursplit = calculatecoordinates(curvedsubcoords[throughedgenum][i], coords);
+
+            for (int j = 0; j < cursplit.size(); j++)
+                splitcoords[tn][index+j] = cursplit[j];
+            index += cursplit.size();
+        }
+    }
+    
+    // Also add the tetrahedra created during a pyramid split:
+    if (tn == 7)
+    {
+        element mystraighttet(4);
+        lagrangeformfunction lfftet(4, co, {});
+        std::vector<double> curvedtetrefcoords = lfftet.getnodecoordinates();
+    
+        splitcoords[4] = std::vector<double>(curvedtetrefcoords.size()*4*ne);
+    
+        std::vector<std::vector<double>> curvedtetsubcoords(4);
+        for (int i = 0; i < 4; i++)
+        {
+            std::vector<double> cc(12);
+            for (int j = 0; j < 12; j++)
+                cc[j] = cornerrefcoords[0][4][12*i+j];
+            curvedtetsubcoords[i] = mystraighttet.calculatecoordinates(curvedtetrefcoords, cc);
+        }
+    
+        int index = 0;
+        for (int e = 0; e < ne; e++)
+        {
+            std::vector<double> coords(3*ncn);
+            for (int i = 0; i < 3*ncn; i++)
+                coords[i] = unsplitcoords[3*ncn*e+i];
+        
+            for (int i = 0; i < 4; i++)
             {
-                int ne = cornerrefcoords[j].size()/3/nn[j];
-                for (int k = 0; k < ne; k++)
-                {
-                    if (curvedrefcoords[j].size() == 0)
-                    {
-                        lagrangeformfunction lff(j, co, {});
-                        curvedrefcoords[j] = lff.getnodecoordinates();
-                    }
-                
-                    std::vector<double> curcorncoords(3*nn[j]);
-                    for (int l = 0; l < 3*nn[j]; l++)
-                        curcorncoords[l] = cornerrefcoords[j][3*nn[j]*k+l];
-                    // Get all curved reference coordinates:
-                    std::vector<double> cursplit = mystraightelems[j].calculatecoordinates(curvedrefcoords[j], curcorncoords);
-                    // Get actual coordinates:
-                    cursplit = myelems[i].calculatecoordinates(cursplit, coords);
-    
-                    for (int l = 0; l < cursplit.size(); l++)
-                        splitcoords[j][curscpos[j]+l] = cursplit[l];
-                    curscpos[j] += cursplit.size();
-                }
+                std::vector<double> cursplit = calculatecoordinates(curvedtetsubcoords[i], coords);
+
+                for (int j = 0; j < cursplit.size(); j++)
+                    splitcoords[4][index+j] = cursplit[j];
+                index += cursplit.size();
             }
         }
     }
+    
 }
 
 void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int throughedgenum)

@@ -384,7 +384,7 @@ class element
         std::vector<int> fullsplitcount(int n);
         // Full-split n times multiple elements whose node coordinates are provided as argument.
         // Can be called by any element type except points.
-        void fullsplit(int n, std::vector<std::vector<double>>& splitcoords, std::vector<std::vector<double>>& unsplitcoords);
+        void fullsplit(int n, std::vector<std::vector<double>>& splitcoords, std::vector<double>& unsplitcoords);
         
         // Get the full-split subelement definition based on their corner reference coordinates.
         // For tetrahedra provide the through-edge to be used in the cut (choose 0 for edge 0-4, 1 for 1-3, 2 for 2-5).
