@@ -28,13 +28,10 @@ std::vector<polynomial> lagrangepyramid::getformfunctionpolynomials(int order)
                 eta.set({{{},{1.0}}});
                 phi.set({{{0.0,1.0}}});
 
-                // Variable change to correspond to our reference element definition:
-                ki = 0.5*(ki+1); eta = 0.5*(eta+1);
-
                 formfunctionpoly[0] = (1.0-ki)*(1.0-eta)*(1.0-phi);
-                formfunctionpoly[1] = ki*(1.0-eta)*(1.0-phi);
-                formfunctionpoly[2] = ki*eta*(1.0-phi);
-                formfunctionpoly[3] = (1.0-ki)*eta*(1.0-phi);
+                formfunctionpoly[1] = (1.0+ki)*(1.0-eta)*(1.0-phi);
+                formfunctionpoly[2] = (1.0+ki)*(1.0+eta)*(1.0-phi);
+                formfunctionpoly[3] = (1.0-ki)*(1.0+eta)*(1.0-phi);
                 formfunctionpoly[4] = phi;
                 break;
           }
