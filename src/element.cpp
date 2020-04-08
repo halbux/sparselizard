@@ -1179,26 +1179,18 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
 
 std::vector<int> element::fullsplitcount(int n)
 {
-    std::vector<int> singlesplit = {1,0,0,0,0,0,0,0, 0,2,0,0,0,0,0,0, 0,0,4,0,0,0,0,0, 0,0,0,4,0,0,0,0, 0,0,0,0,8,0,0,0, 0,0,0,0,0,8,0,0, 0,0,0,0,0,0,8,0, 0,0,0,0,4,0,0,6};
+    std::vector<int> numsons = {1,2,4,4,8,8,8,6};
+    std::vector<int> output(8,0);
+
+    int typenum = gettypenumber();
     
-    std::vector<int> cnt(8,0);
-    cnt[gettypenumber()] = 1;
-    for (int i = 0; i < n; i++)
-    {
-        std::vector<int> cur = cnt;
-        cnt = std::vector<int>(8,0);
+    output[typenum] = std::pow(numsons[typenum],n);
     
-        for (int j = 0; j < 8; j++)
-        {
-            if (cur[j] == 0)
-                continue;
-            
-            for (int k = 0; k < 8; k++)
-                cnt[k] += cur[j]*singlesplit[8*j+k];
-        }
-    }
+    // Pyramids also give tetrahedra when split:
+    if (typenum == 7)
+        output[4] = std::pow(2,n+1)*(std::pow(4,n)-std::pow(3,n));
     
-    return cnt;
+    return output;
 }
 
 void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, std::vector<std::vector<double>>& unsplitcoords)
