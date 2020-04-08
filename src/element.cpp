@@ -1210,8 +1210,9 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
         // Treat the tetrahedra from the split pyramids:
         if (gettypenumber() == 7)
         {
+            element mytet(4,getcurvatureorder());
             std::vector<std::vector<double>> tetsplitcoords;
-            fullsplit(n-1, tetsplitcoords, cursplitcoords[4]);
+            mytet.fullsplit(n-1, tetsplitcoords, cursplitcoords[4]);
             int cursize = splitcoords[4].size();
             int sizetoadd = tetsplitcoords[4].size();
             splitcoords[4].resize(cursize+sizetoadd);
