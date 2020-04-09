@@ -230,3 +230,9 @@ void physicalregions::errorundefined(std::vector<int> physregs)
     }
 }
 
+void physicalregions::clear(void)
+{
+    std::vector<std::shared_ptr<physicalregion>> myphysicalregions = {};
+    std::vector<int> myphysicalregionnumbers = {};
+}
+

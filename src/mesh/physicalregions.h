@@ -59,6 +59,9 @@ class physicalregions
         
         // Give an error if any of the physical regions is not defined:
         void errorundefined(std::vector<int> physregs);
+        
+        // Clear the object (pointers to other objects are not cleared).
+        void clear(void);
 };
 
 #endif
