@@ -42,6 +42,8 @@ class mesh
         physicalregions myphysicalregions;
         disjointregions mydisjointregions;
         
+        int mynumsplitrequested = 0;
+        void splitmesh(void);
         regiondefiner myregiondefiner;
         
         int mynumber = 0;
@@ -89,7 +91,10 @@ class mesh
         void load(std::vector<shape> inputshapes, int verbosity = 1);
 
         // Write to file name:
-        void write(std::string name, int verbosity = 1);        
+        void write(std::string name, int verbosity = 1);     
+        
+        // Split each element in the mesh n times:
+        void split(int n = 1);
         
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
         void shift(int physreg, double x, double y, double z);

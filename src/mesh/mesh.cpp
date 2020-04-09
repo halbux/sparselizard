@@ -1,6 +1,107 @@
 #include "mesh.h"
 
 
+void mesh::splitmesh(void)
+{
+    if (mynumsplitrequested == 0)
+        return;
+
+    // Get all physical region numbers:
+    std::vector<int> prn = myphysicalregions.getallnumbers();
+
+    // Count the number of nodes per element:
+    int co = myelements.getcurvatureorder();
+    std::vector<int> ncn(8);
+    for (int i = 0; i < 8; i++)
+    {
+        element myelem(i,co);
+        ncn[i] = myelem.countcurvednodes();
+    }
+    
+    // Loop on all physical regions:
+    int numnodes = 0;
+    std::vector< std::vector<std::vector<double>> > splitcoords(prn.size(), std::vector<std::vector<double>>(8, std::vector<double>(0)));
+    for (int p = 0; p < prn.size(); p++)
+    {
+        physicalregion* curpr = myphysicalregions.getatindex(p);
+        std::vector<std::vector<int>>* curelemlist = curpr->getelementlist();
+    
+        // Calculate the number of elements after split in the current region:
+        std::vector<int> numsplit(8,0);
+        for (int i = 0; i < 8; i++)
+        {
+            element myel(i,co);
+            std::vector<int> fsc = myel.fullsplitcount(mynumsplitrequested);
+        
+            int ne = curelemlist->at(i).size();
+            for (int j = 0; j < 8; j++)
+                numsplit[i] += ne*fsc[j];
+        }
+        // Preallocate:
+        for (int i = 0; i < 8; i++)
+        {
+            splitcoords[p][i] = std::vector<double>(3*ncn[i]*numsplit[i]);
+            numnodes += ncn[i]*numsplit[i]; 
+        }
+                
+        // Split each element type and group:
+        std::vector<int> indexes(8,0);
+        for (int i = 0; i < 8; i++)
+        {
+            int ne = curelemlist->at(i).size();
+            std::vector<double> coords = std::vector<double>(3*ncn[i]*ne);
+            for (int e = 0; e < ne; e++)
+            {
+                int el = curelemlist->at(i)[e];
+                std::vector<double> curcoords = myelements.getnodecoordinates(i,el);
+                for (int j = 0; j < curcoords.size(); j++)
+                    coords[3*ncn[i]*e+j] = curcoords[j];
+            }
+            element myelem(i,co);
+            std::vector<std::vector<double>> tempsplit;
+            myelem.fullsplit(mynumsplitrequested, tempsplit, coords);
+            
+            // Group with the existing splitcoords[p]:
+            for (int j = 0; j < 8; j++)
+            {
+                for (int k = 0; k < tempsplit[j].size(); k++)
+                    splitcoords[p][j][indexes[j]+k] = tempsplit[j][k];
+                indexes[j] += tempsplit[j].size();
+            }
+        }
+    }
+    
+    // All the info needed is ready. Clear and re-populate the nodes, elements and physical regions.
+    mynodes = nodes();
+    mydisjointregions = disjointregions();
+    myphysicalregions = physicalregions(mydisjointregions);
+    myelements = elements(mynodes, myphysicalregions, mydisjointregions);
+    
+    mynodes.setnumber(numnodes);
+    std::vector<double>* nc = mynodes.getcoordinates();
+    int nindex = 0;
+    for (int p = 0; p < splitcoords.size(); p++)
+    {
+        physicalregion* curpr = myphysicalregions.get(prn[p]);
+        
+        for (int i = 0; i < 8; i++)
+        {
+            int ne = splitcoords[p][i].size()/3/ncn[i];
+            for (int e = 0; e < ne; e++)
+            {
+                std::vector<int> nodelist = myalgorithm::getequallyspaced(nindex, 1, ncn[i]);
+                int curelemindex = myelements.add(i, co, nodelist);
+                curpr->addelement(i,curelemindex);
+                // Add node coordinates:
+                for (int k = 0; k < 3*ncn[i]; k++)
+                    nc->at(3*nindex+k) = splitcoords[p][i][3*ncn[i]*e+k];
+                    
+                nindex += ncn[i];
+            }
+        }
+    }
+}
+
 void mesh::readfromfile(std::string name)
 {
     if (name == "gmshapi")
@@ -160,6 +261,8 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
         petscmesh pmesh(name);
         pmesh.extract(mynodes, myelements, myphysicalregions);
     }
+    
+    splitmesh();
     
     myelements.explode();
     sortbybarycenters();
@@ -427,6 +530,16 @@ void mesh::write(std::string name, int verbosity)
 
     if (verbosity > 0)
         writetime.print("Time to write the mesh: ");
+}
+
+void mesh::split(int n)
+{
+    if (n < 0)
+    {
+        std::cout << "Error in 'mesh' object: number of splits cannot be negative" << std::endl;
+        abort();
+    }
+    mynumsplitrequested += n;
 }
 
 void mesh::shift(int physreg, double x, double y, double z)
