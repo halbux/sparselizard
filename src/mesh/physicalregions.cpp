@@ -230,9 +230,3 @@ void physicalregions::errorundefined(std::vector<int> physregs)
     }
 }
 
-void physicalregions::clear(void)
-{
-    myphysicalregions = {};
-    myphysicalregionnumbers = {};
-}
-

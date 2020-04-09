@@ -186,11 +186,7 @@ class elements
         // 'orient' defines 'totalorientations'. Note: 'totalorientations'
         // is untouched in all renumbering and reordering steps and
         // should thus be called last, after all other steps.
-        void orient(void);    
-        
-        // Clear the object (pointers to other objects are not cleared).
-        void clear(void);
-
+        void orient(void);
 };
 
 #endif

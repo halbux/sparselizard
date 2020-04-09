@@ -997,17 +997,3 @@ void elements::orient(void)
     }
 }
 
-void elements::clear(void)
-{
-    mycurvatureorder = -1;
-    subelementsinelements = std::vector<std::vector<std::vector<int>>>(8, std::vector<std::vector<int>>(4,std::vector<int>(0)));
-    numberofsubelementsineveryelement = std::vector<std::vector<int>>(8,std::vector<int>(4,0));
-    indisjointregion = std::vector<std::vector<int>>(8, std::vector<int>(0));
-    totalorientations = std::vector<std::vector<int>>(8, std::vector<int>(0));
-    barycenters = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    sphereradius = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    boxdimensions = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    adressedgesatnodes = {};
-    edgesatnodes = {};
-}
-
