@@ -49,7 +49,7 @@ void mesh::splitmesh(void)
         for (int i = 0; i < 8; i++)
         {
             int ne = curelemlist->at(i).size();
-            std::vector<double> coords = std::vector<double>(3*ncn[i]*ne);
+            std::vector<double> coords(3*ncn[i]*ne);
             for (int e = 0; e < ne; e++)
             {
                 int el = curelemlist->at(i)[e];
