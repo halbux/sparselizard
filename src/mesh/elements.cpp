@@ -186,6 +186,29 @@ std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elem
     return nodecoords;
 }
 
+std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elementnumber)
+{
+    std::vector<double>* nodecoordinates = mynodes->getcoordinates();
+    
+    if (elementtypenumber == 0)
+        return {nodecoordinates->at(3*elementnumber+0), nodecoordinates->at(3*elementnumber+1), nodecoordinates->at(3*elementnumber+2)};
+    
+    element myelement(elementtypenumber, mycurvatureorder);
+    int curvednumberofnodes = myelement.countcurvednodes();
+    
+    std::vector<double> nodecoords(3*curvednumberofnodes);
+
+    for (int node = 0; node < curvednumberofnodes; node++)
+    {
+        int curnode = subelementsinelements[elementtypenumber][0][elementnumber*curvednumberofnodes+node];
+        nodecoords[3*node+0] = nodecoordinates->at(3*curnode+0);
+        nodecoords[3*node+1] = nodecoordinates->at(3*curnode+1);
+        nodecoords[3*node+2] = nodecoordinates->at(3*curnode+2);
+    }
+
+    return nodecoords;
+}
+
 std::vector<double>* elements::getbarycenters(int elementtypenumber)
 {
     // If not yet populated for the element type:

@@ -113,6 +113,8 @@ class elements
         // Get the x, y or z coordinate of all nodes in the element 
         // (for xyz respectively set to 0, 1 or 2).
         std::vector<double> getnodecoordinates(int elementtypenumber, int elementnumber, int xyz);
+        // Get all coordinates at once:
+        std::vector<double> getnodecoordinates(int elementtypenumber, int elementnumber);
         
         // Get a pointer to the barycenters[elementtypenumber] vector.
         // The 'barycenters' container is populated for the element type if empty. 
