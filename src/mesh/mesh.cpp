@@ -35,7 +35,7 @@ void mesh::splitmesh(void)
         
             int ne = curelemlist->at(i).size();
             for (int j = 0; j < 8; j++)
-                numsplit[i] += ne*fsc[j];
+                numsplit[j] += ne*fsc[j];
         }
         // Preallocate:
         for (int i = 0; i < 8; i++)
