@@ -1,5 +1,8 @@
 #include "myalgorithm.h"
 
+#if defined(__linux__)
+#include <parallel/algorithm>
+#endif
 
 void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
 {
@@ -13,7 +16,11 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
     std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
     // Sort 'reorderingvector' according to 'coordinates' with x > y > z priority order:
     // The < operator is overloaded by a lambda function.
+    #if defined(__linux__)
+    __gnu_parallel::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+    #else
     std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+    #endif
         { 
             // First sort according to the x coordinate:
             if (coordinates[elem1*3+0] < coordinates[elem2*3+0] - noisethreshold[0])
@@ -163,9 +170,6 @@ void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort,
         });
 }
 
-#if defined(__linux__)
-#include <parallel/algorithm>
-#endif
 
 bool sortfun(const std::tuple<int,int,double>& elem1, const std::tuple<int,int,double>& elem2)
 { 
