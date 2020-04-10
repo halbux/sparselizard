@@ -471,6 +471,7 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
     }
     ///// Mesh is transferred
 
+    splitmesh();
 
     myelements.explode();
     sortbybarycenters();
