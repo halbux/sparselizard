@@ -1507,10 +1507,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
 
 void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refcoords)
 {
-    int numnodes = countnodes();
-    int numelems = nums.size()/numnodes;
-
-    refcoords = std::vector<double>(numelems*3*numnodes);
+    refcoords = std::vector<double>(3*nums.size());
 
     if (nums.size() == 0)
         return;
@@ -1561,14 +1558,11 @@ void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refco
         }
     }
         
-    for (int e = 0; e < numelems; e++)
+    for (int i = 0; i < nums.size(); i++)
     {
-        for (int n = 0; n < numnodes; n++)
-        {
-            refcoords[3*numnodes*e+3*n+0] = refs[3*nums[e*numnodes+n]+0];
-            refcoords[3*numnodes*e+3*n+1] = refs[3*nums[e*numnodes+n]+1];
-            refcoords[3*numnodes*e+3*n+2] = refs[3*nums[e*numnodes+n]+2];
-        }
+        refcoords[3*i+0] = refs[3*nums[i]+0];
+        refcoords[3*i+1] = refs[3*nums[i]+1];
+        refcoords[3*i+2] = refs[3*nums[i]+2];
     }
 }
 
