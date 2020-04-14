@@ -1392,7 +1392,7 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
         return 2;
 }
 
-std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers, int throughedgenum)
+std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
 {
     if (gettypenumber() > 4)
     {
@@ -1407,11 +1407,11 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
         case 1:
             return splitline(splitnum);
         case 2:
-            return splittriangle(splitnum, edgenumbers);
+            return splittriangle(splitnum, edgenumbers, nodecoords);
         case 3:
             return splitquadrangle(splitnum);
         case 4:
-            return splittetrahedron(splitnum, edgenumbers, throughedgenum);
+            return splittetrahedron(splitnum, edgenumbers, nodecoords);
     }
 }
         
@@ -1423,8 +1423,10 @@ std::vector<std::vector<int>> element::splitline(int splitnum)
         return {{},{0,2, 2,1},{},{},{},{},{},{}};
 }
         
-std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<int>& edgenumbers)
+std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
 {
+    int meshdim = universe::mymesh->getmeshdimension();
+
     switch (splitnum)
     {
         case 0:
@@ -1435,7 +1437,16 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
             return {{},{},{0,1,4, 0,4,2},{},{},{},{},{}};
         case 3:
         {
-            if (edgenumbers[2] < edgenumbers[1])
+            bool sel = (edgenumbers[2] < edgenumbers[1]);
+            if (meshdim == 2)
+            {
+                std::vector<double> refcoords = {1,0,0, 0,0.5,0, 0,0,0, 0.5,0.5,0};
+                std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
+                sel = false;
+                if (geotools::getdistance(0,1, calced) < geotools::getdistance(2,3, calced))
+                    sel = true;
+            }
+            if (sel)
                 return {{},{},{0,1,5, 5,1,4, 5,4,2},{},{},{},{},{}};
             else
                 return {{},{},{0,1,4, 0,4,5, 5,4,2},{},{},{},{},{}};
@@ -1444,14 +1455,32 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
             return {{},{},{0,3,2, 3,1,2},{},{},{},{},{}};
         case 5:
         {
-            if (edgenumbers[2] < edgenumbers[0])
+            bool sel = (edgenumbers[2] < edgenumbers[0]);
+            if (meshdim == 2)
+            {
+                std::vector<double> refcoords = {1,0,0, 0,0.5,0, 0.5,0,0, 0,1,0};
+                std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
+                sel = false;
+                if (geotools::getdistance(0,1, calced) < geotools::getdistance(2,3, calced))
+                    sel = true;
+            }
+            if (sel)
                 return {{},{},{0,3,5, 5,3,1, 5,1,2},{},{},{},{},{}};
             else
                 return {{},{},{0,3,5, 5,3,2, 3,1,2},{},{},{},{},{}};
         }
         case 6:
         {
-            if (edgenumbers[1] < edgenumbers[0])
+            bool sel = (edgenumbers[1] < edgenumbers[0]);
+            if (meshdim == 2)
+            {
+                std::vector<double> refcoords = {0,0,0, 0.5,0.5,0, 0.5,0,0, 0,1,0};
+                std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
+                sel = false;
+                if (geotools::getdistance(0,1, calced) < geotools::getdistance(2,3, calced))
+                    sel = true;
+            }
+            if (sel)
                 return {{},{},{0,3,4, 0,4,2, 3,1,4},{},{},{},{},{}};
             else
                 return {{},{},{0,3,2, 3,4,2, 3,1,4},{},{},{},{},{}};
@@ -1500,7 +1529,7 @@ std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
     }
 }
 
-std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers, int throughedgenum)
+std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
 {
 
 }

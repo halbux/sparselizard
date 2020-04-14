@@ -291,9 +291,9 @@ class element
         std::vector<int> getnodesinsurface(int surfaceindex, bool faceistriangle, bool faceisquadrangle);
         
         std::vector<std::vector<int>> splitline(int splitnum);
-        std::vector<std::vector<int>> splittriangle(int splitnum, std::vector<int>& edgenumbers);
+        std::vector<std::vector<int>> splittriangle(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords);
         std::vector<std::vector<int>> splitquadrangle(int splitnum);
-        std::vector<std::vector<int>> splittetrahedron(int splitnum, std::vector<int>& edgenumbers, int throughedgenum);
+        std::vector<std::vector<int>> splittetrahedron(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords);
 
     public:
     
@@ -398,7 +398,7 @@ class element
         int choosethroughedge(std::vector<double>& nodecoords);
         
         // Get the reference node numbers defining the transition element split:
-        std::vector<std::vector<int>> split(int splitnum, std::vector<int>& edgenumbers, int throughedgenum = -1);
+        std::vector<std::vector<int>> split(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords);
         // Get the reference coordinates corresponding to the reference node numbers:
         void numstorefcoords(std::vector<int>& nums, std::vector<double>& refcoords);
         
