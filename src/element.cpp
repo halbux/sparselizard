@@ -1546,17 +1546,17 @@ void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refco
         }
         case 5:
         {
-            refcoords = {};
+            refs = {};
             break;
         }
         case 6:
         {
-            refcoords = {};
+            refs = {};
             break;
         }
         case 7:
         {
-            refcoords = {};
+            refs = {};
             break;
         }
     }
