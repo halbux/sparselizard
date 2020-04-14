@@ -1392,6 +1392,193 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
         return 2;
 }
 
+std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers, int throughedgenum)
+{
+    if (gettypenumber() > 4)
+    {
+        std::cout << "Error in 'element' object: transition splits not defined yet for " << gettypenameconjugation(2) << std::endl;
+        abort();
+    }
+
+    switch (gettypenumber())
+    {
+        case 0:
+            return {{0},{},{},{},{},{},{},{}};
+        case 1:
+            return splitline(splitnum);
+        case 2:
+            return splittriangle(splitnum, edgenumbers);
+        case 3:
+            return splitquadrangle(splitnum);
+        case 4:
+            return splittetrahedron(splitnum, edgenumbers, throughedgenum);
+    }
+}
+        
+std::vector<std::vector<int>> element::splitline(int splitnum)
+{
+    if (splitnum == 0)
+        return {{},{0,1},{},{},{},{},{},{}};
+    else
+        return {{},{0,2, 2,1},{},{},{},{},{},{}};
+}
+        
+std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<int>& edgenumbers)
+{
+    switch (splitnum)
+    {
+        case 0:
+            return {{},{},{0,1,2},{},{},{},{},{}};
+        case 1:
+            return {{},{},{0,1,5, 5,1,2},{},{},{},{},{}};
+        case 2:
+            return {{},{},{0,1,4, 0,4,2},{},{},{},{},{}};
+        case 3:
+        {
+            if (edgenumbers[2] < edgenumbers[1])
+                return {{},{},{0,1,5, 5,1,4, 5,4,2},{},{},{},{},{}};
+            else
+                return {{},{},{0,1,4, 0,4,5, 5,4,2},{},{},{},{},{}};
+                
+        }
+        case 4:
+            return {{},{},{0,3,2, 3,1,2},{},{},{},{},{}};
+        case 5:
+        {
+            if (edgenumbers[2] < edgenumbers[0])
+                return {{},{},{0,3,5, 5,3,1, 5,1,2},{},{},{},{},{}};
+            else
+                return {{},{},{0,3,5, 5,3,2, 3,1,2},{},{},{},{},{}};
+        }
+        case 6:
+        {
+            if (edgenumbers[1] < edgenumbers[0])
+                return {{},{},{0,3,4, 0,4,2, 3,1,4},{},{},{},{},{}};
+            else
+                return {{},{},{0,3,2, 3,4,2, 3,1,4},{},{},{},{},{}};
+        }
+        case 7:
+            return {{},{},{0,3,5, 3,1,4, 3,4,5, 5,4,2},{},{},{},{},{}};
+    }
+}    
+
+std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
+{
+    switch (splitnum)
+    {
+        case 0:
+            return {{},{},{},{0,1,2,3},{},{},{},{}};
+        case 1:
+            return {{},{},{0,1,7, 7,1,2, 7,2,3},{},{},{},{},{}};
+        case 2:
+            return {{},{},{0,6,3, 0,1,6, 1,2,6},{},{},{},{},{}};
+        case 3:
+            return {{},{},{},{0,1,8,7, 7,8,6,3, 8,1,2,6},{},{},{},{}};
+        case 4:
+            return {{},{},{0,1,5, 0,5,3, 3,5,2},{},{},{},{},{}};
+        case 5:
+            return {{},{},{},{0,1,5,7, 7,5,2,3},{},{},{},{}};
+        case 6:
+            return {{},{},{},{0,1,5,8, 0,8,6,3, 8,5,2,6},{},{},{},{}};
+        case 7:
+            return {{},{},{7,5,6, 7,6,3, 5,2,6},{0,1,5,7},{},{},{},{}};
+        case 8:
+            return {{},{},{0,4,3, 4,2,3, 4,1,2},{},{},{},{},{}};
+        case 9:
+            return {{},{},{},{0,4,8,7, 4,1,2,8, 7,8,2,3},{},{},{},{}};
+        case 10:
+            return {{},{},{},{0,4,6,3, 4,1,2,6},{},{},{},{}};
+        case 11:
+            return {{},{},{0,4,7, 4,6,7, 7,6,3},{4,1,2,6},{},{},{},{}};
+        case 12:
+            return {{},{},{},{0,4,8,3, 4,1,5,8, 8,5,2,3},{},{},{},{}};
+        case 13:
+            return {{},{},{0,4,7, 7,4,5, 4,1,5},{7,5,2,3},{},{},{},{}};
+        case 14:
+            return {{},{},{4,1,5, 4,5,6, 5,2,6},{0,4,6,3},{},{},{},{}};
+        case 15:
+            return {{},{},{},{0,4,8,7, 4,1,5,8, 7,8,6,3, 8,5,2,6},{},{},{},{}};
+    }
+}
+
+std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers, int throughedgenum)
+{
+
+}
+
+void element::numstorefcoords(std::vector<std::vector<int>>& nums, std::vector<std::vector<double>>& refcoords)
+{
+    refcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    
+    for (int i = 0; i < 8; i++)
+    {
+        if (nums[i].size() == 0)
+            continue;
+            
+        std::vector<double> refs;
+        
+        switch (i)
+        {
+            case 0:
+            {
+                refs = {0,0,0};
+                break;
+            }
+            case 1:
+            {
+                refs = {-1,0,0, 1,0,0, 0,0,0};
+                break;
+            }
+            case 2:
+            {
+                refs = {0,0,0, 1,0,0, 0,1,0, 0.5,0,0, 0.5,0.5,0, 0,0.5,0};
+                break;
+            }
+            case 3:
+            {
+                refs = {-1,-1,0, 1,-1,0, 1,1,0, -1,1,0, 0,-1,0, 1,0,0, 0,1,0, -1,0,0, 0,0,0};
+                break;
+            }
+            case 4:
+            {
+                refs = {0,0,0, 1,0,0, 0,1,0, 0,0,1, 0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
+                break;
+            }
+            case 5:
+            {
+                refcoords = {};
+                break;
+            }
+            case 6:
+            {
+                refcoords = {};
+                break;
+            }
+            case 7:
+            {
+                refcoords = {};
+                break;
+            }
+        }
+        
+        element myelem(i);
+        int numnodes = myelem.countnodes();
+        int numelems = nums[i].size()/numnodes;
+        
+        refcoords[i] = std::vector<double>(numelems*3*numnodes);
+        
+        for (int e = 0; e < numelems; e++)
+        {
+            for (int n = 0; n < numnodes; n++)
+            {
+                refcoords[i][3*numnodes*e+3*n+0] = refs[3*nums[i][e*numnodes+n]+0];
+                refcoords[i][3*numnodes*e+3*n+1] = refs[3*nums[i][e*numnodes+n]+1];
+                refcoords[i][3*numnodes*e+3*n+2] = refs[3*nums[i][e*numnodes+n]+2];
+            }
+        }
+    }
+}
+
 void element::write(std::string filename, std::vector<double> coords)
 {
     int ncn = countcurvednodes();

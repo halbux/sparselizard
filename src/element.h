@@ -289,6 +289,11 @@ class element
         // second argument is true and the third is false and of 'getnodesinquadrangle'
         // if the second is false and the third is true. No error check is performed here.
         std::vector<int> getnodesinsurface(int surfaceindex, bool faceistriangle, bool faceisquadrangle);
+        
+        std::vector<std::vector<int>> splitline(int splitnum);
+        std::vector<std::vector<int>> splittriangle(int splitnum, std::vector<int>& edgenumbers);
+        std::vector<std::vector<int>> splitquadrangle(int splitnum);
+        std::vector<std::vector<int>> splittetrahedron(int splitnum, std::vector<int>& edgenumbers, int throughedgenum);
 
     public:
     
@@ -391,6 +396,11 @@ class element
         
         // Select the through-edge to get the best quality tetrahedron split.
         int choosethroughedge(std::vector<double>& nodecoords);
+        
+        // Get the reference node numbers defining the transition element split:
+        std::vector<std::vector<int>> split(int splitnum, std::vector<int>& edgenumbers, int throughedgenum = -1);
+        // Get the reference coordinates corresponding to the reference node numbers:
+        void numstorefcoords(std::vector<std::vector<int>>& nums, std::vector<std::vector<double>>& refcoords);
         
         // Write to file multiple elements with provided coordinates for debug:
         void write(std::string filename, std::vector<double> coords);
