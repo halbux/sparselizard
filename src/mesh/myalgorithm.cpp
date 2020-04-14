@@ -800,3 +800,38 @@ void myalgorithm::osclean(std::string& line)
         line.resize(siz-1);
 }
 
+std::vector<bool> myalgorithm::inttobinary(int numbits, int num)
+{
+    std::vector<bool> output(numbits, false);
+
+    int index = numbits-1;
+    while (num > 0)
+    {
+        if (num%2 == 1)
+        {
+            output[index] = true;
+            num--;
+        }
+        
+        num = num/2;
+        index--;
+    }    
+
+    return output;
+}
+
+int myalgorithm::binarytoint(std::vector<bool> num)
+{
+    int output = 0;
+
+    int pow2 = 1;
+    for (int i = num.size()-1; i >= 0; i--)
+    {
+        if (num[i])
+            output += pow2;
+        pow2 = pow2*2;
+    }
+
+    return output;
+}
+

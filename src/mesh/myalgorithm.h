@@ -99,6 +99,10 @@ namespace myalgorithm
     
     // Remove trailing CR (added in windows for newline):
     void osclean(std::string& line);
+    
+    // Convert an int to/from a boolean vector:
+    std::vector<bool> inttobinary(int numbits, int num);
+    int binarytoint(std::vector<bool> num);
 };
 
 #endif
