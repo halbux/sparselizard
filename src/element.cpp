@@ -1439,7 +1439,6 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
                 return {{},{},{0,1,5, 5,1,4, 5,4,2},{},{},{},{},{}};
             else
                 return {{},{},{0,1,4, 0,4,5, 5,4,2},{},{},{},{},{}};
-                
         }
         case 4:
             return {{},{},{0,3,2, 3,1,2},{},{},{},{},{}};
