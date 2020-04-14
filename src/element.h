@@ -400,7 +400,7 @@ class element
         // Get the reference node numbers defining the transition element split:
         std::vector<std::vector<int>> split(int splitnum, std::vector<int>& edgenumbers, int throughedgenum = -1);
         // Get the reference coordinates corresponding to the reference node numbers:
-        void numstorefcoords(std::vector<std::vector<int>>& nums, std::vector<std::vector<double>>& refcoords);
+        void numstorefcoords(std::vector<int>& nums, std::vector<double>& refcoords);
         
         // Write to file multiple elements with provided coordinates for debug:
         void write(std::string filename, std::vector<double> coords);

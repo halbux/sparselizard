@@ -1505,75 +1505,69 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
 
 }
 
-void element::numstorefcoords(std::vector<std::vector<int>>& nums, std::vector<std::vector<double>>& refcoords)
+void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refcoords)
 {
-    refcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    int numnodes = countnodes();
+    int numelems = nums.size()/numnodes;
+
+    refcoords = std::vector<double>(numelems*3*numnodes);
+
+    if (nums.size() == 0)
+        return;
+        
+    std::vector<double> refs;
     
-    for (int i = 0; i < 8; i++)
+    switch (gettypenumber())
     {
-        if (nums[i].size() == 0)
-            continue;
-            
-        std::vector<double> refs;
-        
-        switch (i)
+        case 0:
         {
-            case 0:
-            {
-                refs = {0,0,0};
-                break;
-            }
-            case 1:
-            {
-                refs = {-1,0,0, 1,0,0, 0,0,0};
-                break;
-            }
-            case 2:
-            {
-                refs = {0,0,0, 1,0,0, 0,1,0, 0.5,0,0, 0.5,0.5,0, 0,0.5,0};
-                break;
-            }
-            case 3:
-            {
-                refs = {-1,-1,0, 1,-1,0, 1,1,0, -1,1,0, 0,-1,0, 1,0,0, 0,1,0, -1,0,0, 0,0,0};
-                break;
-            }
-            case 4:
-            {
-                refs = {0,0,0, 1,0,0, 0,1,0, 0,0,1, 0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
-                break;
-            }
-            case 5:
-            {
-                refcoords = {};
-                break;
-            }
-            case 6:
-            {
-                refcoords = {};
-                break;
-            }
-            case 7:
-            {
-                refcoords = {};
-                break;
-            }
+            refs = {0,0,0};
+            break;
         }
-        
-        element myelem(i);
-        int numnodes = myelem.countnodes();
-        int numelems = nums[i].size()/numnodes;
-        
-        refcoords[i] = std::vector<double>(numelems*3*numnodes);
-        
-        for (int e = 0; e < numelems; e++)
+        case 1:
         {
-            for (int n = 0; n < numnodes; n++)
-            {
-                refcoords[i][3*numnodes*e+3*n+0] = refs[3*nums[i][e*numnodes+n]+0];
-                refcoords[i][3*numnodes*e+3*n+1] = refs[3*nums[i][e*numnodes+n]+1];
-                refcoords[i][3*numnodes*e+3*n+2] = refs[3*nums[i][e*numnodes+n]+2];
-            }
+            refs = {-1,0,0, 1,0,0, 0,0,0};
+            break;
+        }
+        case 2:
+        {
+            refs = {0,0,0, 1,0,0, 0,1,0, 0.5,0,0, 0.5,0.5,0, 0,0.5,0};
+            break;
+        }
+        case 3:
+        {
+            refs = {-1,-1,0, 1,-1,0, 1,1,0, -1,1,0, 0,-1,0, 1,0,0, 0,1,0, -1,0,0, 0,0,0};
+            break;
+        }
+        case 4:
+        {
+            refs = {0,0,0, 1,0,0, 0,1,0, 0,0,1, 0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
+            break;
+        }
+        case 5:
+        {
+            refcoords = {};
+            break;
+        }
+        case 6:
+        {
+            refcoords = {};
+            break;
+        }
+        case 7:
+        {
+            refcoords = {};
+            break;
+        }
+    }
+        
+    for (int e = 0; e < numelems; e++)
+    {
+        for (int n = 0; n < numnodes; n++)
+        {
+            refcoords[3*numnodes*e+3*n+0] = refs[3*nums[e*numnodes+n]+0];
+            refcoords[3*numnodes*e+3*n+1] = refs[3*nums[e*numnodes+n]+1];
+            refcoords[3*numnodes*e+3*n+2] = refs[3*nums[e*numnodes+n]+2];
         }
     }
 }
