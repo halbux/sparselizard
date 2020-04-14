@@ -1534,6 +1534,48 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
 
 }
 
+void element::getsplitconnectivity(std::vector<bool>& connectivity, std::vector<std::vector<int>>& splitdefinition)
+{
+    connectivity = std::vector<bool>(6*6, false);
+
+    for (int j = 0; j < splitdefinition[2].size()/3; j++)
+    {
+        for (int n = 0; n < 3; n++)
+        {
+            int curnode = splitdefinition[2][3*j+n];
+            int prevnode = splitdefinition[2][3*j+(n+3-1)%3];
+            
+            connectivity[6*curnode+curnode] = true;
+            connectivity[6*prevnode+curnode] = true;
+            connectivity[6*curnode+prevnode] = true;
+        }
+    }
+}
+
+void element::getsplitconnectivity(std::vector<bool>& volumeconnectivity, std::vector<std::vector<bool>>& faceconnectivity)
+{
+    volumeconnectivity = std::vector<bool>(10*10, false);
+    
+    std::vector<int> fnd = getfacesdefinitionsbasedonnodes();
+    std::vector<int> fed = getfacesdefinitionsbasedonedges();
+    // Face edge definition is provided in a special format:
+    for (int i = 0; i < fed.size(); i++)
+        fed[i] = std::abs(fed[i])-1;                                        
+    
+    // Loop on each face:
+    for (int f = 0; f < 4; f++)
+    {
+        // Edge nodes come after the 4 corner nodes:
+        std::vector<int> nmap = {fnd[3*f+0], fnd[3*f+1], fnd[3*f+2], 4+fed[3*f+0], 4+fed[3*f+1], 4+fed[3*f+2]};
+    
+        for (int m = 0; m < 6; m++)
+        {
+            for (int n = 0; n < 6; n++)
+                volumeconnectivity[10*nmap[m]+nmap[n]] = faceconnectivity[f][6*m+n];
+        }
+    }
+}
+
 void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refcoords)
 {
     refcoords = std::vector<double>(3*nums.size());

@@ -295,6 +295,11 @@ class element
         std::vector<std::vector<int>> splitquadrangle(int splitnum);
         std::vector<std::vector<int>> splittetrahedron(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords);
 
+        // Get the node-connectivity of a split TRIANGLE element.
+        void getsplitconnectivity(std::vector<bool>& connectivity, std::vector<std::vector<int>>& splitdefinition);
+        // Get the node-connectivity of a TETRAHEDRON based on the node-connectivity of its faces:
+        void getsplitconnectivity(std::vector<bool>& volumeconnectivity, std::vector<std::vector<bool>>& faceconnectivity);
+        
     public:
     
         element(void) {};
