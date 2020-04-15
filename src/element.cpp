@@ -1576,6 +1576,64 @@ void element::getsplitconnectivity(std::vector<bool>& volumeconnectivity, std::v
     }
 }
 
+void element::deducetets(std::vector<bool>& connectivity, std::vector<std::vector<bool>>& tetdefs, int originnode, int numinloop, int curnode, std::vector<bool> isnodeused)
+{
+    // Loop on all connected nodes (except the node itself and previously used nodes):
+    for (int i = 0; i < 10; i++)
+    {
+        if (i == curnode || connectivity[10*curnode+i] == false)
+            continue;
+            
+        if (numinloop < 4 && isnodeused[i])
+            continue;
+            
+        // The new node must be connected directly to all other ones (removes wrong flat tets on faces):
+        bool isconnectedtoall = true;
+        for (int j = 0; j < 10; j++)
+        {
+            if (isnodeused[j] && connectivity[10*i+j] == false)
+            {
+                isconnectedtoall = false;
+                break;
+            }
+        }
+        if (isconnectedtoall == false)
+            continue;
+
+        // Terminate:
+        if (numinloop == 4)
+        {
+            // New tet found:
+            if (i == originnode)
+                tetdefs.push_back(isnodeused);
+            continue;
+        }
+        std::vector<bool> isused = isnodeused;
+        isused[i] = true;
+        deducetets(connectivity, tetdefs, originnode, numinloop+1, i, isused);
+    }
+}
+
+void element::deducetets(std::vector<bool>& connectivity, std::vector<std::vector<bool>>& tetdefs)
+{
+    tetdefs = {};
+    
+    // Each node is a seed for a tet:
+    for (int t = 0; t < 10; t++)
+    {
+        if (connectivity[10*t+t] == false)
+            continue;
+    
+        std::vector<bool> isnodeused(10, false);
+        isnodeused[t] = true;
+        deducetets(connectivity, tetdefs, t, 1, t, isnodeused);
+    }
+    
+    // Remove duplicates:
+    std::sort( tetdefs.begin(), tetdefs.end() );
+    tetdefs.erase( std::unique( tetdefs.begin(), tetdefs.end() ), tetdefs.end() );
+}
+
 void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refcoords)
 {
     refcoords = std::vector<double>(3*nums.size());

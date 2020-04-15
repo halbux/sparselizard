@@ -300,6 +300,9 @@ class element
         // Get the node-connectivity of a TETRAHEDRON based on the node-connectivity of its faces:
         void getsplitconnectivity(std::vector<bool>& volumeconnectivity, std::vector<std::vector<bool>>& faceconnectivity);
         
+        void deducetets(std::vector<bool>& connectivity, std::vector<std::vector<bool>>& tetdefs, int originnode, int numinloop, int curnode, std::vector<bool> isnodeused);
+        void deducetets(std::vector<bool>& connectivity, std::vector<std::vector<bool>>& tetdefs);
+        
     public:
     
         element(void) {};
