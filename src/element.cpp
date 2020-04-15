@@ -1425,8 +1425,6 @@ std::vector<std::vector<int>> element::splitline(int splitnum)
         
 std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
 {
-    int meshdim = universe::mymesh->getmeshdimension();
-
     switch (splitnum)
     {
         case 0:
@@ -1438,7 +1436,7 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
         case 3:
         {
             bool sel = (edgenumbers[2] < edgenumbers[1]);
-            if (meshdim == 2)
+            if (nodecoords.size() > 0)
             {
                 std::vector<double> refcoords = {1,0,0, 0,0.5,0, 0,0,0, 0.5,0.5,0};
                 std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
@@ -1456,7 +1454,7 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
         case 5:
         {
             bool sel = (edgenumbers[2] < edgenumbers[0]);
-            if (meshdim == 2)
+            if (nodecoords.size() > 0)
             {
                 std::vector<double> refcoords = {1,0,0, 0,0.5,0, 0.5,0,0, 0,1,0};
                 std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
@@ -1472,7 +1470,7 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
         case 6:
         {
             bool sel = (edgenumbers[1] < edgenumbers[0]);
-            if (meshdim == 2)
+            if (nodecoords.size() > 0)
             {
                 std::vector<double> refcoords = {0,0,0, 0.5,0.5,0, 0.5,0,0, 0,1,0};
                 std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
