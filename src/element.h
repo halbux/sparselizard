@@ -293,7 +293,7 @@ class element
         std::vector<std::vector<int>> splitline(int splitnum);
         std::vector<std::vector<int>> splittriangle(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords);
         std::vector<std::vector<int>> splitquadrangle(int splitnum);
-        std::vector<std::vector<int>> splittetrahedron(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords);
+        std::vector<std::vector<int>> splittetrahedron(int splitnum, std::vector<int>& edgenumbers);
 
         // Get the node-connectivity of a split TRIANGLE element.
         void getsplitconnectivity(std::vector<bool>& connectivity, std::vector<std::vector<int>>& splitdefinition);

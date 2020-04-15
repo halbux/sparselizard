@@ -1411,7 +1411,7 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
         case 3:
             return splitquadrangle(splitnum);
         case 4:
-            return splittetrahedron(splitnum, edgenumbers, nodecoords);
+            return splittetrahedron(splitnum, edgenumbers);
     }
 }
         
@@ -1527,9 +1527,136 @@ std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
     }
 }
 
-std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
+std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers)
 {
+    std::vector<bool> isedgecut = myalgorithm::inttobinary(6, splitnum);
 
+    // The triangle element object can be straight or curved (no impact here):
+    element mytri(2);
+
+    // Split the faces and compute their node connectivity:
+    std::vector<std::vector<bool>> faceconnectivity(4);
+    std::vector<int> faceedgedef = {2,1,0, 0,5,3, 3,4,2, 5,1,4};
+    for (int i = 0; i < 4; i++)
+    {
+        int ea = faceedgedef[3*i+0];
+        int eb = faceedgedef[3*i+1];
+        int ec = faceedgedef[3*i+2];
+
+        std::vector<bool> iec = {isedgecut[ea], isedgecut[eb], isedgecut[ec]};
+        std::vector<int> triedgenums = {edgenumbers[ea], edgenumbers[eb], edgenumbers[ec]};
+        std::vector<double> trinodecoords = {}; // Not needed
+        std::vector<std::vector<int>> trisplitdefinition = mytri.split(myalgorithm::binarytoint(iec), triedgenums, trinodecoords);
+        mytri.getsplitconnectivity(faceconnectivity[i], trisplitdefinition);
+    }
+    // Compute the tetrahedron node connectivity:
+    std::vector<bool> connectivity;
+    getsplitconnectivity(connectivity, faceconnectivity);
+
+    
+    // Total number of edges cut:
+    int countcuts = 0;
+    for (int i = 0; i < 6; i++)
+    {
+        if (isedgecut[i])
+            countcuts++;
+    }
+
+    std::vector<bool> connectivitythroughedge = connectivity;
+
+    // When at least two facing edges (e.g. 1 and 3) need to be cut a connection is inserted between them to make the tet cut algo work:
+    std::vector<int> facingedges = {0,4, 1,3, 2,5};
+
+    int edgefacingpair = -1;
+    for (int i = 0; i < 3; i++)
+    {
+        if (isedgecut[facingedges[2*i+0]] && isedgecut[facingedges[2*i+1]])
+        {
+            edgefacingpair = i;
+            break;
+        }
+    }
+    
+    // Add connection:
+    if (edgefacingpair != -1)
+    {
+        int m = 4 + facingedges[2*edgefacingpair+0];
+        int n = 4 + facingedges[2*edgefacingpair+1];
+
+        connectivitythroughedge[m*10+n] = true;
+        connectivitythroughedge[n*10+m] = true;
+    }
+
+    // Connect the tets:
+    std::vector<std::vector<bool>> tetdefs;
+
+    // Insertion of a through-edge when the number of edges to cut is:
+    //
+    // 0: never
+    // 1: never
+    // 2: when the two edges facing each other have to be cut
+    // 3: sometimes
+    // 4: sometimes
+    // 5: always
+    // 6: always
+    if (countcuts >= 5 || (countcuts == 2 && (isedgecut[0] && isedgecut[4] || isedgecut[1] && isedgecut[3] || isedgecut[2] && isedgecut[5])))
+        deducetets(connectivitythroughedge, tetdefs);
+    else
+        deducetets(connectivity, tetdefs);
+        
+    int numtets = tetdefs.size();
+
+    std::vector<int> minnumtet = {1,2,3,4,5,7,8};
+    // If a through-edge must be inserted:
+    if (numtets < minnumtet[countcuts])
+        deducetets(connectivitythroughedge, tetdefs);
+    numtets = tetdefs.size();
+    
+    
+    std::vector<std::vector<int>> output(8, std::vector<int>(0));
+    output[4] = std::vector<int>(numtets*4);
+    for (int i = 0; i < numtets; i++)
+    {
+        int index = 0;
+        for (int j = 0; j < 10; j++)
+        {
+            if (tetdefs[i][j])
+            {
+                output[4][4*i+index];
+                index++;   
+            }
+        }
+    }
+    
+    // Reorder the tetrahedra nodes if needed:
+    std::vector<double> rc = {0,0,0, 1,0,0, 0,1,0, 0,0,1, 0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
+    for (int i = 0; i < numtets; i++)
+    {
+        int p0 = output[4][4*i+0];
+        int p1 = output[4][4*i+1];
+        int p2 = output[4][4*i+2];
+        int p3 = output[4][4*i+3];
+        
+        // Perpendicular to bottom tet face:
+        std::vector<double> a = {rc[3*p1+0]-rc[3*p0+0], rc[3*p1+1]-rc[3*p0+1], rc[3*p1+2]-rc[3*p0+2]};
+        std::vector<double> b = {rc[3*p2+0]-rc[3*p0+0], rc[3*p2+1]-rc[3*p0+1], rc[3*p2+2]-rc[3*p0+2]};
+        std::vector<double> c = {rc[3*p3+0]-rc[3*p0+0], rc[3*p3+1]-rc[3*p0+1], rc[3*p3+2]-rc[3*p0+2]};
+        // Cross product:
+        std::vector<double> cp = {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]};
+        // Check if p3 is above or below (if below the surface orientation is flipped):
+        bool isbelow = true;
+        // Cannot be zero for non-degenerate tet:
+        if (cp[0]*c[0]+cp[1]*c[1]+cp[2]*c[2] > 0)
+            isbelow = false;
+            
+        if (isbelow)
+        {
+            output[4][4*i+1] = p2;
+            output[4][4*i+2] = p1;
+        }
+    }
+    
+    return output;
 }
 
 void element::getsplitconnectivity(std::vector<bool>& connectivity, std::vector<std::vector<int>>& splitdefinition)
