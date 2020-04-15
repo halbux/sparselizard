@@ -1562,57 +1562,46 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
             countcuts++;
     }
 
-    std::vector<bool> connectivitythroughedge = connectivity;
-
     // When at least two facing edges (e.g. 1 and 3) need to be cut a connection is inserted between them to make the tet cut algo work:
     std::vector<int> facingedges = {0,4, 1,3, 2,5};
 
-    int edgefacingpair = -1;
+    std::vector<int> edgefacingpair = {};
     for (int i = 0; i < 3; i++)
     {
         if (isedgecut[facingedges[2*i+0]] && isedgecut[facingedges[2*i+1]])
-        {
-            edgefacingpair = i;
-            break;
-        }
+            edgefacingpair.push_back(i);
     }
     
+    std::vector<std::vector<bool>> connectivitythroughedge(edgefacingpair.size());
+    
     // Add connection:
-    if (edgefacingpair != -1)
+    for (int i = 0; i < edgefacingpair.size(); i++)
     {
-        int m = 4 + facingedges[2*edgefacingpair+0];
-        int n = 4 + facingedges[2*edgefacingpair+1];
+        connectivitythroughedge[i] = connectivity;
+    
+        int m = 4 + facingedges[2*edgefacingpair[i]+0];
+        int n = 4 + facingedges[2*edgefacingpair[i]+1];
 
-        connectivitythroughedge[m*10+n] = true;
-        connectivitythroughedge[n*10+m] = true;
+        connectivitythroughedge[i][m*10+n] = true;
+        connectivitythroughedge[i][n*10+m] = true;
     }
 
     // Connect the tets:
     std::vector<std::vector<bool>> tetdefs;
-
-    // Insertion of a through-edge when the number of edges to cut is:
-    //
-    // 0: never
-    // 1: never
-    // 2: when the two edges facing each other have to be cut
-    // 3: sometimes
-    // 4: sometimes
-    // 5: always
-    // 6: always
-    if (countcuts >= 5 || (countcuts == 2 && (isedgecut[0] && isedgecut[4] || isedgecut[1] && isedgecut[3] || isedgecut[2] && isedgecut[5])))
-        deducetets(connectivitythroughedge, tetdefs);
-    else
-        deducetets(connectivity, tetdefs);
-        
+    deducetets(connectivity, tetdefs);
     int numtets = tetdefs.size();
-
+    
     std::vector<int> minnumtet = {1,2,3,4,5,7,8};
     // If a through-edge must be inserted:
-    if (numtets < minnumtet[countcuts])
-        deducetets(connectivitythroughedge, tetdefs);
-    numtets = tetdefs.size();
-    
-    
+    int ind = 0;
+    while (numtets < minnumtet[countcuts])
+    {
+        deducetets(connectivitythroughedge[ind], tetdefs);
+        numtets = tetdefs.size();
+        ind++;
+    }
+
+    // Convert the boolean tetrahedra definition to node numbers:
     std::vector<std::vector<int>> output(8, std::vector<int>(0));
     output[4] = std::vector<int>(numtets*4);
     for (int i = 0; i < numtets; i++)
