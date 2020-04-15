@@ -1622,7 +1622,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
         {
             if (tetdefs[i][j])
             {
-                output[4][4*i+index];
+                output[4][4*i+index] = j;
                 index++;   
             }
         }
