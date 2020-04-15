@@ -1562,7 +1562,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
             countcuts++;
     }
 
-    // When at least two facing edges (e.g. 1 and 3) need to be cut a connection is inserted between them to make the tet cut algo work:
+    // In case a through-edge has to be inserted:
     std::vector<int> facingedges = {0,4, 1,3, 2,5};
 
     std::vector<int> edgefacingpair = {};
