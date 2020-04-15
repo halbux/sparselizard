@@ -1587,7 +1587,7 @@ void element::deducetets(std::vector<bool>& connectivity, std::vector<std::vecto
         if (numinloop < 4 && isnodeused[i])
             continue;
             
-        // The new node must be connected directly to all other ones (removes wrong flat tets on faces):
+        // The new node must be connected directly to all other ones:
         bool isconnectedtoall = true;
         for (int j = 0; j < 10; j++)
         {
