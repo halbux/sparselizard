@@ -107,6 +107,9 @@ namespace myalgorithm
     // Output a unique number for each combination of number inequalities (no equality allowed).
     // The output is a number ranging from 0 to numbers.size()! - 1.
     int identifyrelations(std::vector<int> numbers);
+    
+    // Factorial of positive integers or zero:
+    int factorial(int n);
 };
 
 #endif
