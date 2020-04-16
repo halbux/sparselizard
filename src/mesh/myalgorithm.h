@@ -103,6 +103,10 @@ namespace myalgorithm
     // Convert an int to/from a boolean vector:
     std::vector<bool> inttobinary(int numbits, int num);
     int binarytoint(std::vector<bool> num);
+    
+    // Output a unique number for each combination of number inequalities (no equality allowed).
+    // The output is a number ranging from 0 to numbers.size()! - 1.
+    int identifyrelations(std::vector<int> numbers);
 };
 
 #endif

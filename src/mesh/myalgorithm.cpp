@@ -835,3 +835,24 @@ int myalgorithm::binarytoint(std::vector<bool> num)
     return output;
 }
 
+int myalgorithm::identifyrelations(std::vector<int> numbers)
+{
+    if (numbers.size() <= 1)
+        return 0;
+
+    int len = numbers.size();
+
+    int maxpos = 0;
+    int fact = 1;
+    for (int i = 1; i < len; i++)
+    {
+        if (numbers[i] > numbers[maxpos])
+            maxpos = i;
+        fact *= i;
+    }
+    
+    numbers.erase(numbers.begin()+maxpos);
+
+    return (maxpos * fact + identifyrelations(numbers));
+}
+
