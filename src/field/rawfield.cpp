@@ -3,7 +3,7 @@
 
 void rawfield::synchronize(std::vector<int> physregsfororder)
 {
-    // The coordinate fields can be used even before the mesh is loaded (cannot call the meshtracker).
+    // The coordinate fields can be used even before the mesh is loaded (cannot call the ptracker).
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "")
         return;
         
@@ -20,7 +20,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         return;
     }
         
-    if (issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker())
+    if (issynchronizing || myptracker == universe::mymesh->getptracker())
         return;
     issynchronizing = true; 
     
@@ -64,14 +64,14 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     
     // We need to know in which disjoint region every old element number was:
     std::vector<std::vector<int>> inolddisjregs;
-    mymeshtracker->getindisjointregions(inolddisjregs);
+    myptracker->getindisjointregions(inolddisjregs);
     // We also need to know how the mesh structure was before:
-    disjointregions* olddisjregs = mymeshtracker->getdisjointregions();
+    disjointregions* olddisjregs = myptracker->getdisjointregions();
 
     
     // Get the map to renumber the current elements to the ones in the mesh as in the old status:
     std::vector<std::vector<int>> numberback;
-    universe::mymesh->getmeshtracker()->getrenumbering(mymeshtracker, numberback);
+    universe::mymesh->getptracker()->getrenumbering(myptracker, numberback);
 
     
     for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
@@ -103,7 +103,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     
         
     // Update the mesh tracker to the current one:
-    mymeshtracker = universe::mymesh->getmeshtracker();
+    myptracker = universe::mymesh->getptracker();
     issynchronizing = false;
 }
 
@@ -189,7 +189,7 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         }    
         else
         {
-            mymeshtracker = universe::mymesh->getmeshtracker();
+            myptracker = universe::mymesh->getptracker();
         
             // Set a -1 undefined interpolation order by default:
             interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);

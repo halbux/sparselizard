@@ -26,7 +26,7 @@
 #include "rawshape.h"
 #include "regiondefiner.h"
 #include "petscmesh.h"
-#include "meshtracker.h"
+#include "ptracker.h"
 #include "rawfield.h"
 
 class nodes;
@@ -47,7 +47,7 @@ class mesh
         regiondefiner myregiondefiner;
         
         int mynumber = 0;
-        std::shared_ptr<meshtracker> mymeshtracker = NULL;
+        std::shared_ptr<ptracker> myptracker = NULL;
         // For p-adaptivity:
         std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
         
@@ -80,7 +80,7 @@ class mesh
         elements* getelements(void);
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
-        std::shared_ptr<meshtracker> getmeshtracker(void);
+        std::shared_ptr<ptracker> getptracker(void);
         int getmeshnumber(void) { return mynumber; };
 
         // Load from file name:

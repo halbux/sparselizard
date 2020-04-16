@@ -225,7 +225,7 @@ nodes* mesh::getnodes(void) {return &mynodes;}
 elements* mesh::getelements(void) {return &myelements;}
 physicalregions* mesh::getphysicalregions(void) {return &myphysicalregions;}
 disjointregions* mesh::getdisjointregions(void) {return &mydisjointregions;}
-std::shared_ptr<meshtracker> mesh::getmeshtracker(void) {return mymeshtracker;}
+std::shared_ptr<ptracker> mesh::getptracker(void) {return myptracker;}
 
 void mesh::load(std::string name, int verbosity, bool legacyreader)
 {
@@ -295,8 +295,8 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
     }
     
     mynumber = 0;
-    mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
-    mymeshtracker->updatedisjointregions(&mydisjointregions);
+    myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myptracker->updatedisjointregions(&mydisjointregions);
     mypadaptdata = {};
 }
 
@@ -384,8 +384,8 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
     }
     
     mynumber = 0;
-    mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
-    mymeshtracker->updatedisjointregions(&mydisjointregions);
+    myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myptracker->updatedisjointregions(&mydisjointregions);
     mypadaptdata = {};
 }
 
@@ -509,8 +509,8 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
     }
     
     mynumber = 0;
-    mymeshtracker = std::shared_ptr<meshtracker>(new meshtracker);
-    mymeshtracker->updatedisjointregions(&mydisjointregions);
+    myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myptracker->updatedisjointregions(&mydisjointregions);
     mypadaptdata = {};
 }
 
@@ -827,9 +827,9 @@ void mesh::adaptp(void)
     ///// Update the mesh:
     
     // The previous mesh tracker should not be touched:
-    std::shared_ptr<meshtracker> newmeshtracker(new meshtracker);
-    *newmeshtracker = *mymeshtracker;
-    mymeshtracker = newmeshtracker;
+    std::shared_ptr<ptracker> newptracker(new ptracker);
+    *newptracker = *myptracker;
+    myptracker = newptracker;
     
     mydisjointregions.clear();
     
@@ -838,7 +838,7 @@ void mesh::adaptp(void)
     std::vector<std::vector<int>> renumvec;
     myelements.reorderbydisjointregions(renumvec);
     
-    mymeshtracker->updaterenumbering(renumvec);
+    myptracker->updaterenumbering(renumvec);
 
     myelements.definedisjointregionsranges();
     
@@ -885,7 +885,7 @@ void mesh::adaptp(void)
     
     ///// New mesh version:
     
-    mymeshtracker->updatedisjointregions(&mydisjointregions);
+    myptracker->updatedisjointregions(&mydisjointregions);
     mynumber++;
 }
 

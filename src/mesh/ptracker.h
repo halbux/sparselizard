@@ -6,8 +6,8 @@
 
 // This object keeps track of the element numbering when the mesh is p-adapted.
 
-#ifndef MESHTRACKER_H
-#define MESHTRACKER_H
+#ifndef PTRACKER_H
+#define PTRACKER_H
 
 #include <iostream>
 #include <vector>
@@ -15,7 +15,7 @@
 #include <memory>
 #include "disjointregions.h"
 
-class meshtracker
+class ptracker
 {
 
     private:
@@ -27,7 +27,7 @@ class meshtracker
     
     public:
 
-        meshtracker(void);
+        ptracker(void);
         
         // This updates the disjoint region object:
         void updatedisjointregions(disjointregions* input);
@@ -38,7 +38,7 @@ class meshtracker
         // The element number in the mesh tracked by this mesh tracker can be renumbered to the one
         // in the mesh tracked by the 'mt' tracker by using mtelemnum = renumbering[thiselemnum].
         // In case 'mt' is NULL it is considered to have identity renumbering (no number change).
-        void getrenumbering(std::shared_ptr<meshtracker> mt, std::vector<std::vector<int>>& renumbering);
+        void getrenumbering(std::shared_ptr<ptracker> mt, std::vector<std::vector<int>>& renumbering);
         
         disjointregions* getdisjointregions(void);
         

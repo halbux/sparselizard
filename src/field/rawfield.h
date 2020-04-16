@@ -98,7 +98,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         bool ispadaptive = false;
         int ispadaptivetrigger = 0;
         
-        std::shared_ptr<meshtracker> mymeshtracker = NULL;
+        std::shared_ptr<ptracker> myptracker = NULL;
 
         // Track the calls to 'setorder', 'setconstraint', 'setconditionalconstraint', 'setgauge'.
         std::vector<std::pair<int, int>> myordertracker = {};

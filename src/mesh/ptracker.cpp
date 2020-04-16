@@ -1,15 +1,15 @@
-#include "meshtracker.h"
+#include "ptracker.h"
 #include "universe.h"
 
 
-meshtracker::meshtracker(void) {}
+ptracker::ptracker(void) {}
 
-void meshtracker::updatedisjointregions(disjointregions* input)
+void ptracker::updatedisjointregions(disjointregions* input)
 {
     mydisjointregions = *input;
 }
 
-void meshtracker::updaterenumbering(std::vector<std::vector<int>>& renumber)
+void ptracker::updaterenumbering(std::vector<std::vector<int>>& renumber)
 {
     if (elementrenumbering.size() == 0)
         elementrenumbering = renumber;
@@ -24,7 +24,7 @@ void meshtracker::updaterenumbering(std::vector<std::vector<int>>& renumber)
     }
 }
 
-void meshtracker::getrenumbering(std::shared_ptr<meshtracker> mt, std::vector<std::vector<int>>& renumbering)
+void ptracker::getrenumbering(std::shared_ptr<ptracker> mt, std::vector<std::vector<int>>& renumbering)
 {
     renumbering.resize(8);
 
@@ -44,12 +44,12 @@ void meshtracker::getrenumbering(std::shared_ptr<meshtracker> mt, std::vector<st
     }
 }
 
-disjointregions* meshtracker::getdisjointregions(void)
+disjointregions* ptracker::getdisjointregions(void)
 {
     return &mydisjointregions;
 }
 
-void meshtracker::getindisjointregions(std::vector<std::vector<int>>& indisjregs)
+void ptracker::getindisjointregions(std::vector<std::vector<int>>& indisjregs)
 {
     // Allocate the vectors:
     indisjregs.resize(8);
@@ -68,7 +68,7 @@ void meshtracker::getindisjointregions(std::vector<std::vector<int>>& indisjregs
     }
 }
 
-void meshtracker::print(void)
+void ptracker::print(void)
 {
     for (int i = 0; i < elementrenumbering.size(); i++)
     {

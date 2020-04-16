@@ -3,7 +3,7 @@
 
 void rawvec::synchronize(void)
 {
-    if (mydofmanager == NULL || mydofmanager->ismanaged() == false || issynchronizing || mymeshtracker == universe::mymesh->getmeshtracker())
+    if (mydofmanager == NULL || mydofmanager->ismanaged() == false || issynchronizing || myptracker == universe::mymesh->getptracker())
         return;
     issynchronizing = true; 
 
@@ -22,14 +22,14 @@ void rawvec::synchronize(void)
 
     // We need to know in which disjoint region every old element number was:
     std::vector<std::vector<int>> inolddisjregs;
-    mymeshtracker->getindisjointregions(inolddisjregs);
+    myptracker->getindisjointregions(inolddisjregs);
     // We also need to know how the mesh structure was before:
-    disjointregions* olddisjregs = mymeshtracker->getdisjointregions();
+    disjointregions* olddisjregs = myptracker->getdisjointregions();
 
     
     // Get the map to renumber the current elements to the ones in the mesh as in the current rawvec status:
     std::vector<std::vector<int>> numberback;
-    universe::mymesh->getmeshtracker()->getrenumbering(mymeshtracker, numberback);
+    universe::mymesh->getptracker()->getrenumbering(myptracker, numberback);
     
     // The fields are unchanged:
     std::vector<std::shared_ptr<rawfield>> curfields = mydofmanager->getfields();
@@ -80,7 +80,7 @@ void rawvec::synchronize(void)
     mycurrentstructure[0].donotsynchronize();
     
     // Update the mesh tracker to the current one:
-    mymeshtracker = universe::mymesh->getmeshtracker();
+    myptracker = universe::mymesh->getptracker();
     issynchronizing = false;
 }
 
@@ -94,7 +94,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
     
     if (mydofmanager->ismanaged())
     {
-        mymeshtracker = universe::mymesh->getmeshtracker();
+        myptracker = universe::mymesh->getptracker();
         
         mycurrentstructure = {*dofmngr};
         mycurrentstructure[0].donotsynchronize();
@@ -109,7 +109,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
     
     if (mydofmanager->ismanaged())
     {
-        mymeshtracker = universe::mymesh->getmeshtracker();
+        myptracker = universe::mymesh->getptracker();
         
         mycurrentstructure = {*dofmngr};
         mycurrentstructure[0].donotsynchronize();
