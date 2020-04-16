@@ -1411,7 +1411,16 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
         case 3:
             return splitquadrangle(splitnum);
         case 4:
-            return splittetrahedron(splitnum, edgenumbers);
+        {
+            // Too slow to be called each time. Compute and store.
+            std::vector<std::vector<int>> splitdef;
+            if (universe::getsplitdefinition(splitdef, 4, splitnum, edgenumbers))
+                return splitdef;
+                
+            splitdef = splittetrahedron(splitnum, edgenumbers);
+            universe::setsplitdefinition(splitdef, 4, splitnum, edgenumbers);
+            return splitdef;
+        }
     }
 }
         

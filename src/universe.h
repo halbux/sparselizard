@@ -97,6 +97,13 @@ class universe
         // Keep the polynomials but reset the values:
         static void resethff(void);
         
+        
+        // Store element split definitions. splitdefinition[elementtypenumber][splitidentifier].
+        static std::vector< std::vector< std::vector<std::vector<int>> > > splitdefinition;
+        // Return true if available and false otherwise.
+        static bool getsplitdefinition(std::vector<std::vector<int>>& splitdef, int elementtypenumber, int splitnum, std::vector<int>& edgenumbers);
+        static void setsplitdefinition(std::vector<std::vector<int>>& splitdef, int elementtypenumber, int splitnum, std::vector<int>& edgenumbers);
+        
 };
 
 #endif

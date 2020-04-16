@@ -179,3 +179,31 @@ void universe::resethff(void)
     }
 }
 
+
+std::vector<std::vector<std::vector<std::vector<int>>>> universe::splitdefinition = std::vector<std::vector<std::vector<std::vector<int>>>>(8, std::vector<std::vector<std::vector<int>>>(0));
+
+bool universe::getsplitdefinition(std::vector<std::vector<int>>& splitdef, int elementtypenumber, int splitnum, std::vector<int>& edgenumbers)
+{
+    int ne = edgenumbers.size();
+    int numrel = myalgorithm::factorial(ne);
+    int rel = myalgorithm::identifyrelations(edgenumbers);
+    
+    if (splitdefinition[elementtypenumber].size() == 0 || splitdefinition[elementtypenumber][splitnum*numrel+rel].size() == 0)
+        return false;
+        
+    splitdef = splitdefinition[elementtypenumber][splitnum*numrel+rel];
+    return true;
+}
+
+void universe::setsplitdefinition(std::vector<std::vector<int>>& splitdef, int elementtypenumber, int splitnum, std::vector<int>& edgenumbers)
+{
+    int ne = edgenumbers.size();
+    int numrel = myalgorithm::factorial(ne);
+    int rel = myalgorithm::identifyrelations(edgenumbers);
+    
+    if (splitdefinition[elementtypenumber].size() == 0)
+        splitdefinition[elementtypenumber] = std::vector<std::vector<std::vector<int>>>(std::pow(2,ne)*numrel, std::vector<std::vector<int>>(0));
+    
+    splitdefinition[elementtypenumber][splitnum*numrel+rel] = splitdef;
+}
+
