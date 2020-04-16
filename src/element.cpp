@@ -1392,7 +1392,7 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
         return 2;
 }
 
-std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
+std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers)
 {
     if (gettypenumber() > 4)
     {
@@ -1407,7 +1407,7 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
         case 1:
             return splitline(splitnum);
         case 2:
-            return splittriangle(splitnum, edgenumbers, nodecoords);
+            return splittriangle(splitnum, edgenumbers);
         case 3:
             return splitquadrangle(splitnum);
         case 4:
@@ -1423,7 +1423,7 @@ std::vector<std::vector<int>> element::splitline(int splitnum)
         return {{},{0,2, 2,1},{},{},{},{},{},{}};
 }
         
-std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<int>& edgenumbers, std::vector<double>& nodecoords)
+std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<int>& edgenumbers)
 {
     switch (splitnum)
     {
@@ -1435,16 +1435,7 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
             return {{},{},{0,1,4, 0,4,2},{},{},{},{},{}};
         case 3:
         {
-            bool sel = (edgenumbers[2] < edgenumbers[1]);
-            if (nodecoords.size() > 0)
-            {
-                std::vector<double> refcoords = {1,0,0, 0,0.5,0, 0,0,0, 0.5,0.5,0};
-                std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
-                sel = false;
-                if (geotools::getdistance(0,1, calced) < geotools::getdistance(2,3, calced))
-                    sel = true;
-            }
-            if (sel)
+            if (edgenumbers[2] < edgenumbers[1])
                 return {{},{},{0,1,5, 5,1,4, 5,4,2},{},{},{},{},{}};
             else
                 return {{},{},{0,1,4, 0,4,5, 5,4,2},{},{},{},{},{}};
@@ -1453,32 +1444,14 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
             return {{},{},{0,3,2, 3,1,2},{},{},{},{},{}};
         case 5:
         {
-            bool sel = (edgenumbers[2] < edgenumbers[0]);
-            if (nodecoords.size() > 0)
-            {
-                std::vector<double> refcoords = {1,0,0, 0,0.5,0, 0.5,0,0, 0,1,0};
-                std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
-                sel = false;
-                if (geotools::getdistance(0,1, calced) < geotools::getdistance(2,3, calced))
-                    sel = true;
-            }
-            if (sel)
+            if (edgenumbers[2] < edgenumbers[0])
                 return {{},{},{0,3,5, 5,3,1, 5,1,2},{},{},{},{},{}};
             else
                 return {{},{},{0,3,5, 5,3,2, 3,1,2},{},{},{},{},{}};
         }
         case 6:
         {
-            bool sel = (edgenumbers[1] < edgenumbers[0]);
-            if (nodecoords.size() > 0)
-            {
-                std::vector<double> refcoords = {0,0,0, 0.5,0.5,0, 0.5,0,0, 0,1,0};
-                std::vector<double> calced = calculatecoordinates(refcoords, nodecoords);
-                sel = false;
-                if (geotools::getdistance(0,1, calced) < geotools::getdistance(2,3, calced))
-                    sel = true;
-            }
-            if (sel)
+            if (edgenumbers[1] < edgenumbers[0])
                 return {{},{},{0,3,4, 0,4,2, 3,1,4},{},{},{},{},{}};
             else
                 return {{},{},{0,3,2, 3,4,2, 3,1,4},{},{},{},{},{}};
@@ -1545,8 +1518,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
 
         std::vector<bool> iec = {isedgecut[ea], isedgecut[eb], isedgecut[ec]};
         std::vector<int> triedgenums = {edgenumbers[ea], edgenumbers[eb], edgenumbers[ec]};
-        std::vector<double> trinodecoords = {}; // Not needed
-        std::vector<std::vector<int>> trisplitdefinition = mytri.split(myalgorithm::binarytoint(iec), triedgenums, trinodecoords);
+        std::vector<std::vector<int>> trisplitdefinition = mytri.split(myalgorithm::binarytoint(iec), triedgenums);
         mytri.getsplitconnectivity(faceconnectivity[i], trisplitdefinition);
     }
     // Compute the tetrahedron node connectivity:
