@@ -54,7 +54,7 @@ int htracker::next(void)
             while (currentdepth > 0 && indexesinclusters[currentdepth] == numsubelems[parenttypes[currentdepth-1]])
                 currentdepth--;
         }
-        else
+        if (currentdepth == 0)
         {
             curtypeorigcountindex++;
             // Skip empty types:
