@@ -1,4 +1,5 @@
 #include "htracker.h"
+#include "lagrangeformfunction.h"
 
 
 htracker::htracker(std::vector<int> numelemspertype)
@@ -161,6 +162,26 @@ void htracker::gettype(std::vector<int>& types)
     }
 }
 
+std::vector<int> htracker::countintypes(void)
+{
+    std::vector<int> output(8,0);
+    
+    resetcursor();
+    
+    for (int i = 0; i < numleaves; i++)
+    {    
+        // Move to next leaf:
+        while (not(isatleaf()))
+            next();
+            
+        output[parenttypes[currentdepth]]++;
+        
+        next();
+    }
+    
+    return output;
+}
+
 void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedgenums)
 {
     // Calculate an upper bound for the size of the new 'splitdata' vector:
@@ -297,5 +318,78 @@ void htracker::print(void)
 int htracker::countbits(void)
 {
     return splitdata.size();
+}
+
+
+void htracker::getadaptedrefcoords(std::vector<std::vector<double>>& arc)
+{
+    std::vector<int> nit = countintypes();
+    std::vector<int> nn = {1,2,3,4,4,8,6,5}; // number of corner nodes
+
+    // Preallocate:
+    std::vector<element> els(8);
+    arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    std::vector<std::vector<double>> crc(8); // corner ref coords
+    for (int i = 0; i < 8; i++)
+    {
+        arc[i] = std::vector<double>(3*nn[i]*nit[i]);
+        els[i] = element(i);
+        lagrangeformfunction lff(i,1,{});
+        crc[i] = lff.getnodecoordinates();
+    }
+
+    // parentrc[depth][indexincluster]:
+    std::vector<std::vector<std::vector<double>>> parentrc(maxdepth+1, std::vector<std::vector<double>>(10));
+    
+    resetcursor();
+    
+    int ln = -1;
+    std::vector<int> iarc(8,0); // indexes in arc
+    while (true)
+    {
+        int t = parenttypes[currentdepth];
+        int ns = currentdepth;
+        int ic = indexesinclusters[currentdepth];
+    
+        if (ns == 0)
+            parentrc[0] = {crc[t]};
+    
+        if (isatleaf())
+        {
+            ln++;
+            
+            for (int i = 0; i < parentrc[ns][ic].size(); i++)
+                arc[t][iarc[t]+i] = parentrc[ns][ic][i];
+            iarc[t] += parentrc[ns][ic].size();
+            
+        
+            if (ln == numleaves-1)
+                break;
+            
+            next();
+        }
+        else
+        {
+            int throughedgenum = next();
+                    
+            std::vector<std::vector<double>> cornerrefcoords;
+            els[t].fullsplit(cornerrefcoords, throughedgenum);
+            
+            int ind = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < cornerrefcoords[i].size()/nn[i]/3; j++)
+                {
+                    std::vector<double> cc(3*nn[i]);
+                    for (int k = 0; k < cc.size(); k++)
+                        cc[k] = cornerrefcoords[i][j*3*nn[i]+k];
+                    
+                    parentrc[ns+1][ind] = els[t].calculatecoordinates(cc, parentrc[ns][ic]);
+
+                    ind++;
+                }
+            }
+        }
+    }
 }
 

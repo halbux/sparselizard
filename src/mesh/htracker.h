@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "element.h"
 
 class htracker
 {
@@ -75,6 +76,8 @@ class htracker
         void countsplits(std::vector<int>& numsplits);
         // Get the element type number of all leaves (modifies the cursor):
         void gettype(std::vector<int>& types);
+        // Count the number of elements of each type after adaptation (modifies the cursor):
+        std::vector<int> countintypes(void);
         
         // Group/keep/split (-1/0/1) the requested leaves. Leaves are grouped if at least one
         // is tagged for grouping and no other is split or tagged for splitting in the same cluster.
@@ -86,6 +89,10 @@ class htracker
         
         // Get length of 'splitdata' vector:
         int countbits(void);
+        
+        
+        // Get the reference coordinates in the original elements of the adapted elements corner nodes:
+        void getadaptedrefcoords(std::vector<std::vector<double>>& arc);
     
 };
 
