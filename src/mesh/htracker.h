@@ -90,8 +90,11 @@ class htracker
         // Get length of 'splitdata' vector:
         int countbits(void);
         
+        // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
+        void countsons(std::vector<int>& numsons);
         
-        // Get the reference coordinates in the original elements of the adapted elements corner nodes:
+        // Get the reference coordinates in the original elements of the adapted elements corner nodes.
+        // Data from lower original element index comes first.
         void getadaptedrefcoords(std::vector<std::vector<double>>& arc);
     
 };

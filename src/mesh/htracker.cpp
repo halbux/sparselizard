@@ -320,6 +320,35 @@ int htracker::countbits(void)
     return splitdata.size();
 }
 
+void htracker::countsons(std::vector<int>& numsons)
+{
+    int num = 0;
+    for (int i = 0; i < 8; i++)
+        num += originalcount[i];
+        
+    numsons = std::vector<int>(8*num,0);
+    
+    resetcursor();
+    
+    int ln = -1;
+    int index = -1;
+    while (true)
+    { 
+        if (currentdepth == 0)
+            index++;
+            
+        if (isatleaf())
+        {
+            ln++;
+            numsons[8*index+parenttypes[currentdepth]]++;
+        }
+        
+        if (ln == numleaves-1)
+            break;
+        
+        next();
+    }
+}
 
 void htracker::getadaptedrefcoords(std::vector<std::vector<double>>& arc)
 {
