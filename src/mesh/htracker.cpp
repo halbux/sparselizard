@@ -182,6 +182,50 @@ std::vector<int> htracker::countintypes(void)
     return output;
 }
 
+void htracker::fix(std::vector<int>& operations)
+{
+    // Number of grouping requests in a cluster:
+    std::vector<int> ngr(maxdepth+1);
+    
+    resetcursor();
+    
+    int ln = -1; // leaf number
+    
+    while (true)
+    {
+        int ns = currentdepth;
+        int ic = indexesinclusters[currentdepth];
+        
+        // Reset cluster info:
+        if (ic == 0)
+            ngr[ns] = 0;
+        
+        if (isatleaf())
+        {
+            ln++;
+            
+            if (operations[ln] == -1)
+            {
+                operations[ln] = 0;
+                ngr[ns]++;
+            }
+            
+            // Group the cluster if all have requested it:
+            if (ns > 0 && ngr[ns] == numsubelems[parenttypes[ns-1]])
+            {
+                // In this situation all leaves are consecutive:
+                for (int i = 0; i < numsubelems[parenttypes[ns-1]]; i++)
+                    operations[ln-i] = -1;
+            }
+        }
+        
+        if (ln == numleaves-1)
+            break;
+        
+        next();
+    }
+}
+
 void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedgenums)
 {
     // Calculate an upper bound for the size of the new 'splitdata' vector:
@@ -193,10 +237,8 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
     }
     std::vector<bool> newsplitdata(upperbound, false);
 
-    // Is any element split/tagged for splitting in the cluster?
-    std::vector<bool> isanysplit(maxdepth+1);
-    // Is any element tagged for grouping in the cluster?
-    std::vector<bool> isanygroup(maxdepth+1);
+    // Number of grouping requests in a cluster:
+    std::vector<int> ngr(maxdepth+1);
     
     resetcursor();
     
@@ -215,10 +257,7 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
         
         // Reset cluster info:
         if (ic == 0)
-        {
-            isanysplit[ns] = false;
-            isanygroup[ns] = false;
-        }
+            ngr[ns] = 0;
 
         // Write the throughedge number:
         if (cte != -1)
@@ -232,7 +271,6 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
         
         if (not(isatleaf()))
         {
-            isanysplit[ns] = true;
             newsplitdata[ni] = true;
             ni++;
         }
@@ -243,7 +281,6 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
             // Split:
             if (operations[ln] == 1)
             {
-                isanysplit[ns] = true;
                 newnumleaves += numsubelems[t]-1;
                 
                 newsplitdata[ni] = true;
@@ -259,12 +296,12 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
                 // Nothing to change for subelements (initialized at all false + group puts it to false anyways):
                 ni += numsubelems[t];
                 
-                if (newmaxdepth <= ns)
+                if (newmaxdepth < ns+1)
                     newmaxdepth = ns+1;
             }
             
             if (operations[ln] == -1)
-                isanygroup[ns] = true;
+                ngr[ns]++;
                 
             // Group/unchanged:
             if (operations[ln] < 1)
@@ -273,20 +310,19 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
                 ni++;
             }
             
-            // A cluster to group must always end with a leaf:
+            // Group the cluster if all have requested it:
             if (ns > 0 && ic == numsubelems[parenttypes[ns-1]]-1)
             {
-                // Group the cluster (if allowed):
                 int md = ns;
-                if (not(isanysplit[ns]) && isanygroup[ns])
+                if (ngr[ns] == numsubelems[parenttypes[ns-1]])
                 {
+                    md--;
                     int pt = parenttypes[ns-1];
                     newnumleaves -= numsubelems[pt]-1;
                     ni -= numsubelems[pt];
                     if (pt == 4)
                         ni -= 2;
                     newsplitdata[ni-1] = false;
-                    md--;
                 }
                 if (newmaxdepth < md)
                     newmaxdepth = md;

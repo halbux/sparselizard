@@ -79,8 +79,11 @@ class htracker
         // Count the number of elements of each type after adaptation (modifies the cursor):
         std::vector<int> countintypes(void);
         
-        // Group/keep/split (-1/0/1) the requested leaves. Leaves are grouped if at least one
-        // is tagged for grouping and no other is split or tagged for splitting in the same cluster.
+        // Update the operations to how they will actually be treated (this removes individual grouping requests):
+        void fix(std::vector<int>& operations);
+        
+        // Group/keep/split (-1/0/1) the requested leaves. Leaves are grouped if all
+        // leaves in the cluster are tagged for grouping and none is already split.
         // The argument vectors must have a size equal to the number of leaves.
         void adapt(std::vector<int>& operations, std::vector<int>& throughedgenums);
         
