@@ -175,7 +175,7 @@ void elements::populatecellsatedges(void)
     // Get the number of edges:
     int numedges = count(1);
     // Get the number of cells of each type and the number of edges in each cell:
-    std::vector<int> numcells(8);
+    std::vector<int> numcells(8,0);
     std::vector<int> ne(8);
     int prealloc = 0;
     for (int i = 0; i < 8; i++)
