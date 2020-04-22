@@ -77,6 +77,13 @@ class elements
         std::vector<int> edgesatnodes = {};
         // Create the two vectors above:
         void populateedgesatnodes(void);
+        
+        // Entries in 'cellsatedges' from index 'adresscellsatedges[i]' to 'adresscellsatedges[i+1]-1' are all cells 
+        // (highest dimension elements) touching edge i and their type number in format {type0,cell0,type1,...}.
+        std::vector<int> adresscellsatedges = {};
+        std::vector<int> cellsatedges = {};
+        // Create the two vectors above:
+        void populatecellsatedges(void);
 
     public:
         
@@ -109,6 +116,10 @@ class elements
         // For curvature nodes an empty vector is returned. 
         int countedgesonnode(int nodenumber);
         std::vector<int> getedgesonnode(int nodenumber);
+        // Get a vector containing all cells (highest dimension elements)
+        // touching edge 'edgenumber'. Format is {type0,cell0,type1,...}.
+        int countcellsonedge(int edgenumber);
+        std::vector<int> getcellsonedge(int edgenumber);
         
         // Get the x, y or z coordinate of all nodes in the element 
         // (for xyz respectively set to 0, 1 or 2).
@@ -128,6 +139,9 @@ class elements
         
         // Get the normal (not normed) to a straight face element:
         std::vector<double> getnormal(int elementtypenumber, int elementnumber);
+        
+        // Get the highest element dimension available:
+        int getdimension(void);
         
         // Print elements data for debug:
         void printnumber(void);

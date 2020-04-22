@@ -168,6 +168,88 @@ std::vector<int> elements::getedgesonnode(int nodenumber)
     return output;
 }
 
+void elements::populatecellsatedges(void)
+{
+    int celldim = getdimension();
+
+    // Get the number of edges:
+    int numedges = count(1);
+    // Get the number of cells of each type and the number of edges in each cell:
+    std::vector<int> numcells(8);
+    std::vector<int> ne(8);
+    int prealloc = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        element myelem(i);
+        if (myelem.getelementdimension() == celldim)
+        {
+            numcells[i] = count(i);
+            ne[i] = myelem.countedges();
+            prealloc += numcells[i]*ne[i];   
+        }
+    }
+
+
+    // Preallocate vectors:
+    adresscellsatedges = std::vector<int>(numedges,0);
+    cellsatedges = std::vector<int>(2*prealloc);
+
+
+    // Vector to count the number of cells touching every edge:
+    std::vector<int> numcellsonedge(numedges,0);
+
+    // Loop on all cells:
+    for (int i = 0; i < 8; i++)
+    {
+        for (int c = 0; c < numcells[i]; c++)
+        {
+            for (int e = 0; e < ne[i]; e++)
+                numcellsonedge[subelementsinelements[i][1][c*ne[i]+e]]++;
+        }
+    }
+
+    for (int e = 1; e < numedges; e++)
+        adresscellsatedges[e] = adresscellsatedges[e-1] + 2*numcellsonedge[e-1];
+
+    std::vector<int> currentcellinedge(numedges,0); 
+    for (int i = 0; i < 8; i++)
+    {
+        for (int c = 0; c < numcells[i]; c++)
+        {
+            for (int e = 0; e < ne[i]; e++)
+            {
+                int curedge = subelementsinelements[i][1][c*ne[i]+e];
+                cellsatedges[adresscellsatedges[curedge]+2*currentcellinedge[curedge]+0] = i;
+                cellsatedges[adresscellsatedges[curedge]+2*currentcellinedge[curedge]+1] = c;
+                
+                currentcellinedge[curedge]++;
+            }
+        }
+    }
+}
+
+int elements::countcellsonedge(int edgenumber)
+{
+    if (cellsatedges.size() == 0)
+        populatecellsatedges();
+
+    if (edgenumber+1 < adresscellsatedges.size())
+        return (adresscellsatedges[edgenumber+1]-adresscellsatedges[edgenumber])/2;
+    else
+        return (cellsatedges.size()-adresscellsatedges[edgenumber])/2;
+}
+
+std::vector<int> elements::getcellsonedge(int edgenumber)
+{
+    int numcellsatedge = countcellsonedge(edgenumber);
+
+    std::vector<int> output(2*numcellsatedge);
+    for (int i = 0; i < 2*numcellsatedge; i++)
+        output[i] = cellsatedges[adresscellsatedges[edgenumber]+i];
+
+    return output;
+}
+
 std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elementnumber, int xyz)
 {
     std::vector<double>* nodecoordinates = mynodes->getcoordinates();
@@ -300,6 +382,18 @@ std::vector<double> elements::getnormal(int elementtypenumber, int elementnumber
     std::vector<double> crossprod = {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]};
     
     return crossprod;
+}
+
+int elements::getdimension(void)
+{
+    int maxi = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        if (count(i) > 0)
+            maxi = i;
+    }
+    element elem(maxi);
+    return elem.getelementdimension();
 }
 
 void elements::printnumber(void)
@@ -645,6 +739,9 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     
     adressedgesatnodes = {};
     edgesatnodes = {};
+    
+    adresscellsatedges = {};
+    cellsatedges = {};
 }
 
 void elements::explode(void)
