@@ -47,6 +47,12 @@ class htracker
         int curtypeorigcountindex = -1;
         std::vector<int> parenttypes = {};
         std::vector<int> indexesinclusters = {};
+
+        // Get the reference and real corner node coordinates of all elements after adaptation (no transition elements added).
+        // 'oc' are the original element coordinates (possible including the curvature nodes).
+        // 'curvatureorder' is the curvature order in 'oc' only.
+        void getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac);
+        
         
     public:
 
@@ -84,6 +90,7 @@ class htracker
         
         // Group/keep/split (-1/0/1) the requested leaves. Leaves are grouped if all
         // leaves in the cluster are tagged for grouping and none is already split.
+        // NEIGBOUR ELEMENTS CANNOT DIFFER BY MORE THAN ONE SPLIT LEVEL.
         // The argument vectors must have a size equal to the number of leaves.
         void adapt(std::vector<int>& operations, std::vector<int>& throughedgenums);
         
@@ -96,9 +103,8 @@ class htracker
         // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
         void countsons(std::vector<int>& numsons);
         
-        // Get the reference coordinates in the original elements of the adapted elements corner nodes.
-        // Data from lower original element index comes first.
-        void getadaptedrefcoords(std::vector<std::vector<double>>& arc);
+        // Get the node coordinates 'ac' of all elements after adaptation based on the original elements coordinates 'oc':
+        void getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold);
     
 };
 

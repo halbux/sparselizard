@@ -1,4 +1,5 @@
 #include "htracker.h"
+#include "myalgorithm.h"
 #include "lagrangeformfunction.h"
 
 
@@ -386,25 +387,34 @@ void htracker::countsons(std::vector<int>& numsons)
     }
 }
 
-void htracker::getadaptedrefcoords(std::vector<std::vector<double>>& arc)
+void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
 {
     std::vector<int> nit = countintypes();
-    std::vector<int> nn = {1,2,3,4,4,8,6,5}; // number of corner nodes
+    std::vector<int> nn(8); // number of corner nodes
+    std::vector<int> ncn(8); // number of corner nodes
 
     // Preallocate:
     std::vector<element> els(8);
     arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
     std::vector<std::vector<double>> crc(8); // corner ref coords
     for (int i = 0; i < 8; i++)
     {
-        arc[i] = std::vector<double>(3*nn[i]*nit[i]);
         els[i] = element(i);
+        nn[i] = els[i].countnodes();
+        element curvedel(i,curvatureorder);
+        ncn[i] = curvedel.countcurvednodes();
+        
+        arc[i] = std::vector<double>(3*nn[i]*nit[i]);
+        ac[i] = std::vector<double>(3*nn[i]*nit[i]);
         lagrangeformfunction lff(i,1,{});
         crc[i] = lff.getnodecoordinates();
     }
 
     // parentrc[depth][indexincluster]:
     std::vector<std::vector<std::vector<double>>> parentrc(maxdepth+1, std::vector<std::vector<double>>(10));
+    
+    std::vector<double> originalelemcoords;
     
     resetcursor();
     
@@ -417,14 +427,28 @@ void htracker::getadaptedrefcoords(std::vector<std::vector<double>>& arc)
         int ic = indexesinclusters[currentdepth];
     
         if (ns == 0)
+        {
             parentrc[0] = {crc[t]};
+            originalelemcoords = std::vector<double>(3*nn[t]);
+            for (int i = 0; i < 3*nn[t]; i++)
+                originalelemcoords[i] = oc[t][curtypeorigcountindex*3*ncn[t]+i];
+        }
     
         if (isatleaf())
         {
             ln++;
             
+            std::vector<double> realcoords;
+            if (ns == 0)
+                realcoords = originalelemcoords;
+            else
+                realcoords = els[parenttypes[0]].calculatecoordinates(parentrc[ns][ic], originalelemcoords);
+            
             for (int i = 0; i < parentrc[ns][ic].size(); i++)
+            {
                 arc[t][iarc[t]+i] = parentrc[ns][ic][i];
+                ac[t][iarc[t]+i] = realcoords[i];
+            }
             iarc[t] += parentrc[ns][ic].size();
             
         
@@ -456,5 +480,211 @@ void htracker::getadaptedrefcoords(std::vector<std::vector<double>>& arc)
             }
         }
     }
+}
+
+void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold)
+{
+    std::vector<int> nn(8);
+    std::vector<int> ncn(8);
+    std::vector<int> ne(8);
+    std::vector<element> straightelements(8);
+    std::vector<element> curvedelements(8);
+    std::vector<std::vector<double>> curvedcoords(8);
+    for (int i = 0; i < 8; i++)
+    {
+        straightelements[i] = element(i);
+        curvedelements[i] = element(i,curvatureorder);
+        nn[i] = curvedelements[i].countnodes();
+        ncn[i] = curvedelements[i].countcurvednodes();
+        ne[i] = curvedelements[i].countedges();
+        lagrangeformfunction lff(i,curvatureorder,{});
+        curvedcoords[i] = lff.getnodecoordinates();
+    }
+
+    // Get the reference ('arc') and real ('ac') element corner coordinates after all fullsplit adaptation:
+    std::vector<std::vector<double>> cornerac;
+    std::vector<std::vector<double>> cornerarc;
+    getadapted(curvatureorder, oc, cornerarc, cornerac);
+    
+    // Compute the barycenter coordinates of all nodes and edges (first edges then nodes):
+    int numnodes = 0, numedges = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        numnodes += cornerac[i].size()/3;
+        numedges += ne[i]*cornerac[i].size()/nn[i]/3;
+    }
+    std::vector<double> barys(3*numedges+3*numnodes);
+
+    int ce = 0, cn = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        element el(i);
+        std::vector<int> edgenodedef = el.getedgesdefinitionsbasedonnodes();
+    
+        int num = cornerac[i].size()/nn[i]/3;
+        for (int j = 0; j < num; j++)
+        {
+            for (int e = 0; e < ne[i]; e++)
+            {
+                int na = edgenodedef[2*e+0];
+                int nb = edgenodedef[2*e+1];
+                
+                barys[3*ce+0] = 0.5*(cornerac[i][3*nn[i]*j+3*na+0] + cornerac[i][3*nn[i]*j+3*nb+0]);
+                barys[3*ce+1] = 0.5*(cornerac[i][3*nn[i]*j+3*na+1] + cornerac[i][3*nn[i]*j+3*nb+1]);
+                barys[3*ce+2] = 0.5*(cornerac[i][3*nn[i]*j+3*na+2] + cornerac[i][3*nn[i]*j+3*nb+2]);
+                
+                ce++;
+            }
+            for (int e = 0; e < nn[i]; e++)
+            {
+                barys[3*numedges+3*cn+0] = cornerac[i][3*nn[i]*j+3*e+0];
+                barys[3*numedges+3*cn+1] = cornerac[i][3*nn[i]*j+3*e+1];
+                barys[3*numedges+3*cn+2] = cornerac[i][3*nn[i]*j+3*e+2];
+                
+                cn++;
+            }
+        }
+    }
+    
+    
+    // Sort the barycenter coordinates:
+    std::vector<double> sortedbarys(barys.size());
+    std::vector<int> reorderingvector;
+    myalgorithm::stablecoordinatesort(noisethreshold, barys, reorderingvector);
+    for (int i = 0; i < reorderingvector.size(); i++)
+    {
+        sortedbarys[3*i+0] = barys[3*reorderingvector[i]+0];
+        sortedbarys[3*i+1] = barys[3*reorderingvector[i]+1];
+        sortedbarys[3*i+2] = barys[3*reorderingvector[i]+2];
+    }
+    std::vector<int> renum(reorderingvector.size());
+    for (int i = 0; i < reorderingvector.size(); i++)
+        renum[reorderingvector[i]] = i;
+    
+    // Remove duplicated barycenters:
+    std::vector<int> renumberingvector;
+    int numunique = myalgorithm::removeduplicatedcoordinates(noisethreshold, sortedbarys, renumberingvector);
+    
+    
+    // Assign a unique edge number for each edge:
+    std::vector<int> edgenumbers(numedges);
+    for (int i = 0; i < numedges; i++)
+        edgenumbers[i] = renumberingvector[renum[i]];
+    
+    // Calculate which edges must be split:
+    std::vector<bool> isanodeatnum(numedges+numnodes,false);
+    for (int i = 0; i < numnodes; i++)
+        isanodeatnum[renumberingvector[renum[numedges+i]]] = true;
+
+    std::vector<bool> isedgesplit(numedges,false);
+    for (int i = 0; i < numedges; i++)
+    {
+        if (isanodeatnum[edgenumbers[i]])
+            isedgesplit[i] = true;
+    }
+    
+    
+    // Split the transition elements:
+    std::vector<int> numsons;
+    countsons(numsons);
+    
+    ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    // No-transition size:
+    std::vector<int> nts(8,0);
+    for (int i = 0; i < 8; i++)
+        nts[i] = ncn[i] * cornerarc[i].size()/nn[i];
+    // Preallocate to an upper bound:
+    ac[1] = std::vector<double>(nts[1]);
+    ac[2] = std::vector<double>(4*nts[2]+3*nts[3]); // NO: ASK FOR ELEMENT OBJECT TO GIVE THAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ac[3] = std::vector<double>(4*nts[3]);
+    ac[4] = std::vector<double>(8*nts[4]);
+    // Undefined for other elements for now:
+    ac[5] = std::vector<double>(0);
+    ac[6] = std::vector<double>(0);
+    ac[7] = std::vector<double>(0);
+        
+    
+    int origelemindex = 0;
+    std::vector<int> indexincoords(8,0); // index in working element
+    std::vector<int> indexintransitioncoords(8,0); // index in working element
+    std::vector<int> firstedge(8,0); // first edge in working element
+    for (int i = 0; i < 7; i++)
+        firstedge[i+1] = firstedge[i] + ne[i] * cornerarc[i].size()/nn[i]/3;
+    // Loop on all original elements:
+    for (int i = 0; i < 8; i++)
+    {
+        for (int oe = 0; oe < originalcount[i]; oe++)
+        {
+            // Get the coordinates of the current original element:
+            std::vector<double> origcoords(3*ncn[i]);
+            for (int j = 0; j < 3*ncn[i]; j++)
+                origcoords[j] = oc[i][3*ncn[i]*oe+j];
+        
+            // Loop on all elements types in the fullsplit-subelements of the original element:
+            for (int j = 0; j < 8; j++)
+            {
+                for (int e = 0; e < numsons[8*origelemindex+j]; e++)
+                {
+                    // Get the corner ref. coords. of the current subelement:
+                    std::vector<double> currefcoords(3*nn[j]);
+                    for (int k = 0; k < 3*nn[j]; k++)
+                        currefcoords[k] = cornerarc[j][indexincoords[j]+k];
+                    indexincoords[j] += 3*nn[j];
+                    
+                    // Get the edge numbers and edge splits for the current subelement:
+                    std::vector<int> curedgenums(ne[j]);
+                    std::vector<bool> curisedgesplit(ne[j]);
+                    for (int k = 0; k < ne[j]; k++)
+                    {
+                        curedgenums[k] = edgenumbers[firstedge[j]+k];
+                        curisedgesplit[k] = isedgesplit[firstedge[j]+k];
+                    }
+                    
+                    int splitnum = myalgorithm::binarytoint(curisedgesplit);
+                    std::vector<std::vector<int>> splitrefnums = straightelements[j].split(splitnum, curedgenums);
+                  
+                    // Loop on all subelements in the transition element:
+                    for (int si = 0; si < 8; si++)
+                    {
+                        std::vector<double> splitrefcoords;
+                        straightelements[j].numstorefcoords(splitrefnums[si], splitrefcoords);
+                    
+                        for (int se = 0; se < splitrefcoords.size()/nn[si]/3; se++)
+                        {
+                            // Get the ref. coords. of the current transition-subelement:
+                            std::vector<double> curcoords(3*nn[si]);
+                            for (int k = 0; k < 3*nn[si]; k++)
+                                curcoords[k] = splitrefcoords[se*nn[si]*3+k];
+                    
+                            // Bring inside the untransitioned element (if split at all):
+                            if (splitnum == 0)
+                                curcoords = currefcoords;
+                            else
+                                curcoords = straightelements[j].calculatecoordinates(curcoords, currefcoords);
+                            
+                            // Make curved:
+                            if (curvatureorder > 1)
+                                curcoords = straightelements[si].calculatecoordinates(curvedcoords[si], curcoords);
+                                
+                            // Calculate actual coordinates: 
+                            curcoords = curvedelements[i].calculatecoordinates(curcoords, origcoords);
+
+                            for (int k = 0; k < curcoords.size(); k++)
+                                ac[si][indexintransitioncoords[si]+k] = curcoords[k];
+                                
+                            indexintransitioncoords[si] += curcoords.size();
+                        }
+                    }
+                    firstedge[j] += ne[j];
+                }
+            }
+            origelemindex++;
+        }
+    }
+    
+    // Fit to size:
+    for (int i = 0; i < 8; i++)
+        ac[i].resize(indexintransitioncoords[i]);
+    
 }
 
