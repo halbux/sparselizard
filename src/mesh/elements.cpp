@@ -204,7 +204,7 @@ void elements::populatecellsatedges(void)
         for (int c = 0; c < numcells[i]; c++)
         {
             for (int e = 0; e < ne[i]; e++)
-                numcellsonedge[subelementsinelements[i][1][c*ne[i]+e]]++;
+                numcellsonedge[getsubelement(1,i,c,e)]++;
         }
     }
 
@@ -218,7 +218,7 @@ void elements::populatecellsatedges(void)
         {
             for (int e = 0; e < ne[i]; e++)
             {
-                int curedge = subelementsinelements[i][1][c*ne[i]+e];
+                int curedge = getsubelement(1,i,c,e);
                 cellsatedges[adresscellsatedges[curedge]+2*currentcellinedge[curedge]+0] = i;
                 cellsatedges[adresscellsatedges[curedge]+2*currentcellinedge[curedge]+1] = c;
                 
