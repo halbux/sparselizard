@@ -1144,11 +1144,12 @@ int element::deducetypenumber(int elemdim, int numnodes)
     }
 }
 
-std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords)
+std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int firstindex)
 {
-    if (mypolynomials.count() > 0)
+    int numpolys = mypolynomials.count();
+    if (numpolys > 0)
     {
-        int numnodes = nodecoords.size()/3;
+        int numnodes = numpolys;
         int numrefs = refcoords.size()/3;
         
         std::vector<double> sf, evaluationpoint;
@@ -1162,9 +1163,9 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
 
             for (int c = 0; c < numnodes; c++)
             {
-                output[3*i+0] += nodecoords[3*c+0] * sf[c];
-                output[3*i+1] += nodecoords[3*c+1] * sf[c];
-                output[3*i+2] += nodecoords[3*c+2] * sf[c];
+                output[3*i+0] += nodecoords[firstindex + 3*c+0] * sf[c];
+                output[3*i+1] += nodecoords[firstindex + 3*c+1] * sf[c];
+                output[3*i+2] += nodecoords[firstindex + 3*c+2] * sf[c];
             }
         }
         return output;
@@ -1173,7 +1174,7 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     {
         lagrangeformfunction lff(gettypenumber(), getcurvatureorder(), {});
         mypolynomials = polynomials(lff.getformfunctionpolynomials());
-        return calculatecoordinates(refcoords, nodecoords);
+        return calculatecoordinates(refcoords, nodecoords, firstindex);
     }
 }
 

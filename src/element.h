@@ -391,7 +391,8 @@ class element
         int deducetypenumber(int elemdim, int numnodes);
         
         // Calculate the physical coordinates corresponding to a set of reference coordinates.
-        std::vector<double> calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords);
+        // The coordinates in 'nodecoords' are taken from index 'firstindex' and following. 
+        std::vector<double> calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int firstindex = 0);
         
         // Count the number of elements of each type in the n times full-split element:
         std::vector<int> fullsplitcount(int n);
