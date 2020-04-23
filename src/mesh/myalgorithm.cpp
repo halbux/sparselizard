@@ -939,7 +939,7 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         edgenumbers[i] = renumberingvector[renum[i]];
     
     // Calculate which edges must be split:
-    std::vector<bool> isanodeatnum(numedges+numnodes,false);
+    std::vector<bool> isanodeatnum(numunique,false);
     for (int i = 0; i < numnodes; i++)
         isanodeatnum[renumberingvector[renum[numedges+i]]] = true;
 
