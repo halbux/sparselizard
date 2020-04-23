@@ -50,9 +50,8 @@ class htracker
 
         // Get the reference and real corner node coordinates of all elements after adaptation (no transition elements added).
         // 'oc' are the original element coordinates (possible including the curvature nodes).
-        // 'curvatureorder' is the curvature order in 'oc' only.
-        void getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac);
-        
+        void getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums);
+        // 'curvatureorder' is the curvature order in 'oc' only. After return 'leafnums' holds the leaf number of every adapted element.
         
     public:
 
@@ -103,8 +102,9 @@ class htracker
         // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
         void countsons(std::vector<int>& numsons);
         
-        // Get the node coordinates 'ac' of all elements after adaptation based on the original elements coordinates 'oc':
-        void getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold);
+        // Get the node coordinates 'ac' of all elements after adaptation based on the original elements coordinates 'oc'.
+        // The parent number of each transition element is provided in 'leafnums' after execution.
+        void getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold);
     
 };
 

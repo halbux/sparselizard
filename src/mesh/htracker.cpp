@@ -387,7 +387,7 @@ void htracker::countsons(std::vector<int>& numsons)
     }
 }
 
-void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
+void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums)
 {
     std::vector<int> nit = countintypes();
     std::vector<int> nn(8); // number of corner nodes
@@ -397,6 +397,7 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
     std::vector<element> els(8);
     arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    leafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
     std::vector<std::vector<double>> crc(8); // corner ref coords
     for (int i = 0; i < 8; i++)
     {
@@ -407,6 +408,7 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
         
         arc[i] = std::vector<double>(3*nn[i]*nit[i]);
         ac[i] = std::vector<double>(3*nn[i]*nit[i]);
+        leafnums[i] = std::vector<int>(nit[i]);
         lagrangeformfunction lff(i,1,{});
         crc[i] = lff.getnodecoordinates();
     }
@@ -451,6 +453,7 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
             }
             iarc[t] += parentrc[ns][ic].size();
             
+            leafnums[t][iarc[t]/3/nn[t]] = ln;
         
             if (ln == numleaves-1)
                 break;
@@ -482,7 +485,7 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
     }
 }
 
-void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold)
+void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
 {
     std::vector<int> nn(8);
     std::vector<int> ncn(8);
@@ -504,7 +507,8 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     // Get the reference ('arc') and real ('ac') element corner coordinates after all fullsplit adaptation:
     std::vector<std::vector<double>> cornerac;
     std::vector<std::vector<double>> cornerarc;
-    getadapted(curvatureorder, oc, cornerarc, cornerac);
+    std::vector<std::vector<int>> lnums;
+    getadapted(curvatureorder, oc, cornerarc, cornerac, lnums);
     
     // Compute the barycenter coordinates of all nodes and edges (first edges then nodes):
     int numnodes = 0, numedges = 0;
@@ -589,6 +593,7 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     countsons(numsons);
     
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    leafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
     // No-transition size:
     std::vector<int> nts(8,0);
     for (int i = 0; i < 8; i++)
@@ -602,7 +607,9 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     ac[5] = std::vector<double>(0);
     ac[6] = std::vector<double>(0);
     ac[7] = std::vector<double>(0);
-        
+    
+    for (int i = 0; i < 8; i++)
+        leafnums[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
     
     int origelemindex = 0;
     std::vector<int> indexincoords(8,0); // index in working element
@@ -672,6 +679,8 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
                             for (int k = 0; k < curcoords.size(); k++)
                                 ac[si][indexintransitioncoords[si]+k] = curcoords[k];
                                 
+                            leafnums[si][indexintransitioncoords[si]/ncn[si]/3] = lnums[j][indexincoords[j]/3/nn[j]];
+                            
                             indexintransitioncoords[si] += curcoords.size();
                         }
                     }
@@ -684,7 +693,9 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     
     // Fit to size:
     for (int i = 0; i < 8; i++)
+    {
         ac[i].resize(indexintransitioncoords[i]);
-    
+        leafnums[i].resize(indexintransitioncoords[i]/ncn[i]/3);
+    }
 }
 
