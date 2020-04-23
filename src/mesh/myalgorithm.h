@@ -13,6 +13,7 @@
 #include <cmath>
 #include <tuple>
 #include <algorithm>
+#include "element.h"
 #include "polynomial.h"
 #include "polynomials.h"
 #include "coordinategroup.h"
@@ -110,6 +111,13 @@ namespace myalgorithm
     
     // Factorial of positive integers or zero:
     int factorial(int n);
+    
+    // Provide the corner coordinates of each element concatenated ineach element type.
+    // This function returns (flattened from lowest type to highest) the edge number of
+    // each edge in an element as well as a bool whose value is true if the edge barycenter
+    // is close enough (according to 'noisethreshold') to any node in the corner coordinates.
+    void assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode, std::vector<double> noisethreshold);
+    
 };
 
 #endif

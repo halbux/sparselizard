@@ -451,9 +451,9 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
                 arc[t][iarc[t]+i] = parentrc[ns][ic][i];
                 ac[t][iarc[t]+i] = realcoords[i];
             }
-            iarc[t] += parentrc[ns][ic].size();
-            
             leafnums[t][iarc[t]/3/nn[t]] = ln;
+            
+            iarc[t] += parentrc[ns][ic].size();
         
             if (ln == numleaves-1)
                 break;
@@ -510,82 +510,10 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     std::vector<std::vector<int>> lnums;
     getadapted(curvatureorder, oc, cornerarc, cornerac, lnums);
     
-    // Compute the barycenter coordinates of all nodes and edges (first edges then nodes):
-    int numnodes = 0, numedges = 0;
-    for (int i = 0; i < 8; i++)
-    {
-        numnodes += cornerac[i].size()/3;
-        numedges += ne[i]*cornerac[i].size()/nn[i]/3;
-    }
-    std::vector<double> barys(3*numedges+3*numnodes);
 
-    int ce = 0, cn = 0;
-    for (int i = 0; i < 8; i++)
-    {
-        element el(i);
-        std::vector<int> edgenodedef = el.getedgesdefinitionsbasedonnodes();
-    
-        int num = cornerac[i].size()/nn[i]/3;
-        for (int j = 0; j < num; j++)
-        {
-            for (int e = 0; e < ne[i]; e++)
-            {
-                int na = edgenodedef[2*e+0];
-                int nb = edgenodedef[2*e+1];
-                
-                barys[3*ce+0] = 0.5*(cornerac[i][3*nn[i]*j+3*na+0] + cornerac[i][3*nn[i]*j+3*nb+0]);
-                barys[3*ce+1] = 0.5*(cornerac[i][3*nn[i]*j+3*na+1] + cornerac[i][3*nn[i]*j+3*nb+1]);
-                barys[3*ce+2] = 0.5*(cornerac[i][3*nn[i]*j+3*na+2] + cornerac[i][3*nn[i]*j+3*nb+2]);
-                
-                ce++;
-            }
-            for (int e = 0; e < nn[i]; e++)
-            {
-                barys[3*numedges+3*cn+0] = cornerac[i][3*nn[i]*j+3*e+0];
-                barys[3*numedges+3*cn+1] = cornerac[i][3*nn[i]*j+3*e+1];
-                barys[3*numedges+3*cn+2] = cornerac[i][3*nn[i]*j+3*e+2];
-                
-                cn++;
-            }
-        }
-    }
-    
-    
-    // Sort the barycenter coordinates:
-    std::vector<double> sortedbarys(barys.size());
-    std::vector<int> reorderingvector;
-    myalgorithm::stablecoordinatesort(noisethreshold, barys, reorderingvector);
-    for (int i = 0; i < reorderingvector.size(); i++)
-    {
-        sortedbarys[3*i+0] = barys[3*reorderingvector[i]+0];
-        sortedbarys[3*i+1] = barys[3*reorderingvector[i]+1];
-        sortedbarys[3*i+2] = barys[3*reorderingvector[i]+2];
-    }
-    std::vector<int> renum(reorderingvector.size());
-    for (int i = 0; i < reorderingvector.size(); i++)
-        renum[reorderingvector[i]] = i;
-    
-    // Remove duplicated barycenters:
-    std::vector<int> renumberingvector;
-    int numunique = myalgorithm::removeduplicatedcoordinates(noisethreshold, sortedbarys, renumberingvector);
-    
-    
-    // Assign a unique edge number for each edge:
-    std::vector<int> edgenumbers(numedges);
-    for (int i = 0; i < numedges; i++)
-        edgenumbers[i] = renumberingvector[renum[i]];
-    
-    // Calculate which edges must be split:
-    std::vector<bool> isanodeatnum(numedges+numnodes,false);
-    for (int i = 0; i < numnodes; i++)
-        isanodeatnum[renumberingvector[renum[numedges+i]]] = true;
-
-    std::vector<bool> isedgesplit(numedges,false);
-    for (int i = 0; i < numedges; i++)
-    {
-        if (isanodeatnum[edgenumbers[i]])
-            isedgesplit[i] = true;
-    }
+std::vector<int> edgenumbers;
+std:vector<bool> isedgesplit;
+myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshold);
     
     
     // Split the transition elements:

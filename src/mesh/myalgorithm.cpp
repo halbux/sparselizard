@@ -865,3 +865,89 @@ int myalgorithm::factorial(int n)
     return out;
 }
 
+void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode, std::vector<double> noisethreshold)
+{
+    std::vector<int> nn(8), ne(8);
+    for (int i = 0; i < 8; i++)
+    {
+        element myelement(i);
+        nn[i] = myelement.countnodes();
+        ne[i] = myelement.countedges();
+    }
+
+    // Compute the barycenter coordinates of all nodes and edges (first the edges then the nodes):
+    int numnodes = 0, numedges = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        numnodes += cornercoords[i].size()/3;
+        numedges += ne[i]*cornercoords[i].size()/nn[i]/3;
+    }
+    std::vector<double> barys(3*numedges + 3*numnodes);
+
+    int ce = 0, cn = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        element myelement(i);
+        std::vector<int> edgenodedef = myelement.getedgesdefinitionsbasedonnodes();
+    
+        int num = cornercoords[i].size()/nn[i]/3;
+        for (int j = 0; j < num; j++)
+        {
+            for (int e = 0; e < ne[i]; e++)
+            {
+                int na = edgenodedef[2*e+0];
+                int nb = edgenodedef[2*e+1];
+                
+                barys[3*ce+0] = 0.5*(cornercoords[i][3*nn[i]*j+3*na+0] + cornercoords[i][3*nn[i]*j+3*nb+0]);
+                barys[3*ce+1] = 0.5*(cornercoords[i][3*nn[i]*j+3*na+1] + cornercoords[i][3*nn[i]*j+3*nb+1]);
+                barys[3*ce+2] = 0.5*(cornercoords[i][3*nn[i]*j+3*na+2] + cornercoords[i][3*nn[i]*j+3*nb+2]);
+                
+                ce++;
+            }
+            for (int e = 0; e < nn[i]; e++)
+            {
+                barys[3*numedges+3*cn+0] = cornercoords[i][3*nn[i]*j+3*e+0];
+                barys[3*numedges+3*cn+1] = cornercoords[i][3*nn[i]*j+3*e+1];
+                barys[3*numedges+3*cn+2] = cornercoords[i][3*nn[i]*j+3*e+2];
+                
+                cn++;
+            }
+        }
+    }
+    
+    // Sort the barycenter coordinates:
+    std::vector<double> sortedbarys(barys.size());
+    std::vector<int> reorderingvector;
+    stablecoordinatesort(noisethreshold, barys, reorderingvector);
+    for (int i = 0; i < reorderingvector.size(); i++)
+    {
+        sortedbarys[3*i+0] = barys[3*reorderingvector[i]+0];
+        sortedbarys[3*i+1] = barys[3*reorderingvector[i]+1];
+        sortedbarys[3*i+2] = barys[3*reorderingvector[i]+2];
+    }
+    std::vector<int> renum(reorderingvector.size());
+    for (int i = 0; i < reorderingvector.size(); i++)
+        renum[reorderingvector[i]] = i;
+    
+    // Remove duplicated barycenters:
+    std::vector<int> renumberingvector;
+    int numunique = removeduplicatedcoordinates(noisethreshold, sortedbarys, renumberingvector);
+    
+    // Assign a unique edge number for each edge:
+    edgenumbers = std::vector<int>(numedges);
+    for (int i = 0; i < numedges; i++)
+        edgenumbers[i] = renumberingvector[renum[i]];
+    
+    // Calculate which edges must be split:
+    std::vector<bool> isanodeatnum(numedges+numnodes,false);
+    for (int i = 0; i < numnodes; i++)
+        isanodeatnum[renumberingvector[renum[numedges+i]]] = true;
+
+    isbarycenteronnode = std::vector<bool>(numedges,false);
+    for (int i = 0; i < numedges; i++)
+    {
+        if (isanodeatnum[edgenumbers[i]])
+            isbarycenteronnode[i] = true;
+    }
+}
+
