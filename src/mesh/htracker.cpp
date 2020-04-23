@@ -622,11 +622,6 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     {
         for (int oe = 0; oe < originalcount[i]; oe++)
         {
-            // Get the coordinates of the current original element:
-            std::vector<double> origcoords(3*ncn[i]);
-            for (int j = 0; j < 3*ncn[i]; j++)
-                origcoords[j] = oc[i][3*ncn[i]*oe+j];
-        
             // Loop on all elements types in the fullsplit-subelements of the original element:
             for (int j = 0; j < 8; j++)
             {
@@ -674,7 +669,7 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
                                 curcoords = straightelements[si].calculatecoordinates(curvedcoords[si], curcoords);
                                 
                             // Calculate actual coordinates: 
-                            curcoords = curvedelements[i].calculatecoordinates(curcoords, origcoords);
+                            curcoords = curvedelements[i].calculatecoordinates(curcoords, oc[i], 3*ncn[i]*oe);
 
                             for (int k = 0; k < curcoords.size(); k++)
                                 ac[si][indexintransitioncoords[si]+k] = curcoords[k];
