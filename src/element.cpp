@@ -1149,7 +1149,6 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     int numpolys = mypolynomials.count();
     if (numpolys > 0)
     {
-        int numnodes = numpolys;
         int numrefs = refcoords.size()/3;
         
         std::vector<double> sf, evaluationpoint;
@@ -1161,7 +1160,7 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
             
             mypolynomials.evalatsingle(evaluationpoint, sf);
 
-            for (int c = 0; c < numnodes; c++)
+            for (int c = 0; c < numpolys; c++)
             {
                 output[3*i+0] += nodecoords[firstindex + 3*c+0] * sf[c];
                 output[3*i+1] += nodecoords[firstindex + 3*c+1] * sf[c];
