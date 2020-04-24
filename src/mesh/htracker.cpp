@@ -387,7 +387,7 @@ void htracker::countsons(std::vector<int>& numsons)
     }
 }
 
-void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums)
+void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
 {
     std::vector<int> nit = countintypes();
     std::vector<int> nn(8); // number of corner nodes
@@ -397,7 +397,6 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
     std::vector<element> els(8);
     arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    leafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
     std::vector<std::vector<double>> crc(8); // corner ref coords
     for (int i = 0; i < 8; i++)
     {
@@ -408,7 +407,6 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
         
         arc[i] = std::vector<double>(3*nn[i]*nit[i]);
         ac[i] = std::vector<double>(3*nn[i]*nit[i]);
-        leafnums[i] = std::vector<int>(nit[i]);
         lagrangeformfunction lff(i,1,{});
         crc[i] = lff.getnodecoordinates();
     }
@@ -431,6 +429,7 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
         if (ns == 0)
         {
             parentrc[0] = {crc[t]};
+            // Take only corner nodes for 'assignedgenumbers' algo to work:
             originalelemcoords = std::vector<double>(3*nn[t]);
             for (int i = 0; i < 3*nn[t]; i++)
                 originalelemcoords[i] = oc[t][curtypeorigcountindex*3*ncn[t]+i];
@@ -451,7 +450,6 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
                 arc[t][iarc[t]+i] = parentrc[ns][ic][i];
                 ac[t][iarc[t]+i] = realcoords[i];
             }
-            leafnums[t][iarc[t]/3/nn[t]] = ln;
             
             iarc[t] += parentrc[ns][ic].size();
         
@@ -508,7 +506,7 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     std::vector<std::vector<double>> cornerac;
     std::vector<std::vector<double>> cornerarc;
     std::vector<std::vector<int>> lnums;
-    getadapted(curvatureorder, oc, cornerarc, cornerac, lnums);
+    getadapted(curvatureorder, oc, cornerarc, cornerac);
     
 
 std::vector<int> edgenumbers;
@@ -516,9 +514,7 @@ std:vector<bool> isedgesplit;
 myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshold);
     
     
-    // Split the transition elements:
-    std::vector<int> numsons;
-    countsons(numsons);
+
     
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
     leafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
@@ -539,80 +535,90 @@ myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshol
     for (int i = 0; i < 8; i++)
         leafnums[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
     
-    int origelemindex = 0;
-    std::vector<int> indexincoords(8,0); // index in working element
-    std::vector<int> indexintransitioncoords(8,0); // index in working element
+    
+    resetcursor();
+    
+    int ln = -1;
+    std::vector<int> iarc(8,0); // indexes in arc
     std::vector<int> firstedge(8,0); // first edge in working element
     for (int i = 0; i < 7; i++)
         firstedge[i+1] = firstedge[i] + ne[i] * cornerarc[i].size()/nn[i]/3;
-    // Loop on all original elements:
-    for (int i = 0; i < 8; i++)
+    std::vector<int> indexintransitioncoords(8,0);
+    while (true)
     {
-        for (int oe = 0; oe < originalcount[i]; oe++)
-        {
-            // Loop on all elements types in the fullsplit-subelements of the original element:
-            for (int j = 0; j < 8; j++)
-            {
-                for (int e = 0; e < numsons[8*origelemindex+j]; e++)
-                {
-                    // Get the corner ref. coords. of the current subelement:
-                    std::vector<double> currefcoords(3*nn[j]);
-                    for (int k = 0; k < 3*nn[j]; k++)
-                        currefcoords[k] = cornerarc[j][indexincoords[j]+k];
-                    indexincoords[j] += 3*nn[j];
-                    
-                    // Get the edge numbers and edge splits for the current subelement:
-                    std::vector<int> curedgenums(ne[j]);
-                    std::vector<bool> curisedgesplit(ne[j]);
-                    for (int k = 0; k < ne[j]; k++)
-                    {
-                        curedgenums[k] = edgenumbers[firstedge[j]+k];
-                        curisedgesplit[k] = isedgesplit[firstedge[j]+k];
-                    }
-                    
-                    int splitnum = myalgorithm::binarytoint(curisedgesplit);
-                    std::vector<std::vector<int>> splitrefnums = straightelements[j].split(splitnum, curedgenums);
-                  
-                    // Loop on all subelements in the transition element:
-                    for (int si = 0; si < 8; si++)
-                    {
-                        std::vector<double> splitrefcoords;
-                        straightelements[j].numstorefcoords(splitrefnums[si], splitrefcoords);
-                    
-                        for (int se = 0; se < splitrefcoords.size()/nn[si]/3; se++)
-                        {
-                            // Get the ref. coords. of the current transition-subelement:
-                            std::vector<double> curcoords(3*nn[si]);
-                            for (int k = 0; k < 3*nn[si]; k++)
-                                curcoords[k] = splitrefcoords[se*nn[si]*3+k];
-                    
-                            // Bring inside the untransitioned element (if split at all):
-                            if (splitnum == 0)
-                                curcoords = currefcoords;
-                            else
-                                curcoords = straightelements[j].calculatecoordinates(curcoords, currefcoords);
-                            
-                            // Make curved:
-                            if (curvatureorder > 1)
-                                curcoords = straightelements[si].calculatecoordinates(curvedcoords[si], curcoords);
-                                
-                            // Calculate actual coordinates: 
-                            curcoords = curvedelements[i].calculatecoordinates(curcoords, oc[i], 3*ncn[i]*oe);
+        int t = parenttypes[currentdepth];
+        int pt = parenttypes[0];
+    
+        if (not(isatleaf()))
+            next();
+    
+        ln++;
+        
+        
 
-                            for (int k = 0; k < curcoords.size(); k++)
-                                ac[si][indexintransitioncoords[si]+k] = curcoords[k];
-                                
-                            leafnums[si][indexintransitioncoords[si]/ncn[si]/3] = lnums[j][indexincoords[j]/3/nn[j]];
-                            
-                            indexintransitioncoords[si] += curcoords.size();
-                        }
-                    }
-                    firstedge[j] += ne[j];
-                }
-            }
-            origelemindex++;
+        // Get the corner ref. coords. of the current subelement:
+        std::vector<double> currefcoords(3*nn[t]);
+        for (int k = 0; k < 3*nn[t]; k++)
+            currefcoords[k] = cornerarc[t][iarc[t]+k];
+        
+        // Get the edge numbers and edge splits for the current subelement:
+        std::vector<int> curedgenums(ne[t]);
+        std::vector<bool> curisedgesplit(ne[t]);
+        for (int k = 0; k < ne[t]; k++)
+        {
+            curedgenums[k] = edgenumbers[firstedge[t]+k];
+            curisedgesplit[k] = isedgesplit[firstedge[t]+k];
         }
+        
+        int splitnum = myalgorithm::binarytoint(curisedgesplit);
+        std::vector<std::vector<int>> splitrefnums = straightelements[t].split(splitnum, curedgenums);
+      
+        // Loop on all subelements in the transition element:
+        for (int si = 0; si < 8; si++)
+        {
+            if (splitrefnums[si].size() == 0)
+                continue;
+        
+            std::vector<double> splitrefcoords;
+            straightelements[t].numstorefcoords(splitrefnums[si], splitrefcoords);
+        
+            for (int se = 0; se < splitrefcoords.size()/nn[si]/3; se++)
+            {
+                // Get the ref. coords. of the current transition-subelement:
+                std::vector<double> curcoords(3*nn[si]);
+                for (int k = 0; k < 3*nn[si]; k++)
+                    curcoords[k] = splitrefcoords[se*nn[si]*3+k];
+        
+                // Bring inside the untransitioned element (if split at all):
+                if (splitnum == 0)
+                    curcoords = currefcoords;
+                else
+                    curcoords = straightelements[t].calculatecoordinates(curcoords, currefcoords);
+                
+                // Make curved:
+                if (curvatureorder > 1)
+                    curcoords = straightelements[si].calculatecoordinates(curvedcoords[si], curcoords);
+                    
+                // Calculate actual coordinates: 
+                curcoords = curvedelements[pt].calculatecoordinates(curcoords, oc[pt], 3*ncn[pt]*curtypeorigcountindex);
+
+                for (int k = 0; k < curcoords.size(); k++)
+                    ac[si][indexintransitioncoords[si]+k] = curcoords[k];
+                    
+                leafnums[si][indexintransitioncoords[si]/ncn[si]/3] = ln;
+                
+                indexintransitioncoords[si] += 3*ncn[si];
+            }
+        }
+        firstedge[t] += ne[t];
+        iarc[t] += 3*nn[t];
+    
+        if (ln == numleaves-1)
+            break;
+        
+        next();
     }
+    
     
     // Fit to size:
     for (int i = 0; i < 8; i++)

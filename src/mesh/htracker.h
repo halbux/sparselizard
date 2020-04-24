@@ -50,7 +50,7 @@ class htracker
 
         // Get the reference and real corner node coordinates of all elements after adaptation (no transition elements added).
         // 'oc' are the original element coordinates (possible including the curvature nodes).
-        void getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums);
+        void getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac);
         // 'curvatureorder' is the curvature order in 'oc' only. After return 'leafnums' holds the leaf number of every adapted element.
         
     public:
