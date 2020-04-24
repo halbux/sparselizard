@@ -1151,10 +1151,10 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     {
         if (returnnodecoords)
         {
-            std::vector<double> output(3*numpolys);
+            std::vector<double> out(3*numpolys);
             for (int i = 0; i < 3*numpolys; i++)
-                output[i] = nodecoords[firstindex+i];
-            return output;
+                out[i] = nodecoords[firstindex+i];
+            return out;
         }
     
         int numrefs = refcoords.size()/3;
