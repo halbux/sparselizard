@@ -1181,7 +1181,7 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     {
         lagrangeformfunction lff(gettypenumber(), getcurvatureorder(), {});
         mypolynomials = polynomials(lff.getformfunctionpolynomials());
-        return calculatecoordinates(refcoords, nodecoords, firstindex);
+        return calculatecoordinates(refcoords, nodecoords, firstindex, returnnodecoords);
     }
 }
 
