@@ -1144,11 +1144,19 @@ int element::deducetypenumber(int elemdim, int numnodes)
     }
 }
 
-std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int firstindex)
+std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int firstindex, bool returnnodecoords)
 {
     int numpolys = mypolynomials.count();
     if (numpolys > 0)
     {
+        if (returnnodecoords)
+        {
+            std::vector<double> output(3*numpolys);
+            for (int i = 0; i < 3*numpolys; i++)
+                output[i] = nodecoords[firstindex+i];
+            return output;
+        }
+    
         int numrefs = refcoords.size()/3;
         
         std::vector<double> sf, evaluationpoint;

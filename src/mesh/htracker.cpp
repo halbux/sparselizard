@@ -3,8 +3,9 @@
 #include "lagrangeformfunction.h"
 
 
-htracker::htracker(std::vector<int> numelemspertype)
+htracker::htracker(int curvatureorder, std::vector<int> numelemspertype)
 {
+    originalcurvatureorder = curvatureorder;
     originalcount = numelemspertype;
     
     for (int i = 0; i < 8; i++)
@@ -387,7 +388,7 @@ void htracker::countsons(std::vector<int>& numsons)
     }
 }
 
-void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
+void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
 {
     std::vector<int> nit = countintypes();
     std::vector<int> nn(8); // number of corner nodes
@@ -396,22 +397,21 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
     // Preallocate:
     std::vector<element> els(8);
     arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
     std::vector<std::vector<double>> crc(8); // corner ref coords
     for (int i = 0; i < 8; i++)
     {
         els[i] = element(i);
         nn[i] = els[i].countnodes();
-        element curvedel(i,curvatureorder);
+        element curvedel(i,originalcurvatureorder);
         ncn[i] = curvedel.countcurvednodes();
         
         arc[i] = std::vector<double>(3*nn[i]*nit[i]);
-        ac[i] = std::vector<double>(3*nn[i]*nit[i]);
         lagrangeformfunction lff(i,1,{});
         crc[i] = lff.getnodecoordinates();
     }
+    ac = arc;
 
-    // parentrc[depth][indexincluster]:
+    // Reference coordinates of the parents - parentrc[depth][indexincluster]:
     std::vector<std::vector<std::vector<double>>> parentrc(maxdepth+1, std::vector<std::vector<double>>(10));
     
     std::vector<double> originalelemcoords;
@@ -427,23 +427,13 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
         int ic = indexesinclusters[currentdepth];
     
         if (ns == 0)
-        {
             parentrc[0] = {crc[t]};
-            // Take only corner nodes for 'assignedgenumbers' algo to work:
-            originalelemcoords = std::vector<double>(3*nn[t]);
-            for (int i = 0; i < 3*nn[t]; i++)
-                originalelemcoords[i] = oc[t][curtypeorigcountindex*3*ncn[t]+i];
-        }
-    
+        
         if (isatleaf())
         {
             ln++;
             
-            std::vector<double> realcoords;
-            if (ns == 0)
-                realcoords = originalelemcoords;
-            else
-                realcoords = els[parenttypes[0]].calculatecoordinates(parentrc[ns][ic], originalelemcoords);
+            std::vector<double> realcoords = els[parenttypes[0]].calculatecoordinates(parentrc[ns][ic], oc[t], curtypeorigcountindex*3*ncn[t], ns == 0);
             
             for (int i = 0; i < parentrc[ns][ic].size(); i++)
             {
@@ -483,7 +473,7 @@ void htracker::getadapted(int curvatureorder, std::vector<std::vector<double>>& 
     }
 }
 
-void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
+void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
 {
     std::vector<int> nn(8);
     std::vector<int> ncn(8);
@@ -494,11 +484,11 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     for (int i = 0; i < 8; i++)
     {
         straightelements[i] = element(i);
-        curvedelements[i] = element(i,curvatureorder);
+        curvedelements[i] = element(i,originalcurvatureorder);
         nn[i] = curvedelements[i].countnodes();
         ncn[i] = curvedelements[i].countcurvednodes();
         ne[i] = curvedelements[i].countedges();
-        lagrangeformfunction lff(i,curvatureorder,{});
+        lagrangeformfunction lff(i,originalcurvatureorder,{});
         curvedcoords[i] = lff.getnodecoordinates();
     }
 
@@ -506,13 +496,13 @@ void htracker::getadaptedcoordinates(int curvatureorder, std::vector<std::vector
     std::vector<std::vector<double>> cornerac;
     std::vector<std::vector<double>> cornerarc;
     std::vector<std::vector<int>> lnums;
-    getadapted(curvatureorder, oc, cornerarc, cornerac);
+    getadapted(oc, cornerarc, cornerac);
     
-
-std::vector<int> edgenumbers;
-std:vector<bool> isedgesplit;
-myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshold);
     
+    // Assign unique edge numbers and deduce edge splits:
+    std::vector<int> edgenumbers;
+    std:vector<bool> isedgesplit;
+    myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshold);
     
 
     
@@ -555,12 +545,6 @@ myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshol
         ln++;
         
         
-
-        // Get the corner ref. coords. of the current subelement:
-        std::vector<double> currefcoords(3*nn[t]);
-        for (int k = 0; k < 3*nn[t]; k++)
-            currefcoords[k] = cornerarc[t][iarc[t]+k];
-        
         // Get the edge numbers and edge splits for the current subelement:
         std::vector<int> curedgenums(ne[t]);
         std::vector<bool> curisedgesplit(ne[t]);
@@ -590,13 +574,10 @@ myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshol
                     curcoords[k] = splitrefcoords[se*nn[si]*3+k];
         
                 // Bring inside the untransitioned element (if split at all):
-                if (splitnum == 0)
-                    curcoords = currefcoords;
-                else
-                    curcoords = straightelements[t].calculatecoordinates(curcoords, currefcoords);
+                curcoords = straightelements[t].calculatecoordinates(curcoords, cornerarc[t], iarc[t], splitnum == 0);
                 
                 // Make curved:
-                if (curvatureorder > 1)
+                if (originalcurvatureorder > 1)
                     curcoords = straightelements[si].calculatecoordinates(curvedcoords[si], curcoords);
                     
                 // Calculate actual coordinates: 
