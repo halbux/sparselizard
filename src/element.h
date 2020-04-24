@@ -392,7 +392,7 @@ class element
         
         // Calculate the physical coordinates corresponding to a set of reference coordinates.
         // The coordinates in 'nodecoords' are taken from index 'firstindex' and following.
-        // If 'returnnodecoords' is true then the node coordinates are returned unchanged.
+        // If 'returnnodecoords' is true then the node coordinates are returned as they are.
         std::vector<double> calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int firstindex = 0, bool returnnodecoords = false);
         
         // Count the number of elements of each type in the n times full-split element:
