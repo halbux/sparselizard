@@ -617,8 +617,11 @@ myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshol
     // Fit to size:
     for (int i = 0; i < 8; i++)
     {
-        ac[i].resize(indexintransitioncoords[i]);
-        leafnums[i].resize(indexintransitioncoords[i]/ncn[i]/3);
+        if (indexintransitioncoords[i] > 0)
+        {
+            ac[i].resize(indexintransitioncoords[i] - 3*ncn[i]);
+            leafnums[i].resize(indexintransitioncoords[i]/ncn[i]/3 - 1);
+        }
     }
 }
 
