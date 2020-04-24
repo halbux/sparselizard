@@ -534,7 +534,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
     std::vector<int> iac(8,0); // index in ac
     while (true)
     {
-        if (not(isatleaf()))
+        while (not(isatleaf()))
             next();
     
         ln++;
