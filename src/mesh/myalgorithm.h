@@ -112,7 +112,7 @@ namespace myalgorithm
     // Factorial of positive integers or zero:
     int factorial(int n);
     
-    // Provide the corner coordinates of each element concatenated in each element type.
+    // Provide the corner coordinates of each STRAIGHT element concatenated in each element type.
     // This function returns (flattened from lowest type to highest) the edge number of
     // each edge in an element as well as a bool whose value is true if the edge barycenter
     // is close enough (according to 'noisethreshold') to any node in the corner coordinates.
