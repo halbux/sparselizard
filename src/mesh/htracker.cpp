@@ -164,6 +164,36 @@ void htracker::gettype(std::vector<int>& types)
     }
 }
 
+void htracker::countsons(std::vector<int>& numsons)
+{
+    int num = 0;
+    for (int i = 0; i < 8; i++)
+        num += originalcount[i];
+        
+    numsons = std::vector<int>(8*num,0);
+    
+    resetcursor();
+    
+    int ln = -1;
+    int index = -1;
+    while (true)
+    { 
+        if (currentdepth == 0)
+            index++;
+            
+        if (isatleaf())
+        {
+            ln++;
+            numsons[8*index+parenttypes[currentdepth]]++;
+        }
+        
+        if (ln == numleaves-1)
+            break;
+        
+        next();
+    }
+}
+
 std::vector<int> htracker::countintypes(void)
 {
     std::vector<int> output(8,0);
@@ -341,51 +371,6 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
     splitdata = newsplitdata;
     numleaves = newnumleaves;
     maxdepth = newmaxdepth;
-}
-
-void htracker::print(void)
-{
-    std::cout << "#leaves is " << numleaves << " | max #splits is " << maxdepth << std::endl;
-
-    for (int i = 0; i < splitdata.size(); i++)
-        std::cout << splitdata[i];
-        
-    std::cout << std::endl;
-}
-
-int htracker::countbits(void)
-{
-    return splitdata.size();
-}
-
-void htracker::countsons(std::vector<int>& numsons)
-{
-    int num = 0;
-    for (int i = 0; i < 8; i++)
-        num += originalcount[i];
-        
-    numsons = std::vector<int>(8*num,0);
-    
-    resetcursor();
-    
-    int ln = -1;
-    int index = -1;
-    while (true)
-    { 
-        if (currentdepth == 0)
-            index++;
-            
-        if (isatleaf())
-        {
-            ln++;
-            numsons[8*index+parenttypes[currentdepth]]++;
-        }
-        
-        if (ln == numleaves-1)
-            break;
-        
-        next();
-    }
 }
 
 void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
@@ -609,5 +594,20 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
             leafnums[i].resize(iac[i]/ncn[i]/3);
         }
     }
+}
+
+void htracker::print(void)
+{
+    std::cout << "#leaves is " << numleaves << " | max #splits is " << maxdepth << std::endl;
+
+    for (int i = 0; i < splitdata.size(); i++)
+        std::cout << splitdata[i];
+        
+    std::cout << std::endl;
+}
+
+int htracker::countbits(void)
+{
+    return splitdata.size();
 }
 

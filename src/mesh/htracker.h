@@ -82,6 +82,9 @@ class htracker
         void countsplits(std::vector<int>& numsplits);
         // Get the element type number of all leaves (modifies the cursor):
         void gettype(std::vector<int>& types);
+        // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
+        void countsons(std::vector<int>& numsons);
+        
         // Count the number of elements of each type after adaptation (modifies the cursor):
         std::vector<int> countintypes(void);
         
@@ -92,22 +95,18 @@ class htracker
         // leaves in the cluster are tagged for grouping and none is already split.
         // NEIGBOUR ELEMENTS CANNOT DIFFER BY MORE THAN ONE SPLIT LEVEL.
         // The argument vectors must have a size equal to the number of leaves.
-        void adapt(std::vector<int>& operations, std::vector<int>& throughedgenums);
-        
-        // Print the tree:
-        void print(void);
-        
-        // Get length of 'splitdata' vector:
-        int countbits(void);
-        
-        // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
-        void countsons(std::vector<int>& numsons);
+        void adapt(std::vector<int>& operations, std::vector<int>& throughedgenums);    
         
         // Get the node coordinates 'ac' of all elements after adaptation based on the original elements 
         // coordinates 'oc' (including curvature nodes). The parent number of each transition element is 
         // provided in 'leafnums' after execution.
         void getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold);
     
+        // Print the tree:
+        void print(void);
+        
+        // Get length of 'splitdata' vector:
+        int countbits(void);
 };
 
 #endif
