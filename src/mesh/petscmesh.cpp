@@ -89,12 +89,11 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     // Number of labels:
     int numlabels;
     DMGetNumLabels(mypetscmesh, &numlabels);
-    // The last label is the depth label (constructed automatically):
-    numlabels--;
     
     element myelem(0);
 
-    for (int l = 0; l < numlabels; l++)
+    // The first two labels are the cell type and the depth label (constructed automatically):
+    for (int l = 2; l < numlabels; l++)
     {
         DMLabel curlabel;
         DMGetLabelByNum(mypetscmesh, l, &curlabel);
