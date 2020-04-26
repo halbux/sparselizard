@@ -7,11 +7,15 @@ void petscmesh::reordernodes(int ourtypenum, std::vector<int>& toreorder)
     switch (ourtypenum)
     {
         case 5:
+        {
             toreorder = {toreorder[0], toreorder[1], toreorder[2], toreorder[3], toreorder[4], toreorder[7], toreorder[6], toreorder[5]};
             break;
+        }
         case 6:
+        {
             toreorder = {toreorder[0], toreorder[2], toreorder[1], toreorder[3], toreorder[4], toreorder[5]};
             break;
+        }
     }
 }
 
