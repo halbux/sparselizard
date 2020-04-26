@@ -92,7 +92,7 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     
     element myelem(0);
 
-    // The first two labels are the cell type and the depth label (constructed automatically):
+    // The first two labels are for the cell type and the depth (constructed automatically):
     for (int l = 2; l < numlabels; l++)
     {
         DMLabel curlabel;
