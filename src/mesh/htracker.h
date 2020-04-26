@@ -22,7 +22,7 @@ class htracker
         // Store in compressed format all split info needed:
         // 
         // 1. 1/0 for fullsplit/transition element (if 0 this element stops here)
-        // 3. 00/01/10 for 0/1/2 through-edge tetrahedron fullsplit (only for tetrahedra)
+        // 3. 00/01/10//11 for 0/1/2/undefined through-edge tetrahedron fullsplit (only for tetrahedra)
         // 4. 1/0 for fullsplit/transition of first subelement
         // 5. ...
         // 6. 1/0 for fullsplit/transition of second subelement
@@ -94,8 +94,8 @@ class htracker
         // Group/keep/split (-1/0/1) the requested leaves. Leaves are grouped if all
         // leaves in the cluster are tagged for grouping and none is already split.
         // NEIGBOUR ELEMENTS CANNOT DIFFER BY MORE THAN ONE SPLIT LEVEL.
-        // The argument vectors must have a size equal to the number of leaves.
-        void adapt(std::vector<int>& operations, std::vector<int>& throughedgenums);    
+        // The argument vector must have a size equal to the number of leaves.
+        void adapt(std::vector<int>& operations);    
         
         // Get the node coordinates 'ac' of all elements after adaptation based on the original elements 
         // coordinates 'oc' (including curvature nodes). The parent number of each transition element is 

@@ -258,7 +258,7 @@ void htracker::fix(std::vector<int>& operations)
     }
 }
 
-void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedgenums)
+void htracker::adapt(std::vector<int>& operations)
 {
     // Calculate an upper bound for the size of the new 'splitdata' vector:
     int upperbound = splitdata.size();
@@ -319,10 +319,8 @@ void htracker::adapt(std::vector<int>& operations, std::vector<int>& throughedge
                 ni++;
                 if (t == 4)
                 {
-                    if (throughedgenums[ln]%2 == 1)
-                        newsplitdata[ni+1] = true;
-                    if (((throughedgenums[ln]-throughedgenums[ln]%2)/2)%2 == 1)
-                        newsplitdata[ni] = true;
+                    newsplitdata[ni] = true;
+                    newsplitdata[ni+1] = true;
                     ni += 2;
                 }
                 // Nothing to change for subelements (initialized at all false + group puts it to false anyways):
@@ -381,18 +379,22 @@ void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std:
 
     // Preallocate:
     std::vector<element> els(8);
+    std::vector<element> curvedels(8);
     arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
     std::vector<std::vector<double>> crc(8); // corner ref coords
+    std::vector<std::vector<double>> curvedrc(8);
     for (int i = 0; i < 8; i++)
     {
         els[i] = element(i);
         nn[i] = els[i].countnodes();
-        element curvedel(i,originalcurvatureorder);
-        ncn[i] = curvedel.countcurvednodes();
+        curvedels[i] = element(i,originalcurvatureorder);
+        ncn[i] = curvedels[i].countcurvednodes();
         
         arc[i] = std::vector<double>(3*nn[i]*nit[i]);
         lagrangeformfunction lff(i,1,{});
         crc[i] = lff.getnodecoordinates();
+        lagrangeformfunction lffc(i,originalcurvatureorder,{});
+        curvedrc[i] = lffc.getnodecoordinates();
     }
     ac = arc;
 
@@ -406,6 +408,7 @@ void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std:
     while (true)
     {
         int t = parenttypes[currentdepth];
+        int ot = parenttypes[0];
         int ns = currentdepth;
         int ic = indexesinclusters[currentdepth];
     
@@ -434,6 +437,21 @@ void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std:
         else
         {
             int throughedgenum = next();
+            
+            // Calculate best through-edge if not yet defined:
+            if (t == 4 && throughedgenum == 3)
+            {
+                std::vector<double> coordsforten = els[t].calculatecoordinates(curvedrc[t], parentrc[ns][ic], originalcurvatureorder == 1);
+                coordsforten = curvedels[ot].calculatecoordinates(coordsforten, oc[ot], curtypeorigcountindex*ncn[ot]*3, ns == 0);
+                
+                throughedgenum = curvedels[t].choosethroughedge(coordsforten);
+                
+                // Add it to 'splitdata' once and for all:
+                if (throughedgenum%2 == 1)
+                    splitdata[cursorposition-1] = true;
+                if (((throughedgenum-throughedgenum%2)/2)%2 == 1)
+                    splitdata[cursorposition-2] = true;
+            }
                     
             std::vector<std::vector<double>> cornerrefcoords;
             els[t].fullsplit(cornerrefcoords, throughedgenum);
