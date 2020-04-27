@@ -43,19 +43,21 @@ OBJECTS=$(CPPS:%.cpp=$(BUILD_DIR)/%.o)
 DEP = $(OBJECTS:%.o=%.d)
 
 all: $(OBJECTS) libsparselizard.so
-	# The main is always recompiled (it could have been replaced):
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o $(BUILD_DIR)/main.o
-	# Linking objects:
-	$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN)
+	@# The main is always recompiled (it could have been replaced):
+	@$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -c main.cpp -o $(BUILD_DIR)/main.o
+	@echo "Linking."
+	@$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN)
+	@echo "Done."
 	
 # Include all .d files
 -include $(DEP)
 
 $(BUILD_DIR)/%.o: %.cpp
-	# Create the folder of the current target in the build directory:
-	mkdir -p $(@D)
-	# Compile .cpp file. MMD creates the dependencies.
-	$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
+	@echo "Compiling" $<
+	@# Create the folder of the current target in the build directory:
+	@mkdir -p $(@D)
+	@# Compile .cpp file. MMD creates the dependencies.
+	@$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
 	
 
 clean :
@@ -64,7 +66,7 @@ clean :
 	rm -f $(BIN)
 	rm -f libsparselizard.so
 
-# Make shared library
 LDFLAGS= -shared
 libsparselizard.so : $(OBJECTS)
-	$(CXX) $(CXX_FLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
+	@echo "Creating shared library."
+	@$(CXX) $(CXX_FLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
