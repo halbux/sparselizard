@@ -61,7 +61,7 @@ $(BUILD_DIR)/%.o: %.cpp
 	
 
 clean :
-    # Removes all files created.
+	# Removes all files created.
 	rm -rf $(BUILD_DIR)
 	rm -f $(BIN)
 	rm -f libsparselizard.so
