@@ -460,6 +460,103 @@ bool element::isinsideelement(double ki, double eta, double phi)
     }
 }
 
+void element::isinsideelement(std::vector<double>& coords, std::vector<double>& cc, std::vector<bool>& isinside, double roundoffnoise)
+{
+    int numcoords = coords.size()/3;
+    isinside = std::vector<bool>(numcoords, true);
+
+    int dim = getelementdimension();
+    if (dim == 1)
+    {   
+        double deltax = std::abs(cc[3]-cc[0]) + roundoffnoise;
+        for (int i = 0; i < numcoords; i++)
+            isinside[i] = (std::abs(coords[3*i+0]-cc[0]) < deltax && std::abs(coords[3*i+0]-cc[3]) < deltax);
+    }
+    if (dim == 2)
+    {   
+        // Normal to each edge and pointing inside element:
+        int ne = countedges();
+        std::vector<double> normals(2*ne);
+        for (int i = 0; i < ne; i++)
+        {
+            int ni = (i+1)%ne;
+            double dx = cc[3*ni+0]-cc[3*i+0];
+            double dy = cc[3*ni+1]-cc[3*i+1];
+            normals[2*i+0] = -dy;
+            normals[2*i+1] = dx;
+        }
+        for (int i = 0; i < numcoords; i++)
+        {
+            for (int j = 0; j < ne; j++)
+            {
+                double dx = coords[3*i+0]-cc[3*j+0];
+                double dy = coords[3*i+1]-cc[3*j+1];
+                // Scalar product must be positive:
+                double sp = normals[2*j+0]*dx + normals[2*j+1]*dy;
+                if (sp < -roundoffnoise)
+                {
+                    isinside[i] = false;
+                    break;
+                }
+            }
+        }
+    }
+    if (dim == 3)
+    {   
+        // Normal to each face and pointing outside element:
+        int ntf = counttriangularfaces();
+        int nf = countfaces();
+        std::vector<int> facedef = getfacesdefinitionsbasedonnodes();
+        
+        std::vector<double> normals(3*nf);
+        std::vector<double> firstnodeinface(3*nf);
+        // Triangular faces come first:
+        int fdi = 0;
+        for (int i = 0; i < nf; i++)
+        {
+            int no = facedef[fdi+0];
+            int na = facedef[fdi+1];
+            int nb;
+            if (i < ntf)
+                nb = facedef[fdi+2];
+            else
+                nb = facedef[fdi+3];
+            
+            // Cross-product:
+            std::vector<double> a = {cc[3*na+0]-cc[3*no+0], cc[3*na+1]-cc[3*no+1], cc[3*na+2]-cc[3*no+2]};
+            std::vector<double> b = {cc[3*nb+0]-cc[3*no+0], cc[3*nb+1]-cc[3*no+1], cc[3*nb+2]-cc[3*no+2]};
+            normals[3*i+0] = a[1]*b[2]-a[2]*b[1];
+            normals[3*i+1] = a[2]*b[0]-a[0]*b[2];
+            normals[3*i+2] = a[0]*b[1]-a[1]*b[0];
+            
+            firstnodeinface[3*i+0] = cc[3*no+0];
+            firstnodeinface[3*i+1] = cc[3*no+1];
+            firstnodeinface[3*i+2] = cc[3*no+2];
+            
+            if (i < ntf)
+                fdi += 3;
+            else
+                fdi += 4;
+        }
+        for (int i = 0; i < numcoords; i++)
+        {
+            for (int j = 0; j < nf; j++)
+            {
+                double dx = coords[3*i+0]-firstnodeinface[3*j+0];
+                double dy = coords[3*i+1]-firstnodeinface[3*j+1];
+                double dz = coords[3*i+2]-firstnodeinface[3*j+2];
+                // Scalar product must be negative:
+                double sp = normals[3*j+0]*dx + normals[3*j+1]*dy + normals[3*j+2]*dz;
+                if (sp > roundoffnoise)
+                {
+                    isinside[i] = false;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 double element::measurereferenceelement(void)
 {
     switch (gettypenumber())
