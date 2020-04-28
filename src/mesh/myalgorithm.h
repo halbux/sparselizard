@@ -80,6 +80,9 @@ namespace myalgorithm
     // Split the 'tosplit' vector into 'blocklen' vectors of length tosplit.size()/blocklen.
     std::vector<std::vector<double>> splitvector(std::vector<double>& tosplit, int blocklen);
     
+    // Split a vector in two vectors according to 'select':
+    void splitvector(std::vector<int>& vec, std::vector<bool>& select, std::vector<int>& falses, std::vector<int>& trues);
+    
     // Norm each block in the vector:
     std::vector<double> normblocks(std::vector<double>& tonorm, int blocklen);
     

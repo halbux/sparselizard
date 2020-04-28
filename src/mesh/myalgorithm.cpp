@@ -699,6 +699,34 @@ std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& t
     return output;
 }
 
+void myalgorithm::splitvector(std::vector<int>& vec, std::vector<bool>& select, std::vector<int>& falses, std::vector<int>& trues)
+{
+    int numtrue = 0;
+    for (int i = 0; i < select.size(); i++)
+    {
+        if (select[i])
+            numtrue++;
+    }
+    
+    trues = std::vector<int>(numtrue);
+    falses = std::vector<int>(select.size()-numtrue);
+    
+    int indt = 0, indf = 0;
+    for (int i = 0; i < select.size(); i++)
+    {
+        if (select[i])
+        {
+            trues[indt] = vec[i];
+            indt++;
+        }
+        else
+        {
+            falses[indf] = vec[i];
+            indf++;
+        }
+    }
+}
+
 std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blocklen)
 {
     int numblocks = tonorm.size()/blocklen;
