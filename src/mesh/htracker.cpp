@@ -534,7 +534,8 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
 
     // Preallocate output containers:
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    leafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    teorc = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    transitionelemsleafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
     // No-transition size:
     std::vector<int> nts(8,0);
     for (int i = 0; i < 8; i++)
@@ -550,8 +551,10 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
     ac[7] = std::vector<double>(0);
     
     for (int i = 0; i < 8; i++)
-        leafnums[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
-    
+    {
+        transitionelemsleafnums[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
+        teorc[i] = std::vector<double>(nn[i]*ac[i].size()/ncn[i]);
+    }
     
     resetcursor();
     
@@ -602,6 +605,9 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
                 // Bring inside the untransitioned element (if split at all):
                 curcoords = straightelements[t].calculatecoordinates(curcoords, cornerarc[t], iarc[t], splitnum == 0);
                 
+                for (int i = 0; i < curcoords.size(); i++)
+                    teorc[si][nn[si]*iac[si]/ncn[si]+i] = curcoords[i];
+                
                 // Make curved:
                 if (originalcurvatureorder > 1)
                     curcoords = straightelements[si].calculatecoordinates(curvedcoords[si], curcoords);
@@ -612,7 +618,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
                 for (int i = 0; i < curcoords.size(); i++)
                     ac[si][iac[si]+i] = curcoords[i];
                     
-                leafnums[si][iac[si]/ncn[si]/3] = ln;
+                transitionelemsleafnums[si][iac[si]/ncn[si]/3] = ln;
                 
                 iac[si] += 3*ncn[si];
                 
@@ -628,16 +634,85 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
         next();
     }
     
-    
     // Fit to size:
     for (int i = 0; i < 8; i++)
     {
         if (iac[i] > 0)
         {
             ac[i].resize(iac[i]);
-            leafnums[i].resize(iac[i]/ncn[i]/3);
+            teorc[i].resize(nn[i]*iac[i]/ncn[i]);
+            transitionelemsleafnums[i].resize(iac[i]/ncn[i]/3);
+        }
+        // ELSE RESIZE TO 0 OR ALREADY EMPTY?
+    }
+    leafnums = transitionelemsleafnums;
+}
+
+void htracker::inoriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc)
+{
+    std::vector<int> oen;
+    getoriginalelementnumber(oen);
+
+    // Preallocate:
+    int numrc = 0, no = 0;
+    std::vector<int> nn(8);
+    std::vector<element> straightels(8);
+    for (int i = 0; i < 8; i++)
+    {
+        straightels[i] = element(i);
+        nn[i] = straightels[i].countnodes();
+        numrc += rc[i].size()/3;
+        no += originalcount[i]; 
+    }   
+    oad = std::vector<int>(no+1,0);
+    orc = std::vector<double>(3*numrc);
+    
+    // Create the 'oad' address vector:
+    std::vector<int> cnt(no,0);
+    for (int i = 0; i < 8; i++)
+    {
+        // This is needed because .size() gives an unsigned int --> .size()-1 underflows
+        if (ad[i].size() == 0)
+            continue;
+        for (int j = 0; j < ad[i].size()-1; j++)
+        {
+            int origelem = oen[transitionelemsleafnums[i][j]];
+            cnt[origelem] += ad[i][j+1]-ad[i][j];
         }
     }
+    
+    for (int i = 1; i <= no; i++)
+        oad[i] = oad[i-1]+cnt[i-1];
+        
+    // Loop on each transition element:
+    std::vector<int> index(no,0);
+    for (int i = 0; i < 8; i++)
+    {
+        // This is needed because .size() gives an unsigned int --> .size()-1 underflows
+        if (ad[i].size() == 0)
+            continue;
+        for (int j = 0; j < ad[i].size()-1; j++)
+        {
+            int nr = (ad[i][j+1]-ad[i][j])/3;
+            
+            std::vector<double> currefs(3*nr);       
+            for (int k = 0; k < 3*nr; k++)
+                currefs[k] = rc[i][ad[i][j]+k];
+                
+            currefs = straightels[i].calculatecoordinates(currefs, teorc[i], 3*nn[i]*j);
+    
+            int origelem = oen[transitionelemsleafnums[i][j]];
+            for (int k = 0; k < 3*nr; k++)
+                orc[oad[origelem]+index[origelem]+k] = currefs[k];
+       
+            index[origelem] += 3*nr;
+        }
+    }
+}
+
+void htracker::tostorage(void)
+{
+    
 }
 
 void htracker::print(void)

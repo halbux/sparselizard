@@ -49,6 +49,10 @@ class htracker
         int curtypeorigcountindex = -1;
         std::vector<int> parenttypes = {};
         std::vector<int> indexesinclusters = {};
+        
+        // Reference coordinates in the original element of each transition element:
+        std::vector<std::vector<double>> teorc = {};
+        std::vector<std::vector<int>> transitionelemsleafnums = {};
 
         // Get the reference and real corner node coordinates of all elements after adaptation (no transition elements added).
         // 'oc' are the original element coordinates including the curvature nodes.
@@ -103,6 +107,14 @@ class htracker
         // coordinates 'oc' (including curvature nodes). The parent number of each transition element is 
         // provided in 'leafnums' after execution.
         void getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold);
+    
+        // Get the reference coordinate in the original element 'orc' corresponding to the reference coordinates in the transition elements 'rc'.
+        // 'ad[t][i]' gives the first position in 'rc' where the ith transition element of type t is. 'oad[i]' does that for the first position
+        // of the ith original element in 'orc'. 'ad' and 'oad' have a 1 longer size and their last value is the vec size.
+        void inoriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc);
+    
+        // Reduce size for storage:
+        void tostorage(void);
     
         // Print the tree:
         void print(void);
