@@ -84,6 +84,8 @@ class htracker
         void gettype(std::vector<int>& types);
         // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
         void countsons(std::vector<int>& numsons);
+        // For each leaf get the original element number:
+        void getoriginalelementnumber(std::vector<int>& oen);
         
         // Count the number of elements of each type after adaptation (modifies the cursor):
         std::vector<int> countintypes(void);
