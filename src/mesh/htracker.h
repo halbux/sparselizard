@@ -111,8 +111,11 @@ class htracker
         // Get the reference coordinate in the original element 'orc' corresponding to the reference coordinates in the transition elements 'rc'.
         // 'ad[t][i]' gives the first position in 'rc' where the ith transition element of type t is. 'oad[i]' does that for the first position
         // of the ith original element in 'orc'. 'ad' and 'oad' have a 1 longer size and their last value is the vec size.
-        void inoriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc);
-    
+        void tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc);
+        // Inverse function of the above:
+        void fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc);
+        // + WRITE ONE FCT DOING BOTH ABOVE (arg is htracker&)
+        
         // Reduce size for storage:
         void tostorage(void);
     

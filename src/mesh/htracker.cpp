@@ -648,7 +648,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
     leafnums = transitionelemsleafnums;
 }
 
-void htracker::inoriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc)
+void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc)
 {
     std::vector<int> oen;
     getoriginalelementnumber(oen);
@@ -708,6 +708,11 @@ void htracker::inoriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
             index[origelem] += 3*nr;
         }
     }
+}
+
+void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc)
+{
+
 }
 
 void htracker::tostorage(void)
