@@ -689,8 +689,23 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
 
 void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc)
 {
+    // Find the transition element in which each ref. coord is:
+    int numtran = 0;
+    std::vector<int> transindex(8,0);
+    for (int i = 0; i < 8; i++)
+    {
+        transindex[i] = numtran;
+        numtran += transitionelemsleafnums[i].size();
+    }    
+    // In which transition element is each ref coord?
+    std::vector<int> transitionelemnum(orc.size()/3);
+    
+    // Indexes of the orc's that are in the current tree position:
+    std::vector<std::vector<std::vector<int>>> activercs(maxdepth+1, std::vector<std::vector<int>>(10));
+    
     resetcursor(true);
     
+    int origelem = -1;
     int ln = -1; // leaf number
     while (true)
     {
@@ -699,11 +714,41 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
         int ns = currentdepth;
         int ic = indexesinclusters[currentdepth];
     
+        if (ns == 0)
+        {
+            origelem++;
+            int numrefsinorig = (oad[origelem+1]-oad[origelem])/3;
+            activercs[0] = {std::vector<int>(numrefsinorig)};
+            for (int i = 0; i < numrefsinorig; i++)
+                activercs[0][0][i] = oad[origelem]/3+i;
+        }
+    
         if (isatleaf())
+        {
             ln++;
+         
+        }
+        else
+        {
+            if (ns > 0)
+            {
+                std::vector<int> par = activercs[ns-1][indexesinclusters[currentdepth-1]];
+                int numinparent = par.size();
             
-        std::vector<double> refcoords = getreferencecoordinates();
-            
+                std::vector<double> refcoords = getreferencecoordinates();
+                
+                // Redirect the ref. coord. to the current element if inside it:
+                std::vector<bool> isinside(numinparent, false);
+                int numinside = 0;
+                for (int i = 0; i < numinparent; i++)
+                {
+                    if (true) // WRITE FCT IN ELEM TO CHECK THAT
+                        isinside[i] = true;
+
+                }
+                myalgorithm::splitvector(par, isinside, activercs[ns-1][indexesinclusters[currentdepth-1]], activercs[ns][ic]);
+            }
+        }
         
         if (ln == numleaves-1)
             break;
