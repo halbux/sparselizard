@@ -42,13 +42,23 @@ class htracker
         
         // Number of subelements in each fullsplit type:
         std::vector<int> numsubelems = {1,2,4,4,8,8,8,10};
+        // Number of corner nodes:
+        std::vector<int> nn;
+        // Number of curved nodes:
+        std::vector<int> ncn;
+        std::vector<std::vector<double>> myrefcoords = std::vector<std::vector<double>>(8);
+        
+        std::vector<element> myelems;
+        std::vector<element> mycurvedelems;
         
         // Information needed by the leaf cursor:
+        bool isrefcalc = false;
         int cursorposition = -1;
         int currentdepth = -1;
         int curtypeorigcountindex = -1;
         std::vector<int> parenttypes = {};
         std::vector<int> indexesinclusters = {};
+        std::vector<std::vector<std::vector<double>>> parentrefcoords = {};
         
         // Reference coordinates in the original element of each transition element:
         std::vector<std::vector<double>> teorc = {};
@@ -66,8 +76,8 @@ class htracker
         int countleaves(void);
         int getmaxdepth(void);
         
-        // Place cursor before first leaf:
-        void resetcursor(void);
+        // Place cursor before first leaf. Request reference coordinate calculations.
+        void resetcursor(bool calcrefcoords = false);
         // Move cursor forward (crashes when exceeding number of leaves). Position might not be at a leaf.
         // The through-edge number needed for the split is returned (-1 if none or no split).
         int next(void);
@@ -90,6 +100,8 @@ class htracker
         void countsons(std::vector<int>& numsons);
         // For each leaf get the original element number:
         void getoriginalelementnumber(std::vector<int>& oen);
+        // Only valid if flag was set to true in 'resetcursor'. Get ref coords of current elem in original element:
+        std::vector<double> getreferencecoordinates(void);
         
         // Count the number of elements of each type after adaptation (modifies the cursor):
         std::vector<int> countintypes(void);
