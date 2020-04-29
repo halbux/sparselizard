@@ -342,6 +342,7 @@ class element
         bool isinsideelement(double ki, double eta, double phi);
         // Check if a set of coordinates is inside a straight element (corner nodes must be in 
         // usual element ordering). Only lines in 1D, faces in 2D and volumes in 3D are accepted.
+        // Provide an absolute roundoff noise threshold.
         void isinsideelement(std::vector<double>& coords, std::vector<double>& cornercoords, std::vector<bool>& isinside, double roundoffnoise);
         
         // Gives the length of the reference line, surface of the reference 

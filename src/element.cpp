@@ -477,6 +477,7 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
         // Normal to each edge and pointing inside element:
         int ne = countedges();
         std::vector<double> normals(2*ne);
+        std::vector<double> edgelens(ne);
         for (int i = 0; i < ne; i++)
         {
             int ni = (i+1)%ne;
@@ -484,6 +485,7 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
             double dy = cc[3*ni+1]-cc[3*i+1];
             normals[2*i+0] = -dy;
             normals[2*i+1] = dx;
+            edgelens[i] = std::abs(dx)+std::abs(dy);
         }
         for (int i = 0; i < numcoords; i++)
         {
@@ -493,7 +495,7 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
                 double dy = coords[3*i+1]-cc[3*j+1];
                 // Scalar product must be positive:
                 double sp = normals[2*j+0]*dx + normals[2*j+1]*dy;
-                if (sp < -roundoffnoise)
+                if (sp < -roundoffnoise*edgelens[j])
                 {
                     isinside[i] = false;
                     break;
@@ -509,6 +511,7 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
         std::vector<int> facedef = getfacesdefinitionsbasedonnodes();
         
         std::vector<double> normals(3*nf);
+        std::vector<double> edgelens(2*nf);
         std::vector<double> firstnodeinface(3*nf);
         // Triangular faces come first:
         int fdi = 0;
@@ -528,6 +531,8 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
             normals[3*i+0] = a[1]*b[2]-a[2]*b[1];
             normals[3*i+1] = a[2]*b[0]-a[0]*b[2];
             normals[3*i+2] = a[0]*b[1]-a[1]*b[0];
+            edgelens[2*i+0] = std::abs(a[0])+std::abs(a[1])+std::abs(a[2]);
+            edgelens[2*i+1] = std::abs(b[0])+std::abs(b[1])+std::abs(b[2]);
             
             firstnodeinface[3*i+0] = cc[3*no+0];
             firstnodeinface[3*i+1] = cc[3*no+1];
@@ -547,7 +552,7 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
                 double dz = coords[3*i+2]-firstnodeinface[3*j+2];
                 // Scalar product must be negative:
                 double sp = normals[3*j+0]*dx + normals[3*j+1]*dy + normals[3*j+2]*dz;
-                if (sp > roundoffnoise)
+                if (sp > roundoffnoise*edgelens[2*j+0]*edgelens[2*j+1])
                 {
                     isinside[i] = false;
                     break;
