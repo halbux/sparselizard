@@ -478,11 +478,21 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
         int ne = countedges();
         std::vector<double> normals(2*ne);
         std::vector<double> rofn(ne);
+        // Calculate element orientation:
+        std::vector<double> va = {cc[3*1+0]-cc[0], cc[3*1+1]-cc[1]};
+        std::vector<double> vb = {cc[3*(ne-1)+0]-cc[0], cc[3*(ne-1)+1]-cc[1]};
+        bool isanticw = ((va[0]*vb[1]-va[1]*vb[0]) > 0); // z comp of cross product
+        
         for (int i = 0; i < ne; i++)
         {
             int ni = (i+1)%ne;
             double dx = cc[3*ni+0]-cc[3*i+0];
             double dy = cc[3*ni+1]-cc[3*i+1];
+            if (not(isanticw))
+            {
+                dx = -dx;
+                dy = -dy;
+            }
             normals[2*i+0] = -dy;
             normals[2*i+1] = dx;
             rofn[i] = roundoffnoise*(std::abs(dx)+std::abs(dy));
