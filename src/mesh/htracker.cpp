@@ -3,20 +3,40 @@
 #include "lagrangeformfunction.h"
 
 
-htracker::htracker(int curvatureorder, std::vector<int> numelemspertype)
+htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> numelemspertype)
 {
+    myoriginalelements = origelems;
+    
     originalcurvatureorder = curvatureorder;
     originalcount = numelemspertype;
+    
+    if (curvatureorder == -1)
+        originalcurvatureorder = myoriginalelements->getcurvatureorder();
+    if (numelemspertype.size() == 0)
+    {
+        int dim = myoriginalelements->getdimension();
+        originalcount = std::vector<int>(8,0);
+        for (int i = 0; i < 8; i++)
+        {
+            element myelem(i);
+            if (myelem.getelementdimension() == dim)
+                originalcount[i] = myoriginalelements->count(i);
+        }
+    }
+        
+
+
     
     myelems = std::vector<element>(8);
     mycurvedelems = std::vector<element>(8);
     nn = std::vector<int>(8);
     ncn = std::vector<int>(8);
+    straightrefcoords = std::vector<std::vector<double>>(8);
     for (int i = 0; i < 8; i++)
     {
         numleaves += originalcount[i];
         lagrangeformfunction lff(i,1,{});
-        myrefcoords[i] = lff.getnodecoordinates();   
+        straightrefcoords[i] = lff.getnodecoordinates();   
         myelems[i] = element(i);
         mycurvedelems[i] = element(i,curvatureorder);
         nn[i] = myelems[i].countnodes();
@@ -43,7 +63,7 @@ void htracker::resetcursor(bool calcrefcoords)
 
     cursorposition = 0;
     currentdepth = 0;
-    curtypeorigcountindex = 0;
+    origindexintype = 0;
     // Find the first not empty type:
     parenttypes = std::vector<int>(maxdepth+1,0);
     while (originalcount[parenttypes[0]] == 0)
@@ -57,7 +77,7 @@ int htracker::next(void)
     int throughedgenum = -1;
     
     if (isrefcalc && currentdepth == 0)
-        parentrefcoords[0] = {myrefcoords[parenttypes[0]]};
+        parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
 
     // If not split we are at a leaf:
     if (splitdata[cursorposition] == false)
@@ -76,12 +96,12 @@ int htracker::next(void)
         }
         if (currentdepth == 0)
         {
-            curtypeorigcountindex++;
+            origindexintype++;
             // Skip empty types:
-            while (curtypeorigcountindex == originalcount[parenttypes[0]])
+            while (origindexintype == originalcount[parenttypes[0]])
             {
                 parenttypes[0]++;
-                curtypeorigcountindex = 0;
+                origindexintype = 0;
             }
         }
     }
@@ -263,7 +283,7 @@ void htracker::getoriginalelementnumber(std::vector<int>& oen)
 std::vector<double> htracker::getreferencecoordinates(void)
 {
     if (currentdepth == 0)
-        return myrefcoords[parenttypes[0]];
+        return straightrefcoords[parenttypes[0]];
     else
         return parentrefcoords[currentdepth][indexesinclusters[currentdepth]];
 }
@@ -445,7 +465,7 @@ void htracker::adapt(std::vector<int>& operations)
     maxdepth = newmaxdepth;
 }
 
-void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& ac)
+void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& apc, bool withphysicals)
 {
     std::vector<int> nit = countintypes();
 
@@ -453,9 +473,12 @@ void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std:
     arc = std::vector<std::vector<double>>(8, std::vector<double>(0));
     for (int i = 0; i < 8; i++)
         arc[i] = std::vector<double>(3*nn[i]*nit[i]);
-    ac = arc;
+    if (withphysicals)
+        apc = arc;
 
     resetcursor(true);
+    
+    std::vector<double> oc;
     
     int ln = -1; // leaf number
     std::vector<int> iarc(8,0); // indexes in arc
@@ -466,17 +489,23 @@ void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std:
         int ns = currentdepth;
         int ic = indexesinclusters[currentdepth];
     
+        if (ns == 0 && ic == 0)
+            oc = myoriginalelements->getnodecoordinates(t, origindexintype);
+    
         if (isatleaf())
         {
             ln++;
             
             std::vector<double> refcoords = getreferencecoordinates();
-            std::vector<double> physcoords = myelems[parenttypes[0]].calculatecoordinates(refcoords, oc[parenttypes[0]], curtypeorigcountindex*3*ncn[parenttypes[0]], ns == 0);
+            std::vector<double> physcoords;
+            if (withphysicals)
+                physcoords = myelems[parenttypes[0]].calculatecoordinates(refcoords, oc, 0, ns == 0);
             
             for (int i = 0; i < refcoords.size(); i++)
             {
                 arc[t][iarc[t]+i] = refcoords[i];
-                ac[t][iarc[t]+i] = physcoords[i];
+                if (withphysicals)
+                    apc[t][iarc[t]+i] = physcoords[i];
             }
             
             iarc[t] += refcoords.size();
@@ -489,7 +518,7 @@ void htracker::getadapted(std::vector<std::vector<double>>& oc, std::vector<std:
     }
 }
 
-void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
+void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
 {
     std::vector<int> ne(8);
     std::vector<std::vector<double>> curvedcoords(8);
@@ -504,7 +533,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
     // Get the reference ('arc') and physical ('ac') element corner coordinates after all fullsplit adaptation:
     std::vector<std::vector<double>> cornerac;
     std::vector<std::vector<double>> cornerarc;
-    getadapted(oc, cornerarc, cornerac);
+    atleaves(cornerarc, cornerac, true);
     
     
     // Assign unique edge numbers and deduce edge splits:
@@ -515,8 +544,8 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
 
     // Preallocate output containers:
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    teorc = std::vector<std::vector<double>>(8, std::vector<double>(0));
-    transitionelemsleafnums = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    transitionsrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    leavesoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
     // No-transition size:
     std::vector<int> nts(8,0);
     for (int i = 0; i < 8; i++)
@@ -533,11 +562,13 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
     
     for (int i = 0; i < 8; i++)
     {
-        transitionelemsleafnums[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
-        teorc[i] = std::vector<double>(nn[i]*ac[i].size()/ncn[i]);
+        leavesoftransitions[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
+        transitionsrefcoords[i] = std::vector<double>(nn[i]*ac[i].size()/ncn[i]);
     }
     
     resetcursor();
+    
+    std::vector<double> oc;
     
     int ln = -1; // leaf number
     std::vector<int> iarc(8,0); // indexes in arc
@@ -547,6 +578,9 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
     std::vector<int> iac(8,0); // index in ac
     while (true)
     {
+        if (currentdepth == 0 && indexesinclusters[0] == 0)
+            oc = myoriginalelements->getnodecoordinates(parenttypes[0], origindexintype);
+    
         while (not(isatleaf()))
             next();
     
@@ -587,19 +621,19 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
                 curcoords = myelems[t].calculatecoordinates(curcoords, cornerarc[t], iarc[t], splitnum == 0);
                 
                 for (int i = 0; i < curcoords.size(); i++)
-                    teorc[si][nn[si]*iac[si]/ncn[si]+i] = curcoords[i];
+                    transitionsrefcoords[si][nn[si]*iac[si]/ncn[si]+i] = curcoords[i];
                 
                 // Make curved:
                 if (originalcurvatureorder > 1)
                     curcoords = myelems[si].calculatecoordinates(curvedcoords[si], curcoords);
                     
                 // Calculate actual coordinates: 
-                curcoords = mycurvedelems[ot].calculatecoordinates(curcoords, oc[ot], 3*ncn[ot]*curtypeorigcountindex);
+                curcoords = mycurvedelems[ot].calculatecoordinates(curcoords, oc, 0);
 
                 for (int i = 0; i < curcoords.size(); i++)
                     ac[si][iac[si]+i] = curcoords[i];
                     
-                transitionelemsleafnums[si][iac[si]/ncn[si]/3] = ln;
+                leavesoftransitions[si][iac[si]/ncn[si]/3] = ln;
                 
                 iac[si] += 3*ncn[si];
                 
@@ -621,12 +655,12 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& oc, std::
         if (iac[i] > 0)
         {
             ac[i].resize(iac[i]);
-            teorc[i].resize(nn[i]*iac[i]/ncn[i]);
-            transitionelemsleafnums[i].resize(iac[i]/ncn[i]/3);
+            transitionsrefcoords[i].resize(nn[i]*iac[i]/ncn[i]);
+            leavesoftransitions[i].resize(iac[i]/ncn[i]/3);
         }
         // ELSE RESIZE TO 0 OR ALREADY EMPTY?
     }
-    leafnums = transitionelemsleafnums;
+    leafnums = leavesoftransitions;
 }
 
 void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc)
@@ -653,7 +687,7 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
             continue;
         for (int j = 0; j < ad[i].size()-1; j++)
         {
-            int origelem = oen[transitionelemsleafnums[i][j]];
+            int origelem = oen[leavesoftransitions[i][j]];
             cnt[origelem] += ad[i][j+1]-ad[i][j];
         }
     }
@@ -676,9 +710,9 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
             for (int k = 0; k < 3*nr; k++)
                 currefs[k] = rc[i][ad[i][j]+k];
                 
-            currefs = myelems[i].calculatecoordinates(currefs, teorc[i], 3*nn[i]*j);
+            currefs = myelems[i].calculatecoordinates(currefs, transitionsrefcoords[i], 3*nn[i]*j);
     
-            int origelem = oen[transitionelemsleafnums[i][j]];
+            int origelem = oen[leavesoftransitions[i][j]];
             for (int k = 0; k < 3*nr; k++)
                 orc[oad[origelem]+index[origelem]+k] = currefs[k];
        
@@ -695,7 +729,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     for (int i = 0; i < 8; i++)
     {
         transindex[i] = numtran;
-        numtran += transitionelemsleafnums[i].size();
+        numtran += leavesoftransitions[i].size();
     }    
     // In which transition element is each ref coord?
     std::vector<int> transitionelemnum(orc.size()/3);
@@ -734,18 +768,21 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             {
                 std::vector<int> par = activercs[ns-1][indexesinclusters[currentdepth-1]];
                 int numinparent = par.size();
+                
+                std::vector<double> parcoords(3*numinparent);
+                for (int i = 0; i < numinparent; i++)
+                {
+                    parcoords[3*i+0] = orc[3*par[i]+0];
+                    parcoords[3*i+1] = orc[3*par[i]+1];
+                    parcoords[3*i+2] = orc[3*par[i]+2];
+                }
             
                 std::vector<double> refcoords = getreferencecoordinates();
                 
                 // Redirect the ref. coord. to the current element if inside it:
-                std::vector<bool> isinside(numinparent, false);
-                int numinside = 0;
-                for (int i = 0; i < numinparent; i++)
-                {
-                    if (true) // WRITE FCT IN ELEM TO CHECK THAT
-                        isinside[i] = true;
-
-                }
+                std::vector<bool> isinside;
+                myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-10);
+                
                 myalgorithm::splitvector(par, isinside, activercs[ns-1][indexesinclusters[currentdepth-1]], activercs[ns][ic]);
             }
         }
@@ -759,7 +796,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
 
 void htracker::tostorage(void)
 {
-    
+    transitionsrefcoords = {};
 }
 
 void htracker::print(void)
