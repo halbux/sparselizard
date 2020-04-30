@@ -26,11 +26,11 @@ class htracker
         // Store in compressed format all split info needed:
         // 
         // 1. 1/0 for fullsplit/transition element (if 0 this element stops here)
-        // 3. 00/01/10/11 for 0/1/2/undefined through-edge tetrahedron fullsplit (only for tetrahedra)
-        // 4. 1/0 for fullsplit/transition element of first subelement
-        // 5. ...
-        // 6. 1/0 for fullsplit/transition element of second subelement
-        // 7. ...
+        // 2. 00/01/10/11 for 0/1/2/undefined through-edge tetrahedron fullsplit (only for tetrahedra)
+        // 3. 1/0 for fullsplit/transition element of first subelement
+        // 4. ...
+        // 5. 1/0 for fullsplit/transition element of second subelement
+        // 6. ...
         //
         // Transition elements are numbered for each type in the order in which they appear in the tree.
         // A transition element can therefore be uniquely identified by its type and index in that type.
