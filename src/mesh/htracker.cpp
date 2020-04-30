@@ -67,6 +67,8 @@ void htracker::resetcursor(bool calcrefcoords)
         parenttypes[0]++;
     indexesinclusters = std::vector<int>(maxdepth+1,0);
     parentrefcoords = std::vector<std::vector<std::vector<double>>>(maxdepth+1, std::vector<std::vector<double>>(10));
+    if (isrefcalc)
+        parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
 }
 
 int htracker::next(void)
