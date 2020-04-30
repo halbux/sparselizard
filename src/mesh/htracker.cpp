@@ -35,7 +35,7 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
         lagrangeformfunction lff(i,1,{});
         straightrefcoords[i] = lff.getnodecoordinates();   
         myelems[i] = element(i);
-        mycurvedelems[i] = element(i,curvatureorder);
+        mycurvedelems[i] = element(i,originalcurvatureorder);
         nn[i] = myelems[i].countnodes();
         ncn[i] = mycurvedelems[i].countcurvednodes();
     }
