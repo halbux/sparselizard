@@ -803,7 +803,7 @@ void htracker::print(void)
     for (int i = 0; i < splitdata.size(); i++)
         std::cout << splitdata[i];
         
-    std::cout << std::endl;
+    std::cout << " (" << splitdata.size() << " bits)" << std::endl;
 }
 
 int htracker::countbits(void)
