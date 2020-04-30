@@ -81,9 +81,6 @@ void htracker::resetcursor(bool calcrefcoords)
 int htracker::next(void)
 {
     int throughedgenum = -1;
-    
-    if (isrefcalc && currentdepth == 0)
-        parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
 
     // If not split we are at a leaf:
     if (splitdata[cursorposition] == false)
@@ -96,11 +93,11 @@ int htracker::next(void)
             // For pyramids the subelement type might change from 4 to 7:
             if (parenttypes[currentdepth-1] == 7 && indexesinclusters[currentdepth] == 4)
                 parenttypes[currentdepth] = 7;
-                
+            // Move back up in the tree as much as needed:
             while (currentdepth > 0 && indexesinclusters[currentdepth] == numsubelems[parenttypes[currentdepth-1]])
                 currentdepth--;
         }
-        if (currentdepth == 0)
+        if (currentdepth == 0) // not else here because currentdepth might change above
         {
             origindexintype++;
             // Skip empty types:
@@ -109,13 +106,18 @@ int htracker::next(void)
                 parenttypes[0]++;
                 origindexintype = 0;
             }
+            if (isrefcalc)
+                parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
         }
     }
     else
     {
         cursorposition++;
+        
         // Get the through-edge number (if any):
-        if (parenttypes[currentdepth] == 4)
+        int t = parenttypes[currentdepth];
+        int ic = indexesinclusters[currentdepth];
+        if (t == 4)
         {
             throughedgenum = 0;
             if (splitdata[cursorposition])
@@ -124,10 +126,17 @@ int htracker::next(void)
                 throughedgenum += 1;
                 
             // If it is 3 we have to define it:
-            if (throughedgenum == 3)
+            if (isrefcalc && throughedgenum == 3)
             {
+                // Get the physical node coordinates of the original element:
                 std::vector<double> origelemcoords = myoriginalelements->getnodecoordinates(parenttypes[0], origindexintype);
-                throughedgenum = mycurvedelems[4].choosethroughedge(origelemcoords);
+                // Get the curved reference coordinates in the original element:
+                std::vector<double> refsinorig = myelems[t].calculatecoordinates(curvedrefcoords[t], parentrefcoords[currentdepth][ic], 0, originalcurvatureorder == 1);
+                // Calculate the physical coordinates of the current element:
+                std::vector<double> coordsinorigelem = mycurvedelems[parenttypes[0]].calculatecoordinates(refsinorig, origelemcoords, 0, currentdepth == 0);
+                // Calculate the best through-edge number:
+                throughedgenum = mycurvedelems[4].choosethroughedge(coordsinorigelem);
+                
                 // Write it to the tree:
                 if (throughedgenum%2 == 1)
                     splitdata[cursorposition+1] = true;
@@ -140,6 +149,9 @@ int htracker::next(void)
         // Optionally compute the current reference coordinates in the original element:
         if (isrefcalc)
         {
+            if (currentdepth == 0)
+                parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
+        
             std::vector<std::vector<double>> cornerrefcoords;
             myelems[parenttypes[currentdepth]].fullsplit(cornerrefcoords, throughedgenum);
             
