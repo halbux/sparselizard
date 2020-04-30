@@ -24,9 +24,6 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
         }
     }
         
-
-
-    
     myelems = std::vector<element>(8);
     mycurvedelems = std::vector<element>(8);
     nn = std::vector<int>(8);
