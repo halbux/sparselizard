@@ -151,7 +151,7 @@ int htracker::next(void)
             cursorposition += 2;
         }
         
-        // Optionally compute the current reference coordinates in the original element:
+        // Optionally compute the subelements reference coordinates in the original element:
         if (isrefcalc)
         {
             if (currentdepth == 0)
@@ -176,9 +176,6 @@ int htracker::next(void)
             }
         }
     
-        // For pyramids the subelement type might change from 4 to 7:
-        if (currentdepth > 0 && parenttypes[currentdepth-1] == 7 && indexesinclusters[currentdepth] == 4)
-            parenttypes[currentdepth] = 7;    
         // Split pyramids give 4 tets and 6 pyramids:
         if (parenttypes[currentdepth] != 7)
             parenttypes[currentdepth+1] = parenttypes[currentdepth];

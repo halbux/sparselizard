@@ -84,7 +84,7 @@ class htracker
         void resetcursor(bool calcrefcoords = false);
         // Move cursor forward (crashes when exceeding number of leaves). Position might not be at a leaf.
         // The through-edge number needed for the split is returned (-1 if n/a, 3 is undefined). In case it
-        // has not been defined yet AND THE RESETCURSOR ARGUMENT WAS SET TO TRUE it is calculated and stored.
+        // has not been defined yet and the 'resetcursor' argument is true it is calculated and stored.
         int next(void);
     
         // Check if the cursor is at a leaf:
