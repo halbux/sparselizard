@@ -89,10 +89,11 @@ int htracker::next(void)
         
         if (currentdepth > 0)
         {
-            indexesinclusters[currentdepth]++;
             // For pyramids the subelement type might change from 4 to 7:
-            if (parenttypes[currentdepth-1] == 7 && indexesinclusters[currentdepth] == 4)
+            if (parenttypes[currentdepth-1] == 7 && indexesinclusters[currentdepth] == 3)
                 parenttypes[currentdepth] = 7;
+            
+            indexesinclusters[currentdepth]++;
             // Move back up in the tree as much as needed:
             while (currentdepth > 0 && indexesinclusters[currentdepth] == numsubelems[parenttypes[currentdepth-1]])
                 currentdepth--;
