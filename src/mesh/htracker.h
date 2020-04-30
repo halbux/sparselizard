@@ -79,11 +79,12 @@ class htracker
         int countleaves(void);
         int getmaxdepth(void);
         
-        // Place cursor before first leaf. Request reference coordinate calculations.
+        // Place cursor at beginning of tree. Request reference coordinate calculations or not.
         void resetcursor(bool calcrefcoords = false);
         // Move cursor forward (crashes when exceeding number of leaves). Position might not be at a leaf.
         // The through-edge number needed for the split is returned (-1 if n/a or no split).
         int next(void);
+    
         // Check if the cursor is at a leaf:
         bool isatleaf(void);
         // Count the number of splits used to reach the current position:
