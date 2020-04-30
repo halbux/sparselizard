@@ -49,8 +49,9 @@ class htracker
         std::vector<int> numsubelems = {1,2,4,4,8,8,8,10};
         // Number of corner/curvature nodes for each element type:
         std::vector<int> nn, ncn;
-        // Order 1 reference coordinates for each element type:
+        // Straight/curved reference coordinates for each element type:
         std::vector<std::vector<double>> straightrefcoords;
+        std::vector<std::vector<double>> curvedrefcoords;
         
         // Straight/curved element object for each element type:
         std::vector<element> myelems;
@@ -82,7 +83,8 @@ class htracker
         // Place cursor at beginning of tree. Request reference coordinate calculations or not.
         void resetcursor(bool calcrefcoords = false);
         // Move cursor forward (crashes when exceeding number of leaves). Position might not be at a leaf.
-        // The through-edge number needed for the split is returned (-1 if n/a or no split).
+        // The through-edge number needed for the split is returned (-1 if n/a or no split). In case it has
+        // not been defined yet AND THE RESETCURSOR ARGUMENT WAS SET TO TRUE it is calculated and stored.
         int next(void);
     
         // Check if the cursor is at a leaf:

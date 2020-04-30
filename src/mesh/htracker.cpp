@@ -29,11 +29,18 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
     nn = std::vector<int>(8);
     ncn = std::vector<int>(8);
     straightrefcoords = std::vector<std::vector<double>>(8);
+    curvedrefcoords = std::vector<std::vector<double>>(8);
     for (int i = 0; i < 8; i++)
     {
         numleaves += originalcount[i];
         lagrangeformfunction lff(i,1,{});
-        straightrefcoords[i] = lff.getnodecoordinates();   
+        straightrefcoords[i] = lff.getnodecoordinates();
+        // LFF NOT YET DEFINED FOR CURVED PYRAMIDS
+        if (i < 7)
+        {
+            lagrangeformfunction lffc(i,originalcurvatureorder,{});
+            curvedrefcoords[i] = lffc.getnodecoordinates();
+        }
         myelems[i] = element(i);
         mycurvedelems[i] = element(i,originalcurvatureorder);
         nn[i] = myelems[i].countnodes();
