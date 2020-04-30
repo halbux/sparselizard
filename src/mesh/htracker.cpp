@@ -104,7 +104,31 @@ int htracker::next(void)
     }
     else
     {
-        // Optionally compute the current reference coordinates in the original element: //// COMPUTE IT HERE BASED ON THE ORIGINAL MESH WHEN isrefcalc IS TRUE! SOLVES ALL SUBSEQUENT PROBLEMS
+        cursorposition++;
+        // Get the through-edge number (if any):
+        if (parenttypes[currentdepth] == 4)
+        {
+            throughedgenum = 0;
+            if (splitdata[cursorposition])
+                throughedgenum += 2;
+            if (splitdata[cursorposition+1])
+                throughedgenum += 1;
+                
+            // If it is 3 we have to define it:
+            if (throughedgenum == 3)
+            {
+                std::vector<double> origelemcoords = myoriginalelements->getnodecoordinates(parenttypes[0], origindexintype);
+                throughedgenum = mycurvedelems[4].choosethroughedge(origelemcoords);
+                // Write it to the tree:
+                if (throughedgenum%2 == 1)
+                    splitdata[cursorposition+1] = true;
+                if (((throughedgenum-throughedgenum%2)/2)%2 == 1)
+                    splitdata[cursorposition] = true;
+            }
+            cursorposition += 2;
+        }
+        
+        // Optionally compute the current reference coordinates in the original element:
         if (isrefcalc)
         {
             std::vector<std::vector<double>> cornerrefcoords;
@@ -138,18 +162,6 @@ int htracker::next(void)
         if (currentdepth > 0)
             indexesinclusters[currentdepth]++;
         indexesinclusters[currentdepth+1] = 0;
-
-        cursorposition++;
-        if (parenttypes[currentdepth] == 4)
-        {
-            throughedgenum = 0;
-            if (splitdata[cursorposition])
-                throughedgenum += 2;
-            if (splitdata[cursorposition+1])
-                throughedgenum += 1;
-                
-            cursorposition += 2;
-        }
         
         currentdepth++;
     }
@@ -382,13 +394,11 @@ void htracker::adapt(std::vector<int>& operations)
         if (ic == 0)
             ngr[ns] = 0;
 
-        // Write the throughedge number:
+        // Mark the throughedge number as undefined (value 3):
         if (cte != -1)
         {
-            if (cte%2 == 1)
-                newsplitdata[ni+1] = true;
-            if (((cte-cte%2)/2)%2 == 1)
-                newsplitdata[ni] = true;
+            newsplitdata[ni+1] = true;
+            newsplitdata[ni] = true;
             ni += 2;
         }
         

@@ -82,7 +82,7 @@ class htracker
         // Place cursor before first leaf. Request reference coordinate calculations.
         void resetcursor(bool calcrefcoords = false);
         // Move cursor forward (crashes when exceeding number of leaves). Position might not be at a leaf.
-        // The through-edge number needed for the split is returned (-1 if none or no split).
+        // The through-edge number needed for the split is returned (-1 if n/a or no split).
         int next(void);
         // Check if the cursor is at a leaf:
         bool isatleaf(void);
