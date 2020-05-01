@@ -191,11 +191,6 @@ class elements
         // Get a vector whose index i is true if node i is a corner node:
         std::vector<bool> iscornernode(void);
         
-        
-        // Reorder the nodes of the elements to have the smallest node 
-        // number as first then the smallest connected one as second...
-        // Doing so with all elements reduces the number of total orientations.
-        void tostandardorientation(void);
 
         // 'orient' defines 'totalorientations'. Note: 'totalorientations'
         // is untouched in all renumbering and reordering steps and

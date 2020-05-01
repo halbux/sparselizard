@@ -277,7 +277,6 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
         currentphysicalregion->definewithdisjointregions();
     }
     
-    myelements.tostandardorientation();
     myelements.orient();
     
     if (verbosity > 0)
@@ -491,7 +490,6 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
         currentphysicalregion->definewithdisjointregions();
     }
     
-    myelements.tostandardorientation();
     myelements.orient();
     
     if (verbosity > 0)
