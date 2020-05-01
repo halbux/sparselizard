@@ -82,8 +82,8 @@ class htracker
         
         // Place cursor at beginning of tree. Request reference coordinate calculations or not.
         void resetcursor(bool calcrefcoords = false);
-        // Move cursor forward (crashes when exceeding number of leaves). Position might not be at a leaf.
-        // The through-edge number needed for the split is returned (-1 if n/a, 3 is undefined). In case it
+        // Move cursor to next node (crashes when exceeding number of leaves). Position might not be at a leaf.
+        // The through-edge number needed for the split is returned (-1 if n/a, 3 if undefined). In case it
         // has not been defined yet and the 'resetcursor' argument is true it is calculated and stored.
         int next(void);
     

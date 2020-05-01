@@ -136,7 +136,9 @@ int htracker::next(void)
                 // Get the physical node coordinates of the original element:
                 std::vector<double> origelemcoords = myoriginalelements->getnodecoordinates(parenttypes[0], origindexintype);
                 // Get the curved reference coordinates in the original element:
-                std::vector<double> refsinorig = myelems[t].calculatecoordinates(curvedrefcoords[t], parentrefcoords[currentdepth][ic], 0, originalcurvatureorder == 1);
+                std::vector<double> refsinorig;
+                if (currentdepth > 0)
+                    refsinorig = myelems[t].calculatecoordinates(curvedrefcoords[t], parentrefcoords[currentdepth][ic], 0, originalcurvatureorder == 1);
                 // Calculate the physical coordinates of the current element:
                 std::vector<double> coordsinorigelem = mycurvedelems[parenttypes[0]].calculatecoordinates(refsinorig, origelemcoords, 0, currentdepth == 0);
                 // Calculate the best through-edge number:
