@@ -157,7 +157,7 @@ int htracker::next(void)
         if (isrefcalc)
         {
             std::vector<std::vector<double>> cornerrefcoords;
-            myelems[parenttypes[currentdepth]].fullsplit(cornerrefcoords, throughedgenum);
+            myelems[t].fullsplit(cornerrefcoords, throughedgenum);
             
             int ind = 0;
             for (int i = 0; i < 8; i++)
@@ -168,7 +168,7 @@ int htracker::next(void)
                     for (int k = 0; k < cc.size(); k++)
                         cc[k] = cornerrefcoords[i][j*3*nn[i]+k];
                     
-                    parentrefcoords[currentdepth+1][ind] = myelems[parenttypes[currentdepth]].calculatecoordinates(cc, parentrefcoords[currentdepth][indexesinclusters[currentdepth]]);
+                    parentrefcoords[currentdepth+1][ind] = myelems[t].calculatecoordinates(cc, parentrefcoords[currentdepth][ic]);
 
                     ind++;
                 }
