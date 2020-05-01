@@ -144,11 +144,11 @@ int htracker::next(void)
                 // Calculate the best through-edge number:
                 throughedgenum = mycurvedelems[4].choosethroughedge(coordsinorigelem);
                 
-                // Write it to the tree:
-                if (throughedgenum%2 == 1)
-                    splitdata[cursorposition+1] = true;
-                if (((throughedgenum-throughedgenum%2)/2)%2 == 1)
-                    splitdata[cursorposition] = true;
+                // Write it to the tree (status is 11 now):
+                if (throughedgenum%2 == 0)
+                    splitdata[cursorposition+1] = false;
+                if (((throughedgenum-throughedgenum%2)/2)%2 == 0)
+                    splitdata[cursorposition] = false;
             }
             cursorposition += 2;
         }
