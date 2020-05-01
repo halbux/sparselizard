@@ -217,6 +217,12 @@ int htracker::getindexincluster(void)
     return indexesinclusters[currentdepth];
 }
 
+std::vector<double> htracker::getreferencecoordinates(void)
+{
+    return parentrefcoords[currentdepth][indexesinclusters[currentdepth]];
+}
+
+
 void htracker::countsplits(std::vector<int>& numsplits)
 {
     numsplits = std::vector<int>(numleaves);
@@ -307,11 +313,6 @@ void htracker::getoriginalelementnumber(std::vector<int>& oen)
         
         next();
     }
-}
-
-std::vector<double> htracker::getreferencecoordinates(void)
-{
-    return parentrefcoords[currentdepth][indexesinclusters[currentdepth]];
 }
 
 std::vector<int> htracker::countintypes(void)
