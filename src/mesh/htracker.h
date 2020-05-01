@@ -97,7 +97,7 @@ class htracker
         int getparenttype(void);
         // Get the index of the current element in the cluster:
         int getindexincluster(void);
-        // Get the reference coordinates in the original element of the current node (only if 'calcrefcoords' is true):
+        // Get the current reference coordinates in the original element (only if 'calcrefcoords' is true):
         std::vector<double> getreferencecoordinates(void);
         
         // Count the number of splits used to reach each leaf (modifies the cursor):
