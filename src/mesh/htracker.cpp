@@ -312,10 +312,7 @@ void htracker::getoriginalelementnumber(std::vector<int>& oen)
 
 std::vector<double> htracker::getreferencecoordinates(void)
 {
-    if (currentdepth == 0)
-        return straightrefcoords[parenttypes[0]];
-    else
-        return parentrefcoords[currentdepth][indexesinclusters[currentdepth]];
+    return parentrefcoords[currentdepth][indexesinclusters[currentdepth]];
 }
 
 std::vector<int> htracker::countintypes(void)
