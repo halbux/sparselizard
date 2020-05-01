@@ -156,9 +156,6 @@ int htracker::next(void)
         // Optionally compute the subelements reference coordinates in the original element:
         if (isrefcalc)
         {
-            if (currentdepth == 0)
-                parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
-        
             std::vector<std::vector<double>> cornerrefcoords;
             myelems[parenttypes[currentdepth]].fullsplit(cornerrefcoords, throughedgenum);
             
