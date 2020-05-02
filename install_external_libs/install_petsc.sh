@@ -49,6 +49,11 @@ fi
 
 ########## COMPILE PETSC :
 
+# In case petsc appends a 2 make a link:
+if [ -d arch-linux2-c-opt ]; then
+    ln -s arch-linux2-c-opt arch-linux-c-opt;
+fi
+
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
