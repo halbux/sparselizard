@@ -109,7 +109,7 @@ class htracker
         // For each leaf get the original element number:
         void getoriginalelementnumber(std::vector<int>& oen);
         
-        // Count the number of elements of each type after adaptation:
+        // Count the number of leaves of each type:
         std::vector<int> countintypes(void);
         
         // Update the operations to how they will actually be treated (this removes individual grouping requests):
