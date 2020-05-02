@@ -100,13 +100,13 @@ class htracker
         // Get the current reference coordinates in the original element (only if 'calcrefcoords' is true):
         std::vector<double> getreferencecoordinates(void);
         
-        // Count the number of splits used to reach each leaf:
+        // Get the split depth of all leaves:
         void countsplits(std::vector<int>& numsplits);
         // Get the element type number of all leaves:
         void gettype(std::vector<int>& types);
-        // For each original element 'numsons' gives the number of sons of each type (by blocks of 8).
+        // For each original element get the number of leaves of each type (by blocks of 8).
         void countsons(std::vector<int>& numsons);
-        // For each leaf get the original element number:
+        // Get the original element number of all leaves:
         void getoriginalelementnumber(std::vector<int>& oen);
         
         // Count the number of leaves of each type:
