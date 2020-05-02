@@ -28,7 +28,7 @@ cd petsc;
 
 if [ "$(uname)" == "Linux" ]; then
 PETSC_DIR=$(pwd);
-PETSC_ARCH=arch-linux2-c-opt;
+PETSC_ARCH=arch-linux-c-opt;
 elif [ "$(uname)" == "Darwin"  ]; then
 PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
