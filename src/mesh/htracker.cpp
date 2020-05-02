@@ -259,6 +259,32 @@ void htracker::gettype(std::vector<int>& types)
     }
 }
 
+void htracker::getoriginalelementnumber(std::vector<int>& oen)
+{
+    oen = std::vector<int>(numleaves);
+    
+    resetcursor();
+    
+    int ln = -1;
+    int index = -1;
+    while (true)
+    { 
+        if (currentdepth == 0)
+            index++;
+            
+        if (isatleaf())
+        {
+            ln++;
+            oen[ln] = index;
+        }
+        
+        if (ln == numleaves-1)
+            break;
+        
+        next();
+    }
+}
+
 void htracker::countsons(std::vector<int>& numsons)
 {
     int num = 0;
@@ -280,32 +306,6 @@ void htracker::countsons(std::vector<int>& numsons)
         {
             ln++;
             numsons[8*index+parenttypes[currentdepth]]++;
-        }
-        
-        if (ln == numleaves-1)
-            break;
-        
-        next();
-    }
-}
-
-void htracker::getoriginalelementnumber(std::vector<int>& oen)
-{
-    oen = std::vector<int>(numleaves);
-    
-    resetcursor();
-    
-    int ln = -1;
-    int index = -1;
-    while (true)
-    { 
-        if (currentdepth == 0)
-            index++;
-            
-        if (isatleaf())
-        {
-            ln++;
-            oen[ln] = index;
         }
         
         if (ln == numleaves-1)

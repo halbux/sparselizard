@@ -104,10 +104,10 @@ class htracker
         void countsplits(std::vector<int>& numsplits);
         // Get the element type number of all leaves:
         void gettype(std::vector<int>& types);
-        // For each original element get the number of leaves of each type (by blocks of 8).
-        void countsons(std::vector<int>& numsons);
         // Get the original element number of all leaves:
         void getoriginalelementnumber(std::vector<int>& oen);
+        // For each original element get the number of leaves of each type (by blocks of 8).
+        void countsons(std::vector<int>& numsons);
         
         // Count the number of leaves of each type:
         std::vector<int> countintypes(void);
