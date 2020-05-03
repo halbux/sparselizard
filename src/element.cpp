@@ -1050,6 +1050,92 @@ int element::deducetypenumber(int elemdim, int numnodes)
 
 std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int fi, bool returnnodecoords)
 {
+    // Need to be ultrafast for straight elements in mesh adaptivity
+    if (returnnodecoords == false)
+    {
+        if (curvedtypenumber == 1)
+        {
+            int numrefs = refcoords.size()/3;
+            std::vector<double> outfast(3*numrefs);
+            for (int i = 0; i < numrefs; i++)
+            {
+                double ki = refcoords[3*i+0];
+                
+                double ff0 = +0.5-0.5*ki;
+                double ff1 = +0.5+0.5*ki;
+                
+                outfast[3*i+0] = nodecoords[fi+3*0+0]*ff0 + nodecoords[fi+3*1+0]*ff1;
+                outfast[3*i+1] = nodecoords[fi+3*0+1]*ff0 + nodecoords[fi+3*1+1]*ff1;
+                outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1;
+            }
+            return outfast;
+        }
+        
+        if (curvedtypenumber == 2)
+        {
+            int numrefs = refcoords.size()/3;
+            std::vector<double> outfast(3*numrefs);
+            for (int i = 0; i < numrefs; i++)
+            {
+                double ki = refcoords[3*i+0];
+                double eta = refcoords[3*i+1];
+                
+                double ff0 = +1-1*eta-1*ki;
+                double ff1 = +1*ki;
+                double ff2 = +1*eta;
+                
+                outfast[3*i+0] = nodecoords[fi+3*0+0]*ff0 + nodecoords[fi+3*1+0]*ff1 + nodecoords[fi+3*2+0]*ff2;
+                outfast[3*i+1] = nodecoords[fi+3*0+1]*ff0 + nodecoords[fi+3*1+1]*ff1 + nodecoords[fi+3*2+1]*ff2;
+                outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1 + nodecoords[fi+3*2+2]*ff2;
+            }
+            return outfast;
+        }
+
+        if (curvedtypenumber == 3)
+        {
+            int numrefs = refcoords.size()/3;
+            std::vector<double> outfast(3*numrefs);
+            for (int i = 0; i < numrefs; i++)
+            {
+                double ki = refcoords[3*i+0];
+                double eta = refcoords[3*i+1];
+                
+                double ff0 = +0.25-0.25*eta-0.25*ki+0.25*ki*eta;
+                double ff1 = +0.25-0.25*eta+0.25*ki-0.25*ki*eta;
+                double ff2 = +0.25+0.25*eta+0.25*ki+0.25*ki*eta;
+                double ff3 = +0.25+0.25*eta-0.25*ki-0.25*ki*eta;
+
+                outfast[3*i+0] = nodecoords[fi+3*0+0]*ff0 + nodecoords[fi+3*1+0]*ff1 + nodecoords[fi+3*2+0]*ff2 + nodecoords[fi+3*3+0]*ff3;
+                outfast[3*i+1] = nodecoords[fi+3*0+1]*ff0 + nodecoords[fi+3*1+1]*ff1 + nodecoords[fi+3*2+1]*ff2 + nodecoords[fi+3*3+1]*ff3;
+                outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1 + nodecoords[fi+3*2+2]*ff2 + nodecoords[fi+3*3+2]*ff3;
+            }
+            return outfast;
+        }
+        
+        if (curvedtypenumber == 4)
+        {
+            int numrefs = refcoords.size()/3;
+            std::vector<double> outfast(3*numrefs);
+            for (int i = 0; i < numrefs; i++)
+            {
+                double ki = refcoords[3*i+0];
+                double eta = refcoords[3*i+1];
+                double phi = refcoords[3*i+2];
+                
+                double ff0 = +1-1*phi-1*eta-1*ki;
+                double ff1 = +1*ki;
+                double ff2 = +1*eta;
+                double ff3 = +1*phi;
+                
+                outfast[3*i+0] = nodecoords[fi+3*0+0]*ff0 + nodecoords[fi+3*1+0]*ff1 + nodecoords[fi+3*2+0]*ff2 + nodecoords[fi+3*3+0]*ff3;
+                outfast[3*i+1] = nodecoords[fi+3*0+1]*ff0 + nodecoords[fi+3*1+1]*ff1 + nodecoords[fi+3*2+1]*ff2 + nodecoords[fi+3*3+1]*ff3;
+                outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1 + nodecoords[fi+3*2+2]*ff2 + nodecoords[fi+3*3+2]*ff3;
+            }
+            return outfast;
+        }
+    }
+
+
     int numpolys = mypolynomials.count();
     if (numpolys > 0)
     {
