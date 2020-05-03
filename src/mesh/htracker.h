@@ -112,7 +112,7 @@ class htracker
         // Count the number of leaves of each type:
         std::vector<int> countintypes(void);
         
-        // Update the operations to how they will actually be treated (this removes individual grouping requests):
+        // Update the operations to how they will actually be treated (priority is split > noop > group):
         void fix(std::vector<int>& operations);
         
         // Group/keep/split (-1/0/1) the requested leaves. Leaves are grouped if all
