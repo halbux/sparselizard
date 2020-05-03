@@ -449,33 +449,31 @@ void htracker::adapt(std::vector<int>& operations)
                 if (newmaxdepth < ns+1)
                     newmaxdepth = ns+1;
             }
-            
-            if (operations[ln] == -1)
-                ngr[ns]++;
-                
-            // Group/unchanged:
-            if (operations[ln] < 1)
+            else
             {
                 newsplitdata[ni] = false;
                 ni++;
-            }
-            
-            // Group the cluster if all have requested it:
-            if (ns > 0 && ic == numsubelems[parenttypes[ns-1]]-1)
-            {
-                int md = ns;
-                if (ngr[ns] == numsubelems[parenttypes[ns-1]])
+        
+                if (operations[ln] == -1)
+                    ngr[ns]++;
+                
+                // Group the cluster if all have requested it:
+                if (ns > 0 && ic == numsubelems[parenttypes[ns-1]]-1)
                 {
-                    md--;
-                    int pt = parenttypes[ns-1];
-                    newnumleaves -= numsubelems[pt]-1;
-                    ni -= numsubelems[pt];
-                    if (pt == 4)
-                        ni -= 2;
-                    newsplitdata[ni-1] = false;
+                    int md = ns;
+                    if (ngr[ns] == numsubelems[parenttypes[ns-1]])
+                    {
+                        md--;
+                        int pt = parenttypes[ns-1];
+                        newnumleaves -= numsubelems[pt]-1;
+                        ni -= numsubelems[pt];
+                        if (pt == 4)
+                            ni -= 2;
+                        newsplitdata[ni-1] = false;
+                    }
+                    if (newmaxdepth < md)
+                        newmaxdepth = md;
                 }
-                if (newmaxdepth < md)
-                    newmaxdepth = md;
             }
         }
         
