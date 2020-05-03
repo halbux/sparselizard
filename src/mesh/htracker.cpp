@@ -400,8 +400,7 @@ void htracker::adapt(std::vector<int>& operations)
     
     int ln = -1; // leaf number
     int ni = 0; // newsplitdata index
-    int cte = -1; // current throughedge
-    
+
     while (true)
     {
         int t = parenttypes[currentdepth];
@@ -412,18 +411,18 @@ void htracker::adapt(std::vector<int>& operations)
         if (ic == 0)
             ngr[ns] = 0;
 
-        // Mark the throughedge number as undefined (value 3):
-        if (cte != -1)
-        {
-            newsplitdata[ni+1] = true;
-            newsplitdata[ni] = true;
-            ni += 2;
-        }
-        
         if (not(isatleaf()))
         {
             newsplitdata[ni] = true;
             ni++;
+            
+            // Write the throughedge number (if any):
+            if (t == 4)
+            {
+                newsplitdata[ni] = splitdata[cursorposition+1];
+                newsplitdata[ni+1] = splitdata[cursorposition+2];
+                ni += 2;
+            }
         }
         else
         {
@@ -436,6 +435,7 @@ void htracker::adapt(std::vector<int>& operations)
                 
                 newsplitdata[ni] = true;
                 ni++;
+                // Initialize throug-edge number at 3 (undefined):
                 if (t == 4)
                 {
                     newsplitdata[ni] = true;
@@ -480,10 +480,10 @@ void htracker::adapt(std::vector<int>& operations)
         
         if (ln == numleaves-1)
             break;
-        
-        cte = next();
+            
+        next();
     }
-    
+
     newsplitdata.resize(ni);
     splitdata = newsplitdata;
     numleaves = newnumleaves;
