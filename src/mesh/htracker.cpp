@@ -435,7 +435,7 @@ void htracker::adapt(std::vector<int>& operations)
                 
                 newsplitdata[ni] = true;
                 ni++;
-                // Initialize throug-edge number at 3 (undefined):
+                // Initialize through-edge number at 3 (undefined):
                 if (t == 4)
                 {
                     newsplitdata[ni] = true;
