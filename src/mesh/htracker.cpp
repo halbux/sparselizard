@@ -443,8 +443,8 @@ void htracker::adapt(std::vector<int>& operations)
                     ni += 2;
                 }
                 // Nothing to change for subelements:
-                for (int i = 0 i < numsubelems[t]; i++)
-                    newsplitdata[ni] = false;
+                for (int i = 0; i < numsubelems[t]; i++)
+                    newsplitdata[ni+i] = false;
                 ni += numsubelems[t];
                 
                 if (newmaxdepth < ns+1)
