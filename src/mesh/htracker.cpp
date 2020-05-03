@@ -416,7 +416,7 @@ void htracker::adapt(std::vector<int>& operations)
             newsplitdata[ni] = true;
             ni++;
             
-            // Write the throughedge number (if any):
+            // Write the through-edge number (if any):
             if (t == 4)
             {
                 newsplitdata[ni] = splitdata[cursorposition+1];
