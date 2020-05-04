@@ -509,7 +509,6 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
     while (true)
     {
         int t = parenttypes[currentdepth];
-        int ot = parenttypes[0];
         int ns = currentdepth;
         int ic = indexesinclusters[currentdepth];
     
