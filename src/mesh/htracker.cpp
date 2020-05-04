@@ -579,7 +579,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
     std::vector<int> firstedge(8,0); // first edge in working element
     for (int i = 0; i < 7; i++)
         firstedge[i+1] = firstedge[i] + ne[i] * cornerarc[i].size()/nn[i]/3;
-    std::vector<int> iac(8,0); // index in ac
+    std::vector<int> ite(8,0); // index of trans. elem.
     while (true)
     {
         int t = parenttypes[currentdepth];
@@ -624,7 +624,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
                 curcoords = myelems[t].calculatecoordinates(curcoords, cornerarc[t], iarc[t], splitnum == 0);
                 
                 for (int i = 0; i < curcoords.size(); i++)
-                    transitionsrefcoords[si][nn[si]*iac[si]/ncn[si]+i] = curcoords[i];
+                    transitionsrefcoords[si][3*nn[si]*ite[si]+i] = curcoords[i];
                 
                 // Make curved:
                 if (originalcurvatureorder > 1)
@@ -634,11 +634,11 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
                 curcoords = mycurvedelems[parenttypes[0]].calculatecoordinates(curcoords, oc, 0);
 
                 for (int i = 0; i < curcoords.size(); i++)
-                    ac[si][iac[si]+i] = curcoords[i];
+                    ac[si][3*ncn[si]*ite[si]+i] = curcoords[i];
                     
-                leavesoftransitions[si][iac[si]/ncn[si]/3] = ln;
+                leavesoftransitions[si][ite[si]] = ln;
                 
-                iac[si] += 3*ncn[si];
+                ite[si]++;
                 
             }
         }
@@ -655,18 +655,9 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
     // Fit to size:
     for (int i = 0; i < 8; i++)
     {
-        if (iac[i] > 0)
-        {
-            ac[i].resize(iac[i]);
-            transitionsrefcoords[i].resize(nn[i]*iac[i]/ncn[i]);
-            leavesoftransitions[i].resize(iac[i]/ncn[i]/3);
-        }
-        else // because initialized to upper bound length
-        {
-            ac[i] = {};
-            transitionsrefcoords[i] = {};
-            leavesoftransitions[i] = {};
-        }
+        ac[i].resize(3*ncn[i]*ite[i]);
+        transitionsrefcoords[i].resize(3*nn[i]*ite[i]);
+        leavesoftransitions[i].resize(ite[i]);
     }
     leafnums = leavesoftransitions;
 }
