@@ -513,7 +513,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
         int ns = currentdepth;
         int ic = indexesinclusters[currentdepth];
     
-        if (ns == 0)
+        if (withphysicals && ns == 0)
             oc = myoriginalelements->getnodecoordinates(t, origindexintype);
     
         if (isatleaf())
