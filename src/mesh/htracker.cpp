@@ -547,41 +547,27 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
     for (int i = 0; i < 8; i++)
         ne[i] = myelems[i].countedges();
 
-
-    // Get the reference ('arc') and physical ('ac') element corner coordinates after all fullsplit adaptation:
-    std::vector<std::vector<double>> cornerac;
-    std::vector<std::vector<double>> cornerarc;
-    atleaves(cornerarc, cornerac, true);
-    
+    // Get the reference ('arc') and physical ('apc') element corner coordinates after all fullsplit adaptations:
+    std::vector<std::vector<double>> cornerarc, cornerapc;
+    atleaves(cornerarc, cornerapc, true);    
     
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
     std:vector<bool> isedgesplit;
-    myalgorithm::assignedgenumbers(cornerac, edgenumbers, isedgesplit, noisethreshold);
+    myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit, noisethreshold);
     
 
-    // Preallocate output containers:
+    // Preallocate output containers to upper bound size:
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
     transitionsrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
     leavesoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
-    // No-transition size:
-    std::vector<int> nts(8,0);
-    for (int i = 0; i < 8; i++)
-        nts[i] = ncn[i] * cornerarc[i].size()/nn[i];
-    // Preallocate to an upper bound:
-    ac[1] = std::vector<double>(nts[1]);
-    ac[2] = std::vector<double>(4*nts[2]+3*nts[3]); // NO: ASK FOR ELEMENT OBJECT TO GIVE THAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ac[3] = std::vector<double>(4*nts[3]);
-    ac[4] = std::vector<double>(8*nts[4]);
-    // Undefined for other elements for now:
-    ac[5] = std::vector<double>(0);
-    ac[6] = std::vector<double>(0);
-    ac[7] = std::vector<double>(0);
-    
+
+    std::vector<int> ub = countupperbound();
     for (int i = 0; i < 8; i++)
     {
-        leavesoftransitions[i] = std::vector<int>(ac[i].size()/ncn[i]/3);
-        transitionsrefcoords[i] = std::vector<double>(nn[i]*ac[i].size()/ncn[i]);
+        ac[i] = std::vector<double>(3*ncn[i]*ub[i]);
+        leavesoftransitions[i] = std::vector<int>(ub[i]);
+        transitionsrefcoords[i] = std::vector<double>(3*nn[i]*ub[i]);
     }
     
     resetcursor();
@@ -596,16 +582,15 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
     std::vector<int> iac(8,0); // index in ac
     while (true)
     {
-        if (currentdepth == 0 && indexesinclusters[0] == 0)
-            oc = myoriginalelements->getnodecoordinates(parenttypes[0], origindexintype);
+        int t = parenttypes[currentdepth];
+
+        if (currentdepth == 0)
+            oc = myoriginalelements->getnodecoordinates(t, origindexintype);
     
         while (not(isatleaf()))
             next();
     
         ln++;
-     
-        int t = parenttypes[currentdepth];
-        int ot = parenttypes[0];
         
         // Get the edge numbers and edge splits for the current subelement:
         std::vector<int> curedgenums(ne[t]);
@@ -646,7 +631,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
                     curcoords = myelems[si].calculatecoordinates(curvedrefcoords[si], curcoords);
                     
                 // Calculate actual coordinates: 
-                curcoords = mycurvedelems[ot].calculatecoordinates(curcoords, oc, 0);
+                curcoords = mycurvedelems[parenttypes[0]].calculatecoordinates(curcoords, oc, 0);
 
                 for (int i = 0; i < curcoords.size(); i++)
                     ac[si][iac[si]+i] = curcoords[i];
@@ -676,9 +661,24 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
             transitionsrefcoords[i].resize(nn[i]*iac[i]/ncn[i]);
             leavesoftransitions[i].resize(iac[i]/ncn[i]/3);
         }
-        // ELSE RESIZE TO 0 OR ALREADY EMPTY?
     }
     leafnums = leavesoftransitions;
+}
+
+std::vector<int> htracker::countupperbound(void)
+{
+    std::vector<int> nit = countintypes();
+    
+    std::vector<int> output(8,0);
+    
+    output[0] = nit[0];
+    output[1] = nit[1];
+    output[2] = 4*nit[2] + 3*nit[3];
+    output[3] = 4*nit[3];
+    output[4] = 8*nit[4];
+    // DEFINE ALSO FOR HEXAHEDRA, PRISMS AND PYRAMIDS (+ adapt tet nums)
+    
+    return output;
 }
 
 void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc)
