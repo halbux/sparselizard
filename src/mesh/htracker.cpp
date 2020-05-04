@@ -669,8 +669,8 @@ std::vector<int> htracker::countupperbound(void)
     std::vector<int> output(8,0);
     
     output[0] = nit[0];
-    output[1] = nit[1];
-    output[2] = 4*nit[2] + 3*nit[3];
+    output[1] = 2*nit[1];
+    output[2] = 4*nit[2] + 4*nit[3];
     output[3] = 4*nit[3];
     output[4] = 8*nit[4];
     // DEFINE ALSO FOR HEXAHEDRA, PRISMS AND PYRAMIDS (+ adapt tet nums)
