@@ -129,7 +129,7 @@ class htracker
         // The parent leaf number of each transition element is provided in 'leafnums' after execution.
         void getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold);
     
-        // Get an upper bound of number of transition elements thatcan be created from all leaves:
+        // Get an upper bound of number of transition elements that can be created from all leaves:
         std::vector<int> countupperbound(void);
     
         // Get the reference coordinate in the original element 'orc' corresponding to the reference coordinates in the transition elements 'rc'.
