@@ -544,13 +544,8 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
 void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
 {
     std::vector<int> ne(8);
-    std::vector<std::vector<double>> curvedcoords(8);
     for (int i = 0; i < 8; i++)
-    {
-        ne[i] = mycurvedelems[i].countedges();
-        lagrangeformfunction lff(i,originalcurvatureorder,{});
-        curvedcoords[i] = lff.getnodecoordinates();
-    }
+        ne[i] = myelems[i].countedges();
 
 
     // Get the reference ('arc') and physical ('ac') element corner coordinates after all fullsplit adaptation:
@@ -648,7 +643,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
                 
                 // Make curved:
                 if (originalcurvatureorder > 1)
-                    curcoords = myelems[si].calculatecoordinates(curvedcoords[si], curcoords);
+                    curcoords = myelems[si].calculatecoordinates(curvedrefcoords[si], curcoords);
                     
                 // Calculate actual coordinates: 
                 curcoords = mycurvedelems[ot].calculatecoordinates(curcoords, oc, 0);
