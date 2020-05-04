@@ -661,6 +661,12 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
             transitionsrefcoords[i].resize(nn[i]*iac[i]/ncn[i]);
             leavesoftransitions[i].resize(iac[i]/ncn[i]/3);
         }
+        else // because initialized to upper bound length
+        {
+            ac[i] = {};
+            transitionsrefcoords[i] = {};
+            leavesoftransitions[i] = {};
+        }
     }
     leafnums = leavesoftransitions;
 }
