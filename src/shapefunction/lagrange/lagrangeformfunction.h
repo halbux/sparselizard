@@ -51,6 +51,8 @@ class lagrangeformfunction
         
     public:
         
+        lagrangeformfunction(void) {};
+        
         // The constructor takes the element type number, the form function
         // order and the coordinates of the evaluation points as input. 
         // They are set once and for all for a given object. 
