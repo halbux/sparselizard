@@ -754,7 +754,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     }    
     
     // Indexes of the 'orc' points that are in the current tree position:
-    std::vector<std::vector<std::vector<int>>> actives(maxdepth+1, std::vector<std::vector<int>>(10));
+    std::vector<std::vector<int>> actives(maxdepth+1, std::vector<int>(0));
     
     // Needed for the root finding:
     std::vector<lagrangeformfunction> lffs(8);
@@ -779,14 +779,14 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             origelem++;
             // Set all to active:
             int numrefsinorig = (oad[origelem+1]-oad[origelem])/3;
-            actives[0] = {myalgorithm::getequallyspaced(oad[origelem]/3, 1, numrefsinorig)};
+            actives[0] = myalgorithm::getequallyspaced(oad[origelem]/3, 1, numrefsinorig);
         }
         else
         {
             std::vector<double> refcoords = getreferencecoordinates();
         
             // Actives in parent:
-            std::vector<int> par = actives[ns-1][indexesinclusters[ns-1]];
+            std::vector<int> par = actives[ns-1];
             int numactivesinparent = par.size();
             
             std::vector<double> parcoords(3*numactivesinparent);
@@ -801,7 +801,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             std::vector<bool> isinside;
             myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-12);
             
-            myalgorithm::splitvector(par, isinside, actives[ns-1][indexesinclusters[ns-1]], actives[ns][ic]);
+            myalgorithm::splitvector(par, isinside, actives[ns-1], actives[ns]);
         }
     
         if (isatleaf())
@@ -827,7 +827,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     }
                         
                     // Actives in the current leaf:
-                    std::vector<int> activesinleaf = actives[ns][ic];
+                    std::vector<int> activesinleaf = actives[ns];
                     int numactivesinleaf = activesinleaf.size();
                     
                     std::vector<double> activecoords(3*numactivesinleaf);
@@ -842,7 +842,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     myelems[i].isinsideelement(activecoords, currefcoords, isintrans, 1e-12);
                     // Actives in the current transition element:
                     std::vector<int> activesintrans;
-                    myalgorithm::splitvector(activesinleaf, isintrans, actives[ns][ic], activesintrans);
+                    myalgorithm::splitvector(activesinleaf, isintrans, actives[ns], activesintrans);
             
                     // Populate 'ad':
                     ad[i][ti[i]+1] = ad[i][ti[i]]+3*activesintrans.size();
