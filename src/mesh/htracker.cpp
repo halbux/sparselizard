@@ -840,7 +840,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     
                     std::vector<bool> isintrans;
                     myelems[i].isinsideelement(activecoords, currefcoords, isintrans, 1e-12);
-                    // Actives in the current transient element:
+                    // Actives in the current transition element:
                     std::vector<int> activesintrans;
                     myalgorithm::splitvector(activesinleaf, isintrans, actives[ns][ic], activesintrans);
             
