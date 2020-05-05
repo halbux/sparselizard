@@ -678,12 +678,16 @@ std::vector<int> htracker::countupperbound(void)
     return output;
 }
 
-void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc)
+void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& maprctoorc)
 {
     std::vector<int> oen;
     getoriginalelementnumber(oen);
 
     // Preallocate:
+    maprctoorc = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    for (int i = 0; i < 8; i++)
+        maprctoorc[i] = std::vector<int>(rc[i].size()/3);
+        
     int numrc = 0, no = 0;
     for (int i = 0; i < 8; i++)
     {
@@ -730,13 +734,15 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
             int origelem = oen[leavesoftransitions[i][j]];
             for (int k = 0; k < 3*nr; k++)
                 orc[oad[origelem]+index[origelem]+k] = currefs[k];
+            for (int k = 0; k < nr; k++)
+                maprctoorc[i][ad[i][j]/3+k] = (oad[origelem]+index[origelem])/3+k;
        
             index[origelem] += 3*nr;
         }
     }
 }
 
-void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc)
+void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& maporctorc)
 {
     int elemdim = myoriginalelements->getdimension();
 
@@ -752,6 +758,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             rc[i] = std::vector<double>(orc.size());
         }
     }    
+    maporctorc = std::vector<int>(2*orc.size()/3);
     
     // Indexes of the 'orc' points that are in the current tree position:
     std::vector<std::vector<int>> actives(maxdepth+1, std::vector<int>(0));
@@ -871,6 +878,9 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                                 rc[i][ad[i][ti[i]]+3*j+0] = kietaphi[0];
                                 rc[i][ad[i][ti[i]]+3*j+1] = kietaphi[1];
                                 rc[i][ad[i][ti[i]]+3*j+2] = kietaphi[2];
+                                
+                                maporctorc[2*activesintrans[j]+0] = i;
+                                maporctorc[2*activesintrans[j]+1] = ad[i][ti[i]]/3+j;
                             }
                             else
                             {
@@ -904,30 +914,60 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
     // Get from this htracker's transition elements to the original elements:
     std::vector<int> oad;
     std::vector<double> orc;
+    std::vector<std::vector<int>> maprctoorc;
     
-    tooriginal(ad, rc, oad, orc);
+    tooriginal(ad, rc, oad, orc, maprctoorc);
     
     // Get from the original elements to the target htracker's transition elements:
     std::vector<std::vector<int>> tad;
     std::vector<std::vector<double>> trc;
+    std::vector<int> maporctorc;
     
-    target.fromoriginal(oad, orc, tad, trc);
+    target.fromoriginal(oad, orc, tad, trc, maporctorc);
     
     
     // Create output containers:
     targettranselems = std::vector<std::vector<int>>(8, std::vector<int>(0));
     targetrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
     
+    // Loop on all 'rc' entries:
     for (int i = 0; i < 8; i++)
     {
         int nr = rc[i].size()/3;
         
+        if (nr == 0)
+            continue;
+        
         targettranselems[i] = std::vector<int>(2*nr);
-        targetrefcoords[i] = std::vector<double>(nr);
+        targetrefcoords[i] = std::vector<double>(3*nr);
+        
+        // Create a vector to map the position in the target 'rc' to the target transition element number:
+        std::vector<int> map(trc[i].size()/3,0);
+        int index = 0;
+        for (int j = 0; j < tad[i].size()-1; j++)
+        {
+            for (int k = 0; k < (tad[i][j+1]-tad[i][j])/3; k++)
+            {
+                map[index] = j;
+                index++;
+            }
+        }
         
         for (int j = 0; j < nr; j++)
         {
+            // To original element:
+            int orc = maprctoorc[i][j];
             
+            // To target:
+            int ttype = maporctorc[2*orc+0];
+            int tind = maporctorc[2*orc+1];
+        
+            targettranselems[i][2*j+0] = ttype;
+            targettranselems[i][2*j+1] = map[tind];
+            
+            targetrefcoords[i][3*j+0] = trc[ttype][3*tind+0];
+            targetrefcoords[i][3*j+1] = trc[ttype][3*tind+1];
+            targetrefcoords[i][3*j+2] = trc[ttype][3*tind+2];
         }
     }
 }
@@ -935,6 +975,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
 void htracker::tostorage(void)
 {
     transitionsrefcoords = {};
+    leavesoftransitions = {};
 }
 
 void htracker::print(void)

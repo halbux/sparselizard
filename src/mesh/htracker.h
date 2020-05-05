@@ -135,9 +135,11 @@ class htracker
         // Get the reference coordinate in the original element 'orc' corresponding to the reference coordinates in the transition elements 'rc'.
         // 'ad[t][i]' gives the first position in 'rc' where the ith transition element of type t is. 'oad[i]' does that for the first position
         // of the ith original element in 'orc'. 'ad' and 'oad' have a 1 longer size and their last value is the vec size.
-        void tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc);
-        // Inverse function of the above:
-        void fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc);
+        // 'maprctoorc[i][j]'x3 gives the position in 'orc' corresponding to the point at 'rc[i][3*j]'. 
+        void tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& maprctoorc);
+        // Inverse function of the above. 'maporctorc[2*i+0]' and 'maporctorc[2*i+1]' respectively 
+        // give t and j such that the ith point in 'orc' corresponds to 'rc[t][3*j]'. 
+        void fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& maporctorc);
         
         // Get the corresponding point at the target. To each rc[i][j] is associated its corresponding transient element type and index in type
         // (in targettranselems[i][2*j+0] and targettranselems[i][2*j+1]) and the associated reference coordinate in the target transient element. 
