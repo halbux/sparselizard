@@ -138,7 +138,10 @@ class htracker
         void tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc);
         // Inverse function of the above:
         void fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc);
-        // + WRITE ONE FCT DOING BOTH ABOVE (arg is htracker&)
+        
+        // Get the corresponding point at the target. To each rc[i][j] is associated its corresponding transient element type and index in type
+        // (in targettranselems[i][2*j+0] and targettranselems[i][2*j+1]) and the associated reference coordinate in the target transient element. 
+        void getattarget(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords);
         
         // Reduce size for storage:
         void tostorage(void);

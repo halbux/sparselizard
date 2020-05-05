@@ -899,6 +899,39 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     }
 }
 
+void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords)
+{
+    // Get from this htracker's transition elements to the original elements:
+    std::vector<int> oad;
+    std::vector<double> orc;
+    
+    tooriginal(ad, rc, oad, orc);
+    
+    // Get from the original elements to the target htracker's transition elements:
+    std::vector<std::vector<int>> tad;
+    std::vector<std::vector<double>> trc;
+    
+    target.fromoriginal(oad, orc, tad, trc);
+    
+    
+    // Create output containers:
+    targettranselems = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    targetrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    
+    for (int i = 0; i < 8; i++)
+    {
+        int nr = rc[i].size()/3;
+        
+        targettranselems[i] = std::vector<int>(2*nr);
+        targetrefcoords[i] = std::vector<double>(nr);
+        
+        for (int j = 0; j < nr; j++)
+        {
+            
+        }
+    }
+}
+
 void htracker::tostorage(void)
 {
     transitionsrefcoords = {};
