@@ -746,8 +746,11 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     {
         int curnumtran = leavesoftransitions[i].size();
         if (curnumtran > 0)
+        {
             ad[i] = std::vector<int>(curnumtran+1,0);
-        rc[i] = std::vector<double>(3*curnumtran);
+            // Max bound (size is unknown for now):
+            rc[i] = std::vector<double>(orc.size());
+        }
     }    
     
     // Indexes of the 'orc' points that are in the current tree position:
@@ -886,6 +889,13 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             break;
             
         next();
+    }
+    
+    // Fit to actual size:
+    for (int i = 0; i < 8; i++)
+    {
+        if (ad[i].size() > 0)
+            rc[i].resize(ad[i][ad[i].size()-1]);
     }
 }
 
