@@ -749,8 +749,6 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             ad[i] = std::vector<int>(curnumtran+1,0);
         rc[i] = std::vector<double>(3*curnumtran);
     }    
-    // Transition element in which each reference coordinate is:
-    std::vector<int> transitionelemnum(orc.size()/3);
     
     // Indexes of the 'orc' points that are in the current tree position:
     std::vector<std::vector<std::vector<int>>> actives(maxdepth+1, std::vector<std::vector<int>>(10));
@@ -815,14 +813,14 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     // Get the reference coordinates of the current transition element:
                     std::vector<double> currefcoords(3*nn[i]);
                     for (int j = 0; j < 3*nn[i]; j++)
-                        currefcoords[j] = transitionsrefcoords[i][3*ti[i]+j];
-                    // Same but by individual coordinates:
+                        currefcoords[j] = transitionsrefcoords[i][3*nn[i]*ti[i]+j];
+                    // Same but by individual coordinates (needed for root finding):
                     std::vector<std::vector<double>> xyz(3, std::vector<double>(nn[i]));
                     for (int j = 0; j < nn[i]; j++)
                     {
-                        xyz[0][j] = transitionsrefcoords[i][3*ti[i]+3*j+0];
-                        xyz[1][j] = transitionsrefcoords[i][3*ti[i]+3*j+1];
-                        xyz[2][j] = transitionsrefcoords[i][3*ti[i]+3*j+2];
+                        xyz[0][j] = transitionsrefcoords[i][3*nn[i]*ti[i]+3*j+0];
+                        xyz[1][j] = transitionsrefcoords[i][3*nn[i]*ti[i]+3*j+1];
+                        xyz[2][j] = transitionsrefcoords[i][3*nn[i]*ti[i]+3*j+2];
                     }
                         
                     // Actives in the current leaf:
@@ -830,11 +828,11 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     int numactivesinleaf = activesinleaf.size();
                     
                     std::vector<double> activecoords(3*numactivesinleaf);
-                    for (int i = 0; i < numactivesinleaf; i++)
+                    for (int j = 0; j < numactivesinleaf; j++)
                     {
-                        activecoords[3*i+0] = orc[3*activesinleaf[i]+0];
-                        activecoords[3*i+1] = orc[3*activesinleaf[i]+1];
-                        activecoords[3*i+2] = orc[3*activesinleaf[i]+2];
+                        activecoords[3*j+0] = orc[3*activesinleaf[j]+0];
+                        activecoords[3*j+1] = orc[3*activesinleaf[j]+1];
+                        activecoords[3*j+2] = orc[3*activesinleaf[j]+2];
                     }
                     
                     std::vector<bool> isintrans;
@@ -846,37 +844,40 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     // Populate 'ad':
                     ad[i][ti[i]+1] = ad[i][ti[i]]+3*activesintrans.size();
             
-                    // Loop on all actives:
-                    for (int k = 0; k < activesintrans.size(); k++)
+                    if (activesintrans.size() > 0)
                     {
-                        // Find the corresponding reference coordinate in the transition element.
+                        // Find the corresponding reference coordinate in the transition element's own reference.
                         // First create the polynomials for the system to solve.
                         std::vector<polynomial> curpols( elemdim*(elemdim+1) );
-                        for (int sj = 0; sj < elemdim; sj++)
+                        for (int j = 0; j < elemdim; j++)
                         {
-                            curpols[sj*(elemdim+1)+0] = lffs[i].getinterpolationpolynomial(xyz[sj]);
+                            curpols[j*(elemdim+1)+0] = lffs[i].getinterpolationpolynomial(xyz[j]);
                             for (int d = 0; d < elemdim; d++)
-                                curpols[sj*(elemdim+1)+1+d] = curpols[sj*(elemdim+1)+0].derivative(d);
+                                curpols[j*(elemdim+1)+1+d] = curpols[j*(elemdim+1)+0].derivative(d);
                         }
                         polynomials polys(curpols);
-                        
-                        std::vector<double> kietaphi = {0.0,0.0,0.0};
-                        std::vector<double> rhs = {transitionsrefcoords[i][ti[i]+0], transitionsrefcoords[i][ti[i]+1], transitionsrefcoords[i][ti[i]+2]};
-                        
-                        if (myalgorithm::getroot(polys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
-                        {
-                            rc[i][ad[i][ti[i]]+3*k+0] = kietaphi[0];
-                            rc[i][ad[i][ti[i]]+3*k+1] = kietaphi[1];
-                            rc[i][ad[i][ti[i]]+3*k+2] = kietaphi[2];
+                
+                        // Loop on all actives:
+                        for (int j = 0; j < activesintrans.size(); j++)
+                        {                        
+                            std::vector<double> kietaphi = {0.0,0.0,0.0};
+                            std::vector<double> rhs = {orc[3*activesintrans[j]+0], orc[3*activesintrans[j]+1], orc[3*activesintrans[j]+2]};
+                            
+                            if (myalgorithm::getroot(polys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                            {
+                                rc[i][ad[i][ti[i]]+3*j+0] = kietaphi[0];
+                                rc[i][ad[i][ti[i]]+3*j+1] = kietaphi[1];
+                                rc[i][ad[i][ti[i]]+3*j+2] = kietaphi[2];
+                            }
+                            else
+                            {
+                                std::cout << "Error in 'htracker' object: root finding algorithm for mesh adaptivity failed to converge for a " << myelems[i].gettypename() << " element" << std::endl;
+                                abort();
+                            }
                         }
-                        else
-                        {
-                            std::cout << "Error in 'htracker' object: root finding algorithm for mesh adaptivity failed to converge for a " << myelems[i].gettypename() << " element" << std::endl;
-                            abort();
-                        }
-                        
-                        ti[i]++;
                     }
+                    
+                    ti[i]++;
                 }
             }
         }
