@@ -738,67 +738,146 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
 
 void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc)
 {
-    // Find the transition element in which each ref. coord is:
-    int numtran = 0;
-    std::vector<int> transindex(8,0);
+    int elemdim = myoriginalelements->getdimension();
+
+    ad = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    rc = std::vector<std::vector<double>>(8, std::vector<double>(0));
     for (int i = 0; i < 8; i++)
     {
-        transindex[i] = numtran;
-        numtran += leavesoftransitions[i].size();
+        int curnumtran = leavesoftransitions[i].size();
+        if (curnumtran > 0)
+            ad[i] = std::vector<int>(curnumtran+1,0);
+        rc[i] = std::vector<double>(3*curnumtran);
     }    
-    // In which transition element is each ref coord?
+    // Transition element in which each reference coordinate is:
     std::vector<int> transitionelemnum(orc.size()/3);
     
-    // Indexes of the orc's that are in the current tree position:
-    std::vector<std::vector<std::vector<int>>> activercs(maxdepth+1, std::vector<std::vector<int>>(10));
+    // Indexes of the 'orc' points that are in the current tree position:
+    std::vector<std::vector<std::vector<int>>> actives(maxdepth+1, std::vector<std::vector<int>>(10));
+    
+    // Needed for the root finding:
+    std::vector<lagrangeformfunction> lffs(8);
+    for (int i = 0; i < 8; i++)
+        lffs[i] = lagrangeformfunction(i,1,{});
     
     resetcursor(true);
     
     int origelem = -1;
     int ln = -1; // leaf number
+    std::vector<int> ti(8,0); // transition element index
+    
     while (true)
     {
         int t = parenttypes[currentdepth];
-        int ot = parenttypes[0];
         int ns = currentdepth;
         int ic = indexesinclusters[currentdepth];
     
+        // Update 'actives':
         if (ns == 0)
         {
             origelem++;
+            // Set all to active:
             int numrefsinorig = (oad[origelem+1]-oad[origelem])/3;
-            activercs[0] = {std::vector<int>(numrefsinorig)};
-            for (int i = 0; i < numrefsinorig; i++)
-                activercs[0][0][i] = oad[origelem]/3+i;
+            actives[0] = {myalgorithm::getequallyspaced(oad[origelem]/3, 1, numrefsinorig)};
+        }
+        else
+        {
+            std::vector<double> refcoords = getreferencecoordinates();
+        
+            // Actives in parent:
+            std::vector<int> par = actives[ns-1][indexesinclusters[ns-1]];
+            int numactivesinparent = par.size();
+            
+            std::vector<double> parcoords(3*numactivesinparent);
+            for (int i = 0; i < numactivesinparent; i++)
+            {
+                parcoords[3*i+0] = orc[3*par[i]+0];
+                parcoords[3*i+1] = orc[3*par[i]+1];
+                parcoords[3*i+2] = orc[3*par[i]+2];
+            }
+            
+            // Redirect the reference coordinates to the current element if inside it:
+            std::vector<bool> isinside;
+            myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-12);
+            
+            myalgorithm::splitvector(par, isinside, actives[ns-1][indexesinclusters[ns-1]], actives[ns][ic]);
         }
     
         if (isatleaf())
         {
             ln++;
-         
-        }
-        else
-        {
-            if (ns > 0)
-            {
-                std::vector<int> par = activercs[ns-1][indexesinclusters[currentdepth-1]];
-                int numinparent = par.size();
-                
-                std::vector<double> parcoords(3*numinparent);
-                for (int i = 0; i < numinparent; i++)
-                {
-                    parcoords[3*i+0] = orc[3*par[i]+0];
-                    parcoords[3*i+1] = orc[3*par[i]+1];
-                    parcoords[3*i+2] = orc[3*par[i]+2];
-                }
             
-                std::vector<double> refcoords = getreferencecoordinates();
-                
-                // Redirect the ref. coord. to the current element if inside it:
-                std::vector<bool> isinside;
-                myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-10);
-                
-                myalgorithm::splitvector(par, isinside, activercs[ns-1][indexesinclusters[currentdepth-1]], activercs[ns][ic]);
+            // Loop on all transition elements of this leaf:
+            for (int i = 0; i < 8; i++)
+            {
+                while (ti[i] < leavesoftransitions[i].size() && leavesoftransitions[i][ti[i]] == ln)
+                {
+                    // Get the reference coordinates of the current transition element:
+                    std::vector<double> currefcoords(3*nn[i]);
+                    for (int j = 0; j < 3*nn[i]; j++)
+                        currefcoords[j] = transitionsrefcoords[i][3*ti[i]+j];
+                    // Same but by individual coordinates:
+                    std::vector<std::vector<double>> xyz(3, std::vector<double>(nn[i]));
+                    for (int j = 0; j < nn[i]; j++)
+                    {
+                        xyz[0][j] = transitionsrefcoords[i][3*ti[i]+3*j+0];
+                        xyz[1][j] = transitionsrefcoords[i][3*ti[i]+3*j+1];
+                        xyz[2][j] = transitionsrefcoords[i][3*ti[i]+3*j+2];
+                    }
+                        
+                    // Actives in the current leaf:
+                    std::vector<int> activesinleaf = actives[ns][ic];
+                    int numactivesinleaf = activesinleaf.size();
+                    
+                    std::vector<double> activecoords(3*numactivesinleaf);
+                    for (int i = 0; i < numactivesinleaf; i++)
+                    {
+                        activecoords[3*i+0] = orc[3*activesinleaf[i]+0];
+                        activecoords[3*i+1] = orc[3*activesinleaf[i]+1];
+                        activecoords[3*i+2] = orc[3*activesinleaf[i]+2];
+                    }
+                    
+                    std::vector<bool> isintrans;
+                    myelems[i].isinsideelement(activecoords, currefcoords, isintrans, 1e-12);
+                    // Actives in the current transient element:
+                    std::vector<int> activesintrans;
+                    myalgorithm::splitvector(activesinleaf, isintrans, actives[ns][ic], activesintrans);
+            
+                    // Populate 'ad':
+                    ad[i][ti[i]+1] = ad[i][ti[i]]+3*activesintrans.size();
+            
+                    // Loop on all actives:
+                    for (int k = 0; k < activesintrans.size(); k++)
+                    {
+                        // Find the corresponding reference coordinate in the transition element.
+                        // First create the polynomials for the system to solve.
+                        std::vector<polynomial> curpols( elemdim*(elemdim+1) );
+                        for (int sj = 0; sj < elemdim; sj++)
+                        {
+                            curpols[sj*(elemdim+1)+0] = lffs[i].getinterpolationpolynomial(xyz[sj]);
+                            for (int d = 0; d < elemdim; d++)
+                                curpols[sj*(elemdim+1)+1+d] = curpols[sj*(elemdim+1)+0].derivative(d);
+                        }
+                        polynomials polys(curpols);
+                        
+                        std::vector<double> kietaphi = {0.0,0.0,0.0};
+                        std::vector<double> rhs = {transitionsrefcoords[i][ti[i]+0], transitionsrefcoords[i][ti[i]+1], transitionsrefcoords[i][ti[i]+2]};
+                        
+                        if (myalgorithm::getroot(polys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                        {
+                            rc[i][ad[i][ti[i]]+3*k+0] = kietaphi[0];
+                            rc[i][ad[i][ti[i]]+3*k+1] = kietaphi[1];
+                            rc[i][ad[i][ti[i]]+3*k+2] = kietaphi[2];
+                        }
+                        else
+                        {
+                            std::cout << "Error in 'htracker' object: root finding algorithm for mesh adaptivity failed to converge for a " << myelems[i].gettypename() << " element" << std::endl;
+                            abort();
+                        }
+                        
+                        ti[i]++;
+                    }
+                }
             }
         }
         
