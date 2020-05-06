@@ -930,6 +930,23 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
     targettranselems = std::vector<std::vector<int>>(8, std::vector<int>(0));
     targetrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
     
+    // Create a vector to map the position in the target 'rc' to the target transition element number:
+    std::vector<std::vector<int>> map(8, std::vector<int>(0));
+    for (int i = 0; i < 8; i++)
+    {
+        map[i] = std::vector<int>(trc[i].size()/3);
+    
+        int index = 0;
+        for (int j = 0; j < tad[i].size()-1; j++)
+        {
+            for (int k = 0; k < (tad[i][j+1]-tad[i][j])/3; k++)
+            {
+                map[i][index] = j;
+                index++;
+            }
+        }
+    }
+    
     // Loop on all 'rc' entries:
     for (int i = 0; i < 8; i++)
     {
@@ -941,18 +958,6 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
         targettranselems[i] = std::vector<int>(2*nr);
         targetrefcoords[i] = std::vector<double>(3*nr);
         
-        // Create a vector to map the position in the target 'rc' to the target transition element number:
-        std::vector<int> map(trc[i].size()/3,0);
-        int index = 0;
-        for (int j = 0; j < tad[i].size()-1; j++)
-        {
-            for (int k = 0; k < (tad[i][j+1]-tad[i][j])/3; k++)
-            {
-                map[index] = j;
-                index++;
-            }
-        }
-        
         for (int j = 0; j < nr; j++)
         {
             // To original element:
@@ -963,7 +968,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
             int tind = maporctorc[2*orc+1];
         
             targettranselems[i][2*j+0] = ttype;
-            targettranselems[i][2*j+1] = map[tind];
+            targettranselems[i][2*j+1] = map[i][tind];
             
             targetrefcoords[i][3*j+0] = trc[ttype][3*tind+0];
             targetrefcoords[i][3*j+1] = trc[ttype][3*tind+1];
