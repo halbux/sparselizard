@@ -971,7 +971,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
             int tind = maporctorc[2*orc+1];
         
             targettranselems[i][2*j+0] = ttype;
-            targettranselems[i][2*j+1] = map[i][tind];
+            targettranselems[i][2*j+1] = map[ttype][tind];
             
             targetrefcoords[i][3*j+0] = trc[ttype][3*tind+0];
             targetrefcoords[i][3*j+1] = trc[ttype][3*tind+1];
