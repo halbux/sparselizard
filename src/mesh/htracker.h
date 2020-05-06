@@ -141,7 +141,7 @@ class htracker
         // give t and j such that the ith point in 'orc' corresponds to 'rc[t][3*j]'. 
         void fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& maporctorc);
         
-        // Get the corresponding point at the target. To each rc[i][j] is associated its corresponding transient element type and index in type
+        // Get the corresponding point at the target. To each rc[i][3*j] is associated its corresponding transient element type and index in type
         // (in targettranselems[i][2*j+0] and targettranselems[i][2*j+1]) and the associated reference coordinate in the target transient element. 
         void getattarget(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords);
         
