@@ -934,6 +934,9 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
     std::vector<std::vector<int>> map(8, std::vector<int>(0));
     for (int i = 0; i < 8; i++)
     {
+        if (trc[i].size() == 0)
+            continue;
+    
         map[i] = std::vector<int>(trc[i].size()/3);
     
         int index = 0;
