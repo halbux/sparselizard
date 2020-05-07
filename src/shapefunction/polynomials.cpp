@@ -48,7 +48,6 @@ void polynomials::evalatsingle(const std::vector<double>& evaluationpoint, std::
 {
     double ki = evaluationpoint[0], eta = evaluationpoint[1], phi = evaluationpoint[2];
 
-
     // Create the monomial value vector:
     std::vector<double> monomialval(mynummonomials);
     evaled = std::vector<double>(mynumpolys,0);
@@ -83,6 +82,86 @@ void polynomials::evalatsingle(const std::vector<double>& evaluationpoint, std::
             index++;
         }
     }
+}
+
+void polynomials::evalatsingle(const std::vector<double>& evaluationpoint, int num, std::vector<double>& evaled)
+{
+    double ki = evaluationpoint[0], eta = evaluationpoint[1], phi = evaluationpoint[2];
+
+    // Create the monomial value vector:
+    std::vector<double> monomialval(mynummonomials);
+    std::vector<int> kietaphipowers(3*mynummonomials);
+    evaled = std::vector<double>((num+1)*mynumpolys,0);
+    
+    int index = 0;
+    double a = 1, b = 1, c = 1;
+    for (int k = 0; k < mykilen; k++)
+    {   
+        b = a;
+        for (int e = 0; e < myetalen; e++)
+        {    
+            c = b;
+            for (int p = 0; p < myphilen; p++)
+            {
+                monomialval[index] = c;  
+                kietaphipowers[3*index+0] = k;
+                kietaphipowers[3*index+1] = e;
+                kietaphipowers[3*index+2] = p;
+                index++;
+                
+                c *= phi;
+            }
+            b *= eta;
+        }
+        a *= ki;
+    }
+
+    // Multiply the coefficients by the monomial values:
+    for (int pol = 0; pol < mynumpolys; pol++)
+    {
+        int p = pol*(num+1);
+        for (int i = 0; i < mynummonomials; i++)
+        {
+            int cc = mycoeffs[pol*mynummonomials+i];
+        
+            evaled[p+0] += cc * monomialval[i];
+            if (num > 0 && kietaphipowers[3*i+0] > 0)
+                evaled[p+1] += cc * monomialval[i-myetalen*myphilen]; // dki
+            if (num > 1 && kietaphipowers[3*i+1] > 0)
+                evaled[p+2] += cc * monomialval[i-myphilen]; // deta
+            if (num > 2 && kietaphipowers[3*i+2] > 0)
+                evaled[p+3] += cc * monomialval[i-1]; // dphi
+        }
+    }
+}
+
+polynomials polynomials::sum(std::vector<double>& weights)
+{
+    int num = weights.size()/mynumpolys;
+    
+    polynomials output;
+    
+    output.mynumpolys = num;
+    
+    output.mykilen = mykilen;
+    output.myetalen = myetalen;
+    output.myphilen = myphilen;
+    
+    output.mynummonomials = mynummonomials;
+    
+    output.mycoeffs = std::vector<double>(num * mynummonomials, 0);
+    
+    for (int n = 0; n < num; n++)
+    {
+        for (int p = 0; p < mynumpolys; p++)
+        {
+            int w = weights[n*mynumpolys+p];
+            for (int c = 0; c < mynummonomials; c++)
+                output.mycoeffs[n*mynummonomials+c] += w * mycoeffs[p*mynummonomials+c];
+        }
+    }
+    
+    return output;
 }
 
 void polynomials::print(void)

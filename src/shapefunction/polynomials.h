@@ -33,7 +33,13 @@ class polynomials
         
         // Evaluate at a single {ki,eta,phi} point:
         void evalatsingle(const std::vector<double>& evaluationpoint, std::vector<double>& evaled);
+        // Same as above but {poly1,dkipoly1,detapoly1,...,poly2,dkipoly2,detapoly2,...} is returned. 
+        // 'num' equal to 0/1/2/3 returns respectively poly/poly+dki/poly+dki+deta/poly+dki+deta+dphi. 
+        void evalatsingle(const std::vector<double>& evaluationpoint, int num, std::vector<double>& evaled);
         
+        // Return the weighted sum of 'mypolys' such that mypolys = {p0,p1,...}
+        // where pi = sum_k( weights[ i * mynumpolys + k ] * mypolys[k] ).
+        polynomials sum(std::vector<double>& weights);
         
         void print(void);
         
