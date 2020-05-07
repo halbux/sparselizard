@@ -648,11 +648,11 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                         {
                             std::vector<double> curnormal = myelems->getnormal(elemtypenum, curelem);
                             curnormal = {std::abs(curnormal[0]), std::abs(curnormal[1]), std::abs(curnormal[2])};
-                            myalgorithm::stablesort(0, curnormal, coordranking);
+                            stablesort(0, curnormal, coordranking);
                         }
                         else
                         {
-                            myalgorithm::stablesort(0, elemdist, coordranking);
+                            stablesort(0, elemdist, coordranking);
                             coordranking = {coordranking[2],coordranking[1],coordranking[0]};
                         }
                     
@@ -667,7 +667,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     }
                     rhs = {rhs[coordranking[0]],rhs[coordranking[1]],rhs[coordranking[2]]};
                     
-                    if (myalgorithm::getroot(polys, rhs, kietaphi) == 1)
+                    if (getroot(polys, rhs, kietaphi) == 1)
                     {
                         // Check if the (ki,eta,phi) coordinates are inside the element:
                         if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
