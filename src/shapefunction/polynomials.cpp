@@ -154,7 +154,7 @@ polynomials polynomials::sum(std::vector<double>& weights)
     {
         for (int p = 0; p < mynumpolys; p++)
         {
-             double w = weights[n*mynumpolys+p];
+            double w = weights[n*mynumpolys+p];
             for (int c = 0; c < mynummonomials; c++)
                 output.mycoeffs[n*mynummonomials+c] += w * mycoeffs[p*mynummonomials+c];
         }
