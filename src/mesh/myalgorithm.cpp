@@ -979,3 +979,18 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
     }
 }
 
+std::vector<double> myalgorithm::separate(std::vector<double>& v, int blocklen, std::vector<int> sel)
+{
+    int numblocks = v.size()/blocklen;
+    
+    std::vector<double> output(sel.size() * numblocks);
+    
+    for (int s = 0; s < sel.size(); s++)
+    {
+        for (int b = 0; b < numblocks; b++)
+            output[s*numblocks+b] = v[b*blocklen + sel[s]];
+    }
+    
+    return output;
+}
+

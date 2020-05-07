@@ -121,6 +121,9 @@ namespace myalgorithm
     // is close enough (according to 'noisethreshold') to any node in the corner coordinates.
     void assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode, std::vector<double> noisethreshold);
     
+    // For a vector 'vec' of repeating blocks [b0 b1 b2 ...] the output is [b0[sel[0]] b1[sel[0]] ... b0[sel[1]] b1[sel[1]] ...].
+    std::vector<double> separate(std::vector<double>& v, int blocklen, std::vector<int> sel);
+    
 };
 
 #endif
