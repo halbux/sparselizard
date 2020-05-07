@@ -127,9 +127,9 @@ void polynomials::evalatsingle(const std::vector<double>& evaluationpoint, int n
             if (num > 0 && kietaphipowers[3*i+0] > 0)
                 evaled[p+1] += cc * kietaphipowers[3*i+0] * monomialval[i-myetalen*myphilen]; // dki
             if (num > 1 && kietaphipowers[3*i+1] > 0)
-                evaled[p+2] += cc * kietaphipowers[3*i+0] * monomialval[i-myphilen]; // deta
+                evaled[p+2] += cc * kietaphipowers[3*i+1] * monomialval[i-myphilen]; // deta
             if (num > 2 && kietaphipowers[3*i+2] > 0)
-                evaled[p+3] += cc * kietaphipowers[3*i+0] * monomialval[i-1]; // dphi
+                evaled[p+3] += cc * kietaphipowers[3*i+2] * monomialval[i-1]; // dphi
         }
     }
 }
