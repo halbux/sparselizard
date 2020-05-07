@@ -427,14 +427,14 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
 
     switch (polys.count())
     {
-        case 2:
+        case 1:
         {
             while (std::abs(deltaki) > tol)
             {
                 if (it < maxit)
                 {
                     std::vector<double> evaled;
-                    polys.evalatsingle(guess, evaled);
+                    polys.evalatsingle(guess, 1, evaled);
                 
                     double f = evaled[0] - rhs[0];
                     double jac11 = evaled[1];
@@ -456,14 +456,14 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
             }
             break;
         }
-        case 6:
+        case 2:
         {
             while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol)
             {
                 if (it < maxit)
                 {
                     std::vector<double> evaled;
-                    polys.evalatsingle(guess, evaled);
+                    polys.evalatsingle(guess, 2, evaled);
                     
                     double f = evaled[0] - rhs[0];
                     double g = evaled[3] - rhs[1];
@@ -497,14 +497,14 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
             }
             break;
         }
-        case 12:
+        case 3:
         {
             while (std::abs(deltaki) > tol || std::abs(deltaeta) > tol || std::abs(deltaphi) > tol)
             {
                 if (it < maxit)
                 {
                     std::vector<double> evaled;
-                    polys.evalatsingle(guess, evaled);
+                    polys.evalatsingle(guess, 3, evaled);
                     
                     double f = evaled[0] - rhs[0];
                     double g = evaled[4] - rhs[1];
@@ -590,7 +590,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     int rangebegin = mydisjregs->getrangebegin(disjreg), rangeend = mydisjregs->getrangeend(disjreg);
     int numelems = rangeend-rangebegin+1;
 
-    lagrangeformfunction mylagrange(elemtypenum, elemorder, {});
+    polynomials polys(lagrangeformfunction(elemtypenum,elemorder,{}).getformfunctionpolynomials());
     element myel(elemtypenum, elemorder);
     
     double alpha = 1.0+1.0e-8;
@@ -607,7 +607,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     {
         double curelem = rangebegin+e;
         
-        polynomials polys;
+        polynomials syspolys;
         std::vector<int> coordranking = {};
         
         double xbary = barycenters->at(3*curelem+0); double ybary = barycenters->at(3*curelem+1); double zbary = barycenters->at(3*curelem+2);
@@ -641,7 +641,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     std::vector<double> rhs = {curx, cury, curz};
 
                     // Only create once for all coordinates the polynomials and only for the required elements:
-                    if (polys.count() == 0)
+                    if (syspolys.count() == 0)
                     {
                         // The coordinate polynomial used to calculate the reference coordinate must be carefully selected:
                         if (problemdimension == 3 && elemdim == 2)
@@ -655,19 +655,18 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                             stablesort(0, elemdist, coordranking);
                             coordranking = {coordranking[2],coordranking[1],coordranking[0]};
                         }
+                        
+                        std::vector<int> trimmedcr = coordranking;
+                        trimmedcr.resize(elemdim);
                     
-                        std::vector<polynomial> curpols( elemdim*(elemdim+1) );
-                        for (int j = 0; j < elemdim; j++)
-                        {
-                            curpols[j*(elemdim+1)+0] = mylagrange.getinterpolationpolynomial(myelems->getnodecoordinates(elemtypenum, curelem, coordranking[j]));
-                            for (int d = 0; d < elemdim; d++)
-                                curpols[j*(elemdim+1)+1+d] = curpols[j*(elemdim+1)+0].derivative(d);
-                        }
-                        polys = polynomials(curpols);
+                        std::vector<double> curcoords = myelems->getnodecoordinates(elemtypenum, curelem);
+                        
+                        std::vector<double> xyz = myalgorithm::separate(curcoords, 3, trimmedcr);
+                        syspolys = polys.sum(xyz);
                     }
                     rhs = {rhs[coordranking[0]],rhs[coordranking[1]],rhs[coordranking[2]]};
                     
-                    if (getroot(polys, rhs, kietaphi) == 1)
+                    if (getroot(syspolys, rhs, kietaphi) == 1)
                     {
                         // Check if the (ki,eta,phi) coordinates are inside the element:
                         if (myel.isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))

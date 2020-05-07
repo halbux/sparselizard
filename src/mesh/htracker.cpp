@@ -764,9 +764,9 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     std::vector<std::vector<int>> actives(maxdepth+1, std::vector<int>(0));
     
     // Needed for the root finding:
-    std::vector<lagrangeformfunction> lffs(8);
+    std::vector<polynomials> polys(8);
     for (int i = 0; i < 8; i++)
-        lffs[i] = lagrangeformfunction(i,1,{});
+        polys[i] = polynomials(lagrangeformfunction(i,1,{}).getformfunctionpolynomials());
     
     resetcursor(true);
     
@@ -824,14 +824,6 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     std::vector<double> currefcoords(3*nn[i]);
                     for (int j = 0; j < 3*nn[i]; j++)
                         currefcoords[j] = transitionsrefcoords[i][3*nn[i]*ti[i]+j];
-                    // Same but by individual coordinates (needed for root finding):
-                    std::vector<std::vector<double>> xyz(3, std::vector<double>(nn[i]));
-                    for (int j = 0; j < nn[i]; j++)
-                    {
-                        xyz[0][j] = transitionsrefcoords[i][3*nn[i]*ti[i]+3*j+0];
-                        xyz[1][j] = transitionsrefcoords[i][3*nn[i]*ti[i]+3*j+1];
-                        xyz[2][j] = transitionsrefcoords[i][3*nn[i]*ti[i]+3*j+2];
-                    }
                         
                     // Actives in the current leaf:
                     std::vector<int> activesinleaf = actives[ns];
@@ -858,14 +850,8 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     {
                         // Find the corresponding reference coordinate in the transition element's own reference.
                         // First create the polynomials for the system to solve.
-                        std::vector<polynomial> curpols( elemdim*(elemdim+1) );
-                        for (int j = 0; j < elemdim; j++)
-                        {
-                            curpols[j*(elemdim+1)+0] = lffs[i].getinterpolationpolynomial(xyz[j]);
-                            for (int d = 0; d < elemdim; d++)
-                                curpols[j*(elemdim+1)+1+d] = curpols[j*(elemdim+1)+0].derivative(d);
-                        }
-                        polynomials polys(curpols);
+                        std::vector<double> xyz = myalgorithm::separate(currefcoords, 3, myalgorithm::getequallyspaced(0,1,elemdim));
+                        polynomials syspolys = polys[i].sum(xyz);
                 
                         // Loop on all actives:
                         for (int j = 0; j < activesintrans.size(); j++)
@@ -873,7 +859,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                             std::vector<double> kietaphi = {0.0,0.0,0.0};
                             std::vector<double> rhs = {orc[3*activesintrans[j]+0], orc[3*activesintrans[j]+1], orc[3*activesintrans[j]+2]};
                             
-                            if (myalgorithm::getroot(polys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                            if (myalgorithm::getroot(syspolys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
                             {
                                 rc[i][ad[i][ti[i]]+3*j+0] = kietaphi[0];
                                 rc[i][ad[i][ti[i]]+3*j+1] = kietaphi[1];
