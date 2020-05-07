@@ -17,6 +17,7 @@ class polynomials
 {
     private:
 
+        int mynumpolys = 0;
         std::vector<polynomial> mypolys = {};
         
         // Size in the ki, eta and phi direction:
@@ -28,7 +29,7 @@ class polynomials
         polynomials(void) {};
         polynomials(std::vector<polynomial> input);
     
-        int count(void) { return mypolys.size(); };
+        int count(void) { return mynumpolys; };
         
         // Evaluate at a single {ki,eta,phi} point:
         void evalatsingle(const std::vector<double>& evaluationpoint, std::vector<double>& evaled);
