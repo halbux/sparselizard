@@ -121,7 +121,7 @@ void polynomials::evalatsingle(const std::vector<double>& evaluationpoint, int n
         int p = pol*(num+1);
         for (int i = 0; i < mynummonomials; i++)
         {
-            int cc = mycoeffs[pol*mynummonomials+i];
+            double cc = mycoeffs[pol*mynummonomials+i];
         
             evaled[p+0] += cc * monomialval[i];
             if (num > 0 && kietaphipowers[3*i+0] > 0)
