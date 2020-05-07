@@ -3,25 +3,24 @@
 
 polynomials::polynomials(std::vector<polynomial> input)
 {
-    mypolys = input;
-    mynumpolys = mypolys.size();
+    mynumpolys = input.size();
     
     // Get the ki, eta and phi length of the polynomial encompassing them all:
     for (int pol = 0; pol < mynumpolys; pol++)
     {
-        int curkilen = mypolys[pol].mycoefficients.size();
+        int curkilen = input[pol].mycoefficients.size();
         if (mykilen < curkilen)
             mykilen = curkilen;
         
         for (int k = 0; k < curkilen; k++)
         {
-            int curetalen = mypolys[pol].mycoefficients[k].size();
+            int curetalen = input[pol].mycoefficients[k].size();
             if (myetalen < curetalen)
                 myetalen = curetalen;
             
             for (int e = 0; e < curetalen; e++)
             {
-                int curphilen = mypolys[pol].mycoefficients[k][e].size();
+                int curphilen = input[pol].mycoefficients[k][e].size();
                 if (myphilen < curphilen)
                     myphilen = curphilen;
             }
@@ -33,12 +32,12 @@ polynomials::polynomials(std::vector<polynomial> input)
     mycoeffs = std::vector<double>(mynumpolys * mynummonomials, 0.0);
     for (int pol = 0; pol < mynumpolys; pol++)
     {
-        for (int k = 0; k < mypolys[pol].mycoefficients.size(); k++)
+        for (int k = 0; k < input[pol].mycoefficients.size(); k++)
         {
-            for (int e = 0; e < mypolys[pol].mycoefficients[k].size(); e++)
+            for (int e = 0; e < input[pol].mycoefficients[k].size(); e++)
             {
-                for (int p = 0; p < mypolys[pol].mycoefficients[k][e].size(); p++)
-                    mycoeffs[pol*mynummonomials+k*myetalen*myphilen+e*myphilen+p] = mypolys[pol].mycoefficients[k][e][p];
+                for (int p = 0; p < input[pol].mycoefficients[k][e].size(); p++)
+                    mycoeffs[pol*mynummonomials+k*myetalen*myphilen+e*myphilen+p] = input[pol].mycoefficients[k][e][p];
             }
         }
     }

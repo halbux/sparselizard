@@ -18,7 +18,6 @@ class polynomials
     private:
 
         int mynumpolys = 0;
-        std::vector<polynomial> mypolys = {};
         
         // Size in the ki, eta and phi direction:
         int mykilen = 0, myetalen = 0, myphilen = 0, mynummonomials = 0;
@@ -37,8 +36,8 @@ class polynomials
         // 'num' equal to 0/1/2/3 returns respectively poly/poly+dki/poly+dki+deta/poly+dki+deta+dphi. 
         void evalatsingle(const std::vector<double>& evaluationpoint, int num, std::vector<double>& evaled);
         
-        // Return the weighted sum of 'mypolys' such that mypolys = {p0,p1,...}
-        // where pi = sum_k( weights[ i * mynumpolys + k ] * mypolys[k] ).
+        // Return the weighted sum of the original polynomials.
+        // Output holds {p1,p2,...} where pi = sum_k( weights[ i * mynumpolys + k ] * originalpoly[k] ).
         polynomials sum(std::vector<double>& weights);
         
         void print(void);
