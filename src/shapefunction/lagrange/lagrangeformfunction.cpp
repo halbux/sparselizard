@@ -131,21 +131,6 @@ std::vector<polynomial> lagrangeformfunction::getformfunctionpolynomials(void)
     return myformfunctionpolynomials;
 }
 
-polynomial lagrangeformfunction::getinterpolationpolynomial(const std::vector<double>& interpol)
-{
-    preparepoly();
-
-    polynomial poly;
-    
-    for (int i = 0; i < myformfunctionpolynomials.size(); i++)
-    {
-        if (interpol[i] != 0.0)
-            poly = poly + interpol[i]*myformfunctionpolynomials[i];
-    }
-
-    return poly;
-}
-
 void lagrangeformfunction::print(void)
 {
     preparepoly();

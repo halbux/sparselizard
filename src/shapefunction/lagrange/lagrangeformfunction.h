@@ -71,9 +71,6 @@ class lagrangeformfunction
         std::vector<double> getnodecoordinates(void);
         std::vector<polynomial> getformfunctionpolynomials(void);
         
-        // Input is the weight for each shape function. Output is the sum of all weighted shape functions.  
-        polynomial getinterpolationpolynomial(const std::vector<double>& interpol);
-        
         void print(void);
 };
 
