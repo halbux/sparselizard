@@ -26,6 +26,7 @@
 #include "vectorfieldselect.h"
 #include "spanningtree.h"
 
+class spanningtree;
 class vectorfieldselect;
 class parameter;
 class rawfield;

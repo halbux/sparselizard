@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "mesh.h"
+#include "rawmesh.h"
 #include "field.h"
 #include "jacobian.h"
 #include "memory.h"
@@ -30,7 +30,7 @@ class universe
     
     public:
 
-        static mesh* mymesh;
+        static std::shared_ptr<rawmesh> mymesh;
 
         static bool isaxisymmetric;
         

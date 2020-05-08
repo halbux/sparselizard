@@ -1,7 +1,7 @@
 #include "universe.h"
 
 
-mesh* universe::mymesh = NULL;
+std::shared_ptr<rawmesh> universe::mymesh = NULL;
 
 bool universe::isaxisymmetric = false;
 
