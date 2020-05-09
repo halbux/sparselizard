@@ -33,7 +33,7 @@ class nodes;
 class elements;
 class shape;
 
-class rawmesh
+class rawmesh : public std::enable_shared_from_this<rawmesh>
 {
     private:
         
@@ -50,9 +50,6 @@ class rawmesh
         std::shared_ptr<ptracker> myptracker = NULL;
         // For p-adaptivity:
         std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
-        
-
-        std::string filename = "";
     
     public:
         
@@ -127,6 +124,8 @@ class rawmesh
         void printdisjointregions(void);
         // Print the elements in every physical region:
         void printelementsinphysicalregions(bool isdebug = false);
+        
+        std::shared_ptr<rawmesh> getpointer(void);
 };
 
 

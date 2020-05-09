@@ -241,18 +241,15 @@ void mathop::grouptimesteps(std::string filename, std::string fileprefix, int fi
 
 std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
 {
-    // Back up the mesh in the universe:
-    std::shared_ptr<rawmesh> meshbkp = universe::mymesh;
-
-    mesh loadedmesh;
+    std::shared_ptr<rawmesh> loadedmesh(new rawmesh());
     
-    loadedmesh.getpointer()->readfromfile(meshfile);
+    loadedmesh->readfromfile(meshfile);
     
-    nodes* loadednodes = loadedmesh.getpointer()->getnodes();
+    nodes* loadednodes = loadedmesh->getnodes();
     std::vector<double>* nodecoords = loadednodes->getcoordinates();
     int totalnumnodes = nodecoords->size()/3;
-    elements* loadedelems = loadedmesh.getpointer()->getelements();
-    physicalregions* loadedphysregs = loadedmesh.getpointer()->getphysicalregions();
+    elements* loadedelems = loadedmesh->getelements();
+    physicalregions* loadedphysregs = loadedmesh->getphysicalregions();
 
     int curvatureorder = loadedelems->getcurvatureorder();
     if (curvatureorder > 1)
@@ -329,10 +326,6 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
     
         output[physregdim].push_back(curshape);
     }
-    
-    // Restore the mesh to the universe:
-    universe::mymesh = meshbkp;
-    
     
     return output;
 }

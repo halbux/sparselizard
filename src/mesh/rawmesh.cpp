@@ -216,8 +216,6 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     ///// Memory is reset
 
 
-    filename = name;
-
     if (verbosity > 0)
     {
         if (name == "gmshapi")
@@ -374,7 +372,6 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     mydisjointregions = disjointregions();
     myphysicalregions = physicalregions(mydisjointregions);
     myelements = elements(mynodes, myphysicalregions, mydisjointregions);
-    filename = "";
      ///// Memory is reset
 
 
@@ -946,5 +943,10 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
 
         std::cout << std::endl;
     }
+}
+
+std::shared_ptr<rawmesh> rawmesh::getpointer(void)
+{
+    return shared_from_this();
 }
 
