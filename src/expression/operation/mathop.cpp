@@ -628,7 +628,7 @@ expression mathop::doubledotproduct(expression a, expression b)
 {
     if (a.countcolumns() != b.countcolumns() || a.countrows() != b.countrows())
     {
-        std::cout << "Error in 'mathop' namespace: dimension mismatch for Frobenius product" << std::endl;
+        std::cout << "Error in 'mathop' namespace: dimension mismatch for double dot product" << std::endl;
         abort();
     }
 
