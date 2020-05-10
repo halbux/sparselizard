@@ -531,22 +531,26 @@ std::vector<double> elements::computebarycenters(int elementtypenumber)
         return *nodecoordinates;
         
     element myelement(elementtypenumber, mycurvatureorder);
-    int curvednumberofnodes = myelement.countcurvednodes();
+    int nn = myelement.countnodes();
+    int ncn = myelement.countcurvednodes();
+    
+    double invnn = 1.0/nn;
     
     // Preallocate the barycenter coordinates vector:
     std::vector<double> barycentercoordinates(3 * count(elementtypenumber),0);
     // Compute the barycenters on the straight element:
-    for (int elem = 0; elem < count(elementtypenumber); elem++)
+    int numel = count(elementtypenumber);
+    for (int elem = 0; elem < numel; elem++)
     {
-        for (int node = 0; node < myelement.countnodes(); node++)
+        for (int node = 0; node < nn; node++)
         {
-            barycentercoordinates[3*elem+0] += nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elem*curvednumberofnodes+node]+0);
-            barycentercoordinates[3*elem+1] += nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elem*curvednumberofnodes+node]+1);
-            barycentercoordinates[3*elem+2] += nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elem*curvednumberofnodes+node]+2);
+            barycentercoordinates[3*elem+0] += nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elem*ncn+node]+0);
+            barycentercoordinates[3*elem+1] += nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elem*ncn+node]+1);
+            barycentercoordinates[3*elem+2] += nodecoordinates->at(3*subelementsinelements[elementtypenumber][0][elem*ncn+node]+2);
         }
-        barycentercoordinates[3*elem+0] = barycentercoordinates[3*elem+0]/myelement.countnodes();
-        barycentercoordinates[3*elem+1] = barycentercoordinates[3*elem+1]/myelement.countnodes();
-        barycentercoordinates[3*elem+2] = barycentercoordinates[3*elem+2]/myelement.countnodes();
+        barycentercoordinates[3*elem+0] *= invnn;
+        barycentercoordinates[3*elem+1] *= invnn;
+        barycentercoordinates[3*elem+2] *= invnn;
     }
     
     return barycentercoordinates;
