@@ -130,7 +130,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || timestepindex == 1)
             {
                 leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*timestep)*C + ((1.0-alphaf)*beta*timestep*timestep)*K;
-                leftmat.reuselu();
+                leftmat.reusefactorization();
                 
                 matu = -K;
                 matv = ((alphaf-1.0)*timestep)*K-C;

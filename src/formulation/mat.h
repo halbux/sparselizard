@@ -54,7 +54,7 @@ class mat
         // Remove the rows and columns associated to Dirichlet constraints:
         void removeconstraints(void);
         
-        void reuselu(void);
+        void reusefactorization(void);
         
         std::shared_ptr<rawmat> getpointer(void) { return rawmatptr; };
         

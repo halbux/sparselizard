@@ -624,7 +624,7 @@ expression mathop::crossproduct(expression a, expression b)
     return crossprodexpr;
 }
 
-expression mathop::frobeniusproduct(expression a, expression b)
+expression mathop::doubledotproduct(expression a, expression b)
 {
     if (a.countcolumns() != b.countcolumns() || a.countrows() != b.countrows())
     {
@@ -1133,12 +1133,12 @@ expression mathop::predefinedviscousforce(expression dofv, expression tfv, expre
     mu.reuseit();
 
     if (isdensityconstant && isviscosityconstant)
-        return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) );
+        return ( - mu*doubledotproduct(grad(dofv), grad(tfv)) );
 
     if (isdensityconstant)
-        return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) - mu*frobeniusproduct(transpose(grad(dofv)), grad(tfv)) );
+        return ( - mu*doubledotproduct(grad(dofv), grad(tfv)) - mu*doubledotproduct(transpose(grad(dofv)), grad(tfv)) );
     else
-        return ( - mu*frobeniusproduct(grad(dofv), grad(tfv)) - mu*frobeniusproduct(transpose(grad(dofv)), grad(tfv)) + (2.0/3.0)*mu*div(dofv)*trace(grad(tfv)) );
+        return ( - mu*doubledotproduct(grad(dofv), grad(tfv)) - mu*doubledotproduct(transpose(grad(dofv)), grad(tfv)) + (2.0/3.0)*mu*div(dofv)*trace(grad(tfv)) );
 }
 
 

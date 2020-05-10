@@ -110,7 +110,7 @@ std::vector<std::vector<vec>> impliciteuler::run(bool islinear, double starttime
             if (isconstant[1] == false || isconstant[2] == false || timestepindex == 1)
             {
                 leftmat = C + timestep*K;
-                leftmat.reuselu();
+                leftmat.reusefactorization();
             }
             
             // Update the solution xnext.

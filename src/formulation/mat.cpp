@@ -33,7 +33,7 @@ long long int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->co
 
 void mat::removeconstraints(void) { errorifpointerisnull(); rawmatptr->removeconstraints(); };
 
-void mat::reuselu(void) { errorifpointerisnull(); rawmatptr->reuselu(); }
+void mat::reusefactorization(void) { errorifpointerisnull(); rawmatptr->reuselu(); }
 
 Mat mat::getpetsc(void) { errorifpointerisnull(); return rawmatptr->getpetsc(); }   
 
