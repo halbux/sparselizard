@@ -132,7 +132,7 @@ void sparselizard(void)
     //--------------
     chambre += integral(KviT,-rho*dt(dof(v))*tf(v));
     chambre += integral(KviT,-grad(dof(p))*tf(v)); 
-    chambre += integral(KviT,-lmb*(frobeniusproduct(grad(dof(v)),grad(tf(v)))+frobeniusproduct(transpose(grad(dof(v))),grad(tf(v)))));
+    chambre += integral(KviT,-lmb*(doubledotproduct(grad(dof(v)),grad(tf(v)))+doubledotproduct(transpose(grad(dof(v))),grad(tf(v)))));
     chambre += integral(KviT,(2*lmb/3-muB)*div(dof(v))*trace(grad(tf(v))) );
     //non linearity terms of NS
     //expression(v).reuseit();
