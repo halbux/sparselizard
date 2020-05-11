@@ -73,7 +73,7 @@
 namespace orientation
 {
     // Only the corner nodes must be provided in the node list.
-    int gettotalorientation(int elementtypenumber, std::vector<int>& nodelist); 
+    std::vector<int> gettotalorientation(int elementtypenumber, std::vector<int>& nodelist); 
     
     // Count the number of orientations for a given element type:
     int countorientations(int elemtypenum);

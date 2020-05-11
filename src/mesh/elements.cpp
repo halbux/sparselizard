@@ -1016,18 +1016,14 @@ void elements::orient(void)
         int numberofcurvednodes = myelement.countcurvednodes();
         int numelemofcurrenttype = count(elementtypenumber);
         
-        totalorientations[elementtypenumber].resize(numelemofcurrenttype);
-    
         // Loop on all elements:
-        std::vector<int> currentnodes(numberofnodes);
+        std::vector<int> cornernodes(numelemofcurrenttype*numberofnodes);
         for (int i = 0; i < numelemofcurrenttype; i++)
         {
-            // Get only the corner nodes, not the curvature-related nodes:
             for (int j = 0; j < numberofnodes; j++)
-                currentnodes[j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
-            
-            totalorientations[elementtypenumber][i] = orientation::gettotalorientation(elementtypenumber, currentnodes); 
+                cornernodes[i*numberofnodes+j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
         }
+        totalorientations[elementtypenumber] = orientation::gettotalorientation(elementtypenumber, cornernodes); 
     }
 }
 
