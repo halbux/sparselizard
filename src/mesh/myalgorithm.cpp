@@ -116,7 +116,11 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
     std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
     // Sort 'reorderingvector' according to 'tosort':
     // The < operator is overloaded by a lambda function.
+    #if defined(__linux__)
+    __gnu_parallel::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+    #else
     std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+    #endif
         { 
             if (tosort[elem1] < tosort[elem2])
                 return true;
