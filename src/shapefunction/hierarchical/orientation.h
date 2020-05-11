@@ -29,7 +29,7 @@
 // - 1 if i > k > j | [0 2 1]
 // - 2 if j > k > i | [1 2 0]
 // - 3 if j > i > k | [1 0 2]
-// - 4 if k > i > j    | [2 0 1]
+// - 4 if k > i > j | [2 0 1]
 // - 5 if k > j > i | [2 1 0]
 //
 // The vector on the right of '|' gives the node reordering to be in orientation 0.
