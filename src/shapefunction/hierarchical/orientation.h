@@ -72,7 +72,7 @@
 
 namespace orientation
 {
-    // Only the corner nodes are required in the node list, all extra nodes are disregarded.
+    // Only the corner nodes must be provided in the node list.
     int gettotalorientation(int elementtypenumber, std::vector<int>& nodelist); 
     
     // Count the number of orientations for a given element type:
@@ -92,8 +92,8 @@ namespace orientation
     
     // 'getedgesorientationsinelement' outputs a vector listing the 
     // orientation of all edges in the element.
-    std::vector<int> getedgesorientationsinelement(int elementtypenumber, std::vector<int>& curvednodelist);
-    std::vector<int> getfacesorientationsinelement(int elementtypenumber, std::vector<int>& curvednodelist);
+    std::vector<int> getedgesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist);
+    std::vector<int> getfacesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist);
     
     // 'getorientationofedgeargument' gives the orientation 
     // of the edge whose nodes are provided as input argument

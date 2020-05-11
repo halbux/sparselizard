@@ -105,7 +105,7 @@ std::vector<std::vector<int>> orientation::getreorderingtoreferencequadrangularf
     return reordering;
 }
 
-std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumber, std::vector<int>& curvednodelist)
+std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist)
 {
     element myelement(elementtypenumber);
     
@@ -118,15 +118,15 @@ std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumbe
     for (int i = 0; i < numberofedges; i++)
     {
         // Create the edge node list:
-        nodesinedges[0] = curvednodelist[edgesdefinitionbasedonnodes[2*i+0]];
-        nodesinedges[1] = curvednodelist[edgesdefinitionbasedonnodes[2*i+1]];
+        nodesinedges[0] = nodelist[edgesdefinitionbasedonnodes[2*i+0]];
+        nodesinedges[1] = nodelist[edgesdefinitionbasedonnodes[2*i+1]];
         
         alledgesorientations[i] = getorientationofedge(nodesinedges);
     }
     return alledgesorientations;
 }
 
-std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumber, std::vector<int>& curvednodelist)
+std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist)
 {
     element myelement(elementtypenumber);
     
@@ -144,9 +144,9 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
             std::vector<int> nodesinface(3);
 
             // Create the triangle node list:
-            nodesinface[0] = curvednodelist[facesdefinitionbasedonnodes[3*i+0]];
-            nodesinface[1] = curvednodelist[facesdefinitionbasedonnodes[3*i+1]];
-            nodesinface[2] = curvednodelist[facesdefinitionbasedonnodes[3*i+2]];
+            nodesinface[0] = nodelist[facesdefinitionbasedonnodes[3*i+0]];
+            nodesinface[1] = nodelist[facesdefinitionbasedonnodes[3*i+1]];
+            nodesinface[2] = nodelist[facesdefinitionbasedonnodes[3*i+2]];
         
             allfacesorientations[i] = getorientationoftriangle(nodesinface);
         }
@@ -156,10 +156,10 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
             int offset = 3*numberoftriangularfaces;
 
             // Create the quadrangle node list:
-            nodesinface[0] = curvednodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+0]];
-            nodesinface[1] = curvednodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+1]];
-            nodesinface[2] = curvednodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+2]];
-            nodesinface[3] = curvednodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+3]];
+            nodesinface[0] = nodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+0]];
+            nodesinface[1] = nodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+1]];
+            nodesinface[2] = nodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+2]];
+            nodesinface[3] = nodelist[facesdefinitionbasedonnodes[offset+4*(i-numberoftriangularfaces)+3]];
 
             allfacesorientations[i] = getorientationofquadrangle(nodesinface);
         }
