@@ -650,16 +650,6 @@ bool element::ishorizontaledge(int edgenum)
 
 std::vector<int> element::getnodesinline(int lineindex)
 {
-    if (curvednodelist.size() != countcurvednodes())
-    {
-        std::cout << "Error: trying to use an order " << getcurvatureorder() << " " << gettypename() << " with " << curvednodelist.size() << " nodes. There should be " << countcurvednodes() << ". Have you correctly defined the node list?" << std::endl;
-        abort();
-    }
-    if (lineindex+1 > countedges())
-    {
-        std::cout << "Error: trying to get the " << lineindex+1 << "th line in a " << gettypename() << " but there are only " << countedges() << std::endl;
-        abort();
-    }
     int order = getcurvatureorder();
     int numberofnodesinline = order + 1;
     std::vector<int> nodesinline(numberofnodesinline);
@@ -686,33 +676,11 @@ std::vector<int> element::getnodesinline(int lineindex)
 
 std::vector<int> element::getnodesintriangle(int triangleindex)
 {
-    if (curvednodelist.size() != countcurvednodes())
-    {
-        std::cout << "Error: trying to use an order " << getcurvatureorder() << " " << gettypename() << " with " << curvednodelist.size() << " nodes. There should be " << countcurvednodes() << ". Have you correctly defined the node list?" << std::endl;
-        abort();
-    }
-    if (triangleindex+1 > counttriangularfaces())
-    {
-        std::cout << "Error: trying to get the " << triangleindex+1 << "th triangle in a " << gettypename() << " but there are only " << counttriangularfaces() << std::endl;
-        abort();
-    }
-
     return getnodesinsurface(triangleindex, true, false);
 }
 
 std::vector<int> element::getnodesinquadrangle(int quadrangleindex)
 {
-    if (curvednodelist.size() != countcurvednodes())
-    {
-        std::cout << "Error: trying to use an order " << getcurvatureorder() << " " << gettypename() << " with " << curvednodelist.size() << " nodes. There should be " << countcurvednodes() << ". Have you correctly defined the node list?" << std::endl;
-        abort();
-    }
-    if (quadrangleindex+1 > countquadrangularfaces())
-    {
-        std::cout << "Error: trying to get the " << quadrangleindex+1 << "th quadrangle in a " << gettypename() << " but there are only " << countquadrangularfaces() << std::endl;
-        abort();
-    }
-
     return getnodesinsurface(quadrangleindex, false, true);
 }
 

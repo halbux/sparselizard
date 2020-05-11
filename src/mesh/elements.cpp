@@ -757,6 +757,10 @@ void elements::explode(void)
     {
         element myelement(elementtypenumber, mycurvatureorder);
         int curvednumberofnodes = myelement.countcurvednodes();
+        int numberofedges = myelement.countedges();
+        int numberoftriangularfaces = myelement.counttriangularfaces();
+        int numberofquadrangularfaces = myelement.countquadrangularfaces();
+        int elementdimension = myelement.getelementdimension();
         
         std::vector<int> facesdefinitionsbasedonedges = myelement.getfacesdefinitionsbasedonedges();
 
@@ -776,16 +780,16 @@ void elements::explode(void)
 
             // Add all line subelements - only for 2D and 3D elements:
             int firstnewlinenumber = count(1);
-            for (int line = 0; line < myelement.countedges(); line++)
+            for (int line = 0; line < numberofedges; line++)
             {
                 std::vector<int> nodesinline = myelement.getnodesinline(line);
                 int newlinenumber = add(1, mycurvatureorder, nodesinline);
                 subelementsinelements[elementtypenumber][1].push_back(newlinenumber);
             }
             // Add all subsurfaces - only for 3D elements:
-            if (myelement.getelementdimension() == 3)
+            if (elementdimension == 3)
             {
-                for (int triangle = 0; triangle < myelement.counttriangularfaces(); triangle++)
+                for (int triangle = 0; triangle < numberoftriangularfaces; triangle++)
                 {
                     std::vector<int> nodesintriangle = myelement.getnodesintriangle(triangle);
                     int newtrianglenumber = add(2, mycurvatureorder, nodesintriangle);
@@ -794,14 +798,14 @@ void elements::explode(void)
                     for (int triangleline = 0; triangleline < 3; triangleline++)
                         subelementsinelements[2][1].push_back(firstnewlinenumber + std::abs(facesdefinitionsbasedonedges[3*triangle+triangleline])-1);
                 }    
-                for (int quadrangle = 0; quadrangle < myelement.countquadrangularfaces(); quadrangle++)
+                for (int quadrangle = 0; quadrangle < numberofquadrangularfaces; quadrangle++)
                 {
                     std::vector<int> nodesinquadrangle = myelement.getnodesinquadrangle(quadrangle);
                     int newquadranglenumber = add(3, mycurvatureorder, nodesinquadrangle);
                     subelementsinelements[elementtypenumber][3].push_back(newquadranglenumber);
                     // Also link the quadrangle to its lines (defined before):
                     for (int quadrangleline = 0; quadrangleline < 4; quadrangleline++)
-                        subelementsinelements[3][1].push_back(firstnewlinenumber + std::abs(facesdefinitionsbasedonedges[3*myelement.counttriangularfaces()+4*quadrangle+quadrangleline])-1);
+                        subelementsinelements[3][1].push_back(firstnewlinenumber + std::abs(facesdefinitionsbasedonedges[3*numberoftriangularfaces+4*quadrangle+quadrangleline])-1);
                 }    
             }
         }
