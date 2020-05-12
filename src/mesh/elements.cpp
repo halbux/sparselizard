@@ -769,6 +769,32 @@ void elements::explode(void)
             continue;
 
         std::vector<int> currentnodes(curvednumberofnodes,0);
+        
+        // Get all line/triangle/quadrangle definitions:
+        std::vector<int> consecutives = myalgorithm::getequallyspaced(0,1,curvednumberofnodes);
+        myelement.setnodes(consecutives);
+        // Extract line node indexes:
+        std::vector<std::vector<int>> indexesinlines(numberofedges);
+        for (int i = 0; i < numberofedges; i++)
+            indexesinlines[i] = myelement.getnodesinline(i);
+        int numnodesinline = indexesinlines[0].size();
+        std::vector<int> nodesinline(numnodesinline);
+        // Extract triangular face node indexes:
+        std::vector<std::vector<int>> indexesintris(numberoftriangularfaces);
+        for (int i = 0; i < numberoftriangularfaces; i++)
+            indexesintris[i] = myelement.getnodesintriangle(i);
+        int numnodesintri = 0;
+        if (numberoftriangularfaces > 0)
+            numnodesintri = indexesintris[0].size();
+        std::vector<int> nodesintriangle(numnodesintri);
+        // Extract quadrangular face node indexes:
+        std::vector<std::vector<int>> indexesinquads(numberofquadrangularfaces);
+        for (int i = 0; i < numberofquadrangularfaces; i++)
+            indexesinquads[i] = myelement.getnodesinquadrangle(i);
+        int numnodesinquad = 0;
+        if (numberofquadrangularfaces > 0)
+            numnodesinquad = indexesinquads[0].size();
+        std::vector<int> nodesinquadrangle(numnodesinquad);
 
         // Loop on all elements of the current type:
         for (int elem = 0; elem < count(elementtypenumber); elem++)
@@ -776,13 +802,14 @@ void elements::explode(void)
             // Define the nodes of the element object:
             for (int i = 0; i < curvednumberofnodes; i++)
                 currentnodes[i] = subelementsinelements[elementtypenumber][0][elem*curvednumberofnodes+i];
-            myelement.setnodes(currentnodes);
 
             // Add all line subelements - only for 2D and 3D elements:
             int firstnewlinenumber = count(1);
             for (int line = 0; line < numberofedges; line++)
             {
-                std::vector<int> nodesinline = myelement.getnodesinline(line);
+                for (int i = 0; i < numnodesinline; i++)
+                    nodesinline[i] = currentnodes[indexesinlines[line][i]];
+                    
                 int newlinenumber = add(1, mycurvatureorder, nodesinline);
                 subelementsinelements[elementtypenumber][1].push_back(newlinenumber);
             }
@@ -791,7 +818,9 @@ void elements::explode(void)
             {
                 for (int triangle = 0; triangle < numberoftriangularfaces; triangle++)
                 {
-                    std::vector<int> nodesintriangle = myelement.getnodesintriangle(triangle);
+                    for (int i = 0; i < numnodesintri; i++)
+                        nodesintriangle[i] = currentnodes[indexesintris[triangle][i]];
+                    
                     int newtrianglenumber = add(2, mycurvatureorder, nodesintriangle);
                     subelementsinelements[elementtypenumber][2].push_back(newtrianglenumber);
                     // Also link the triangle to its lines. All lines have already been defined before above.
@@ -800,7 +829,9 @@ void elements::explode(void)
                 }    
                 for (int quadrangle = 0; quadrangle < numberofquadrangularfaces; quadrangle++)
                 {
-                    std::vector<int> nodesinquadrangle = myelement.getnodesinquadrangle(quadrangle);
+                    for (int i = 0; i < numnodesinquad; i++)
+                        nodesinquadrangle[i] = currentnodes[indexesinquads[quadrangle][i]];
+                        
                     int newquadranglenumber = add(3, mycurvatureorder, nodesinquadrangle);
                     subelementsinelements[elementtypenumber][3].push_back(newquadranglenumber);
                     // Also link the quadrangle to its lines (defined before):
