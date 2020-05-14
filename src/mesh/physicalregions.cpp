@@ -188,6 +188,43 @@ int physicalregions::getindex(int physicalregionnumber)
     return -1;
 }
 
+bool physicalregions::inphysicalregions(int elementtypenumber, std::vector<int> selectedphysregindexes, int totalnumelemsintype, std::vector<int>& addresses, std::vector<int>& prs)
+{
+    int numelems = 0;
+    for (int i = 0; i < selectedphysregindexes.size(); i++)
+        numelems += myphysicalregions[i]->getelementlist()->at(elementtypenumber).size();
+    if (numelems == 0)
+        return false;
+        
+    std::vector<int> numprinelems(totalnumelemsintype, 0);
+    for (int i = 0; i < selectedphysregindexes.size(); i++)
+    {
+        std::vector<int>* ellist = &(myphysicalregions[selectedphysregindexes[i]]->getelementlist()->at(elementtypenumber));
+        for (int j = 0; j < ellist->size(); j++)
+            numprinelems[ellist->at(j)]++;
+    }
+
+    addresses = std::vector<int>(totalnumelemsintype+1, 0);
+    for (int i = 1; i <= totalnumelemsintype; i++)
+        addresses[i] = addresses[i-1] + numprinelems[i-1];
+
+    // Populate:
+    prs = std::vector<int>(addresses[totalnumelemsintype]);
+    std::vector<int> ind(totalnumelemsintype, 0);
+    for (int i = 0; i < selectedphysregindexes.size(); i++)
+    {
+        int curpr = myphysicalregionnumbers[i];
+        std::vector<int>* ellist = &(myphysicalregions[selectedphysregindexes[i]]->getelementlist()->at(elementtypenumber));
+        for (int j = 0; j < ellist->size(); j++)
+        {
+            int curel = ellist->at(j);
+            prs[addresses[curel]+ind[curel]] = curpr;
+            ind[curel]++;
+        }
+    }
+    return true;
+}
+
 void physicalregions::remove(std::vector<int> toremove, bool ispartofdisjregstructure)
 {
     // Tag regions to remove:

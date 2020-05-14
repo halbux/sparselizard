@@ -54,6 +54,12 @@ class physicalregions
         // Get the index of the physical region number (-1 if undefined):
         int getindex(int physicalregionnumber);
         
+        // Get the list of physical regions in which each element of a given type is.
+        // 'addresses[i]' gives the first index in 'prs' where to find the physical
+        // regions for the ith element. Length is numelems+1 and last entry gives prs.size().
+        // Flag 'false' is returned if there are no elements of the requested type.
+        bool inphysicalregions(int elementtypenumber, std::vector<int> selectedphysregindexes, int totalnumelemsintype, std::vector<int>& addresses, std::vector<int>& prs);
+        
         // Remove physical regions (physical regions required for the compressed mesh structure should NOT be removed).
         void remove(std::vector<int> toremove, bool ispartofdisjregstructure);
         
