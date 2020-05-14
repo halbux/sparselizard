@@ -971,6 +971,28 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
     }
 }
 
+void htracker::atoriginal(int tt, int tn, int& ort, int& orn, std::vector<int>& on, std::vector<int>& oe, std::vector<int>& of)
+{
+    ort = originalsoftransitions[tt][2*tn+0];
+    orn = originalsoftransitions[tt][2*tn+1];
+
+    std::vector<double> nc(3*nn[tt]);
+    for (int i = 0; i < 3*nn[tt]; i++)
+        nc[i] = transitionsrefcoords[tt][3*nn[tt]*tn+i];
+    myelems[ort].atnode(nc, on);
+    
+    if (tt > 1)
+    {
+        std::vector<double> eb = myelems[tt].getedgebarycenter(nc);
+        myelems[ort].atedge(eb, oe);
+    }
+    if (tt > 3)
+    {
+        std::vector<double> fb = myelems[tt].getfacebarycenter(nc);
+        myelems[ort].atface(fb, of);
+    }
+}
+
 void htracker::tostorage(void)
 {
     transitionsrefcoords = {};
