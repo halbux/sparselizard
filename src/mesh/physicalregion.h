@@ -46,8 +46,7 @@ class physicalregion
         int countelements(void);
         int getelementdimension(void);
         
-        // 'definewithdisjointregions' defines the physical region in terms
-        // of the disjoint regions it contains. Note: calling it clears 'elementlist'.
+        // 'definewithdisjointregions' defines the physical region in terms of the disjoint regions it contains.
         void definewithdisjointregions(void);  
         // Set manually the list of disjoint regions in the physical region.
         // Duplicates are removed. 'myelementdimension' is updated to the max dim of the disj regs.
