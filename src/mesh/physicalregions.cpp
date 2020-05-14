@@ -213,7 +213,7 @@ bool physicalregions::inphysicalregions(int elementtypenumber, std::vector<int> 
     std::vector<int> ind(totalnumelemsintype, 0);
     for (int i = 0; i < selectedphysregindexes.size(); i++)
     {
-        int curpr = myphysicalregionnumbers[i];
+        int curpr = myphysicalregionnumbers[selectedphysregindexes[i]];
         std::vector<int>* ellist = &(myphysicalregions[selectedphysregindexes[i]]->getelementlist()->at(elementtypenumber));
         for (int j = 0; j < ellist->size(); j++)
         {
