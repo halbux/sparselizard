@@ -192,7 +192,7 @@ bool physicalregions::inphysicalregions(int elementtypenumber, std::vector<int> 
 {
     int numelems = 0;
     for (int i = 0; i < selectedphysregindexes.size(); i++)
-        numelems += myphysicalregions[i]->getelementlist()->at(elementtypenumber).size();
+        numelems += myphysicalregions[selectedphysregindexes[i]]->getelementlist()->at(elementtypenumber).size();
     if (numelems == 0)
         return false;
         
