@@ -561,12 +561,14 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
     ac = std::vector<std::vector<double>>(8, std::vector<double>(0));
     transitionsrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
     leavesoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    originalsoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
 
     std::vector<int> ub = countupperbound();
     for (int i = 0; i < 8; i++)
     {
         ac[i] = std::vector<double>(3*ncn[i]*ub[i]);
         leavesoftransitions[i] = std::vector<int>(ub[i]);
+        originalsoftransitions[i] = std::vector<int>(2*ub[i]);
         transitionsrefcoords[i] = std::vector<double>(3*nn[i]*ub[i]);
     }
     
@@ -637,6 +639,8 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
                     ac[si][3*ncn[si]*ite[si]+i] = curcoords[i];
                     
                 leavesoftransitions[si][ite[si]] = ln;
+                originalsoftransitions[si][2*ite[si]+0] = parenttypes[0];
+                originalsoftransitions[si][2*ite[si]+1] = origindexintype;
                 
                 ite[si]++;
                 
@@ -658,6 +662,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
         ac[i].resize(3*ncn[i]*ite[i]);
         transitionsrefcoords[i].resize(3*nn[i]*ite[i]);
         leavesoftransitions[i].resize(ite[i]);
+        originalsoftransitions[i].resize(2*ite[i]);
     }
     leafnums = leavesoftransitions;
 }
@@ -970,6 +975,7 @@ void htracker::tostorage(void)
 {
     transitionsrefcoords = {};
     leavesoftransitions = {};
+    originalsoftransitions = {};
 }
 
 void htracker::print(void)

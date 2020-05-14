@@ -71,6 +71,8 @@ class htracker
         // Transition elements of each type are ordered in the way the appear in the tree.
         std::vector<std::vector<double>> transitionsrefcoords = {};
         std::vector<std::vector<int>> leavesoftransitions = {};
+        // At [i][2*j+0] and [i][2*j+1] this gives the type and index of the corresponding original element:
+        std::vector<std::vector<int>> originalsoftransitions = {};
 
     public:
 
