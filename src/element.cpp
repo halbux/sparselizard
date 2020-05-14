@@ -571,6 +571,198 @@ void element::isinsideelement(std::vector<double>& coords, std::vector<double>& 
     }
 }
 
+void element::atnode(std::vector<double>& refcoords, std::vector<int>& nodenums, double roundoffnoise)
+{
+    int numrefs = refcoords.size()/3;
+    nodenums = std::vector<int>(numrefs, -1);
+
+    switch (gettypenumber())
+    {
+        case 1:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+0] + 1.0) < roundoffnoise)
+                    nodenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] - 1.0) < roundoffnoise)
+                    nodenums[i] = 1; 
+            }
+            break;
+        }
+        case 2:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise)
+                    nodenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] - 1.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise)
+                    nodenums[i] = 1; 
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+1] - 1.0) < roundoffnoise)
+                    nodenums[i] = 2;
+            }
+            break;
+        }
+        case 3:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+0] + 1.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 1.0) < roundoffnoise)
+                    nodenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] - 1.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 1.0) < roundoffnoise)
+                    nodenums[i] = 1; 
+                if (std::abs(refcoords[3*i+0] - 1.0) < roundoffnoise && std::abs(refcoords[3*i+1] - 1.0) < roundoffnoise)
+                    nodenums[i] = 2;
+                if (std::abs(refcoords[3*i+0] + 1.0) < roundoffnoise && std::abs(refcoords[3*i+1] - 1.0) < roundoffnoise)
+                    nodenums[i] = 3;
+            }
+            break;
+        }
+        case 4:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+2] + 0.0) < roundoffnoise)
+                    nodenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] - 1.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+2] + 0.0) < roundoffnoise)
+                    nodenums[i] = 1; 
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+1] - 1.0) < roundoffnoise && std::abs(refcoords[3*i+2] + 0.0) < roundoffnoise)
+                    nodenums[i] = 2;
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+2] - 1.0) < roundoffnoise)
+                    nodenums[i] = 3;
+            }
+            break;
+        }
+        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+    }
+}
+
+void element::atedge(std::vector<double>& refcoords, std::vector<int>& edgenums, double roundoffnoise)
+{
+    int numrefs = refcoords.size()/3;
+    edgenums = std::vector<int>(numrefs, -1);
+
+    switch (gettypenumber())
+    {
+        case 2:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise)
+                    edgenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] + refcoords[3*i+1] - 1.0) < roundoffnoise)
+                    edgenums[i] = 1; 
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise)
+                    edgenums[i] = 2;
+            }
+            break;
+        }
+        case 3:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+1] + 1.0) < roundoffnoise)
+                    edgenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] - 1.0) < roundoffnoise)
+                    edgenums[i] = 1; 
+                if (std::abs(refcoords[3*i+1] - 1.0) < roundoffnoise)
+                    edgenums[i] = 2;
+                if (std::abs(refcoords[3*i+0] + 1.0) < roundoffnoise)
+                    edgenums[i] = 3;
+            }
+            break;
+        }
+        case 4:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+2] + 0.0) < roundoffnoise)
+                    edgenums[i] = 0;
+                if (std::abs(refcoords[3*i+0] + refcoords[3*i+1] - 1.0) < roundoffnoise)
+                    edgenums[i] = 1; 
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+2] + 0.0) < roundoffnoise)
+                    edgenums[i] = 2;
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise && std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise)
+                    edgenums[i] = 3;
+                if (std::abs(refcoords[3*i+1] + refcoords[3*i+2] - 1.0) < roundoffnoise)
+                    edgenums[i] = 4;
+                if (std::abs(refcoords[3*i+0] + refcoords[3*i+2] - 1.0) < roundoffnoise)
+                    edgenums[i] = 5;
+            }
+            break;
+        }
+        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+    }
+}
+
+void element::atface(std::vector<double>& refcoords, std::vector<int>& facenums, double roundoffnoise)
+{
+    int numrefs = refcoords.size()/3;
+    facenums = std::vector<int>(numrefs, -1);
+
+    switch (gettypenumber())
+    {
+        case 4:
+        {
+            for (int i = 0; i < numrefs; i++)
+            {
+                if (std::abs(refcoords[3*i+2] + 0.0) < roundoffnoise)
+                    facenums[i] = 0;
+                if (std::abs(refcoords[3*i+1] + 0.0) < roundoffnoise)
+                    facenums[i] = 1; 
+                if (std::abs(refcoords[3*i+0] + 0.0) < roundoffnoise)
+                    facenums[i] = 2;
+                if (std::abs(refcoords[3*i+0] + refcoords[3*i+1] + refcoords[3*i+2] - 1.0) < roundoffnoise)
+                    facenums[i] = 3;
+            }
+            break;
+        }
+        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+    }
+}
+
+std::vector<double> element::getedgebarycenter(std::vector<double>& nc)
+{
+    switch (curvedtypenumber)
+    {
+        case 1:
+            return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2])};
+        case 2:
+            return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2]),
+                    0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2]),
+                    0.5*(nc[3*2+0]+nc[3*0+0]), 0.5*(nc[3*2+1]+nc[3*0+1]), 0.5*(nc[3*2+2]+nc[3*0+2])};
+        case 3:
+            return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2]),
+                    0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2]),
+                    0.5*(nc[3*2+0]+nc[3*3+0]), 0.5*(nc[3*2+1]+nc[3*3+1]), 0.5*(nc[3*2+2]+nc[3*3+2]),
+                    0.5*(nc[3*3+0]+nc[3*0+0]), 0.5*(nc[3*3+1]+nc[3*0+1]), 0.5*(nc[3*3+2]+nc[3*0+2])};
+        case 4:
+            return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2]),
+                    0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2]),
+                    0.5*(nc[3*2+0]+nc[3*0+0]), 0.5*(nc[3*2+1]+nc[3*0+1]), 0.5*(nc[3*2+2]+nc[3*0+2]),
+                    0.5*(nc[3*3+0]+nc[3*0+0]), 0.5*(nc[3*3+1]+nc[3*0+1]), 0.5*(nc[3*3+2]+nc[3*0+2]),
+                    0.5*(nc[3*3+0]+nc[3*2+0]), 0.5*(nc[3*3+1]+nc[3*2+1]), 0.5*(nc[3*3+2]+nc[3*2+2]),
+                    0.5*(nc[3*3+0]+nc[3*1+0]), 0.5*(nc[3*3+1]+nc[3*1+1]), 0.5*(nc[3*3+2]+nc[3*1+2])};
+        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+    }
+}
+
+std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
+{
+    switch (curvedtypenumber)
+    {
+        case 2:
+            return {(nc[3*0+0]+nc[3*1+0]+nc[3*2+0])/3.0, (nc[3*0+1]+nc[3*1+1]+nc[3*2+1])/3.0, (nc[3*0+2]+nc[3*1+2]+nc[3*2+2])/3.0};
+        case 3:
+            return {(nc[3*0+0]+nc[3*1+0]+nc[3*2+0]+nc[3*2+0])/4.0, (nc[3*0+1]+nc[3*1+1]+nc[3*2+1]+nc[3*2+1])/4.0, (nc[3*0+2]+nc[3*1+2]+nc[3*2+2]+nc[3*2+2])/4.0};
+        case 4:
+            return {(nc[3*0+0]+nc[3*2+0]+nc[3*1+0])/3.0, (nc[3*0+1]+nc[3*2+1]+nc[3*1+1])/3.0, (nc[3*0+2]+nc[3*2+2]+nc[3*1+2])/3.0,
+                    (nc[3*0+0]+nc[3*1+0]+nc[3*3+0])/3.0, (nc[3*0+1]+nc[3*1+1]+nc[3*3+1])/3.0, (nc[3*0+2]+nc[3*1+2]+nc[3*3+2])/3.0,
+                    (nc[3*0+0]+nc[3*3+0]+nc[3*2+0])/3.0, (nc[3*0+1]+nc[3*3+1]+nc[3*2+1])/3.0, (nc[3*0+2]+nc[3*3+2]+nc[3*2+2])/3.0,
+                    (nc[3*3+0]+nc[3*1+0]+nc[3*2+0])/3.0, (nc[3*3+1]+nc[3*1+1]+nc[3*2+1])/3.0, (nc[3*3+2]+nc[3*1+2]+nc[3*2+2])/3.0};
+        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+    }
+}
+
 double element::measurereferenceelement(void)
 {
     switch (gettypenumber())

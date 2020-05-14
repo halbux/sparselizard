@@ -345,6 +345,16 @@ class element
         // Provide an absolute roundoff noise threshold.
         void isinsideelement(std::vector<double>& coords, std::vector<double>& cornercoords, std::vector<bool>& isinside, double roundoffnoise);
         
+        // Return the corner node/edge/face index at which each reference coordinate is (return -1 if at none).
+        // Can only be called for elements of higher dimension than the requested object.
+        void atnode(std::vector<double>& refcoords, std::vector<int>& nodenums, double roundoffnoise = 1e-8);
+        void atedge(std::vector<double>& refcoords, std::vector<int>& edgenums, double roundoffnoise = 1e-8);
+        void atface(std::vector<double>& refcoords, std::vector<int>& facenums, double roundoffnoise = 1e-8);
+        
+        // Get the barycenter of each edge/face of a straight element whose node coordinates are provided:
+        std::vector<double> getedgebarycenter(std::vector<double>& nc);
+        std::vector<double> getfacebarycenter(std::vector<double>& nc);
+        
         // Gives the length of the reference line, surface of the reference 
         // triangle/quadrangle and volume of the reference volume elements.
         double measurereferenceelement(void);
