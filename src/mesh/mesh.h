@@ -21,7 +21,11 @@
 #include <memory>
 #include "shape.h"
 #include "rawmesh.h"
+#include "field.h"
+#include "expression.h"
 
+class field;
+class expression;
 class rawmesh;
 class shape;
 
@@ -48,6 +52,11 @@ class mesh
 
         // Write to file name:
         void write(std::string name, int verbosity = 1);     
+        
+        // H-adaptivity:
+        void adapt(void);
+        void setadaptation(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
+        void setadaptation(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
         
         // Split each element in the mesh n times:
         void split(int n = 1);

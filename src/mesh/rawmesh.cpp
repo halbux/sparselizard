@@ -868,6 +868,21 @@ void rawmesh::adaptp(void)
     mynumber++;
 }
 
+void rawmesh::adapt(void)
+{
+
+}
+
+void rawmesh::setadaptation(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
+{
+
+}
+
+void rawmesh::setadaptation(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
+{
+
+}
+
 void rawmesh::writewithdisjointregions(std::string name)
 {
     // Create a new 'physicalregions' object where the ith 

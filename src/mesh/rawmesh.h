@@ -27,6 +27,7 @@
 #include "regiondefiner.h"
 #include "petscmesh.h"
 #include "ptracker.h"
+#include "htracker.h"
 #include "rawfield.h"
 
 class nodes;
@@ -50,6 +51,10 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<ptracker> myptracker = NULL;
         // For p-adaptivity:
         std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
+    
+        // For h-adaptivity (only one element or empty if not h-adaptive):
+        std::shared_ptr<htracker> myhtracker = NULL;
+        std::vector<std::tuple<expression,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {};
     
     public:
         
@@ -116,6 +121,11 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
         void remove(rawfield* inrawfield);
         void adaptp(void);
+        
+        // For h-adaptivity:
+        void adapt(void);
+        void setadaptation(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
+        void setadaptation(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
         void writewithdisjointregions(std::string);
