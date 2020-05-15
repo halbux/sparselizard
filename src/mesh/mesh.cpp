@@ -108,6 +108,11 @@ void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim,
     rawmeshptr->sphereselection(newphysreg, physregtosphere, selecteddim, centercoords, radius);
 }
 
+void mesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
+{
+    rawmeshptr->regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
+}
+
 void mesh::use(void)
 {
     universe::mymesh = rawmeshptr;

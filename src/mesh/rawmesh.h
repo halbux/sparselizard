@@ -110,6 +110,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void regionskin(int newphysreg, int physregtoskin);
         void boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
         void sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
+        void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
         
         // For p-adaptivity:
         void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);

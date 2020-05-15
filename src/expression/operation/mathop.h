@@ -34,7 +34,6 @@ namespace mathop
     // Perform operations (union, intersection, exclusion) on physical regions:
     int regionunion(const std::vector<int> physregs);
     int regionintersection(const std::vector<int> physregs);
-    int regionexclusion(int physreg, int toexclude);
     int regionall(void);
 
     void printvector(std::vector<double> input);

@@ -592,6 +592,11 @@ void rawmesh::sphereselection(int newphysreg, int physregtosphere, int selectedd
     myregiondefiner.sphereselection(newphysreg, selecteddim, centercoords, radius, physregtosphere);
 }
 
+void rawmesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
+{
+    myregiondefiner.regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
+}
+
 
 void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
 {

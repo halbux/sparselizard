@@ -58,11 +58,21 @@ class regiondefiner
         std::vector<std::vector<double>> spherecenters = {};
         // List of the sphere radii:
         std::vector<double> sphereradii = {};
+        
+        // EXCLUSION (operation type 3)
+        //
+        // List of new exclusion physical regions:
+        std::vector<int> excluded = {};
+        // List of physical regions from which an exclusion is requested:
+        std::vector<int> toexcludefrom = {};
+        // List of physical regions to exclude:
+        std::vector<std::vector<int>> toexclude = {};
 
 
         void defineskinregion(int regnum);
         void defineboxregion(int regnum);
         void definesphereregion(int regnum);
+        void defineexclusionregion(int regnum);
 
     public:
 
@@ -71,6 +81,7 @@ class regiondefiner
         void regionskin(int newphysreg, int physregtoskin);
         void boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
         void sphereselection(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere);
+        void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
 
 
         void defineregions(void);

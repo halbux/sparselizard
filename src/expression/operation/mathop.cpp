@@ -20,11 +20,6 @@ int mathop::regionintersection(const std::vector<int> physregs)
     return (universe::mymesh->getphysicalregions())->createintersection(physregs);
 }
 
-int mathop::regionexclusion(int physreg, int toexclude)
-{
-    return (universe::mymesh->getphysicalregions())->createexclusion(physreg, toexclude);
-}
-
 int mathop::regionall(void)
 {
     return (universe::mymesh->getphysicalregions())->createunionofall();

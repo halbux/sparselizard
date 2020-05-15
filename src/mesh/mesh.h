@@ -72,6 +72,7 @@ class mesh
         void regionskin(int newphysreg, int physregtoskin);
         void boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
         void sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
+        void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
         
         // Set this mesh as the one to use:
         void use(void);

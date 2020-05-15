@@ -202,6 +202,63 @@ void regiondefiner::definesphereregion(int regnum)
     newphysreg->removeduplicatedelements();
 }
 
+void regiondefiner::defineexclusionregion(int regnum)
+{
+    myphysicalregions->errorundefined({toexcludefrom[regnum]});
+    for (int i = 0; i < toexclude[regnum].size(); i++)
+        myphysicalregions->errorundefined({toexclude[regnum][i]});
+        
+    // Make sure the regions are of same dimension:
+    int physregdim = myphysicalregions->get(toexcludefrom[regnum])->getelementdimension();
+    for (int i = 0; i < toexclude[regnum].size(); i++)
+    {
+        int curdim = myphysicalregions->get(toexclude[regnum][i])->getelementdimension();
+        if (curdim != physregdim)
+        {
+            std::cout << "Error in 'regiondefiner' object: cannot exclude a " << curdim << "D region form a " << physregdim << "D region (dimensions must be equal)" << std::endl;
+            abort();
+        }
+    }
+    
+    physicalregion* newphysreg = myphysicalregions->get(excluded[regnum]);
+    physicalregion* curphysreg = myphysicalregions->get(toexcludefrom[regnum]);
+    
+    std::vector<std::vector<int>>* curelems = curphysreg->getelementlist();
+
+    // Loop on all element types:
+    for (int i = 0; i <= 7; i++)
+    {
+        std::vector<int>* curelemtype = &(curelems->at(i));
+
+        if (curelemtype->size() == 0)
+            continue;
+
+        int numelemsintype = myelements->count(i);
+        std::vector<bool> inexcluded(numelemsintype, false);
+        // First add all elements from which to exclude:
+        for (int e = 0; e < curelemtype->size(); e++)
+            inexcluded[curelemtype->at(e)] = true;
+
+        // Now remove the elements to exclude:
+        for (int j = 0; j < toexclude[regnum].size(); j++)
+        {
+            physicalregion* curtoexclude = myphysicalregions->get(toexclude[regnum][j]);
+            std::vector<int>* curelemtypetoexclude = &(curtoexclude->getelementlist()->at(i));
+
+            for (int e = 0; e < curelemtypetoexclude->size(); e++)
+                inexcluded[curelemtypetoexclude->at(e)] = false;
+        }
+
+        // All trues must be added:
+        for (int j = 0; j < inexcluded.size(); j++)
+        {
+            if (inexcluded[j])
+                newphysreg->addelement(i, j);
+        }
+    }
+    newphysreg->removeduplicatedelements();
+}
+
 regiondefiner::regiondefiner(nodes& inputnodes, elements& inputelems, physicalregions& inputphysregs)
 {
     mynodes = &inputnodes;
@@ -275,6 +332,17 @@ void regiondefiner::sphereselection(int newphysreg, int selecteddim, std::vector
     sphereradii.push_back(radius);
 }
 
+void regiondefiner::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
+{    
+    int cur = toexcludefrom.size();
+    std::vector<int> prio = {3,cur};
+    mypriority.push_back(prio);
+    
+    excluded.push_back(newphysreg);
+    toexcludefrom.push_back(physregtoexcludefrom);
+    toexclude.push_back(physregstoexclude);
+}
+
 
 void regiondefiner::defineregions(void)
 {
@@ -286,6 +354,8 @@ void regiondefiner::defineregions(void)
             defineboxregion(mypriority[i][1]);
         if (mypriority[i][0] == 2)
             definesphereregion(mypriority[i][1]);
+        if (mypriority[i][0] == 3)
+            defineexclusionregion(mypriority[i][1]);
     }
 }
 

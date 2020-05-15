@@ -36,14 +36,11 @@ mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, in
 void sparselizard(void)
 {	
     // Region numbers used in this simulation:
-    int fluid = 1, inlet = 2, outlet = 3, skin = 4;
+    int fluid = 1, inlet = 2, outlet = 3, wall = 4;
     // Height of the inlet [m]:
     double h1 = 1e-3;
     mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 5, 15, 8, 8);
     
-    // Define the fluid wall (not including the inlet and outlet):
-    int wall = regionexclusion(skin, regionunion({inlet,outlet}));
-
     // Dynamic viscosity of water [Pa.s] and density [kg/m3]:
     double mu = 8.9e-4, rho = 1000;
 
@@ -116,7 +113,7 @@ void sparselizard(void)
 
 mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2)
 {
-    int fluid = 1, inlet = 2, outlet = 3, skin = 4;
+    int fluid = 1, inlet = 2, outlet = 3, wall = 4, skin = 5;
 
     shape qthinleft("quadrangle", fluid, {0,0,0, l1,0,0, l1,h1,0, 0,h1,0}, {nl1,nh1,nl1,nh1});
     shape qthinright("quadrangle", fluid, {l1,0,0, l1+l2,0,0, l1+l2,h1,0, l1,h1,0}, {nl2,nh1,nl2,nh1});
@@ -128,6 +125,7 @@ mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, in
 
     mesh mymesh;
     mymesh.regionskin(skin, fluid);
+    mymesh.regionexclusion(wall, skin, {inlet, outlet});
     mymesh.load({qthinleft,qthinright,qthick,linlet,loutlet});
 
     mymesh.write("pipestep.msh");
