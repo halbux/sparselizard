@@ -97,7 +97,7 @@ void sparselizard(void)
 
 	// Write 20 magnetic field lines starting on the top side of the magnet array:
 	shape ln("line", -1, {-0.025,0.01,0, 0.025,0.01,0}, 20);
-	(-grad(phi)).streamline(regionexclusion(wholedomain, magnets), "magneticfieldline.pos", ln.getcoords(), 0.01/5);
+	(-grad(phi)).streamline(regionunion({air, steel}), "magneticfieldline.pos", ln.getcoords(), 0.01/5);
 
 
 
