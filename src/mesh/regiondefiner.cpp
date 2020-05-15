@@ -205,8 +205,7 @@ void regiondefiner::definesphereregion(int regnum)
 void regiondefiner::defineexclusionregion(int regnum)
 {
     myphysicalregions->errorundefined({toexcludefrom[regnum]});
-    for (int i = 0; i < toexclude[regnum].size(); i++)
-        myphysicalregions->errorundefined({toexclude[regnum][i]});
+    myphysicalregions->errorundefined(toexclude[regnum]);
         
     // Make sure the regions are of same dimension:
     int physregdim = myphysicalregions->get(toexcludefrom[regnum])->getelementdimension();
