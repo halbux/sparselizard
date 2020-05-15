@@ -28,16 +28,13 @@ void sparselizard(void)
     wallclock clk;
     
     // The domain regions as defined in 'createmesh':
-    int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
+    int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6;
     
     // Tube thickness, height, inner radius and domain size [m]:
     double thtube = 1e-3, htube = 210e-3, rintube = 10e-3, linf = 100e-3;
     
     // Create the geometry and the mesh:   
     mesh mymesh = createmesh(thtube, htube, rintube, linf, 7, 4, 10, 7, 20);
-    
-    // Define a region to visualize the solution:
-    boxcut = regionexclusion(wholedomain, boxcut);
     
     // Write the mesh for display:
     mymesh.write("tubeinair.msh");
@@ -142,7 +139,7 @@ void sparselizard(void)
         a.setdata(wholedomain, asol[i]);
         
         // Write b = curl(a) to disk:
-        norm(curl(a) + bsource).write(boxcut, "normbtotal" + std::to_string(i+1000) + ".pos"); 
+        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtk"); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];
@@ -163,7 +160,7 @@ void sparselizard(void)
 
 mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair, int prog)
 {
-    int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6, boxcut = 7;
+    int wholedomain = 1, tube = 2, insidetube = 3, tubeskin = 4, domainskin = 5, ground = 6;
     
     // To be sure to have nodes at z = 0:
     if (nhtube%2 == 0)
@@ -235,7 +232,6 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     mymesh.regionskin(tubeskin, tube);
     mymesh.regionskin(domainskin, wholedomain);
     mymesh.boxselection(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
-    mymesh.boxselection(boxcut, wholedomain, 3, {-1e-10,linf+1e-10, -1e-10,linf+1e-10, -htube-linf,htube+linf});
     
     mymesh.load({voltube, voltubeinside, wholevol});
     
