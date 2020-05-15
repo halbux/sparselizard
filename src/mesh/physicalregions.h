@@ -58,7 +58,7 @@ class physicalregions
         // regions for the ith element. Length is numelems+1 and last entry gives prs.size().
         void inphysicalregions(int elementtypenumber, int totalnumelemsintype, std::vector<int>& addresses, std::vector<int>& prs);
         
-        // Remove physical regions (physical regions required for the compressed mesh structure should NOT be removed).
+        // Remove physical regions (do not call this yourself).
         void remove(std::vector<int> toremove, bool ispartofdisjregstructure);
         
         // Give an error if any of the physical regions is not defined:
