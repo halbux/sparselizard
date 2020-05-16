@@ -50,17 +50,17 @@ void mesh::write(std::string name, int verbosity)
 
 void mesh::adapt(void)
 {
-    rawmeshptr->adapt();
+    rawmeshptr->adapth();
 }
 
-void mesh::setadaptation(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
+void mesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
 {
-    rawmeshptr->setadaptation(criterion, triggers, lownumsplits, highnumsplits, thresdown, thresup, mincritrange);
+    rawmeshptr->setadaptivity(criterion, triggers, lownumsplits, highnumsplits, thresdown, thresup, mincritrange);
 }
 
-void mesh::setadaptation(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
+void mesh::setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
 {
-    rawmeshptr->setadaptation(criterion, triggers, thresholds, numsplits, thresdown, thresup, mincritrange);
+    rawmeshptr->setadaptivity(criterion, triggers, thresholds, numsplits, thresdown, thresup, mincritrange);
 }
 
 void mesh::split(int n)

@@ -55,8 +55,8 @@ class mesh
         
         // H-adaptivity:
         void adapt(void);
-        void setadaptation(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
-        void setadaptation(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
+        void setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
+        void setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
         
         // Split each element in the mesh n times:
         void split(int n = 1);
