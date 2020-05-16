@@ -870,7 +870,7 @@ void rawmesh::adaptp(void)
 
 void rawmesh::adapth(void)
 {
-
+    // Adapt mesh and create it in myhadaptedmesh then send to universe + send last adapted mesh to universe when mesh.use().
 }
 
 void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
