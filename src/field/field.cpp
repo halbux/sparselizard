@@ -137,9 +137,17 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
     }
     for (int i = 1; i < thresholds.size(); i++)
     {
-        if (thresholds[i] < thresholds[i-1])
+        if (thresholds[i] < thresholds[i-1]+noiselevel)
         {
-            std::cout << "Error in 'field' object: in 'setorder' thresholds must be provided in increasing order" << std::endl;
+            std::cout << "Error in 'field' object: in 'setorder' expecting increasing thresholds" << std::endl;
+            abort();   
+        }
+    }
+    for (int i = 1; i < orders.size(); i++)
+    {
+        if (orders[i] <= orders[i-1])
+        {
+            std::cout << "Error in 'field' object: in 'setorder' expecting increasing orders" << std::endl;
             abort();   
         }
     }
