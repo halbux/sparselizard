@@ -107,20 +107,20 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     issynchronizing = false;
 }
 
-bool rawfield::istrigger(void)
+bool rawfield::isptrigger(void)
 {
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
         return (ispadaptivetrigger > 0);
 
     for (int i = 0; i < mysubfields.size(); i++)
     {
-        if (mysubfields[i][0]->istrigger())
+        if (mysubfields[i][0]->isptrigger())
             return true;
     }
     
     for (int h = 0; h < myharmonics.size(); h++)
     {
-        if (myharmonics[h].size() > 0 && myharmonics[h][0]->istrigger())
+        if (myharmonics[h].size() > 0 && myharmonics[h][0]->isptrigger())
             return true;
     }
 
@@ -214,9 +214,9 @@ rawfield::~rawfield(void)
         universe::mymesh->remove(this);
 
     // Reset the adaptivity triggers:
-    for (int i = 0; i < myadapttriggers.size(); i++)
-        myadapttriggers[i]->settriggerflag(false);
-    myadapttriggers = {};
+    for (int i = 0; i < mypadapttriggers.size(); i++)
+        mypadapttriggers[i]->setptriggerflag(false);
+    mypadapttriggers = {};
 }
 
 int rawfield::countcomponents(void)
@@ -450,30 +450,30 @@ void rawfield::setorder(expression criterion, std::vector<field> triggers, std::
         universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, thresdown, thresup, mincritrange);
         
         // Reset the trigger flag on the previous triggers:
-        for (int i = 0; i < myadapttriggers.size(); i++)
-            myadapttriggers[i]->settriggerflag(false);
-        myadapttriggers = {};
+        for (int i = 0; i < mypadapttriggers.size(); i++)
+            mypadapttriggers[i]->setptriggerflag(false);
+        mypadapttriggers = {};
         // Set the trigger on the fields:
         for (int i = 0; i < triggers.size(); i++)
         {
-            myadapttriggers.push_back(triggers[i].getpointer());
-            triggers[i].getpointer()->settriggerflag(true);
+            mypadapttriggers.push_back(triggers[i].getpointer());
+            triggers[i].getpointer()->setptriggerflag(true);
         }
     }
 }
 
-void rawfield::settriggerflag(bool istrig)
+void rawfield::setptriggerflag(bool isptrig)
 {
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->settriggerflag(istrig);
+        mysubfields[i][0]->setptriggerflag(isptrig);
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->settriggerflag(istrig);
+            myharmonics[i][0]->setptriggerflag(isptrig);
     }
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
     {
-        if (istrig)
+        if (isptrig)
             ispadaptivetrigger++;
         else
             ispadaptivetrigger--;
@@ -483,6 +483,11 @@ void rawfield::settriggerflag(bool istrig)
             abort();
         }
     }
+}
+
+void rawfield::sethtriggerflag(bool ishtrig)
+{
+
 }
 
 void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)

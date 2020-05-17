@@ -1003,12 +1003,12 @@ void mathop::setdata(vec invec)
     std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
     
     // Check if there is any p-adaptivity trigger:
-    bool isanytrigger = false;
+    bool isanyptrigger = false;
     for (int i = 0; i < allfields.size(); i++)
     {
-        if (allfields[i]->istrigger())
+        if (allfields[i]->isptrigger())
         {
-            isanytrigger = true;
+            isanyptrigger = true;
             break;
         }
     }
@@ -1021,7 +1021,7 @@ void mathop::setdata(vec invec)
 
     universe::ispadaptallowed = wasallowed;
     
-    if (isanytrigger)
+    if (isanyptrigger)
         universe::mymesh->adaptp();
 }
 

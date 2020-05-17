@@ -182,7 +182,7 @@ void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
     
-    if (rawfieldptr->istrigger())
+    if (rawfieldptr->isptrigger())
         universe::mymesh->adaptp();
 }
 
@@ -190,7 +190,7 @@ void field::setvalue(int physreg, expression meshdeform, expression input, int e
 {
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
     
-    if (rawfieldptr->istrigger())
+    if (rawfieldptr->isptrigger())
         universe::mymesh->adaptp();
 }
 
@@ -198,7 +198,7 @@ void field::setvalue(int physreg, int numfftharms, expression input, int extrain
 {
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
     
-    if (rawfieldptr->istrigger())
+    if (rawfieldptr->isptrigger())
         universe::mymesh->adaptp();
 }
 
@@ -206,7 +206,7 @@ void field::setvalue(int physreg, int numfftharms, expression meshdeform, expres
 {
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
     
-    if (rawfieldptr->istrigger())
+    if (rawfieldptr->isptrigger())
         universe::mymesh->adaptp();
 }
 
@@ -214,7 +214,7 @@ void field::setvalue(int physreg)
 {
     rawfieldptr->setvalue(physreg);
     
-    if (rawfieldptr->istrigger())
+    if (rawfieldptr->isptrigger())
         universe::mymesh->adaptp();
 }
 
@@ -247,7 +247,7 @@ void field::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
     rawfieldptr->setdata(physreg, myvec, op); 
     
-    if (rawfieldptr->istrigger())
+    if (rawfieldptr->isptrigger())
         universe::mymesh->adaptp();
 }
 
@@ -355,7 +355,7 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     {
         std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
         
-        if (rawfieldptr->istrigger())
+        if (rawfieldptr->isptrigger())
             universe::mymesh->adaptp();
         
         return datout;
@@ -365,7 +365,7 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     {
         std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
         
-        if (rawfieldptr->istrigger())
+        if (rawfieldptr->isptrigger())
             universe::mymesh->adaptp();
             
         return datout;
