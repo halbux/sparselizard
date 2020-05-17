@@ -963,7 +963,7 @@ void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, s
     }
     
     // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs(mydisjointregions.count());
+    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
