@@ -875,12 +875,118 @@ void rawmesh::adapth(void)
 
 void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
 {
+    if (lownumsplits < 0)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' cannot use negative minimum number of splits " << lownumsplits << std::endl;
+        abort();   
+    }
+    if (highnumsplits < lownumsplits)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' the minimum number of splits cannot be larger than the maximum" << std::endl;
+        abort();   
+    }
 
+    int cnt = highnumsplits-lownumsplits+1;
+    std::vector<double> thresholds(cnt+1);
+    thresholds[0] = 0;
+    for (int i = 1; i < thresholds.size()-1; i++)
+        thresholds[i] = 1.0/cnt * i;
+    thresholds[thresholds.size()-1] = 1.0;
+
+    std::vector<int> numsplits(cnt);
+    for (int i = 0; i < cnt; i++)
+        numsplits[i] = lownumsplits + i;
+        
+    setadaptivity(criterion, triggers, thresholds, numsplits, thresdown, thresup, mincritrange);
 }
 
 void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
 {
+    double noiselevel = 1e-8;
 
+    if (not(criterion.isscalar()))
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expected a scalar criterion for mesh adaptivity" << std::endl;
+        abort();   
+    }
+    if (numsplits.size() == 0)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' number of splits vector cannot be empty" << std::endl;
+        abort();   
+    }
+    if (thresholds.size() != numsplits.size()+1)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expected a threshold vector of size " << numsplits.size()+1 << " for the number of splits vector of size " << numsplits.size() << " provided (thresholds 0.0 and 1.0 must be included)" << std::endl;
+        abort();   
+    }
+    for (int i = 0; i < thresholds.size(); i++)
+    {
+        if (thresholds[i] < 0.0-noiselevel || thresholds[i] > 1.0+noiselevel)
+        {
+            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' thresholds must be between 0.0 and 1.0" << std::endl;
+            abort();   
+        }
+    }
+    for (int i = 1; i < thresholds.size(); i++)
+    {
+        if (thresholds[i] < thresholds[i-1]+noiselevel)
+        {
+            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expecting increasing thresholds" << std::endl;
+            abort();   
+        }
+    }
+    for (int i = 1; i < numsplits.size(); i++)
+    {
+        if (numsplits[i] <= numsplits[i-1])
+        {
+            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expecting increasing number of splits" << std::endl;
+            abort();   
+        }
+    }
+    if (thresholds[0] > noiselevel || thresholds[thresholds.size()-1] < 1.0-noiselevel)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' thresholds 0.0 and 1.0 must be included" << std::endl;
+        abort();   
+    }
+    for (int i = 0; i < numsplits.size(); i++)
+    {
+        if (numsplits[i] < 0)
+        {
+            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' number of splits cannot be negative" << std::endl;
+            abort();   
+        }
+    }
+    if (thresdown < 0.0-noiselevel || thresdown > 1.0+noiselevel || thresup < 0.0-noiselevel || thresup > 1.0+noiselevel)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' thresholds must be between 0.0 and 1.0" << std::endl;
+        abort();   
+    }
+    
+    // The criterion cannot be multiharmonic:
+    std::vector<int> alldisjregs(mydisjointregions.count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    if (not(criterion.isharmonicone(alldisjregs)))
+    {
+        std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
+        abort();
+    }
+        
+    std::vector<std::shared_ptr<rawfield>> htriggers = {};
+    if (myhadaptdata.size() > 0)
+        htriggers = std::get<1>(myhadaptdata[0]);
+        
+    // Reset the trigger flag on the previous triggers:
+    for (int i = 0; i < htriggers.size(); i++)
+        htriggers[i]->sethtriggerflag(false);
+    htriggers = {};
+    // Set the trigger on the fields:
+    for (int i = 0; i < triggers.size(); i++)
+    {
+        htriggers.push_back(triggers[i].getpointer());
+        triggers[i].getpointer()->sethtriggerflag(true);
+    }
+    
+    myhadaptdata = {std::make_tuple(criterion, htriggers, thresholds, numsplits, thresdown, thresup, mincritrange)};   
 }
 
 void rawmesh::writewithdisjointregions(std::string name)
