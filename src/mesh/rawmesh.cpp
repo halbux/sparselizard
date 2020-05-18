@@ -870,6 +870,151 @@ void rawmesh::adaptp(void)
 
 void rawmesh::adapth(void)
 {
+    if (universe::ishadaptallowed == false || myhadaptdata.size() == 0)
+        return;
+
+    double noisethreshold = 1e-8;
+    int meshdim = getmeshdimension();
+    
+    if (myhtracker.size() == 0)
+        myhtracker = {std::shared_ptr<htracker>(new htracker(&myelements))};
+    // Initialise leaf numbers:
+    if (leafnumbersoftransitions.size() == 0)
+    {
+        leafnumbersoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
+        int ind = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            element myelem(i);
+            if (myelem.getelementdimension() != meshdim)
+                continue;
+            int nelem = myelements.count(i);
+            leafnumbersoftransitions[i] = std::vector<int>(nelem);
+            for (int j = 0; j < nelem; j++)
+                leafnumbersoftransitions[i][j] = ind+j;
+            ind += nelem;
+        }
+    }
+    
+    std::vector<int> leavesnumsplits;
+    myhtracker[0]->countsplits(leavesnumsplits);
+
+
+    ///// Evaluate the criterion:
+
+    int wholedomain = mathop::regionall();
+    
+    field one("one");
+    
+    formulation critaverage;
+    critaverage += mathop::integral(wholedomain, -std::get<0>(myhadaptdata[0]) * mathop::tf(one) / mathop::getmeshsize(2) );
+    critaverage.generaterhs();
+    vec crit = critaverage.rhs();
+    
+    myphysicalregions.remove({wholedomain}, false);
+
+
+    ///// Move to densematrix container:
+    
+    int totalnumelems = crit.size();
+
+    intdensematrix ads(totalnumelems,1, 0, 1);
+    densematrix critmat = crit.getvalues(ads);
+    double* critptr = critmat.getvalues();
+
+    std::shared_ptr<dofmanager> dofmngr = crit.getpointer()->getdofmanager();
+    dofmngr->selectfield(one.getpointer()->harmonic(1));
+    
+
+    ///// Calculate the number of splits to use:
+    
+    std::vector<double> thresholds = std::get<2>(myhadaptdata[0]);
+    std::vector<int> numsplits = std::get<3>(myhadaptdata[0]);
+    double thresdown = std::get<4>(myhadaptdata[0]) + noisethreshold;
+    double thresup = std::get<5>(myhadaptdata[0]) + noisethreshold;
+    double mincritrange = std::get<6>(myhadaptdata[0]);
+    
+    int minnumsplits = *std::min_element(numsplits.begin(), numsplits.end());
+
+    std::vector<double> minmax = critmat.minmax();
+    double cmin = minmax[0];
+    double cmax = minmax[1];
+    
+    double crange = cmax-cmin;
+    
+    std::vector<std::vector<int>> newnumsplits(8, std::vector<int>(0));
+    for (int i = 0; i < 8; i++)
+    {
+        element myelem(i);
+        if (myelem.getelementdimension() != meshdim)
+            continue;
+        newnumsplits[i] = std::vector<int>(myelements.count(i));
+    }
+    
+    // Convert the thresholds from % to criterion value:
+    for (int th = 0; th < thresholds.size(); th++)
+        thresholds[th] = cmin + thresholds[th] * crange;
+    
+    // Vector with +1 to split a leaf, 0 to keep as is and -1 to group:
+    std::vector<int> vadapt(myhtracker[0]->countleaves(), -1); // all grouped initially
+    
+    bool isidentical = true;
+    for (int d = 0; d < mydisjointregions.count(); d++)
+    {
+        if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
+        {
+            int typenum = mydisjointregions.getelementtypenumber(d);
+            int numelems = mydisjointregions.countelements(d);
+            int rb = dofmngr->getrangebegin(d,0);
+            int rbe = mydisjointregions.getrangebegin(d);
+        
+            for (int e = 0; e < numelems; e++)
+            {
+                int ln = leafnumbersoftransitions[typenum][rbe+e];
+            
+                int oldnumsplits = leavesnumsplits[ln];
+                    
+                // In case the criterion range is not large enough the number of splits are all set to minimum:
+                if (crange < mincritrange)
+                    newnumsplits[typenum][rbe+e] = minnumsplits;
+                else
+                {
+                    double curcrit = critptr[rb+e];
+                    
+                    int interv = myalgorithm::findinterval(curcrit, thresholds);
+                    newnumsplits[typenum][rbe+e] = numsplits[interv];
+                    
+                    // Check if the criterion is beyond the down/up change threshold.
+                    double intervsize = thresholds[interv+1]-thresholds[interv];
+                    // Bring back to upper interval?
+                    if (interv < thresholds.size()-2 && numsplits[interv+1] == oldnumsplits && critptr[e] > thresholds[interv+1]-intervsize*thresdown)
+                        newnumsplits[typenum][rbe+e] = oldnumsplits;
+                    // Bring back to lower interval?
+                    if (interv > 0 && numsplits[interv-1] == oldnumsplits && critptr[e] < thresholds[interv]+intervsize*thresup)
+                        newnumsplits[typenum][rbe+e] = oldnumsplits;
+                }
+            
+                int nns = newnumsplits[typenum][rbe+e];
+                if (oldnumsplits != nns)
+                    isidentical = false;
+                    
+                // Split or keep unchanged. Multiple transition elements can share the same leaf!
+                if (nns > oldnumsplits)
+                    vadapt[ln] = 1;
+                if (vadapt[ln] < 1 && nns == oldnumsplits)
+                    vadapt[ln] = 0;
+            }
+        }
+    }
+
+    // Nothing to do if all new number of splits are identical to the old ones:
+    if (isidentical)
+        return;
+
+    // Update to how it will be actually treated:
+    myhtracker[0]->fix(vadapt);
+        
+
     // Adapt mesh and create it in myhadaptedmesh then send to universe + send last adapted mesh to universe when mesh.use().
 }
 
