@@ -43,6 +43,7 @@ class universe
         static int physregshift;
         
         static bool ispadaptallowed;
+        static bool ishadaptallowed;
         
         // To allow reusing computed things:
         static bool isreuseallowed;
