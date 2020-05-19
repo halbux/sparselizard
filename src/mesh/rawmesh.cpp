@@ -139,9 +139,9 @@ void rawmesh::writetofile(std::string name)
     }
 }
 
-void rawmesh::sortbybarycenters(void)
+void rawmesh::sortbybarycenters(int lasttypetoprocess)
 {
-    for (int elementtypenumber = 0; elementtypenumber <= 7; elementtypenumber++)
+    for (int elementtypenumber = 0; elementtypenumber <= lasttypetoprocess; elementtypenumber++)
     {
         if (myelements.count(elementtypenumber) == 0)
             continue;
@@ -157,9 +157,9 @@ void rawmesh::sortbybarycenters(void)
     }
 }
 
-void rawmesh::removeduplicates(void)
+void rawmesh::removeduplicates(int lasttypetoprocess)
 {
-    for (int elementtypenumber = 0; elementtypenumber <= 7; elementtypenumber++)
+    for (int elementtypenumber = 0; elementtypenumber <= lasttypetoprocess; elementtypenumber++)
     {
         if (myelements.count(elementtypenumber) == 0)
             continue;
@@ -876,8 +876,11 @@ void rawmesh::adapth(void)
     double noisethreshold = 1e-8;
     int meshdim = getmeshdimension();
     
-    if (myhtracker.size() == 0)
-        myhtracker = {std::shared_ptr<htracker>(new htracker(&myelements))};
+    if (myhtracker == NULL)
+        myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
+    if (myhadaptedmesh == NULL)
+        myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
+        
     // Initialise leaf numbers:
     if (leafnumbersoftransitions.size() == 0)
     {
@@ -897,7 +900,7 @@ void rawmesh::adapth(void)
     }
     
     std::vector<int> leavesnumsplits;
-    myhtracker[0]->countsplits(leavesnumsplits);
+    myhtracker->countsplits(leavesnumsplits);
 
 
     ///// Evaluate the criterion:
@@ -956,7 +959,7 @@ void rawmesh::adapth(void)
         thresholds[th] = cmin + thresholds[th] * crange;
     
     // Vector with +1 to split a leaf, 0 to keep as is and -1 to group:
-    std::vector<int> vadapt(myhtracker[0]->countleaves(), -1); // all grouped initially
+    std::vector<int> vadapt(myhtracker->countleaves(), -1); // all grouped initially
     
     bool isidentical = true;
     for (int d = 0; d < mydisjointregions.count(); d++)
@@ -1012,7 +1015,7 @@ void rawmesh::adapth(void)
         return;
 
     // Update to how it will be actually treated:
-    myhtracker[0]->fix(vadapt);
+    myhtracker->fix(vadapt);
         
 
     // Adapt mesh and create it in myhadaptedmesh then send to universe + send last adapted mesh to universe when mesh.use().

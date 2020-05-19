@@ -53,11 +53,11 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<ptracker> myptracker = NULL;
         std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
     
-        // For h-adaptivity:
-        std::vector<std::shared_ptr<htracker>> myhtracker = {}; // h-tracker to get adapted mesh below
-        std::vector<std::shared_ptr<rawmesh>> myhadaptedmesh = {};
-        std::vector<std::tuple<expression,std::vector<std::shared_ptr<rawfield>>,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
+        // For h-adaptivity (only for original mesh):
+        std::shared_ptr<htracker> myhtracker = NULL;
+        std::shared_ptr<rawmesh> myhadaptedmesh = NULL;
         std::vector<std::vector<int>> leafnumbersoftransitions = {};
+        std::vector<std::tuple<expression,std::vector<std::shared_ptr<rawfield>>,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
     
     public:
         
@@ -69,9 +69,9 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // 'sortbybarycenters' sorts the elements (and nodes) according to 
         // the x then y then z coordinates of their barycenter. Round off
         // noise on the coordinates is taken into account in the sorting.
-        void sortbybarycenters(void);
+        void sortbybarycenters(int lasttypetoprocess = 7);
         // 'removeduplicates' removes the duplicated elements (and nodes).
-        void removeduplicates(void);
+        void removeduplicates(int lasttypetoprocess = 7);
         
         // 'printcount' prints the number of elements for every type.
         void printcount(void);
