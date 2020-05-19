@@ -870,17 +870,22 @@ void rawmesh::adaptp(void)
 
 void rawmesh::adapth(void)
 {
-    if (universe::ishadaptallowed == false || myhadaptdata.size() == 0)
-        return;
-
     double noisethreshold = 1e-8;
     int meshdim = getmeshdimension();
     
-    if (myhtracker == NULL)
-        myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
     universe::mymesh = myhadaptedmesh;
     if (myhadaptedmesh == NULL)
-        universe::mymesh = shared_from_this();   
+        universe::mymesh = shared_from_this();  
+ 
+    if (universe::ishadaptallowed == false || myhadaptdata.size() == 0)
+        return;
+        
+    elements* elptr = universe::mymesh->getelements();
+    disjointregions* drptr = universe::mymesh->getdisjointregions();
+    physicalregions* prptr = universe::mymesh->getphysicalregions();
+    
+    if (myhtracker == NULL)
+        myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
     myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
         
     // Initialise leaf numbers:
@@ -916,7 +921,7 @@ void rawmesh::adapth(void)
     critaverage.generaterhs();
     vec crit = critaverage.rhs();
     
-    universe::mymesh->getphysicalregions()->remove({wholedomain}, false);
+    prptr->remove({wholedomain}, false);
 
 
     ///// Move to densematrix container:
@@ -947,15 +952,6 @@ void rawmesh::adapth(void)
     
     double crange = cmax-cmin;
     
-    std::vector<std::vector<int>> newnumsplits(8, std::vector<int>(0));
-    for (int i = 0; i < 8; i++)
-    {
-        element myelem(i);
-        if (myelem.getelementdimension() != meshdim)
-            continue;
-        newnumsplits[i] = std::vector<int>(universe::mymesh->myelements.count(i));
-    }
-    
     // Convert the thresholds from % to criterion value:
     for (int th = 0; th < thresholds.size(); th++)
         thresholds[th] = cmin + thresholds[th] * crange;
@@ -964,49 +960,49 @@ void rawmesh::adapth(void)
     std::vector<int> vadapt(myhtracker->countleaves(), -1); // all grouped initially
     
     bool isidentical = true;
-    for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
+    for (int d = 0; d < drptr->count(); d++)
     {
         if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
         {
-            int typenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
-            int numelems = universe::mymesh->getdisjointregions()->countelements(d);
+            int typenum = drptr->getelementtypenumber(d);
+            int numelems = drptr->countelements(d);
             int rb = dofmngr->getrangebegin(d,0);
-            int rbe = universe::mymesh->getdisjointregions()->getrangebegin(d);
+            int rbe = drptr->getrangebegin(d);
         
             for (int e = 0; e < numelems; e++)
             {
                 int ln = leafnumbersoftransitions[typenum][rbe+e];
-            
                 int oldnumsplits = leavesnumsplits[ln];
+                
+                int newnumsplits;
                     
                 // In case the criterion range is not large enough the number of splits are all set to minimum:
                 if (crange < mincritrange)
-                    newnumsplits[typenum][rbe+e] = minnumsplits;
+                    newnumsplits = minnumsplits;
                 else
                 {
                     double curcrit = critptr[rb+e];
                     
                     int interv = myalgorithm::findinterval(curcrit, thresholds);
-                    newnumsplits[typenum][rbe+e] = numsplits[interv];
+                    newnumsplits = numsplits[interv];
                     
                     // Check if the criterion is beyond the down/up change threshold.
                     double intervsize = thresholds[interv+1]-thresholds[interv];
                     // Bring back to upper interval?
                     if (interv < thresholds.size()-2 && numsplits[interv+1] == oldnumsplits && critptr[e] > thresholds[interv+1]-intervsize*thresdown)
-                        newnumsplits[typenum][rbe+e] = oldnumsplits;
+                        newnumsplits = oldnumsplits;
                     // Bring back to lower interval?
                     if (interv > 0 && numsplits[interv-1] == oldnumsplits && critptr[e] < thresholds[interv]+intervsize*thresup)
-                        newnumsplits[typenum][rbe+e] = oldnumsplits;
+                        newnumsplits = oldnumsplits;
                 }
             
-                int nns = newnumsplits[typenum][rbe+e];
-                if (oldnumsplits != nns)
+                if (oldnumsplits != newnumsplits)
                     isidentical = false;
                     
                 // Split or keep unchanged. Multiple transition elements can share the same leaf!
-                if (nns > oldnumsplits)
+                if (newnumsplits > oldnumsplits)
                     vadapt[ln] = 1;
-                if (vadapt[ln] < 1 && nns == oldnumsplits)
+                if (vadapt[ln] < 1 && newnumsplits == oldnumsplits)
                     vadapt[ln] = 0;
             }
         }
@@ -1014,10 +1010,308 @@ void rawmesh::adapth(void)
 
     // Nothing to do if all new number of splits are identical to the old ones:
     if (isidentical)
-        return;
+        return;        
+        
+        
+    ///// Propagate the splits to guarantee at most a one delta between neighbouring elements:
 
-    // Update to how it will be actually treated:
-    myhtracker->fix(vadapt);
+    int maxnumsplits = myhtracker->getmaxdepth() + 1; // includes any new split request
+    
+    for (int ns = maxnumsplits; ns > 1; ns--)
+    {
+        // Update to how it will be actually treated:
+        myhtracker->fix(vadapt);
+
+        for (int d = 0; d < drptr->count(); d++)
+        {
+            if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
+            {
+                int typenum = drptr->getelementtypenumber(d);
+                int numelems = drptr->countelements(d);
+                int rbe = drptr->getrangebegin(d);
+                element curelem(typenum);
+                int numedges = curelem.countedges();
+            
+                for (int e = 0; e < numelems; e++)
+                {
+                    int ln = leafnumbersoftransitions[typenum][rbe+e];
+                    int numsplits = leavesnumsplits[ln] + vadapt[ln];
+                    
+                    if (numsplits != ns)
+                        continue;
+                    
+                    // Loop on every edge of the current element:
+                    for (int en = 0; en < numedges; en++)
+                    {
+                        int currentedge = elptr->getsubelement(1, typenum, rbe+e, en);
+                        // Get all cells touching the current edge:
+                        std::vector<int> cellsonedge = elptr->getcellsonedge(currentedge);
+
+                        for (int c = 0; c < cellsonedge.size()/2; c++)
+                        {
+                            int curcell = cellsonedge[2*c+1];
+                            int celltype = cellsonedge[2*c+0];
+                            
+                            if (typenum == celltype && curcell == rbe+e)
+                                continue;
+                            
+                            int curln = leafnumbersoftransitions[celltype][curcell];
+                            int neighbournumsplits = leavesnumsplits[curln] + vadapt[curln];
+
+                            if (numsplits > neighbournumsplits+1)
+                                vadapt[curln] += numsplits-neighbournumsplits-1;                     
+                        }
+                    }
+                }
+            }
+        }
+    }
+        
+    myhtracker->adapt(vadapt);
+    
+    
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////// STILL DRAFT BELOW
+
+
+
+
+
+
+
+int verbosity = 1;
+
+// curv order:
+int co = myelements.getcurvatureorder();
+    
+    
+    
+    std::vector<int> nn(8);
+    std::vector<int> ncn(8);
+    std::vector<element> els(8);
+    for (int i = 0; i < 8; i++)
+    {
+        els[i] = element(i, co);
+        nn[i] = els[i].countnodes();   
+        ncn[i] = els[i].countcurvednodes();   
+    }
+    int md = getmeshdimension();
+    
+    
+    std::vector<std::vector<double>> ac;
+    
+    
+wallclock clkhtracker;
+    myhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
+clkhtracker.print("Htracker coord dump time:");
+    
+
+    
+
+physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.get(1);
+  
+    
+    
+     wallclock loadtime;   
+    
+    
+    // Initialize nodes size:
+    int numnodes = 0;
+    for (int i = 0; i < 8; i++)
+        numnodes += ac[i].size()/3;
+    myhadaptedmesh->mynodes.setnumber(numnodes);
+    std::vector<double>* nc = myhadaptedmesh->mynodes.getcoordinates();
+    
+
+    // Loop on all elements of max dimension in the original mesh: ///////////////// ALSO ADD LOWER DIM PHYSICAL REGIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    int ni = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int e = 0; e < ac[i].size()/ncn[i]/3; e++)
+        {
+            // Add nodes coordinates:
+            for (int j = 0; j < 3*ncn[i]; j++)
+                nc->at(3*ni+j) = ac[i][3*ncn[i]*e+j];
+                
+            std::vector<int> nodes = myalgorithm::getequallyspaced(ni, 1, ncn[i]);
+            
+            int elementindexincurrenttype = myhadaptedmesh->myelements.add(i, co, nodes);
+            currentphysicalregion->addelement(i, elementindexincurrenttype);
+            
+            ni += ncn[i];
+        }
+    }
+    
+    
+
+    
+    int lasttype = 1;
+    if (getmeshdimension() == 3) // ! REGIONDEFINE MIGHT CREATE DUPLICATES! --> NO IT DOESN T!!!!!
+        lasttype = 3;
+    
+    
+//wallclock cli;
+    myhadaptedmesh->myelements.explode();
+//cli.print("------------------------------>");   
+
+    myhadaptedmesh->sortbybarycenters(lasttype);
+
+
+    myhadaptedmesh->removeduplicates(lasttype);
+    
+    
+    
+    ///// INCLUDE LOWER DIM PHYSREGS:  DO THIS BEFORE REMOVING DUPLICATES??????????? OTHERWISE DUPLICATES HAVE TO BE REMOVED AGAIN!!!!!!!!!!!!!!!
+    
+    // 1. Get from orig mesh (if any of that dim) all elems of lower dim and create vec with all physregs in which they are
+    // 2. Loop on all elements of max dim in this mesh and call htracker.atoriginal
+    // 3 For each face/edge/node check if any physreg of lower dim --> add to physregs that element
+    
+    // LETS DO IT:
+    
+    
+    // 1.:
+    physicalregions* pr = getphysicalregions();
+    elements* origelems = getelements();
+
+    std::vector<std::vector<int>> addresses(8, std::vector<int>(0));
+    std::vector<std::vector<int>> prnums(8, std::vector<int>(0));
+    std::vector<int> dims = {0,1,2,2,3,3,3,3};
+
+    std::vector<bool> isanyatdim(3, false);
+    for (int i = 0; i < 8; i++)
+    {
+        // Only lower dim entities need this:
+        if (dims[i] >= meshdim)
+            continue;
+    
+        // Skip if none:
+        pr->inphysicalregions(i, origelems->count(i), addresses[i], prnums[i]);
+        
+        if (prnums[i].size() == 0)
+            continue;
+        
+        isanyatdim[dims[i]] = true;
+    }
+    
+    
+    // 2. 
+    bool isanypratnode = isanyatdim[0];
+    bool isanypratedge = isanyatdim[1];
+    bool isanypratface = isanyatdim[2];
+    
+    if (isanypratnode || isanypratedge || isanypratface)
+    {
+        // Loop on all transition elements (of max dim):
+        for (int i = 0; i < 8; i++)
+        {
+            // Skip not meshdim dim elements:
+            int curdim = dims[i];
+            if (curdim != meshdim)
+                continue;
+            
+            std::vector<int> on, oe, of;
+            for (int j = 0; j < myhadaptedmesh->myelements.count(i); j++)
+            {
+                int origtype, origelemnum;
+                myhtracker->atoriginal(i, j, origtype, origelemnum, on, oe, of);
+                
+                
+                if (isanypratnode)
+                {
+                    for (int n = 0; n < on.size(); n++)
+                    {
+                        if (on[n] != -1)
+                        {
+                            int curnum = myhadaptedmesh->myelements.getsubelement(0, i, j, n);
+                            int curorignum = origelems->getsubelement(0, origtype, origelemnum, on[n]);
+                            // Loop on all physical regions for this subelement:
+                            int numpr = addresses[0][curorignum+1]-addresses[0][curorignum];
+                            
+                            for (int p = 0; p < numpr; p++)
+                            {
+                                int cpr = prnums[0][addresses[0][curorignum]+p]; // currne pr
+
+                                // + ADD ONLY ONCE THE ELEMENT, OTHERWISE IT IS ADDED E.G. FOR EDGES AT EACH TOUCHING QUAD (í.e. 2 times the same in 2D!!!!!!!!!!!!!)
+                                myhadaptedmesh->myphysicalregions.get(cpr)->addelement(0,curnum); //// SHOULD BE MUST FASTER, ADD ALL IN ONE SINGLE CALL?
+                            }
+                        }
+                    }
+                }
+                
+                // Loop on all subelements:
+                if (isanypratedge)
+                {
+                    for (int e = 0; e < oe.size(); e++)
+                    {
+                        if (oe[e] != -1)
+                        {
+                            int curnum = myhadaptedmesh->myelements.getsubelement(1, i, j, e);
+                            int curorignum = origelems->getsubelement(1, origtype, origelemnum, oe[e]);
+                            // Loop on all physical regions for this subelement:
+                            int numpr = addresses[1][curorignum+1]-addresses[1][curorignum];
+                            
+                            for (int p = 0; p < numpr; p++)
+                            {
+                                int cpr = prnums[1][addresses[1][curorignum]+p]; // currne pr
+
+                                // + ADD ONLY ONCE THE ELEMENT, OTHERWISE IT IS ADDED E.G. FOR EDGES AT EACH TOUCHING QUAD (í.e. 2 times the same in 2D!!!!!!!!!!!!!)
+                                myhadaptedmesh->myphysicalregions.get(cpr)->addelement(1,curnum); //// SHOULD BE MUST FASTER, ADD ALL IN ONE SINGLE CALL?
+                            }
+                        }
+                    }
+                }
+            
+            }
+        }
+    }
+    
+    
+    ///// REGIONUNION AND THE LIKE ARE LOST WITH THE ABOVE BECAUSE THEY DO NOT ADD ELEMENTLIST TO THEIR PHYSREG!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
+    
+    // INCLUDE THIS?? MAYBE NOT?? myregiondefiner.defineregions(); --> ANSWER IS NO: BECAUSE THEY ARE ALREADY ADDED IN THE LOWER DIM PHYS REG ELEMENTS ADD STEP!!!!!
+
+    myhadaptedmesh->myelements.definedisjointregions();
+
+    std::vector<std::vector<int>> renumbydr;
+    myhadaptedmesh->myelements.reorderbydisjointregions(renumbydr);
+  
+    std::vector<std::vector<int>> lnt = leafnumbersoftransitions;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < lnt[i].size(); j++)
+            leafnumbersoftransitions[i][renumbydr[i][j]] = lnt[i][j];
+    }
+    
+    myhadaptedmesh->myelements.definedisjointregionsranges();
+    
+    // Define the physical regions based on the disjoint regions they contain:
+    for (int physregindex = 0; physregindex < myhadaptedmesh->myphysicalregions.count(); physregindex++)
+    {
+        physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.getatindex(physregindex);
+        currentphysicalregion->definewithdisjointregions();
+    }
+    
+    myhadaptedmesh->myelements.orient();
+
+    if (verbosity > 0)
+        myhadaptedmesh->printcount();
+    if (verbosity > 1)
+        myhadaptedmesh->printelementsinphysicalregions();
+    if (verbosity > 0)
+        loadtime.print("Time to load the mesh: ");
+    
+    
+    
+universe::mymesh = myhadaptedmesh;
+
+
+
+
+        
         
 
 }
