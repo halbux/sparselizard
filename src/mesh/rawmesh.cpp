@@ -989,10 +989,10 @@ void rawmesh::adapth(void)
                     // Check if the criterion is beyond the down/up change threshold.
                     double intervsize = thresholds[interv+1]-thresholds[interv];
                     // Bring back to upper interval?
-                    if (interv < thresholds.size()-2 && numsplits[interv+1] == oldnumsplits && critptr[e] > thresholds[interv+1]-intervsize*thresdown)
+                    if (interv < thresholds.size()-2 && numsplits[interv+1] == oldnumsplits && curcrit > thresholds[interv+1]-intervsize*thresdown)
                         newnumsplits = oldnumsplits;
                     // Bring back to lower interval?
-                    if (interv > 0 && numsplits[interv-1] == oldnumsplits && critptr[e] < thresholds[interv]+intervsize*thresup)
+                    if (interv > 0 && numsplits[interv-1] == oldnumsplits && curcrit < thresholds[interv]+intervsize*thresup)
                         newnumsplits = oldnumsplits;
                 }
             
