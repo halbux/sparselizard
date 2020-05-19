@@ -878,8 +878,10 @@ void rawmesh::adapth(void)
     
     if (myhtracker == NULL)
         myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
+    universe::mymesh = myhadaptedmesh;
     if (myhadaptedmesh == NULL)
-        myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
+        universe::mymesh = shared_from_this();   
+    myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
         
     // Initialise leaf numbers:
     if (leafnumbersoftransitions.size() == 0)
@@ -914,7 +916,7 @@ void rawmesh::adapth(void)
     critaverage.generaterhs();
     vec crit = critaverage.rhs();
     
-    myphysicalregions.remove({wholedomain}, false);
+    universe::mymesh->getphysicalregions()->remove({wholedomain}, false);
 
 
     ///// Move to densematrix container:
@@ -951,7 +953,7 @@ void rawmesh::adapth(void)
         element myelem(i);
         if (myelem.getelementdimension() != meshdim)
             continue;
-        newnumsplits[i] = std::vector<int>(myelements.count(i));
+        newnumsplits[i] = std::vector<int>(universe::mymesh->myelements.count(i));
     }
     
     // Convert the thresholds from % to criterion value:
@@ -962,14 +964,14 @@ void rawmesh::adapth(void)
     std::vector<int> vadapt(myhtracker->countleaves(), -1); // all grouped initially
     
     bool isidentical = true;
-    for (int d = 0; d < mydisjointregions.count(); d++)
+    for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
     {
         if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
         {
-            int typenum = mydisjointregions.getelementtypenumber(d);
-            int numelems = mydisjointregions.countelements(d);
+            int typenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
+            int numelems = universe::mymesh->getdisjointregions()->countelements(d);
             int rb = dofmngr->getrangebegin(d,0);
-            int rbe = mydisjointregions.getrangebegin(d);
+            int rbe = universe::mymesh->getdisjointregions()->getrangebegin(d);
         
             for (int e = 0; e < numelems; e++)
             {
@@ -1018,7 +1020,6 @@ void rawmesh::adapth(void)
     myhtracker->fix(vadapt);
         
 
-    // Adapt mesh and create it in myhadaptedmesh then send to universe + send last adapted mesh to universe when mesh.use().
 }
 
 void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
