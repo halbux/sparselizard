@@ -1140,122 +1140,88 @@ void rawmesh::adapth(int verbosity)
     myhadaptedmesh->removeduplicates(lasttype[meshdim]);
     
     
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////// STILL DRAFT BELOW
-
-
+    ///// Add the lower dimension physical regions:
     
-    ///// INCLUDE LOWER DIM PHYSREGS:  DO THIS BEFORE REMOVING DUPLICATES??????????? OTHERWISE DUPLICATES HAVE TO BE REMOVED AGAIN!!!!!!!!!!!!!!!
-    
-    // 1. Get from orig mesh (if any of that dim) all elems of lower dim and create vec with all physregs in which they are
-    // 2. Loop on all elements of max dim in this mesh and call htracker.atoriginal
-    // 3 For each face/edge/node check if any physreg of lower dim --> add to physregs that element
-    
-    // LETS DO IT:
-    
-    
-    // 1.:
-    std::vector<std::vector<int>> daddresses(8, std::vector<int>(0));
-    std::vector<std::vector<int>> dprnums(8, std::vector<int>(0));
     std::vector<int> dims = {0,1,2,2,3,3,3,3};
-
-    std::vector<bool> isanyatdim(3, false);
+    // Check if there is any node/edge/face physical region for speedup:
+    std::vector<bool> isanypratdim(4, false);
+    for (int i = 0; i < 8; i++)
+        isanypratdim[dims[i]] = (isanypratdim[dims[i]] || prnums[i].size() > 0);
+    
+    // Loop on all transition elements:
     for (int i = 0; i < 8; i++)
     {
-        // Only lower dim entities need this:
-        if (dims[i] >= meshdim)
-            continue;
-    
-        // Skip if none:
-        origpr->inphysicalregions(i, origelems->count(i), daddresses[i], dprnums[i]);
-        
-        if (dprnums[i].size() == 0)
+        if (dims[i] != meshdim)
             continue;
         
-        isanyatdim[dims[i]] = true;
-    }
-    
-    
-    // 2. 
-    bool isanypratnode = isanyatdim[0];
-    bool isanypratedge = isanyatdim[1];
-    bool isanypratface = isanyatdim[2];
-    
-    if (isanypratnode || isanypratedge || isanypratface)
-    {
-        // Loop on all transition elements (of max dim):
-        for (int i = 0; i < 8; i++)
+        std::vector<int> on, oe, of;
+        for (int j = 0; j < myhadaptedmesh->myelements.count(i); j++)
         {
-            // Skip not meshdim dim elements:
-            int curdim = dims[i];
-            if (curdim != meshdim)
-                continue;
+            int origtype, origelemnum;
+            myhtracker->atoriginal(i, j, origtype, origelemnum, on, oe, of);
             
-            std::vector<int> on, oe, of;
-            for (int j = 0; j < myhadaptedmesh->myelements.count(i); j++)
+            if (isanypratdim[0])
             {
-                int origtype, origelemnum;
-                myhtracker->atoriginal(i, j, origtype, origelemnum, on, oe, of);
-                
-                
-                if (isanypratnode)
+                for (int n = 0; n < on.size(); n++)
                 {
-                    for (int n = 0; n < on.size(); n++)
+                    if (on[n] != -1)
                     {
-                        if (on[n] != -1)
-                        {
-                            int curnum = myhadaptedmesh->myelements.getsubelement(0, i, j, n);
-                            int curorignum = origelems->getsubelement(0, origtype, origelemnum, on[n]);
-                            // Loop on all physical regions for this subelement:
-                            int numpr = addresses[0][curorignum+1]-addresses[0][curorignum];
-                            
-                            for (int p = 0; p < numpr; p++)
-                            {
-                                int cpr = prnums[0][addresses[0][curorignum]+p]; // currne pr
-
-                                // + ADD ONLY ONCE THE ELEMENT, OTHERWISE IT IS ADDED E.G. FOR EDGES AT EACH TOUCHING QUAD (í.e. 2 times the same in 2D!!!!!!!!!!!!!)
-                                myhadaptedmesh->myphysicalregions.get(cpr)->addelement(0,curnum); //// SHOULD BE MUST FASTER, ADD ALL IN ONE SINGLE CALL?
-                            }
-                        }
+                        int curnum = myhadaptedmesh->myelements.getsubelement(0, i, j, n);
+                        int curorignum = origelems->getsubelement(0, origtype, origelemnum, on[n]);
+                        // Loop on all physical regions for this subelement:
+                        int numpr = addresses[0][curorignum+1]-addresses[0][curorignum];
+                        for (int p = 0; p < numpr; p++)
+                            myhadaptedmesh->myphysicalregions.get( prnums[0][addresses[0][curorignum]+p] )->addelement(0,curnum);
                     }
                 }
-                
-                // Loop on all subelements:
-                if (isanypratedge)
+            }
+            if (isanypratdim[1])
+            {
+                for (int e = 0; e < oe.size(); e++)
                 {
-                    for (int e = 0; e < oe.size(); e++)
+                    if (oe[e] != -1)
                     {
-                        if (oe[e] != -1)
-                        {
-                            int curnum = myhadaptedmesh->myelements.getsubelement(1, i, j, e);
-                            int curorignum = origelems->getsubelement(1, origtype, origelemnum, oe[e]);
-                            // Loop on all physical regions for this subelement:
-                            int numpr = addresses[1][curorignum+1]-addresses[1][curorignum];
-                            
-                            for (int p = 0; p < numpr; p++)
-                            {
-                                int cpr = prnums[1][addresses[1][curorignum]+p]; // currne pr
-
-                                // + ADD ONLY ONCE THE ELEMENT, OTHERWISE IT IS ADDED E.G. FOR EDGES AT EACH TOUCHING QUAD (í.e. 2 times the same in 2D!!!!!!!!!!!!!)
-                                myhadaptedmesh->myphysicalregions.get(cpr)->addelement(1,curnum); //// SHOULD BE MUST FASTER, ADD ALL IN ONE SINGLE CALL?
-                            }
-                        }
+                        int curnum = myhadaptedmesh->myelements.getsubelement(1, i, j, e);
+                        int curorignum = origelems->getsubelement(1, origtype, origelemnum, oe[e]);
+                        // Loop on all physical regions for this subelement:
+                        int numpr = addresses[1][curorignum+1]-addresses[1][curorignum];
+                        for (int p = 0; p < numpr; p++)
+                            myhadaptedmesh->myphysicalregions.get( prnums[1][addresses[1][curorignum]+p] )->addelement(1,curnum);
                     }
                 }
-            
+            }
+            if (isanypratdim[2])
+            {
+                for (int f = 0; f < of.size(); f++)
+                {
+                    if (of[f] != -1)
+                    {
+                        // FOR HEXAHEDRA, PRISMS AND PYRAMIDS THIS IS INCORRECT SINCE THEIR FACES ARE NOT ONLY TRIANGULAR
+                        // DO NOT FORGET THAT THE TRANSITION AND ORIGINAL ELEMENTS MIGHT BE OF DIFFERENT TYPES AND THE FACES AS WELL!
+                        int curnum = myhadaptedmesh->myelements.getsubelement(2, i, j, f);
+                        int curorignum = origelems->getsubelement(2, origtype, origelemnum, of[f]);
+                        // Loop on all physical regions for this subelement:
+                        int numpr = addresses[2][curorignum+1]-addresses[2][curorignum];
+                        for (int p = 0; p < numpr; p++)
+                            myhadaptedmesh->myphysicalregions.get( prnums[2][addresses[2][curorignum]+p] )->addelement(2,curnum);
+                    }
+                }
             }
         }
     }
     
+    // Remove the duplicated elements in every physical region:
+    for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
+    {
+        physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
+        currentphysicalregion->removeduplicatedelements();
+    }
     
-    ///// REGIONUNION AND THE LIKE ARE LOST WITH THE ABOVE BECAUSE THEY DO NOT ADD ELEMENTLIST TO THEIR PHYSREG!!!!!!!!!!!!!!!!!!!!!!!
     
+    ///// Continue processing the mesh:
     
-    
-    // INCLUDE THIS?? MAYBE NOT?? myregiondefiner.defineregions(); --> ANSWER IS NO: BECAUSE THEY ARE ALREADY ADDED IN THE LOWER DIM PHYS REG ELEMENTS ADD STEP!!!!!
-
     myhadaptedmesh->myelements.definedisjointregions();
-
+    
     std::vector<std::vector<int>> renumbydr;
     myhadaptedmesh->myelements.reorderbydisjointregions(renumbydr);
   
@@ -1277,23 +1243,25 @@ void rawmesh::adapth(int verbosity)
     
     myhadaptedmesh->myelements.orient();
 
+ 
+    // Send mesh to universe:
+    universe::mymesh = myhadaptedmesh;
+    
+    // Optional output:
     if (verbosity > 0)
-        myhadaptedmesh->printcount();
-    if (verbosity > 1)
-        myhadaptedmesh->printelementsinphysicalregions();
-    if (verbosity > 0)
-        clk.print("Time to load the mesh: ");
+    {
+        std::string out = "";
+        for (int i = 0; i < 8; i++)
+        {
+            element myelem(i);
+            int curnum = myhadaptedmesh->myelements.count(i);
+            if (dims[i] == meshdim && curnum > 0)
+                out = out + std::to_string(curnum) + " " + myelem.gettypenameconjugation(curnum) + " + ";
+        }
+        out.resize(out.size()-3);
     
-    
-    
-universe::mymesh = myhadaptedmesh;
-
-
-
-
-    //// PRINT TIMING + NUM MAXDIM ELEMS IN CASE OF VERBOSITY ARGUMENT = 1!!!!!!!!!!!!
-        
-
+        clk.print("Adapted to " + out + " (" + std::to_string(myhtracker->getmaxdepth()) + ") in");
+    }
 }
 
 void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
