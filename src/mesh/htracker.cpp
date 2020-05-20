@@ -293,7 +293,6 @@ void htracker::getoriginalelement(std::vector<int>& oet, std::vector<int>& oei)
     resetcursor();
     
     int ln = -1;
-    int index = -1;
     while (true)
     { 
         if (isatleaf())
