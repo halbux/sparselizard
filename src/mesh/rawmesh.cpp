@@ -888,7 +888,6 @@ void rawmesh::adapth(int verbosity)
     
     if (myhtracker == NULL)
         myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
-    myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
         
     // Initialise leaf numbers:
     if (leafnumbersoftransitions.size() == 0)
@@ -1012,7 +1011,9 @@ void rawmesh::adapth(int verbosity)
 
     // Nothing to do if all new number of splits are identical to the old ones:
     if (isidentical)
-        return;        
+        return;
+        
+    myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);       
         
         
     ///// Propagate the splits to guarantee at most a one delta between neighbouring elements:
