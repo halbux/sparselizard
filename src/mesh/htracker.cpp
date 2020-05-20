@@ -285,6 +285,34 @@ void htracker::getoriginalelementnumber(std::vector<int>& oen)
     }
 }
 
+void htracker::getoriginalelement(std::vector<int>& oet, std::vector<int>& oei)
+{
+    oet = std::vector<int>(numleaves);
+    oei = std::vector<int>(numleaves);
+    
+    resetcursor();
+    
+    int ln = -1;
+    int index = -1;
+    while (true)
+    { 
+        if (currentdepth == 0)
+            index++;
+            
+        if (isatleaf())
+        {
+            ln++;
+            oet[ln] = parenttypes[0];
+            oei[ln] = origindexintype;
+        }
+        
+        if (ln == numleaves-1)
+            break;
+        
+        next();
+    }
+}
+
 void htracker::countsons(std::vector<int>& numsons)
 {
     int num = 0;

@@ -54,7 +54,7 @@ class mesh
         void write(std::string name, int verbosity = 1);     
         
         // H-adaptivity:
-        void adapt(void);
+        void adapt(int verbosity = 0);
         void setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
         void setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
         

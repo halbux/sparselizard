@@ -868,8 +868,10 @@ void rawmesh::adaptp(void)
     mynumber++;
 }
 
-void rawmesh::adapth(void)
+void rawmesh::adapth(int verbosity)
 {
+    wallclock clk;
+
     double noisethreshold = 1e-8;
     int meshdim = getmeshdimension();
     
@@ -1070,51 +1072,10 @@ void rawmesh::adapth(void)
     myhtracker->adapt(vadapt);
     
     
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////// STILL DRAFT BELOW
-
-
-
-
-
-
-
-int verbosity = 1;
-
-// curv order:
-int co = myelements.getcurvatureorder();
-    
-    
-    
-    std::vector<int> nn(8);
-    std::vector<int> ncn(8);
-    std::vector<element> els(8);
-    for (int i = 0; i < 8; i++)
-    {
-        els[i] = element(i, co);
-        nn[i] = els[i].countnodes();   
-        ncn[i] = els[i].countcurvednodes();   
-    }
-    int md = getmeshdimension();
-    
+    ///// Get the adapted element coordinates 'ac' and add to the mesh containers:
     
     std::vector<std::vector<double>> ac;
-    
-    
-wallclock clkhtracker;
     myhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
-clkhtracker.print("Htracker coord dump time:");
-    
-
-    
-
-physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.get(1);
-  
-    
-    
-     wallclock loadtime;   
-    
     
     // Initialize nodes size:
     int numnodes = 0;
@@ -1122,45 +1083,66 @@ physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.get(1)
         numnodes += ac[i].size()/3;
     myhadaptedmesh->mynodes.setnumber(numnodes);
     std::vector<double>* nc = myhadaptedmesh->mynodes.getcoordinates();
-    
 
-    // Loop on all elements of max dimension in the original mesh: ///////////////// ALSO ADD LOWER DIM PHYSICAL REGIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Get the original element type and index for all leaves:
+    std::vector<int> oet, oei;
+    myhtracker->getoriginalelement(oet, oei);
+    
+    // Get the list of all physical regions in which each original element is:
+    physicalregions* origpr = getphysicalregions();
+    elements* origelems = getelements();
+
+    std::vector<std::vector<int>> addresses(8, std::vector<int>(0));
+    std::vector<std::vector<int>> prnums(8, std::vector<int>(0));
+    for (int i = 0; i < 8; i++)
+        origpr->inphysicalregions(i, origelems->count(i), addresses[i], prnums[i]);
+
+    // Loop on all elements of max dimension in the original mesh:
     int ni = 0;
+    int co = myelements.getcurvatureorder();
     for (int i = 0; i < 8; i++)
     {
-        for (int e = 0; e < ac[i].size()/ncn[i]/3; e++)
+        element myelem(i, co);
+        int ncn = myelem.countcurvednodes();
+        int numelems = ac[i].size()/ncn/3;
+    
+        for (int e = 0; e < numelems; e++)
         {
+            int ln = leafnumbersoftransitions[i][e];
+            int origtype = oet[ln];
+            int origindex = oei[ln];
+            int numprs = addresses[origtype][origindex+1]-addresses[origtype][origindex];
+            
             // Add nodes coordinates:
-            for (int j = 0; j < 3*ncn[i]; j++)
-                nc->at(3*ni+j) = ac[i][3*ncn[i]*e+j];
+            for (int j = 0; j < 3*ncn; j++)
+                nc->at(3*ni+j) = ac[i][3*ncn*e+j];
                 
-            std::vector<int> nodes = myalgorithm::getequallyspaced(ni, 1, ncn[i]);
-            
+            // Add element:
+            std::vector<int> nodes = myalgorithm::getequallyspaced(ni, 1, ncn);
             int elementindexincurrenttype = myhadaptedmesh->myelements.add(i, co, nodes);
-            currentphysicalregion->addelement(i, elementindexincurrenttype);
             
-            ni += ncn[i];
+            // Add the element to all required physical regions:
+            for (int p = 0; p < numprs; p++)
+                myhadaptedmesh->myphysicalregions.get(prnums[origtype][addresses[origtype][origindex]+p])->addelement(i, elementindexincurrenttype);
+            
+            ni += ncn;
         }
     }
-    
-    
 
-    
-    int lasttype = 1;
-    if (getmeshdimension() == 3) // ! REGIONDEFINE MIGHT CREATE DUPLICATES! --> NO IT DOESN T!!!!!
-        lasttype = 3;
-    
-    
-//wallclock cli;
+
+    ///// Process the mesh:
+        
     myhadaptedmesh->myelements.explode();
-//cli.print("------------------------------>");   
 
-    myhadaptedmesh->sortbybarycenters(lasttype);
-
-
-    myhadaptedmesh->removeduplicates(lasttype);
+    std::vector<int> lasttype = {-1,0,1,3};
+    myhadaptedmesh->sortbybarycenters(lasttype[meshdim]);
+    myhadaptedmesh->removeduplicates(lasttype[meshdim]);
     
     
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////// STILL DRAFT BELOW
+
+
     
     ///// INCLUDE LOWER DIM PHYSREGS:  DO THIS BEFORE REMOVING DUPLICATES??????????? OTHERWISE DUPLICATES HAVE TO BE REMOVED AGAIN!!!!!!!!!!!!!!!
     
@@ -1172,11 +1154,8 @@ physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.get(1)
     
     
     // 1.:
-    physicalregions* pr = getphysicalregions();
-    elements* origelems = getelements();
-
-    std::vector<std::vector<int>> addresses(8, std::vector<int>(0));
-    std::vector<std::vector<int>> prnums(8, std::vector<int>(0));
+    std::vector<std::vector<int>> daddresses(8, std::vector<int>(0));
+    std::vector<std::vector<int>> dprnums(8, std::vector<int>(0));
     std::vector<int> dims = {0,1,2,2,3,3,3,3};
 
     std::vector<bool> isanyatdim(3, false);
@@ -1187,9 +1166,9 @@ physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.get(1)
             continue;
     
         // Skip if none:
-        pr->inphysicalregions(i, origelems->count(i), addresses[i], prnums[i]);
+        origpr->inphysicalregions(i, origelems->count(i), daddresses[i], dprnums[i]);
         
-        if (prnums[i].size() == 0)
+        if (dprnums[i].size() == 0)
             continue;
         
         isanyatdim[dims[i]] = true;
@@ -1302,7 +1281,7 @@ physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.get(1)
     if (verbosity > 1)
         myhadaptedmesh->printelementsinphysicalregions();
     if (verbosity > 0)
-        loadtime.print("Time to load the mesh: ");
+        clk.print("Time to load the mesh: ");
     
     
     
@@ -1311,7 +1290,7 @@ universe::mymesh = myhadaptedmesh;
 
 
 
-        
+    //// PRINT TIMING + NUM MAXDIM ELEMS IN CASE OF VERBOSITY ARGUMENT = 1!!!!!!!!!!!!
         
 
 }

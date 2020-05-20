@@ -48,9 +48,9 @@ void mesh::write(std::string name, int verbosity)
     rawmeshptr->write(name, verbosity);
 }
 
-void mesh::adapt(void)
+void mesh::adapt(int verbosity)
 {
-    rawmeshptr->adapth();
+    rawmeshptr->adapth(verbosity);
 }
 
 void mesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)

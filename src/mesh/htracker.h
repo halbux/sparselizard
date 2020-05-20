@@ -108,6 +108,8 @@ class htracker
         void gettype(std::vector<int>& types);
         // Get the original element number of all leaves:
         void getoriginalelementnumber(std::vector<int>& oen);
+        // Get the original element type and index in type of all leaves:
+        void getoriginalelement(std::vector<int>& oet, std::vector<int>& oei);
         // For each original element get the number of leaves of each type (by blocks of 8).
         void countsons(std::vector<int>& numsons);
         
