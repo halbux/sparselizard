@@ -296,9 +296,6 @@ void htracker::getoriginalelement(std::vector<int>& oet, std::vector<int>& oei)
     int index = -1;
     while (true)
     { 
-        if (currentdepth == 0)
-            index++;
-            
         if (isatleaf())
         {
             ln++;
