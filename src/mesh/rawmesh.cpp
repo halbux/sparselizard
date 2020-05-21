@@ -1211,9 +1211,9 @@ void rawmesh::adapth(int verbosity)
     }
     
     // Remove the duplicated elements in every physical region:
-    for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
+    for (int physregindex = 0; physregindex < myhadaptedmesh->myphysicalregions.count(); physregindex++)
     {
-        physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
+        physicalregion* currentphysicalregion = myhadaptedmesh->myphysicalregions.getatindex(physregindex);
         currentphysicalregion->removeduplicatedelements();
     }
     
