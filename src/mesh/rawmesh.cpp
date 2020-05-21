@@ -1098,7 +1098,7 @@ void rawmesh::adapth(int verbosity)
     for (int i = 0; i < 8; i++)
         origpr->inphysicalregions(i, origelems->count(i), addresses[i], prnums[i]);
 
-    // Loop on all elements of max dimension in the original mesh:
+    // Loop on all elements of max dimension in the adapted mesh:
     int ni = 0;
     int co = myelements.getcurvatureorder();
     for (int i = 0; i < 8; i++)
