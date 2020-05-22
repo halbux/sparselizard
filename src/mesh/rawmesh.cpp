@@ -1004,27 +1004,7 @@ bool rawmesh::adapth(int verbosity)
             }
         }
     }
-
-    // Nothing to do if all new number of splits are identical to the old ones:
-    myhtracker->fix(vadapt);
-    bool isidentical = true;
-    for (int i = 0; i < vadapt.size(); i++)
-    {
-        if (vadapt[i] != 0)
-        {
-            isidentical = false;
-            break;
-        }
-    }
-    if (isidentical)
-    {
-        if (verbosity > 0)
-            std::cout << "Nothing to do for adaptation." << std::endl;
-        return false;
-    }
-        
-    myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);       
-        
+             
         
     ///// Propagate the splits to guarantee at most a one delta between neighbouring elements:
 
@@ -1080,10 +1060,31 @@ bool rawmesh::adapth(int verbosity)
         }
     }
         
+        
+    // Nothing to do if all new number of splits are identical to the old ones:
+    myhtracker->fix(vadapt);
+    bool isidentical = true;
+    for (int i = 0; i < vadapt.size(); i++)
+    {
+        if (vadapt[i] != 0)
+        {
+            isidentical = false;
+            break;
+        }
+    }
+    if (isidentical)
+    {
+        if (verbosity > 0)
+            std::cout << "Nothing to do for adaptation." << std::endl;
+        return false;
+    }
+        
     myhtracker->adapt(vadapt);
     
     
     ///// Get the adapted element coordinates 'ac' and add to the mesh containers:
+    
+    myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
     
     std::vector<std::vector<double>> ac;
     myhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
