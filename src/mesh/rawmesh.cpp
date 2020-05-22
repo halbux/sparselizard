@@ -960,7 +960,6 @@ void rawmesh::adapth(int verbosity)
     // Vector with +1 to split a leaf, 0 to keep as is and -1 to group:
     std::vector<int> vadapt(myhtracker->countleaves(), -1); // all grouped initially
     
-    bool isidentical = true;
     for (int d = 0; d < drptr->count(); d++)
     {
         if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
@@ -996,9 +995,6 @@ void rawmesh::adapth(int verbosity)
                     if (interv > 0 && numsplits[interv-1] == oldnumsplits && curcrit < thresholds[interv]+intervsize*thresup)
                         newnumsplits = oldnumsplits;
                 }
-            
-                if (oldnumsplits != newnumsplits)
-                    isidentical = false;
                     
                 // Split or keep unchanged. Multiple transition elements can share the same leaf!
                 if (newnumsplits > oldnumsplits)
@@ -1010,6 +1006,16 @@ void rawmesh::adapth(int verbosity)
     }
 
     // Nothing to do if all new number of splits are identical to the old ones:
+    myhtracker->fix(vadapt);
+    bool isidentical = true;
+    for (int i = 0; i < vadapt.size(); i++)
+    {
+        if (vadapt[i] != 0)
+        {
+            isidentical = false;
+            break;
+        }
+    }
     if (isidentical)
     {
         if (verbosity > 0)
