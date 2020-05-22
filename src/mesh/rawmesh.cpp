@@ -868,7 +868,7 @@ void rawmesh::adaptp(void)
     mynumber++;
 }
 
-void rawmesh::adapth(int verbosity)
+bool rawmesh::adapth(int verbosity)
 {
     wallclock clk;
 
@@ -880,7 +880,7 @@ void rawmesh::adapth(int verbosity)
         universe::mymesh = shared_from_this();  
  
     if (universe::ishadaptallowed == false || myhadaptdata.size() == 0)
-        return;
+        return false;
         
     elements* elptr = universe::mymesh->getelements();
     disjointregions* drptr = universe::mymesh->getdisjointregions();
@@ -1020,7 +1020,7 @@ void rawmesh::adapth(int verbosity)
     {
         if (verbosity > 0)
             std::cout << "Nothing to do for adaptation." << std::endl;
-        return;
+        return false;
     }
         
     myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);       
@@ -1272,6 +1272,8 @@ void rawmesh::adapth(int verbosity)
     
         clk.print("Adapted to " + out + " (" + std::to_string(myhtracker->getmaxdepth()) + ") in");
     }
+    
+    return true;
 }
 
 void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)

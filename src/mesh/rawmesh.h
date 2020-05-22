@@ -126,7 +126,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void adaptp(void);
         
         // For h-adaptivity:
-        void adapth(int verbosity);
+        bool adapth(int verbosity);
         void setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange);
         void setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange);
 
