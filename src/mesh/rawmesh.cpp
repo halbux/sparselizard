@@ -1011,7 +1011,11 @@ void rawmesh::adapth(int verbosity)
 
     // Nothing to do if all new number of splits are identical to the old ones:
     if (isidentical)
+    {
+        if (verbosity > 0)
+            std::cout << "Nothing to do for adaptation." << std::endl;
         return;
+    }
         
     myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);       
         
