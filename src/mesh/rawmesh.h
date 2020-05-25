@@ -140,6 +140,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void printelementsinphysicalregions(bool isdebug = false);
         
         std::shared_ptr<rawmesh> getpointer(void);
+        std::shared_ptr<rawmesh> gethadaptedpointer(void);
 };
 
 
