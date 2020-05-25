@@ -93,37 +93,43 @@ void mesh::split(int n)
 void mesh::shift(int physreg, double x, double y, double z)
 {
     rawmeshptr->shift(physreg, x, y, z);
-    rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
 }
 
 void mesh::shift(double x, double y, double z)
 {
     rawmeshptr->shift(x, y, z);
-    rawmeshptr->gethadaptedpointer()->shift(x, y, z);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->shift(x, y, z);
 }
 
 void mesh::rotate(int physreg, double ax, double ay, double az)
 {
     rawmeshptr->rotate(physreg, ax, ay, az);
-    rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
 }
 
 void mesh::rotate(double ax, double ay, double az)
 {
     rawmeshptr->rotate(ax, ay, az);
-    rawmeshptr->gethadaptedpointer()->rotate(ax, ay, az);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->rotate(ax, ay, az);
 }
 
 void mesh::scale(int physreg, double x, double y, double z)
 {
     rawmeshptr->scale(physreg, x, y, z);
-    rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
 }
 
 void mesh::scale(double x, double y, double z)
 {
     rawmeshptr->scale(x, y, z);
-    rawmeshptr->gethadaptedpointer()->scale(x, y, z);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->scale(x, y, z);
 }
 
 int mesh::getmeshdimension(void)
