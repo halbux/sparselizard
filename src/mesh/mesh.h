@@ -32,6 +32,9 @@ class shape;
 class mesh
 {
     private:
+    
+        bool isloaded = false;
+        void errorifloaded(void);
         
         // The actual mesh:
         std::shared_ptr<rawmesh> rawmeshptr = NULL;

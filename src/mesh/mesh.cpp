@@ -1,6 +1,15 @@
 #include "mesh.h"
 
 
+void mesh::errorifloaded(void)
+{
+    if (isloaded)
+    {
+        std::cout << "Error in 'mesh' object: cannot perform the requested operation (mesh is already loaded)" << std::endl;
+        abort();
+    }
+}
+
 mesh::mesh(void)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
@@ -12,6 +21,7 @@ mesh::mesh(std::string filename, int verbosity, bool legacyreader)
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
     rawmeshptr->load(filename, verbosity, legacyreader);
+    isloaded = true;
 }
 
 mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
@@ -19,6 +29,7 @@ mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosi
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
+    isloaded = true;
 }
 
 mesh::mesh(std::vector<shape> inputshapes, int verbosity)
@@ -26,21 +37,28 @@ mesh::mesh(std::vector<shape> inputshapes, int verbosity)
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
     rawmeshptr->load(inputshapes, verbosity);
+    isloaded = true;
 }
 
 void mesh::load(std::string name, int verbosity, bool legacyreader)
 {
+    errorifloaded();
     rawmeshptr->load(name, verbosity, legacyreader);
+    isloaded = true;
 }
 
 void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
 {
+    errorifloaded();
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
+    isloaded = true;
 }
 
 void mesh::load(std::vector<shape> inputshapes, int verbosity)
 {
+    errorifloaded();
     rawmeshptr->load(inputshapes, verbosity);
+    isloaded = true;
 }
 
 void mesh::write(std::string name, int verbosity)
@@ -65,6 +83,7 @@ void mesh::setadaptivity(expression criterion, std::vector<field> triggers, std:
 
 void mesh::split(int n)
 {
+    errorifloaded();
     rawmeshptr->split(n);
 }
 
@@ -110,21 +129,25 @@ std::vector<int> mesh::getphysicalregionnumbers(int dim)
 
 void mesh::regionskin(int newphysreg, int physregtoskin)
 {
+    errorifloaded();
     rawmeshptr->regionskin(newphysreg, physregtoskin);
 }
 
 void mesh::boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
 {
+    errorifloaded();
     rawmeshptr->boxselection(newphysreg, physregtobox, selecteddim, boxlimit);
 }
 
 void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
 {
+    errorifloaded();
     rawmeshptr->sphereselection(newphysreg, physregtosphere, selecteddim, centercoords, radius);
 }
 
 void mesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
 {
+    errorifloaded();
     rawmeshptr->regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
 }
 

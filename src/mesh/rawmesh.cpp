@@ -208,13 +208,7 @@ std::shared_ptr<ptracker> rawmesh::getptracker(void) {return myptracker;}
 
 void rawmesh::load(std::string name, int verbosity, bool legacyreader)
 {
-    ///// Reset all memory of the rawmesh object:
-    mynodes = nodes();
-    mydisjointregions = disjointregions();
-    myphysicalregions = physicalregions(mydisjointregions);
-    myelements = elements(mynodes, myphysicalregions, mydisjointregions);
-    ///// Memory is reset
-
+    // Do not call this when the mesh is already loaded!
 
     if (verbosity > 0)
     {
@@ -367,13 +361,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
 
 void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
 {
-    ///// Reset all memory of the rawmesh object:
-    mynodes = nodes();
-    mydisjointregions = disjointregions();
-    myphysicalregions = physicalregions(mydisjointregions);
-    myelements = elements(mynodes, myphysicalregions, mydisjointregions);
-     ///// Memory is reset
-
+    // Do not call this when the mesh is already loaded!
 
     if (verbosity > 0)
         std::cout << "Loading mesh from " << inputshapes.size() << " shapes" << std::endl;
