@@ -502,38 +502,74 @@ void rawmesh::split(int n)
 
 void rawmesh::shift(int physreg, double x, double y, double z)
 {
+    // The nodes object needs access to the universe:
+    std::shared_ptr<rawmesh> torestore = universe::mymesh;
+    universe::mymesh = shared_from_this();
+    
     mynodes.shift(physreg, x, y, z);
     myelements.shift(physreg, x, y, z);
+    
+    universe::mymesh = torestore;
 }
 
 void rawmesh::shift(double x, double y, double z)
 {
+    // The nodes object needs access to the universe:
+    std::shared_ptr<rawmesh> torestore = universe::mymesh;
+    universe::mymesh = shared_from_this();
+    
     mynodes.shift(-1, x, y, z);
     myelements.shift(-1, x, y, z);
+    
+    universe::mymesh = torestore;
 }
 
 void rawmesh::rotate(int physreg, double ax, double ay, double az)
 {
+    // The nodes object needs access to the universe:
+    std::shared_ptr<rawmesh> torestore = universe::mymesh;
+    universe::mymesh = shared_from_this();
+    
     mynodes.rotate(physreg, ax, ay, az);
     myelements.rotate(physreg, ax, ay, az);
+    
+    universe::mymesh = torestore;
 }
 
 void rawmesh::rotate(double ax, double ay, double az)
 {
+    // The nodes object needs access to the universe:
+    std::shared_ptr<rawmesh> torestore = universe::mymesh;
+    universe::mymesh = shared_from_this();
+    
     mynodes.rotate(-1, ax, ay, az);
     myelements.rotate(-1, ax, ay, az);
+    
+    universe::mymesh = torestore;
 }
 
 void rawmesh::scale(int physreg, double x, double y, double z)
 {
+    // The nodes object needs access to the universe:
+    std::shared_ptr<rawmesh> torestore = universe::mymesh;
+    universe::mymesh = shared_from_this();
+    
     mynodes.scale(physreg, x, y, z);
     myelements.scale(physreg, x, y, z);
+    
+    universe::mymesh = torestore;
 }
 
 void rawmesh::scale(double x, double y, double z)
 {
+    // The nodes object needs access to the universe:
+    std::shared_ptr<rawmesh> torestore = universe::mymesh;
+    universe::mymesh = shared_from_this();
+    
     mynodes.scale(-1, x, y, z);
     myelements.scale(-1, x, y, z);
+    
+    universe::mymesh = torestore;
 }
 
 int rawmesh::getmeshdimension(void)
