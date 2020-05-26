@@ -1002,25 +1002,30 @@ void mathop::setdata(vec invec)
     // Get all fields in the vec structure:
     std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
     
-    // Check if there is any p-adaptivity trigger:
-    bool isanyptrigger = false;
+    // Check if there is any hp-adaptivity trigger:
+    bool isanyhtrigger = false, isanyptrigger = false;
     for (int i = 0; i < allfields.size(); i++)
     {
+        if (allfields[i]->ishtrigger())
+            isanyhtrigger = true;
         if (allfields[i]->isptrigger())
-        {
             isanyptrigger = true;
-            break;
-        }
     }
     
-    bool wasallowed = universe::ispadaptallowed;
+    bool washallowed = universe::ishadaptallowed;
+    universe::ishadaptallowed = false;
+    bool waspallowed = universe::ispadaptallowed;
     universe::ispadaptallowed = false;
     
     for (int i = 0; i < allfields.size(); i++)
         field(allfields[i]).setdata(-1, invec);
 
-    universe::ispadaptallowed = wasallowed;
+    universe::ispadaptallowed = waspallowed;
+    universe::ishadaptallowed = washallowed;
     
+    if (isanyhtrigger)
+        universe::mymesh->getoriginalmeshpointer()->adapth(0);
+        
     if (isanyptrigger)
         universe::mymesh->adaptp();
 }

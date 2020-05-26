@@ -58,7 +58,10 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<rawmesh> myhadaptedmesh = NULL;
         std::vector<std::vector<int>> leafnumbersoftransitions = {};
         std::vector<std::tuple<expression,std::vector<std::shared_ptr<rawfield>>,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
-    
+        // Only for the h-adapted mesh:
+        bool ishadaptedmesh = false;
+        std::weak_ptr<rawmesh> myoriginalmesh;
+        
     public:
         
         // 'readfromfile' hands over to the function reading the format of the mesh file.
@@ -141,6 +144,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         
         std::shared_ptr<rawmesh> getpointer(void);
         std::shared_ptr<rawmesh> gethadaptedpointer(void);
+        std::shared_ptr<rawmesh> getoriginalmeshpointer(void);
 };
 
 

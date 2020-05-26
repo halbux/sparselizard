@@ -1109,6 +1109,8 @@ bool rawmesh::adapth(int verbosity)
     ///// Get the adapted element coordinates 'ac' and add to the mesh containers:
     
     myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
+    myhadaptedmesh->ishadaptedmesh = true;
+    myhadaptedmesh->myoriginalmesh = shared_from_this(); 
     
     std::vector<std::vector<double>> ac;
     myhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
@@ -1507,5 +1509,18 @@ std::shared_ptr<rawmesh> rawmesh::getpointer(void)
 std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
 {
     return myhadaptedmesh;
+}
+
+std::shared_ptr<rawmesh> rawmesh::getoriginalmeshpointer(void)
+{
+    if (ishadaptedmesh == false)
+        return shared_from_this();
+
+    if (myoriginalmesh.expired())
+    {
+        std::cout << "Error in 'rawmesh' object: original mesh is needed but it was destroyed" << std::endl;
+        abort();
+    }
+    return myoriginalmesh.lock();
 }
 
