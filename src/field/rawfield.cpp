@@ -127,6 +127,26 @@ bool rawfield::isptrigger(void)
     return false;
 }
 
+bool rawfield::ishtrigger(void)
+{
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+        return (ishadaptivetrigger > 0);
+
+    for (int i = 0; i < mysubfields.size(); i++)
+    {
+        if (mysubfields[i][0]->ishtrigger())
+            return true;
+    }
+    
+    for (int h = 0; h < myharmonics.size(); h++)
+    {
+        if (myharmonics[h].size() > 0 && myharmonics[h][0]->ishtrigger())
+            return true;
+    }
+
+    return false;
+}
+
 rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm)
 {
     multiharmonic = ismultiharm;
@@ -487,7 +507,25 @@ void rawfield::setptriggerflag(bool isptrig)
 
 void rawfield::sethtriggerflag(bool ishtrig)
 {
-
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->sethtriggerflag(ishtrig);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->sethtriggerflag(ishtrig);
+    }
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+    {
+        if (ishtrig)
+            ishadaptivetrigger++;
+        else
+            ishadaptivetrigger--;
+        if (ishadaptivetrigger < 0)
+        {
+            std::cout << "Error in 'rawfield' object: trigger flag cannot be negative" << std::endl;
+            abort();
+        }
+    }
 }
 
 void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)

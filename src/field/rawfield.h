@@ -97,6 +97,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         bool ispadaptive = false;
         int ispadaptivetrigger = 0;
+        int ishadaptivetrigger = 0;
         
         std::shared_ptr<ptracker> myptracker = NULL;
 
@@ -119,6 +120,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void synchronize(std::vector<int> physregsfororder = {});
         
         bool isptrigger(void);
+        bool ishtrigger(void);
         
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
         rawfield(void);
