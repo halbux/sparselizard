@@ -889,7 +889,13 @@ void rawmesh::adaptp(void)
     ///// New mesh version:
     
     myptracker->updatedisjointregions(&mydisjointregions);
-    mynumber++;
+    if (ishadaptedmesh)
+    {
+        myoriginalmesh.lock()->mynumber++;
+        mynumber = myoriginalmesh.lock()->mynumber;   
+    }
+    else
+        mynumber++;
 }
 
 bool rawmesh::adapth(int verbosity)
