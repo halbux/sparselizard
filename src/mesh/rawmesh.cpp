@@ -1300,6 +1300,17 @@ bool rawmesh::adapth(int verbosity)
         clk.print("Adapted to " + out + " (" + std::to_string(myhtracker->getmaxdepth()) + ") in");
     }
     
+    
+    ///// New mesh version:
+    
+    mynumber++;
+    myhadaptedmesh->mynumber = mynumber;
+    
+    myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
+    myhadaptedmesh->mypadaptdata = mypadaptdata;
+    
+    
     return true;
 }
 
