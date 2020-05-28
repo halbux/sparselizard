@@ -234,7 +234,7 @@ void mathop::writeshapefunctions(std::string filename, std::string sftypename, i
 
     lagrangeformfunction slff(elementtypenumber, 1, {});
     std::vector<double> scoords = slff.getnodecoordinates();
-    lagrangeformfunction lff(elementtypenumber, maxorder, {});
+    lagrangeformfunction lff(elementtypenumber, maxorder+1, {});
     std::vector<double> coords = lff.getnodecoordinates();
 
     std::shared_ptr<hierarchicalformfunction> hff = selector::select(elementtypenumber, sftypename);
@@ -278,7 +278,7 @@ void mathop::writeshapefunctions(std::string filename, std::string sftypename, i
             for (int c = 0; c < numcomp; c++)
                 ffvals[c] = hffc.tomatrix(h, i, j, o, l, 0, c);
                  
-            iodata datatowrite(maxorder, 1, numcomp == 1, {});
+            iodata datatowrite(maxorder+1, 1, numcomp == 1, {});
                  
             datatowrite.addcoordinates(elementtypenumber, x, y, z);
             datatowrite.adddata(elementtypenumber, ffvals);
