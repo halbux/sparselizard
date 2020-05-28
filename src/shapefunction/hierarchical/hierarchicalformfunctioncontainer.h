@@ -71,6 +71,7 @@ class hierarchicalformfunctioncontainer
         // correspond to all form functions. The form functions are ordered 
         // in the way defined in 'hierarchicalformfunctioniterator'.
         densematrix tomatrix(int totalorientation, int order, int whichderivative, int component);
+        densematrix tomatrix(int h, int i, int j, int k, int l, int m, int n);
 
         // Print all form function values for debug.
         void print(bool printallderivatives);

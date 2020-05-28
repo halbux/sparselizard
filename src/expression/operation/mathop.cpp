@@ -216,6 +216,84 @@ expression mathop::getfieldorder(field input)
 
 void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
 
+void mathop::writeshapefunctions(std::string filename, std::string sftypename, int elementtypenumber, int maxorder, bool allorientations)
+{
+    if (elementtypenumber == 7)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot write shape functions for pyramids (non-polynomial)" << std::endl;
+        abort();
+    }
+    if (elementtypenumber > 7)
+    {
+        std::cout << "Error in 'mathop' namespace: element type number must be between 0 and 7" << std::endl;
+        abort();
+    }
+    
+    element myelement(elementtypenumber);
+    int numnodes = myelement.countnodes();
+
+    lagrangeformfunction slff(elementtypenumber, 1, {});
+    std::vector<double> scoords = slff.getnodecoordinates();
+    lagrangeformfunction lff(elementtypenumber, maxorder, {});
+    std::vector<double> coords = lff.getnodecoordinates();
+
+    std::shared_ptr<hierarchicalformfunction> hff = selector::select(elementtypenumber, sftypename);
+    int numcomp = hff->countcomponents();
+    std::vector<densematrix> ffvals(numcomp);
+
+    // Prepare the element x, y and z coordinates:
+    densematrix x(1,numnodes), y(1,numnodes), z(1,numnodes);
+    double* xptr = x.getvalues();
+    double* yptr = y.getvalues();
+    double* zptr = z.getvalues();
+    for (int i = 0; i < numnodes; i++)
+    {
+        xptr[i] = scoords[3*i+0];
+        yptr[i] = scoords[3*i+1];
+        zptr[i] = scoords[3*i+2];
+    }
+    // Evaluate all form functions:
+    hierarchicalformfunctioncontainer hffc = hff->evalat(maxorder);
+    hffc.evaluate(coords);
+    
+    std::vector<std::string> dimtype = {"node","edge","face","volume"};
+
+    // Loop on all form functions:
+    hierarchicalformfunctioniterator myiterator(sftypename, elementtypenumber, maxorder);
+    for (int ff = 0; ff < myiterator.count(); ff++)
+    {    
+        int h = myiterator.getformfunctionorder();
+        int i = myiterator.getdimension();
+        int j = myiterator.getnodeedgefacevolumeindex();
+        
+        int l = myiterator.getformfunctionindexincurrentorderinnodeedgefacevolume();
+        int ffnum = myiterator.getoverallformfunctionindex();
+     
+        int subtype = myiterator.getassociatedelementtype();   
+        int numorientations = orientation::countorientations(subtype);
+        if (allorientations == false)
+            numorientations = 1;
+        for (int o = 0; o < numorientations; o++)
+        {
+            for (int c = 0; c < numcomp; c++)
+                ffvals[c] = hffc.tomatrix(h, i, j, o, l, 0, c);
+                 
+            iodata datatowrite(maxorder, 1, numcomp == 1, {});
+                 
+            datatowrite.addcoordinates(elementtypenumber, x, y, z);
+            datatowrite.adddata(elementtypenumber, ffvals);
+                
+            std::string ori = "";
+            if (allorientations)
+                ori = "_orientation_" + std::to_string(o);
+                
+            iointerface::writetofile(filename, datatowrite, std::to_string(ffnum+1000) + "_" + std::to_string(l) + "th_of_order_" + std::to_string(h) + "_at_" + dimtype[i] + "_" + std::to_string(j) + ori);
+        }
+        
+        myiterator.next();
+    }    
+}
+
 expression mathop::t(void) { expression exp; return exp.time(); }
 
 void mathop::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)

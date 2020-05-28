@@ -63,6 +63,9 @@ namespace mathop
     
     void setphysicalregionshift(int shiftamount);
 
+    // Write all shape functions for an element type up to a given order:
+    void writeshapefunctions(std::string filename, std::string sftypename, int elementtypenumber, int maxorder, bool allorientations = false);
+    
     // The time variable:
     expression t(void);
 

@@ -106,6 +106,11 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, in
     return valmat;
 }
 
+densematrix hierarchicalformfunctioncontainer::tomatrix(int h, int i, int j, int k, int l, int m, int n)
+{
+    return densematrix(1, myevaluationpoints.size()/3, val[h][i][j][k][l][m][n]);
+}
+
 void hierarchicalformfunctioncontainer::print(bool printallderivatives)
 {
     std::cout.precision(17);
