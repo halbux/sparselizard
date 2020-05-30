@@ -54,13 +54,12 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
     
         // For h-adaptivity (only for original mesh):
-        std::shared_ptr<htracker> myhtracker = NULL;
         std::shared_ptr<rawmesh> myhadaptedmesh = NULL;
         std::vector<std::vector<int>> leafnumbersoftransitions = {};
         std::vector<std::tuple<expression,std::vector<std::shared_ptr<rawfield>>,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
-        // Only for the h-adapted mesh:
-        bool ishadaptedmesh = false;
+        // For the h-adapted mesh:
         std::weak_ptr<rawmesh> myoriginalmesh;
+        std::shared_ptr<htracker> myhtracker = NULL;
         
     public:
         
@@ -86,6 +85,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
         std::shared_ptr<ptracker> getptracker(void);
+        std::shared_ptr<htracker> gethtracker(void);
         int getmeshnumber(void) { return mynumber; };
 
         // Load from file name:

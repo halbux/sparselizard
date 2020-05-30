@@ -205,6 +205,13 @@ elements* rawmesh::getelements(void) {return &myelements;}
 physicalregions* rawmesh::getphysicalregions(void) {return &myphysicalregions;}
 disjointregions* rawmesh::getdisjointregions(void) {return &mydisjointregions;}
 std::shared_ptr<ptracker> rawmesh::getptracker(void) {return myptracker;}
+std::shared_ptr<htracker> rawmesh::gethtracker(void)
+{
+    if (myhadaptedmesh != NULL)
+        return myhadaptedmesh->myhtracker;
+    else
+        return myhtracker;
+}
 
 void rawmesh::load(std::string name, int verbosity, bool legacyreader)
 {
@@ -265,9 +272,12 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     }
     
     mynumber = 0;
+    
     myptracker = std::shared_ptr<ptracker>(new ptracker);
     myptracker->updatedisjointregions(&mydisjointregions);
-    mypadaptdata = {};
+    
+    myoriginalmesh = shared_from_this();
+    myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
 }
 
 void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
@@ -354,9 +364,12 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     }
     
     mynumber = 0;
+    
     myptracker = std::shared_ptr<ptracker>(new ptracker);
     myptracker->updatedisjointregions(&mydisjointregions);
-    mypadaptdata = {};
+    
+    myoriginalmesh = shared_from_this();
+    myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
 }
 
 void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
@@ -471,9 +484,12 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     }
     
     mynumber = 0;
+    
     myptracker = std::shared_ptr<ptracker>(new ptracker);
     myptracker->updatedisjointregions(&mydisjointregions);
-    mypadaptdata = {};
+    
+    myoriginalmesh = shared_from_this();
+    myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
 }
 
 
@@ -889,13 +905,8 @@ void rawmesh::adaptp(void)
     ///// New mesh version:
     
     myptracker->updatedisjointregions(&mydisjointregions);
-    if (ishadaptedmesh)
-    {
-        myoriginalmesh.lock()->mynumber++;
-        mynumber = myoriginalmesh.lock()->mynumber;   
-    }
-    else
-        mynumber++;
+    getoriginalmeshpointer()->mynumber++;
+    mynumber = getoriginalmeshpointer()->mynumber;
 }
 
 bool rawmesh::adapth(int verbosity)
@@ -916,8 +927,11 @@ bool rawmesh::adapth(int verbosity)
     disjointregions* drptr = universe::mymesh->getdisjointregions();
     physicalregions* prptr = universe::mymesh->getphysicalregions();
     
-    if (myhtracker == NULL)
-        myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
+    std::shared_ptr<htracker> newhtracker(new htracker(NULL));
+    if (myhadaptedmesh != NULL)
+        *newhtracker = *(myhadaptedmesh->myhtracker);
+    else
+        *newhtracker = *myhtracker;
         
     // Initialise leaf numbers:
     if (leafnumbersoftransitions.size() == 0)
@@ -938,7 +952,7 @@ bool rawmesh::adapth(int verbosity)
     }
     
     std::vector<int> leavesnumsplits;
-    myhtracker->countsplits(leavesnumsplits);
+    newhtracker->countsplits(leavesnumsplits);
 
 
     ///// Evaluate the criterion:
@@ -988,7 +1002,7 @@ bool rawmesh::adapth(int verbosity)
         thresholds[th] = cmin + thresholds[th] * crange;
     
     // Vector with +1 to split a leaf, 0 to keep as is and -1 to group:
-    std::vector<int> vadapt(myhtracker->countleaves(), -1); // all grouped initially
+    std::vector<int> vadapt(newhtracker->countleaves(), -1); // all grouped initially
     
     for (int d = 0; d < drptr->count(); d++)
     {
@@ -1038,12 +1052,12 @@ bool rawmesh::adapth(int verbosity)
         
     ///// Propagate the splits to guarantee at most a one delta between neighbouring elements:
 
-    int maxnumsplits = myhtracker->getmaxdepth() + 1; // includes any new split request
+    int maxnumsplits = newhtracker->getmaxdepth() + 1; // includes any new split request
     
     for (int ns = maxnumsplits; ns > 1; ns--)
     {
         // Update to how it will be actually treated:
-        myhtracker->fix(vadapt);
+        newhtracker->fix(vadapt);
 
         for (int d = 0; d < drptr->count(); d++)
         {
@@ -1092,7 +1106,7 @@ bool rawmesh::adapth(int verbosity)
         
         
     // Nothing to do if all new number of splits are identical to the old ones:
-    myhtracker->fix(vadapt);
+    newhtracker->fix(vadapt);
     bool isidentical = true;
     for (int i = 0; i < vadapt.size(); i++)
     {
@@ -1109,17 +1123,17 @@ bool rawmesh::adapth(int verbosity)
         return false;
     }
         
-    myhtracker->adapt(vadapt);
+    newhtracker->adapt(vadapt);
     
     
     ///// Get the adapted element coordinates 'ac' and add to the mesh containers:
     
     myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
-    myhadaptedmesh->ishadaptedmesh = true;
     myhadaptedmesh->myoriginalmesh = shared_from_this(); 
+    myhadaptedmesh->myhtracker = newhtracker;
     
     std::vector<std::vector<double>> ac;
-    myhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
+    newhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
     
     // Initialize nodes size:
     int numnodes = 0;
@@ -1130,7 +1144,7 @@ bool rawmesh::adapth(int verbosity)
 
     // Get the original element type and index for all leaves:
     std::vector<int> oet, oei;
-    myhtracker->getoriginalelement(oet, oei);
+    newhtracker->getoriginalelement(oet, oei);
     
     // Get the list of all physical regions in which each original element is:
     physicalregions* origpr = getphysicalregions();
@@ -1201,7 +1215,7 @@ bool rawmesh::adapth(int verbosity)
         for (int j = 0; j < myhadaptedmesh->myelements.count(i); j++)
         {
             int origtype, origelemnum;
-            myhtracker->atoriginal(i, j, origtype, origelemnum, on, oe, of);
+            newhtracker->atoriginal(i, j, origtype, origelemnum, on, oe, of);
             
             if (isanypratdim[0])
             {
@@ -1286,9 +1300,6 @@ bool rawmesh::adapth(int verbosity)
     
     myhadaptedmesh->myelements.orient();
 
- 
-    // Send mesh to universe:
-    universe::mymesh = myhadaptedmesh;
     
     // Optional output:
     if (verbosity > 0)
@@ -1303,7 +1314,7 @@ bool rawmesh::adapth(int verbosity)
         }
         out.resize(out.size()-3);
     
-        clk.print("Adapted to " + out + " (" + std::to_string(myhtracker->getmaxdepth()) + ") in");
+        clk.print("Adapted to " + out + " (" + std::to_string(newhtracker->getmaxdepth()) + ") in");
     }
     
     
@@ -1314,7 +1325,12 @@ bool rawmesh::adapth(int verbosity)
     
     myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker);
     myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
-    myhadaptedmesh->mypadaptdata = mypadaptdata;
+    myhadaptedmesh->mypadaptdata = universe::mymesh->mypadaptdata;
+    mypadaptdata = {};
+    
+    
+    ///// Send mesh to universe:
+    universe::mymesh = myhadaptedmesh;
     
     
     return true;
@@ -1530,12 +1546,9 @@ std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
 
 std::shared_ptr<rawmesh> rawmesh::getoriginalmeshpointer(void)
 {
-    if (ishadaptedmesh == false)
-        return shared_from_this();
-
     if (myoriginalmesh.expired())
     {
-        std::cout << "Error in 'rawmesh' object: original mesh is needed but it was destroyed" << std::endl;
+        std::cout << "Error in 'rawmesh' object: the original mesh is needed but it was destroyed" << std::endl;
         abort();
     }
     return myoriginalmesh.lock();
