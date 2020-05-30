@@ -927,7 +927,7 @@ bool rawmesh::adapth(int verbosity)
     disjointregions* drptr = universe::mymesh->getdisjointregions();
     physicalregions* prptr = universe::mymesh->getphysicalregions();
     
-    std::shared_ptr<htracker> newhtracker(new htracker(NULL));
+    std::shared_ptr<htracker> newhtracker(new htracker);
     if (myhadaptedmesh != NULL)
         *newhtracker = *(myhadaptedmesh->myhtracker);
     else

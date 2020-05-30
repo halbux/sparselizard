@@ -76,6 +76,7 @@ class htracker
 
     public:
 
+        htracker(void) {};
         // Provide the original 'elements' object (or the latter two arguments for debug):
         htracker(elements* origelems, int curvatureorder = -1, std::vector<int> numelemspertype = {});
         
