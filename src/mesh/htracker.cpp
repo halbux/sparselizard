@@ -49,6 +49,28 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
     
     // Initialize the tree:
     splitdata = std::vector<bool>(numleaves, false);
+    
+    // Initialize the remaining containers:
+    transitionsrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    leavesoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    originalsoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
+
+    int ind = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        int num = originalcount[i];
+        transitionsrefcoords[i] = myalgorithm::duplicate(straightrefcoords[i], num);
+        // Leaves equal originals here:
+        leavesoftransitions[i] = myalgorithm::getequallyspaced(ind, 1, num);
+        originalsoftransitions[i] = std::vector<int>(2*num);
+        for (int j = 0; j < num; j++)
+        {
+            originalsoftransitions[i][2*j+0] = i;
+            originalsoftransitions[i][2*j+1] = j;
+        }
+        
+        ind += num;
+    }
 }
 
 int htracker::countleaves(void)

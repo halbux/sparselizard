@@ -679,6 +679,18 @@ std::vector<int> myalgorithm::getequallyspaced(int start, int space, int amount)
     return output;
 }
 
+std::vector<double> myalgorithm::duplicate(std::vector<double> invec, int n)
+{
+    int len = invec.size();
+    std::vector<double> out(len*n);
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < len; j++)
+            out[len*i+j] = invec[j];
+    }
+    return out;
+}
+
 void myalgorithm::osclean(std::string& line)
 {
     int siz = line.size();

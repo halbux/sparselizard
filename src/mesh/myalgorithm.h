@@ -96,6 +96,9 @@ namespace myalgorithm
     // Get a vector of equally spaced numbers:
     std::vector<int> getequallyspaced(int start, int space, int amount);
     
+    // Create a vector equal to n duplicates of the argument vector:
+    std::vector<double> duplicate(std::vector<double> invec, int n);
+    
     // Remove trailing CR (added in windows for newline):
     void osclean(std::string& line);
     
