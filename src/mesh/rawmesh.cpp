@@ -1326,7 +1326,7 @@ bool rawmesh::adapth(int verbosity)
     myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker);
     myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
     myhadaptedmesh->mypadaptdata = universe::mymesh->mypadaptdata;
-    mypadaptdata = {};
+    universe::mymesh->mypadaptdata = {};
     
     
     ///// Send mesh to universe:
