@@ -205,13 +205,7 @@ elements* rawmesh::getelements(void) {return &myelements;}
 physicalregions* rawmesh::getphysicalregions(void) {return &myphysicalregions;}
 disjointregions* rawmesh::getdisjointregions(void) {return &mydisjointregions;}
 std::shared_ptr<ptracker> rawmesh::getptracker(void) {return myptracker;}
-std::shared_ptr<htracker> rawmesh::gethtracker(void)
-{
-    if (myhadaptedmesh != NULL)
-        return myhadaptedmesh->myhtracker;
-    else
-        return myhtracker;
-}
+std::shared_ptr<htracker> rawmesh::gethtracker(void) {return myhtracker;}
 
 void rawmesh::load(std::string name, int verbosity, bool legacyreader)
 {
