@@ -1017,13 +1017,6 @@ void htracker::atoriginal(int tt, int tn, int& ort, int& orn, std::vector<int>& 
     }
 }
 
-void htracker::tostorage(void)
-{
-    transitionsrefcoords = {};
-    leavesoftransitions = {};
-    originalsoftransitions = {};
-}
-
 void htracker::print(void)
 {
     std::cout << "#leaves is " << numleaves << " | max #splits is " << maxdepth << std::endl;

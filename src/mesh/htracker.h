@@ -154,9 +154,6 @@ class htracker
         // in which each node/edge/face is (-1 if none). Data is only returned for boundaries.
         void atoriginal(int transitiontype, int transitionnumber, int& originaltype, int& originalnumber, std::vector<int>& on, std::vector<int>& oe, std::vector<int>& of);
          
-        // Reduce size for storage:
-        void tostorage(void);
-    
         // Print the tree:
         void print(void);
         
