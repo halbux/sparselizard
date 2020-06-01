@@ -135,8 +135,7 @@ class htracker
         void atleaves(std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& apc, bool withphysicals);
         
         // Get the node coordinates 'ac' of all transition elements after adaptation.
-        // The parent leaf number of each transition element is provided in 'leafnums' after execution.
-        void getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold);
+        void getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold);
     
         // Get an upper bound of number of transition elements that can be created from all leaves:
         std::vector<int> countupperbound(void);

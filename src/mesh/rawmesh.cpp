@@ -926,24 +926,6 @@ bool rawmesh::adapth(int verbosity)
         *newhtracker = *(myhadaptedmesh->myhtracker);
     else
         *newhtracker = *myhtracker;
-        
-    // Initialise leaf numbers:
-    if (leafnumbersoftransitions.size() == 0)
-    {
-        leafnumbersoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
-        int ind = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            element myelem(i);
-            if (myelem.getelementdimension() != meshdim)
-                continue;
-            int nelem = myelements.count(i);
-            leafnumbersoftransitions[i] = std::vector<int>(nelem);
-            for (int j = 0; j < nelem; j++)
-                leafnumbersoftransitions[i][j] = ind+j;
-            ind += nelem;
-        }
-    }
     
     std::vector<int> leavesnumsplits;
     newhtracker->countsplits(leavesnumsplits);
@@ -1009,7 +991,7 @@ bool rawmesh::adapth(int verbosity)
         
             for (int e = 0; e < numelems; e++)
             {
-                int ln = leafnumbersoftransitions[typenum][rbe+e];
+                int ln = newhtracker->getleafnumber(typenum, rbe+e);
                 int oldnumsplits = leavesnumsplits[ln];
                 
                 int newnumsplits;
@@ -1065,7 +1047,7 @@ bool rawmesh::adapth(int verbosity)
             
                 for (int e = 0; e < numelems; e++)
                 {
-                    int ln = leafnumbersoftransitions[typenum][rbe+e];
+                    int ln = newhtracker->getleafnumber(typenum, rbe+e);
                     int numsplits = leavesnumsplits[ln] + vadapt[ln];
                     
                     if (numsplits != ns)
@@ -1086,7 +1068,7 @@ bool rawmesh::adapth(int verbosity)
                             if (typenum == celltype && curcell == rbe+e)
                                 continue;
                             
-                            int curln = leafnumbersoftransitions[celltype][curcell];
+                            int curln = newhtracker->getleafnumber(celltype, curcell);
                             int neighbournumsplits = leavesnumsplits[curln] + vadapt[curln];
 
                             if (numsplits > neighbournumsplits+1)
@@ -1127,7 +1109,7 @@ bool rawmesh::adapth(int verbosity)
     myhadaptedmesh->myhtracker = newhtracker;
     
     std::vector<std::vector<double>> ac;
-    newhtracker->getadaptedcoordinates(ac, leafnumbersoftransitions, mynodes.getnoisethreshold());
+    newhtracker->getadaptedcoordinates(ac, mynodes.getnoisethreshold());
     
     // Initialize nodes size:
     int numnodes = 0;
@@ -1160,7 +1142,7 @@ bool rawmesh::adapth(int verbosity)
     
         for (int e = 0; e < numelems; e++)
         {
-            int ln = leafnumbersoftransitions[i][e];
+            int ln = newhtracker->getleafnumber(i, e);
             int origtype = oet[ln];
             int origindex = oei[ln];
             int numprs = addresses[origtype][origindex+1]-addresses[origtype][origindex];
@@ -1275,13 +1257,7 @@ bool rawmesh::adapth(int verbosity)
     
     std::vector<std::vector<int>> renumbydr;
     myhadaptedmesh->myelements.reorderbydisjointregions(renumbydr);
-  
-    std::vector<std::vector<int>> lnt = leafnumbersoftransitions;
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < lnt[i].size(); j++)
-            leafnumbersoftransitions[i][renumbydr[i][j]] = lnt[i][j];
-    }
+    newhtracker->renumbertransitions(renumbydr);
     
     myhadaptedmesh->myelements.definedisjointregionsranges();
     

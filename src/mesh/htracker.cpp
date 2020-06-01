@@ -591,7 +591,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
     }
 }
 
-void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<std::vector<int>>& leafnums, std::vector<double> noisethreshold)
+void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold)
 {
     std::vector<int> ne(8);
     for (int i = 0; i < 8; i++)
@@ -717,7 +717,6 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
         touser[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
         toht[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
     }
-    leafnums = leavesoftransitions;
 }
 
 std::vector<int> htracker::countupperbound(void)
