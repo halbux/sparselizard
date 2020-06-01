@@ -122,6 +122,12 @@ namespace myalgorithm
     // For a vector 'vec' of repeating blocks [b0 b1 b2 ...] the output is [b0[sel[0]] b1[sel[0]] ... b0[sel[1]] b1[sel[1]] ...].
     std::vector<double> separate(std::vector<double>& v, int blocklen, std::vector<int> sel);
     
+    // Return the renumbering obtained when the original renumbering is renumbered again by a new renumbering:
+    std::vector<int> chainrenumbering(std::vector<int>& originalrenum, std::vector<int>& newrenum);
+    
+    // Invert the renumbering:
+    std::vector<int> invertrenumbering(std::vector<int>& renum);
+    
 };
 
 #endif

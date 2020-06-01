@@ -864,3 +864,23 @@ std::vector<double> myalgorithm::separate(std::vector<double>& v, int blocklen, 
     return output;
 }
 
+std::vector<int> myalgorithm::chainrenumbering(std::vector<int>& originalrenum, std::vector<int>& newrenum)
+{
+    std::vector<int> output(originalrenum.size());
+
+    for (int i = 0; i < originalrenum.size(); i++)
+        output[i] = newrenum[originalrenum[i]];
+
+    return output;
+}
+
+std::vector<int> myalgorithm::invertrenumbering(std::vector<int>& renum)
+{
+    std::vector<int> output(renum.size());
+
+    for (int i = 0; i < renum.size(); i++)
+        output[renum[i]] = i;
+
+    return output;
+}
+
