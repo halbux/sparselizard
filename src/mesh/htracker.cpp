@@ -961,8 +961,18 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     }
 }
 
-void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords)
+void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<std::vector<double>>& userrc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords)
 {
+    // Take the transition element renumbering into account:
+    std::vector<std::vector<int>> ad(8, std::vector<int>(0));
+    std::vector<std::vector<double>> rc(8, std::vector<double>(0));
+    for (int i = 0; i < 8; i++)
+    {
+        if (userrc[i].size() > 0)
+            myalgorithm::reorder(userad[i], userrc[i], toht[i], ad[i], rc[i]);
+    }
+
+
     // Get from this htracker's transition elements to the original elements:
     std::vector<int> oad;
     std::vector<double> orc;
@@ -1013,27 +1023,34 @@ void htracker::getattarget(std::vector<std::vector<int>>& ad, std::vector<std::v
         targettranselems[i] = std::vector<int>(2*nr);
         targetrefcoords[i] = std::vector<double>(3*nr);
         
-        for (int j = 0; j < nr; j++)
+        for (int j = 0; j < ad[i].size()-1; j++)
         {
-            // To original element:
-            int orc = maprctoorc[i][j];
+            int pos = ad[i][j]/3;
+            int userpos = userad[i][touser[i][j]]/3;
+            for (int k = 0; k < (ad[i][j+1]-ad[i][j])/3; k++)
+            {
+                // To original element:
+                int orc = maprctoorc[i][pos+k];
+                
+                // To target:
+                int ttype = maporctorc[2*orc+0];
+                int tind = maporctorc[2*orc+1];
             
-            // To target:
-            int ttype = maporctorc[2*orc+0];
-            int tind = maporctorc[2*orc+1];
-        
-            targettranselems[i][2*j+0] = ttype;
-            targettranselems[i][2*j+1] = map[ttype][tind];
-            
-            targetrefcoords[i][3*j+0] = trc[ttype][3*tind+0];
-            targetrefcoords[i][3*j+1] = trc[ttype][3*tind+1];
-            targetrefcoords[i][3*j+2] = trc[ttype][3*tind+2];
+                targettranselems[i][2*(userpos+k)+0] = ttype;
+                targettranselems[i][2*(userpos+k)+1] = map[ttype][tind];
+                
+                targetrefcoords[i][3*(userpos+k)+0] = trc[ttype][3*tind+0];
+                targetrefcoords[i][3*(userpos+k)+1] = trc[ttype][3*tind+1];
+                targetrefcoords[i][3*(userpos+k)+2] = trc[ttype][3*tind+2];
+            }
         }
     }
 }
 
 void htracker::atoriginal(int tt, int tn, int& ort, int& orn, std::vector<int>& on, std::vector<int>& oe, std::vector<int>& of)
 {
+    tn = toht[tt][tn];
+
     ort = originalsoftransitions[tt][2*tn+0];
     orn = originalsoftransitions[tt][2*tn+1];
 
