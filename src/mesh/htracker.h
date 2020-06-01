@@ -148,9 +148,11 @@ class htracker
         // 'ad[t][i]' gives the first position in 'rc' where the ith transition element of type t is. 'oad[i]' does that for the first position
         // of the ith original element in 'orc'. 'ad' and 'oad' have a 1 longer size and their last value is the vec size.
         // 'maprctoorc[i][j]'x3 gives the position in 'orc' corresponding to the point at 'rc[i][3*j]'. 
+        // DO NOT CALL THIS YOURSELF (RENUMBERING IS NOT TAKEN INTO ACCOUNT).
         void tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& maprctoorc);
         // Inverse function of the above. 'maporctorc[2*i+0]' and 'maporctorc[2*i+1]' respectively 
         // give t and j such that the ith point in 'orc' corresponds to 'rc[t][3*j]'. 
+        // DO NOT CALL THIS YOURSELF (RENUMBERING IS NOT TAKEN INTO ACCOUNT).
         void fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& maporctorc);
         
         // Get the corresponding point at the target. To each rc[i][3*j] is associated its corresponding transition element type and index in type
