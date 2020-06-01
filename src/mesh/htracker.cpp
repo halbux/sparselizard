@@ -54,6 +54,8 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
     transitionsrefcoords = std::vector<std::vector<double>>(8, std::vector<double>(0));
     leavesoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
     originalsoftransitions = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    touser = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    toht = std::vector<std::vector<int>>(8, std::vector<int>(0));
 
     int ind = 0;
     for (int i = 0; i < 8; i++)
