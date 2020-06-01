@@ -1057,7 +1057,8 @@ void htracker::atoriginal(int tt, int tn, int& ort, int& orn, std::vector<int>& 
 
 int htracker::getleafnumber(int transitiontype, int transitionnumber)
 {
-    return leavesoftransitions[transitiontype][transitionnumber];
+    int tn = toht[transitiontype][transitionnumber];
+    return leavesoftransitions[transitiontype][tn];
 }
 
 void htracker::print(void)
