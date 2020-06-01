@@ -68,6 +68,8 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
             originalsoftransitions[i][2*j+0] = i;
             originalsoftransitions[i][2*j+1] = j;
         }
+        touser[i] = myalgorithm::getequallyspaced(0, 1, num);
+        toht[i] = myalgorithm::getequallyspaced(0, 1, num);
         
         ind += num;
     }
@@ -709,6 +711,9 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
         transitionsrefcoords[i].resize(3*nn[i]*ite[i]);
         leavesoftransitions[i].resize(ite[i]);
         originalsoftransitions[i].resize(2*ite[i]);
+        
+        touser[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
+        toht[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
     }
     leafnums = leavesoftransitions;
 }
@@ -727,6 +732,15 @@ std::vector<int> htracker::countupperbound(void)
     // DEFINE ALSO FOR HEXAHEDRA, PRISMS AND PYRAMIDS (+ adapt tet nums)
     
     return output;
+}
+
+void htracker::renumbertransitions(std::vector<std::vector<int>>& renumbering)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        touser[i] = myalgorithm::chainrenumbering(touser[i], renumbering[i]);
+        toht[i] = myalgorithm::invertrenumbering(touser[i]);
+    }
 }
 
 void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& maprctoorc)

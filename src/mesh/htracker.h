@@ -73,6 +73,10 @@ class htracker
         std::vector<std::vector<int>> leavesoftransitions = {};
         // At [i][2*j+0] and [i][2*j+1] this gives the type and index of the corresponding original element:
         std::vector<std::vector<int>> originalsoftransitions = {};
+        
+        // Transition elements renumbering:
+        std::vector<std::vector<int>> touser = {};
+        std::vector<std::vector<int>> toht = {};
 
     public:
 
@@ -137,6 +141,9 @@ class htracker
         // Get an upper bound of number of transition elements that can be created from all leaves:
         std::vector<int> countupperbound(void);
     
+        // Renumber the transition elements:
+        void renumbertransitions(std::vector<std::vector<int>>& renumbering);
+        
         // Get the reference coordinate in the original element 'orc' corresponding to the reference coordinates in the transition elements 'rc'.
         // 'ad[t][i]' gives the first position in 'rc' where the ith transition element of type t is. 'oad[i]' does that for the first position
         // of the ith original element in 'orc'. 'ad' and 'oad' have a 1 longer size and their last value is the vec size.
