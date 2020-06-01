@@ -884,3 +884,32 @@ std::vector<int> myalgorithm::invertrenumbering(std::vector<int>& renum)
     return output;
 }
 
+void myalgorithm::reorder(std::vector<int>& inad, std::vector<double>& indat, std::vector<int>& renumbering, std::vector<int>& outad, std::vector<double>& outdat)
+{
+    if (indat.size() == 0)
+    {
+        outad = {};
+        outdat = {};
+        return;
+    }
+
+    int num = inad.size()-1;
+    
+    std::vector<int> outcnt(num,0);
+    for (int i = 0; i < num; i++)
+        outcnt[renumbering[i]] = inad[i+1]-inad[i];
+        
+    outad = std::vector<int>(num+1,0);
+    for (int i = 1; i < num+1; i++)
+        outad[i] = outad[i-1] + outcnt[i-1];  
+
+    outdat = std::vector<double>(indat.size());
+    for (int i = 0; i < num; i++)
+    {
+        int inpos = inad[i];
+        int outpos = outad[renumbering[i]];
+        for (int j = 0; j < inad[i+1]-inad[i]; j++)
+            outdat[outpos+j] = indat[inpos+j];
+    }
+}
+

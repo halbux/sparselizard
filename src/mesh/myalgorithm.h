@@ -128,6 +128,9 @@ namespace myalgorithm
     // Invert the renumbering:
     std::vector<int> invertrenumbering(std::vector<int>& renum);
     
+    // Reorder an address-data pair based on a renumbering of the addresses (last entry in address vectors is data.size):
+    void reorder(std::vector<int>& inad, std::vector<double>& indat, std::vector<int>& renumbering, std::vector<int>& outad, std::vector<double>& outdat);
+    
 };
 
 #endif
