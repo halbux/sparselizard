@@ -1039,6 +1039,11 @@ void htracker::atoriginal(int tt, int tn, int& ort, int& orn, std::vector<int>& 
     }
 }
 
+int htracker::getleafnumber(int transitiontype, int transitionnumber)
+{
+    return leavesoftransitions[transitiontype][transitionnumber];
+}
+
 void htracker::print(void)
 {
     std::cout << "#leaves is " << numleaves << " | max #splits is " << maxdepth << std::endl;
