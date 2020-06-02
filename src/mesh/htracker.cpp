@@ -1037,7 +1037,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<st
                 int tind = maporctorc[2*orc+1];
             
                 targettranselems[i][2*(userpos+k)+0] = ttype;
-                targettranselems[i][2*(userpos+k)+1] = map[ttype][tind];
+                targettranselems[i][2*(userpos+k)+1] = target.touser[ttype][map[ttype][tind]];
                 
                 targetrefcoords[i][3*(userpos+k)+0] = trc[ttype][3*tind+0];
                 targetrefcoords[i][3*(userpos+k)+1] = trc[ttype][3*tind+1];
