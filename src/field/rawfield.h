@@ -48,7 +48,9 @@
 #include "field.h"
 #include "vectorfieldselect.h"
 #include "spanningtree.h"
+#include "rawmesh.h"
 
+class rawmesh;
 class vectorfieldselect;
 class coefmanager;
 class rawvec;
@@ -112,6 +114,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
+        
+        
+        // Mesh on which this object is based:
+        std::shared_ptr<rawmesh> myrawmesh = NULL;
 
     public:
   

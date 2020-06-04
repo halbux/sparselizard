@@ -209,6 +209,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         }    
         else
         {
+            myrawmesh = universe::mymesh;
+        
             myptracker = universe::mymesh->getptracker();
         
             // Set a -1 undefined interpolation order by default:
