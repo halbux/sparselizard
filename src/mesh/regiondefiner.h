@@ -83,6 +83,7 @@ class regiondefiner
         void sphereselection(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere);
         void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
 
+        bool isanyregiondefined(void);
 
         void defineregions(void);
 };

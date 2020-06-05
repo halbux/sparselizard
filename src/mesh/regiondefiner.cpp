@@ -342,6 +342,11 @@ void regiondefiner::regionexclusion(int newphysreg, int physregtoexcludefrom, st
     toexclude.push_back(physregstoexclude);
 }
 
+bool regiondefiner::isanyregiondefined(void)
+{
+    return (mypriority.size() > 0);
+}
+
 
 void regiondefiner::defineregions(void)
 {
