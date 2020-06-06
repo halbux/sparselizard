@@ -84,6 +84,7 @@ class regiondefiner
         void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
 
         bool isanyregiondefined(void);
+        bool isanycoordinatedependentregiondefined(void);
 
         void defineregions(void);
 };

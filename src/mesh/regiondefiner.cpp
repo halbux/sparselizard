@@ -347,6 +347,17 @@ bool regiondefiner::isanyregiondefined(void)
     return (mypriority.size() > 0);
 }
 
+bool regiondefiner::isanycoordinatedependentregiondefined(void)
+{
+    for (int i = 0; i < mypriority.size(); i++)
+    {
+        if (mypriority[i][0] != 0 && mypriority[i][0] != 3)
+            return true;
+    }
+
+    return false;
+}
+
 
 void regiondefiner::defineregions(void)
 {

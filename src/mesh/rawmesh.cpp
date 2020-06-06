@@ -349,9 +349,9 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     }
     
     // Due to the shifting the bounds in regiondefiner will not be treated correctly:
-    if (mergeduplicates == false && myregiondefiner.isanyregiondefined())
+    if (mergeduplicates == false && myregiondefiner.isanycoordinatedependentregiondefined())
     {
-        std::cout << "Error in 'rawmesh' object: cannot define additional regions during loading when combining meshes without merging duplicates" << std::endl;
+        std::cout << "Error in 'rawmesh' object: cannot define the requested region during loading when combining meshes without merging duplicates" << std::endl;
         abort();
     }
     
