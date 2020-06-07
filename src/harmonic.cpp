@@ -153,25 +153,3 @@ std::vector<std::vector<densematrix>> harmonic::timederivative(int timederivativ
     }
     return input;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
