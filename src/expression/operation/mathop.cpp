@@ -961,6 +961,119 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
     return sol;
 }
 
+std::vector<vec> mathop::solve(mat A, std::vector<vec> b, std::string soltype)
+{
+    if (soltype != "lu")
+    {
+        std::cout << "Error in 'mathop' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        abort();
+    }
+    for (int i = 0; i < b.size(); i++)
+    {
+        if (A.countrows() != b[i].size())
+        {
+            std::cout << "Error in 'mathop' namespace: multi-rhs direct solve of Ax = b failed (size of A and at least one rhs do not match)" << std::endl;
+            abort();
+        }
+        if (A.getpointer() == NULL || b[i].getpointer() == NULL)
+        {
+            std::cout << "Error in 'mathop' namespace: multi-rhs direct solve of Ax = b failed (A or at least one rhs is undefined)" << std::endl;
+            abort();
+        }
+    }
+    
+    if (b.size() == 0)
+        return {};
+        
+    int numrhs = b.size();
+    int len = b[0].size();
+    
+    // The copy of the rhs is returned in case there is no nonzero entry in A:
+    if (A.countnnz() == 0)
+    {
+        std::vector<vec> bcopy(numrhs);
+        for (int i = 0; i < numrhs; i++)
+            bcopy[i] = b[i].copy();
+        return bcopy;
+    }
+
+    // Concatenate rhs vecs to densematrix:
+    intdensematrix ads(len, 1, 0, 1);
+    densematrix rhs(numrhs, len);
+    double* rhsptr = rhs.getvalues();
+    for (int i = 0; i < numrhs; i++)
+    {
+        densematrix vecvals = b[i].getvalues(ads);
+        double* vecvalsptr = vecvals.getvalues();
+        for (int j = 0; j < len; j++)
+            rhsptr[i*len+j] = vecvalsptr[j];
+    }
+    
+    // Solve multi-rhs:
+    densematrix sols = solve(A, rhs, soltype);
+    double* solsptr = sols.getvalues();
+
+    // Extract 'sols' rows to sol vecs:
+    densematrix vals(len,1);
+    double* valsptr = vals.getvalues();
+    std::vector<vec> outvecs(numrhs);
+    for (int i = 0; i < numrhs; i++)
+    {
+        for (int j = 0; j < len; j++)
+            valsptr[j] = solsptr[i*len+j];
+    
+        outvecs[i] = vec(std::shared_ptr<rawvec>(new rawvec(b[i].getpointer()->getdofmanager())));
+        outvecs[i].setvalues(ads, vals);
+    }
+    
+    return outvecs;
+}
+
+densematrix mathop::solve(mat A, densematrix b, std::string soltype)
+{
+    int numrhs = b.countrows();
+    int len = b.countcolumns();
+ 
+    Mat Apetsc = A.getpetsc();
+    
+    KSP* ksp = A.getpointer()->getksp();
+    PC pc;
+    if (A.getpointer()->isludefined() == false)
+    {
+        KSPCreate(PETSC_COMM_WORLD, ksp);
+        KSPSetOperators(*ksp, Apetsc, Apetsc);
+        KSPSetFromOptions(*ksp);
+
+        KSPGetPC(*ksp,&pc);
+        PCSetType(pc,PCLU);
+        PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
+        PCSetUp(pc);
+    }
+    else
+        KSPGetPC(*ksp,&pc);
+        
+    PCFactorGetMatrix(pc, &Apetsc);
+
+    densematrix densesols(numrhs, len);
+
+    Mat sols, rhses;
+    MatCreateSeqDense(PETSC_COMM_SELF, len, numrhs, densesols.getvalues(), &sols);
+    MatCreateSeqDense(PETSC_COMM_SELF, len, numrhs, b.getvalues(), &rhses);
+    
+    // 'rhs' and 'sols' are considered column major in petsc.
+    MatMatSolve(Apetsc, rhses, sols);
+
+    A.getpointer()->isludefined(true);
+
+    if (A.getpointer()->islutobereused() == false)
+    {
+        KSPDestroy(ksp);
+        A.getpointer()->isludefined(false);
+    }
+    
+    return densesols;
+}
+
 int mykspmonitor(KSP ksp, PetscInt iter, PetscReal resnorm, void* unused)
 {
     std::cout << iter << " KSP residual norm " << resnorm << std::endl;

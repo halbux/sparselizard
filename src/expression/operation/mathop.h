@@ -175,6 +175,11 @@ namespace mathop
 
     // Direct resolution (with or without diagonal scaling):
     vec solve(mat A, vec b, std::string soltype = "lu", bool diagscaling = false);
+    // Multi-rhs direct resolution:
+    std::vector<vec> solve(mat A, std::vector<vec> b, std::string soltype = "lu");
+    // Densematrix 'b' has size #rhs x #dofs:
+    densematrix solve(mat A, densematrix b, std::string soltype);
+    
     // Iterative resolution (with or without diagonal scaling):
     void solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
 
