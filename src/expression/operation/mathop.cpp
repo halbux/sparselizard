@@ -1062,6 +1062,9 @@ densematrix mathop::solve(mat A, densematrix b, std::string soltype)
     
     // 'rhs' and 'sols' are considered column major in petsc.
     MatMatSolve(Apetsc, rhses, sols);
+    
+    MatDestroy(&sols);
+    MatDestroy(&rhses);
 
     A.getpointer()->isludefined(true);
 
