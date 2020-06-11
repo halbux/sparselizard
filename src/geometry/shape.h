@@ -61,8 +61,8 @@ class shape
 
         void setphysicalregion(int physreg);
 
-        // Move the shape in the x, y and z direction by a value given in the expressions.
-        // Only the x, y and z coordinate field are allowed in the expressions.
+        // Move the shape in the x, y and z direction by a value given in the expression.
+        // Only the x, y and z coordinate field are allowed in the expression.
         void move(expression u);
 
         // Shift the shape in the x, y and z direction.
