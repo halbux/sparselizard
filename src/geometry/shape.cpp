@@ -194,10 +194,16 @@ void shape::setphysicalregion(int physreg)
     rawshapeptr->setphysicalregion(physreg); 
 }
 
-void shape::deform(expression xdeform, expression ydeform, expression zdeform)
+void shape::move(expression u)
 {
     errornullpointer();
-    rawshapeptr->deform(xdeform, ydeform, zdeform); 
+    if (u.countcolumns() != 1 || u.countrows() > 3)
+    {
+        std::cout << "Error in 'shape' object: unexpected argument size in 'move' (expected a column vector up to length 3)" << std::endl;
+        abort();
+    }
+    u.resize(3,1);
+    rawshapeptr->move(mathop::compx(u), mathop::compy(u), mathop::compz(u));
 }
 
 void shape::shift(double shiftx, double shifty, double shiftz)

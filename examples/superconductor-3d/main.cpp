@@ -202,7 +202,7 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     shape airfootprint("union", -1, airquads);
     // Deform to have a mesh progression in the air:
     expression radius = sqrt(x*x+y*y);
-    airfootprint.deform(x*pow(radius/(rintube+thtube),prog-1)-x,y*pow(radius/(rintube+thtube),prog-1)-y,0);
+    airfootprint.move(array3x1(x*pow(radius/(rintube+thtube),prog-1)-x,y*pow(radius/(rintube+thtube),prog-1)-y,0));
     
     
     // Create the cylinder region inside the tube:

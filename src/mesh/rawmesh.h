@@ -100,6 +100,12 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // Split each element in the mesh n times:
         void split(int n = 1);
         
+        // Get a bool vector telling if the nodes are in a physical region:
+        std::vector<bool> isnodeinphysicalregion(int physreg);
+        
+        // Move the mesh in the x, y and z direction by a value given in the expression.
+        void move(int physreg, expression u);
+        void move(expression u);
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
         void shift(int physreg, double x, double y, double z);
         void shift(double x, double y, double z);

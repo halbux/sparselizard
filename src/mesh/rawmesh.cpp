@@ -1,4 +1,5 @@
 #include "rawmesh.h"
+#include "geotools.h"
 
 
 void rawmesh::splitmesh(void)
@@ -517,76 +518,183 @@ void rawmesh::split(int n)
     mynumsplitrequested += n;
 }
 
-void rawmesh::shift(int physreg, double x, double y, double z)
+std::vector<bool> rawmesh::isnodeinphysicalregion(int physreg)
 {
-    // The nodes object needs access to the universe:
-    std::shared_ptr<rawmesh> torestore = universe::mymesh;
-    universe::mymesh = shared_from_this();
+    int numberofnodes = mynodes.count();
     
-    mynodes.shift(physreg, x, y, z);
-    myelements.shift(physreg, x, y, z);
+    std::vector<bool> output;
+
+    if (physreg < 0)
+        output = std::vector<bool>(numberofnodes, true);
+    else
+    {
+        output = std::vector<bool>(numberofnodes, false);
     
-    universe::mymesh = torestore;
+        // Get only the disjoint regions with highest dimension elements:
+        std::vector<int> selecteddisjregs = myphysicalregions.get(physreg)->getdisjointregions();
+    
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+        {
+            int disjreg = selecteddisjregs[i];
+            int numelems = mydisjointregions.countelements(disjreg);
+            int elemtypenum = mydisjointregions.getelementtypenumber(disjreg);
+            int rangebegin = mydisjointregions.getrangebegin(disjreg);
+            int curvatureorder = myelements.getcurvatureorder();
+            
+            element myelem(elemtypenum, curvatureorder);
+
+            for (int e = 0; e < numelems; e++)
+            {
+                for (int n = 0; n < myelem.countcurvednodes(); n++)
+                    output[myelements.getsubelement(0, elemtypenum, rangebegin+e, n)] = true;
+            }
+        }
+    }
+    
+    return output;
 }
 
-void rawmesh::shift(double x, double y, double z)
+void rawmesh::move(int physreg, expression u)
 {
-    // The nodes object needs access to the universe:
-    std::shared_ptr<rawmesh> torestore = universe::mymesh;
-    universe::mymesh = shared_from_this();
+    int meshdim = getmeshdimension();
+    if (u.countcolumns() != 1 || u.countrows() < meshdim || u.countrows() > 3)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'move' expected a " << meshdim << "x1 expression" << std::endl;
+        abort();
+    }
+
+    std::vector<double>* coords = mynodes.getcoordinates();
     
-    mynodes.shift(-1, x, y, z);
-    myelements.shift(-1, x, y, z);
+    u = u.resize(3,1);
     
-    universe::mymesh = torestore;
+    // To move each node only once:
+    std::vector<bool> isnodemoved(mynodes.count(), false);
+    
+    // Get only the disjoint regions with highest dimension elements:
+    std::vector<int> selecteddisjregs;
+    if (physreg >= 0)
+        selecteddisjregs = (myphysicalregions.get(physreg))->getdisjointregions();
+    else
+        selecteddisjregs = mydisjointregions.get(getmeshdimension());
+        
+    if (not(u.isharmonicone(selecteddisjregs)))
+    {
+        std::cout << "Error in 'rawmesh' object: the expression to move the mesh cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+        
+    // Send the disjoint regions with same element type numbers together:
+    disjointregionselector mydisjregselector(selecteddisjregs, {});
+    for (int i = 0; i < mydisjregselector.countgroups(); i++)
+    {
+        std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
+        int elementtypenumber = mydisjointregions.getelementtypenumber(mydisjregs[0]);
+
+        // Get the reference coordinates corresponding to the nodes:
+        lagrangeformfunction lff(elementtypenumber, myelements.getcurvatureorder(), {});
+        std::vector<double> evaluationpoints = lff.getnodecoordinates();
+        int ncn = evaluationpoints.size()/3;
+
+        // Loop on all total orientations (if required):
+        bool isorientationdependent = u.isvalueorientationdependent(mydisjregs);
+        elementselector myselector(mydisjregs, isorientationdependent);
+        do
+        {            
+            universe::allowreuse();
+
+            // Compute the expression at the evaluation points:
+            densematrix xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densematrix yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densematrix zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+
+            universe::forbidreuse();
+
+            double* xvalptr = xval.getvalues();
+            double* yvalptr = yval.getvalues();
+            double* zvalptr = zval.getvalues();
+
+            std::vector<int> elementnumbers = myselector.getelementnumbers();
+
+            // Loop on all elements:
+            for (int e = 0; e < elementnumbers.size(); e++)
+            {
+                int curelem = elementnumbers[e];
+                for (int n = 0; n < ncn; n++)
+                {
+                    int curnode = myelements.getsubelement(0, elementtypenumber, elementnumbers[e], n);
+                    if (isnodemoved[curnode] == false)
+                    {
+                        coords->at(3*curnode+0) += xvalptr[e*ncn+n];
+                        coords->at(3*curnode+1) += yvalptr[e*ncn+n];
+                        coords->at(3*curnode+2) += zvalptr[e*ncn+n];
+                        
+                        isnodemoved[curnode] = true;
+                    }
+                }
+            }
+        }
+        while (myselector.next());
+    }
+}
+
+void rawmesh::shift(int physreg, double x, double y, double z)
+{
+    std::vector<double>* coords = mynodes.getcoordinates();
+
+    std::vector<bool> isinsidereg = isnodeinphysicalregion(physreg);
+    
+    for (int n = 0; n < mynodes.count(); n++)
+    {
+        if (isinsidereg[n])
+        {
+            coords->at(3*n+0) += x;
+            coords->at(3*n+1) += y;
+            coords->at(3*n+2) += z;
+        }
+    }
+
+    myelements.cleancoordinatedependentcontainers();
 }
 
 void rawmesh::rotate(int physreg, double ax, double ay, double az)
 {
-    // The nodes object needs access to the universe:
-    std::shared_ptr<rawmesh> torestore = universe::mymesh;
-    universe::mymesh = shared_from_this();
+    std::vector<double>* coords = mynodes.getcoordinates();
     
-    mynodes.rotate(physreg, ax, ay, az);
-    myelements.rotate(physreg, ax, ay, az);
+    std::vector<bool> isinsidereg = isnodeinphysicalregion(physreg);
     
-    universe::mymesh = torestore;
-}
-
-void rawmesh::rotate(double ax, double ay, double az)
-{
-    // The nodes object needs access to the universe:
-    std::shared_ptr<rawmesh> torestore = universe::mymesh;
-    universe::mymesh = shared_from_this();
+    std::vector<double> rotated = *coords;
+    geotools::rotate(ax, ay, az, &rotated);
     
-    mynodes.rotate(-1, ax, ay, az);
-    myelements.rotate(-1, ax, ay, az);
+    for (int n = 0; n < mynodes.count(); n++)
+    {
+        if (isinsidereg[n])
+        {
+            coords->at(3*n+0) = rotated[3*n+0];
+            coords->at(3*n+1) = rotated[3*n+1];
+            coords->at(3*n+2) = rotated[3*n+2];
+        }
+    }
     
-    universe::mymesh = torestore;
+    myelements.cleancoordinatedependentcontainers();
 }
 
 void rawmesh::scale(int physreg, double x, double y, double z)
 {
-    // The nodes object needs access to the universe:
-    std::shared_ptr<rawmesh> torestore = universe::mymesh;
-    universe::mymesh = shared_from_this();
-    
-    mynodes.scale(physreg, x, y, z);
-    myelements.scale(physreg, x, y, z);
-    
-    universe::mymesh = torestore;
-}
+    std::vector<double>* coords = mynodes.getcoordinates();
 
-void rawmesh::scale(double x, double y, double z)
-{
-    // The nodes object needs access to the universe:
-    std::shared_ptr<rawmesh> torestore = universe::mymesh;
-    universe::mymesh = shared_from_this();
+    std::vector<bool> isinsidereg = isnodeinphysicalregion(physreg);
     
-    mynodes.scale(-1, x, y, z);
-    myelements.scale(-1, x, y, z);
-    
-    universe::mymesh = torestore;
+    for (int n = 0; n < mynodes.count(); n++)
+    {
+        if (isinsidereg[n])
+        {
+            coords->at(3*n+0) *= x;
+            coords->at(3*n+1) *= y;
+            coords->at(3*n+2) *= z;
+        }
+    }
+
+    myelements.cleancoordinatedependentcontainers();
 }
 
 int rawmesh::getmeshdimension(void)

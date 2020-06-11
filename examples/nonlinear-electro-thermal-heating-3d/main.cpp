@@ -166,9 +166,9 @@ mesh createmesh(void)
     shape centralblock = centralquad.extrude(volume, thickness, 3);
 
     // Make the central block less large in the middle:
-    centralblock.deform(0, 15*(abs(x)-0.5*length/2)*y, 0);
+    centralblock.move(array3x1(0, 15*(abs(x)-0.5*length/2)*y, 0));
     // Make it also a little thinner (in the z direction) in the middle:
-    centralblock.deform(0, 0, 15*(abs(x)-0.5*length/2)*z);
+    centralblock.move(array3x1(0, 0, 15*(abs(x)-0.5*length/2)*z));
     
     // Get the input and output faces:
     shape inputface = leftblock.getsons()[4];

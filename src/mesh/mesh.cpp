@@ -90,6 +90,20 @@ void mesh::split(int n)
     rawmeshptr->split(n);
 }
 
+void mesh::move(int physreg, expression u)
+{
+    rawmeshptr->move(physreg, u);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->move(physreg, u);
+}
+
+void mesh::move(expression u)
+{
+    rawmeshptr->move(-1, u);
+    if (rawmeshptr->gethadaptedpointer() != NULL)
+        rawmeshptr->gethadaptedpointer()->move(-1, u);
+}
+        
 void mesh::shift(int physreg, double x, double y, double z)
 {
     rawmeshptr->shift(physreg, x, y, z);
@@ -99,9 +113,9 @@ void mesh::shift(int physreg, double x, double y, double z)
 
 void mesh::shift(double x, double y, double z)
 {
-    rawmeshptr->shift(x, y, z);
+    rawmeshptr->shift(-1, x, y, z);
     if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->shift(x, y, z);
+        rawmeshptr->gethadaptedpointer()->shift(-1, x, y, z);
 }
 
 void mesh::rotate(int physreg, double ax, double ay, double az)
@@ -113,9 +127,9 @@ void mesh::rotate(int physreg, double ax, double ay, double az)
 
 void mesh::rotate(double ax, double ay, double az)
 {
-    rawmeshptr->rotate(ax, ay, az);
+    rawmeshptr->rotate(-1, ax, ay, az);
     if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->rotate(ax, ay, az);
+        rawmeshptr->gethadaptedpointer()->rotate(-1, ax, ay, az);
 }
 
 void mesh::scale(int physreg, double x, double y, double z)
@@ -127,9 +141,9 @@ void mesh::scale(int physreg, double x, double y, double z)
 
 void mesh::scale(double x, double y, double z)
 {
-    rawmeshptr->scale(x, y, z);
+    rawmeshptr->scale(-1, x, y, z);
     if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->scale(x, y, z);
+        rawmeshptr->gethadaptedpointer()->scale(-1, x, y, z);
 }
 
 int mesh::getmeshdimension(void)

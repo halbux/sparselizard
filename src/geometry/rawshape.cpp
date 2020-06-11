@@ -2,7 +2,7 @@
 #include "geotools.h"
 
 
-void rawshape::deform(expression xdeform, expression ydeform, expression zdeform, bool recursively)
+void rawshape::move(expression xmove, expression ymove, expression zmove, bool recursively)
 {
     std::vector<double>* mycoords = getcoords();
 
@@ -19,24 +19,24 @@ void rawshape::deform(expression xdeform, expression ydeform, expression zdeform
         zcoords[i] = mycoords->at(3*i+2);
     }
 
-    std::vector<double> xdeformvec = xdeform.evaluate(xcoords,ycoords,zcoords);
-    std::vector<double> ydeformvec = ydeform.evaluate(xcoords,ycoords,zcoords);
-    std::vector<double> zdeformvec = zdeform.evaluate(xcoords,ycoords,zcoords);
+    std::vector<double> xmovevec = xmove.evaluate(xcoords,ycoords,zcoords);
+    std::vector<double> ymovevec = ymove.evaluate(xcoords,ycoords,zcoords);
+    std::vector<double> zmovevec = zmove.evaluate(xcoords,ycoords,zcoords);
 
     for (int i = 0; i < numnodes; i++)
     {
-        mycoords->at(3*i+0) += xdeformvec[i];
-        mycoords->at(3*i+1) += ydeformvec[i];
-        mycoords->at(3*i+2) += zdeformvec[i];
+        mycoords->at(3*i+0) += xmovevec[i];
+        mycoords->at(3*i+1) += ymovevec[i];
+        mycoords->at(3*i+2) += zmovevec[i];
     }
 
     
-    // Also deform (only once) every sub shape:
+    // Also move (only once) every sub shape:
     if (recursively)
     {
         std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
         for (int i = 0; i < subshapes.size(); i++)
-            subshapes[i]->deform(xdeform, ydeform, zdeform, false);
+            subshapes[i]->move(xmove, ymove, zmove, false);
     }
 }
 

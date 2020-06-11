@@ -135,8 +135,8 @@ void sparselizard(void)
     
     ///// DEFORM THE BIG CYLINDER ABOVE AND BELOW:
     
-    v7.deform(0,0, 100*(bigouterradius-sqrt((x-0.1)*(x-0.1)+y*y))*(z-centralthickness/2));
-    v8.deform(0,0, 100*(bigouterradius-sqrt((x-0.1)*(x-0.1)+y*y))*(z-centralthickness/2));
+    v7.move(array3x1(0,0, 100*(bigouterradius-sqrt((x-0.1)*(x-0.1)+y*y))*(z-centralthickness/2)));
+    v8.move(array3x1(0,0, 100*(bigouterradius-sqrt((x-0.1)*(x-0.1)+y*y))*(z-centralthickness/2)));
     
     
     ///// GET THE BOTTOM SURFACE OF THE SMALL CYLINDER AND ASSIGN PHYSICAL REGION NUMBER 2
