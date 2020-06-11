@@ -10,6 +10,8 @@ void sparselizard(void)
     // The domain regions:
     int sur = 1, right = 2, boundary = 3;
 
+    setaxisymmetry();
+
     int n = 50;
 
     shape q("quadrangle", sur, {0.005,0,0, 0.055,0,0, 0.055,0.04,0, 0.005,0.04,0}, {n,n,n,n});
@@ -23,8 +25,6 @@ void sparselizard(void)
     ll.setphysicalregion(boundary);
 
     mesh mymesh({q,lb,lr,lt,ll});
-
-    setaxisymmetry();
 
     // Edge shape functions 'hcurl' for the electric field E.
     // Fields x and y are the x and y coordinate fields.

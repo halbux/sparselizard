@@ -187,7 +187,16 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
 }
 
 
-void mathop::setaxisymmetry(void) { universe::isaxisymmetric = true; }
+void mathop::setaxisymmetry(void)
+{
+    // Make sure the call is done before loading the mesh:
+    if (universe::mymesh != NULL)
+    {
+        std::cout << "Error in 'mathop' namespace: 'setaxisymmetry' must be called before loading the mesh" << std::endl;
+        abort();
+    }
+    universe::isaxisymmetric = true;
+}
 
 void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
 void mathop::settime(double t) { universe::currenttimestep = t; }

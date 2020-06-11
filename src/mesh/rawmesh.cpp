@@ -231,6 +231,7 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     }
     
     splitmesh();
+    mynodes.fixifaxisymmetric();
     
     myelements.explode();
     sortbybarycenters();
@@ -450,6 +451,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     ///// Mesh is transferred
 
     splitmesh();
+    mynodes.fixifaxisymmetric();
 
     myelements.explode();
     sortbybarycenters();
@@ -635,6 +637,8 @@ void rawmesh::move(int physreg, expression u)
         }
         while (myselector.next());
     }
+    
+    mynodes.fixifaxisymmetric();
 }
 
 void rawmesh::shift(int physreg, double x, double y, double z)
@@ -654,6 +658,8 @@ void rawmesh::shift(int physreg, double x, double y, double z)
     }
 
     myelements.cleancoordinatedependentcontainers();
+    
+    mynodes.fixifaxisymmetric();
 }
 
 void rawmesh::rotate(int physreg, double ax, double ay, double az)
@@ -676,6 +682,8 @@ void rawmesh::rotate(int physreg, double ax, double ay, double az)
     }
     
     myelements.cleancoordinatedependentcontainers();
+    
+    mynodes.fixifaxisymmetric();
 }
 
 void rawmesh::scale(int physreg, double x, double y, double z)
@@ -695,6 +703,8 @@ void rawmesh::scale(int physreg, double x, double y, double z)
     }
 
     myelements.cleancoordinatedependentcontainers();
+    
+    mynodes.fixifaxisymmetric();
 }
 
 int rawmesh::getmeshdimension(void)
@@ -1277,6 +1287,8 @@ bool rawmesh::adapth(int verbosity)
             ni += ncn;
         }
     }
+    
+    myhadaptedmesh->mynodes.fixifaxisymmetric();
 
 
     ///// Process the mesh:

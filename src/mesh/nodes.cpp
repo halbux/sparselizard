@@ -1,4 +1,5 @@
 #include "nodes.h"
+#include "universe.h"
 #include "myalgorithm.h"
 
 
@@ -116,5 +117,29 @@ double nodes::getgeometrydimension(int coord)
 std::vector<double> nodes::getnoisethreshold(void)
 {
     return std::vector<double> {roundoffnoiselevel*getgeometrydimension(0), roundoffnoiselevel*getgeometrydimension(1), roundoffnoiselevel*getgeometrydimension(2)};
+}
+
+void nodes::fixifaxisymmetric(void)
+{
+    if (universe::isaxisymmetric == false)
+        return;
+
+    double xnoiselevel = getgeometrydimension(0) * roundoffnoiselevel;
+
+    int numberofnodes = count();
+    for (int i = 0; i < numberofnodes; i++)
+    {
+        double curx = mycoordinates[3*i+0];
+        if (curx < 0)
+        {
+            if (std::abs(curx) < xnoiselevel)
+                mycoordinates[3*i+0] = 0.0;
+            else
+            {
+                std::cout << "Error in 'nodes' object: expected only positive x node coordinates with axisymmetry (found a node at x = " << curx << " which is out of noise range)" << std::endl;
+                abort();
+            }
+        }
+    }
 }
 

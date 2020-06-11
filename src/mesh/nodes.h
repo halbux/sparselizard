@@ -60,6 +60,9 @@ class nodes
         // Get a round off noise threshold for each coordinate.
         std::vector<double> getnoisethreshold(void);
         
+        // Set to zero all negative x coordinates if within the noise range. Throw an error if above the noise range.
+        void fixifaxisymmetric(void);
+        
 };
 
 #endif
