@@ -105,16 +105,12 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         
         // Move the mesh in the x, y and z direction by a value given in the expression.
         void move(int physreg, expression u);
-        void move(expression u);
         // 'shift' translates the mesh in the 'x', 'y' and 'z' direction.
         void shift(int physreg, double x, double y, double z);
-        void shift(double x, double y, double z);
         // 'rotate' rotates the mesh by ax, ay and az degrees around the x, y and z axis respectively.
         void rotate(int physreg, double ax, double ay, double az);
-        void rotate(double ax, double ay, double az);
         // 'scale' scales the mesh in the 'x', 'y' and 'z' direction.
         void scale(int physreg, double x, double y, double z);
-        void scale(double x, double y, double z);
         
         // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
         int getmeshdimension(void);
