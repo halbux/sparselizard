@@ -362,27 +362,27 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
 
             std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
             // Skip if no conditional constraint is active:
-               if (condval[1][0].max() < 0)
-                   continue;
-               std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
-               
-               // Create a matrix with all indices:
-               intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
-               int* curindexmatptr = curindexmat.getvalues();
-               int index = 0;
-               for (int i = 0; i < curdisjregs.size(); i++)
-               {
-                   // There is only a single shape function per node!
-                   for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
-                   {
-                       curindexmatptr[index] = ind;
-                       index++;
-                }
-               }
+            if (condval[1][0].max() < 0)
+                continue;
+            std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
 
-               // Append to the vectors:
-               condvalvec.push_back(condval[1][0]);
-               constrvalvec.push_back(constrval[1][0]);
+            // Create a matrix with all indices:
+            intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
+            int* curindexmatptr = curindexmat.getvalues();
+            int index = 0;
+            for (int i = 0; i < curdisjregs.size(); i++)
+            {
+                // There is only a single shape function per node!
+                for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
+                {
+                    curindexmatptr[index] = ind;
+                    index++;
+                }
+            }
+
+            // Append to the vectors:
+            condvalvec.push_back(condval[1][0]);
+            constrvalvec.push_back(constrval[1][0]);
             indexmat.push_back(curindexmat);
         }
     }
@@ -557,7 +557,7 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
             num -= myelement.counttriangularfaces();
         
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, inputfield->gettypename());
-    int currentnumberofformfunctions, previousdisjreg;       
+        int currentnumberofformfunctions, previousdisjreg;       
 
         for (int i = 0; i < elementlist.size(); i++)
         {
@@ -568,10 +568,10 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
             int currentdisjointregion = myelements->getdisjointregion(associatedelementtype, currentsubelem);
             
             // The current subelement might require less form functions:
-        if (i == 0 || currentdisjointregion != previousdisjreg)
+            if (i == 0 || currentdisjointregion != previousdisjreg)
                 currentnumberofformfunctions = myformfunction->count(inputfield->getinterpolationorder(currentdisjointregion), associatedelementdimension, myiterator.getnodeedgefacevolumeindex());
 
-        previousdisjreg = currentdisjointregion;
+            previousdisjreg = currentdisjointregion;
             
             // If not in a disjoint region on which the field is defined set -2 adress.
             if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)
