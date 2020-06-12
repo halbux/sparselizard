@@ -638,6 +638,8 @@ void rawmesh::move(int physreg, expression u)
         while (myselector.next());
     }
     
+    myelements.cleancoordinatedependentcontainers();
+    
     mynodes.fixifaxisymmetric();
 }
 
