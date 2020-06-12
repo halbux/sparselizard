@@ -202,7 +202,7 @@ void shape::move(expression u)
         std::cout << "Error in 'shape' object: unexpected argument size in 'move' (expected a column vector up to length 3)" << std::endl;
         abort();
     }
-    u.resize(3,1);
+    u = u.resize(3,1);
     rawshapeptr->move(mathop::compx(u), mathop::compy(u), mathop::compz(u));
 }
 
