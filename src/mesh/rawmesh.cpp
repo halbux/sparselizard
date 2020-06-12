@@ -620,7 +620,6 @@ void rawmesh::move(int physreg, expression u)
             // Loop on all elements:
             for (int e = 0; e < elementnumbers.size(); e++)
             {
-                int curelem = elementnumbers[e];
                 for (int n = 0; n < ncn; n++)
                 {
                     int curnode = myelements.getsubelement(0, elementtypenumber, elementnumbers[e], n);
