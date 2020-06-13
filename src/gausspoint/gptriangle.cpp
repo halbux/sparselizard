@@ -5,7 +5,14 @@ void gptriangle::set(int integrationorder, std::vector<double>& coordinates, std
 
     switch (integrationorder)
     {
-        case 0 ... 1:
+        case 0:
+            
+            coordinates = {1.0/3.0,1.0/3.0,0};
+            weights = {0.5};
+
+            break;
+
+        case 1:
             
             coordinates = {1.0/3.0,1.0/3.0,0};
             weights = {0.5};

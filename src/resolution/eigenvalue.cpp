@@ -131,7 +131,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         
         PEPCreate( PETSC_COMM_WORLD, &pep );
         
-        Mat petscmats[mymats.size()];
+        int nummats = mymats.size();
+        Mat petscmats[nummats];
         for (int i = 0; i < mymats.size(); i++)
             petscmats[i] = mymats[i].getpetsc();
         

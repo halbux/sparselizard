@@ -5,7 +5,14 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
     
     switch (integrationorder)
     {
-        case 0 ... 1:
+        case 0:
+            
+            coordinates = {0.25,0.25,0.25};
+            weights = {1.0/6.0};
+
+            break;
+            
+        case 1:
             
             coordinates = {0.25,0.25,0.25};
             weights = {1.0/6.0};

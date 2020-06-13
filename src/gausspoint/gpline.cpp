@@ -10,7 +10,17 @@ void gpline::set(int integrationorder, std::vector<double>& coordinates, std::ve
         
     switch (numberofgausspoints)
     {
-        case 0 ... 1:
+        case 0:
+
+            // Coordinates:
+            coordinates[0] = 0;
+
+            // Weights:
+            weights[0] = 2.0;
+
+            break;
+            
+        case 1:
 
             // Coordinates:
             coordinates[0] = 0;
