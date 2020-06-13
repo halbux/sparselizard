@@ -831,7 +831,7 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
 
             break;
 
-        case 10 ... 11:
+        case 10: case 11:
             
             coordinates.resize(126*3);
             weights.resize(126);
@@ -1344,7 +1344,7 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
 
             break;
 
-        case 12 ... 13:
+        case 12: case 13:
             
             coordinates.resize(210*3);
             weights.resize(210);
@@ -2193,7 +2193,7 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
 
             break;
 
-        case 14 ... 15:
+        case 14: case 15:
             
             coordinates.resize(330*3);
             weights.resize(330);
@@ -3522,7 +3522,7 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
 
             break;
 
-        case 16 ... 17:
+        case 16: case 17:
             
             coordinates.resize(495*3);
             weights.resize(495);
@@ -5511,7 +5511,7 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
 
             break;
 
-        case 18 ... 19:
+        case 18: case 19:
     
             coordinates.resize(715*3);
             weights.resize(715);
@@ -8380,7 +8380,7 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
 
             break;
 
-        case 20 ... 21:
+        case 20: case 21:
             
             coordinates.resize(1001*3);
             weights.resize(1001);
