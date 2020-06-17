@@ -39,6 +39,11 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
     gmsh::model::getPhysicalGroups(dimTags, -1);
 
     int numphysregs = dimTags.size();
+    if (numphysregs == 0)
+    {
+        std::cout << "Error in 'gmshinterface' namespace: no physical region found in mesh loaded from gmsh api" << std::endl;
+        abort();
+    }
     std::vector<int> allphysregsdims(numphysregs);
     std::vector<int> allphysregs(numphysregs);
     for (int i = 0; i < numphysregs; i++)
