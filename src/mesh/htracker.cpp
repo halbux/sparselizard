@@ -385,6 +385,11 @@ std::vector<int> htracker::countintypes(void)
     return output;
 }
 
+int htracker::counttransitions(int elementtypenumber)
+{
+    return leavesoftransitions[elementtypenumber].size();
+}
+
 void htracker::fix(std::vector<int>& operations)
 {
     // Number of grouping requests in a cluster:
@@ -961,7 +966,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     }
 }
 
-void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<std::vector<double>>& userrc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords)
+void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<std::vector<double>>& userrc, htracker* target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords)
 {
     // Take the transition element renumbering into account:
     std::vector<std::vector<int>> ad(8, std::vector<int>(0));
@@ -985,7 +990,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<st
     std::vector<std::vector<double>> trc;
     std::vector<int> maporctorc;
     
-    target.fromoriginal(oad, orc, tad, trc, maporctorc);
+    target->fromoriginal(oad, orc, tad, trc, maporctorc);
     
     
     // Create output containers:
@@ -1037,7 +1042,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<st
                 int tind = maporctorc[2*orc+1];
             
                 targettranselems[i][2*(userpos+k)+0] = ttype;
-                targettranselems[i][2*(userpos+k)+1] = target.touser[ttype][map[ttype][tind]];
+                targettranselems[i][2*(userpos+k)+1] = target->touser[ttype][map[ttype][tind]];
                 
                 targetrefcoords[i][3*(userpos+k)+0] = trc[ttype][3*tind+0];
                 targetrefcoords[i][3*(userpos+k)+1] = trc[ttype][3*tind+1];

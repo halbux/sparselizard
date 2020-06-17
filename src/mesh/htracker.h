@@ -120,6 +120,8 @@ class htracker
         
         // Count the number of leaves of each type:
         std::vector<int> countintypes(void);
+        // Count the number of transition elements of a type:
+        int counttransitions(int elementtypenumber);
         
         // Update the operations to how they will actually be treated (priority is split > noop > group):
         void fix(std::vector<int>& operations);
@@ -156,7 +158,7 @@ class htracker
         
         // Get the corresponding point at the target. To each rc[i][3*j] is associated its corresponding transition element type and index in type
         // (in targettranselems[i][2*j+0] and targettranselems[i][2*j+1]) and the associated reference coordinate in the target transition element. 
-        void getattarget(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, htracker& target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords);
+        void getattarget(std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, htracker* target, std::vector<std::vector<int>>& targettranselems, std::vector<std::vector<double>>& targetrefcoords);
 
         // For a given transition element get the node/edge/face indexes of the original element (respectively in 'on', 'oe', 'of')
         // in which each node/edge/face is (-1 if none). Data is only returned for boundaries.
