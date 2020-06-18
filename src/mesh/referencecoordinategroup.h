@@ -20,6 +20,8 @@ class referencecoordinategroup
         double noisethreshold = 1e-10;
         
         coordinategroup mycoordgroup;
+        std::vector<int> myinputelems = {};
+        std::vector<double> myinputrefcoords = {};
         
         // One entry per number of reference coordinates in an element:
         std::vector<std::vector<int>> myelems = {};
@@ -38,9 +40,14 @@ class referencecoordinategroup
     
         referencecoordinategroup(void) {};
         referencecoordinategroup(std::vector<double>& coords);
+        // Provide in 'elems' the element types and numbers {type0,elemnum0,type1,...}:
+        referencecoordinategroup(std::vector<int>& elems, std::vector<double>& refcoords);
         
         // All disjoint regions should hold the same element type number:
         void evalat(std::vector<int> inputdisjregs);
+        void evalat(int elemtypenum);
+        
+        void evalat(std::vector<int>& elems, std::vector<double>& kietaphis, std::vector<int>& coordnums);
         
         bool next(void);
         

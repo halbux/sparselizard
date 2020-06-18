@@ -6,6 +6,12 @@ referencecoordinategroup::referencecoordinategroup(std::vector<double>& coords)
     mycoordgroup = coordinategroup(coords);
 }
 
+referencecoordinategroup::referencecoordinategroup(std::vector<int>& elems, std::vector<double>& refcoords)
+{
+    myinputelems = elems;
+    myinputrefcoords = refcoords;
+}
+
 void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
 {
     int numcoords = mycoordgroup.countcoordinates();
@@ -16,7 +22,45 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
     std::vector<double> kietaphis(3*numcoords,0.0);
     
     for (int d = 0; d < inputdisjregs.size(); d++)
-        myalgorithm::getreferencecoordinates(mycoordgroup, inputdisjregs[d], elems, kietaphis);    
+        myalgorithm::getreferencecoordinates(mycoordgroup, inputdisjregs[d], elems, kietaphis);
+        
+    evalat(elems, kietaphis, coordnums);  
+}
+
+void referencecoordinategroup::evalat(int elemtypenum)
+{
+    int numintype = 0;
+    for (int i = 0; i < myinputelems.size()/2; i++)
+    {
+        if (myinputelems[2*i+0] == elemtypenum)
+            numintype++;
+    }
+    
+    std::vector<int> elems(numintype);
+    std::vector<double> kietaphis(3*numintype,0.0);
+    std::vector<int> coordnums(numintype);
+
+    int index = 0;
+    for (int i = 0; i < myinputelems.size()/2; i++)
+    {
+        if (myinputelems[2*i+0] == elemtypenum)
+        {
+            elems[index] = myinputelems[2*i+1];
+            kietaphis[3*index+0] = myinputrefcoords[3*i+0];
+            kietaphis[3*index+1] = myinputrefcoords[3*i+1];
+            kietaphis[3*index+2] = myinputrefcoords[3*i+2];
+            coordnums[index] = i;
+            
+            index++;
+        }
+    }
+    
+    evalat(elems, kietaphis, coordnums);  
+}
+    
+void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<double>& kietaphis, std::vector<int>& coordnums)
+{
+    int numcoords = elems.size();
     
     // Remove the negative elements (not found):
     int numpositive = 0;
