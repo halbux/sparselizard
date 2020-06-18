@@ -577,7 +577,7 @@ void rawmesh::move(int physreg, expression u)
     if (physreg >= 0)
         selecteddisjregs = (myphysicalregions.get(physreg))->getdisjointregions();
     else
-        selecteddisjregs = mydisjointregions.get(meshdim);
+        selecteddisjregs = mydisjointregions.getindim(meshdim);
         
     if (not(u.isharmonicone(selecteddisjregs)))
     {

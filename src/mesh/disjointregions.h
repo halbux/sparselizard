@@ -46,8 +46,9 @@ class disjointregions
         int getelementtypenumber(int disjointregionnumber);
         int getelementdimension(int disjointregionnumber);
         
-        // Get the numbers of all disjoint regions of a given dimension:
-        std::vector<int> get(int dim);
+        // Get the numbers of all disjoint regions of a given dimension/element type:
+        std::vector<int> getindim(int dim);
+        std::vector<int> getintype(int elementtypenumber);
         
         bool isinphysicalregion(int disjointregionnumber, int physicalregionindex);
         

@@ -66,13 +66,30 @@ int disjointregions::getelementdimension(int disjointregionnumber)
     return myelement.getelementdimension();
 }
 
-std::vector<int> disjointregions::get(int dim)
+std::vector<int> disjointregions::getindim(int dim)
 {
     std::vector<int> output(elementtypenumbers.size());
     int num = 0;
     for (int d = 0; d < output.size(); d++)
     {
         if (getelementdimension(d) == dim)
+        {
+            output[num] = d;
+            num++;
+        }
+    }
+    output.resize(num);
+    
+    return output;
+}
+
+std::vector<int> disjointregions::getintype(int elementtypenumber)
+{
+    std::vector<int> output(elementtypenumbers.size());
+    int num = 0;
+    for (int d = 0; d < output.size(); d++)
+    {
+        if (getelementtypenumber(d) == elementtypenumber)
         {
             output[num] = d;
             num++;
