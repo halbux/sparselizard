@@ -8,8 +8,6 @@ referencecoordinategroup::referencecoordinategroup(std::vector<double>& coords)
 
 void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
 {
-    mydisjregs = inputdisjregs;
-    
     int numcoords = mycoordgroup.countcoordinates();
     
     std::vector<int> elems(numcoords,-1);
@@ -17,8 +15,8 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
     std::iota(coordnums.begin(), coordnums.end(), 0);
     std::vector<double> kietaphis(3*numcoords,0.0);
     
-    for (int d = 0; d < mydisjregs.size(); d++)
-        myalgorithm::getreferencecoordinates(mycoordgroup, mydisjregs[d], elems, kietaphis);    
+    for (int d = 0; d < inputdisjregs.size(); d++)
+        myalgorithm::getreferencecoordinates(mycoordgroup, inputdisjregs[d], elems, kietaphis);    
     
     // Remove the negative elements (not found):
     int numpositive = 0;

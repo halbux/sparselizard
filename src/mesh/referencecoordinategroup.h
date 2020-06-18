@@ -21,8 +21,6 @@ class referencecoordinategroup
         
         coordinategroup mycoordgroup;
         
-        std::vector<int> mydisjregs = {};
-        
         // One entry per number of reference coordinates in an element:
         std::vector<std::vector<int>> myelems = {};
         std::vector<std::vector<int>> mycoordnums = {};
