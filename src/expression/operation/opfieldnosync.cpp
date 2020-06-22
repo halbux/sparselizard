@@ -21,7 +21,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     //
     // UNIVERSE::MYMESH ---- P ----> UNIVERSE::MYMESH ---- h ----> myrawmesh ---- p ----> myptracker
     
-    if (universe::mymesh->getptracker() != NULL)
+    if (universe::mymesh != myrawmesh) 
     {
         std::vector<std::vector<int>> renumberingthere;
         universe::mymesh->getptracker()->getrenumbering(NULL, renumberingthere);
@@ -97,7 +97,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     double* outvals = output.getvalues();
     
     std::shared_ptr<rawmesh> bkp = universe::mymesh;
-    universe::mymesh = myrawmesh;
+    universe::mymesh = NULL;//myrawmesh->get(myptracker); // universe::myorigmesh WORKS!!!!!
     
     for (int i = 0; i < 8; i++)
     {
@@ -114,7 +114,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
             std::vector<int> elemens = rcg.getelements();
             int numrefcoords = kietaphi.size()/3;
             
-            std::vector<int> curdisjregs = myrawmesh->getptracker()->getdisjointregions()->getintype(i);
+            std::vector<int> curdisjregs = myptracker->getdisjointregions()->getintype(i);
 
             // Check if the field is orientation dependent:
             bool isorientationdependent = false;
