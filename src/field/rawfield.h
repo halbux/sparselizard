@@ -114,6 +114,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
+        // Allow/forbid syncing:
+        bool issynchronizingallowed = true;
         
         
         // Mesh on which this object is based:
@@ -124,6 +126,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Synchronize with the hp-adapted mesh.
         // If provided, 'physregsfororder' must be {physreg1,orderpr1,physreg2,orderpr2,...} with ORDERS SORTED ASCENDINGLY.
         void synchronize(std::vector<int> physregsfororder = {});
+        
+        void allowsynchronizing(bool allowit) { issynchronizingallowed = allowit; };
         
         bool isptrigger(void);
         bool ishtrigger(void);
@@ -176,6 +180,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         spanningtree* getspanningtree(void);
         
         std::shared_ptr<rawfield> getpointer(void);
+        std::shared_ptr<rawmesh> getrawmesh(void);
+        std::shared_ptr<ptracker> getptracker(void);
 
         // Transfer data from a solution vector to the field.
         // Get from all regions with physreg set to -1. 'op' can be 'add' or 'set'. 

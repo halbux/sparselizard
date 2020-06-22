@@ -20,7 +20,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         return;
     }
         
-    if (issynchronizing || myptracker == universe::mymesh->getptracker())
+    if (not(issynchronizingallowed) || issynchronizing || myptracker == universe::mymesh->getptracker())
         return;
     issynchronizing = true; 
     
@@ -781,6 +781,20 @@ std::shared_ptr<rawfield> rawfield::getpointer(void)
     synchronize();
    
     return shared_from_this();
+}
+
+std::shared_ptr<rawmesh> rawfield::getrawmesh(void)
+{
+    synchronize();
+    
+    return myrawmesh;
+}
+
+std::shared_ptr<ptracker> rawfield::getptracker(void)
+{
+    synchronize();
+    
+    return myptracker;
 }
 
 void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
