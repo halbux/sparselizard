@@ -21,7 +21,7 @@ class opfieldnosync: public operation
 
     public:
 
-        opfieldnosync(std::shared_ptr<rawfield> fieldin) { myfield = fieldin; };
+        opfieldnosync(std::shared_ptr<rawfield> fieldin);
 
         void selectformfunctioncomponent(int comp) { formfunctioncomponent = comp; };
 

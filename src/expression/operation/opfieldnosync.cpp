@@ -2,6 +2,18 @@
 #include "myalgorithm.h"
 
 
+opfieldnosync::opfieldnosync(std::shared_ptr<rawfield> fieldin)
+{
+    std::string tn = fieldin->gettypename();
+    if (tn != "h1" && tn != "hcurl")
+    {
+        std::cout << "Error in 'opfieldnosync' object: cannot hp-adapt a '" << tn << "' type field" << std::endl;
+        abort();
+    }
+
+    myfield = fieldin;
+}
+
 std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Forbid synchronization:
