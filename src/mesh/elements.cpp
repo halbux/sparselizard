@@ -1057,3 +1057,36 @@ void elements::orient(void)
     }
 }
 
+elements elements::copy(nodes* nds, physicalregions* prs, disjointregions* drs)
+{
+    elements out;
+    
+    out = *this;
+    
+    out.mynodes = nds;
+    out.myphysicalregions = prs;
+    out.mydisjointregions = drs;
+    
+    return out;
+}
+
+void elements::toptracker(std::shared_ptr<ptracker> originpt, std::shared_ptr<ptracker> targetpt)
+{
+    std::vector<std::vector<int>> renumbering;
+    std::vector<std::vector<int>> reordering(8, std::vector<int>(0));
+    originpt->getrenumbering(targetpt, renumbering);
+    
+    for (int i = 0; i < 8; i++)
+    {
+        if (renumbering[i].size() == 0)
+            continue;
+    
+        reordering[i] = myalgorithm::getreordering(renumbering[i]);    
+        // Renumber and reorder the elements in all containers:
+        renumber(i, renumbering[i]);
+        reorder(i, reordering[i]);  
+    }
+    
+    targetpt->getindisjointregions(indisjointregion);
+}
+

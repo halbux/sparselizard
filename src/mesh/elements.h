@@ -18,6 +18,7 @@
 #include <algorithm>
 #include "orientation.h"
 #include "myalgorithm.h"
+#include "ptracker.h"
 
 class nodes;
 
@@ -87,6 +88,7 @@ class elements
 
     public:
         
+        elements(void) {};
         elements(nodes&, physicalregions&, disjointregions&);
         
         // Add an element defined by its element type number, curvature order and 
@@ -190,12 +192,18 @@ class elements
         
         // Get a vector whose index i is true if node i is a corner node:
         std::vector<bool> iscornernode(void);
-        
 
         // 'orient' defines 'totalorientations'. Note: 'totalorientations'
         // is untouched in all renumbering and reordering steps and
         // should thus be called last, after all other steps.
         void orient(void);
+        
+        
+        // Make a full copy of this object (linking objects used are the arguments):
+        elements copy(nodes* nds, physicalregions* prs, disjointregions* drs);
+        
+        // Bring this object in the state corresponding to the target ptracker:
+        void toptracker(std::shared_ptr<ptracker> originpt, std::shared_ptr<ptracker> targetpt);
 };
 
 #endif
