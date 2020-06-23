@@ -884,6 +884,16 @@ std::vector<int> myalgorithm::invertrenumbering(std::vector<int>& renum)
     return output;
 }
 
+std::vector<int> myalgorithm::getreordering(std::vector<int>& renum)
+{
+    std::vector<int> out(renum.size());
+    
+    for (int i = 0; i < renum.size(); i++)
+        out[renum[i]] = i;
+    
+    return out;
+}
+
 void myalgorithm::reorder(std::vector<int>& inad, std::vector<double>& indat, std::vector<int>& renumbering, std::vector<int>& outad, std::vector<double>& outdat)
 {
     if (indat.size() == 0)
