@@ -81,6 +81,15 @@ int elements::count(int elementtypenumber)
     return subelementsinelements[elementtypenumber][0].size()/numberofsubelementsineveryelement[elementtypenumber][0];
 }
 
+std::vector<int> elements::count(void)
+{
+    std::vector<int> output(8);
+    for (int i = 0; i < 8; i++)
+        output[i] = count(i);
+
+    return output;
+}
+
 int elements::getcurvatureorder(void)
 {
     return mycurvatureorder;

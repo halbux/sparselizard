@@ -107,6 +107,8 @@ class elements
         
         // Return the number of elements of a given type.
         int count(int elementtypenumber);
+        // Count in each type:
+        std::vector<int> count(void);
         // Return the curvature order:
         int getcurvatureorder(void);
         
