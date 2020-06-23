@@ -37,7 +37,7 @@ void referencecoordinategroup::evalat(int elemtypenum)
     }
     
     std::vector<int> elems(numintype);
-    std::vector<double> kietaphis(3*numintype,0.0);
+    std::vector<double> kietaphis(3*numintype);
     std::vector<int> coordnums(numintype);
 
     int index = 0;
