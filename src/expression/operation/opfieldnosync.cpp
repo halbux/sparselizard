@@ -26,7 +26,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         std::vector<std::vector<int>> renumberingthere;
         universe::mymesh->getptracker()->getrenumbering(NULL, renumberingthere);
 
-        for (int i = 0; i < renumberingthere[elemtype].size(); i++)
+        for (int i = 0; i < elemnums.size(); i++)
             elemnums[i] = renumberingthere[elemtype][elemnums[i]];
     }
 
