@@ -269,7 +269,7 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     
     mynumber = 0;
     
-    myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myptracker = std::shared_ptr<ptracker>(new ptracker(myelements.count()));
     myptracker->updatedisjointregions(&mydisjointregions);
     
     myoriginalmesh = shared_from_this();
@@ -357,22 +357,14 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
         abort();
     }
     
-    this->load(flat, verbosity);
+    load(flat, verbosity);
     
     // Shift back to the original position:
     if (mergeduplicates == false)
     {
         for (int i = 0; i < numfiles; i++)
-            this->shift(maxphysreg+1+i, -shiftvec[i],0,0);
+            shift(maxphysreg+1+i, -shiftvec[i],0,0);
     }
-    
-    mynumber = 0;
-    
-    myptracker = std::shared_ptr<ptracker>(new ptracker);
-    myptracker->updatedisjointregions(&mydisjointregions);
-    
-    myoriginalmesh = shared_from_this();
-    myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
 }
 
 void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
@@ -489,7 +481,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     
     mynumber = 0;
     
-    myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myptracker = std::shared_ptr<ptracker>(new ptracker(myelements.count()));
     myptracker->updatedisjointregions(&mydisjointregions);
     
     myoriginalmesh = shared_from_this();
@@ -966,7 +958,7 @@ void rawmesh::adaptp(void)
     ///// Update the mesh:
     
     // The previous mesh tracker should not be touched:
-    std::shared_ptr<ptracker> newptracker(new ptracker);
+    std::shared_ptr<ptracker> newptracker(new ptracker(myelements.count()));
     *newptracker = *myptracker;
     myptracker = newptracker;
     
@@ -1421,7 +1413,7 @@ bool rawmesh::adapth(int verbosity)
     mynumber++;
     myhadaptedmesh->mynumber = mynumber;
     
-    myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker);
+    myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker(myhadaptedmesh->myelements.count()));
     myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
     myhadaptedmesh->mypadaptdata = universe::mymesh->mypadaptdata;
     universe::mymesh->mypadaptdata = {};

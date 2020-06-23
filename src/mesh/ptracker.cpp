@@ -2,7 +2,12 @@
 #include "universe.h"
 
 
-ptracker::ptracker(void) {}
+ptracker::ptracker(std::vector<int> numelemspertype)
+{
+    elementrenumbering.resize(8);
+    for (int i = 0; i < 8; i++)
+        elementrenumbering[i] = myalgorithm::getequallyspaced(0, 1, numelemspertype[i]);
+}
 
 void ptracker::updatedisjointregions(disjointregions* input)
 {
@@ -11,16 +16,11 @@ void ptracker::updatedisjointregions(disjointregions* input)
 
 void ptracker::updaterenumbering(std::vector<std::vector<int>>& renumber)
 {
-    if (elementrenumbering.size() == 0)
-        elementrenumbering = renumber;
-    else
+    for (int i = 0; i < 8; i++)
     {
-        for (int i = 0; i < 8; i++)
-        {
-            std::vector<int> oldrenum = elementrenumbering[i]; 
-            for (int j = 0; j < elementrenumbering[i].size(); j++)
-                elementrenumbering[i][j] = renumber[i][oldrenum[j]];
-        }
+        std::vector<int> oldrenum = elementrenumbering[i]; 
+        for (int j = 0; j < elementrenumbering[i].size(); j++)
+            elementrenumbering[i][j] = renumber[i][oldrenum[j]];
     }
 }
 

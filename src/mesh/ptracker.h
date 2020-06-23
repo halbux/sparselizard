@@ -27,7 +27,7 @@ class ptracker
     
     public:
 
-        ptracker(void);
+        ptracker(std::vector<int> numelemspertype);
         
         // This updates the disjoint region object:
         void updatedisjointregions(disjointregions* input);
