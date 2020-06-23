@@ -86,6 +86,10 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<ptracker> getptracker(void);
         std::shared_ptr<htracker> gethtracker(void);
         int getmeshnumber(void) { return mynumber; };
+        
+        // Get a full copy of this rawmesh adapted to the target ptracker.
+        // If the target ptracker is identical to 'myptracker' then this object is returned.
+        std::shared_ptr<rawmesh> getattarget(std::shared_ptr<ptracker> targetpt);
 
         // Load from file name:
         void load(std::string name, int verbosity = 1, bool legacyreader = true);   

@@ -97,7 +97,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     double* outvals = output.getvalues();
     
     std::shared_ptr<rawmesh> bkp = universe::mymesh;
-    universe::mymesh = NULL;//myrawmesh->get(myptracker); // universe::myorigmesh WORKS!!!!!
+    universe::mymesh = myrawmesh->getattarget(myptracker);
     
     for (int i = 0; i < 8; i++)
     {

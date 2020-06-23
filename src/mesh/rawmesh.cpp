@@ -208,6 +208,31 @@ disjointregions* rawmesh::getdisjointregions(void) {return &mydisjointregions;}
 std::shared_ptr<ptracker> rawmesh::getptracker(void) {return myptracker;}
 std::shared_ptr<htracker> rawmesh::gethtracker(void) {return myhtracker;}
 
+std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt)
+{
+    if (myptracker == targetpt)
+        return shared_from_this();
+
+    std::shared_ptr<rawmesh> om(new rawmesh);
+
+    om->mynodes = mynodes;
+    om->mydisjointregions = *(targetpt->getdisjointregions());
+    om->myphysicalregions = physicalregions(om->mydisjointregions);
+    om->myelements = myelements.copy(&(om->mynodes), &(om->myphysicalregions), &(om->mydisjointregions));
+
+    (om->myelements).toptracker(myptracker, targetpt);
+
+    // Define the physical regions based on the disjoint regions they contain:
+    for (int prindex = 0; prindex < myphysicalregions.count(); prindex++)
+    {
+        int prnum = myphysicalregions.getnumber(prindex);
+        physicalregion* currentphysicalregion = myphysicalregions.get(prnum);
+        currentphysicalregion->definewithdisjointregions();
+    }
+    
+    return om;
+}
+
 void rawmesh::load(std::string name, int verbosity, bool legacyreader)
 {
     // Do not call this when the mesh is already loaded!
