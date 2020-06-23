@@ -105,7 +105,7 @@ class elements
         int getdisjointregion(int elementtypenumber, int elementnumber);
         int gettotalorientation(int elementtypenumber, int elementnumber);
         
-        // Return the number of elements of a given type.
+        // Return the number of elements of a given type:
         int count(int elementtypenumber);
         // Count in each type:
         std::vector<int> count(void);
