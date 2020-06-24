@@ -225,14 +225,6 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
     om->myelements = myelements.copy(&(om->mynodes), &(om->myphysicalregions), &(om->mydisjointregions));
 
     (om->myelements).toptracker(myptracker, targetpt);
-
-    // Define the physical regions based on the disjoint regions they contain:
-    for (int prindex = 0; prindex < myphysicalregions.count(); prindex++)
-    {
-        int prnum = myphysicalregions.getnumber(prindex);
-        physicalregion* currentphysicalregion = myphysicalregions.get(prnum);
-        currentphysicalregion->definewithdisjointregions();
-    }
     
     universe::mymesh = bkp;
     
