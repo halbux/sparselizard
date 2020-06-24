@@ -212,6 +212,10 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
 {
     if (myptracker == targetpt)
         return shared_from_this();
+        
+    std::shared_ptr<rawmesh> bkp = universe::mymesh;
+    // Needed in ptracker:
+    universe::mymesh = shared_from_this();
 
     std::shared_ptr<rawmesh> om(new rawmesh);
 
@@ -229,6 +233,8 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
         physicalregion* currentphysicalregion = myphysicalregions.get(prnum);
         currentphysicalregion->definewithdisjointregions();
     }
+    
+    universe::mymesh = bkp;
     
     return om;
 }
