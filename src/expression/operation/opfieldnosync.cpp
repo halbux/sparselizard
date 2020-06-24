@@ -157,6 +157,30 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
                 universe::forbidreuse();
     
                 densematrix interp = myfield->interpolate(0, formfunctioncomponent, myselector, kietaphi)[1][0];
+                
+                if (myfield->gettypename() == "hcurl")
+                {
+                    expression expr;
+                    expression invjac = expr.invjac();
+                    
+                    densematrix fx = myfield->interpolate(0, 0, myselector, kietaphi)[1][0];
+                    densematrix fy = myfield->interpolate(0, 1, myselector, kietaphi)[1][0];
+                    densematrix fz = myfield->interpolate(0, 2, myselector, kietaphi)[1][0];
+                    
+                    densematrix invjacx = invjac.getoperationinarray(0,0)->interpolate(myselector, kietaphi, NULL)[1][0];
+                    densematrix invjacy = invjac.getoperationinarray(0,1)->interpolate(myselector, kietaphi, NULL)[1][0];
+                    densematrix invjacz = invjac.getoperationinarray(0,2)->interpolate(myselector, kietaphi, NULL)[1][0];
+                    
+                    fx.multiplyelementwise(invjacx);
+                    fy.multiplyelementwise(invjacy);
+                    fz.multiplyelementwise(invjacz);
+                    
+                    interp = densematrix(interp.countrows(), interp.countcolumns(), 0.0);
+                    interp.add(fx);
+                    interp.add(fy);
+                    interp.add(fz);
+                }
+                
                 double* interpvals = interp.getvalues();
                       
                 // Place the interpolated values at the right position in the output densematrix:
