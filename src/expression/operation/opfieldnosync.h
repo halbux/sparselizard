@@ -14,6 +14,8 @@ class opfieldnosync: public operation
 
     private:
 
+        bool reuse = false;
+
         int formfunctioncomponent = 0;
 
         // Cannnot be a 'x', 'y', 'z' or 'one' field:
@@ -28,6 +30,10 @@ class opfieldnosync: public operation
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::shared_ptr<operation> copy(void);
+        
+        void reuseit(bool istobereused) { reuse = istobereused; };
+        
+        void print(void);
 
 };
 

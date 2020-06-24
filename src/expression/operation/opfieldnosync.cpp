@@ -16,6 +16,17 @@ opfieldnosync::opfieldnosync(std::shared_ptr<rawfield> fieldin)
 
 std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
+    // Get the value from the universe if available and reuse is enabled:
+    if (reuse && universe::isreuseallowed)
+    {
+        int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
+        if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
+    }
+    
+    bool wasreuseallowed = universe::isreuseallowed;
+    // Because of the 'gethff' call in interpolate:
+    universe::forbidreuse();
+    
     // Forbid synchronization:
     myfield->allowsynchronizing(false);
                 
@@ -117,8 +128,8 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     
     ///// Evaluate the field at all reference coordinate groups:
-    densematrix output(elemnums.size(), numevalpts);
-    double* outvals = output.getvalues();
+    densematrix valmat(elemnums.size(), numevalpts);
+    double* valsptr = valmat.getvalues();
     
     std::shared_ptr<rawmesh> bkp = universe::mymesh;
     universe::mymesh = myrawmesh->getattarget(myptracker);
@@ -153,9 +164,6 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
             elementselector myselector(curdisjregs, elemens, isorientationdependent);
             do 
             {
-                // Because of the 'gethff' call in interpolate:
-                universe::forbidreuse();
-    
                 densematrix interp = myfield->interpolate(0, formfunctioncomponent, myselector, kietaphi)[1][0];
                 
                 if (myfield->gettypename() == "hcurl")
@@ -191,7 +199,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
                     for (int k = 0; k < numrefcoords; k++)
                     {
                         int pos = coordindexes[curorigelem*numrefcoords+k];
-                        outvals[pos] = interpvals[j*numrefcoords+k];
+                        valsptr[pos] = interpvals[j*numrefcoords+k];
                     }
                 }
             }
@@ -202,7 +210,15 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     myfield->allowsynchronizing(true);
     
-    return {{}, {output}};
+    std::vector<std::vector<densematrix>> out = {{}, {valmat}};
+    
+    if (wasreuseallowed)
+        universe::allowreuse();
+    
+    if (reuse && universe::isreuseallowed)
+        universe::setprecomputed(shared_from_this(), out);
+    
+    return out;
 }
 
 std::shared_ptr<operation> opfieldnosync::copy(void)
@@ -210,5 +226,12 @@ std::shared_ptr<operation> opfieldnosync::copy(void)
     std::shared_ptr<opfieldnosync> op(new opfieldnosync(myfield));
     *op = *this;
     return op;
+}
+
+void opfieldnosync::print(void)
+{
+    std::cout << "nosync(";
+    myfield->print();
+    std::cout << ")";
 }
 
