@@ -70,7 +70,19 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         std::vector<std::vector<int>> ad(8, std::vector<int>(0));
         std::vector<std::vector<double>> rc(8, std::vector<double>(0));
         
-        ad[elemtype] = myalgorithm::getequallyspaced(0, evaluationcoordinates.size(), elemnums.size()+1);
+        int numelems = universe::mymesh->getelements()->count(elemtype);
+        std::vector<bool> iselem(numelems, false);
+        for (int i = 0; i < elemnums.size(); i++)
+            iselem[elemnums[i]] = true;
+        ad[elemtype] = std::vector<int>(numelems+1,0);
+        for (int i = 1; i < numelems+1; i++)
+        {
+            if (iselem[i-1])
+                ad[elemtype][i] = ad[elemtype][i-1] + evaluationcoordinates.size();
+            else
+                ad[elemtype][i] = ad[elemtype][i-1];
+        }
+        
         rc[elemtype] = myalgorithm::duplicate(evaluationcoordinates, elemnums.size());
         
         std::vector<std::vector<int>> tel;
