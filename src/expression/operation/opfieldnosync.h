@@ -23,7 +23,7 @@ class opfieldnosync: public operation
     public:
 
         opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin);
-        // Provide the operations for all components after constructor (if multiple):
+        // Provide the operations for all components after constructor:
         void setcomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps);
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
