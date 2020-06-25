@@ -4,14 +4,17 @@
 
 opfieldnosync::opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin)
 {
-    myformfunctioncomponent = formfunctioncomponent;
+    mycomp = formfunctioncomponent;
     myfield = fieldin;
 }
 
-void opfieldnosync::setothercomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps)
+void opfieldnosync::setcomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps)
 {
-    mycomponents = allcomps;
-    mycomponents[myformfunctioncomponent] = NULL;
+    std::vector<std::weak_ptr<opfieldnosync>> weakptrs(allcomps.size());
+    for (int c = 0; c < allcomps.size(); c++)
+        weakptrs[c] = allcomps[c];
+
+    mycomponents = weakptrs;
 }
 
 std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -221,23 +224,16 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     myfield->allowsynchronizing(true);
     
-    std::vector<std::vector<densematrix>> out = {{}, {valmats[myformfunctioncomponent]}};
-    
     if (wasreuseallowed)
         universe::allowreuse();
     
     if (universe::isreuseallowed)
     {
-        universe::setprecomputed(shared_from_this(), out);
-        // Also provide the value of the other components:
         for (int c = 0; c < numcomps; c++)
-        {
-            if (mycomponents[c] != NULL)
-                universe::setprecomputed(mycomponents[c], {{}, {valmats[c]}});
-        }
+                universe::setprecomputed(mycomponents[c].lock(), {{}, {valmats[c]}});
     }
     
-    return out;
+    return {{}, {valmats[mycomp]}};
 }
 
 void opfieldnosync::print(void)

@@ -14,18 +14,17 @@ class opfieldnosync: public operation
 
     private:
 
-        int myformfunctioncomponent = -1;
+        int mycomp = -1;
         
-        std::vector<std::shared_ptr<opfieldnosync>> mycomponents = {NULL};
+        std::vector<std::weak_ptr<opfieldnosync>> mycomponents = {};
 
-        // Cannnot be a 'x', 'y', 'z' or 'one' field:
-        std::shared_ptr<rawfield> myfield;
+        std::shared_ptr<rawfield> myfield = NULL;
 
     public:
 
         opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin);
-        // Provide the operations for all components after constructor:
-        void setothercomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps);
+        // Provide the operations for all components after constructor (if multiple):
+        void setcomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps);
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         

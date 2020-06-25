@@ -872,6 +872,7 @@ expression mathop::nosync(std::shared_ptr<rawfield> rf)
     if (tn == "h1")
     {
         std::shared_ptr<opfieldnosync> opx( new opfieldnosync(0, rf));
+        opx->setcomponents({opx});
         rf->allowsynchronizing(true);
         return expression(opx);
     }
@@ -881,9 +882,9 @@ expression mathop::nosync(std::shared_ptr<rawfield> rf)
         std::shared_ptr<opfieldnosync> opy( new opfieldnosync(1, rf));
         std::shared_ptr<opfieldnosync> opz( new opfieldnosync(2, rf));
         
-        opx->setothercomponents({opx, opy, opz});
-        opy->setothercomponents({opx, opy, opz});
-        opz->setothercomponents({opx, opy, opz});
+        opx->setcomponents({opx, opy, opz});
+        opy->setcomponents({opx, opy, opz});
+        opz->setcomponents({opx, opy, opz});
         
         expression exprx(opx);
         expression expry(opy);
