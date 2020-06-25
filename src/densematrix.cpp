@@ -314,6 +314,16 @@ void densematrix::addproduct(double coef, densematrix B)
     }
 }
 
+void densematrix::addproduct(densematrix A, densematrix B)
+{
+    double* myvaluesptr = myvalues.get();
+    double* Amyvaluesptr = A.myvalues.get();
+    double* Bmyvaluesptr = B.myvalues.get();
+
+    for (long long int i = 0; i < numrows*numcols; i++)
+        myvaluesptr[i] += Amyvaluesptr[i]*Bmyvaluesptr[i];
+}
+
 densematrix densematrix::returnproduct(double coef)
 {
     densematrix output(numrows, numcols);

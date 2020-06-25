@@ -97,6 +97,8 @@ class densematrix
 
         // Add coef*B without changing B.
         void addproduct(double coef, densematrix B);
+        // Add A*B without changing A or B.
+        void addproduct(densematrix A, densematrix B);
         // Return the product by 'coef' without modifying this object.
         densematrix returnproduct(double coef);
 
