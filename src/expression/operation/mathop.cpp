@@ -862,6 +862,41 @@ integration mathop::integral(int physreg, int numcoefharms, expression meshdefor
 expression mathop::dof(expression input, int physreg) { return input.dof(physreg); }
 expression mathop::tf(expression input, int physreg) { return input.tf(physreg); }
 
+expression mathop::nosync(std::shared_ptr<rawfield> rf)
+{
+    // Forbid synchronization:
+    rf->allowsynchronizing(false);
+    
+    std::string tn = rf->gettypename();
+    
+    if (tn == "h1")
+    {
+        std::shared_ptr<opfieldnosync> opx( new opfieldnosync(0, rf));
+        rf->allowsynchronizing(true);
+        return expression(opx);
+    }
+    if (tn == "hcurl")
+    {
+        std::shared_ptr<opfieldnosync> opx( new opfieldnosync(0, rf));
+        std::shared_ptr<opfieldnosync> opy( new opfieldnosync(1, rf));
+        std::shared_ptr<opfieldnosync> opz( new opfieldnosync(2, rf));
+        
+        opx->setothercomponents({opx, opy, opz});
+        opy->setothercomponents({opx, opy, opz});
+        opz->setothercomponents({opx, opy, opz});
+        
+        expression exprx(opx);
+        expression expry(opy);
+        expression exprz(opz);
+        
+        rf->allowsynchronizing(true);
+        return array3x1(exprx,expry,exprz);
+    }
+
+    std::cout << "Error in 'mathop' namespace: cannot hp-adapt a '" << tn << "' type field" << std::endl;
+    abort();
+}
+
 
 
 expression mathop::array1x1(expression term11)

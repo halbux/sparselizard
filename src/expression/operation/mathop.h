@@ -159,6 +159,9 @@ namespace mathop
 
     expression dof(expression input, int physreg = -1);
     expression tf(expression input, int physreg = -1);
+    
+    // Use a field without hp-synchronizing it:
+    expression nosync(std::shared_ptr<rawfield> rf);
 
 
 

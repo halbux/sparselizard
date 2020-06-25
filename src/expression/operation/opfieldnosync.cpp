@@ -2,33 +2,35 @@
 #include "myalgorithm.h"
 
 
-opfieldnosync::opfieldnosync(std::shared_ptr<rawfield> fieldin)
+opfieldnosync::opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin)
 {
-    std::string tn = fieldin->gettypename();
-    if (tn != "h1" && tn != "hcurl")
-    {
-        std::cout << "Error in 'opfieldnosync' object: cannot hp-adapt a '" << tn << "' type field" << std::endl;
-        abort();
-    }
-
+    myformfunctioncomponent = formfunctioncomponent;
     myfield = fieldin;
 }
 
-std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+void opfieldnosync::setothercomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps)
 {
-    // Get the value from the universe if available and reuse is enabled:
-    if (reuse && universe::isreuseallowed)
+    mycomponents = allcomps;
+    mycomponents[myformfunctioncomponent] = NULL;
+}
+
+std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+{   
+    // Get the value from the universe if available:
+    if (universe::isreuseallowed)
     {
         int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
-    
+
     bool wasreuseallowed = universe::isreuseallowed;
     // Because of the 'gethff' call in interpolate:
     universe::forbidreuse();
     
     // Forbid synchronization:
     myfield->allowsynchronizing(false);
+                
+    std::string fieldtypename = myfield->gettypename();
                 
     // All selected elements are of the same type:
     int numevalpts = evaluationcoordinates.size()/3;
@@ -128,8 +130,14 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     
     ///// Evaluate the field at all reference coordinate groups:
-    densematrix valmat(elemnums.size(), numevalpts);
-    double* valsptr = valmat.getvalues();
+    int numcomps = mycomponents.size();
+    std::vector<densematrix> valmats(numcomps);
+    std::vector<double*> valsptrs(numcomps);
+    for (int i = 0; i < numcomps; i++)
+    {
+        valmats[i] = densematrix(elemnums.size(), numevalpts);
+        valsptrs[i] = valmats[i].getvalues();
+    }
     
     std::shared_ptr<rawmesh> bkp = universe::mymesh;
     universe::mymesh = myrawmesh->getattarget(myptracker);
@@ -164,32 +172,34 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
             elementselector myselector(curdisjregs, elemens, isorientationdependent);
             do 
             {
-                densematrix interp = myfield->interpolate(0, formfunctioncomponent, myselector, kietaphi)[1][0];
+                std::vector<densematrix> interpoled(numcomps);
                 
-                if (myfield->gettypename() == "hcurl")
+                if (fieldtypename == "h1")
+                    interpoled[0] = myfield->interpolate(0, 0, myselector, kietaphi)[1][0];
+                
+                if (fieldtypename == "hcurl")
                 {
-                    expression expr;
-                    expression invjac = expr.invjac();
-                    
                     densematrix fx = myfield->interpolate(0, 0, myselector, kietaphi)[1][0];
                     densematrix fy = myfield->interpolate(0, 1, myselector, kietaphi)[1][0];
                     densematrix fz = myfield->interpolate(0, 2, myselector, kietaphi)[1][0];
-                    
-                    densematrix invjacx = invjac.getoperationinarray(0,0)->interpolate(myselector, kietaphi, NULL)[1][0];
-                    densematrix invjacy = invjac.getoperationinarray(0,1)->interpolate(myselector, kietaphi, NULL)[1][0];
-                    densematrix invjacz = invjac.getoperationinarray(0,2)->interpolate(myselector, kietaphi, NULL)[1][0];
-                    
-                    fx.multiplyelementwise(invjacx);
-                    fy.multiplyelementwise(invjacy);
-                    fz.multiplyelementwise(invjacz);
-                    
-                    interp = densematrix(interp.countrows(), interp.countcolumns(), 0.0);
-                    interp.add(fx);
-                    interp.add(fy);
-                    interp.add(fz);
+                 
+                    expression expr;
+                    expression invjac = expr.invjac();
+                    // To compute only once the jac:
+                    universe::allowreuse();
+                    for (int c = 0; c < numcomps; c++)
+                    {
+                        interpoled[c] = densematrix(myselector.countinselection(), kietaphi.size()/3, 0.0);
+                        interpoled[c].addproduct( invjac.getoperationinarray(c, 0)->interpolate(myselector, kietaphi, NULL)[1][0], fx );
+                        interpoled[c].addproduct( invjac.getoperationinarray(c, 1)->interpolate(myselector, kietaphi, NULL)[1][0], fy );
+                        interpoled[c].addproduct( invjac.getoperationinarray(c, 2)->interpolate(myselector, kietaphi, NULL)[1][0], fz );
+                    }
+                    universe::forbidreuse();
                 }
                 
-                double* interpvals = interp.getvalues();
+                std::vector<double*> interpvals(numcomps);
+                for (int c = 0; c < numcomps; c++)
+                    interpvals[c] = interpoled[c].getvalues();
                       
                 // Place the interpolated values at the right position in the output densematrix:
                 std::vector<int> originds = myselector.getoriginalindexes();
@@ -199,7 +209,8 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
                     for (int k = 0; k < numrefcoords; k++)
                     {
                         int pos = coordindexes[curorigelem*numrefcoords+k];
-                        valsptr[pos] = interpvals[j*numrefcoords+k];
+                        for (int c = 0; c < numcomps; c++)
+                            valsptrs[c][pos] = interpvals[c][j*numrefcoords+k];
                     }
                 }
             }
@@ -210,22 +221,23 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     myfield->allowsynchronizing(true);
     
-    std::vector<std::vector<densematrix>> out = {{}, {valmat}};
+    std::vector<std::vector<densematrix>> out = {{}, {valmats[myformfunctioncomponent]}};
     
     if (wasreuseallowed)
         universe::allowreuse();
     
-    if (reuse && universe::isreuseallowed)
+    if (universe::isreuseallowed)
+    {
         universe::setprecomputed(shared_from_this(), out);
+        // Also provide the value of the other components:
+        for (int c = 0; c < numcomps; c++)
+        {
+            if (mycomponents[c] != NULL)
+                universe::setprecomputed(mycomponents[c], {{}, {valmats[c]}});
+        }
+    }
     
     return out;
-}
-
-std::shared_ptr<operation> opfieldnosync::copy(void)
-{
-    std::shared_ptr<opfieldnosync> op(new opfieldnosync(myfield));
-    *op = *this;
-    return op;
 }
 
 void opfieldnosync::print(void)

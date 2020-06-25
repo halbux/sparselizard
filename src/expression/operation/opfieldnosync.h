@@ -14,24 +14,20 @@ class opfieldnosync: public operation
 
     private:
 
-        bool reuse = false;
-
-        int formfunctioncomponent = 0;
+        int myformfunctioncomponent = -1;
+        
+        std::vector<std::shared_ptr<opfieldnosync>> mycomponents = {NULL};
 
         // Cannnot be a 'x', 'y', 'z' or 'one' field:
         std::shared_ptr<rawfield> myfield;
 
     public:
 
-        opfieldnosync(std::shared_ptr<rawfield> fieldin);
-
-        void selectformfunctioncomponent(int comp) { formfunctioncomponent = comp; };
+        opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin);
+        // Provide the operations for all components after constructor:
+        void setothercomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps);
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-
-        std::shared_ptr<operation> copy(void);
-        
-        void reuseit(bool istobereused) { reuse = istobereused; };
         
         void print(void);
 
