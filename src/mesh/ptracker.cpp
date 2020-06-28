@@ -1,5 +1,4 @@
 #include "ptracker.h"
-#include "universe.h"
 
 
 ptracker::ptracker(std::vector<int> numelemspertype)
@@ -31,7 +30,7 @@ void ptracker::getrenumbering(std::shared_ptr<ptracker> mt, std::vector<std::vec
     for (int i = 0; i < 8; i++)
     {
         renumbering[i].resize(elementrenumbering[i].size());
-        if (mt != NULL && mt->elementrenumbering.size() != 0)
+        if (mt != NULL)
         {
             for (int j = 0; j < elementrenumbering[i].size(); j++)
                 renumbering[i][elementrenumbering[i][j]] = mt->elementrenumbering[i][j];
@@ -54,7 +53,7 @@ void ptracker::getindisjointregions(std::vector<std::vector<int>>& indisjregs)
     // Allocate the vectors:
     indisjregs.resize(8);
     for (int i = 0; i < 8; i++)
-        indisjregs[i] = std::vector<int>(universe::mymesh->getelements()->count(i), -1); // Corner nodes will have -1
+        indisjregs[i] = std::vector<int>(elementrenumbering[i].size(), -1); // Corner nodes will have -1
     
     int numdisjregs = mydisjointregions.count();
     for (int d = 0; d < numdisjregs; d++)

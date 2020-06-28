@@ -212,10 +212,6 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
 {
     if (myptracker == targetpt)
         return shared_from_this();
-        
-    std::shared_ptr<rawmesh> bkp = universe::mymesh;
-    // Needed in ptracker:
-    universe::mymesh = shared_from_this();
 
     std::shared_ptr<rawmesh> om(new rawmesh);
 
@@ -225,8 +221,6 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
     om->myelements = myelements.copy(&(om->mynodes), &(om->myphysicalregions), &(om->mydisjointregions));
 
     (om->myelements).toptracker(myptracker, targetpt);
-    
-    universe::mymesh = bkp;
     
     return om;
 }
