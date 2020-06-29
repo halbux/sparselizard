@@ -38,7 +38,6 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     // All selected elements are of the same type:
     int numevalpts = evaluationcoordinates.size()/3;
     int elemtype = elemselect.getelementtypenumber();
-    int elemdim = elemselect.getelementdimension();
     std::vector<int> elemnums = elemselect.getelementnumbers();
     
     int meshdim = universe::mymesh->getmeshdimension();
@@ -106,6 +105,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
             rc[i] = std::vector<double>(ad[i][ad[i].size()-1]);
         }
         
+        std::vector<int> origindex(elemnumshere.size()/2);
         for (int i = 0; i < elemnumshere.size()/2; i++)
         {
             int typ = elemnumshere[2*i+0];
@@ -116,6 +116,8 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
             rc[typ][pos+1] = evalcoordshere[3*i+1];
             rc[typ][pos+2] = evalcoordshere[3*i+2];
             
+            origindex[i] = pos/3;
+            
             index[typ][num] += 3;
         }
         
@@ -125,9 +127,19 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         // Find at target:
         (universe::mymesh->gethtracker())->getattarget(ad, rc, myrawmesh->gethtracker().get(), tel, trc);
         
-        // All element types have been placed in format type-number at position [elemtype]:
-        elemnumshere = tel[elemtype];
-        evalcoordshere = trc[elemtype];  
+        // Recombine:
+        for (int i = 0; i < elemnumshere.size()/2; i++)
+        {
+            int typ = elemnumshere[2*i+0];
+            int ind = origindex[i];
+            
+            elemnumshere[2*i+0] = tel[typ][2*ind+0];
+            elemnumshere[2*i+1] = tel[typ][2*ind+1];
+
+            evalcoordshere[3*i+0] = trc[typ][3*ind+0];
+            evalcoordshere[3*i+1] = trc[typ][3*ind+1];
+            evalcoordshere[3*i+2] = trc[typ][3*ind+2];
+        }   
     }
 
 
@@ -166,7 +178,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     for (int i = 0; i < 8; i++)
     {
         element myelem(i);
-        if (myelem.getelementdimension() != elemdim)
+        if (myelem.getelementdimension() != meshdim)
             continue;
         
         rcg.evalat(i);
