@@ -41,8 +41,19 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     int elemdim = elemselect.getelementdimension();
     std::vector<int> elemnums = elemselect.getelementnumbers();
     
+    int meshdim = universe::mymesh->getmeshdimension();
+    
     std::shared_ptr<rawmesh> myrawmesh = myfield->getrawmesh();
     std::shared_ptr<ptracker> myptracker = myfield->getptracker();
+    
+    
+    ///// Get the corresponding reference coordinates on the highest dimension elements:
+    
+    std::vector<int> elemnumshere;
+    std::vector<double> evalcoordshere;
+
+    std::vector<int> maxdimdisjregs = universe::mymesh->getdisjointregions()->getindim(meshdim);
+    universe::mymesh->getelements()->getrefcoordsondisjregs(elemtype, elemnums, evaluationcoordinates, maxdimdisjregs, elemnumshere, evalcoordshere);
     
     
     ///// Bring the evaluation points to the not p-adapted universe::mymesh.
@@ -54,52 +65,59 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         std::vector<std::vector<int>> renumberingthere;
         universe::mymesh->getptracker()->getrenumbering(NULL, renumberingthere);
 
-        for (int i = 0; i < elemnums.size(); i++)
-            elemnums[i] = renumberingthere[elemtype][elemnums[i]];
+        for (int i = 0; i < elemnumshere.size()/2; i++)
+            elemnumshere[2*i+1] = renumberingthere[elemnumshere[2*i+0]][elemnumshere[2*i+1]];
     }
-
+    
     
     ///// Bring the evaluation points to the mesh of this field.
     //
     // universe::mymesh ---- P ----> UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
-    std::vector<int> elemnumshere;
-    std::vector<double> evalcoordshere;
-    
     // In case there is no h-adaptivity:
-    if (universe::mymesh == myrawmesh)
+    if (universe::mymesh != myrawmesh)
     {
-        elemnumshere = std::vector<int>(2*elemnums.size()*numevalpts);
-        for (int i = 0; i < elemnums.size(); i++)
+        std::vector<std::vector<int>> cnt(8);
+        std::vector<std::vector<int>> index(8);
+        for (int i = 0; i < 8; i++)
         {
-            // Give same format as when coming out of 'getattarget':
-            for (int j = 0; j < numevalpts; j++)
-            {
-                elemnumshere[2*i*numevalpts+2*j+0] = elemtype;
-                elemnumshere[2*i*numevalpts+2*j+1] = elemnums[i];
-            }
+            element myelem(i);
+            if (myelem.getelementdimension() != meshdim)
+                continue;
+            cnt[i] = std::vector<int>(universe::mymesh->getelements()->count(i),0);
+            index[i] = std::vector<int>(universe::mymesh->getelements()->count(i),0);
         }
-        evalcoordshere = myalgorithm::duplicate(evaluationcoordinates, elemnums.size());
-    }
-    else
-    {
+            
+        for (int i = 0; i < elemnumshere.size()/2; i++)
+            cnt[elemnumshere[2*i+0]][elemnumshere[2*i+1]]++;
+    
         std::vector<std::vector<int>> ad(8, std::vector<int>(0));
         std::vector<std::vector<double>> rc(8, std::vector<double>(0));
         
-        int numelems = universe::mymesh->getelements()->count(elemtype);
-        std::vector<bool> iselem(numelems, false);
-        for (int i = 0; i < elemnums.size(); i++)
-            iselem[elemnums[i]] = true;
-        ad[elemtype] = std::vector<int>(numelems+1,0);
-        for (int i = 1; i < numelems+1; i++)
+        for (int i = 0; i < 8; i++)
         {
-            if (iselem[i-1])
-                ad[elemtype][i] = ad[elemtype][i-1] + evaluationcoordinates.size();
-            else
-                ad[elemtype][i] = ad[elemtype][i-1];
+            if (cnt[i].size() == 0)
+                continue;
+        
+            ad[i] = std::vector<int>(cnt[i].size()+1,0);
+            for (int j = 1; j < ad[i].size(); j++)
+                ad[i][j] = ad[i][j-1] + 3*cnt[i][j-1];
+                
+            rc[i] = std::vector<double>(ad[i][ad[i].size()-1]);
         }
         
-        rc[elemtype] = myalgorithm::duplicate(evaluationcoordinates, elemnums.size());
+        for (int i = 0; i < elemnumshere.size()/2; i++)
+        {
+            int typ = elemnumshere[2*i+0];
+            int num = elemnumshere[2*i+1];
+            int pos = ad[typ][num] + index[typ][num];
+            
+            rc[typ][pos+0] = evalcoordshere[3*i+0];
+            rc[typ][pos+1] = evalcoordshere[3*i+1];
+            rc[typ][pos+2] = evalcoordshere[3*i+2];
+            
+            index[typ][num] += 3;
+        }
         
         std::vector<std::vector<int>> tel;
         std::vector<std::vector<double>> trc;
@@ -109,10 +127,10 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         
         // All element types have been placed in format type-number at position [elemtype]:
         elemnumshere = tel[elemtype];
-        evalcoordshere = trc[elemtype];
+        evalcoordshere = trc[elemtype];  
     }
 
-    
+
     ///// Bring the evaluation points to the ptracker of this field.
     //
     // universe::mymesh ---- P ----> universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER

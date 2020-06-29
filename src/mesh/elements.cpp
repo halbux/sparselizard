@@ -286,6 +286,83 @@ std::vector<double> elements::getnodecoordinates(int elementtypenumber, int elem
     return nodecoords;
 }
 
+void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> targetdisjregs, std::vector<int>& targetelems, std::vector<double>& targetrefcoords)
+{
+    std::vector<int> renumtoelems(count(origintype), -1);
+    std::vector<bool> isprocessed(elems.size(), false);
+    for (int i = 0; i < elems.size(); i++)
+        renumtoelems[elems[i]] = i;
+
+    int numrc = refcoords.size()/3;
+    int numpoints = elems.size() * numrc;
+    element mysubelement(origintype);
+    int subnumnodes = mysubelement.countnodes();
+    std::vector<double> cornerrcs(3*subnumnodes);
+    
+    targetelems = std::vector<int>(2*numpoints);
+    targetrefcoords = std::vector<double>(3*numpoints);
+    
+    std::vector<double> nodeindexincurelem(count(0));
+
+    for (int i = 0; i < targetdisjregs.size(); i++)
+    {
+        int d = targetdisjregs[i];
+        int tn = mydisjointregions->getelementtypenumber(d);
+        int ne = mydisjointregions->countelements(d);
+        int rb = mydisjointregions->getrangebegin(d);
+        
+        element myelement(tn);
+        int numnodes = myelement.countnodes();
+        int numsubelems = myelement.counttype(origintype);
+        
+        lagrangeformfunction lff(tn, 1, {});
+        std::vector<double> rcs = lff.getnodecoordinates();
+        
+        // Loop on all candidate target elements:
+        for (int e = 0; e < ne; e++)
+        {
+            // Loop on all 'origintype' subelements in the target:
+            for (int s = 0; s < numsubelems; s++)
+            {
+                int cursubelem = getsubelement(origintype, tn, rb+e, s);
+                int origindex = renumtoelems[cursubelem];
+                
+                if (origindex != -1 && isprocessed[origindex] == false)
+                {
+                    isprocessed[origindex] = true;
+                    
+                    for (int n = 0; n < numnodes; n++)
+                    {
+                        int curnode = getsubelement(0, tn, rb+e, n);
+                        nodeindexincurelem[curnode] = n;
+                    }    
+        
+                    for (int n = 0; n < subnumnodes; n++)
+                    {
+                        int curnode = getsubelement(0, origintype, cursubelem, n);
+
+                        cornerrcs[3*n+0] = rcs[3*nodeindexincurelem[curnode]+0];
+                        cornerrcs[3*n+1] = rcs[3*nodeindexincurelem[curnode]+1];
+                        cornerrcs[3*n+2] = rcs[3*nodeindexincurelem[curnode]+2];
+                    }
+                        
+                    std::vector<double> rcsintarget = mysubelement.calculatecoordinates(refcoords, cornerrcs, 0, (origintype == 0));
+                    
+                    for (int r = 0; r < numrc; r++)
+                    {
+                        targetelems[2*origindex*numrc+2*r+0] = tn;
+                        targetelems[2*origindex*numrc+2*r+1] = rb+e;
+                        
+                        targetrefcoords[3*origindex*numrc+3*r+0] = rcsintarget[3*r+0];
+                        targetrefcoords[3*origindex*numrc+3*r+1] = rcsintarget[3*r+1];
+                        targetrefcoords[3*origindex*numrc+3*r+2] = rcsintarget[3*r+2];
+                    }
+                }
+            }
+        }
+    }
+}
+
 std::vector<double>* elements::getbarycenters(int elementtypenumber)
 {
     // If not yet populated for the element type:
