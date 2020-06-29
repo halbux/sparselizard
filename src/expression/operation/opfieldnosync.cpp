@@ -171,7 +171,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         
         rcg.evalat(i);
 
-        while (rcg.next()) //// SKIP ALL THIS IF ONLY P-ADAPTIVITY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        while (rcg.next())
         {
             std::vector<double> kietaphi = rcg.getreferencecoordinates();
             std::vector<int> coordindexes = rcg.getcoordinatenumber();
