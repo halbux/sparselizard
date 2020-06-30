@@ -302,7 +302,7 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
     targetelems = std::vector<int>(2*numpoints);
     targetrefcoords = std::vector<double>(3*numpoints);
     
-    std::vector<double> nodeindexincurelem(count(0));
+    std::vector<int> nodeindexincurelem(count(0));
 
     for (int i = 0; i < targetdisjregs.size(); i++)
     {
