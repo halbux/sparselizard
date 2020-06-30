@@ -260,7 +260,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     if (universe::isreuseallowed)
     {
         for (int c = 0; c < numcomps; c++)
-                universe::setprecomputed(mycomponents[c].lock(), {{}, {valmats[c]}});
+            universe::setprecomputed(mycomponents[c].lock(), {{}, {valmats[c]}});
     }
     
     return {{}, {valmats[mycomp]}};
