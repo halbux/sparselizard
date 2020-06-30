@@ -41,6 +41,14 @@ void mathop::printvector(std::vector<int> input)
     std::cout << std::endl;
 }
 
+void mathop::printvector(std::vector<bool> input)
+{
+    std::cout << "Vector size is " << input.size() << std::endl;
+    for (int i = 0; i < input.size(); i++)
+        std::cout << input[i] << " ";
+    std::cout << std::endl;
+}
+
 void mathop::writevector(std::string filename, std::vector<double> towrite, char delimiter, bool writesize)
 {
     if (towrite.size() == 0)

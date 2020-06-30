@@ -38,6 +38,7 @@ namespace mathop
 
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);
+    void printvector(std::vector<bool> input);
 
     void writevector(std::string filename, std::vector<double> towrite, char delimiter = ',', bool writesize = false);
     // Load a vector of doubles separated by a character:
