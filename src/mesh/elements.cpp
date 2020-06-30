@@ -321,6 +321,9 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
         // Loop on all candidate target elements:
         for (int e = 0; e < ne; e++)
         {
+            for (int n = 0; n < numnodes; n++)
+                nodeindexincurelem[getsubelement(0, tn, rb+e, n)] = n;
+        
             // Loop on all 'origintype' subelements in the target:
             for (int s = 0; s < numsubelems; s++)
             {
@@ -330,12 +333,6 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
                 if (origindex != -1 && isprocessed[origindex] == false)
                 {
                     isprocessed[origindex] = true;
-                    
-                    for (int n = 0; n < numnodes; n++)
-                    {
-                        int curnode = getsubelement(0, tn, rb+e, n);
-                        nodeindexincurelem[curnode] = n;
-                    }    
         
                     for (int n = 0; n < subnumnodes; n++)
                     {
