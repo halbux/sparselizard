@@ -299,7 +299,7 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
     int subnumnodes = mysubelement.countnodes();
     std::vector<double> cornerrcs(3*subnumnodes);
     
-    targetelems = std::vector<int>(2*numpoints);
+    targetelems = std::vector<int>(2*numpoints, -1);
     targetrefcoords = std::vector<double>(3*numpoints);
     
     std::vector<int> nodeindexincurelem(count(0));
