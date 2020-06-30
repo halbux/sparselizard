@@ -131,7 +131,7 @@ class elements
         
         // Get the elements in format {type0,elemnum0,type1,...} and reference coordinates at the target disjoint regions.
         // All elements have same reference coordinates at the origin. One reference coordinate per element at target.
-        // All target disjoint regions must have elements of same dimensions.
+        // All target disjoint regions must have elements of same dimension.
         void getrefcoordsondisjregs(int origintype, std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> targetdisjregs, std::vector<int>& targetelems, std::vector<double>& targetrefcoords);
         
         // Get a pointer to the barycenters[elementtypenumber] vector.
