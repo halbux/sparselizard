@@ -134,7 +134,7 @@ namespace myalgorithm
     void reorder(std::vector<int>& inad, std::vector<double>& indat, std::vector<int>& renumbering, std::vector<int>& outad, std::vector<double>& outdat);
     
     // 'elems' has format {elemtype0,elemnum0,elemtype1,...}. 'totalnumelems[i]' gives the number of elements of type i in the mesh.
-    // For the ith point in 'elems' the vector origindex[i]' gives the index/3 in 'rcs[element type at ith point in elems]'. 
+    // For the ith point in 'elems' the vector indexinrcsoforigin[i]' gives the index/3 in 'rcs[element type at ith point in elems]'. 
     void toaddressdata(std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> totalnumelems, std::vector<std::vector<int>>& ads, std::vector<std::vector<double>>& rcs, std::vector<int>& indexinrcsoforigin);
     
 };
