@@ -987,6 +987,7 @@ void rawmesh::adaptp(void)
     myelements.reorderbydisjointregions(renumvec);
     
     myptracker->updaterenumbering(renumvec);
+    myhtracker->renumbertransitions(renumvec);
 
     myelements.definedisjointregionsranges();
     

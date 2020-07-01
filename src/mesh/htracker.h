@@ -12,16 +12,19 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
 #include "element.h"
 #include "elements.h"
+#include "nodes.h"
 
 class htracker
 {
 
     private:
     
-        // Original elements on which this tracker is based:
-        elements* myoriginalelements = NULL;
+        // Original nodes and elements on which this tracker is based:
+        std::shared_ptr<nodes> myoriginalnodes = NULL;
+        std::shared_ptr<elements> myoriginalelements = NULL;
     
         // Store in compressed format all split info needed:
         // 

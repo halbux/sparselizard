@@ -5,8 +5,11 @@
 
 htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> numelemspertype)
 {
-    myoriginalelements = origelems;
-    
+    myoriginalnodes = std::shared_ptr<nodes>(new nodes);
+    *myoriginalnodes = *(origelems->getnodes());
+    myoriginalelements = std::shared_ptr<elements>(new elements);
+    *myoriginalelements = origelems->copy(myoriginalnodes.get(), NULL, NULL);
+
     originalcurvatureorder = curvatureorder;
     originalcount = numelemspertype;
     
