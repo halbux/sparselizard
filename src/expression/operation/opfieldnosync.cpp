@@ -57,7 +57,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     ///// Bring the evaluation points to the not p-adapted universe::mymesh.
     //
-    // UNIVERSE::MYMESH ---- P ----> UNIVERSE::MYMESH ---- h ----> myrawmesh ---- p ----> myptracker
+    // UNIVERSE::MYMESH ---- p ----> UNIVERSE::MYMESH ---- h ----> myrawmesh ---- p ----> myptracker
     
     if (universe::mymesh != myrawmesh) 
     {
@@ -71,7 +71,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     ///// Bring the evaluation points to the mesh of this field.
     //
-    // universe::mymesh ---- P ----> UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
+    // universe::mymesh ---- p ----> UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
     if (universe::mymesh != myrawmesh)
     {
@@ -103,7 +103,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
 
     ///// Bring the evaluation points to the ptracker of this field.
     //
-    // universe::mymesh ---- P ----> universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
+    // universe::mymesh ---- p ----> universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
     
     if (myrawmesh->getptracker() != myptracker)
     {
