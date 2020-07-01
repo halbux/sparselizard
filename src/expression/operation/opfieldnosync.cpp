@@ -73,7 +73,6 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     //
     // universe::mymesh ---- P ----> UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
-    // In case there is no h-adaptivity:
     if (universe::mymesh != myrawmesh)
     {
         std::vector<std::vector<int>> cnt(8);
