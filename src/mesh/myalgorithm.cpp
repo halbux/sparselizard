@@ -923,3 +923,62 @@ void myalgorithm::reorder(std::vector<int>& inad, std::vector<double>& indat, st
     }
 }
 
+void myalgorithm::toaddressdata(std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> totalnumelems, std::vector<std::vector<int>>& ads, std::vector<std::vector<double>>& rcs, std::vector<int>& indexinrcsoforigin)
+{
+    int ne = elems.size()/2;
+
+    std::vector<int> countintype(8,0);
+    std::vector<std::vector<int>> cnt(8);
+    for (int i = 0; i < 8; i++)
+        cnt[i] = std::vector<int>(totalnumelems[i],0);
+        
+    for (int i = 0; i < ne; i++)
+    {
+        int typ = elems[2*i+0];
+        int num = elems[2*i+1];
+        
+        countintype[typ]++;
+        cnt[typ][num]++;
+    }
+    
+    // Remove empty types:
+    std::vector<std::vector<int>> index(8);
+    for (int i = 0; i < 8; i++)
+    {
+        if (countintype[i] == 0)
+            cnt[i] = {};
+        index[i] = std::vector<int>(cnt[i].size(),0);
+    }
+    
+    ads = std::vector<std::vector<int>>(8, std::vector<int>(0));
+    rcs = std::vector<std::vector<double>>(8, std::vector<double>(0));
+    
+    for (int i = 0; i < 8; i++)
+    {
+        if (cnt[i].size() == 0)
+            continue;
+    
+        ads[i] = std::vector<int>(cnt[i].size()+1,0);
+        for (int j = 1; j < ads[i].size(); j++)
+            ads[i][j] = ads[i][j-1] + 3*cnt[i][j-1];
+            
+        rcs[i] = std::vector<double>(3*countintype[i]);
+    }
+    
+    indexinrcsoforigin = std::vector<int>(ne);
+    for (int i = 0; i < ne; i++)
+    {
+        int typ = elems[2*i+0];
+        int num = elems[2*i+1];
+        int pos = ads[typ][num] + index[typ][num];
+        
+        rcs[typ][pos+0] = refcoords[3*i+0];
+        rcs[typ][pos+1] = refcoords[3*i+1];
+        rcs[typ][pos+2] = refcoords[3*i+2];
+        
+        indexinrcsoforigin[i] = pos/3;
+        
+        index[typ][num] += 3;
+    }
+}
+

@@ -75,62 +75,21 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     if (universe::mymesh != myrawmesh)
     {
-        std::vector<std::vector<int>> cnt(8);
-        std::vector<std::vector<int>> index(8);
-        for (int i = 0; i < 8; i++)
-        {
-            element myelem(i);
-            if (myelem.getelementdimension() != meshdim)
-                continue;
-            cnt[i] = std::vector<int>(universe::mymesh->getelements()->count(i),0);
-            index[i] = std::vector<int>(universe::mymesh->getelements()->count(i),0);
-        }
-            
-        for (int i = 0; i < elemnumshere.size()/2; i++)
-            cnt[elemnumshere[2*i+0]][elemnumshere[2*i+1]]++;
-    
-        std::vector<std::vector<int>> ad(8, std::vector<int>(0));
-        std::vector<std::vector<double>> rc(8, std::vector<double>(0));
-        
-        for (int i = 0; i < 8; i++)
-        {
-            if (cnt[i].size() == 0)
-                continue;
-        
-            ad[i] = std::vector<int>(cnt[i].size()+1,0);
-            for (int j = 1; j < ad[i].size(); j++)
-                ad[i][j] = ad[i][j-1] + 3*cnt[i][j-1];
-                
-            rc[i] = std::vector<double>(ad[i][ad[i].size()-1]);
-        }
-        
-        std::vector<int> origindex(elemnumshere.size()/2);
-        for (int i = 0; i < elemnumshere.size()/2; i++)
-        {
-            int typ = elemnumshere[2*i+0];
-            int num = elemnumshere[2*i+1];
-            int pos = ad[typ][num] + index[typ][num];
-            
-            rc[typ][pos+0] = evalcoordshere[3*i+0];
-            rc[typ][pos+1] = evalcoordshere[3*i+1];
-            rc[typ][pos+2] = evalcoordshere[3*i+2];
-            
-            origindex[i] = pos/3;
-            
-            index[typ][num] += 3;
-        }
-        
-        std::vector<std::vector<int>> tel;
-        std::vector<std::vector<double>> trc;
+        std::vector<std::vector<int>> ads;
+        std::vector<std::vector<double>> rcs;
+        std::vector<int> indexinrcsoforigin;
+        myalgorithm::toaddressdata(elemnumshere, evalcoordshere, universe::mymesh->getelements()->count(), ads, rcs, indexinrcsoforigin);
         
         // Find at target:
-        (universe::mymesh->gethtracker())->getattarget(ad, rc, myrawmesh->gethtracker().get(), tel, trc);
+        std::vector<std::vector<int>> tel;
+        std::vector<std::vector<double>> trc;
+        (universe::mymesh->gethtracker())->getattarget(ads, rcs, myrawmesh->gethtracker().get(), tel, trc);
         
         // Recombine:
         for (int i = 0; i < elemnumshere.size()/2; i++)
         {
             int typ = elemnumshere[2*i+0];
-            int ind = origindex[i];
+            int ind = indexinrcsoforigin[i];
             
             elemnumshere[2*i+0] = tel[typ][2*ind+0];
             elemnumshere[2*i+1] = tel[typ][2*ind+1];
