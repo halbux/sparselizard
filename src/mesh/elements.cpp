@@ -9,6 +9,10 @@ elements::elements(nodes& inputnodes, physicalregions& inputphysicalregions, dis
     mydisjointregions = &inputdisjointregions;
 }
 
+nodes* elements::getnodes(void) {return mynodes;}
+physicalregions* elements::getphysicalregions(void) {return myphysicalregions;}
+disjointregions* elements::getdisjointregions(void) {return mydisjointregions;}
+
 int elements::add(int elementtypenumber, int curvatureorder, std::vector<int>& nodelist)
 {
     // Point elements have a number equal to the node defining them

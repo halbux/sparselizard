@@ -91,6 +91,10 @@ class elements
         elements(void) {};
         elements(nodes&, physicalregions&, disjointregions&);
         
+        nodes* getnodes(void);
+        physicalregions* getphysicalregions(void);
+        disjointregions* getdisjointregions(void);
+        
         // Add an element defined by its element type number, curvature order and 
         // curved nodes. Return the created element number. Only 'pointsinelements' 
         // is changed. 'elementtypenumber' is the UNCURVED element type number.
