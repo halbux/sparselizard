@@ -55,23 +55,9 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     universe::mymesh->getelements()->getrefcoordsondisjregs(elemtype, elemnums, evaluationcoordinates, maxdimdisjregs, elemnumshere, evalcoordshere);
     
     
-    ///// Bring the evaluation points to the not p-adapted universe::mymesh.
-    //
-    // UNIVERSE::MYMESH ---- p ----> UNIVERSE::MYMESH ---- h ----> myrawmesh ---- p ----> myptracker
-    
-    if (universe::mymesh != myrawmesh) 
-    {
-        std::vector<std::vector<int>> renumberingthere;
-        universe::mymesh->getptracker()->getrenumbering(NULL, renumberingthere);
-
-        for (int i = 0; i < elemnumshere.size()/2; i++)
-            elemnumshere[2*i+1] = renumberingthere[elemnumshere[2*i+0]][elemnumshere[2*i+1]];
-    }
-    
-    
     ///// Bring the evaluation points to the mesh of this field.
     //
-    // universe::mymesh ---- p ----> UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
+    // UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
     if (universe::mymesh != myrawmesh)
     {
@@ -103,7 +89,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
 
     ///// Bring the evaluation points to the ptracker of this field.
     //
-    // universe::mymesh ---- p ----> universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
+    // universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
     
     if (myrawmesh->getptracker() != myptracker)
     {
