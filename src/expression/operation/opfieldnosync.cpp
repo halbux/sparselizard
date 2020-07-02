@@ -125,6 +125,17 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         element myelem(i);
         if (myelem.getelementdimension() != meshdim)
             continue;
+    
+        std::vector<int> curdisjregs = myptracker->getdisjointregions()->getintype(i);
+
+        // Check if the field is orientation dependent:
+        bool isorientationdependent = false;
+        for (int j = 0; j < curdisjregs.size(); j++)
+        {
+            std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(j, myfield->gettypename());
+            if ( myformfunction->isorientationdependent(myfield->getinterpolationorder(curdisjregs[j])) )
+                isorientationdependent = true;
+        }
         
         rcg.evalat(i);
 
@@ -134,17 +145,6 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
             std::vector<int> coordindexes = rcg.getcoordinatenumber();
             std::vector<int> elemens = rcg.getelements();
             int numrefcoords = kietaphi.size()/3;
-            
-            std::vector<int> curdisjregs = myptracker->getdisjointregions()->getintype(i);
-
-            // Check if the field is orientation dependent:
-            bool isorientationdependent = false;
-            for (int j = 0; j < curdisjregs.size(); j++)
-            {
-                std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(j, myfield->gettypename());
-                if ( myformfunction->isorientationdependent(myfield->getinterpolationorder(curdisjregs[j])) )
-                    isorientationdependent = true;
-            }
 
             // Loop on all total orientations (if required):
             elementselector myselector(curdisjregs, elemens, isorientationdependent);
