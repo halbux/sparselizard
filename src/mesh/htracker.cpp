@@ -832,7 +832,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             rc[i] = std::vector<double>(orc.size());
         }
     }    
-    maporctorc = std::vector<int>(2*orc.size()/3);
+    maporctorc = std::vector<int>(2*orc.size()/3, -1);
     
     // Indexes of the 'orc' points that are in the current tree position:
     std::vector<std::vector<int>> actives(maxdepth+1, std::vector<int>(0));
@@ -880,7 +880,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             
             // Redirect the reference coordinates to the current element if inside it:
             std::vector<bool> isinside;
-            myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-12);
+            myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-10);
             
             myalgorithm::splitvector(par, isinside, actives[ns-1], actives[ns]);
         }
@@ -912,7 +912,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     }
                     
                     std::vector<bool> isintrans;
-                    myelems[i].isinsideelement(activecoords, currefcoords, isintrans, 1e-12);
+                    myelems[i].isinsideelement(activecoords, currefcoords, isintrans, 1e-10);
                     // Actives in the current transition element:
                     std::vector<int> activesintrans;
                     myalgorithm::splitvector(activesinleaf, isintrans, actives[ns], activesintrans);
@@ -966,6 +966,17 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     {
         if (ad[i].size() > 0)
             rc[i].resize(ad[i][ad[i].size()-1]);
+    }
+    
+    // Sanity check:
+    for (int i = 0; i < maporctorc.size(); i++)
+    {
+        if (maporctorc[i] < 0)
+        {
+            std::cout << "Error in 'htracker' object: mapping failed for at least one point" << std::endl;
+            std::cout << "A possible cause is that some gauss points are outside of the reference element (try reducing the integration order)" << std::endl;
+            abort();
+        }
     }
 }
 
