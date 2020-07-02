@@ -974,7 +974,6 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
         if (maporctorc[i] < 0)
         {
             std::cout << "Error in 'htracker' object: mapping failed for at least one point" << std::endl;
-            std::cout << "A possible cause is that some gauss points are outside of the reference element (try reducing the integration order)" << std::endl;
             abort();
         }
     }
