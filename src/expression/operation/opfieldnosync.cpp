@@ -167,7 +167,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
                     universe::allowreuse();
                     for (int c = 0; c < numcomps; c++)
                     {
-                        interpoled[c] = densematrix(myselector.countinselection(), kietaphi.size()/3, 0.0);
+                        interpoled[c] = densematrix(myselector.countinselection(), numrefcoords, 0.0);
                         interpoled[c].addproduct( invjac.getoperationinarray(c, 0)->interpolate(myselector, kietaphi, NULL)[1][0], fx );
                         interpoled[c].addproduct( invjac.getoperationinarray(c, 1)->interpolate(myselector, kietaphi, NULL)[1][0], fy );
                         interpoled[c].addproduct( invjac.getoperationinarray(c, 2)->interpolate(myselector, kietaphi, NULL)[1][0], fz );
