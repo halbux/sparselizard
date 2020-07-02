@@ -107,6 +107,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     
     
     ///// Evaluate the field at all reference coordinate groups:
+    
     int numcomps = mycomponents.size();
     std::vector<densematrix> valmats(numcomps);
     std::vector<double*> valsptrs(numcomps);
