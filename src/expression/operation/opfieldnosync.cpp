@@ -130,9 +130,9 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
 
         // Check if the field is orientation dependent:
         bool isorientationdependent = false;
+        std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(i, fieldtypename);
         for (int j = 0; j < curdisjregs.size(); j++)
         {
-            std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(i, fieldtypename);
             if ( myformfunction->isorientationdependent(myfield->getinterpolationorder(curdisjregs[j])) )
                 isorientationdependent = true;
         }
