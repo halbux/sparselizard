@@ -29,9 +29,6 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     bool wasreuseallowed = universe::isreuseallowed;
     // Because of the 'gethff' call in interpolate:
     universe::forbidreuse();
-    
-    // Forbid synchronization:
-    myfield->allowsynchronizing(false);
                 
     std::string fieldtypename = myfield->gettypename();
                 
@@ -196,8 +193,6 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
         }
     }
     universe::mymesh = bkp;
-    
-    myfield->allowsynchronizing(true);
     
     if (wasreuseallowed)
         universe::allowreuse();

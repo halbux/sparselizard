@@ -872,16 +872,12 @@ expression mathop::tf(expression input, int physreg) { return input.tf(physreg);
 
 expression mathop::nosync(std::shared_ptr<rawfield> rf)
 {
-    // Forbid synchronization:
-    rf->allowsynchronizing(false);
-    
     std::string tn = rf->gettypename();
     
     if (tn == "h1")
     {
         std::shared_ptr<opfieldnosync> opx( new opfieldnosync(0, rf));
         opx->setcomponents({opx});
-        rf->allowsynchronizing(true);
         return expression(opx);
     }
     if (tn == "hcurl")
@@ -898,7 +894,6 @@ expression mathop::nosync(std::shared_ptr<rawfield> rf)
         expression expry(opy);
         expression exprz(opz);
         
-        rf->allowsynchronizing(true);
         return array3x1(exprx,expry,exprz);
     }
 
