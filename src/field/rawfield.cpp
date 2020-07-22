@@ -26,7 +26,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     
     // Get a copy of this field before syncing:
     std::shared_ptr<rawfield> originalthis(new rawfield);
-    *originalthis = *this;
+//    *originalthis = *this;
     
     // Backup the current coefmanager:
     std::shared_ptr<coefmanager> myoldcoefmanager = mycoefmanager;
