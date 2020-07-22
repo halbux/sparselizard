@@ -113,6 +113,8 @@ class elements
         
         // Return the number of elements of a given type:
         int count(int elementtypenumber);
+        // Return the number of elements of a given dimension:
+        int countindim(int dim);
         // Count in each type:
         std::vector<int> count(void);
         // Return the curvature order:
