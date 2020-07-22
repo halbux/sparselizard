@@ -108,6 +108,8 @@ void universe::setprecomputedfft(std::shared_ptr<operation> op, densematrix val)
 }
         
 bool universe::skipgausspointweightproduct = false;
+bool universe::skipdetjacproduct = false;
+int universe::forcedintegrationorder = -1;
 
 bool universe::keeptrackofrhsassembly = false;
 std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 

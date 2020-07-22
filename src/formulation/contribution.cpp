@@ -68,6 +68,8 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         // Compute the integration order, set it to zero if negative.
         // Adding an extra +2 generally gives a good integration in practice.
         int integrationorder = dofinterpolationorder + tfinterpolationorder + 2 + integrationorderdelta;
+        if (universe::forcedintegrationorder >= 0)
+            integrationorder = universe::forcedintegrationorder;
         if (integrationorder < 0)
         {
             std::cout << "Error in 'contribution' object: trying to integrate at negative order " << integrationorder << std::endl;
@@ -176,7 +178,8 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                 {
                     if (currentcoeff[h].size() > 0)
                     {
-                        currentcoeff[h][0].multiplyelementwise(detjac);
+                        if (universe::skipdetjacproduct == false)
+                            currentcoeff[h][0].multiplyelementwise(detjac);
                         currentcoeff[h][0].transpose();
                         
                         if (isdofinterpolate)
