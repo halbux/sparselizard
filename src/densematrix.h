@@ -16,6 +16,7 @@
 #include <cmath>
 #include "cblas.h"
 #include <memory>
+#include "intdensematrix.h"
 
 class densematrix
 {   
@@ -158,6 +159,9 @@ class densematrix
         // Extract the rows/columns in a given range:
         densematrix extractrows(long long int rangebegin, long long int rangeend);
         densematrix extractcols(long long int rangebegin, long long int rangeend);
+        
+        // Multiply this block diagonal matrix (column major) by a vector:
+        densematrix blockdiagonaltimesvector(intdensematrix blocklens, densematrix v);
 
 };
 
