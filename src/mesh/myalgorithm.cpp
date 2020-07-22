@@ -982,3 +982,24 @@ void myalgorithm::toaddressdata(std::vector<int>& elems, std::vector<double>& re
     }
 }
 
+std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
+{
+    // Get the total size:
+    int len = 0;
+    for (int i = 0; i < tocat.size(); i++)
+        len += tocat[i].size();
+        
+    std::vector<int> output(len);
+    int index = 0;
+    for (int i = 0; i < tocat.size(); i++)
+    {
+        for (int j = 0; j < tocat[i].size(); j++)
+        {
+            output[index] = tocat[i][j];
+            index++;
+        }
+    }
+    
+    return output;
+}
+

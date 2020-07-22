@@ -137,6 +137,9 @@ namespace myalgorithm
     // For the ith point in 'elems' the vector indexinrcsoforigin[i]' gives the index/3 in 'rcs[element type at ith point in elems]'. 
     void toaddressdata(std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> totalnumelems, std::vector<std::vector<int>>& ads, std::vector<std::vector<double>>& rcs, std::vector<int>& indexinrcsoforigin);
     
+    // Concatenate vectors:
+    std::vector<int> concatenate(std::vector<std::vector<int>> tocat);
+    
 };
 
 #endif
