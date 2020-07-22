@@ -127,6 +127,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // If provided, 'physregsfororder' must be {physreg1,orderpr1,physreg2,orderpr2,...} with ORDERS SORTED ASCENDINGLY.
         void synchronize(std::vector<int> physregsfororder = {});
         
+        void updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool withtiming = false);
+        void updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis);
+        void updateothershapefunctions(std::shared_ptr<rawfield> originalthis, int dim);
+        
         void allowsynchronizing(bool allowit) { issynchronizingallowed = allowit; };
         
         bool isptrigger(void);

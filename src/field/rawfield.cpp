@@ -24,6 +24,9 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         return;
     issynchronizing = true; 
     
+    // Get a copy of this field before syncing:
+    std::shared_ptr<rawfield> originalthis(new rawfield);
+    *originalthis = *this;
     
     // Backup the current coefmanager:
     std::shared_ptr<coefmanager> myoldcoefmanager = mycoefmanager;
@@ -60,7 +63,8 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     for (int i = 0; i < mygaugetracker.size(); i++)
         setgauge(mygaugetracker[i]);
         
-    // Update the coef manager:
+    // Update the coef manager with the new nodal/edge/face/volume shape function coefficients:
+//    updateshapefunctions(originalthis, true);
     
     // We need to know in which disjoint region every old element number was:
     std::vector<std::vector<int>> inolddisjregs;
@@ -105,6 +109,147 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     // Update the mesh tracker to the current one:
     myptracker = universe::mymesh->getptracker();
     issynchronizing = false;
+}
+
+void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool withtiming)
+{
+    wallclock clkn;
+    updatenodalshapefunctions(originalthis);
+    if (withtiming)
+        clkn.print("Time to update the nodal shape functions:");
+    wallclock clke;
+    updateothershapefunctions(originalthis,1);
+    if (withtiming)
+        clke.print("Time to update the edge shape functions:");
+    wallclock clkf;
+    updateothershapefunctions(originalthis,2);
+    if (withtiming)
+        clkf.print("Time to update the face shape functions:");
+    wallclock clkv;
+    updateothershapefunctions(originalthis,3);
+    if (withtiming)
+    {
+        clkv.print("Time to update the volume shape functions:");
+        clkn.print("Total time:");
+    }
+}
+
+void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
+{
+    field thisfield = field(shared_from_this());
+    
+    if (gettypename() != "h1")
+        return;
+        
+    // Create a temporary physical region that is the union of all disjoint regions in the current dimension:
+    std::vector<int> alldrsindim = universe::mymesh->getdisjointregions()->getindim(0);
+    int physreg = universe::mymesh->getphysicalregions()->createfromdisjointregionlist(alldrsindim);
+    
+    universe::skipgausspointweightproduct = true;
+    universe::skipdetjacproduct = true;
+    universe::forcedintegrationorder = 0;
+
+    formulation evalatnodes;
+    evalatnodes += mathop::integral(physreg, -mathop::nosync(originalthis) * mathop::tf(thisfield) );
+    evalatnodes.generaterhs();
+    vec vals = evalatnodes.rhs();
+    
+    universe::skipgausspointweightproduct = false;
+    universe::skipdetjacproduct = false;
+    universe::forcedintegrationorder = -1;
+    
+    setdata(physreg, vals|thisfield);
+    universe::mymesh->getphysicalregions()->remove({physreg}, false);
+}
+
+void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis, int dim) // dim can be 1, 2 or 3
+{
+    int meshdim = universe::mymesh->getmeshdimension();
+    if (dim > meshdim)
+        return;
+
+    std::string tn = gettypename();
+    field thisfield = field(shared_from_this());
+    
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    physicalregions* prs = universe::mymesh->getphysicalregions();
+    
+    // Create temporary physical regions and more:
+    int physreg = prs->createfromdisjointregionlist(drs->getindim(dim));
+    int dirichletphysreg;
+    if (dim == 1)
+        dirichletphysreg = prs->createfromdisjointregionlist(drs->getindim(0));
+    if (dim == 2)
+        dirichletphysreg = prs->createfromdisjointregionlist(myalgorithm::concatenate({drs->getindim(0),drs->getindim(1)}));
+    if (dim == 3)
+        dirichletphysreg = prs->createfromdisjointregionlist(myalgorithm::concatenate({drs->getindim(0),drs->getindim(1),drs->getindim(2)}));
+    
+    // The Dirichlet constraints (if any) are added to the rhs of the projection.
+    //
+    // | A   B |  | x |   | v |
+    // |       |  |   | = |   |
+    // | 0   1 |  | y |   | w |
+
+    // Create the formulation to get block A and v:
+    formulation blockAv;
+    // A and V blocks of the projection:
+    blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield) );
+    // Get blocks A and v:
+    blockAv.generate();
+    mat A = blockAv.A();
+    vec v = blockAv.rhs();
+    
+    if (dim > 1 || tn == "h1")
+    {
+        // Create the formulation to get block B and w:
+        formulation blockB;
+        // To get the structure right:
+        blockB += mathop::integral(dirichletphysreg, 0 * mathop::dof(thisfield) * mathop::tf(thisfield));
+        // B block of the projection:
+        blockB += mathop::integral(physreg, mathop::dof(thisfield, dirichletphysreg) * mathop::tf(thisfield) );
+        // Get block B:
+        blockB.generatestiffnessmatrix();
+        mat B = blockB.A();
+        vec w = vec(blockB);
+        (w|thisfield).setdata(dirichletphysreg, thisfield);
+        
+        // System to solve is Ax = v - By:
+        vec By = -B*w;
+        thisfield.setdata(physreg, By);
+        v.setdata(physreg, thisfield, "add");  
+    }
+    
+    int numelemsindim = universe::mymesh->getelements()->countindim(dim);
+    std::vector<int> alldrsindim = drs->getindim(dim);
+    
+    intdensematrix blocksizes(numelemsindim,1);
+    int* bsvals = blocksizes.getvalues();
+    int index = 0;
+    int preallocsize = 0;
+    for (int d = 0; d < alldrsindim.size(); d++)
+    {
+        int curder = alldrsindim[d];
+        int numedgesinder = drs->countelements(curder);
+        int numffinder = blockAv.getdofmanager()->countformfunctions(curder);
+        for (int i = 0; i < numedgesinder; i++)
+            bsvals[index+i] = numffinder;
+        index += numedgesinder;
+        preallocsize += numedgesinder * numffinder*numffinder;
+    }
+
+    densematrix blockvals(preallocsize, 1);
+    MatInvertVariableBlockDiagonal(A.getpetsc(), numelemsindim, bsvals, blockvals.getvalues());
+
+    // Solve block-diagonal system:
+    intdensematrix alladds(v.size(),1, 0,1);
+    densematrix vmat = v.getvalues(alladds);
+    densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
+
+    v.setvalues(alladds, prod);
+
+    setdata(physreg, v|thisfield);
+    universe::mymesh->getphysicalregions()->remove({dirichletphysreg}, false);
+    universe::mymesh->getphysicalregions()->remove({physreg}, false);
 }
 
 bool rawfield::isptrigger(void)
