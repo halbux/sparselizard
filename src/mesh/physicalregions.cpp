@@ -66,6 +66,16 @@ int physicalregions::createunionofall(void)
     return createunion(tounite);
 }
 
+int physicalregions::createfromdisjointregionlist(std::vector<int> drs)
+{
+    int newphysregnum = getmaxphysicalregionnumber() + 1;
+    
+    physicalregion* newphysreg = get(newphysregnum);
+    newphysreg->setdisjointregions(drs);
+    
+    return newphysregnum;
+}
+
 int physicalregions::getmaxphysicalregionnumber(void)
 {
     return *std::max_element(myphysicalregionnumbers.begin(), myphysicalregionnumbers.end());

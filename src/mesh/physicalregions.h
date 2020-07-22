@@ -36,6 +36,9 @@ class physicalregions
         int createintersection(const std::vector<int> input);
         int createunionofall(void);
         
+        // Create a physical region from a list of disjoint regions of same dimension:
+        int createfromdisjointregionlist(std::vector<int> drs);
+        
         int getmaxphysicalregionnumber(void);
         
         // 'get' creates any non-existent physical region object:
