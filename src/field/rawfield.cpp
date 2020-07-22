@@ -236,18 +236,20 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         index += numedgesinder;
         preallocsize += numedgesinder * numffinder*numffinder;
     }
+    if (preallocsize > 0)
+    {
+        densematrix blockvals(preallocsize, 1);
+        MatInvertVariableBlockDiagonal(A.getpetsc(), numelemsindim, bsvals, blockvals.getvalues());
 
-    densematrix blockvals(preallocsize, 1);
-    MatInvertVariableBlockDiagonal(A.getpetsc(), numelemsindim, bsvals, blockvals.getvalues());
+        // Solve block-diagonal system:
+        intdensematrix alladds(v.size(),1, 0,1);
+        densematrix vmat = v.getvalues(alladds);
+        densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
 
-    // Solve block-diagonal system:
-    intdensematrix alladds(v.size(),1, 0,1);
-    densematrix vmat = v.getvalues(alladds);
-    densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
+        v.setvalues(alladds, prod);
 
-    v.setvalues(alladds, prod);
-
-    setdata(physreg, v|thisfield);
+        setdata(physreg, v|thisfield);
+    }
     universe::mymesh->getphysicalregions()->remove({dirichletphysreg}, false);
     universe::mymesh->getphysicalregions()->remove({physreg}, false);
 }
