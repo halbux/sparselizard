@@ -215,6 +215,8 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         index += numelemsindr;
         preallocsize += numelemsindr * numffindr*numffindr;
     }
+    blocksizes = blocksizes.removevalue(0);
+    bsvals = blocksizes.getvalues();
     
     if (preallocsize > 0)
     {
@@ -244,7 +246,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         }
     
         densematrix blockvals(preallocsize, 1);
-        MatInvertVariableBlockDiagonal(A.getpetsc(), numelemsindim, bsvals, blockvals.getvalues());
+        MatInvertVariableBlockDiagonal(A.getpetsc(), blocksizes.count(), bsvals, blockvals.getvalues());
 
         // Solve block-diagonal system:
         intdensematrix alladds(v.size(),1, 0,1);
