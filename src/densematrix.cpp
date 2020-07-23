@@ -720,7 +720,7 @@ densematrix densematrix::extractcols(long long int rangebegin, long long int ran
 
 densematrix densematrix::blockdiagonaltimesvector(intdensematrix blocklens, densematrix v)
 {
-    int nb = blocklens.count();
+    long long int nb = blocklens.count();
     
     int* blvals = blocklens.getvalues();
     double* bdvals = getvalues();
@@ -730,17 +730,17 @@ densematrix densematrix::blockdiagonaltimesvector(intdensematrix blocklens, dens
     double* outvals = output.getvalues();
     
     // Loop on all blocks:
-    int vecoffset = 0;
-    int matoffset = 0;
-    for (int n = 0; n < nb; n++)
+    long long int vecoffset = 0;
+    long long int matoffset = 0;
+    for (long long int n = 0; n < nb; n++)
     {
-        int cs = blvals[n];
+        long long int cs = blvals[n];
         // Loop on all block columns:
-        for (int j = 0; j < cs; j++)
+        for (long long int j = 0; j < cs; j++)
         {
             double curvecval = vvals[vecoffset+j];
             // Loop on all block rows:
-            for (int i = 0; i < cs; i++)
+            for (long long int i = 0; i < cs; i++)
                 outvals[vecoffset+i] += bdvals[matoffset+i] * curvecval;
             matoffset += cs;
         }
