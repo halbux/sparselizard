@@ -280,6 +280,11 @@ void field::automaticupdate(bool updateit)
     rawfieldptr->allowvaluesynchronizing(updateit);
 }
 
+void field::noautomaticupdate(void)
+{
+    rawfieldptr->allowvaluesynchronizing(false);
+}
+
 field field::comp(int component) 
 { 
     if (component < 0 || component > 2)

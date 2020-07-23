@@ -115,6 +115,7 @@ class field
 
         // Allow/forbid automatic updating of the field value during hp-adaptivity:
         void automaticupdate(bool updateit);
+        void noautomaticupdate(void);
         
         std::shared_ptr<rawfield> getpointer(void) { return rawfieldptr; };
 

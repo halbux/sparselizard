@@ -1409,7 +1409,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     
     // Create the Lagrange multiplier field:
     field lambda(ptr1->gettypename(false), ptr1->getharmonics());
-    lambda.automaticupdate(false);
+    lambda.noautomaticupdate();
     lambda.getpointer()->setorder(gamma1, lagmultorder, false);
     lambda.getpointer()->setorder(gamma2, lagmultorder, false);
 
@@ -1470,7 +1470,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     
     // Create the Lagrange multiplier field:
     field lambda(ptr1->gettypename(false), ptr1->getharmonics());
-    lambda.automaticupdate(false);
+    lambda.noautomaticupdate();
     lambda.getpointer()->setorder(gamma1, lagmultorder, false);
     lambda.getpointer()->setorder(gamma2, lagmultorder, false);
     
@@ -1565,7 +1565,7 @@ std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, fi
     // Create the Lagrange multiplier field:
     std::shared_ptr<rawfield> ptr = u.getpointer();
     field lambda(ptr->gettypename(false), ptr->getharmonics());
-    lambda.automaticupdate(false);
+    lambda.noautomaticupdate();
     lambda.getpointer()->setorder(gamma1, lagmultorder, false);
     lambda.getpointer()->setorder(gamma2, lagmultorder, false);
     
