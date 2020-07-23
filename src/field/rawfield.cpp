@@ -194,31 +194,8 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     formulation blockAv;
     // A and V blocks of the projection:
     blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield) );
-    // Get blocks A and v:
-    blockAv.generate();
-    mat A = blockAv.A();
-    vec v = blockAv.rhs();
     
-    if (dim > 1 || tn == "h1")
-    {
-        // Create the formulation to get block B and w:
-        formulation blockB;
-        // To get the structure right:
-        blockB += mathop::integral(dirichletphysreg, 0 * mathop::dof(thisfield) * mathop::tf(thisfield));
-        // B block of the projection:
-        blockB += mathop::integral(physreg, mathop::dof(thisfield, dirichletphysreg) * mathop::tf(thisfield) );
-        // Get block B:
-        blockB.generatestiffnessmatrix();
-        mat B = blockB.A();
-        vec w = vec(blockB);
-        (w|thisfield).setdata(dirichletphysreg, thisfield);
-        
-        // System to solve is Ax = v - By:
-        vec By = -B*w;
-        thisfield.setdata(physreg, By);
-        v.setdata(physreg, thisfield, "add");  
-    }
-    
+    // Get the block diagonal info:
     int numelemsindim = universe::mymesh->getelements()->countindim(dim);
     std::vector<int> alldrsindim = drs->getindim(dim);
     
@@ -226,18 +203,45 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     int* bsvals = blocksizes.getvalues();
     int index = 0;
     int preallocsize = 0;
+    blockAv.getdofmanager()->selectfield(shared_from_this());
     for (int d = 0; d < alldrsindim.size(); d++)
     {
-        int curder = alldrsindim[d];
-        int numedgesinder = drs->countelements(curder);
-        int numffinder = blockAv.getdofmanager()->countformfunctions(curder);
-        for (int i = 0; i < numedgesinder; i++)
-            bsvals[index+i] = numffinder;
-        index += numedgesinder;
-        preallocsize += numedgesinder * numffinder*numffinder;
+        int curdr = alldrsindim[d];
+        int numelemsindr = drs->countelements(curdr);
+        int numffindr = blockAv.getdofmanager()->countformfunctions(curdr);
+        for (int i = 0; i < numelemsindr; i++)
+            bsvals[index+i] = numffindr;
+        index += numelemsindr;
+        preallocsize += numelemsindr * numffindr*numffindr;
     }
+    
     if (preallocsize > 0)
     {
+        // Get blocks A and v:
+        blockAv.generate();
+        mat A = blockAv.A();
+        vec v = blockAv.rhs();
+        
+        if (dim > 1 || tn == "h1")
+        {
+            // Create the formulation to get block B and w:
+            formulation blockB;
+            // To get the structure right:
+            blockB += mathop::integral(dirichletphysreg, 0 * mathop::dof(thisfield) * mathop::tf(thisfield));
+            // B block of the projection:
+            blockB += mathop::integral(physreg, mathop::dof(thisfield, dirichletphysreg) * mathop::tf(thisfield) );
+            // Get block B:
+            blockB.generatestiffnessmatrix();
+            mat B = blockB.A();
+            vec w = vec(blockB);
+            (w|thisfield).setdata(dirichletphysreg, thisfield);
+            
+            // System to solve is Ax = v - By:
+            vec By = -B*w;
+            thisfield.setdata(physreg, By);
+            v.setdata(physreg, thisfield, "add");  
+        }
+    
         densematrix blockvals(preallocsize, 1);
         MatInvertVariableBlockDiagonal(A.getpetsc(), numelemsindim, bsvals, blockvals.getvalues());
 
