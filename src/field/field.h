@@ -113,6 +113,9 @@ class field
         // Transfer data from and to the current field:
         void setdata(int physreg, vec myvec, std::string op = "set");
 
+        // Allow/forbid automatic updating of the field value during hp-adaptivity:
+        void automaticupdate(bool updateit);
+        
         std::shared_ptr<rawfield> getpointer(void) { return rawfieldptr; };
 
         // Select a component.

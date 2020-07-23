@@ -114,8 +114,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
-        // Allow/forbid syncing:
-        bool issynchronizingallowed = true;
+        // Allow/forbid value syncing:
+        bool isvaluesynchronizingallowed = true;
         
         
         // Mesh on which this object is based:
@@ -131,7 +131,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis);
         void updateothershapefunctions(std::shared_ptr<rawfield> originalthis, int dim);
         
-        void allowsynchronizing(bool allowit) { issynchronizingallowed = allowit; };
+        void allowvaluesynchronizing(bool allowit);
         
         bool isptrigger(void);
         bool ishtrigger(void);

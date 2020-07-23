@@ -20,7 +20,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         return;
     }
         
-    if (not(issynchronizingallowed) || issynchronizing || myptracker == universe::mymesh->getptracker())
+    if (issynchronizing || myptracker == universe::mymesh->getptracker())
         return;
     issynchronizing = true; 
     
@@ -65,7 +65,8 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         setgauge(mygaugetracker[i]);
         
     // Update the coef manager with the new nodal/edge/face/volume shape function coefficients:
-//    updateshapefunctions(originalthis, true);
+//  if (isvaluesynchronizingallowed)
+//    updateshapefunctions(originalthis, false);
     
     // We need to know in which disjoint region every old element number was:
     std::vector<std::vector<int>> inolddisjregs;
@@ -259,6 +260,19 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     }
     universe::mymesh->getphysicalregions()->remove({dirichletphysreg}, false);
     universe::mymesh->getphysicalregions()->remove({physreg}, false);
+}
+
+void rawfield::allowvaluesynchronizing(bool allowit)
+{
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->allowvaluesynchronizing(allowit);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->allowvaluesynchronizing(allowit);
+    }
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+        isvaluesynchronizingallowed = allowit;
 }
 
 bool rawfield::isptrigger(void)

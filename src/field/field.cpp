@@ -275,6 +275,11 @@ void field::setdata(int physreg, vec myvec, std::string op)
     setdata(physreg, myvec|thisfield, op);
 }
 
+void field::automaticupdate(bool updateit)
+{
+    rawfieldptr->allowvaluesynchronizing(updateit);
+}
+
 field field::comp(int component) 
 { 
     if (component < 0 || component > 2)
