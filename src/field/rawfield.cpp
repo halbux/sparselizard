@@ -26,7 +26,8 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     
     // Get a copy of this field before syncing:
     std::shared_ptr<rawfield> originalthis(new rawfield);
-//    *originalthis = *this;
+    *originalthis = *this;
+    originalthis->mypadapttriggers = {};
     
     // Backup the current coefmanager:
     std::shared_ptr<coefmanager> myoldcoefmanager = mycoefmanager;
@@ -234,12 +235,12 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
             blockB.generatestiffnessmatrix();
             mat B = blockB.A();
             vec w = vec(blockB);
-            (w|thisfield).setdata(dirichletphysreg, thisfield);
+            transferdata(dirichletphysreg, w|thisfield, "set");
             
             // System to solve is Ax = v - By:
             vec By = -B*w;
-            thisfield.setdata(physreg, By);
-            v.setdata(physreg, thisfield, "add");  
+            setdata(physreg, By|thisfield);
+            transferdata(physreg, v|thisfield, "add");
         }
     
         densematrix blockvals(preallocsize, 1);
