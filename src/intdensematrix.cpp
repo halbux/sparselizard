@@ -57,6 +57,50 @@ long long int intdensematrix::countpositive(void)
     return numpositive;
 }
 
+long long int intdensematrix::countoccurences(long long int value)
+{
+    int* myvaluesptr = myvalues.get();
+    
+    long long int num = 0;
+    for (long long int i = 0; i < numcols*numrows; i++)
+    {
+        if (myvaluesptr[i] == value)
+            num++;
+    }
+    return num;
+}
+
+intdensematrix intdensematrix::removevalue(long long int toremove)
+{
+    int* myvaluesptr = myvalues.get();
+    
+    long long int num = countoccurences(toremove);
+    
+    intdensematrix output(numcols*numrows-num,1);
+    int* outvals = output.getvalues();
+    
+    long long int index = 0;
+    for (long long int i = 0; i < numcols*numrows; i++)
+    {
+        if (myvaluesptr[i] != toremove)
+        {
+            outvals[index] = myvaluesptr[i];
+            index++;
+        }
+    }
+    return output;
+}
+
+long long int intdensematrix::sum(void)
+{
+    int* myvaluesptr = myvalues.get();
+    
+    long long int summed = 0;
+    for (long long int i = 0; i < numcols*numrows; i++)
+        summed += myvaluesptr[i];
+    return summed;
+}
+
 void intdensematrix::print(void)
 {
     printsize();

@@ -43,6 +43,13 @@ class intdensematrix
         
         // Count the number of positive or zero integer values:
         long long int countpositive(void);
+        // Count the number of occurences of a value:
+        long long int countoccurences(long long int value);
+        // Filter out the argument value and return a column vector:
+        intdensematrix removevalue(long long int toremove);
+
+        // Sum all values:
+        long long int sum(void);
 
         void print(void);
         void printsize(void);
