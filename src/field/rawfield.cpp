@@ -174,7 +174,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     disjointregions* drs = universe::mymesh->getdisjointregions();
     physicalregions* prs = universe::mymesh->getphysicalregions();
     
-    // Create temporary physical regions and more:
+    // Create temporary physical regions:
     int physreg = prs->createfromdisjointregionlist(drs->getindim(dim));
     int dirichletphysreg;
     if (dim == 1)
