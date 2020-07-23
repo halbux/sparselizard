@@ -192,7 +192,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
 
     // Create the formulation to get block A and v:
     formulation blockAv;
-    // A and V blocks of the projection:
+    // A and v blocks of the projection:
     blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield) );
     
     // Get the block diagonal info:
