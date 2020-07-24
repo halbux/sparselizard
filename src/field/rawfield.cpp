@@ -115,6 +115,16 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
 
 void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool withtiming)
 {
+    // Only do a projection. No constraint calculation.
+    std::vector<std::shared_ptr<integration>> myconstraintsbkp = myconstraints;
+    std::vector<std::vector<expression>> myconditionalconstraintsbkp = myconditionalconstraints;
+    std::vector<bool> isitgaugedbkp = isitgauged;
+    
+    myconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
+    myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
+    isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+        
+
     wallclock clkn;
     updatenodalshapefunctions(originalthis);
     if (withtiming)
@@ -134,6 +144,12 @@ void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool
         clkv.print("Time to update the volume shape functions:");
         clkn.print("Total time:");
     }
+    
+    
+    // Restore:
+    myconstraints = myconstraintsbkp;
+    myconditionalconstraints = myconditionalconstraintsbkp;
+    isitgauged = isitgaugedbkp;
 }
 
 void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
