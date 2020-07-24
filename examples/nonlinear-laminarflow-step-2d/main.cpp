@@ -61,8 +61,8 @@ void sparselizard(void)
     // The v field will trigger the p-adaptivity every time its value changes.
     // With the selected orders (1 to 3 for p and 2 to 4 for v) the BB condition is always satisfied.
     expression adaptcriterion = norm(grad(compx(v))) + norm(grad(compy(v)));
-    p.setorder(adaptcriterion, {v}, 1, 3);
-    v.setorder(adaptcriterion, {v}, 2, 4);
+    p.setorder(adaptcriterion, {v}, 1, 3, 0.01, 0.01);
+    v.setorder(adaptcriterion, {v}, 2, 4, 0.01, 0.01);
 
     // Define the weak formulation for incompressible laminar flow:
     formulation laminarflow;

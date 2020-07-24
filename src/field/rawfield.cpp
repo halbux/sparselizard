@@ -65,47 +65,8 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         setgauge(mygaugetracker[i]);
         
     // Update the coef manager with the new nodal/edge/face/volume shape function coefficients:
-//  if (isvaluesynchronizingallowed)
-//    updateshapefunctions(originalthis, false);
-    
-    // We need to know in which disjoint region every old element number was:
-    std::vector<std::vector<int>> inolddisjregs;
-    myptracker->getindisjointregions(inolddisjregs);
-    // We also need to know how the mesh structure was before:
-    disjointregions* olddisjregs = myptracker->getdisjointregions();
-
-    
-    // Get the map to renumber the current elements to the ones in the mesh as in the old status:
-    std::vector<std::vector<int>> numberback;
-    universe::mymesh->getptracker()->getrenumbering(myptracker, numberback);
-
-    
-    for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
-    {
-        int numff = mycoefmanager->countformfunctions(d);
-        if (numff == 0)
-            continue;
-            
-        int elemtypenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
-        int rb = universe::mymesh->getdisjointregions()->getrangebegin(d);
-        int numelems = universe::mymesh->getdisjointregions()->countelements(d);
-            
-        for (int ff = 0; ff < numff; ff++)
-        {
-            for (int e = 0; e < numelems; e++)
-            {
-                int oldelemnum = numberback[elemtypenum][rb+e];
-                int oldelemdisjreg = inolddisjregs[elemtypenum][oldelemnum];
-                
-                if (myoldcoefmanager->isdefined(oldelemdisjreg, ff))
-                {
-                    int oldelemindex = oldelemnum - olddisjregs->getrangebegin(oldelemdisjreg);
-                    double val = myoldcoefmanager->getcoef(oldelemdisjreg, ff, oldelemindex);
-                    mycoefmanager->setcoef(d, ff, e, val);
-                }
-            }
-        }
-    }
+    if (isvaluesynchronizingallowed)
+        updateshapefunctions(originalthis, false);
     
         
     // Update the mesh tracker to the current one:
