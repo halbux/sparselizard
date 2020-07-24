@@ -29,8 +29,6 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     *originalthis = *this;
     originalthis->mypadapttriggers = {};
     
-    // Backup the current coefmanager:
-    std::shared_ptr<coefmanager> myoldcoefmanager = mycoefmanager;
     // Create a new one:
     mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename));
 
