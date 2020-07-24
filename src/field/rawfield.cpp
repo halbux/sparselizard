@@ -68,6 +68,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         
     // Update the mesh tracker to the current one:
     myptracker = universe::mymesh->getptracker();
+    myrawmesh = universe::mymesh;
     issynchronizing = false;
 }
 
