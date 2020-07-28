@@ -132,10 +132,10 @@ expression mathop::norm(expression expr)
     return sqrt(mynorm);
 }
 
-expression mathop::normal(int surfphysreg)
+expression mathop::normal(int physreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
-    int elementdimension = universe::mymesh->getphysicalregions()->get(surfphysreg)->getelementdimension();
+    int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
 
     if (problemdimension-1 != elementdimension || problemdimension == 1)
     {
