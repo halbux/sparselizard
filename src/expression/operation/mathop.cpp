@@ -139,7 +139,7 @@ expression mathop::normal(int physreg)
 
     if (elementdimension >= problemdimension)
     {
-        std::cout << "Error in 'mathop' namespace: can only compute the normal to a region of lower dimension than the geometry" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only compute a normal to a region of lower dimension than the geometry" << std::endl;
         abort();
     }
 
