@@ -179,22 +179,12 @@ expression mathop::tangent(int physreg)
         return 1.0;
     if (problemdimension == 2)
     {
-        if (elementdimension == 1)
-        {
-            expression mynorm = sqrt(expr.jac(0,0)*expr.jac(0,0)+expr.jac(0,1)*expr.jac(0,1));
-            mynorm.reuseit();
-            if (universe::isaxisymmetric)
-                return array3x1(expr.jac(0,0), expr.jac(0,1), 0)/mynorm;
-            else
-                return array2x1(expr.jac(0,0), expr.jac(0,1))/mynorm;
-        }
-        if (elementdimension == 2)
-        {
-            if (universe::isaxisymmetric)
-                return array3x1(1,0,0);
-            else
-                return array2x1(1,0);
-        }
+        expression mynorm = sqrt(expr.jac(0,0)*expr.jac(0,0)+expr.jac(0,1)*expr.jac(0,1));
+        mynorm.reuseit();
+        if (universe::isaxisymmetric)
+            return array3x1(expr.jac(0,0), expr.jac(0,1), 0)/mynorm;
+        else
+            return array2x1(expr.jac(0,0), expr.jac(0,1))/mynorm;
     }
     if (problemdimension == 3)
     {
