@@ -137,13 +137,15 @@ expression mathop::normal(int physreg)
     int problemdimension = universe::mymesh->getmeshdimension();
     int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
 
-    if (problemdimension-1 != elementdimension || problemdimension == 1)
+    if (elementdimension >= problemdimension)
     {
-        std::cout << "Error in 'mathop' namespace: can only compute the normal to a surface in 3D and to a line in 2D" << std::endl;
+        std::cout << "Error in 'mathop' namespace: can only compute the normal to a region of lower dimension than the geometry" << std::endl;
         abort();
     }
 
     expression expr;
+    if (problemdimension == 1)
+        return 1.0;
     if (problemdimension == 2)
     {
         expression mynorm = sqrt(expr.invjac(0,1)*expr.invjac(0,1)+expr.invjac(1,1)*expr.invjac(1,1));
@@ -158,6 +160,47 @@ expression mathop::normal(int physreg)
         expression mynorm = sqrt(expr.invjac(0,2)*expr.invjac(0,2)+expr.invjac(1,2)*expr.invjac(1,2)+expr.invjac(2,2)*expr.invjac(2,2));
         mynorm.reuseit();
         return array3x1(expr.invjac(0,2), expr.invjac(1,2), expr.invjac(2,2))/mynorm;
+    }
+}
+
+expression mathop::tangent(int physreg)
+{
+    int problemdimension = universe::mymesh->getmeshdimension();
+    int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
+
+    if (elementdimension != 1 && elementdimension != 2)
+    {
+        std::cout << "Error in 'mathop' namespace: can only compute a tangent to a line or face region" << std::endl;
+        abort();
+    }
+
+    expression expr;
+    if (problemdimension == 1)
+        return 1.0;
+    if (problemdimension == 2)
+    {
+        if (elementdimension == 1)
+        {
+            expression mynorm = sqrt(expr.jac(0,0)*expr.jac(0,0)+expr.jac(0,1)*expr.jac(0,1));
+            mynorm.reuseit();
+            if (universe::isaxisymmetric)
+                return array3x1(expr.jac(0,0), expr.jac(0,1), 0)/mynorm;
+            else
+                return array2x1(expr.jac(0,0), expr.jac(0,1))/mynorm;
+        }
+        if (elementdimension == 2)
+        {
+            if (universe::isaxisymmetric)
+                return array3x1(1,0,0);
+            else
+                return array2x1(1,0);
+        }
+    }
+    if (problemdimension == 3)
+    {
+        expression mynorm = sqrt(expr.jac(0,0)*expr.jac(0,0)+expr.jac(0,1)*expr.jac(0,1)+expr.jac(0,2)*expr.jac(0,2));
+        mynorm.reuseit();
+        return array3x1(expr.jac(0,0), expr.jac(0,1), expr.jac(0,2))/mynorm;
     }
 }
 
