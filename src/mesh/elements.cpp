@@ -62,7 +62,15 @@ int elements::getsubelement(int subelementtypenumber, int elementtypenumber, int
 
 int elements::getdisjointregion(int elementtypenumber, int elementnumber)
 {
-    return indisjointregion[elementtypenumber][elementnumber];
+    int output = indisjointregion[elementtypenumber][elementnumber];
+    if (output >= 0)
+        return output;
+    else
+    {
+        std::cout << "Error in 'elements' object: returned a negative disjoint region number" << std::endl;
+        std::cout << "Possible reason: too bad quality elements obtained when h-adapting a curved mesh (some identical edges might not have been merged and therefore AMR has failed)" << std::endl;
+        abort();
+    }
 }
 
 int elements::gettotalorientation(int elementtypenumber, int elementnumber)
