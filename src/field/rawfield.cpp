@@ -179,16 +179,25 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     intdensematrix blocksizes(numelemsindim,1);
     int* bsvals = blocksizes.getvalues();
     int index = 0;
+    int indexindm = 0;
     int preallocsize = 0;
     blockAv.getdofmanager()->selectfield(shared_from_this());
+    // Vector to reorder the mat and vec to bring together the parts of the diagonal blocks:
+    intdensematrix renumtodiagblocks(blockAv.getdofmanager()->countdofs(), 1);
+    int* renumptr = renumtodiagblocks.getvalues();
     for (int d = 0; d < alldrsindim.size(); d++)
     {
         int curdr = alldrsindim[d];
         int numelemsindr = drs->countelements(curdr);
         int numffindr = blockAv.getdofmanager()->countformfunctions(curdr);
         for (int i = 0; i < numelemsindr; i++)
+        {
             bsvals[index+i] = numffindr;
+            for (int ff = 0; ff < numffindr; ff++)
+                renumptr[indexindm+i*numffindr+ff] = indexindm+numelemsindr*ff+i;
+        }
         index += numelemsindr;
+        indexindm += numelemsindr * numffindr;
         preallocsize += numelemsindr * numffindr*numffindr;
     }
     blocksizes = blocksizes.removevalue(0);
@@ -220,16 +229,19 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
             setdata(physreg, By|thisfield);
             transferdata(physreg, v|thisfield, "add");
         }
-    
+        
+        A.permute(renumtodiagblocks, renumtodiagblocks);
         densematrix blockvals(preallocsize, 1);
         MatInvertVariableBlockDiagonal(A.getpetsc(), blocksizes.count(), bsvals, blockvals.getvalues());
 
         // Solve block-diagonal system:
+        v.permute(renumtodiagblocks);
         intdensematrix alladds(v.size(),1, 0,1);
         densematrix vmat = v.getvalues(alladds);
         densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
 
         v.setvalues(alladds, prod);
+        v.permute(renumtodiagblocks, true);
 
         setdata(physreg, v|thisfield);
     }
