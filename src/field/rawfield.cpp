@@ -118,7 +118,7 @@ void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
     if (gettypename() != "h1")
         return;
         
-    // Create a temporary physical region that is the union of all disjoint regions in the current dimension:
+    // Create temporary physical regions:
     std::vector<int> alldrsindim = universe::mymesh->getdisjointregions()->getindim(0);
     int physreg = universe::mymesh->getphysicalregions()->createfromdisjointregionlist(alldrsindim);
     
