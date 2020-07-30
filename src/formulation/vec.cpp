@@ -20,6 +20,23 @@ vec::vec(int vecsize, intdensematrix addresses, densematrix vals)
 
 int vec::size(void) { errorifpointerisnull(); return rawvecptr->size(); }
 
+void vec::permute(intdensematrix rowpermute, bool invertit)
+{
+    if (rowpermute.count() != size())
+    {
+        std::cout << "Error in 'vec' object: unexpected argument size for permutation" << std::endl;
+        abort();
+    }
+
+    IS rowpermutis;
+    ISCreateGeneral(PETSC_COMM_SELF, rowpermute.count(), rowpermute.getvalues(), PETSC_USE_POINTER, &rowpermutis);
+    
+    if (invertit == false)
+        VecPermute(getpetsc(), rowpermutis, PETSC_FALSE);
+    else
+        VecPermute(getpetsc(), rowpermutis, PETSC_TRUE);
+}
+
 void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
         
 void vec::updateconstraints(void)
