@@ -6,6 +6,7 @@ std::vector<std::vector<densematrix>> operation::interpolate(elementselector& el
     std::cout << "Error in 'operation' object: cannot interpolate the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }
 
@@ -14,6 +15,7 @@ densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselecto
     std::cout << "Error in 'operation' object: cannot interpolate the multiharmonic operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }
 
@@ -22,6 +24,7 @@ std::vector<std::vector<densematrix>> operation::interpolate(int kietaphiderivat
     std::cout << "Error in 'operation' object: expression provided for mesh deformation is invalid" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }
 
@@ -68,6 +71,7 @@ std::shared_ptr<rawfield> operation::getfieldpointer(void)
     std::cout << "Error in 'operation' object: cannot get the field pointer" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }         
 
@@ -76,6 +80,7 @@ void operation::reuseit(bool istobereused)
     std::cout << "Error in 'operation' object: cannot reuse the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }
 
@@ -84,6 +89,7 @@ bool operation::isreused(void)
     std::cout << "Error in 'operation' object: cannot call 'isreused' on the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }
         
@@ -92,6 +98,7 @@ void operation::setspacederivative(int whichderivative)
     std::cout << "Error in 'operation' object: either you are trying to apply a space derivative to something else than fields, dof() and tf() or the field does not allow this kind of space derivative" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }   
 
@@ -100,6 +107,7 @@ void operation::setkietaphiderivative(int whichderivative)
     std::cout << "Error in 'operation' object: can only apply reference-element space derivatives to fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }   
 
@@ -108,6 +116,7 @@ void operation::increasetimederivativeorder(int derivativeorder)
     std::cout << "Error in 'operation' object: can only apply time derivatives to fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
+    std::cout << std::endl;
     abort();
 }   
 
