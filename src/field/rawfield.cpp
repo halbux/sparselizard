@@ -171,40 +171,52 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     formulation blockAv;
     // A and v blocks of the projection:
     blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield) );
+  
+    std::shared_ptr<dofmanager> dm = blockAv.getdofmanager();
+    dm->selectfield(shared_from_this());
     
     // Get the block diagonal info:
-    int numelemsindim = universe::mymesh->getelements()->countindim(dim);
     std::vector<int> alldrsindim = drs->getindim(dim);
-    
-    intdensematrix blocksizes(numelemsindim,1);
-    int* bsvals = blocksizes.getvalues();
-    int index = 0;
-    int indexindm = 0;
-    int preallocsize = 0;
-    blockAv.getdofmanager()->selectfield(shared_from_this());
-    // Vector to reorder the mat and vec to bring together the parts of the diagonal blocks:
-    intdensematrix renumtodiagblocks(blockAv.getdofmanager()->countdofs(), 1);
-    int* renumptr = renumtodiagblocks.getvalues();
+    // Count the number of non-empty diagonal blocks:
+    int numblocks = 0, preallocsize = 0;
     for (int d = 0; d < alldrsindim.size(); d++)
     {
         int curdr = alldrsindim[d];
         int numelemsindr = drs->countelements(curdr);
-        int numffindr = blockAv.getdofmanager()->countformfunctions(curdr);
-        for (int i = 0; i < numelemsindr; i++)
-        {
-            bsvals[index+i] = numffindr;
-            for (int ff = 0; ff < numffindr; ff++)
-                renumptr[indexindm+i*numffindr+ff] = indexindm+numelemsindr*ff+i;
-        }
-        index += numelemsindr;
-        indexindm += numelemsindr * numffindr;
+        int numffindr = dm->countformfunctions(curdr);
+        if (numffindr == 0)
+            continue;
+        numblocks += numelemsindr;
         preallocsize += numelemsindr * numffindr*numffindr;
     }
-    blocksizes = blocksizes.removevalue(0);
-    bsvals = blocksizes.getvalues();
     
     if (preallocsize > 0)
     {
+        intdensematrix blocksizes(numblocks,1);
+        int* bsvals = blocksizes.getvalues();
+
+        // Vector to reorder the mat and vec to bring together the parts of the diagonal blocks:
+        intdensematrix renumtodiagblocks(dm->countdofs(), 1);
+        int* renumptr = renumtodiagblocks.getvalues();
+        int index = 0;
+        for (int d = 0; d < alldrsindim.size(); d++)
+        {
+            int curdr = alldrsindim[d];
+            int numelemsindr = drs->countelements(curdr);
+            int numffindr = dm->countformfunctions(curdr);
+            if (numffindr == 0)
+                continue;
+            int rb = dm->getrangebegin(curdr, 0);
+            
+            for (int i = 0; i < numelemsindr; i++)
+            {
+                bsvals[rb+i] = numffindr;
+                for (int ff = 0; ff < numffindr; ff++)
+                    renumptr[rb+i*numffindr+ff] = rb+numelemsindr*ff+i;
+            }
+            index += numelemsindr;
+        }
+    
         // Get blocks A and v:
         blockAv.generate();
         mat A = blockAv.A();
