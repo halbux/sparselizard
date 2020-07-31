@@ -170,7 +170,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     // Create the formulation to get block A and v:
     formulation blockAv;
     // A and v blocks of the projection:
-    blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield) );
+    blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield), myupdateaccuracy);
   
     std::shared_ptr<dofmanager> dm = blockAv.getdofmanager();
     dm->selectfield(shared_from_this());
@@ -227,9 +227,9 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
             // Create the formulation to get block B and w:
             formulation blockB;
             // To get the structure right:
-            blockB += mathop::integral(dirichletphysreg, 0 * mathop::dof(thisfield) * mathop::tf(thisfield));
+            blockB += mathop::integral(dirichletphysreg, 0 * mathop::dof(thisfield) * mathop::tf(thisfield), myupdateaccuracy);
             // B block of the projection:
-            blockB += mathop::integral(physreg, mathop::dof(thisfield, dirichletphysreg) * mathop::tf(thisfield) );
+            blockB += mathop::integral(physreg, mathop::dof(thisfield, dirichletphysreg) * mathop::tf(thisfield), myupdateaccuracy);
             // Get block B:
             blockB.generatestiffnessmatrix();
             mat B = blockB.A();
@@ -272,6 +272,19 @@ void rawfield::allowvaluesynchronizing(bool allowit)
     }
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
         isvaluesynchronizingallowed = allowit;
+}
+
+void rawfield::setupdateaccuracy(int extraintegrationorder)
+{
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setupdateaccuracy(extraintegrationorder);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setupdateaccuracy(extraintegrationorder);
+    }
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+        myupdateaccuracy = extraintegrationorder;
 }
 
 bool rawfield::isptrigger(void)

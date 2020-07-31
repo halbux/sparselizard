@@ -285,6 +285,11 @@ void field::noautomaticupdate(void)
     rawfieldptr->allowvaluesynchronizing(false);
 }
 
+void field::setupdateaccuracy(int extraintegrationorder)
+{
+    rawfieldptr->setupdateaccuracy(extraintegrationorder);
+}
+
 field field::comp(int component) 
 { 
     if (component < 0 || component > 2)

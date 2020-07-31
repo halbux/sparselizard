@@ -117,6 +117,8 @@ class field
         void automaticupdate(bool updateit);
         void noautomaticupdate(void);
         
+        void setupdateaccuracy(int extraintegrationorder);
+        
         std::shared_ptr<rawfield> getpointer(void) { return rawfieldptr; };
 
         // Select a component.

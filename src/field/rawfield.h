@@ -117,6 +117,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Allow/forbid value syncing:
         bool isvaluesynchronizingallowed = true;
         
+        int myupdateaccuracy = 0;
+        
         
         // Mesh on which this object is based:
         std::shared_ptr<rawmesh> myrawmesh = NULL;
@@ -132,6 +134,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void updateothershapefunctions(std::shared_ptr<rawfield> originalthis, int dim);
         
         void allowvaluesynchronizing(bool allowit);
+        
+        void setupdateaccuracy(int extraintegrationorder);
         
         bool isptrigger(void);
         bool ishtrigger(void);
