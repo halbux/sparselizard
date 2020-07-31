@@ -210,7 +210,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
             
             for (int i = 0; i < numelemsindr; i++)
             {
-                bsvals[rb+i] = numffindr;
+                bsvals[index+i] = numffindr;
                 for (int ff = 0; ff < numffindr; ff++)
                     renumptr[rb+i*numffindr+ff] = rb+numelemsindr*ff+i;
             }
