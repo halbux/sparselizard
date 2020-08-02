@@ -39,11 +39,11 @@ double hadapt1d(void)
 
 double hadapt2d(void)
 {	
-    int v1 = 1, v2 = 2, v3 = 3, v4 = 4, l1 = 5, l2 = 6, l3 = 7, l4 = 8;
+    int s1 = 1, s2 = 2, s3 = 3, s4 = 4, l1 = 5, l2 = 6, l3 = 7, l4 = 8;
 
     mesh mymesh("2d.msh");
 
-    int vol = regionunion({v1,v2,v3,v4});
+    int sur = regionunion({s1,s2,s3,s4});
     int lin = regionunion({l1,l2,l3,l4});
 
     field v("h1"), x("x"), y("y");
@@ -52,22 +52,22 @@ double hadapt2d(void)
 
     mymesh.setadaptivity(criterion, {}, 0, 5, 0.2, 0.2);
 
-    v.setorder(v1, 5);
-    v.setorder(v2, 4);
-    v.setorder(v3, 3);
-    v.setorder(v4, 3);
+    v.setorder(s1, 5);
+    v.setorder(s2, 4);
+    v.setorder(s3, 3);
+    v.setorder(s4, 3);
 
     v.setconstraint(lin, x);
 
     formulation poisson;
 
-    poisson += integral(vol, grad(dof(v))*grad(tf(v)));
+    poisson += integral(sur, grad(dof(v))*grad(tf(v)));
 
-    do
-        solve(poisson);
-    while (mymesh.adapt(1));
+    while (mymesh.adapt(1)) {}
+    
+    solve(poisson);
 
-    double intgr = norm(grad(v)).integrate(vol, 5);
+    double intgr = norm(grad(v)).integrate(sur, 5);
     double exact = 2.0*getpi();
     double relerror = std::abs(intgr-exact)/exact;
 
@@ -94,9 +94,9 @@ double hadapt3d(void)
 
     poisson += integral(vol, grad(dof(v))*grad(tf(v)));
 
-    do
-        solve(poisson);
-    while (mymesh.adapt(1));
+    while (mymesh.adapt(1)) {}
+    
+    solve(poisson);
 
     double intgr = norm(grad(v)).integrate(vol, 5);
     double exact = 10.0;
