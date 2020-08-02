@@ -1,0 +1,125 @@
+// The purpose of this example is to check that AMR works as expected when the software is modified.
+
+
+#include "sparselizardbase.h"
+
+
+using namespace mathop;
+
+double hadapt1d(void)
+{
+    int line = 1, left = 2, right = 3;
+
+    mesh mymesh("1d.msh");
+
+    field v("h1"), x("x");
+
+    mymesh.setadaptivity(x, {}, 0, 2);
+
+    v.setorder(line, 1);
+
+    v.setconstraint(left, 10);
+    v.setconstraint(right, 2);
+
+    formulation poisson;
+
+    poisson += integral(line, grad(dof(v))*grad(tf(v)));
+
+    solve(poisson);
+
+    mymesh.adapt(1);
+    mymesh.adapt(1);
+
+    double intgr = norm(grad(v)).integrate(line, 5);
+    double exact = 8.0;
+    double relerror = std::abs(intgr-exact)/exact;
+
+    return relerror;
+}
+
+double hadapt2d(void)
+{	
+    int v1 = 1, v2 = 2, v3 = 3, v4 = 4, l1 = 5, l2 = 6, l3 = 7, l4 = 8;
+
+    mesh mymesh("2d.msh");
+
+    int vol = regionunion({v1,v2,v3,v4});
+    int lin = regionunion({l1,l2,l3,l4});
+
+    field v("h1"), x("x"), y("y");
+
+    expression criterion = ifpositive(sin(3*x*y), sin(50*x)*sin(57*y)*x*y, 0);
+
+    mymesh.setadaptivity(criterion, {}, 0, 5, 0.2, 0.2);
+
+    v.setorder(v1, 5);
+    v.setorder(v2, 4);
+    v.setorder(v3, 3);
+    v.setorder(v4, 3);
+
+    v.setconstraint(lin, x);
+
+    formulation poisson;
+
+    poisson += integral(vol, grad(dof(v))*grad(tf(v)));
+
+    do
+        solve(poisson);
+    while (mymesh.adapt(1));
+
+    double intgr = norm(grad(v)).integrate(vol, 5);
+    double exact = 2.0*getpi();
+    double relerror = std::abs(intgr-exact)/exact;
+
+    return relerror;
+}
+
+double hadapt3d(void)
+{	
+    int vol = 1, left = 2, right = 3;
+
+    mesh mymesh("3d.msh");
+
+    field v("h1"), x("x"), y("y"), z("z");
+    v.setorder(vol, 1);
+
+    expression criterion = ifpositive(sin(5*x)*sin(4*y)*sin(6*z), sin(50*x)*sin(57*y)*y*sin(53*z), 0);
+
+    mymesh.setadaptivity(criterion, {}, 0, 5, 0.5, 0.5);
+
+    v.setconstraint(left, 10);
+    v.setconstraint(right, 0);
+
+    formulation poisson;
+
+    poisson += integral(vol, grad(dof(v))*grad(tf(v)));
+
+    do
+        solve(poisson);
+    while (mymesh.adapt(1));
+
+    double intgr = norm(grad(v)).integrate(vol, 5);
+    double exact = 10.0;
+    double relerror = std::abs(intgr-exact)/exact;
+
+    return relerror;
+}
+
+int main(void)
+{	
+    SlepcInitialize(0,{},0,0);
+
+    double relerror1d = hadapt1d();
+    double relerror2d = hadapt2d();
+    double relerror3d = hadapt3d();
+
+    std::cout << relerror1d << " " << relerror2d << " " << relerror3d << std::endl;
+
+    // Code validation line. Can be removed.
+    std::cout << (relerror1d < 2e-15 && relerror2d < 2e-11 && relerror3d < 2e-13);
+
+    SlepcFinalize();
+
+    return 0;
+}
+
