@@ -242,3 +242,13 @@ void physicalregions::errorundefined(std::vector<int> physregs)
     }
 }
 
+void physicalregions::copy(disjointregions* drs, physicalregions* target)
+{
+    *target = *this;
+    
+    for (int i = 0; i < myphysicalregions.size(); i++)
+        target->myphysicalregions[i] = myphysicalregions[i]->copy(target, drs);
+    
+    target->mydisjointregions = drs;
+}
+

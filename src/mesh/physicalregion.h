@@ -67,6 +67,9 @@ class physicalregion
         
         std::vector<std::vector<int>>* getelementlist(void);
         
+        // Make a full copy of this object (linking objects used are the arguments):
+        std::shared_ptr<physicalregion> copy(physicalregions* prs, disjointregions* drs);
+        
 };
 
 #endif

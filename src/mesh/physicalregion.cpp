@@ -175,3 +175,16 @@ std::vector<std::vector<int>>* physicalregion::getelementlist(void)
     return &elementlist;
 }
 
+std::shared_ptr<physicalregion> physicalregion::copy(physicalregions* prs, disjointregions* drs)
+{
+    std::shared_ptr<physicalregion> out(new physicalregion);
+    
+    *out = *this;
+    
+    out->myphysicalregions = prs;
+    out->mydisjointregions = drs;
+    
+    return out;
+}
+
+

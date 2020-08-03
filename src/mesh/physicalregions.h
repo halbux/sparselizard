@@ -66,6 +66,9 @@ class physicalregions
         
         // Give an error if any of the physical regions is not defined:
         void errorundefined(std::vector<int> physregs);
+        
+        // Make a full copy of this object (linking objects used are the arguments):
+        void copy(disjointregions* drs, physicalregions* target);
 };
 
 #endif

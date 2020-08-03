@@ -208,6 +208,20 @@ disjointregions* rawmesh::getdisjointregions(void) {return &mydisjointregions;}
 std::shared_ptr<ptracker> rawmesh::getptracker(void) {return myptracker;}
 std::shared_ptr<htracker> rawmesh::gethtracker(void) {return myhtracker;}
 
+std::shared_ptr<rawmesh> rawmesh::copy(void)
+{
+    std::shared_ptr<rawmesh> om(new rawmesh);
+
+    *om = *this;
+    
+    om->mynodes = mynodes;
+    om->mydisjointregions = mydisjointregions;
+    myphysicalregions.copy(&(om->mydisjointregions), &(om->myphysicalregions));
+    om->myelements = myelements.copy(&(om->mynodes), &(om->myphysicalregions), &(om->mydisjointregions));
+
+    return om;
+}
+
 std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt)
 {
     if (myptracker == targetpt)
