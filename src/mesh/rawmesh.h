@@ -58,7 +58,6 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<rawmesh> myhadaptedmesh = NULL;
         std::vector<std::tuple<expression,std::vector<std::shared_ptr<rawfield>>,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
         // For the h-adapted mesh:
-        std::weak_ptr<rawmesh> myoriginalmesh;
         std::shared_ptr<htracker> myhtracker = NULL;
         
     public:

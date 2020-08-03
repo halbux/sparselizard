@@ -303,7 +303,6 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     myptracker = std::shared_ptr<ptracker>(new ptracker(myelements.count()));
     myptracker->updatedisjointregions(&mydisjointregions);
     
-    myoriginalmesh = shared_from_this();
     myhtracker = std::shared_ptr<htracker>(new htracker(copy()));
 }
 
@@ -515,7 +514,6 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     myptracker = std::shared_ptr<ptracker>(new ptracker(myelements.count()));
     myptracker->updatedisjointregions(&mydisjointregions);
     
-    myoriginalmesh = shared_from_this();
     myhtracker = std::shared_ptr<htracker>(new htracker(copy()));
 }
 
@@ -1255,7 +1253,6 @@ bool rawmesh::adapth(int verbosity)
     ///// Get the adapted element coordinates 'ac' and add to the mesh containers:
     
     myhadaptedmesh = std::shared_ptr<rawmesh>(new rawmesh);
-    myhadaptedmesh->myoriginalmesh = shared_from_this(); 
     myhadaptedmesh->myhtracker = newhtracker;
     
     std::vector<std::vector<double>> ac;
@@ -1663,11 +1660,6 @@ std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
 
 std::shared_ptr<rawmesh> rawmesh::getoriginalmeshpointer(void)
 {
-    if (myoriginalmesh.expired())
-    {
-        std::cout << "Error in 'rawmesh' object: the original mesh is needed but it was destroyed" << std::endl;
-        abort();
-    }
-    return myoriginalmesh.lock();
+    return myhtracker->getoriginalmesh();
 }
 
