@@ -3,27 +3,24 @@
 #include "lagrangeformfunction.h"
 
 
-htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> numelemspertype)
+htracker::htracker(std::shared_ptr<rawmesh> origmesh, int curvatureorder, std::vector<int> numelemspertype)
 {
-    myoriginalnodes = std::shared_ptr<nodes>(new nodes);
-    *myoriginalnodes = *(origelems->getnodes());
-    myoriginalelements = std::shared_ptr<elements>(new elements);
-    *myoriginalelements = origelems->copy(myoriginalnodes.get(), NULL, NULL);
+    myoriginalmesh = origmesh;
 
     originalcurvatureorder = curvatureorder;
     originalcount = numelemspertype;
     
     if (curvatureorder == -1)
-        originalcurvatureorder = myoriginalelements->getcurvatureorder();
+        originalcurvatureorder = origmesh->getelements()->getcurvatureorder();
     if (numelemspertype.size() == 0)
     {
-        int dim = myoriginalelements->getdimension();
+        int dim = origmesh->getelements()->getdimension();
         originalcount = std::vector<int>(8,0);
         for (int i = 0; i < 8; i++)
         {
             element myelem(i);
             if (myelem.getelementdimension() == dim)
-                originalcount[i] = myoriginalelements->count(i);
+                originalcount[i] = origmesh->getelements()->count(i);
         }
     }
         
@@ -80,6 +77,11 @@ htracker::htracker(elements* origelems, int curvatureorder, std::vector<int> num
     }
 }
 
+std::shared_ptr<rawmesh> htracker::getoriginalmesh(void)
+{
+    return myoriginalmesh;
+}
+
 int htracker::countleaves(void)
 {
     return numleaves;
@@ -109,6 +111,8 @@ void htracker::resetcursor(bool calcrefcoords)
 
 int htracker::next(void)
 {
+    elements* myelements = getoriginalmesh()->getelements();
+
     int throughedgenum = -1;
 
     // If not split we are at a leaf:
@@ -163,7 +167,7 @@ int htracker::next(void)
             if (isrefcalc && throughedgenum == 3)
             {
                 // Get the physical node coordinates of the original element:
-                std::vector<double> origelemcoords = myoriginalelements->getnodecoordinates(parenttypes[0], origindexintype);
+                std::vector<double> origelemcoords = myelements->getnodecoordinates(parenttypes[0], origindexintype);
                 // Get the curved reference coordinates in the original element:
                 std::vector<double> refsinorig;
                 if (currentdepth > 0)
@@ -549,6 +553,8 @@ void htracker::adapt(std::vector<int>& operations)
 
 void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::vector<double>>& apc, bool withphysicals)
 {
+    elements* myelements = getoriginalmesh()->getelements();
+
     std::vector<int> nit = countintypes();
 
     // Preallocate:
@@ -571,7 +577,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
         int ic = indexesinclusters[currentdepth];
     
         if (withphysicals && ns == 0)
-            oc = myoriginalelements->getnodecoordinates(t, origindexintype);
+            oc = myelements->getnodecoordinates(t, origindexintype);
     
         if (isatleaf())
         {
@@ -601,6 +607,8 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
 
 void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold)
 {
+    elements* myelements = getoriginalmesh()->getelements();
+    
     std::vector<int> ne(8);
     for (int i = 0; i < 8; i++)
         ne[i] = myelems[i].countedges();
@@ -645,7 +653,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
         int t = parenttypes[currentdepth];
 
         if (currentdepth == 0)
-            oc = myoriginalelements->getnodecoordinates(t, origindexintype);
+            oc = myelements->getnodecoordinates(t, origindexintype);
     
         while (not(isatleaf()))
             next();
@@ -818,7 +826,7 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
 
 void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std::vector<std::vector<int>>& ad, std::vector<std::vector<double>>& rc, std::vector<int>& maporctorc)
 {
-    int elemdim = myoriginalelements->getdimension();
+    int elemdim = getoriginalmesh()->getelements()->getdimension();
 
     ad = std::vector<std::vector<int>>(8, std::vector<int>(0));
     rc = std::vector<std::vector<double>>(8, std::vector<double>(0));

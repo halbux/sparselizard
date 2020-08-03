@@ -14,17 +14,17 @@
 #include <string>
 #include <memory>
 #include "element.h"
-#include "elements.h"
-#include "nodes.h"
+#include "rawmesh.h"
+
+class rawmesh;
 
 class htracker
 {
 
     private:
     
-        // Original nodes and elements on which this tracker is based:
-        std::shared_ptr<nodes> myoriginalnodes = NULL;
-        std::shared_ptr<elements> myoriginalelements = NULL;
+        // Original mesh on which this tracker is based:
+        std::shared_ptr<rawmesh> myoriginalmesh;
     
         // Store in compressed format all split info needed:
         // 
@@ -84,8 +84,10 @@ class htracker
     public:
 
         htracker(void) {};
-        // Provide the original 'elements' object (or the latter two arguments for debug):
-        htracker(elements* origelems, int curvatureorder = -1, std::vector<int> numelemspertype = {});
+        // Provide the original 'rawmesh' object (or the latter two arguments for debug):
+        htracker(std::shared_ptr<rawmesh> origmesh, int curvatureorder = -1, std::vector<int> numelemspertype = {});
+        
+        std::shared_ptr<rawmesh> getoriginalmesh(void);
         
         int countleaves(void);
         int getmaxdepth(void);

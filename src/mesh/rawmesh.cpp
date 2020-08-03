@@ -304,7 +304,7 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     myptracker->updatedisjointregions(&mydisjointregions);
     
     myoriginalmesh = shared_from_this();
-    myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
+    myhtracker = std::shared_ptr<htracker>(new htracker(copy()));
 }
 
 void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
@@ -516,7 +516,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     myptracker->updatedisjointregions(&mydisjointregions);
     
     myoriginalmesh = shared_from_this();
-    myhtracker = std::shared_ptr<htracker>(new htracker(&myelements));
+    myhtracker = std::shared_ptr<htracker>(new htracker(copy()));
 }
 
 

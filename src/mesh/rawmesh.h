@@ -30,6 +30,7 @@
 #include "htracker.h"
 #include "rawfield.h"
 
+class htracker;
 class nodes;
 class elements;
 class shape;
