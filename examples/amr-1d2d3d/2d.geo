@@ -37,5 +37,3 @@ Physical Line(5) = {1};
 Physical Line(6) = {2};
 Physical Line(7) = {3};
 Physical Line(8) = {4};
-
-
