@@ -1656,11 +1656,6 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
     }
 }
 
-std::shared_ptr<rawmesh> rawmesh::getpointer(void)
-{
-    return shared_from_this();
-}
-
 std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
 {
     return myhadaptedmesh;
