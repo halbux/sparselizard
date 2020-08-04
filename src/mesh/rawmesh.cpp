@@ -840,7 +840,7 @@ void rawmesh::adaptp(void)
     
     std::vector<vec> crits(num), oldords(num);
     
-    int wholedomain = (universe::mymesh->getphysicalregions())->createunionofall();
+    int wholedomain = myphysicalregions.createunionofall();
     
     field one("one");
     for (int i = 0; i < num; i++)
@@ -1082,7 +1082,7 @@ bool rawmesh::adapth(int verbosity)
 
     ///// Evaluate the criterion:
 
-    int wholedomain = (universe::mymesh->getphysicalregions())->createunionofall();
+    int wholedomain = prptr->createunionofall();
     
     field one("one");
     
