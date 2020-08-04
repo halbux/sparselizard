@@ -1074,10 +1074,7 @@ bool rawmesh::adapth(int verbosity)
     physicalregions* prptr = universe::mymesh->getphysicalregions();
     
     std::shared_ptr<htracker> newhtracker(new htracker);
-    if (myhadaptedmesh != NULL)
-        *newhtracker = *(myhadaptedmesh->myhtracker);
-    else
-        *newhtracker = *myhtracker;
+    *newhtracker = *(myhadaptedmesh->myhtracker);
     
     std::vector<int> leavesnumsplits;
     newhtracker->countsplits(leavesnumsplits);
