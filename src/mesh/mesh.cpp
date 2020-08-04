@@ -92,13 +92,15 @@ void mesh::split(int n)
 
 void mesh::move(int physreg, expression u)
 {
-    rawmeshptr->move(physreg, u);
+    if (rawmeshptr->getmeshnumber() == 0)
+        rawmeshptr->move(physreg, u);
     rawmeshptr->gethadaptedpointer()->move(physreg, u);
 }
 
 void mesh::move(expression u)
 {
-    rawmeshptr->move(-1, u);
+    if (rawmeshptr->getmeshnumber() == 0)
+        rawmeshptr->move(-1, u);
     rawmeshptr->gethadaptedpointer()->move(-1, u);
 }
         
