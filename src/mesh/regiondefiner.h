@@ -76,6 +76,7 @@ class regiondefiner
 
     public:
 
+        regiondefiner(void) {};
         regiondefiner(nodes& inputnodes, elements& inputelems, physicalregions& inputphysregs);
 
         void regionskin(int newphysreg, int physregtoskin);
@@ -87,6 +88,9 @@ class regiondefiner
         bool isanycoordinatedependentregiondefined(void);
 
         void defineregions(void);
+        
+        // Make a full copy of this object (linking objects used are the arguments):
+        regiondefiner copy(nodes* nds, elements* els, physicalregions* prs);
 };
 
 #endif

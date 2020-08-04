@@ -218,6 +218,7 @@ std::shared_ptr<rawmesh> rawmesh::copy(void)
     om->mydisjointregions = mydisjointregions;
     myphysicalregions.copy(&(om->mydisjointregions), &(om->myphysicalregions));
     om->myelements = myelements.copy(&(om->mynodes), &(om->myphysicalregions), &(om->mydisjointregions));
+    om->myregiondefiner = myregiondefiner.copy(&(om->mynodes), &(om->myelements), &(om->myphysicalregions));
 
     return om;
 }

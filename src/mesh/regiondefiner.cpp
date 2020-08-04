@@ -374,4 +374,17 @@ void regiondefiner::defineregions(void)
     }
 }
 
+regiondefiner regiondefiner::copy(nodes* nds, elements* els, physicalregions* prs)
+{
+    regiondefiner out;
+    
+    out = *this;
+    
+    out.mynodes = nds;
+    out.myelements = els;
+    out.myphysicalregions = prs;
+    
+    return out;
+}
+
 
