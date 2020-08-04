@@ -79,7 +79,12 @@ htracker::htracker(std::shared_ptr<rawmesh> origmesh, int curvatureorder, std::v
 
 std::shared_ptr<rawmesh> htracker::getoriginalmesh(void)
 {
-    return myoriginalmesh;
+    if (myoriginalmesh.expired())
+    {
+        std::cout << "Error in 'htracker' object: the original mesh is needed but it was destroyed" << std::endl;
+        abort();
+    }
+    return myoriginalmesh.lock();
 }
 
 int htracker::countleaves(void)

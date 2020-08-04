@@ -303,7 +303,8 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     myptracker = std::shared_ptr<ptracker>(new ptracker(myelements.count()));
     myptracker->updatedisjointregions(&mydisjointregions);
     
-    myhtracker = std::shared_ptr<htracker>(new htracker(copy()));
+    myhtracker = std::shared_ptr<htracker>(new htracker(shared_from_this()));
+    myhadaptedmesh = copy();
 }
 
 void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
@@ -393,7 +394,10 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     if (mergeduplicates == false)
     {
         for (int i = 0; i < numfiles; i++)
+        {
             shift(maxphysreg+1+i, -shiftvec[i],0,0);
+            myhadaptedmesh->shift(maxphysreg+1+i, -shiftvec[i],0,0);
+        }
     }
 }
 
@@ -514,7 +518,8 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     myptracker = std::shared_ptr<ptracker>(new ptracker(myelements.count()));
     myptracker->updatedisjointregions(&mydisjointregions);
     
-    myhtracker = std::shared_ptr<htracker>(new htracker(copy()));
+    myhtracker = std::shared_ptr<htracker>(new htracker(shared_from_this()));
+    myhadaptedmesh = copy();
 }
 
 
@@ -1059,8 +1064,6 @@ bool rawmesh::adapth(int verbosity)
     int meshdim = getmeshdimension();
     
     universe::mymesh = myhadaptedmesh;
-    if (myhadaptedmesh == NULL)
-        universe::mymesh = shared_from_this();  
  
     if (universe::ishadaptallowed == false || myhadaptdata.size() == 0)
         return false;
@@ -1655,7 +1658,10 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
 
 std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
 {
-    return myhadaptedmesh;
+    if (myhadaptedmesh == NULL)
+        return shared_from_this();
+    else
+        return myhadaptedmesh;
 }
 
 std::shared_ptr<rawmesh> rawmesh::getoriginalmeshpointer(void)

@@ -24,7 +24,7 @@ class htracker
     private:
     
         // Original mesh on which this tracker is based:
-        std::shared_ptr<rawmesh> myoriginalmesh;
+        std::weak_ptr<rawmesh> myoriginalmesh;
     
         // Store in compressed format all split info needed:
         // 

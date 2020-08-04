@@ -12,16 +12,19 @@ double mathop::getpi(void)
 
 int mathop::regionunion(const std::vector<int> physregs)
 {
+    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs);
     return (universe::mymesh->getphysicalregions())->createunion(physregs);
 }
 
 int mathop::regionintersection(const std::vector<int> physregs)
 {
+    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs);
     return (universe::mymesh->getphysicalregions())->createintersection(physregs);
 }
 
 int mathop::regionall(void)
 {
+    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunionofall();
     return (universe::mymesh->getphysicalregions())->createunionofall();
 }
 

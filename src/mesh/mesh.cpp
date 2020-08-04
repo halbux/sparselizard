@@ -19,24 +19,24 @@ mesh::mesh(void)
 mesh::mesh(std::string filename, int verbosity, bool legacyreader)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
     rawmeshptr->load(filename, verbosity, legacyreader);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 mesh::mesh(std::vector<shape> inputshapes, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
     rawmeshptr->load(inputshapes, verbosity);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -44,6 +44,7 @@ void mesh::load(std::string name, int verbosity, bool legacyreader)
 {
     errorifloaded();
     rawmeshptr->load(name, verbosity, legacyreader);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -51,6 +52,7 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
 {
     errorifloaded();
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -58,15 +60,13 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
 {
     errorifloaded();
     rawmeshptr->load(inputshapes, verbosity);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 void mesh::write(std::string name, int verbosity)
 {
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->write(name, verbosity);
-    else
-        rawmeshptr->write(name, verbosity);
+    rawmeshptr->gethadaptedpointer()->write(name, verbosity);
 }
 
 bool mesh::adapt(int verbosity)
@@ -93,57 +93,49 @@ void mesh::split(int n)
 void mesh::move(int physreg, expression u)
 {
     rawmeshptr->move(physreg, u);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->move(physreg, u);
+    rawmeshptr->gethadaptedpointer()->move(physreg, u);
 }
 
 void mesh::move(expression u)
 {
     rawmeshptr->move(-1, u);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->move(-1, u);
+    rawmeshptr->gethadaptedpointer()->move(-1, u);
 }
         
 void mesh::shift(int physreg, double x, double y, double z)
 {
     rawmeshptr->shift(physreg, x, y, z);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
+    rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
 }
 
 void mesh::shift(double x, double y, double z)
 {
     rawmeshptr->shift(-1, x, y, z);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->shift(-1, x, y, z);
+    rawmeshptr->gethadaptedpointer()->shift(-1, x, y, z);
 }
 
 void mesh::rotate(int physreg, double ax, double ay, double az)
 {
     rawmeshptr->rotate(physreg, ax, ay, az);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
+    rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
 }
 
 void mesh::rotate(double ax, double ay, double az)
 {
     rawmeshptr->rotate(-1, ax, ay, az);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->rotate(-1, ax, ay, az);
+    rawmeshptr->gethadaptedpointer()->rotate(-1, ax, ay, az);
 }
 
 void mesh::scale(int physreg, double x, double y, double z)
 {
     rawmeshptr->scale(physreg, x, y, z);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
+    rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
 }
 
 void mesh::scale(double x, double y, double z)
 {
     rawmeshptr->scale(-1, x, y, z);
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        rawmeshptr->gethadaptedpointer()->scale(-1, x, y, z);
+    rawmeshptr->gethadaptedpointer()->scale(-1, x, y, z);
 }
 
 int mesh::getmeshdimension(void)
@@ -182,9 +174,6 @@ void mesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector
 
 void mesh::use(void)
 {
-    if (rawmeshptr->gethadaptedpointer() != NULL)
-        universe::mymesh = rawmeshptr->gethadaptedpointer();
-    else
-        universe::mymesh = rawmeshptr;
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
 }
 
