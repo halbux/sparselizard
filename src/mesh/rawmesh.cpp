@@ -829,7 +829,7 @@ void rawmesh::remove(rawfield* inrawfield)
 
 void rawmesh::adaptp(void)
 {
-    if (universe::ispadaptallowed == false)
+    if (universe::ispadaptallowed == false || mypadaptdata.size() == 0)
         return;
 
     double noisethreshold = 1e-8;
