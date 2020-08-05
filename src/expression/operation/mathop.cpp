@@ -912,15 +912,15 @@ expression mathop::nosync(std::shared_ptr<rawfield> rf)
     
     if (tn == "h1")
     {
-        std::shared_ptr<opfieldnosync> opx(new opfieldnosync(0, rf));
+        std::shared_ptr<opnosync> opx(new opnosync(0, rf));
         opx->setcomponents({opx});
         return expression(opx);
     }
     if (tn == "hcurl")
     {
-        std::shared_ptr<opfieldnosync> opx(new opfieldnosync(0, rf));
-        std::shared_ptr<opfieldnosync> opy(new opfieldnosync(1, rf));
-        std::shared_ptr<opfieldnosync> opz(new opfieldnosync(2, rf));
+        std::shared_ptr<opnosync> opx(new opnosync(0, rf));
+        std::shared_ptr<opnosync> opy(new opnosync(1, rf));
+        std::shared_ptr<opnosync> opz(new opnosync(2, rf));
         
         opx->setcomponents({opx, opy, opz});
         opy->setcomponents({opx, opy, opz});

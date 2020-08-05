@@ -4,27 +4,27 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-#ifndef OPFIELDNOSYNC_H
-#define OPFIELDNOSYNC_H
+#ifndef OPNOSYNC_H
+#define OPNOSYNC_H
 
 #include "operation.h"
 
-class opfieldnosync: public operation
+class opnosync: public operation
 {
 
     private:
 
         int mycomp = -1;
         
-        std::vector<std::weak_ptr<opfieldnosync>> mycomponents = {};
+        std::vector<std::weak_ptr<opnosync>> mycomponents = {};
 
         std::shared_ptr<rawfield> myfield = NULL;
 
     public:
 
-        opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin);
+        opnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin);
         // Provide the operations for all components after constructor:
-        void setcomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps);
+        void setcomponents(std::vector<std::shared_ptr<opnosync>> allcomps);
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         

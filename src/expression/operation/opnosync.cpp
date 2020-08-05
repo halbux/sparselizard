@@ -1,23 +1,23 @@
-#include "opfieldnosync.h"
+#include "opnosync.h"
 #include "myalgorithm.h"
 
 
-opfieldnosync::opfieldnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin)
+opnosync::opnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin)
 {
     mycomp = formfunctioncomponent;
     myfield = fieldin;
 }
 
-void opfieldnosync::setcomponents(std::vector<std::shared_ptr<opfieldnosync>> allcomps)
+void opnosync::setcomponents(std::vector<std::shared_ptr<opnosync>> allcomps)
 {
-    std::vector<std::weak_ptr<opfieldnosync>> weakptrs(allcomps.size());
+    std::vector<std::weak_ptr<opnosync>> weakptrs(allcomps.size());
     for (int c = 0; c < allcomps.size(); c++)
         weakptrs[c] = allcomps[c];
 
     mycomponents = weakptrs;
 }
 
-std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> opnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {   
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -206,7 +206,7 @@ std::vector<std::vector<densematrix>> opfieldnosync::interpolate(elementselector
     return {{}, {valmats[mycomp]}};
 }
 
-void opfieldnosync::print(void)
+void opnosync::print(void)
 {
     std::cout << "nosync(";
     myfield->print();
