@@ -14,17 +14,15 @@ class opnosync: public operation
 
     private:
 
-        int mycomp = -1;
-        
-        std::vector<std::weak_ptr<opnosync>> mycomponents = {};
+        std::shared_ptr<operation> myarg;
 
-        std::shared_ptr<rawfield> myfield = NULL;
+        // Evaluation will be performed on this mesh state:
+        std::shared_ptr<rawmesh> myrawmesh = NULL;
+        std::shared_ptr<ptracker> myptracker = NULL;
 
     public:
 
-        opnosync(int formfunctioncomponent, std::shared_ptr<rawfield> fieldin);
-        // Provide the operations for all components after constructor:
-        void setcomponents(std::vector<std::shared_ptr<opnosync>> allcomps);
+        opnosync(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         

@@ -127,7 +127,7 @@ void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
     universe::forcedintegrationorder = 0;
 
     formulation evalatnodes;
-    evalatnodes += mathop::integral(physreg, -mathop::nosync(originalthis) * mathop::tf(thisfield) );
+    evalatnodes += mathop::integral(physreg, -mathop::atmeshstate(field(originalthis), myrawmesh, myptracker) * mathop::tf(thisfield) );
     evalatnodes.generaterhs();
     vec vals = evalatnodes.rhs();
     
@@ -170,7 +170,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     // Create the formulation to get block A and v:
     formulation blockAv;
     // A and v blocks of the projection:
-    blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::nosync(originalthis) * mathop::tf(thisfield), myupdateaccuracy);
+    blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::atmeshstate(field(originalthis), myrawmesh, myptracker) * mathop::tf(thisfield), myupdateaccuracy);
   
     std::shared_ptr<dofmanager> dm = blockAv.getdofmanager();
     dm->selectfield(shared_from_this());

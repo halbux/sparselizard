@@ -17,7 +17,9 @@
 #include "vec.h"
 #include "mat.h"
 #include "formulation.h"
+#include "rawmesh.h"
 
+class rawmesh;
 class expression;
 class integration;
 class mat;
@@ -163,9 +165,8 @@ namespace mathop
     expression dof(expression input, int physreg = -1);
     expression tf(expression input, int physreg = -1);
     
-    // Use a field without hp-synchronizing it:
-    expression nosync(std::shared_ptr<rawfield> rf);
-
+    // Return an expression whose value will be calculated on the argument mesh state (the expression is hp-synchronized to that mesh state after the call):
+    expression atmeshstate(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
 
 
     // Define typically used arrays for convenience:

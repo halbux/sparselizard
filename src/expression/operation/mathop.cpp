@@ -906,37 +906,23 @@ integration mathop::integral(int physreg, int numcoefharms, expression meshdefor
 expression mathop::dof(expression input, int physreg) { return input.dof(physreg); }
 expression mathop::tf(expression input, int physreg) { return input.tf(physreg); }
 
-expression mathop::nosync(std::shared_ptr<rawfield> rf)
+expression mathop::atmeshstate(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
-    std::string tn = rf->gettypename();
+    int m = expr.countrows();
+    int n = expr.countcolumns();
     
-    if (tn == "h1")
+    std::vector<expression> subexprs(m*n);
+    for (int i = 0; i < m; i++)
     {
-        std::shared_ptr<opnosync> opx(new opnosync(0, rf));
-        opx->setcomponents({opx});
-        return expression(opx);
+        for (int j = 0; j < n; j++)
+        {
+            std::shared_ptr<opnosync> op(new opnosync(expr.getoperationinarray(i,j), rm, pt));
+            subexprs[i*n+j] = expression(op);
+        }
     }
-    if (tn == "hcurl")
-    {
-        std::shared_ptr<opnosync> opx(new opnosync(0, rf));
-        std::shared_ptr<opnosync> opy(new opnosync(1, rf));
-        std::shared_ptr<opnosync> opz(new opnosync(2, rf));
-        
-        opx->setcomponents({opx, opy, opz});
-        opy->setcomponents({opx, opy, opz});
-        opz->setcomponents({opx, opy, opz});
-        
-        expression exprx(opx);
-        expression expry(opy);
-        expression exprz(opz);
-        
-        return array3x1(exprx,expry,exprz);
-    }
-
-    std::cout << "Error in 'mathop' namespace: cannot hp-adapt a '" << tn << "' type field" << std::endl;
-    abort();
+    
+    return expression(m, n, subexprs);
 }
-
 
 
 expression mathop::array1x1(expression term11)
