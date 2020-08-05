@@ -134,7 +134,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // For p-adaptivity:
         void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
         void remove(rawfield* inrawfield);
-        void adaptp(void);
+        void adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted);
         
         // For h-adaptivity:
         bool adapth(int verbosity);

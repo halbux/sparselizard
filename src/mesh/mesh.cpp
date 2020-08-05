@@ -71,7 +71,7 @@ void mesh::write(std::string name, int verbosity)
 
 bool mesh::adapt(int verbosity)
 {
-    return rawmeshptr->adapth(verbosity);
+    return mathop::adapthp(true, false, verbosity);
 }
 
 void mesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)

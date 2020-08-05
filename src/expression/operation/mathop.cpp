@@ -924,6 +924,21 @@ expression mathop::atmeshstate(expression expr, std::shared_ptr<rawmesh> rm, std
     return expression(m, n, subexprs);
 }
 
+bool mathop::adapthp(bool withhadapt, bool withpadapt, bool ishverbose)
+{
+    bool washchanged = false;
+
+    std::shared_ptr<rawmesh> rmcritcalc = universe::mymesh;
+    std::shared_ptr<ptracker> ptcritcalc = universe::mymesh->getptracker();
+
+    if (withhadapt)
+        washchanged = universe::mymesh->getoriginalmeshpointer()->adapth(ishverbose);
+
+    if (withhadapt || withpadapt) // a p step must follow h
+        universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged);
+
+    return washchanged;
+}
 
 expression mathop::array1x1(expression term11)
 {
@@ -1287,11 +1302,7 @@ void mathop::setdata(vec invec)
     universe::ispadaptallowed = waspallowed;
     universe::ishadaptallowed = washallowed;
     
-    if (isanyhtrigger)
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (isanyptrigger)
-        universe::mymesh->adaptp();
+    mathop::adapthp(isanyhtrigger, isanyptrigger);
 }
 
 

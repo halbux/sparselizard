@@ -237,6 +237,8 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
 
     (om->myelements).toptracker(myptracker, targetpt);
     
+    om->myptracker = targetpt;
+    
     return om;
 }
 
@@ -827,7 +829,7 @@ void rawmesh::remove(rawfield* inrawfield)
     mypadaptdata.resize(curindex);
 }
 
-void rawmesh::adaptp(void)
+void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted)
 {
     if (universe::ispadaptallowed == false || mypadaptdata.size() == 0)
         return;
@@ -847,13 +849,20 @@ void rawmesh::adaptp(void)
     {
         std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
     
+        expression critexpr = std::get<1>(mypadaptdata[i]);
+        if (washadapted)
+            critexpr = mathop::atmeshstate(critexpr, critcalcrm, critcalcpt);
+        expression orderexpr = mathop::getfieldorder(field(curraw));
+        if (washadapted)
+            orderexpr = mathop::atmeshstate(orderexpr, critcalcrm, critcalcpt);
+            
         formulation critaverage;
-        critaverage += mathop::integral(wholedomain, -std::get<1>(mypadaptdata[i]) * mathop::tf(one) / mathop::getmeshsize(2) );
+        critaverage += mathop::integral(wholedomain, -critexpr * mathop::tf(one) / mathop::getmeshsize(2) );
         critaverage.generaterhs();
         crits[i] = critaverage.rhs();
         
         formulation elorder;
-        elorder += mathop::integral(wholedomain, -mathop::getfieldorder(field(curraw)) * mathop::tf(one) / mathop::getmeshsize(2) );
+        elorder += mathop::integral(wholedomain, -orderexpr * mathop::tf(one) / mathop::getmeshsize(2) );
         elorder.generaterhs();
         oldords[i] = elorder.rhs();
     }
@@ -948,7 +957,7 @@ void rawmesh::adaptp(void)
         }
     }
     // Nothing to do if all new orders are identical to the old ones:
-    if (isidenticalorder)
+    if (isidenticalorder && not(washadapted))
         return;
         
     

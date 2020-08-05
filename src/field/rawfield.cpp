@@ -468,7 +468,7 @@ std::vector<int> rawfield::getharmonics(void)
 
 int rawfield::getfirstharmonic(void)
 {
-    synchronize();
+    // Do not sync this.
     
     if (mysubfields.size() == 0)
     {
@@ -1204,14 +1204,14 @@ std::shared_ptr<rawfield> rawfield::comp(int component)
 
 std::shared_ptr<rawfield> rawfield::harmonic(int harmonicnumber)
 {
-    synchronize();
+    // Do not sync this.
     
     return harmonic(std::vector<int>{harmonicnumber});
 }
 
 std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumbers)
 {
-    synchronize();
+    // Do not sync this.
     
     if (mysubfields.size() != 0)
     {

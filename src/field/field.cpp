@@ -182,55 +182,35 @@ void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
     
-    if (rawfieldptr->ishtrigger())
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (rawfieldptr->isptrigger())
-        universe::mymesh->adaptp();
+    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
     
-    if (rawfieldptr->ishtrigger())
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (rawfieldptr->isptrigger())
-        universe::mymesh->adaptp();
+    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
     
-    if (rawfieldptr->ishtrigger())
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (rawfieldptr->isptrigger())
-        universe::mymesh->adaptp();
+    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
     
-    if (rawfieldptr->ishtrigger())
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (rawfieldptr->isptrigger())
-        universe::mymesh->adaptp();
+    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg)
 {
     rawfieldptr->setvalue(physreg);
     
-    if (rawfieldptr->ishtrigger())
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (rawfieldptr->isptrigger())
-        universe::mymesh->adaptp();
+    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
@@ -262,11 +242,7 @@ void field::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
     rawfieldptr->setdata(physreg, myvec, op); 
     
-    if (rawfieldptr->ishtrigger())
-        universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-    if (rawfieldptr->isptrigger())
-        universe::mymesh->adaptp();
+    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setdata(int physreg, vec myvec, std::string op)
@@ -388,11 +364,7 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     {
         std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
     
-        if (rawfieldptr->ishtrigger())
-            universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-        if (rawfieldptr->isptrigger())
-            universe::mymesh->adaptp();
+        mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
         
         return datout;
     }
@@ -401,11 +373,7 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     {
         std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
         
-        if (rawfieldptr->ishtrigger())
-            universe::mymesh->getoriginalmeshpointer()->adapth(0);
-        
-        if (rawfieldptr->isptrigger())
-            universe::mymesh->adaptp();
+        mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
             
         return datout;
     }
