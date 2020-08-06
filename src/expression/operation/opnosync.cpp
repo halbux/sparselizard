@@ -39,7 +39,7 @@ std::vector<std::vector<densematrix>> opnosync::interpolate(elementselector& ele
     universe::mymesh->getelements()->getrefcoordsondisjregs(elemtype, elemnums, evaluationcoordinates, maxdimdisjregs, elemnumshere, evalcoordshere);
     
     
-    ///// Bring the evaluation points to the mesh of this field.
+    ///// Bring the evaluation points to the mesh here.
     //
     // UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
@@ -71,7 +71,7 @@ std::vector<std::vector<densematrix>> opnosync::interpolate(elementselector& ele
     }
 
 
-    ///// Bring the evaluation points to the ptracker of this field.
+    ///// Bring the evaluation points to the ptracker here.
     //
     // universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
     
@@ -90,7 +90,7 @@ std::vector<std::vector<densematrix>> opnosync::interpolate(elementselector& ele
     referencecoordinategroup rcg(elemnumshere, evalcoordshere);
     
     
-    ///// Evaluate the field at all reference coordinate groups:
+    ///// Evaluate the operation at all reference coordinate groups:
 
     densematrix argmat(elemnums.size(), numevalpts);
     double* argmatptr = argmat.getvalues();
