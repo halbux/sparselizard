@@ -934,7 +934,7 @@ bool mathop::adapthp(bool withhadapt, bool withpadapt, bool ishverbose)
     if (withhadapt)
         washchanged = universe::mymesh->getoriginalmeshpointer()->adapth(ishverbose);
 
-    if (withhadapt || withpadapt) // a p step must follow h
+    if (washchanged || withpadapt) // a p step must follow h
         universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged);
 
     return washchanged;
