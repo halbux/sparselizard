@@ -153,7 +153,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
 
 void opathp::print(void)
 {
-    std::cout << "nosync(";
+    std::cout << "athp(";
     myarg->print();
     std::cout << ")";
 }
