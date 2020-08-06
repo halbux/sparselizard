@@ -1064,6 +1064,8 @@ void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     for (int i = 0; i < prtoremove.size(); i++)
         prtoremove[i] = lastphysregnum+1+i;
     myphysicalregions.remove(prtoremove, true);
+    
+    myptracker->updatedisjointregions(&mydisjointregions);
 }
 
 bool rawmesh::adapth(int verbosity)
