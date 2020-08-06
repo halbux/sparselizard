@@ -906,7 +906,7 @@ integration mathop::integral(int physreg, int numcoefharms, expression meshdefor
 expression mathop::dof(expression input, int physreg) { return input.dof(physreg); }
 expression mathop::tf(expression input, int physreg) { return input.tf(physreg); }
 
-expression mathop::atmeshstate(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
+expression mathop::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
     int m = expr.countrows();
     int n = expr.countcolumns();
@@ -916,7 +916,7 @@ expression mathop::atmeshstate(expression expr, std::shared_ptr<rawmesh> rm, std
     {
         for (int j = 0; j < n; j++)
         {
-            std::shared_ptr<opnosync> op(new opnosync(expr.getoperationinarray(i,j), rm, pt));
+            std::shared_ptr<opathp> op(new opathp(expr.getoperationinarray(i,j), rm, pt));
             subexprs[i*n+j] = expression(op);
         }
     }

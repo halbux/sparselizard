@@ -1,15 +1,15 @@
-#include "opnosync.h"
+#include "opathp.h"
 #include "myalgorithm.h"
 
 
-opnosync::opnosync(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
+opathp::opathp(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
     myarg = arg;
     myrawmesh = rm;
     myptracker = pt;
 }
 
-std::vector<std::vector<densematrix>> opnosync::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {   
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -151,7 +151,7 @@ std::vector<std::vector<densematrix>> opnosync::interpolate(elementselector& ele
     return {{}, {argmat}};
 }
 
-void opnosync::print(void)
+void opathp::print(void)
 {
     std::cout << "nosync(";
     myarg->print();

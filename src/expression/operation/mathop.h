@@ -166,7 +166,7 @@ namespace mathop
     expression tf(expression input, int physreg = -1);
     
     // Return an expression whose value will be calculated on the argument mesh state (the expression is hp-synchronized to that mesh state after the call):
-    expression atmeshstate(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
+    expression athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
 
     bool adapthp(bool withhadapt, bool withpadapt, bool ishverbose = false);
 

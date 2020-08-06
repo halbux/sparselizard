@@ -4,12 +4,12 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-#ifndef OPNOSYNC_H
-#define OPNOSYNC_H
+#ifndef OPATHP_H
+#define OPATHP_H
 
 #include "operation.h"
 
-class opnosync: public operation
+class opathp: public operation
 {
 
     private:
@@ -22,7 +22,7 @@ class opnosync: public operation
 
     public:
 
-        opnosync(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
+        opathp(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         

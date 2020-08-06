@@ -851,10 +851,10 @@ void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     
         expression critexpr = std::get<1>(mypadaptdata[i]);
         if (washadapted)
-            critexpr = mathop::atmeshstate(critexpr, critcalcrm, critcalcpt);
+            critexpr = mathop::athp(critexpr, critcalcrm, critcalcpt);
         expression orderexpr = mathop::getfieldorder(field(curraw));
         if (washadapted)
-            orderexpr = mathop::atmeshstate(orderexpr, critcalcrm, critcalcpt);
+            orderexpr = mathop::athp(orderexpr, critcalcrm, critcalcpt);
             
         formulation critaverage;
         critaverage += mathop::integral(wholedomain, -critexpr * mathop::tf(one) / mathop::getmeshsize(2) );
