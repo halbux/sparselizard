@@ -423,7 +423,7 @@ rawfield::~rawfield(void)
 
 int rawfield::countcomponents(void)
 {
-    synchronize();
+    // Do not sync this.
 
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
         return 1;
@@ -434,7 +434,7 @@ int rawfield::countcomponents(void)
 
 int rawfield::countformfunctioncomponents(void)
 {
-    synchronize();
+    // Do not sync this.
     
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
         return 1;
@@ -535,7 +535,7 @@ void rawfield::printharmonics(void)
 
 void rawfield::print(void)
 {
-    synchronize();
+    // Do not sync this.
     
     if (myname.size() == 0)
         std::cout << "field";
