@@ -831,7 +831,7 @@ void rawmesh::remove(rawfield* inrawfield)
 
 void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted)
 {
-    if (universe::ispadaptallowed == false || mypadaptdata.size() == 0)
+    if (mypadaptdata.size() == 0)
         return;
 
     double noisethreshold = 1e-8;
@@ -1075,7 +1075,7 @@ bool rawmesh::adapth(int verbosity)
     
     universe::mymesh = myhadaptedmesh;
  
-    if (universe::ishadaptallowed == false || myhadaptdata.size() == 0)
+    if (myhadaptdata.size() == 0)
         return false;
         
     elements* elptr = universe::mymesh->getelements();

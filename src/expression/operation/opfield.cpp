@@ -61,10 +61,6 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
         int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
-    
-    // Avoid infinite recursive calls at the .setdata step in case e.g. dtx is in the p-adaptivity criterion.
-    bool waspadaptivityallowed = universe::ispadaptallowed;
-    universe::ispadaptallowed = false;
 
     // Time derivative of non-multiharmonic fields:
     if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
@@ -80,7 +76,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             abort();
         }
         // Set the field value to the field time derivative value on all regions:
-        field(myfield).setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]);
+        myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|field(myfield));
     }
 
     std::vector<std::vector<densematrix>> output;
@@ -154,7 +150,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             abort();
         }
         // Set the field value back to its initial value on all regions:
-        field(myfield).setdata(-1, (universe::xdtxdtdtx)[0][0]);
+        myfield->setdata(-1, (universe::xdtxdtdtx)[0][0]|field(myfield));
     }
 
     if (myfield->ismultiharmonic() && timederivativeorder > 0)
@@ -162,8 +158,6 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
 
     if (reuse && universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), output);
-
-    universe::ispadaptallowed = waspadaptivityallowed;
 
     return output;
 }

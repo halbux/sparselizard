@@ -1291,16 +1291,8 @@ void mathop::setdata(vec invec)
             isanyptrigger = true;
     }
     
-    bool washallowed = universe::ishadaptallowed;
-    universe::ishadaptallowed = false;
-    bool waspallowed = universe::ispadaptallowed;
-    universe::ispadaptallowed = false;
-    
     for (int i = 0; i < allfields.size(); i++)
-        field(allfields[i]).setdata(-1, invec);
-
-    universe::ispadaptallowed = waspallowed;
-    universe::ishadaptallowed = washallowed;
+        allfields[i]->setdata(-1, invec|field(allfields[i]));
     
     mathop::adapthp(isanyhtrigger, isanyptrigger);
 }
