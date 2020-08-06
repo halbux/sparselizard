@@ -1024,6 +1024,13 @@ void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
         currentphysicalregion->definewithdisjointregions();
     }
+    
+
+    ///// New mesh version:
+    
+    myptracker->updatedisjointregions(&mydisjointregions);
+    getoriginalmeshpointer()->mynumber++;
+    mynumber = getoriginalmeshpointer()->mynumber;
 
     
     ///// Synchronize the rawfields and set their interpolation order:
@@ -1057,13 +1064,6 @@ void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     for (int i = 0; i < prtoremove.size(); i++)
         prtoremove[i] = lastphysregnum+1+i;
     myphysicalregions.remove(prtoremove, true);
-    
-    
-    ///// New mesh version:
-    
-    myptracker->updatedisjointregions(&mydisjointregions);
-    getoriginalmeshpointer()->mynumber++;
-    mynumber = getoriginalmeshpointer()->mynumber;
 }
 
 bool rawmesh::adapth(int verbosity)
