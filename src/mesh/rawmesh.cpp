@@ -225,9 +225,12 @@ std::shared_ptr<rawmesh> rawmesh::copy(void)
 
 std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt)
 {
+    // All calls from mathop::adapthp immediately return (myptracker always equals targetpt).
     if (myptracker == targetpt)
         return shared_from_this();
 
+    // Here we are in a rawfield syncing and the ptracker and htracker do not need to be updated.
+    
     std::shared_ptr<rawmesh> om(new rawmesh);
 
     om->mynodes = mynodes;
@@ -236,8 +239,6 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
     om->myelements = myelements.copy(&(om->mynodes), &(om->myphysicalregions), &(om->mydisjointregions));
 
     (om->myelements).toptracker(myptracker, targetpt);
-    
-    om->myptracker = targetpt;
     
     return om;
 }
