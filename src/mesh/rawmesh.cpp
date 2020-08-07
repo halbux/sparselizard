@@ -229,7 +229,7 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
     if (myptracker == targetpt)
         return shared_from_this();
 
-    // Here we are in a rawfield syncing and the ptracker and htracker do not need to be updated.
+    // Here we are in a rawfield syncing and the ptracker and htracker are not needed in 'om'.
     
     std::shared_ptr<rawmesh> om(new rawmesh);
 
