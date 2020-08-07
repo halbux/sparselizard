@@ -10,13 +10,15 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
+    std::vector<int> drsinelsel = elemselect.getdisjointregions();
+    
     densematrix output(elemselect.countinselection(), 1);
     
     elements* myelems = universe::mymesh->getelements();
     int numdisjregs = universe::mymesh->getdisjointregions()->count();
-    std::vector<int> orderofdisjregs(numdisjregs);
-    for (int i = 0; i < numdisjregs; i++)
-        orderofdisjregs[i] = myfield->getinterpolationorder(i);
+    std::vector<int> orderofdisjregs(numdisjregs, -1);
+    for (int i = 0; i < drsinelsel.size(); i++)
+        orderofdisjregs[drsinelsel[i]] = myfield->getinterpolationorder(drsinelsel[i]);
     
     int elementtypenumber = elemselect.getelementtypenumber();
     
@@ -44,13 +46,15 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
+    std::vector<int> drsinelsel = elemselect.getdisjointregions();
+    
     densematrix output(elemselect.countinselection(), 1);
     
     elements* myelems = universe::mymesh->getelements();
     int numdisjregs = universe::mymesh->getdisjointregions()->count();
-    std::vector<int> orderofdisjregs(numdisjregs);
-    for (int i = 0; i < numdisjregs; i++)
-        orderofdisjregs[i] = myfield->getinterpolationorder(i);
+    std::vector<int> orderofdisjregs(numdisjregs, -1);
+    for (int i = 0; i < drsinelsel.size(); i++)
+        orderofdisjregs[drsinelsel[i]] = myfield->getinterpolationorder(drsinelsel[i]);
     
     int elementtypenumber = elemselect.getelementtypenumber();
     
