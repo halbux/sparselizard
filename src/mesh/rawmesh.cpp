@@ -811,6 +811,9 @@ void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, st
 
 void rawmesh::remove(rawfield* inrawfield)
 {
+    // To delay criterion-field destruction to after 'mypadaptdata' has a valid state (after resize):
+    std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> pad = mypadaptdata;
+    
     // Remove the pointed field and all expired fields:
     int curindex = 0;
     for (int i = 0; i < mypadaptdata.size(); i++)
