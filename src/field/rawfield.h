@@ -160,7 +160,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Print the raw field name:
         void print(void);
         // Set the raw field name:
-        void setname(std::string name) { myname = name; };
+        void setname(std::string name);
         std::string gettypename(bool familyonly = true);
 
         void setorder(int physreg, int interpolorder, bool iscalledbyuser = true);

@@ -543,6 +543,21 @@ void rawfield::print(void)
         std::cout << myname;
 }
 
+void rawfield::setname(std::string name)
+{
+    // Do not sync this.
+    
+    myname = name;
+    
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->setname(name);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->setname(name);
+    }
+}
+
 std::string rawfield::gettypename(bool familyonly)
 {
     synchronize();
