@@ -1,9 +1,9 @@
 #include "coefmanager.h"
-#include "universe.h"
 
-coefmanager::coefmanager(std::string fieldtypename)
+coefmanager::coefmanager(std::string fieldtypename, disjointregions* drs)
 {
     myfieldtypename = fieldtypename;
+    mydisjointregions = *drs;
 
     if (myfieldtypename == "x" || myfieldtypename == "y" || myfieldtypename == "z")
     {
@@ -12,7 +12,7 @@ coefmanager::coefmanager(std::string fieldtypename)
     };
         
     // Preallocate 'coefs' for the number of disjoint regions:
-    coefs.resize((universe::mymesh->getdisjointregions())->count());
+    coefs.resize(mydisjointregions.count());
     // Resize coefs to accomodate an inital order 1 interpolated field:
     for (int i = 0; i < coefs.size(); i++)
         fitinterpolationorder(i, 1);
@@ -31,9 +31,8 @@ int coefmanager::countformfunctions(int disjreg)
 void coefmanager::fitinterpolationorder(int disjreg, int interpolationorder)
 {
     // Get the element type number in the current disjoint region:
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
-    int elementtypenumber = mydisjointregions->getelementtypenumber(disjreg);
-    int elementdimension = mydisjointregions->getelementdimension(disjreg);
+    int elementtypenumber = mydisjointregions.getelementtypenumber(disjreg);
+    int elementdimension = mydisjointregions.getelementdimension(disjreg);
 
     // Get the number of form functions associated to dimension elementdimension:
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, myfieldtypename);
@@ -58,8 +57,7 @@ void coefmanager::setcoef(int disjreg, int formfunctionindex, int elementindexin
     else
     {
         // This is rarely called and can thus be slower:
-        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
-        int numberofelements = mydisjointregions->countelements(disjreg);
+        int numberofelements = mydisjointregions.countelements(disjreg);
         coefs[disjreg][formfunctionindex].resize(numberofelements); // Filled with zeros.
 
         coefs[disjreg][formfunctionindex][elementindexindisjointregion] = val;

@@ -24,6 +24,8 @@ class coefmanager
 
     private:
 
+    disjointregions mydisjointregions;
+
     std::string myfieldtypename;
 
     // 'coefs[disjreg][formfunc][elem]' gives the coefficient for  
@@ -37,7 +39,7 @@ class coefmanager
     public:
 
     coefmanager() {};
-    coefmanager(std::string fieldtypename);
+    coefmanager(std::string fieldtypename, disjointregions* drs);
     
     bool isdefined(int disjreg, int formfunctionindex);
     int countformfunctions(int disjreg);
