@@ -1,7 +1,7 @@
 #include "rawfield.h"
 
 
-void rawfield::synchronize(std::vector<int> physregsfororder)
+void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> disjregsfororder)
 {
     // The coordinate fields can be used even before the mesh is loaded (cannot call the ptracker).
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "")
@@ -30,7 +30,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     originalthis->mypadapttriggers = {};
     
     // Create a new coef manager:
-    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename));
+    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getptracker()->getdisjointregions()));
     
     // Flush the containers:
     interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);
@@ -39,16 +39,25 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
     isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
     
     // Rebuild the containers:
-    if (physregsfororder.size() == 0)
+    if (disjregsfororder.size() == 0)
     {
-        for (int i = 0; i < myordertracker.size(); i++)
-            setorder(myordertracker[i].first, myordertracker[i].second, false);
+        if (physregsfororder.size() == 0)
+        {
+            for (int i = 0; i < myordertracker.size(); i++)
+                setorder(myordertracker[i].first, myordertracker[i].second, false);
+        }
+        else
+        {
+            // For p-adaptive fields:
+            for (int i = physregsfororder.size()/2-1; i >= 0; i--)
+                setorder(physregsfororder[2*i+0], physregsfororder[2*i+1], false);
+        }
     }
     else
     {
-        // For p-adaptive fields:
-        for (int i = physregsfororder.size()/2-1; i >= 0; i--)
-            setorder(physregsfororder[2*i+0], physregsfororder[2*i+1], false);
+        interpolationorder = disjregsfororder;
+        for (int i = 0; i < interpolationorder.size(); i++)
+            mycoefmanager->fitinterpolationorder(i, interpolationorder[i]); 
     }
     for (int i = 0; i < myconstraintphysregtracker.size(); i++)
     {
@@ -415,7 +424,7 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
 
             isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
 
-            mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename));
+            mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getptracker()->getdisjointregions()));
         }
     }
     return;
@@ -1023,6 +1032,8 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
     std::shared_ptr<rawfield> selectedrawfield = myvec.getrawfield();
     std::shared_ptr<rawvec> selectedvec = myvec.getrawvector();
         
+    disjointregions* dr = selectedvec->getptracker()->getdisjointregions();
+        
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
     {
@@ -1093,9 +1104,9 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
                     mycoefmanager->fitinterpolationorder(disjreg, getinterpolationorder(disjreg));
                 }
 
-                int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjreg);
-                int elementdimension = (universe::mymesh->getdisjointregions())->getelementdimension(disjreg);
-                int numelem = (universe::mymesh->getdisjointregions())->countelements(disjreg);
+                int elementtypenumber = dr->getelementtypenumber(disjreg);
+                int elementdimension = dr->getelementdimension(disjreg);
+                int numelem = dr->countelements(disjreg);
 
                 std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
                 // The interpolation order for this field and the selected fields might be different.
