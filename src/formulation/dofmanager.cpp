@@ -162,7 +162,7 @@ std::vector<int> dofmanager::getdisjointregionsofselectedfield(void)
 {
     synchronize();
     
-    int totalnumdisjreg = universe::mymesh->getdisjointregions()->count();
+    int totalnumdisjreg = countdisjointregions();
     
     std::vector<int> output(totalnumdisjreg);
     int index = 0;
@@ -512,6 +512,19 @@ std::vector<std::shared_ptr<rawfield>> dofmanager::getfields(void)
     return myfields;
 }
 
+void dofmanager::replaceselectedfield(std::shared_ptr<rawfield> rf)
+{
+    synchronize();
+    
+    if (selectedfieldnumber >= 0)
+        myfields[selectedfieldnumber] = rf;
+    else
+    {
+        std::cout << "Error in 'dofmanager' object: in 'replaceselectedfield' expected a selected field" << std::endl;
+        abort();
+    }
+}
+
 std::vector<int> dofmanager::getselectedfieldorders(void)
 {
     synchronize();
@@ -537,6 +550,13 @@ int dofmanager::countformfunctions(int disjointregion)
     synchronize();
     
     return rangebegin[selectedfieldnumber][disjointregion].size();
+}
+
+int dofmanager::countdisjointregions(void)
+{
+    synchronize();
+    
+    return rangebegin[selectedfieldnumber].size();
 }
         
 void dofmanager::print(void)

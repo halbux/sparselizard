@@ -20,7 +20,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder)
         return;
     }
         
-    if (issynchronizing || myptracker == universe::mymesh->getptracker())
+    if (issynchronizing || not(issynchronizingallowed) || myptracker == universe::mymesh->getptracker())
         return;
     issynchronizing = true; 
     
@@ -259,6 +259,19 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     }
     universe::mymesh->getphysicalregions()->remove({dirichletphysreg}, false);
     universe::mymesh->getphysicalregions()->remove({physreg}, false);
+}
+
+void rawfield::allowsynchronizing(bool allowit)
+{
+    for (int i = 0; i < mysubfields.size(); i++)
+        mysubfields[i][0]->allowsynchronizing(allowit);
+    for (int i = 0; i < myharmonics.size(); i++)
+    {
+        if (myharmonics[i].size() > 0)
+            myharmonics[i][0]->allowsynchronizing(allowit);
+    }
+    if (mysubfields.size() == 0 && myharmonics.size() == 0)
+        issynchronizingallowed = allowit;
 }
 
 void rawfield::allowvaluesynchronizing(bool allowit)

@@ -107,11 +107,13 @@ class dofmanager
         
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
+        void replaceselectedfield(std::shared_ptr<rawfield> rf);
         
         std::vector<int> getselectedfieldorders(void);
         
         int countdofs(void);
         int countformfunctions(int disjointregion);
+        int countdisjointregions(void);
         
         void print(void);
         
