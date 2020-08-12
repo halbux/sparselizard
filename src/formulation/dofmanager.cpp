@@ -149,7 +149,7 @@ void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
         std::cout << "Error in object 'dofmanager': selected field is not defined in the dof manager" << std::endl;
         abort();
     }
-    if (myfields[selectedfieldnumber]->getinterpolationorders() != myfieldorders[selectedfieldnumber])
+    if (not(issynchronizing) && myfields[selectedfieldnumber]->getinterpolationorders() != myfieldorders[selectedfieldnumber])
     {
         std::cout << "Error in 'dofmanager' object: ";
         myfields[selectedfieldnumber]->print();
