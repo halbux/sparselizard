@@ -7,73 +7,39 @@ void rawvec::synchronize(void)
         return;
     issynchronizing = true; 
 
+    // For a correct 'setdata' call below (now 'mydofmanager' will not be synced either):
+    dofmanager dm;
+    dm = *mydofmanager; // backup
+    *mydofmanager = mycurrentstructure[0];
     
-    // Extract all the values from the vector:
-    intdensematrix adresses(mycurrentstructure[0].countdofs(),1, 0,1);
-    densematrix alloldvals = getvalues(adresses);
-    double* alloldvalsptr = alloldvals.getvalues();
+    std::vector<std::shared_ptr<rawfield>> dmfields = mycurrentstructure[0].getfields();
+    std::vector<std::shared_ptr<rawfield>> datafields(dmfields.size());
+    
+    for (int i = 0; i < dmfields.size(); i++)
+    {
+        mydofmanager->selectfield(dmfields[i]);
+        mycurrentstructure[0].selectfield(dmfields[i]);
+        datafields[i] = std::shared_ptr<rawfield>(new rawfield(&(mycurrentstructure[0]), myrawmesh, myptracker));
+        mydofmanager->replaceselectedfield(datafields[i]);
+        mycurrentstructure[0].replaceselectedfield(datafields[i]);
+        datafields[i]->allowsynchronizing(false);
+        datafields[i]->setdata(-1, vec(shared_from_this())|field(datafields[i]));
+        datafields[i]->allowsynchronizing(true);
+    }
+      
+    *mydofmanager = dm; // restore
+    
+    for (int i = 0; i < dmfields.size(); i++)
+    {
+        mydofmanager->selectfield(dmfields[i]);
+        datafields[i]->synchronize({}, mydofmanager->getselectedfieldorders());
+    }
     
     // Create new petsc object (needed since number of dofs can change):
     VecDestroy(&myvec);
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
     VecSetFromOptions(myvec);    
-    
-
-    // We need to know in which disjoint region every old element number was:
-    std::vector<std::vector<int>> inolddisjregs;
-    myptracker->getindisjointregions(inolddisjregs);
-    // We also need to know how the mesh structure was before:
-    disjointregions* olddisjregs = myptracker->getdisjointregions();
-
-    
-    // Get the map to renumber the current elements to the ones in the mesh as in the current rawvec status:
-    std::vector<std::vector<int>> numberback;
-    universe::mymesh->getptracker()->getrenumbering(myptracker, numberback);
-    
-    // The fields are unchanged:
-    std::vector<std::shared_ptr<rawfield>> curfields = mydofmanager->getfields();
-
-
-    for (int i = 0; i < curfields.size(); i++)
-    {
-        mycurrentstructure[0].selectfield(curfields[i]);
-        mydofmanager->selectfield(curfields[i]);
-    
-        for (int d = 0; d < universe::mymesh->getdisjointregions()->count(); d++)
-        {
-            int numff = mydofmanager->countformfunctions(d);
-            if (numff == 0)
-                continue;
-            
-            int elemtypenum = universe::mymesh->getdisjointregions()->getelementtypenumber(d);
-            int rb = universe::mymesh->getdisjointregions()->getrangebegin(d);
-        
-            for (int ff = 0; ff < numff; ff++)
-            {
-                densematrix vals(universe::mymesh->getdisjointregions()->countelements(d), 1, 0.0);
-                double* myvals = vals.getvalues();
-            
-                for (int e = 0; e < vals.countrows(); e++)
-                {
-                    // Find the corresponding index and value in 'alloldvalsptr':
-                    int oldelemnum = numberback[elemtypenum][rb+e];
-                    int oldelemdisjreg = inolddisjregs[elemtypenum][oldelemnum];
-                    
-                    // Value will be 0 if not in the previous vector:
-                    if (mycurrentstructure[0].isdefined(oldelemdisjreg, ff))
-                    {
-                        int oldelemindex = oldelemnum - olddisjregs->getrangebegin(oldelemdisjreg);
-                        int olddofrb = mycurrentstructure[0].getrangebegin(oldelemdisjreg, ff);
-                        myvals[e] = alloldvalsptr[olddofrb+oldelemindex];
-                    }
-                }
-                
-                setvalues(curfields[i], d, ff, vals, "set");
-            }
-        }
-    }    
-    
     
     // Update the dof manager to the current one:
     mycurrentstructure = {*mydofmanager};
@@ -82,6 +48,11 @@ void rawvec::synchronize(void)
     // Update the mesh tracker to the current one:
     myptracker = universe::mymesh->getptracker();
     myrawmesh = universe::mymesh;
+    
+    // Transfer the data back to the vector:
+    for (int i = 0; i < datafields.size(); i++)
+        datafields[i]->transferdata(-1, vec(shared_from_this())|field(dmfields[i]), "set");
+    
     issynchronizing = false;
 }
 

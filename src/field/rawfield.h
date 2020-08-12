@@ -145,6 +145,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
         rawfield(void);
+        // Get a new field with interpolation orders from 'dm' (the corresponding field must have been selected in 'dm'):
+        rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
+        
         ~rawfield(void);
         
         bool ismultiharmonic(void) { return multiharmonic; };

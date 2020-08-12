@@ -432,6 +432,32 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
 
 rawfield::rawfield(void) {}
 
+rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
+{
+    int numdrs = dm->countdisjointregions();
+    
+    std::shared_ptr<rawfield> selectedrf = dm->getselectedfield();
+
+    mytypename = selectedrf->gettypename();
+    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, pt->getdisjointregions()));
+    
+    interpolationorder = dm->getselectedfieldorders();
+    
+    myconstraints = std::vector<std::shared_ptr<integration>>(numdrs, NULL);
+    myconditionalconstraints = std::vector<std::vector<expression>>(numdrs, std::vector<expression>(0));
+    isitgauged = std::vector<bool>( numdrs, false);
+    
+    for (int i = 0; i < numdrs; i++)
+        mycoefmanager->fitinterpolationorder(i, interpolationorder[i]); 
+
+    issynchronizingallowed = selectedrf->issynchronizingallowed;
+    isvaluesynchronizingallowed = selectedrf->isvaluesynchronizingallowed;
+    myupdateaccuracy = selectedrf->myupdateaccuracy;
+    
+    myptracker = pt;
+    myrawmesh = rm;
+}
+
 rawfield::~rawfield(void)
 {
     if (universe::mymesh != NULL && mysubfields.size() == 0 && myharmonics.size() == 0)
