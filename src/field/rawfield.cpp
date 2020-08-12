@@ -545,7 +545,7 @@ void rawfield::print(void)
 
 void rawfield::printvalues(bool databoundsonly)
 {
-    // Do not sync this.
+    synchronize();
     
     if (mycoefmanager == NULL)
         std::cout << "Field has no values to print." << std::endl;
