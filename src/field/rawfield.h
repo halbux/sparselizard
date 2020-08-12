@@ -218,6 +218,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Get the interpolation order on a disjoint region.
         // Only valid for fields without subfields.
         int getinterpolationorder(int disjreg);
+        std::vector<int> getinterpolationorders(void);
         
         // Give an error if all harmonics have not the same interpolation order.
         // Only valid for fields without subfields.

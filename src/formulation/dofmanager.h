@@ -33,6 +33,9 @@ class dofmanager
         // The currently selected field (if any) is myfields[selectedfieldnumber]:
         int selectedfieldnumber = -1;
         
+        // Order of each field on each disjoint region:
+        std::vector<std::vector<int>> myfieldorders = {};
+        
         // 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
         // the first row/column in the matrix at which the data for 
         //
@@ -104,6 +107,8 @@ class dofmanager
         
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
+        
+        std::vector<int> getselectedfieldorders(void);
         
         int countdofs(void);
         int countformfunctions(int disjointregion);

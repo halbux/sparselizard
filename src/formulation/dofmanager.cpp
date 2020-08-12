@@ -13,6 +13,7 @@ void dofmanager::synchronize(void)
     myfields = {};
     int selectedfieldnumberbkp = selectedfieldnumber;
     selectedfieldnumber = -1;
+    myfieldorders = {};
     rangebegin = {};
     rangeend = {};
 
@@ -49,10 +50,22 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
     {
         fieldindex = myfields.size();
         myfields.push_back(fieldtoadd);
+        myfieldorders.push_back(fieldtoadd->getinterpolationorders());
         int numberofdisjointregions = mydisjointregions->count();
         std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
         rangebegin.push_back(temp);
         rangeend.push_back(temp);
+    }
+    else
+    {
+        // Make sure the field order has not changed between to calls:
+        if (fieldtoadd->getinterpolationorders() != myfieldorders[fieldindex])
+        {
+            std::cout << "Error in 'dofmanager' object: ";
+            fieldtoadd->print();
+            std::cout << " order was changed and does not match dof structure anymore" << std::endl;
+            abort();
+        }
     }
     
     // Add an entry for every form function - if not already existing:
@@ -134,6 +147,13 @@ void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
     if (selectedfieldnumber == -1)
     {
         std::cout << "Error in object 'dofmanager': selected field is not defined in the dof manager" << std::endl;
+        abort();
+    }
+    if (myfields[selectedfieldnumber]->getinterpolationorders() != myfieldorders[selectedfieldnumber])
+    {
+        std::cout << "Error in 'dofmanager' object: ";
+        myfields[selectedfieldnumber]->print();
+        std::cout << " order was changed and does not match dof structure anymore" << std::endl;
         abort();
     }
 }
@@ -490,6 +510,19 @@ std::vector<std::shared_ptr<rawfield>> dofmanager::getfields(void)
     synchronize();
     
     return myfields;
+}
+
+std::vector<int> dofmanager::getselectedfieldorders(void)
+{
+    synchronize();
+    
+    if (selectedfieldnumber >= 0)
+        return myfieldorders[selectedfieldnumber];
+    else
+    {
+        std::cout << "Error in 'dofmanager' object: in 'getselectedfieldorders' expected a selected field" << std::endl;
+        abort();
+    }
 }
 
 int dofmanager::countdofs(void)

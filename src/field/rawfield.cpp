@@ -1362,6 +1362,13 @@ int rawfield::getinterpolationorder(int disjreg)
     }
 }
 
+std::vector<int> rawfield::getinterpolationorders(void)
+{
+    synchronize();
+    
+    return interpolationorder;
+}
+
 void rawfield::errornotsameinterpolationorder(int disjreg)
 {
     synchronize();
