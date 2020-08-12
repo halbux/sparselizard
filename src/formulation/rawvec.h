@@ -20,12 +20,14 @@
 #include "petscvec.h"
 #include "mathop.h"
 #include "ptracker.h"
+#include "rawmesh.h"
 
 class vectorfieldselect;
 class dofmanager;
 class rawfield;
+class rawmesh;
 
-class rawvec
+class rawvec : public std::enable_shared_from_this<rawvec>
 {
     private:
 
@@ -41,6 +43,9 @@ class rawvec
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
         
+        
+        // Mesh on which this object is based:
+        std::shared_ptr<rawmesh> myrawmesh = NULL;
     
     public:
             
@@ -78,6 +83,10 @@ class rawvec
         
         std::shared_ptr<dofmanager> getdofmanager(void);
         Vec getpetsc(void);
+        
+        std::shared_ptr<rawvec> getpointer(void);
+        std::shared_ptr<rawmesh> getrawmesh(void);
+        std::shared_ptr<ptracker> getptracker(void);
         
         // Transfer data between the 'inputvec' vector and this vector:
         void setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield);

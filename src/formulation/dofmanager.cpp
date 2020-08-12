@@ -475,6 +475,16 @@ std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
     return newdofmanager;
 }
 
+std::shared_ptr<rawfield> dofmanager::getselectedfield(void)
+{
+    synchronize();
+
+    if (selectedfieldnumber >= 0)
+        return myfields[selectedfieldnumber];
+    else
+        return NULL;
+}
+
 std::vector<std::shared_ptr<rawfield>> dofmanager::getfields(void)
 {
     synchronize();

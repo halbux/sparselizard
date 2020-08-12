@@ -102,6 +102,7 @@ class dofmanager
         // Removed dofs are renumbered as -1.
         std::shared_ptr<dofmanager> removeconstraints(int* dofrenumbering);
         
+        std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
         
         int countdofs(void);

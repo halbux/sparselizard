@@ -543,6 +543,16 @@ void rawfield::print(void)
         std::cout << myname;
 }
 
+void rawfield::printvalues(bool databoundsonly)
+{
+    // Do not sync this.
+    
+    if (mycoefmanager == NULL)
+        std::cout << "Field has no values to print." << std::endl;
+    else
+        mycoefmanager->print(databoundsonly);
+}
+
 void rawfield::setname(std::string name)
 {
     // Do not sync this.
@@ -1052,7 +1062,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
             else
             {
                 std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
-                dofmngr->selectfield(shared_from_this());
+                dofmngr->selectfield(selectedrawfield);
                 selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
             }
 
@@ -1162,7 +1172,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     else
     {
         std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
-        dofmngr->selectfield(shared_from_this());
+        dofmngr->selectfield(selectedrawfield);
         selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
     }
 

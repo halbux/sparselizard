@@ -48,6 +48,8 @@ class coefmanager
 
     double getcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion);
     void setcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion, double val);
+    
+    void print(bool databoundsonly);
         
 };
 

@@ -65,3 +65,37 @@ void coefmanager::setcoef(int disjreg, int formfunctionindex, int elementindexin
         coefs[disjreg][formfunctionindex][elementindexindisjointregion] = val;
     }
 }
+
+void coefmanager::print(bool databoundsonly)
+{
+    std::cout << std::endl << "Field of type " << myfieldtypename << ":" << std::endl;
+    
+    for (int d = 0; d < coefs.size(); d++)
+    {
+        for (int ff = 0; ff < coefs[d].size(); ff++)
+        {
+            if (coefs[d][ff].size() > 0)
+                std::cout << std::endl << "--> Disjoint region " << d << ", shape function " << ff << ":" << std::endl;
+            double datamin, datamax;
+            if (coefs[d][ff].size() > 0)
+            {
+                datamin = coefs[d][ff][0];
+                datamax = coefs[d][ff][0];
+            }
+            for (int e = 0; e < coefs[d][ff].size(); e++)
+            {
+                if (databoundsonly == false)
+                    std::cout << coefs[d][ff][e] << " ";
+                if (coefs[d][ff][e] < datamin)
+                    datamin = coefs[d][ff][e];
+                if (coefs[d][ff][e] > datamax)
+                    datamax = coefs[d][ff][e];
+            }
+            if (databoundsonly == false)
+                std::cout << std::endl;
+            if (coefs[d][ff].size() > 0)
+                std::cout << "Data min/max: " << datamin << " / " << datamax << std::endl;
+        }
+    }
+    std::cout << std::endl;
+}

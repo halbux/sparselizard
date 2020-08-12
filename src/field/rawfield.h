@@ -159,6 +159,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         // Print the raw field name:
         void print(void);
+        void printvalues(bool databoundsonly = true);
         // Set the raw field name:
         void setname(std::string name);
         std::string gettypename(bool familyonly = true);

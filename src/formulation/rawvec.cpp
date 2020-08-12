@@ -81,6 +81,7 @@ void rawvec::synchronize(void)
     
     // Update the mesh tracker to the current one:
     myptracker = universe::mymesh->getptracker();
+    myrawmesh = universe::mymesh;
     issynchronizing = false;
 }
 
@@ -95,6 +96,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
     if (mydofmanager->ismanaged())
     {
         myptracker = universe::mymesh->getptracker();
+        myrawmesh = universe::mymesh;
         
         mycurrentstructure = {*dofmngr};
         mycurrentstructure[0].donotsynchronize();
@@ -110,6 +112,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
     if (mydofmanager->ismanaged())
     {
         myptracker = universe::mymesh->getptracker();
+        myrawmesh = universe::mymesh;
         
         mycurrentstructure = {*dofmngr};
         mycurrentstructure[0].donotsynchronize();
@@ -449,6 +452,27 @@ Vec rawvec::getpetsc(void)
     synchronize();
     
     return myvec;
+}
+
+std::shared_ptr<rawvec> rawvec::getpointer(void)
+{
+    synchronize();
+   
+    return shared_from_this();
+}
+
+std::shared_ptr<rawmesh> rawvec::getrawmesh(void)
+{
+    synchronize();
+    
+    return myrawmesh;
+}
+
+std::shared_ptr<ptracker> rawvec::getptracker(void)
+{
+    synchronize();
+    
+    return myptracker;
 }
 
 void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_ptr<rawfield> inputfield)
