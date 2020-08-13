@@ -58,7 +58,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
     }
     else
     {
-        // Make sure the field order has not changed between to calls:
+        // Make sure the field order has not changed between two calls:
         if (fieldtoadd->getinterpolationorders() != myfieldorders[fieldindex])
         {
             std::cout << "Error in 'dofmanager' object: ";
