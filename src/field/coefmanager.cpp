@@ -72,27 +72,29 @@ void coefmanager::print(bool databoundsonly)
     {
         for (int ff = 0; ff < coefs[d].size(); ff++)
         {
-            if (coefs[d][ff].size() > 0)
-                std::cout << std::endl << "--> Disjoint region " << d << ", shape function " << ff << ":" << std::endl;
-            double datamin, datamax;
-            if (coefs[d][ff].size() > 0)
-            {
-                datamin = coefs[d][ff][0];
-                datamax = coefs[d][ff][0];
-            }
+            if (coefs[d][ff].size() == 0)
+                continue;
+                
+            std::cout << std::endl << "--> Disjoint region " << d << ", shape function " << ff << ":" << std::endl;
+            
+            double datamin = coefs[d][ff][0];
+            double datamax = coefs[d][ff][0];
+            
             for (int e = 0; e < coefs[d][ff].size(); e++)
             {
+                double val = coefs[d][ff][e];
+                
                 if (databoundsonly == false)
-                    std::cout << coefs[d][ff][e] << " ";
-                if (coefs[d][ff][e] < datamin)
-                    datamin = coefs[d][ff][e];
-                if (coefs[d][ff][e] > datamax)
-                    datamax = coefs[d][ff][e];
+                    std::cout << val << " ";
+                if (val < datamin)
+                    datamin = val;
+                if (val > datamax)
+                    datamax = val;
             }
             if (databoundsonly == false)
                 std::cout << std::endl;
-            if (coefs[d][ff].size() > 0)
-                std::cout << "Data min/max: " << datamin << " / " << datamax << std::endl;
+
+            std::cout << "Data min/max: " << datamin << " / " << datamax << std::endl;
         }
     }
     std::cout << std::endl;
