@@ -30,7 +30,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     originalthis->mypadapttriggers = {};
     
     // Create a new coef manager:
-    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getptracker()->getdisjointregions()));
+    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
     
     // Flush the containers:
     interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);
