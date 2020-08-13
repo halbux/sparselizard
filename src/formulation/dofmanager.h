@@ -114,7 +114,6 @@ class dofmanager
         
         int countdofs(void);
         int countformfunctions(int disjointregion);
-        int countdisjointregions(void);
         
         void print(void);
         

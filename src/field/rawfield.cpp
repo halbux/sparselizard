@@ -434,7 +434,7 @@ rawfield::rawfield(void) {}
 
 rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
-    int numdrs = dm->countdisjointregions();
+    int numdrs = pt->getdisjointregions()->count();
     
     std::shared_ptr<rawfield> selectedrf = dm->getselectedfield();
 

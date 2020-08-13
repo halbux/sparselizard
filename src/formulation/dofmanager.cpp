@@ -162,11 +162,9 @@ std::vector<int> dofmanager::getdisjointregionsofselectedfield(void)
 {
     synchronize();
     
-    int totalnumdisjreg = countdisjointregions();
-    
-    std::vector<int> output(totalnumdisjreg);
+    std::vector<int> output(rangebegin[selectedfieldnumber].size());
     int index = 0;
-    for (int i = 0; i < totalnumdisjreg; i++)
+    for (int i = 0; i < output.size(); i++)
     {
         if (rangebegin[selectedfieldnumber][i].size() > 0)
         {
@@ -516,26 +514,14 @@ void dofmanager::replaceselectedfield(std::shared_ptr<rawfield> rf)
 {
     synchronize();
     
-    if (selectedfieldnumber >= 0)
-        myfields[selectedfieldnumber] = rf;
-    else
-    {
-        std::cout << "Error in 'dofmanager' object: in 'replaceselectedfield' expected a selected field" << std::endl;
-        abort();
-    }
+    myfields[selectedfieldnumber] = rf;
 }
 
 std::vector<int> dofmanager::getselectedfieldorders(void)
 {
     synchronize();
     
-    if (selectedfieldnumber >= 0)
-        return myfieldorders[selectedfieldnumber];
-    else
-    {
-        std::cout << "Error in 'dofmanager' object: in 'getselectedfieldorders' expected a selected field" << std::endl;
-        abort();
-    }
+    return myfieldorders[selectedfieldnumber];
 }
 
 int dofmanager::countdofs(void)
@@ -550,13 +536,6 @@ int dofmanager::countformfunctions(int disjointregion)
     synchronize();
     
     return rangebegin[selectedfieldnumber][disjointregion].size();
-}
-
-int dofmanager::countdisjointregions(void)
-{
-    synchronize();
-    
-    return rangebegin[selectedfieldnumber].size();
 }
         
 void dofmanager::print(void)
