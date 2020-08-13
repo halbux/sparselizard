@@ -424,7 +424,7 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
 
             isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
 
-            mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getptracker()->getdisjointregions()));
+            mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
         }
     }
     return;
