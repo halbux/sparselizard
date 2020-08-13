@@ -107,7 +107,7 @@ class dofmanager
         
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
-        // The replacing field must have an identical order vector as the replaced one:
+        // The replacing field must have an identical type and order vector as the replaced one:
         void replaceselectedfield(std::shared_ptr<rawfield> rf);
         
         std::vector<int> getselectedfieldorders(void);
