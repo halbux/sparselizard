@@ -1052,10 +1052,20 @@ void elements::definedisjointregions(void)
             // (no dof will ever be associated to curvature nodes).
             if (typenum != 0 || isnodeacornernode[elem])
             {
+                bool isinany = false;
                 for (int i = 0; i < numberofphysicalregions; i++)
+                {
                     temp[i] = isinphysicalregion[typenum][elem*numberofphysicalregions+i];
-
-                indisjointregion[typenum][elem] = mydisjointregions->add(typenum, temp);
+                    isinany = isinany || temp[i];
+                }
+                if (isinany)
+                    indisjointregion[typenum][elem] = mydisjointregions->add(typenum, temp);
+                else
+                {
+                    element problemelem(typenum);
+                    std::cout << "Error in 'elements' object: trying to add a '" << problemelem.gettypename() << "' element that has no physical region tag" << std::endl;
+                    abort();
+                }
             }
             else
                 indisjointregion[typenum][elem] = -1;
