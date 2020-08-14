@@ -69,6 +69,10 @@ class vec
         // 'op' can be 'add' or 'set'.
         void setdata(int physreg, field myfield, std::string op = "set");
         
+        // Allow/forbid automatic updating of the vec value during hp-adaptivity:
+        void automaticupdate(bool updateit);
+        void noautomaticupdate(void);
+        
         Vec getpetsc(void);
         
         // Write and load raw vec data:

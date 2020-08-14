@@ -42,6 +42,8 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         void synchronize(void);
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
+        // Allow/forbid value syncing:
+        bool isvaluesynchronizingallowed = true;
         
         
         // Mesh on which this object is based:
@@ -53,6 +55,8 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input);
         
         ~rawvec(void);
+        
+        void allowvaluesynchronizing(bool allowit);
         
         int size(void);
         

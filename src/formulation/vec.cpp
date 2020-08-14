@@ -87,6 +87,18 @@ void vec::setdata(int physreg, field myfield, std::string op)
     vectorfieldselect(rawvecptr, myfield.getpointer()).setdata(physreg, myfield, op);
 }
 
+void vec::automaticupdate(bool updateit)
+{
+    errorifpointerisnull();
+    rawvecptr->allowvaluesynchronizing(updateit);
+}
+
+void vec::noautomaticupdate(void)
+{
+    errorifpointerisnull();
+    rawvecptr->allowvaluesynchronizing(false);
+}
+
 Vec vec::getpetsc(void) { errorifpointerisnull(); return rawvecptr->getpetsc(); }
 
 void vec::write(std::string filename)

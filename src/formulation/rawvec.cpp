@@ -7,32 +7,35 @@ void rawvec::synchronize(void)
         return;
     issynchronizing = true; 
 
-    // For a correct 'setdata' call below (now 'mydofmanager' will not be synced either):
-    dofmanager dm;
-    dm = *mydofmanager; // backup
-    *mydofmanager = mycurrentstructure[0];
-    
     std::vector<std::shared_ptr<rawfield>> dmfields = mycurrentstructure[0].getfields();
     std::vector<std::shared_ptr<rawfield>> datafields(dmfields.size());
     
-    for (int i = 0; i < dmfields.size(); i++)
+    if (isvaluesynchronizingallowed)
     {
-        mydofmanager->selectfield(dmfields[i]);
-        mycurrentstructure[0].selectfield(dmfields[i]);
-        datafields[i] = std::shared_ptr<rawfield>(new rawfield(&(mycurrentstructure[0]), myrawmesh, myptracker));
-        mydofmanager->replaceselectedfield(datafields[i]);
-        mycurrentstructure[0].replaceselectedfield(datafields[i]);
-        datafields[i]->allowsynchronizing(false);
-        datafields[i]->setdata(-1, vec(shared_from_this())|field(datafields[i]));
-        datafields[i]->allowsynchronizing(true);
-    }
-      
-    *mydofmanager = dm; // restore
-    
-    for (int i = 0; i < dmfields.size(); i++)
-    {
-        mydofmanager->selectfield(dmfields[i]);
-        datafields[i]->synchronize({}, mydofmanager->getselectedfieldorders());
+        // For a correct 'setdata' call below (now 'mydofmanager' will not be synced either):
+        dofmanager dm;
+        dm = *mydofmanager; // backup
+        *mydofmanager = mycurrentstructure[0];
+        
+        for (int i = 0; i < dmfields.size(); i++)
+        {
+            mydofmanager->selectfield(dmfields[i]);
+            mycurrentstructure[0].selectfield(dmfields[i]);
+            datafields[i] = std::shared_ptr<rawfield>(new rawfield(&(mycurrentstructure[0]), myrawmesh, myptracker));
+            mydofmanager->replaceselectedfield(datafields[i]);
+            mycurrentstructure[0].replaceselectedfield(datafields[i]);
+            datafields[i]->allowsynchronizing(false);
+            datafields[i]->setdata(-1, vec(shared_from_this())|field(datafields[i]));
+            datafields[i]->allowsynchronizing(true);
+        }
+          
+        *mydofmanager = dm; // restore
+        
+        for (int i = 0; i < dmfields.size(); i++)
+        {
+            mydofmanager->selectfield(dmfields[i]);
+            datafields[i]->synchronize({}, mydofmanager->getselectedfieldorders());
+        }
     }
     
     // Create new petsc object (needed since number of dofs can change):
@@ -49,9 +52,12 @@ void rawvec::synchronize(void)
     myptracker = universe::mymesh->getptracker();
     myrawmesh = universe::mymesh;
     
-    // Transfer the data back to the vector:
-    for (int i = 0; i < datafields.size(); i++)
-        datafields[i]->transferdata(-1, vec(shared_from_this())|field(dmfields[i]), "set");
+    if (isvaluesynchronizingallowed)
+    {
+        // Transfer the data back to the vector:
+        for (int i = 0; i < datafields.size(); i++)
+            datafields[i]->transferdata(-1, vec(shared_from_this())|field(dmfields[i]), "set");
+    }
     
     issynchronizing = false;
 }
@@ -100,6 +106,11 @@ int rawvec::size(void)
         return 0;
     else
         return mydofmanager->countdofs(); 
+}
+
+void rawvec::allowvaluesynchronizing(bool allowit)
+{
+    isvaluesynchronizingallowed = allowit;
 }
 
 void rawvec::removeconstraints(void)
