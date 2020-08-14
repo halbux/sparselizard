@@ -44,7 +44,7 @@ void coefmanager::fitinterpolationorder(int disjreg, int interpolationorder)
 
 double coefmanager::getcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion)
 {
-    if (coefs[disjreg][formfunctionindex].size() != 0)
+    if (formfunctionindex < coefs[disjreg].size() && coefs[disjreg][formfunctionindex].size() != 0)
         return coefs[disjreg][formfunctionindex][elementindexindisjointregion];
     else
         return 0;
