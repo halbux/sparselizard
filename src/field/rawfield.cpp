@@ -438,6 +438,7 @@ rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<
     
     std::shared_ptr<rawfield> selectedrf = dm->getselectedfield();
 
+    multiharmonic = selectedrf->multiharmonic;
     mytypename = selectedrf->gettypename();
     mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, pt->getdisjointregions()));
     
@@ -579,6 +580,27 @@ void rawfield::printharmonics(void)
         }
         std::cout << std::endl;
     }
+}
+
+std::shared_ptr<coefmanager> rawfield::resetcoefmanager(void)
+{
+    synchronize();
+    
+    std::shared_ptr<coefmanager> outcm = mycoefmanager;
+    
+    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, myptracker->getdisjointregions()));
+    
+    for (int i = 0; i < interpolationorder.size(); i++)
+        mycoefmanager->fitinterpolationorder(i, interpolationorder[i]);
+    
+    return outcm;
+}
+
+void rawfield::setcoefmanager(std::shared_ptr<coefmanager> cm)
+{
+    synchronize();
+    
+    mycoefmanager = cm;
 }
 
 void rawfield::print(void)

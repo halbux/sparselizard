@@ -163,6 +163,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Print a string showing the harmonics in the field:
         void printharmonics(void);
         
+        // Reset the coef manager to all zero and return the current one:
+        std::shared_ptr<coefmanager> resetcoefmanager(void);
+        void setcoefmanager(std::shared_ptr<coefmanager> cm);
+        
         // Print the raw field name:
         void print(void);
         void printvalues(bool databoundsonly = true);

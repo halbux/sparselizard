@@ -63,18 +63,20 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     }
 
     // Time derivative of non-multiharmonic fields:
+    std::shared_ptr<coefmanager> cmbkp = NULL;
     if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
     {
         // Get the vector in the universe corresponding to the field time derivative.
         // This was created and set to the universe by a time resolution object.
         if ((universe::xdtxdtdtx)[timederivativeorder].size() == 0)
         {
-            if (timederivativeorder == 1)
-                std::cout << "Error in 'opfield' object: the dt(field) value was not made available by a time resolution" << std::endl;
-            if (timederivativeorder == 2)
-                std::cout << "Error in 'opfield' object: the dtdt(field) value was not made available by a time resolution" << std::endl;
+            std::vector<std::string> messtr = {"","dt","dtdt"};
+            std::cout << "Error in 'opfield' object: the " << messtr[timederivativeorder] << "(";
+            myfield->print();
+            std::cout << ") value was not made available by a time resolution" << std::endl;
             abort();
         }
+        cmbkp = myfield->harmonic(1)->resetcoefmanager();
         // Set the field value to the field time derivative value on all regions:
         myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|field(myfield));
     }
@@ -140,18 +142,8 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
         }
     }
 
-    if (myfield->ismultiharmonic() == false && timederivativeorder > 0)
-    {
-        // Get the vector in the universe corresponding to the field data.
-        // This was created and set to the universe by a time resolution object.
-        if ((universe::xdtxdtdtx)[0].size() == 0)
-        {
-            std::cout << "Error in 'opfield' object: the field value was not made available by a time resolution" << std::endl;
-            abort();
-        }
-        // Set the field value back to its initial value on all regions:
-        myfield->setdata(-1, (universe::xdtxdtdtx)[0][0]|field(myfield));
-    }
+    if (cmbkp != NULL)
+        myfield->harmonic(1)->setcoefmanager(cmbkp);
 
     if (myfield->ismultiharmonic() && timederivativeorder > 0)
         output = harmonic::timederivative(timederivativeorder, output);
