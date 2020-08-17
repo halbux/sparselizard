@@ -63,6 +63,12 @@ void mat::removeconstraints(void) { errorifpointerisnull(); errorifinvalidated()
 
 void mat::reusefactorization(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->reuselu(); }
 
+std::shared_ptr<rawmat> mat::getpointer(void)
+{
+    errorifinvalidated();
+    return rawmatptr;
+}
+        
 Mat mat::getpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getpetsc(); }   
 
 void mat::print(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->print(); }

@@ -60,7 +60,7 @@ class mat
         
         void reusefactorization(void);
         
-        std::shared_ptr<rawmat> getpointer(void) { return rawmatptr; };
+        std::shared_ptr<rawmat> getpointer(void);
         
         Mat getpetsc(void);
         
