@@ -35,6 +35,7 @@ class mat
         std::shared_ptr<rawmat> rawmatptr = NULL;
         
         void errorifpointerisnull(void);
+        void errorifinvalidated(void);
             
     public:
                     

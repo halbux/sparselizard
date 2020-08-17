@@ -59,6 +59,8 @@ class rawmat
         
         long long int countnnz(void) { return nnz; };
         
+        int getmeshnumber(void) { return mymeshnumber; };
+        
         // Set all row and/or column indices requested to -1 (-1 adresses are ignored at assembly):
         void zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns);
 

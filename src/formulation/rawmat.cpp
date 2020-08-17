@@ -6,8 +6,7 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)
 {
     mydofmanager = dofmngr;
     
-    if (mydofmanager->ismanaged())
-        mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input)
@@ -16,8 +15,7 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input)
     
     mymat = input;
     
-    if (mydofmanager->ismanaged())
-        mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::mymesh->getmeshnumber();
 }
         
 rawmat::~rawmat(void) 
@@ -301,12 +299,6 @@ std::shared_ptr<dofmanager> rawmat::getdofmanager(void)
 
 Mat rawmat::getpetsc(void)
 {
-    if (mydofmanager->ismanaged() && mymeshnumber != universe::mymesh->getmeshnumber())
-    {
-        std::cout << "Error in 'rawmat' object: object has been invalidated by mesh adaptation and cannot be used" << std::endl;
-        abort();
-    }
-
     return mymat;
 }
 

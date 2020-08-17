@@ -10,6 +10,15 @@ void mat::errorifpointerisnull(void)
     }
 }
 
+void mat::errorifinvalidated(void)
+{
+    if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::mymesh->getmeshnumber())
+    {
+        std::cout << "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" << std::endl;
+        abort();
+    }
+}
+
 mat::mat(long long int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(std::shared_ptr<dofmanager>(new dofmanager(matsize))));
@@ -26,10 +35,10 @@ mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix c
     rawmatptr->clearfragments();
 }
 
-long long int mat::countrows(void) { errorifpointerisnull(); return rawmatptr->countrows(); }
-long long int mat::countcolumns(void) { errorifpointerisnull(); return rawmatptr->countcolumns(); }
+long long int mat::countrows(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->countrows(); }
+long long int mat::countcolumns(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->countcolumns(); }
         
-long long int mat::countnnz(void) { errorifpointerisnull(); return rawmatptr->countnnz(); }
+long long int mat::countnnz(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->countnnz(); }
 
 void mat::permute(intdensematrix rowpermute, intdensematrix colpermute)
 {
@@ -50,13 +59,13 @@ void mat::permute(intdensematrix rowpermute, intdensematrix colpermute)
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(rawmatptr->getdofmanager(), permutedmat));
 }
 
-void mat::removeconstraints(void) { errorifpointerisnull(); rawmatptr->removeconstraints(); };
+void mat::removeconstraints(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->removeconstraints(); };
 
-void mat::reusefactorization(void) { errorifpointerisnull(); rawmatptr->reuselu(); }
+void mat::reusefactorization(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->reuselu(); }
 
-Mat mat::getpetsc(void) { errorifpointerisnull(); return rawmatptr->getpetsc(); }   
+Mat mat::getpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getpetsc(); }   
 
-void mat::print(void) { errorifpointerisnull(); rawmatptr->print(); }
+void mat::print(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->print(); }
 
 mat mat::copy(void)
 {
