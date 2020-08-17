@@ -98,6 +98,11 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
 
 rawvec::~rawvec(void) { VecDestroy(&myvec); }
 
+void rawvec::allowvaluesynchronizing(bool allowit)
+{
+    isvaluesynchronizingallowed = allowit;
+}
+
 int rawvec::size(void) 
 { 
     synchronize();
@@ -106,11 +111,6 @@ int rawvec::size(void)
         return 0;
     else
         return mydofmanager->countdofs(); 
-}
-
-void rawvec::allowvaluesynchronizing(bool allowit)
-{
-    isvaluesynchronizingallowed = allowit;
 }
 
 void rawvec::removeconstraints(void)
