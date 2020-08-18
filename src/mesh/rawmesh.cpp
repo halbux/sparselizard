@@ -833,10 +833,10 @@ void rawmesh::remove(rawfield* inrawfield)
     mypadaptdata.resize(curindex);
 }
 
-void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted)
+bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted)
 {
     if (mypadaptdata.size() == 0)
-        return;
+        return false;
 
     double noisethreshold = 1e-8;
     int num = mypadaptdata.size();
@@ -962,7 +962,7 @@ void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     }
     // Nothing to do if all new orders are identical to the old ones:
     if (isidenticalorder && not(washadapted))
-        return;
+        return false;
         
     
     ///// Add the elements to new physical regions:
@@ -1070,6 +1070,9 @@ void rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     myphysicalregions.remove(prtoremove, true);
     
     myptracker->updatedisjointregions(&mydisjointregions);
+    
+    
+    return true;
 }
 
 bool rawmesh::adapth(int verbosity)

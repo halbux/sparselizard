@@ -930,9 +930,9 @@ bool mathop::adapt(bool isverbose)
     std::shared_ptr<ptracker> ptcritcalc = universe::mymesh->getptracker();
 
     bool washchanged = universe::mymesh->getoriginalmeshpointer()->adapth(isverbose);
-    universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged);
+    bool waspchanged = universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged);
 
-    return washchanged;
+    return (washchanged || waspchanged);
 }
 
 expression mathop::array1x1(expression term11)
