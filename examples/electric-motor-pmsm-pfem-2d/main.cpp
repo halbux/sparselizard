@@ -52,7 +52,7 @@ double sparselizard(double alpha)
     // Use interpolation order 2 to evaluate the initial p-adaptivity criterion:
     az.setorder(all, 2);
     // The interpolation order of az is increased where its gradient is sharper (p-adaptivity).
-    az.setorder(norm(grad(az)), {az}, 2, 5);
+    az.setorder(norm(grad(az)), 2, 5);
 
     // Put a magnetic wall at the inner rotor and outer stator boundaries:
     az.setconstraint(inarc);
@@ -109,8 +109,11 @@ double sparselizard(double alpha)
 
     // Simple p-adaptivity loop:
     for (int i = 0; i <= 2; i++)
+    {
         solve(magnetostatics);
-
+        adapt();
+    }
+    
     az.write(all, "a"+std::to_string((int)alpha)+".vtu", 2);
     curl(a).write(all, "b"+std::to_string((int)alpha)+".vtu", 2);
     // Write the adapted field order:

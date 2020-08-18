@@ -98,8 +98,6 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         
         bool ispadaptive = false;
-        int ispadaptivetrigger = 0;
-        int ishadaptivetrigger = 0;
         
         std::shared_ptr<ptracker> myptracker = NULL;
 
@@ -109,8 +107,6 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<std::shared_ptr<integration>> myconstraintcalctracker = {};
         std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
         std::vector<int> mygaugetracker = {};
-        
-        std::vector<std::shared_ptr<rawfield>> mypadapttriggers = {};
         
         // To avoid infinite recursive calls:
         bool issynchronizing = false;
@@ -139,9 +135,6 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void allowvaluesynchronizing(bool allowit);
         
         void setupdateaccuracy(int extraintegrationorder);
-        
-        bool isptrigger(void);
-        bool ishtrigger(void);
         
         rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm);
         rawfield(void);
@@ -175,10 +168,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::string gettypename(bool familyonly = true);
 
         void setorder(int physreg, int interpolorder, bool iscalledbyuser = true);
-        void setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
-        
-        void setptriggerflag(bool isptrig);
-        void sethtriggerflag(bool ishtrig);
+        void setorder(expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
         
         void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:

@@ -1123,11 +1123,11 @@ bool rawmesh::adapth(int verbosity)
 
     ///// Calculate the number of splits to use:
     
-    std::vector<double> thresholds = std::get<2>(myhadaptdata[0]);
-    std::vector<int> numsplits = std::get<3>(myhadaptdata[0]);
-    double thresdown = std::get<4>(myhadaptdata[0]) + noisethreshold;
-    double thresup = std::get<5>(myhadaptdata[0]) + noisethreshold;
-    double mincritrange = std::get<6>(myhadaptdata[0]);
+    std::vector<double> thresholds = std::get<1>(myhadaptdata[0]);
+    std::vector<int> numsplits = std::get<2>(myhadaptdata[0]);
+    double thresdown = std::get<3>(myhadaptdata[0]) + noisethreshold;
+    double thresup = std::get<4>(myhadaptdata[0]) + noisethreshold;
+    double mincritrange = std::get<5>(myhadaptdata[0]);
     
     int minnumsplits = *std::min_element(numsplits.begin(), numsplits.end());
 
@@ -1471,7 +1471,7 @@ bool rawmesh::adapth(int verbosity)
     return true;
 }
 
-void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
+void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
 {
     if (lownumsplits < 0)
     {
@@ -1495,10 +1495,10 @@ void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, i
     for (int i = 0; i < cnt; i++)
         numsplits[i] = lownumsplits + i;
         
-    setadaptivity(criterion, triggers, thresholds, numsplits, thresdown, thresup, mincritrange);
+    setadaptivity(criterion, thresholds, numsplits, thresdown, thresup, mincritrange);
 }
 
-void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
+void rawmesh::setadaptivity(expression criterion, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
 {
     double noiselevel = 1e-8;
 
@@ -1568,23 +1568,8 @@ void rawmesh::setadaptivity(expression criterion, std::vector<field> triggers, s
         std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
         abort();
     }
-        
-    std::vector<std::shared_ptr<rawfield>> htriggers = {};
-    if (myhadaptdata.size() > 0)
-        htriggers = std::get<1>(myhadaptdata[0]);
-        
-    // Reset the trigger flag on the previous triggers:
-    for (int i = 0; i < htriggers.size(); i++)
-        htriggers[i]->sethtriggerflag(false);
-    htriggers = {};
-    // Set the trigger on the fields:
-    for (int i = 0; i < triggers.size(); i++)
-    {
-        htriggers.push_back(triggers[i].getpointer());
-        triggers[i].getpointer()->sethtriggerflag(true);
-    }
     
-    myhadaptdata = {std::make_tuple(criterion, htriggers, thresholds, numsplits, thresdown, thresup, mincritrange)};   
+    myhadaptdata = {std::make_tuple(criterion, thresholds, numsplits, thresdown, thresup, mincritrange)};   
 }
 
 void rawmesh::writewithdisjointregions(std::string name)

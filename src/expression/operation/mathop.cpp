@@ -924,18 +924,13 @@ expression mathop::athp(expression expr, std::shared_ptr<rawmesh> rm, std::share
     return expression(m, n, subexprs);
 }
 
-bool mathop::adapthp(bool withhadapt, bool withpadapt, bool ishverbose)
+bool mathop::adapt(bool isverbose)
 {
-    bool washchanged = false;
-
     std::shared_ptr<rawmesh> rmcritcalc = universe::mymesh;
     std::shared_ptr<ptracker> ptcritcalc = universe::mymesh->getptracker();
 
-    if (withhadapt)
-        washchanged = universe::mymesh->getoriginalmeshpointer()->adapth(ishverbose);
-
-    if (washchanged || withpadapt) // a p step must follow h
-        universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged);
+    bool washchanged = universe::mymesh->getoriginalmeshpointer()->adapth(isverbose);
+    universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged);
 
     return washchanged;
 }
@@ -1281,20 +1276,8 @@ void mathop::setdata(vec invec)
     // Get all fields in the vec structure:
     std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
     
-    // Check if there is any hp-adaptivity trigger:
-    bool isanyhtrigger = false, isanyptrigger = false;
-    for (int i = 0; i < allfields.size(); i++)
-    {
-        if (allfields[i]->ishtrigger())
-            isanyhtrigger = true;
-        if (allfields[i]->isptrigger())
-            isanyptrigger = true;
-    }
-    
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, invec|field(allfields[i]));
-    
-    mathop::adapthp(isanyhtrigger, isanyptrigger);
 }
 
 

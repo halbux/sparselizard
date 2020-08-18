@@ -27,7 +27,6 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     // Get a copy of this field before syncing:
     std::shared_ptr<rawfield> originalthis(new rawfield);
     *originalthis = *this;
-    originalthis->mypadapttriggers = {};
     
     // Create a new coef manager:
     mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
@@ -309,46 +308,6 @@ void rawfield::setupdateaccuracy(int extraintegrationorder)
         myupdateaccuracy = extraintegrationorder;
 }
 
-bool rawfield::isptrigger(void)
-{
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-        return (ispadaptivetrigger > 0);
-
-    for (int i = 0; i < mysubfields.size(); i++)
-    {
-        if (mysubfields[i][0]->isptrigger())
-            return true;
-    }
-    
-    for (int h = 0; h < myharmonics.size(); h++)
-    {
-        if (myharmonics[h].size() > 0 && myharmonics[h][0]->isptrigger())
-            return true;
-    }
-
-    return false;
-}
-
-bool rawfield::ishtrigger(void)
-{
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-        return (ishadaptivetrigger > 0);
-
-    for (int i = 0; i < mysubfields.size(); i++)
-    {
-        if (mysubfields[i][0]->ishtrigger())
-            return true;
-    }
-    
-    for (int h = 0; h < myharmonics.size(); h++)
-    {
-        if (myharmonics[h].size() > 0 && myharmonics[h][0]->ishtrigger())
-            return true;
-    }
-
-    return false;
-}
-
 rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm)
 {
     multiharmonic = ismultiharm;
@@ -463,11 +422,6 @@ rawfield::~rawfield(void)
 {
     if (universe::mymesh != NULL && mysubfields.size() == 0 && myharmonics.size() == 0)
         universe::mymesh->remove(this);
-
-    // Reset the adaptivity triggers:
-    for (int i = 0; i < mypadapttriggers.size(); i++)
-        mypadapttriggers[i]->setptriggerflag(false);
-    mypadapttriggers = {};
 }
 
 int rawfield::countcomponents(void)
@@ -712,7 +666,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     }
 }
 
-void rawfield::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
+void rawfield::setorder(expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
 {
     synchronize();
     
@@ -733,11 +687,11 @@ void rawfield::setorder(expression criterion, std::vector<field> triggers, std::
 
     // Set the interpolation order on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange);
+        mysubfields[i][0]->setorder(criterion, thresholds, orders, thresdown, thresup, mincritrange);
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange);
+            myharmonics[i][0]->setorder(criterion, thresholds, orders, thresdown, thresup, mincritrange);
     }
 
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
@@ -745,63 +699,6 @@ void rawfield::setorder(expression criterion, std::vector<field> triggers, std::
         ispadaptive = true;
         
         universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, thresdown, thresup, mincritrange);
-        
-        // Reset the trigger flag on the previous triggers:
-        for (int i = 0; i < mypadapttriggers.size(); i++)
-            mypadapttriggers[i]->setptriggerflag(false);
-        mypadapttriggers = {};
-        // Set the trigger on the fields:
-        for (int i = 0; i < triggers.size(); i++)
-        {
-            mypadapttriggers.push_back(triggers[i].getpointer());
-            triggers[i].getpointer()->setptriggerflag(true);
-        }
-    }
-}
-
-void rawfield::setptriggerflag(bool isptrig)
-{
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setptriggerflag(isptrig);
-    for (int i = 0; i < myharmonics.size(); i++)
-    {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setptriggerflag(isptrig);
-    }
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-    {
-        if (isptrig)
-            ispadaptivetrigger++;
-        else
-            ispadaptivetrigger--;
-        if (ispadaptivetrigger < 0)
-        {
-            std::cout << "Error in 'rawfield' object: trigger flag cannot be negative" << std::endl;
-            abort();
-        }
-    }
-}
-
-void rawfield::sethtriggerflag(bool ishtrig)
-{
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->sethtriggerflag(ishtrig);
-    for (int i = 0; i < myharmonics.size(); i++)
-    {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->sethtriggerflag(ishtrig);
-    }
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-    {
-        if (ishtrig)
-            ishadaptivetrigger++;
-        else
-            ishadaptivetrigger--;
-        if (ishadaptivetrigger < 0)
-        {
-            std::cout << "Error in 'rawfield' object: trigger flag cannot be negative" << std::endl;
-            abort();
-        }
     }
 }
 

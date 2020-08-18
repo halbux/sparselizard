@@ -71,7 +71,7 @@ void field::setorder(int physreg, int interpolorder)
     rawfieldptr->setorder(physreg, interpolorder); 
 }
 
-void field::setorder(expression criterion, std::vector<field> triggers, int loworder, int highorder, double thresdown, double thresup, double mincritrange)
+void field::setorder(expression criterion, int loworder, int highorder, double thresdown, double thresup, double mincritrange)
 {
     if (loworder < 0)
     {
@@ -100,18 +100,13 @@ void field::setorder(expression criterion, std::vector<field> triggers, int lowo
     for (int i = 0; i < numorders; i++)
         orders[i] = loworder + i;
         
-    setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange);
+    setorder(criterion, thresholds, orders, thresdown, thresup, mincritrange);
 }
 
-void field::setorder(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
+void field::setorder(expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
 {
     double noiselevel = 1e-8;
 
-    if (triggers.size() == 0)
-    {
-        std::cout << "Error in 'field' object: in 'setorder' expected at least one field to trigger the p-adaptation" << std::endl;
-        abort();   
-    }
     if (not(criterion.isscalar()))
     {
         std::cout << "Error in 'field' object: in 'setorder' expected a scalar criterion to set an adaptive field order" << std::endl;
@@ -175,42 +170,32 @@ void field::setorder(expression criterion, std::vector<field> triggers, std::vec
         abort();   
     }
     
-    rawfieldptr->setorder(criterion, triggers, thresholds, orders, thresdown, thresup, mincritrange); 
+    rawfieldptr->setorder(criterion, thresholds, orders, thresdown, thresup, mincritrange); 
 }
 
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
-    
-    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
-    
-    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
-    
-    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
-    
-    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setvalue(int physreg)
 {
     rawfieldptr->setvalue(physreg);
-    
-    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
 }
 
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
@@ -240,9 +225,7 @@ void field::setdata(int physreg, vectorfieldselect myvec, std::string op)
         abort();
     }
 
-    rawfieldptr->setdata(physreg, myvec, op); 
-    
-    mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
+    rawfieldptr->setdata(physreg, myvec, op);
 }
 
 void field::setdata(int physreg, vec myvec, std::string op)
@@ -361,22 +344,10 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     }
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
-    {
-        std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
-    
-        mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
-        
-        return datout;
-    }
+        return rawfieldptr->loadraw(filename, isbinary);
     
     if (isbinary == false && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz"))
-    {
-        std::vector<double> datout = rawfieldptr->loadraw(filename, isbinary);
-        
-        mathop::adapthp(rawfieldptr->ishtrigger(), rawfieldptr->isptrigger());
-            
-        return datout;
-    }
+        return rawfieldptr->loadraw(filename, isbinary);
     
     std::cout << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to load raw field data" << std::endl;
     abort();

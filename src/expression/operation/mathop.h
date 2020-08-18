@@ -168,7 +168,8 @@ namespace mathop
     // Return an expression whose value will be calculated on the argument mesh state (the expression is hp-synchronized to that mesh state after the call):
     expression athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
 
-    bool adapthp(bool withhadapt, bool withpadapt, bool ishverbose = false);
+    // hp-adaptation:
+    bool adapt(bool isverbose = true);
 
     // Define typically used arrays for convenience:
     expression array1x1(expression term11);

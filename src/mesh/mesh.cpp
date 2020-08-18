@@ -69,19 +69,14 @@ void mesh::write(std::string name, int verbosity)
     rawmeshptr->gethadaptedpointer()->write(name, verbosity);
 }
 
-bool mesh::adapt(int verbosity)
+void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
 {
-    return mathop::adapthp(true, false, verbosity);
+    rawmeshptr->setadaptivity(criterion, lownumsplits, highnumsplits, thresdown, thresup, mincritrange);
 }
 
-void mesh::setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
+void mesh::setadaptivity(expression criterion, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
 {
-    rawmeshptr->setadaptivity(criterion, triggers, lownumsplits, highnumsplits, thresdown, thresup, mincritrange);
-}
-
-void mesh::setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
-{
-    rawmeshptr->setadaptivity(criterion, triggers, thresholds, numsplits, thresdown, thresup, mincritrange);
+    rawmeshptr->setadaptivity(criterion, thresholds, numsplits, thresdown, thresup, mincritrange);
 }
 
 void mesh::split(int n)

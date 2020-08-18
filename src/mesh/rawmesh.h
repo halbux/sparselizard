@@ -56,7 +56,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
     
         // For h-adaptivity (only for original mesh):
         std::shared_ptr<rawmesh> myhadaptedmesh = NULL;
-        std::vector<std::tuple<expression,std::vector<std::shared_ptr<rawfield>>,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
+        std::vector<std::tuple<expression,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
         // For the h-adapted mesh:
         std::shared_ptr<htracker> myhtracker = NULL;
         
@@ -138,8 +138,8 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         
         // For h-adaptivity:
         bool adapth(int verbosity);
-        void setadaptivity(expression criterion, std::vector<field> triggers, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange);
-        void setadaptivity(expression criterion, std::vector<field> triggers, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange);
+        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange);
+        void setadaptivity(expression criterion, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange);
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
         void writewithdisjointregions(std::string);
