@@ -14,7 +14,7 @@ double hadapt1d(void)
 
     field v("h1"), x("x");
 
-    mymesh.setadaptivity(x, {}, 0, 2);
+    mymesh.setadaptivity(x, 0, 2);
 
     v.setorder(line, 1);
 
@@ -50,7 +50,7 @@ double hadapt2d(void)
 
     expression criterion = ifpositive(sin(3*x*y), sin(50*x)*sin(57*y)*x*y, 0);
 
-    mymesh.setadaptivity(criterion, {}, 0, 5, 0.2, 0.2);
+    mymesh.setadaptivity(criterion, 0, 5, 0.2, 0.2);
 
     v.setorder(s1, 5);
     v.setorder(s2, 4);
@@ -85,7 +85,7 @@ double hadapt3d(void)
 
     expression criterion = ifpositive(sin(5*x)*sin(4*y)*sin(6*z), sin(50*x)*sin(57*y)*y*sin(53*z), 0);
 
-    mymesh.setadaptivity(criterion, {}, 0, 5, 0.5, 0.5);
+    mymesh.setadaptivity(criterion, 0, 5, 0.5, 0.5);
 
     v.setconstraint(left, 10);
     v.setconstraint(right, 0);
