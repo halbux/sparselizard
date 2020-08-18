@@ -225,7 +225,7 @@ std::shared_ptr<rawmesh> rawmesh::copy(void)
 
 std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt)
 {
-    // All calls from mathop::adapthp immediately return (myptracker always equals targetpt).
+    // All calls from mathop::adapt immediately return (myptracker always equals targetpt).
     if (myptracker == targetpt)
         return shared_from_this();
 
