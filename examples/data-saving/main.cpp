@@ -68,6 +68,8 @@ int main(void)
 
     sparselizard(true);
     sparselizard(false);
+    
+    std::cout << true;
 
     SlepcFinalize();
 
