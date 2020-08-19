@@ -1,4 +1,4 @@
-// The purpose of this example is to check that saving to and loading from .slz works as expected when the software is modified.
+// The purpose of this example is to check that hp-adaptivity works as expected when the software is modified.
 
 
 #include "sparselizardbase.h"
