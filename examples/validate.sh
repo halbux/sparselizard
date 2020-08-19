@@ -78,11 +78,4 @@ rm *.vtk;
 rm *.vtu;
 rm *.pvd;
 rm *.csv;
-
-
-
-
-
-
-
-
+rm *.slz;
