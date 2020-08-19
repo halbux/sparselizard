@@ -169,7 +169,7 @@ namespace mathop
     expression athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
 
     // hp-adaptation:
-    bool adapt(bool isverbose = true);
+    bool adapt(int verbosity = 0);
 
     // Define typically used arrays for convenience:
     expression array1x1(expression term11);

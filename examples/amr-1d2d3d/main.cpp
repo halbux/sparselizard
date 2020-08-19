@@ -27,8 +27,8 @@ double hadapt1d(void)
 
     solve(poisson);
 
-    adapt();
-    adapt();
+    adapt(1);
+    adapt(1);
 
     double intgr = norm(grad(v)).integrate(line, 5);
     double exact = 8.0;
@@ -63,7 +63,7 @@ double hadapt2d(void)
 
     poisson += integral(sur, grad(dof(v))*grad(tf(v)));
 
-    while (adapt()) {}
+    while (adapt(1)) {}
     
     solve(poisson);
 
@@ -94,7 +94,7 @@ double hadapt3d(void)
 
     poisson += integral(vol, grad(dof(v))*grad(tf(v)));
 
-    while (adapt()) {}
+    while (adapt(1)) {}
     
     solve(poisson);
 

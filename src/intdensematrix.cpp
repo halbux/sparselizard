@@ -91,6 +91,18 @@ intdensematrix intdensematrix::removevalue(long long int toremove)
     return output;
 }
 
+std::vector<int> intdensematrix::countalloccurences(int maxintval)
+{
+    int* myvaluesptr = myvalues.get();
+    
+    std::vector<int> output(maxintval+1, 0);
+    
+    for (long long int i = 0; i < numcols*numrows; i++)
+        output[myvaluesptr[i]]++;
+    
+    return output;
+}
+
 long long int intdensematrix::sum(void)
 {
     int* myvaluesptr = myvalues.get();

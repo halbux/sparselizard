@@ -833,7 +833,7 @@ void rawmesh::remove(rawfield* inrawfield)
     mypadaptdata.resize(curindex);
 }
 
-bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted)
+bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted, int verbosity)
 {
     if (mypadaptdata.size() == 0)
         return false;
@@ -962,8 +962,12 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     }
     // Nothing to do if all new orders are identical to the old ones:
     if (isidenticalorder && not(washadapted))
+    {
+        if (verbosity > 0)
+            std::cout << "Nothing to do for p-adaptation." << std::endl;
         return false;
-        
+    }
+    
     
     ///// Add the elements to new physical regions:
     
@@ -1072,20 +1076,38 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     myptracker->updatedisjointregions(&mydisjointregions);
     
     
+    ///// Print p-adaptation summary:
+    if (verbosity > 0)
+        std::cout << "Adapted order of " << num << " field" << myalgorithm::getplurals(num) << "." << std::endl;
+    if (verbosity > 1)
+    {
+        for (int i = 0; i < num; i++)
+        {
+            std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
+            std::vector<int> numineachorder = newordsmat[i].countalloccurences(newmaxorder);
+
+            curraw->print();
+
+            for (int o = 0; o <= newmaxorder; o++)
+                std::cout << " " << numineachorder[o];
+            std::cout << std::endl;
+        }
+    }
+    
     return true;
 }
 
 bool rawmesh::adapth(int verbosity)
 {
+    if (myhadaptdata.size() == 0)
+        return false;
+        
     wallclock clk;
 
     double noisethreshold = 1e-8;
     int meshdim = getmeshdimension();
     
     universe::mymesh = myhadaptedmesh;
- 
-    if (myhadaptdata.size() == 0)
-        return false;
         
     elements* elptr = universe::mymesh->getelements();
     disjointregions* drptr = universe::mymesh->getdisjointregions();
@@ -1262,7 +1284,7 @@ bool rawmesh::adapth(int verbosity)
     if (isidentical)
     {
         if (verbosity > 0)
-            std::cout << "Nothing to do for adaptation." << std::endl;
+            std::cout << "Nothing to do for h-adaptation." << std::endl;
         return false;
     }
         

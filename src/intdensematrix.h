@@ -47,6 +47,9 @@ class intdensematrix
         long long int countoccurences(long long int value);
         // Filter out the argument value and return a column vector:
         intdensematrix removevalue(long long int toremove);
+        
+        // Return a vector whose ith entry gives the number of times the ith value appears:
+        std::vector<int> countalloccurences(int maxintval);
 
         // Sum all values:
         long long int sum(void);
