@@ -1077,6 +1077,7 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     
     
     ///// Print p-adaptation summary:
+    
     if (verbosity > 0)
         std::cout << "Adapted order of " << num << " field" << myalgorithm::getplurals(num) << "." << std::endl;
     if (verbosity > 1)
