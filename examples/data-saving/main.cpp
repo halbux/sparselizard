@@ -55,10 +55,7 @@ void sparselizard(bool iswritemode)
         std::cout << focheck << " " << ucheck << std::endl;
         std::cout << std::abs(focheck-extradata[0])/std::abs(focheck) << " " << std::abs(ucheck-extradata[1])/std::abs(ucheck) << std::endl;
         
-        getfieldorder(u.compx()).write(all, "fo.pos");
-        
-        if (std::abs(focheck-extradata[0])/std::abs(focheck) > 0 || std::abs(ucheck-extradata[1])/std::abs(ucheck) > 0)
-            abort();
+        std::cout << (std::abs(focheck-extradata[0])/std::abs(focheck) == 0 && std::abs(ucheck-extradata[1])/std::abs(ucheck) == 0);
     }
 }
 
@@ -69,8 +66,6 @@ int main(void)
     sparselizard(true);
     sparselizard(false);
     
-    std::cout << true;
-
     SlepcFinalize();
 
     return 0;
