@@ -66,6 +66,14 @@ namespace mathop
     expression getmeshsize(int integrationorder);
     expression getfieldorder(field input);
     
+    std::vector<double> gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
+    std::vector<double> gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
+    std::vector<double> gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
+    
+    void printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
+    void printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
+    void printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
+    
     void setphysicalregionshift(int shiftamount);
 
     // Write all shape functions for an element type up to a given order:

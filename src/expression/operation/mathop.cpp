@@ -267,6 +267,94 @@ expression mathop::getfieldorder(field input)
     return expression(op);
 }
 
+std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+{
+    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    if (not(EorH.isharmonicone(alldisjregs)) || not(epsilonormu.isharmonicone(alldisjregs)))
+    {
+        std::cout << "Error in 'mathop' namespace: cannot have a multiharmonic argument in the total force calculation" << std::endl;
+        abort();
+    }
+    
+    int wholedomain = universe::mymesh->getphysicalregions()->createunionofall();
+
+    int numcomps = universe::mymesh->getmeshdimension();
+    if (numcomps == 1)
+    {
+        std::cout << "Error in 'mathop' namespace: force calculation formula is undefined in 1D" << std::endl;
+        abort();
+    }
+        
+    std::vector<std::string> tn = {"","h1","h1xy","h1xyz"};
+
+    field f(tn[numcomps]);
+    f.setorder(wholedomain, 1); // must be order 1
+    
+    formulation forcecalc;
+    if (meshdeform == NULL)
+        forcecalc += integral(wholedomain, -predefinedelectrostaticforce(tf(f, physreg), EorH, epsilonormu), extraintegrationorder);
+    else
+        forcecalc += integral(wholedomain, *meshdeform, -predefinedelectrostaticforce(tf(f, physreg), EorH, epsilonormu), extraintegrationorder);
+    forcecalc.generate();
+    vec fv = forcecalc.b();
+    
+    // First x then y then z component in structure:
+    std::vector<double> output(numcomps);
+    
+    int siz = fv.size()/numcomps;
+    for (int c = 0; c < numcomps; c++)
+    {
+        densematrix vecvals = fv.getvalues(intdensematrix(siz, 1, c*siz, 1));
+        output[c] = vecvals.sum();
+    }
+    
+    universe::mymesh->getphysicalregions()->remove({wholedomain}, false);
+    
+    return output;
+}
+
+std::vector<double> mathop::gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
+{
+    return gettotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
+}
+
+std::vector<double> mathop::gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+{
+    return gettotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
+}
+
+void mathop::printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+{
+    std::vector<double> totforce = gettotalforce(physreg, meshdeform, EorH, epsilonormu, extraintegrationorder);
+
+    std::cout << "Total force on region " << physreg << " is ";
+    std::vector<std::string> compstr = {"x","y","z"};
+    if (not(universe::isaxisymmetric))
+    {
+        std::vector<std::string> unitstr = {"",""," N per unit depth"," N"};
+        for (int c = 0; c < totforce.size(); c++)
+        {
+            std::cout << "f" << compstr[c] << " = " << totforce[c];
+            if (c != totforce.size()-1)
+                std::cout << ", ";
+        }
+        std::cout << unitstr[totforce.size()] << std::endl;
+    }
+    else
+        std::cout << "fx = 0, fy = " << 2.0*getpi()*totforce[1] << ", fz = 0 N" << std::endl;
+}
+
+void mathop::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
+{
+    printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
+}
+
+void mathop::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+{
+    printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
+}
+
 void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
 
 void mathop::writeshapefunctions(std::string filename, std::string sftypename, int elementtypenumber, int maxorder, bool allorientations)
