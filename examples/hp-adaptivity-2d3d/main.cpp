@@ -98,7 +98,7 @@ double adapthcurl(void)
     
     std::cout << "Relative error for 'hcurl': " << errorv << std::endl;
     
-    return errorv;
+    return std::abs(errorv);
 }
 
 int main(void)
