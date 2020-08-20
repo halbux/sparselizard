@@ -15,17 +15,22 @@ double adapth1(void)
     
     mesh mymesh({q}, 0);
     
-    field v("h1"), w("h1"), x("x"), y("y");
+    field u("h1"), v("h1"), w("h1"), x("x"), y("y");
     
+    u.setorder(sur, 1);
     v.setorder(sur, 3);
     w.setorder(sur, 2);
     
     w.setvalue(sur, x*x);
     
-    // P-adaptivity of field v:
-    v.setorder(sin(5*x)*sin(3*y), 3, 5);
+    // P-adaptivity of field u and v:
+    u.setorder(x, 2, 2);
+    v.setorder(sin(5*x)*sin(3*y)+1e-3*u, 3, 5);
     
     adapt(0);
+    adapt(0);
+    
+    u.setvalue(sur, x*x+y*y);
     
     // Increase the integration order during the hp-adaptivity field value projection:
     v.setupdateaccuracy(2);
@@ -51,14 +56,18 @@ double adapth1(void)
     
     v.setdata(sur, sol);
     
+    // Relative error on 'u' adaptation:
+    double erroru = (abs(u).integrate(sur, 5)-2.0/3.0)/(2.0/3.0);
     // Relative error on 'sol' adaptation:
     double errorsol = abs(toproject-v).integrate(sur, 5)/abs(toproject).integrate(sur, 5);
     // Relative error on 'w' adaptation:
     double errorw = (abs(w).integrate(sur, 5)-1.0/3.0)/(1.0/3.0);
     
-    std::cout << "Relative error for 'h1': " << errorsol << " " << errorw << std::endl;
+    erroru = std::abs(erroru); errorsol = std::abs(errorsol); errorw = std::abs(errorw);
     
-    return errorsol+errorw;
+    std::cout << "Relative error for 'h1': " << erroru << " " << errorsol << " " << errorw << std::endl;
+    
+    return erroru+errorsol+errorw;
 }
 
 double adapthcurl(void)
