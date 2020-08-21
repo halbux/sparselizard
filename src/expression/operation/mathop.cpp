@@ -305,6 +305,8 @@ std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, e
     int siz = fv.size()/numcomps;
     for (int c = 0; c < numcomps; c++)
     {
+        // totalforce = integral(fdensity*1) = integral(fdensity*sumi(Ni)) = sumi(integral(fdensity*Ni))
+        // where Ni includes all 'h1' nodal shape functions (their sum equals one). 
         densematrix vecvals = fv.getvalues(intdensematrix(siz, 1, c*siz, 1));
         output[c] = vecvals.sum();
     }
