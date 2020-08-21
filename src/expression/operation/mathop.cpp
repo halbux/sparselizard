@@ -309,6 +309,9 @@ std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, e
         output[c] = vecvals.sum();
     }
     
+    if (universe::isaxisymmetric)
+        output = {0, 2.0*getpi()*output[1], 0};
+    
     universe::mymesh->getphysicalregions()->remove({wholedomain}, false);
     
     return output;
@@ -330,19 +333,16 @@ void mathop::printtotalforce(int physreg, expression* meshdeform, expression Eor
 
     std::cout << "Total force on region " << physreg << " is ";
     std::vector<std::string> compstr = {"x","y","z"};
-    if (not(universe::isaxisymmetric))
+
+    for (int c = 0; c < totforce.size(); c++)
     {
-        std::vector<std::string> unitstr = {"",""," N per unit depth"," N"};
-        for (int c = 0; c < totforce.size(); c++)
-        {
-            std::cout << "f" << compstr[c] << " = " << totforce[c];
-            if (c != totforce.size()-1)
-                std::cout << ", ";
-        }
-        std::cout << unitstr[totforce.size()] << std::endl;
+        std::cout << "f" << compstr[c] << " = " << totforce[c];
+        if (c != totforce.size()-1)
+            std::cout << ", ";
     }
-    else
-        std::cout << "fx = 0, fy = " << 2.0*getpi()*totforce[1] << ", fz = 0 N" << std::endl;
+    
+    std::vector<std::string> unitstr = {"",""," N per unit depth"," N"};
+    std::cout << unitstr[totforce.size()] << std::endl;
 }
 
 void mathop::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
