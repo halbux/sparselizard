@@ -68,11 +68,23 @@ class regiondefiner
         // List of physical regions to exclude:
         std::vector<std::vector<int>> toexclude = {};
 
+        // LAYER SELECTION (operation type 4)
+        //
+        // List of new layer-selected physical regions:
+        std::vector<int> layered = {};
+        // List of physical regions from which the layer selection is requested:
+        std::vector<int> tolayer = {};
+        // List of physical regions where the layer selection growth starts:
+        std::vector<int> growthstart = {};
+        // List of number of layers to select:
+        std::vector<int> numlayers = {}; 
+        
 
         void defineskinregion(int regnum);
         void defineboxregion(int regnum);
         void definesphereregion(int regnum);
         void defineexclusionregion(int regnum);
+        void definelayerregion(int regnum);
 
     public:
 
@@ -83,6 +95,7 @@ class regiondefiner
         void boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
         void sphereselection(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere);
         void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
+        void layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl);
 
         bool isanyregiondefined(void);
         bool isanycoordinatedependentregiondefined(void);

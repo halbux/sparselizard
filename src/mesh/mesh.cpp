@@ -163,6 +163,12 @@ void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim,
     rawmeshptr->sphereselection(newphysreg, physregtosphere, selecteddim, centercoords, radius);
 }
 
+void mesh::layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
+{
+    errorifloaded();
+    rawmeshptr->layerselection(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
+}
+
 void mesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
 {
     errorifloaded();

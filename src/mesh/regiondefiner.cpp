@@ -258,6 +258,95 @@ void regiondefiner::defineexclusionregion(int regnum)
     newphysreg->removeduplicatedelements();
 }
 
+void regiondefiner::definelayerregion(int regnum)
+{
+    myphysicalregions->errorundefined({tolayer[regnum]});
+    myphysicalregions->errorundefined({growthstart[regnum]});
+        
+    physicalregion* newphysreg = myphysicalregions->get(layered[regnum]);
+    physicalregion* origphysreg = myphysicalregions->get(tolayer[regnum]);
+    physicalregion* growthphysreg = myphysicalregions->get(growthstart[regnum]);
+    
+    int nl = numlayers[regnum];
+    
+    // Tag the nodes that are in the growth region:
+    std::vector<bool> isnodeingrowthregion(mynodes->count(), false);
+    std::vector<std::vector<int>>* elemsingr = growthphysreg->getelementlist();
+    // Loop on all element types:
+    for (int i = 0; i <= 7; i++)
+    {
+        std::vector<int>* curelemtype = &(elemsingr->at(i));
+
+        int numelems = curelemtype->size();
+        if (numelems == 0)
+            continue;
+            
+        element el(i);
+        int nn = el.countnodes();
+            
+        for (int j = 0; j < numelems; j++)
+        {
+            int curelem = curelemtype->at(j);
+            for (int n = 0; n < nn; n++)
+                isnodeingrowthregion[myelements->getsubelement(0, i, curelem, n)] = true;
+        }
+    }
+    
+    std::vector<std::vector<bool>> inlayer(8, std::vector<bool>(0)); // avoid duplicates
+    for (int i = 0; i <= 7; i++)
+        inlayer[i] = std::vector<bool>(myelements->count(i), false);
+
+    std::vector<std::vector<int>>* curelems = origphysreg->getelementlist();
+    
+    for (int l = 0; l < nl; l++)
+    {
+        // 'isnodeingr' is fixed:
+        std::vector<bool> isnodeingr = isnodeingrowthregion;
+    
+        // Find all elements in the current layer (must be touching the growth region with at least one node):
+        for (int i = 0; i <= 7; i++)
+        {
+            std::vector<int>* curelemtype = &(curelems->at(i));
+
+            int numelems = curelemtype->size();
+            if (numelems == 0)
+                continue;
+
+            element el(i);
+            int nn = el.countnodes();
+
+            for (int j = 0; j < numelems; j++)
+            {
+                int curelem = curelemtype->at(j);
+                if (inlayer[i][curelem])
+                    continue;
+                    
+                for (int n = 0; n < nn; n++)
+                {
+                    int curnode = myelements->getsubelement(0, i, curelem, n);
+                    // If element is in layer:
+                    if (isnodeingr[curnode])
+                    {
+                        inlayer[i][curelem] = true;
+                        newphysreg->addelement(i, curelem);
+                        break;
+                    }
+                }
+                // Add nodes if element is in layer:
+                if (inlayer[i][curelem])
+                {
+                    for (int n = 0; n < nn; n++)
+                    {
+                        int curnode = myelements->getsubelement(0, i, curelem, n);
+                        isnodeingrowthregion[curnode] = true;
+                    }
+                }
+            }
+        }
+    }
+    newphysreg->removeduplicatedelements();
+}
+
 regiondefiner::regiondefiner(nodes& inputnodes, elements& inputelems, physicalregions& inputphysregs)
 {
     mynodes = &inputnodes;
@@ -342,6 +431,24 @@ void regiondefiner::regionexclusion(int newphysreg, int physregtoexcludefrom, st
     toexclude.push_back(physregstoexclude);
 }
 
+void regiondefiner::layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl)
+{
+    int cur = tolayer.size();
+    std::vector<int> prio = {4,cur};
+    mypriority.push_back(prio);
+    
+    if (nl <= 0)
+    {
+        std::cout << "Error in 'regiondefiner' object: expected at least one layer to select" << std::endl;
+        abort();
+    }
+
+    layered.push_back(newphysreg);
+    tolayer.push_back(physregtoselectfrom);
+    growthstart.push_back(physregtostartgrowth);
+    numlayers.push_back(nl);
+}
+
 bool regiondefiner::isanyregiondefined(void)
 {
     return (mypriority.size() > 0);
@@ -351,7 +458,7 @@ bool regiondefiner::isanycoordinatedependentregiondefined(void)
 {
     for (int i = 0; i < mypriority.size(); i++)
     {
-        if (mypriority[i][0] != 0 && mypriority[i][0] != 3)
+        if (mypriority[i][0] == 1 || mypriority[i][0] == 2)
             return true;
     }
 
@@ -371,6 +478,8 @@ void regiondefiner::defineregions(void)
             definesphereregion(mypriority[i][1]);
         if (mypriority[i][0] == 3)
             defineexclusionregion(mypriority[i][1]);
+        if (mypriority[i][0] == 4)
+            definelayerregion(mypriority[i][1]);
     }
 }
 

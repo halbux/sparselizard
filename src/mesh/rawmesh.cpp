@@ -782,6 +782,11 @@ void rawmesh::sphereselection(int newphysreg, int physregtosphere, int selectedd
     myregiondefiner.sphereselection(newphysreg, selecteddim, centercoords, radius, physregtosphere);
 }
 
+void rawmesh::layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
+{
+    myregiondefiner.layerselection(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
+}
+
 void rawmesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
 {
     myregiondefiner.regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
