@@ -122,15 +122,18 @@ std::vector<double> mathop::loadvector(std::string filename, char delimiter, boo
 
 expression mathop::norm(expression expr)
 {
-    if (expr.countcolumns() > 1)
+    expression mynorm;
+    
+    for (int i = 0; i < expr.countrows(); i++)
     {
-        std::cout << "Error in 'mathop' namespace: can only compute the norm of column vectors" << std::endl;
-        abort();
+        for (int j = 0; j < expr.countcolumns(); j++)
+        {
+            if (i == 0 && j == 0)
+                mynorm = pow(expr.at(i,j),2);
+            else
+                mynorm = mynorm + pow(expr.at(i,j),2);
+        }
     }
-
-    expression mynorm = pow(expr.at(0,0),2);
-    for (int i = 1; i < expr.countrows(); i++)
-        mynorm = mynorm + pow(expr.at(i,0),2);
 
     return sqrt(mynorm);
 }
