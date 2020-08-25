@@ -46,7 +46,7 @@ namespace mathop
     // Load a vector of doubles separated by a character:
     std::vector<double> loadvector(std::string filename, char delimiter = ',', bool sizeincluded = false);
 
-    // Compute the L2 norm of a vector expression:
+    // Compute the L2 norm of an expression:
     expression norm(expression expr);
 
     // Normal vector with unit norm:
