@@ -70,9 +70,9 @@ namespace mathop
     std::vector<double> gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
     std::vector<double> gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
     
-    void printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
-    void printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
-    void printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
+    std::vector<double> printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
+    std::vector<double> printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
+    std::vector<double> printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
     
     void setphysicalregionshift(int shiftamount);
 

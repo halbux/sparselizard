@@ -332,7 +332,7 @@ std::vector<double> mathop::gettotalforce(int physreg, expression meshdeform, ex
     return gettotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
-void mathop::printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> mathop::printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     std::vector<double> totforce = gettotalforce(physreg, meshdeform, EorH, epsilonormu, extraintegrationorder);
 
@@ -348,16 +348,18 @@ void mathop::printtotalforce(int physreg, expression* meshdeform, expression Eor
     
     std::vector<std::string> unitstr = {"",""," N per unit depth"," N"};
     std::cout << unitstr[totforce.size()] << std::endl;
+    
+    return totforce;
 }
 
-void mathop::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> mathop::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
+    return printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
-void mathop::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> mathop::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
+    return printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
 void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
