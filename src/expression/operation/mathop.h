@@ -178,6 +178,9 @@ namespace mathop
 
     // hp-adaptation:
     bool adapt(int verbosity = 0);
+    
+    // Define a Zienkiewicz-Zhu type error indicator:
+    expression zienkiewiczzhu(expression input);
 
     // Define typically used arrays for convenience:
     expression array1x1(expression term11);

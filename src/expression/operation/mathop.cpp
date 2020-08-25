@@ -1030,6 +1030,26 @@ bool mathop::adapt(int verbosity)
     return (washchanged || waspchanged);
 }
 
+expression mathop::zienkiewiczzhu(expression input)
+{
+    if (not(input.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: in 'zienkiewiczzhu' expected a scalar expression as argument" << std::endl;
+        abort();
+    }
+    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    if (not(input.isharmonicone(alldisjregs)))
+    {
+        std::cout << "Error in 'mathop' namespace: in 'zienkiewiczzhu' cannot have a multiharmonic expression as argument" << std::endl;
+        abort();
+    }
+
+    // std::shared_ptr<operrorestimator> op(new operrorestimator("zienkiewiczzhu", input));
+    
+    // return expression(op);
+}
+
 expression mathop::array1x1(expression term11)
 {
     std::vector<expression> terms = {term11};
