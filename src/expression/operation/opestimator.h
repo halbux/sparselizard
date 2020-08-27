@@ -25,6 +25,8 @@ class opestimator: public operation
         // This contains the estimated value:
         std::shared_ptr<opfield> myvalue = NULL;
         
+        int mystatenumber = 0;
+        
     public:
         
         opestimator(std::string estimatortype, std::shared_ptr<operation> arg);

@@ -21,6 +21,24 @@ double universe::getfundamentalfrequency(void)
 
 int universe::physregshift = 0;
 
+void universe::allowestimatorupdate(bool allowitonce)
+{
+    if (allowitonce)
+    {
+        estimatorcalcstate = std::abs(estimatorcalcstate);
+        estimatorcalcstate++;
+    }
+    else
+        estimatorcalcstate = -std::abs(estimatorcalcstate);
+}
+
+bool universe::isestimatorupdateallowed(int statenumber)
+{
+    return (estimatorcalcstate > 0 && statenumber != estimatorcalcstate);
+}
+
+int universe::estimatorcalcstate = -1; // cannot start at 0 since it has to be negative.
+        
 bool universe::isreuseallowed = false;
 
 void universe::allowreuse(void)

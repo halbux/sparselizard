@@ -27,9 +27,13 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
     bool wasreuseallowed = universe::isreuseallowed;
     universe::forbidreuse();
     
-    // Update the estimator:
-    if (mytype == "zienkiewiczzhu")
-        estimatezienkiewiczzhu();
+    // Update the estimator if allowed:
+    if (universe::isestimatorupdateallowed(mystatenumber))
+    {
+        if (mytype == "zienkiewiczzhu")
+            estimatezienkiewiczzhu();
+        mystatenumber = universe::estimatorcalcstate;
+    }
     
     // Provide the requested output:
     std::vector<std::vector<densematrix>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, meshdeform);

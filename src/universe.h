@@ -42,6 +42,12 @@ class universe
         // Shift the physical region numbers by (physregdim+1) x physregshift when loading a mesh:
         static int physregshift;
         
+        // Error estimators need evaluations across elements and can therefore not be efficiently evaluated in the usual way.
+        // Error estimators will be updated if 'estimatorcalcstate' > 0 and their state number is different than the latter.
+        static void allowestimatorupdate(bool allowitonce);
+        static bool isestimatorupdateallowed(int statenumber);
+        static int estimatorcalcstate;
+        
         // To allow reusing computed things:
         static bool isreuseallowed;
         static void allowreuse(void);

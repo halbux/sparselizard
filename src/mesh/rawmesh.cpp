@@ -853,6 +853,8 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     
     int wholedomain = myphysicalregions.createunionofall();
     
+    universe::allowestimatorupdate(true);
+    
     field one("one");
     for (int i = 0; i < num; i++)
     {
@@ -876,6 +878,8 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         oldords[i] = elorder.rhs();
     }
     int totalnumelems = crits[0].size();
+    
+    universe::allowestimatorupdate(false);
 
     // Move to densematrix container:
     std::vector<densematrix> critsmat(num), oldordsmat(num);
@@ -1132,10 +1136,14 @@ bool rawmesh::adapth(int verbosity)
     
     field one("one");
     
+    universe::allowestimatorupdate(true);
+        
     formulation critaverage;
     critaverage += mathop::integral(wholedomain, -std::get<0>(myhadaptdata[0]) * mathop::tf(one) / mathop::getmeshsize(2) );
     critaverage.generaterhs();
     vec crit = critaverage.rhs();
+    
+    universe::allowestimatorupdate(false);
     
     prptr->remove({wholedomain}, false);
 
