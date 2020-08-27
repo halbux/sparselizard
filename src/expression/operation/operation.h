@@ -148,6 +148,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opcos.h"
 #include "opdetjac.h"
 #include "opdof.h"
+#include "opestimator.h"
 #include "opfield.h"
 #include "opfieldorder.h"
 #include "opinversion.h"

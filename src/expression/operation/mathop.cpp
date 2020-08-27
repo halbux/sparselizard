@@ -1045,9 +1045,9 @@ expression mathop::zienkiewiczzhu(expression input)
         abort();
     }
 
-    // std::shared_ptr<operrorestimator> op(new operrorestimator("zienkiewiczzhu", input));
+    std::shared_ptr<opestimator> op(new opestimator("zienkiewiczzhu", input.getoperationinarray(0,0)));
     
-    // return expression(op);
+    return expression(op);
 }
 
 expression mathop::array1x1(expression term11)
