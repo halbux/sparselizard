@@ -698,6 +698,8 @@ void rawfield::setorder(expression criterion, std::vector<double> thresholds, st
     {
         ispadaptive = true;
         
+        criterion = mathop::abs(criterion);
+        
         universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, thresdown, thresup, mincritrange);
     }
 }

@@ -428,6 +428,8 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
         abort();
     }
+    
+    universe::allowestimatorupdate(true);
 
     // This will be the output:
     std::vector<double> maxval = {};
@@ -475,6 +477,8 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         }
         while (myselector.next());
     }
+    
+    universe::allowestimatorupdate(false);
 
     return maxval;
 }
@@ -591,6 +595,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     if (numtimeevals != -1)
         interpolated = {std::vector<double>(numcoords*numtimeevals,0.0)};
     
+    universe::allowestimatorupdate(true);
     
     referencecoordinategroup rcg(xyzcoord);
     
@@ -671,6 +676,8 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
         }
     }
     
+    universe::allowestimatorupdate(false);
+    
     // Provide a non-empty interpolation vector even in case nothing was found:
     if (interpolated.size() == 0)
         interpolated = {{},std::vector<double>(numcoords,0)};
@@ -710,6 +717,8 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
         abort();
     }
+    
+    universe::allowestimatorupdate(true);
 
     double integralvalue = 0;
     // Send the disjoint regions with same element type numbers together:
@@ -751,6 +760,9 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         }
         while (myselector.next());
     }
+    
+    universe::allowestimatorupdate(false);
+    
     return integralvalue;
 }
 
@@ -823,6 +835,8 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     std::vector<std::vector<iodata>> datatowrite = {};
     if (numtimesteps > 0)
         datatowrite = {{iodata(lagrangeorder, geolagrangeorder, isscalar(), timetags)}};
+
+    universe::allowestimatorupdate(true);
 
     // Send the disjoint regions with same element type numbers together:
     disjointregionselector mydisjregselector(selecteddisjregs, {});
@@ -914,6 +928,8 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         }
         while (myselector.next());
     }
+    
+    universe::allowestimatorupdate(false);
 
     // Write the data:
     if (numtimesteps <= 0)

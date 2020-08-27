@@ -48,7 +48,7 @@ double hadapt2d(void)
 
     field v("h1"), x("x"), y("y");
 
-    expression criterion = ifpositive(sin(3*x*y), sin(50*x)*sin(57*y)*x*y, 0);
+    expression criterion = 1+ifpositive(sin(3*x*y), sin(50*x)*sin(57*y)*x*y, 0);
 
     mymesh.setadaptivity(criterion, 0, 5, 0.2, 0.2);
 
@@ -83,7 +83,7 @@ double hadapt3d(void)
     field v("h1"), x("x"), y("y"), z("z");
     v.setorder(vol, 1);
 
-    expression criterion = ifpositive(sin(5*x)*sin(4*y)*sin(6*z), sin(50*x)*sin(57*y)*y*sin(53*z), 0);
+    expression criterion = 1+ifpositive(sin(5*x)*sin(4*y)*sin(6*z), sin(50*x)*sin(57*y)*y*sin(53*z), 0);
 
     mymesh.setadaptivity(criterion, 0, 5, 0.5, 0.5);
 
@@ -116,7 +116,7 @@ int main(void)
     std::cout << relerror1d << " " << relerror2d << " " << relerror3d << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (relerror1d < 2e-15 && relerror2d < 2e-11 && relerror3d < 2e-13);
+    std::cout << (relerror1d < 2e-15 && relerror2d < 2e-11 && relerror3d < 1e-12);
 
     SlepcFinalize();
 

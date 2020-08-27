@@ -921,7 +921,7 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         int* newordsptr = newordsmat[i].getvalues();
     
         std::vector<double> minmax = critsmat[i].minmax();
-        double cmin = minmax[0];
+        double cmin = 0.0;
         double cmax = minmax[1];
         
         double crange = cmax-cmin;
@@ -1171,7 +1171,7 @@ bool rawmesh::adapth(int verbosity)
     int minnumsplits = *std::min_element(numsplits.begin(), numsplits.end());
 
     std::vector<double> minmax = critmat.minmax();
-    double cmin = minmax[0];
+    double cmin = 0.0;
     double cmax = minmax[1];
     
     double crange = cmax-cmin;
@@ -1607,6 +1607,8 @@ void rawmesh::setadaptivity(expression criterion, std::vector<double> thresholds
         std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
         abort();
     }
+    
+    criterion = mathop::abs(criterion);
     
     myhadaptdata = {std::make_tuple(criterion, thresholds, numsplits, thresdown, thresup, mincritrange)};   
 }
