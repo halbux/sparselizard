@@ -191,6 +191,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::shared_ptr<rawfield> getpointer(void);
         std::shared_ptr<rawmesh> getrawmesh(void);
         std::shared_ptr<ptracker> getptracker(void);
+        
+        std::shared_ptr<coefmanager> getcoefmanager(void);
 
         // Transfer data from a solution vector to the field.
         // Get from all regions with physreg set to -1. 'op' can be 'add' or 'set'. 

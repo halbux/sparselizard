@@ -969,6 +969,13 @@ std::shared_ptr<ptracker> rawfield::getptracker(void)
     return myptracker;
 }
 
+std::shared_ptr<coefmanager> rawfield::getcoefmanager(void)
+{
+    synchronize();
+    
+    return mycoefmanager;
+}
+
 void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 {
     synchronize();
