@@ -122,6 +122,9 @@ std::vector<double> mathop::loadvector(std::string filename, char delimiter, boo
 
 expression mathop::norm(expression expr)
 {
+    if (expr.isscalar())
+        return abs(expr);
+
     expression mynorm;
     
     for (int i = 0; i < expr.countrows(); i++)
@@ -1032,11 +1035,6 @@ bool mathop::adapt(int verbosity)
 
 expression mathop::zienkiewiczzhu(expression input)
 {
-    if (not(input.isscalar()))
-    {
-        std::cout << "Error in 'mathop' namespace: in 'zienkiewiczzhu' expected a scalar expression as argument" << std::endl;
-        abort();
-    }
     std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(input.isharmonicone(alldisjregs)))
@@ -1045,9 +1043,25 @@ expression mathop::zienkiewiczzhu(expression input)
         abort();
     }
 
-    std::shared_ptr<opestimator> op(new opestimator("zienkiewiczzhu", input.getoperationinarray(0,0)));
+    int m = input.countrows();
+    int n = input.countcolumns();
+
+    std::vector<expression> zzexprs(m*n);
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (input.getoperationinarray(i,j)->isconstant())
+                zzexprs[i*n+j] = 0;
+            else
+            {
+                std::shared_ptr<opestimator> op(new opestimator("zienkiewiczzhu", input.getoperationinarray(i,j)));
+                zzexprs[i*n+j] = expression(op);
+            }
+        }
+    }
     
-    return expression(op);
+    return norm(expression(m, n, zzexprs));
 }
 
 expression mathop::array1x1(expression term11)
