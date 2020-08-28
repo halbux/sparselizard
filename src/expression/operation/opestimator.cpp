@@ -17,6 +17,12 @@ opestimator::opestimator(std::string estimatortype, std::shared_ptr<operation> a
 
 std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
+    if (meshdeform != NULL)
+    {
+        std::cout << "Error in 'opestimator' object: estimator cannot be computed on a deformed mesh" << std::endl;
+        abort();
+    }
+
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
     {
@@ -36,7 +42,7 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
     }
     
     // Provide the requested output:
-    std::vector<std::vector<densematrix>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densematrix>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, NULL);
     
    if (wasreuseallowed)
         universe::allowreuse();
