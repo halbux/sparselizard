@@ -32,12 +32,12 @@ void universe::allowestimatorupdate(bool allowitonce)
         estimatorcalcstate = -std::abs(estimatorcalcstate);
 }
 
-bool universe::isestimatorupdateallowed(int statenumber)
+bool universe::isestimatorupdateallowed(long long int statenumber)
 {
     return (estimatorcalcstate > 0 && statenumber != estimatorcalcstate);
 }
 
-int universe::estimatorcalcstate = -1; // cannot start at 0 since it has to be negative.
+long long int universe::estimatorcalcstate = -1; // cannot start at 0 since it has to be negative.
         
 bool universe::isreuseallowed = false;
 

@@ -45,8 +45,8 @@ class universe
         // Error estimators need evaluations across elements and can therefore not be efficiently evaluated in the usual way.
         // Error estimators will be updated if 'estimatorcalcstate' > 0 and their state number is different than the latter.
         static void allowestimatorupdate(bool allowitonce);
-        static bool isestimatorupdateallowed(int statenumber);
-        static int estimatorcalcstate;
+        static bool isestimatorupdateallowed(long long int statenumber);
+        static long long int estimatorcalcstate;
         
         // To allow reusing computed things:
         static bool isreuseallowed;

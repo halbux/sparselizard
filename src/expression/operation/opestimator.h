@@ -25,7 +25,7 @@ class opestimator: public operation
         // This contains the estimated value:
         std::shared_ptr<opfield> myvalue = NULL;
         
-        int mystatenumber = 0;
+        long long int mystatenumber = 0;
         
     public:
         
