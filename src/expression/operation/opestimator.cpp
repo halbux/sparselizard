@@ -85,6 +85,7 @@ void opestimator::estimatezienkiewiczzhu(void)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     
+    elements* myelements = universe::mymesh->getelements();
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
     
     // Compute 'myarg' at all mesh nodes: 
