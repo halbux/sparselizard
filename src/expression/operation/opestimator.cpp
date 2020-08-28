@@ -98,7 +98,7 @@ void opestimator::estimatezienkiewiczzhu(void)
     double* nvmin = nodalvaluesmin.getvalues();
     double* nvmax = nodalvaluesmax.getvalues();
     
-    std::vector<int> numcontribs(universe::mymesh->getnodes()->count(), 0);
+    std::vector<int> numcontribs(numnodes, 0);
 
     // Send the disjoint regions with same element type numbers together:
     disjointregionselector mydisjregselector(alldisjregsinmaxdim, {});
