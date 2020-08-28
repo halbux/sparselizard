@@ -85,11 +85,10 @@ void opestimator::estimatezienkiewiczzhu(void)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     
-    elements* myelements = universe::mymesh->getelements();
     disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
     
     // Compute 'myarg' at all mesh nodes: 
-    std::vector<int> alldisjregsinmaxdim = universe::mymesh->getdisjointregions()->getindim(problemdimension);
+    std::vector<int> alldisjregsinmaxdim = mydisjointregions->getindim(problemdimension);
 
     int numnodes = universe::mymesh->getnodes()->count();
 
@@ -107,7 +106,7 @@ void opestimator::estimatezienkiewiczzhu(void)
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
 
         // Evaluate at the corner nodes:
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtypenumber = mydisjointregions->getelementtypenumber(mydisjregs[0]);
     
         lagrangeformfunction mylagrange(elementtypenumber, 1, {});
         std::vector<double> evaluationpoints = mylagrange.getnodecoordinates();
