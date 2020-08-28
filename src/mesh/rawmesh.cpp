@@ -924,7 +924,7 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         double cmin = 0.0;
         double cmax = minmax[1];
         
-        double crange = cmax-cmin;
+        double crange = std::abs(cmax-cmin);
         
         // Convert the thresholds from % to criterion value:
         for (int th = 0; th < thresholds.size(); th++)
@@ -1174,7 +1174,7 @@ bool rawmesh::adapth(int verbosity)
     double cmin = 0.0;
     double cmax = minmax[1];
     
-    double crange = cmax-cmin;
+    double crange = std::abs(cmax-cmin);
     
     // Convert the thresholds from % to criterion value:
     for (int th = 0; th < thresholds.size(); th++)
