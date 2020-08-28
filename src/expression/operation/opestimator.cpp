@@ -69,8 +69,8 @@ std::shared_ptr<operation> opestimator::simplify(std::vector<int> disjregs)
 std::shared_ptr<operation> opestimator::copy(void)
 {
     std::shared_ptr<opestimator> op(new opestimator(mytype, myarg));
-    *op = *this;
-    op->reuse = false;
+    // 'myvalue' should not be the same one as in this object thus do not do '*op = *this'.
+    op->mystatenumber = 0; // to make sure 'myvalue' is recalculated when allowed (it is all zero here)
     return op;
 }
 
