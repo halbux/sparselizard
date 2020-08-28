@@ -39,7 +39,7 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
     std::vector<std::vector<densematrix>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, meshdeform);
     
    if (wasreuseallowed)
-        universe::allowreuse;
+        universe::allowreuse();
     
     if (reuse && universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), argmat);
