@@ -10,21 +10,21 @@ disjointregionselector::disjointregionselector(std::vector<int> disjointregionnu
     criteria.push_back(typenums);
     
     std::vector<int> renumberingvector(disjointregionnumbers.size());
-       std::iota(renumberingvector.begin(), renumberingvector.end(), 0);
-       // Sort 'reorderingvector' according to all criteria.
+    std::iota(renumberingvector.begin(), renumberingvector.end(), 0);
+    // Sort 'reorderingvector' according to all criteria.
     // The < operator is overloaded by a lambda function.
     std::sort(renumberingvector.begin(), renumberingvector.end(), [&](int elem1, int elem2)
-        { 
-            for (int i = 0; i < criteria.size(); i++)
-            {
-                if (criteria[i][elem1] < criteria[i][elem2])
-                    return true;
-                if (criteria[i][elem1] > criteria[i][elem2])
-                    return false;
-            }
-            // For identical entries make a COHERENT decision for a stable sorting.
-            return (elem1 < elem2);
-        });
+    { 
+        for (int i = 0; i < criteria.size(); i++)
+        {
+            if (criteria[i][elem1] < criteria[i][elem2])
+                return true;
+            if (criteria[i][elem1] > criteria[i][elem2])
+                return false;
+        }
+        // For identical entries make a COHERENT decision for a stable sorting.
+        return (elem1 < elem2);
+    });
     
     // Sort all criteria accordingly:
     std::vector<std::vector<int>> criteriabackup = criteria;
