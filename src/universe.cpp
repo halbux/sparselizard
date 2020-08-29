@@ -25,8 +25,11 @@ void universe::allowestimatorupdate(bool allowitonce)
 {
     if (allowitonce)
     {
-        estimatorcalcstate = std::abs(estimatorcalcstate);
-        estimatorcalcstate++;
+        if (estimatorcalcstate < 0)
+        {
+            estimatorcalcstate = std::abs(estimatorcalcstate);
+            estimatorcalcstate++;
+        }
     }
     else
         estimatorcalcstate = -std::abs(estimatorcalcstate);
@@ -121,10 +124,8 @@ void universe::setprecomputedfft(std::shared_ptr<operation> op, densematrix val)
     oppointersfft.push_back(op);
     opcomputedfft.push_back(val.copy());
 }
-        
-bool universe::skipgausspointweightproduct = false;
-bool universe::skipdetjacproduct = false;
-int universe::forcedintegrationorder = -1;
+
+bool universe::isbarycentereval = false;
 
 bool universe::keeptrackofrhsassembly = false;
 std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 

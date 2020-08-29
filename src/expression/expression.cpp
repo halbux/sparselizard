@@ -1163,68 +1163,13 @@ vec expression::atbarycenter(int physreg, field onefield)
         abort();
     }
 
-    // Compute the expression at the barycenter.
-    // When there is a single Gauss point it is at the barycenter --> set integration order to 0.
-    // The default integration order is 1 (order of a 'one' field) + 2 :
+    // Compute the expression at the barycenter:
     formulation formul;
-    formul += integration(physreg, - mathop::tf(onefield)*(this->getcopy()) / mathop::abs(detjac()), -3);
+    formul += integration(physreg, - mathop::tf(onefield)*(this->getcopy()));
 
-    universe::skipgausspointweightproduct = true;
+    universe::isbarycentereval = true;
     formul.generate();
-    universe::skipgausspointweightproduct = false;
-
-    return formul.rhs();
-}
-
-vec expression::integrateonelements(int physreg, field onefield, int integrationorder)
-{
-    return integrateonelements(physreg, NULL, onefield, integrationorder);
-}
-
-vec expression::integrateonelements(int physreg, expression meshdeform, field onefield, int integrationorder)
-{
-    return integrateonelements(physreg, &meshdeform, onefield, integrationorder);
-}
-
-vec expression::integrateonelements(int physreg, expression* meshdeform, field onefield, int integrationorder)
-{
-    // The expression must be scalar and the field must be a scalar "one" type:
-    if (onefield.getpointer()->gettypename() != "one" || onefield.countcomponents() != 1 || isscalar() == false)
-    {
-        std::cout << "Error in 'expression' object: integrateonelements requires a scalar expression and a scalar 'one' type field" << std::endl;
-        abort();
-    }
-
-    int problemdimension = universe::mymesh->getmeshdimension();
-    if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
-    {
-        std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
-    }
-
-    // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
-
-    // Multiharmonic expressions are not allowed.
-    if (not(isharmonicone(selecteddisjregs)))
-    {
-        std::cout << "Error in 'expression' object: cannot integrate a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
-    }
-    if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
-    {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
-    }
-
-    formulation formul;
-    // The default integration order is 1 (order of a 'one' field) + 2 :
-    if (meshdeform == NULL)
-        formul += integration(physreg, - mathop::tf(onefield)*(this->getcopy()), -3+integrationorder);
-    else
-        formul += integration(physreg, *meshdeform, - mathop::tf(onefield)*(this->getcopy()), -3+integrationorder);
-
-    formul.generate();
+    universe::isbarycentereval = false;
 
     return formul.rhs();
 }

@@ -44,7 +44,7 @@ class universe
         
         // Error estimators need evaluations across elements and can therefore not be efficiently evaluated in the usual way.
         // Error estimators will be updated if 'estimatorcalcstate' > 0 and their state number is different than the latter.
-        static void allowestimatorupdate(bool allowitonce);
+        static void allowestimatorupdate(bool allowitonce); // must be called with false before allowing again
         static bool isestimatorupdateallowed(long long int statenumber);
         static long long int estimatorcalcstate;
         
@@ -73,12 +73,9 @@ class universe
         static void setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densematrix>> val);
         static void setprecomputedfft(std::shared_ptr<operation> op, densematrix val);
         
-        // If set to true the Gauss points weights/detjac product is not performed when assembling a formulation:
-        static bool skipgausspointweightproduct;
-        static bool skipdetjacproduct;
-        // If positive or zero this forces the integration order when assembling a formulation:
-        static int forcedintegrationorder;
-
+        // Barycenter evaluation mode during rhs contribution generation:
+        static bool isbarycentereval;
+        
         // If set to true the individual right handside contribution addresses and values are stored in 'rhsterms' when generating a formulation:
         static bool keeptrackofrhsassembly;
         // Every row in a given (int)densematrix corresponds to a shape function and every column to a given mesh element.

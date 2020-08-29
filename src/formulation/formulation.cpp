@@ -121,6 +121,8 @@ void formulation::generate(int m, int contributionnumber)
     // Make sure the contribution number exists:
     if (contributionnumber >= mycontributions[m].size() || mycontributions[m][contributionnumber].size() == 0)
         return;
+ 
+    universe::allowestimatorupdate(true);
         
     if (m == 0 && myvec == NULL)
         myvec = std::shared_ptr<rawvec>(new rawvec(mydofmanager));
@@ -135,6 +137,9 @@ void formulation::generate(int m, int contributionnumber)
         else
             contributionstogenerate[i].generate(NULL, mymat[m-1], not(isconstraintcomputation));
     }
+    
+    universe::allowestimatorupdate(false);
+    
 }
 
 void formulation::generate(void)

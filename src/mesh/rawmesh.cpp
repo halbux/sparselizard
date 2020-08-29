@@ -853,6 +853,8 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     
     int wholedomain = myphysicalregions.createunionofall();
     
+    // This flag here makes sure the estimators will only be updated
+    // once in the loop even if this function is called again inside:
     universe::allowestimatorupdate(true);
     
     field one("one");
@@ -867,25 +869,8 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         if (washadapted)
             orderexpr = mathop::athp(orderexpr, critcalcrm, critcalcpt);
             
-        // Barycenter eval:
-        universe::skipgausspointweightproduct = true;
-        universe::skipdetjacproduct = true;
-        universe::forcedintegrationorder = 0;
-        
-        formulation criteval;
-        criteval += mathop::integral(wholedomain, -critexpr * mathop::tf(one));
-        criteval.generaterhs();
-        crits[i] = criteval.rhs();
-        
-        formulation elorder;
-        elorder += mathop::integral(wholedomain, -orderexpr * mathop::tf(one));
-        elorder.generaterhs();
-        oldords[i] = elorder.rhs();
-        
-        universe::skipgausspointweightproduct = false;
-        universe::skipdetjacproduct = false;
-        universe::forcedintegrationorder = -1;
-        
+        crits[i] = critexpr.atbarycenter(wholedomain, one);
+        oldords[i] = orderexpr.atbarycenter(wholedomain, one);
     }
     int totalnumelems = crits[0].size();
     
@@ -1144,19 +1129,7 @@ bool rawmesh::adapth(int verbosity)
     
     universe::allowestimatorupdate(true);
         
-    // Barycenter eval:
-    universe::skipgausspointweightproduct = true;
-    universe::skipdetjacproduct = true;
-    universe::forcedintegrationorder = 0;
-        
-    formulation criteval;
-    criteval += mathop::integral(wholedomain, -std::get<0>(myhadaptdata[0]) * mathop::tf(one));
-    criteval.generaterhs();
-    vec crit = criteval.rhs();
-    
-    universe::skipgausspointweightproduct = false;
-    universe::skipdetjacproduct = false;
-    universe::forcedintegrationorder = -1;
+    vec crit = std::get<0>(myhadaptdata[0]).atbarycenter(wholedomain, one);
     
     universe::allowestimatorupdate(false);
     

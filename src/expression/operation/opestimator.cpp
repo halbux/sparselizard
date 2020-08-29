@@ -41,6 +41,9 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
             estimatezienkiewiczzhu();
         mystatenumber = universe::estimatorcalcstate;
     }
+    // If any update is forbidden reset value to 0:
+    if (universe::estimatorcalcstate < 0)
+        myvalue->getfieldpointer()->resetcoefmanager();
     
     // Provide the requested output:
     std::vector<std::vector<densematrix>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, NULL);

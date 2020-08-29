@@ -130,18 +130,14 @@ void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
     std::vector<int> alldrsindim = universe::mymesh->getdisjointregions()->getindim(0);
     int physreg = universe::mymesh->getphysicalregions()->createfromdisjointregionlist(alldrsindim);
     
-    universe::skipgausspointweightproduct = true;
-    universe::skipdetjacproduct = true;
-    universe::forcedintegrationorder = 0;
-
     formulation evalatnodes;
     evalatnodes += mathop::integral(physreg, -mathop::athp(field(originalthis), myrawmesh, myptracker) * mathop::tf(thisfield) );
-    evalatnodes.generaterhs();
-    vec vals = evalatnodes.rhs();
     
-    universe::skipgausspointweightproduct = false;
-    universe::skipdetjacproduct = false;
-    universe::forcedintegrationorder = -1;
+    universe::isbarycentereval = true;
+    evalatnodes.generaterhs();
+    universe::isbarycentereval = false;
+    
+    vec vals = evalatnodes.rhs();
     
     setdata(physreg, vals|thisfield);
     universe::mymesh->getphysicalregions()->remove({physreg}, false);

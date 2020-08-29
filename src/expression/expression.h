@@ -151,10 +151,6 @@ class expression
         
         // Output a vector based on field 'onefield' that stores the barycenter values of the expression.
         vec atbarycenter(int physreg, field onefield);
-        // Output a vector based on field 'onefield' that stores the value of the 
-        // expression integrated on every element separately in region 'physreg'.
-        vec integrateonelements(int physreg, field onefield, int integrationorder);
-        vec integrateonelements(int physreg, expression meshdeform, field onefield, int integrationorder);
         
         // Print the expression:
         void print(void);
