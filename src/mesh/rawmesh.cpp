@@ -867,15 +867,25 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         if (washadapted)
             orderexpr = mathop::athp(orderexpr, critcalcrm, critcalcpt);
             
-        formulation critaverage;
-        critaverage += mathop::integral(wholedomain, -critexpr * mathop::tf(one) / mathop::getmeshsize(2) );
-        critaverage.generaterhs();
-        crits[i] = critaverage.rhs();
+        // Barycenter eval:
+        universe::skipgausspointweightproduct = true;
+        universe::skipdetjacproduct = true;
+        universe::forcedintegrationorder = 0;
+        
+        formulation criteval;
+        criteval += mathop::integral(wholedomain, -critexpr * mathop::tf(one));
+        criteval.generaterhs();
+        crits[i] = criteval.rhs();
         
         formulation elorder;
-        elorder += mathop::integral(wholedomain, -orderexpr * mathop::tf(one) / mathop::getmeshsize(2) );
+        elorder += mathop::integral(wholedomain, -orderexpr * mathop::tf(one));
         elorder.generaterhs();
         oldords[i] = elorder.rhs();
+        
+        universe::skipgausspointweightproduct = false;
+        universe::skipdetjacproduct = false;
+        universe::forcedintegrationorder = -1;
+        
     }
     int totalnumelems = crits[0].size();
     
@@ -920,15 +930,11 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         double* oldordsptr = oldordsmat[i].getvalues();
         int* newordsptr = newordsmat[i].getvalues();
     
-        std::vector<double> minmax = critsmat[i].minmax();
-        double cmin = 0.0;
-        double cmax = minmax[1];
-        
-        double crange = std::abs(cmax-cmin);
+        double crange = critsmat[i].maxabs();
         
         // Convert the thresholds from % to criterion value:
         for (int th = 0; th < thresholds.size(); th++)
-            thresholds[th] = cmin + thresholds[th] * crange;
+            thresholds[th] = 0.0 + thresholds[th] * crange;
         
         // In case the criterion range is not large enough the element orders are all set to minimum:
         if (crange < mincritrange)
@@ -1138,10 +1144,19 @@ bool rawmesh::adapth(int verbosity)
     
     universe::allowestimatorupdate(true);
         
-    formulation critaverage;
-    critaverage += mathop::integral(wholedomain, -std::get<0>(myhadaptdata[0]) * mathop::tf(one) / mathop::getmeshsize(2) );
-    critaverage.generaterhs();
-    vec crit = critaverage.rhs();
+    // Barycenter eval:
+    universe::skipgausspointweightproduct = true;
+    universe::skipdetjacproduct = true;
+    universe::forcedintegrationorder = 0;
+        
+    formulation criteval;
+    criteval += mathop::integral(wholedomain, -std::get<0>(myhadaptdata[0]) * mathop::tf(one));
+    criteval.generaterhs();
+    vec crit = criteval.rhs();
+    
+    universe::skipgausspointweightproduct = false;
+    universe::skipdetjacproduct = false;
+    universe::forcedintegrationorder = -1;
     
     universe::allowestimatorupdate(false);
     
@@ -1170,15 +1185,11 @@ bool rawmesh::adapth(int verbosity)
     
     int minnumsplits = *std::min_element(numsplits.begin(), numsplits.end());
 
-    std::vector<double> minmax = critmat.minmax();
-    double cmin = 0.0;
-    double cmax = minmax[1];
-    
-    double crange = std::abs(cmax-cmin);
+    double crange = critmat.maxabs();
     
     // Convert the thresholds from % to criterion value:
     for (int th = 0; th < thresholds.size(); th++)
-        thresholds[th] = cmin + thresholds[th] * crange;
+        thresholds[th] = 0.0 + thresholds[th] * crange;
     
     // Vector with +1 to split a leaf, 0 to keep as is and -1 to group:
     std::vector<int> vadapt(newhtracker->countleaves(), -1); // all grouped initially

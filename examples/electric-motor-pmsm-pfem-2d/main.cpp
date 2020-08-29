@@ -176,7 +176,7 @@ int main(void)
     SlepcFinalize();
     
     // Code validation line. Can be removed:
-    std::cout << (torque < 3.54898 && torque > 3.54896);
+    std::cout << (torque < 3.56288 && torque > 3.56284);
 
     return 0;
 }

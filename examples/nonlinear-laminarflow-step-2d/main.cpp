@@ -110,7 +110,7 @@ void sparselizard(void)
     std::cout << std::endl << "Flowrate in/out for a unit width: " << flowratein << " / " << flowrateout << " m^3/s" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (vnorm*flowrateout < 2.63225e-05 && vnorm*flowrateout > 2.63221e-05);
+    std::cout << (vnorm*flowrateout < 2.63213e-05 && vnorm*flowrateout > 2.63209e-05);
 }
 
 mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2)
