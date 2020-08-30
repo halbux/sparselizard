@@ -31,12 +31,11 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
     }
     
     bool wasreuseallowed = universe::isreuseallowed;
+    universe::forbidreuse();
     
     // Update the estimator if allowed:
     if (universe::isestimatorupdateallowed(mystatenumber))
-    {
-        universe::forbidreuse();
-        
+    {   
         if (mytype == "zienkiewiczzhu")
             estimatezienkiewiczzhu();
         mystatenumber = universe::estimatorcalcstate;
