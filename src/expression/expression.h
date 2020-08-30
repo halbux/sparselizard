@@ -65,7 +65,6 @@ class expression
         void interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<std::vector<double>>& interpolated, std::vector<bool>& isfound, int numtimeevals);
         double integrate(int physreg, expression* meshdeform, int integrationorder);
         void write(int physreg, int numfftharms, expression* meshdeform, std::string filename, int lagrangeorder, int numtimesteps);
-        vec integrateonelements(int physreg, expression* meshdeform, field onefield, int integrationorder);
         
     public:
         
