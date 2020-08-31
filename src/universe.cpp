@@ -25,22 +25,22 @@ void universe::allowestimatorupdate(bool allowitonce)
 {
     if (allowitonce)
     {
-        if (estimatorcalcstate < 0)
-        {
-            estimatorcalcstate = std::abs(estimatorcalcstate);
+        numallowedtimes++;
+        if (numallowedtimes == 1)
             estimatorcalcstate++;
-        }
     }
     else
-        estimatorcalcstate = -std::abs(estimatorcalcstate);
+        numallowedtimes--;
 }
 
 bool universe::isestimatorupdateallowed(long long int statenumber)
 {
-    return (estimatorcalcstate > 0 && statenumber != estimatorcalcstate);
+    return (numallowedtimes > 0 && statenumber != estimatorcalcstate);
 }
 
-long long int universe::estimatorcalcstate = -1; // cannot start at 0 since it has to be negative.
+long long int universe::estimatorcalcstate = 0;
+
+int universe::numallowedtimes = 0;
         
 bool universe::isreuseallowed = false;
 

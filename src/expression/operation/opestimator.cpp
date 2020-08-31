@@ -41,7 +41,7 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
         mystatenumber = universe::estimatorcalcstate;
     }
     // If any update is forbidden reset value to 0:
-    if (universe::estimatorcalcstate < 0)
+    if (universe::numallowedtimes <= 0)
         myvalue->getfieldpointer()->resetcoefmanager();
     
     // Provide the requested output:
