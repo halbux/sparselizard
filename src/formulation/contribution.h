@@ -61,6 +61,9 @@ class contribution
         // Number of time evaluations for the FFT of the coef. Negative means no FFT.
         int numfftcoeffs = -1;
         
+        // Barycenter evaluation mode during rhs term assembly:
+        bool isbarycentereval = false;
+        
         // The contribution is computed on the mesh deformed by (if any):
         std::vector<expression> mymeshdeformation = {};
 
@@ -84,6 +87,7 @@ class contribution
         void settfphysicalregion(int physreg);
         void setintegrationorderdelta(int integrorderdelta);
         void setnumfftcoeffs(int numcoeffs);
+        void setbarycenterevalflag(void);
         
         // Generate the contribution and store it in the 
         // vec (for rhs contributions) or in the mat.

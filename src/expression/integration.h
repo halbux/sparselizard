@@ -34,6 +34,9 @@ class integration
         // Set it true if this object corresponds to project zero.
         bool isprojectionofzero = false;
         
+        // Barycenter eval mode for a rhs term:
+        bool isbarycentereval = false;
+        
         integration(void) {};
         
         integration(int physreg, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);

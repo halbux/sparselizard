@@ -1165,11 +1165,12 @@ vec expression::atbarycenter(int physreg, field onefield)
 
     // Compute the expression at the barycenter:
     formulation formul;
-    formul += integration(physreg, - mathop::tf(onefield)*(this->getcopy()));
+    
+    integration myterm(physreg, - mathop::tf(onefield)*(this->getcopy()));
+    myterm.isbarycentereval = true;
 
-    universe::isbarycentereval = true;
+    formul += myterm;
     formul.generate();
-    universe::isbarycentereval = false;
 
     return formul.rhs();
 }

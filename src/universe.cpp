@@ -125,8 +125,6 @@ void universe::setprecomputedfft(std::shared_ptr<operation> op, densematrix val)
     opcomputedfft.push_back(val.copy());
 }
 
-bool universe::isbarycentereval = false;
-
 bool universe::keeptrackofrhsassembly = false;
 std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 
         

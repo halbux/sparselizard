@@ -73,9 +73,6 @@ class universe
         static void setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densematrix>> val);
         static void setprecomputedfft(std::shared_ptr<operation> op, densematrix val);
         
-        // Barycenter evaluation mode during rhs contribution generation:
-        static bool isbarycentereval;
-        
         // If set to true the individual right handside contribution addresses and values are stored in 'rhsterms' when generating a formulation:
         static bool keeptrackofrhsassembly;
         // Every row in a given (int)densematrix corresponds to a shape function and every column to a given mesh element.

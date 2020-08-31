@@ -87,6 +87,9 @@ void formulation::operator+=(integration integrationobject)
         mycontribution.setintegrationorderdelta(integrationorderdelta);
         mycontribution.setnumfftcoeffs(integrationobject.getnumberofcoefharms());
         
+        if (integrationobject.isbarycentereval)
+            mycontribution.setbarycenterevalflag();
+        
         mycontribution.setintegrationphysicalregion(integrationphysreg);
         if (doffield != NULL)
             mycontribution.setdofphysicalregion(dofphysreg);
