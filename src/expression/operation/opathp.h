@@ -26,6 +26,10 @@ class opathp: public operation
 
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         
+        std::vector<std::shared_ptr<operation>> getarguments(void) { return {myarg}; };
+        
+        bool isvalueorientationdependent(std::vector<int> disjregs) { return false; };
+        
         void print(void);
 
 };
