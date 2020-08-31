@@ -66,8 +66,8 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         if (doffield != NULL)
             dofinterpolationorder = doffield->getinterpolationorder(mydisjregs[0]);
         
-        // Compute the integration order, set it to zero if negative.
-        // Adding an extra +2 generally gives a good integration in practice.
+        // Compute the integration order.
+        // Adding an extra +2 generally gives a good integration.
         int integrationorder = dofinterpolationorder + tfinterpolationorder + 2 + integrationorderdelta;
         if (isbarycentereval)
             integrationorder = 0;
