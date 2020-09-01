@@ -802,7 +802,7 @@ void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
         }
         else
         {
-            std::cout << "Error in 'rawfield' object: cannot set nodal values for node number " << curnode << " (is not an element corner node)" << std::endl;
+            std::cout << "Error in 'rawfield' object: cannot set nodal value for node number " << curnode << " (is not an element corner node)" << std::endl;
             abort();
         }
     }
@@ -849,7 +849,7 @@ densematrix rawfield::getnodalvalues(intdensematrix nodenumbers)
         }
         else
         {
-            std::cout << "Error in 'rawfield' object: cannot get nodal values for node number " << curnode << " (is not an element corner node)" << std::endl;
+            std::cout << "Error in 'rawfield' object: cannot get nodal value for node number " << curnode << " (is not an element corner node)" << std::endl;
             abort();
         }
     }
