@@ -60,10 +60,10 @@ int elements::getsubelement(int subelementtypenumber, int elementtypenumber, int
         return subelementsinelements[elementtypenumber][subelementtypenumber][elementnumber*numberofsubelementsineveryelement[elementtypenumber][subelementtypenumber]+subelementindex];
 }
 
-int elements::getdisjointregion(int elementtypenumber, int elementnumber)
+int elements::getdisjointregion(int elementtypenumber, int elementnumber, bool errorifnegative)
 {
     int output = indisjointregion[elementtypenumber][elementnumber];
-    if (output >= 0)
+    if (output >= 0 || not(errorifnegative))
         return output;
     else
     {

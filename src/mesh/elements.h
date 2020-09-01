@@ -108,7 +108,7 @@ class elements
         // E.g. getsubelement(0, 3, 245, 1) returns the second node in quadrangle number 245.
         int getsubelement(int subelementtypenumber, int elementtypenumber, int elementnumber, int subelementindex);
         
-        int getdisjointregion(int elementtypenumber, int elementnumber);
+        int getdisjointregion(int elementtypenumber, int elementnumber, bool errorifnegative = true);
         int gettotalorientation(int elementtypenumber, int elementnumber);
         
         // Return the number of elements of a given type:
