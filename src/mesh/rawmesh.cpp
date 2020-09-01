@@ -410,7 +410,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     // Do not call this when the mesh is already loaded!
 
     if (verbosity > 0)
-        std::cout << "Loading mesh from " << inputshapes.size() << " shapes" << std::endl;
+        std::cout << "Loading mesh from " << inputshapes.size() << " shape" << myalgorithm::getplurals(inputshapes.size()) << std::endl;
     
     wallclock loadtime;
     
