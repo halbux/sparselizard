@@ -198,6 +198,54 @@ void field::setvalue(int physreg)
     rawfieldptr->setvalue(physreg);
 }
 
+void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
+{
+    if (nodenumbers.count() != values.count())
+    {
+        std::cout << "Error in 'field' object: argument size mismatch in 'setnodalvalues'" << std::endl;
+        abort();
+    }
+    
+    if (nodenumbers.count() > 0)
+    {
+        int numnodes = universe::mymesh->getelements()->count(0);
+        std::vector<int> minmax = nodenumbers.minmax();
+        if (minmax[0] < 0)
+        {
+            std::cout << "Error in 'field' object: trying to set value of node number " << minmax[0] << " (must be positive)" << std::endl;
+            abort();
+        }
+        if (minmax[1] >= numnodes)
+        {
+            std::cout << "Error in 'field' object: trying to set value of node number " << minmax[1] << " (highest node number in mesh is " << numnodes-1 << ")" << std::endl;
+            abort();
+        }
+    }
+    
+    rawfieldptr->setnodalvalues(nodenumbers, values);
+}
+
+densematrix field::getnodalvalues(intdensematrix nodenumbers)
+{
+    if (nodenumbers.count() > 0)
+    {
+        int numnodes = universe::mymesh->getelements()->count(0);
+        std::vector<int> minmax = nodenumbers.minmax();
+        if (minmax[0] < 0)
+        {
+            std::cout << "Error in 'field' object: trying to get value of node number " << minmax[0] << " (must be positive)" << std::endl;
+            abort();
+        }
+        if (minmax[1] >= numnodes)
+        {
+            std::cout << "Error in 'field' object: trying to get value of node number " << minmax[1] << " (highest node number in mesh is " << numnodes-1 << ")" << std::endl;
+            abort();
+        }
+    }
+    
+    return rawfieldptr->getnodalvalues(nodenumbers);
+}
+
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
 void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree); }
 void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree); }

@@ -760,6 +760,103 @@ void rawfield::setvalue(int physreg)
     }
 }
 
+void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
+{
+    synchronize();
+    
+    if (myharmonics.size() == 2 && myharmonics[1].size() == 1)
+    {
+        myharmonics[1][0]->setnodalvalues(nodenumbers, values);
+        return;
+    }
+    
+    elements* els = universe::mymesh->getelements();
+    disjointregions* drs = universe::mymesh->getdisjointregions(); 
+
+    int numnodes = nodenumbers.count();
+    int* nptr = nodenumbers.getvalues();
+    double* vptr = values.getvalues();
+
+    // Only for 'h1' type fields:
+    if (mytypename != "h1")
+    {
+        std::cout << "Error in 'rawfield' object: cannot set nodal values for '" << mytypename << "' type fields (only 'h1' type)" << std::endl;
+        abort();
+    }
+    
+    if (mysubfields.size() != 0 || myharmonics.size() != 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
+        abort();
+    }
+    
+    for (int i = 0; i < numnodes; i++)
+    {
+        int curnode = nptr[i];
+        int ndr = els->getdisjointregion(0, curnode, false);
+
+        if (ndr >= 0)
+        {
+            int rb = drs->getrangebegin(ndr);
+            mycoefmanager->setcoef(ndr, 0, curnode-rb, vptr[i]);
+        }
+        else
+        {
+            std::cout << "Error in 'rawfield' object: cannot set nodal values for node number " << curnode << " (is not an element corner node)" << std::endl;
+            abort();
+        }
+    }
+}
+
+densematrix rawfield::getnodalvalues(intdensematrix nodenumbers)
+{
+    synchronize();
+    
+    if (myharmonics.size() == 2 && myharmonics[1].size() == 1)
+        return myharmonics[1][0]->getnodalvalues(nodenumbers);
+    
+    elements* els = universe::mymesh->getelements();
+    disjointregions* drs = universe::mymesh->getdisjointregions(); 
+    
+    int numnodes = nodenumbers.count();
+    int* nptr = nodenumbers.getvalues();
+    
+    densematrix output(nodenumbers.countrows(), nodenumbers.countcolumns());
+    double* vptr = output.getvalues();
+
+    // Only for 'h1' type fields:
+    if (mytypename != "h1")
+    {
+        std::cout << "Error in 'rawfield' object: cannot get nodal values for '" << mytypename << "' type fields (only 'h1' type)" << std::endl;
+        abort();
+    }
+    
+    if (mysubfields.size() != 0 || myharmonics.size() != 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot get nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
+        abort();
+    }
+    
+    for (int i = 0; i < numnodes; i++)
+    {
+        int curnode = nptr[i];
+        int ndr = els->getdisjointregion(0, curnode);
+
+        if (ndr >= 0)
+        {
+            int rb = drs->getrangebegin(ndr);
+            vptr[i] = mycoefmanager->getcoef(ndr, 0, curnode-rb);
+        }
+        else
+        {
+            std::cout << "Error in 'rawfield' object: cannot get nodal values for node number " << curnode << " (is not an element corner node)" << std::endl;
+            abort();
+        }
+    }
+
+    return output;
+}
+
 void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     synchronize();

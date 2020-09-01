@@ -81,6 +81,10 @@ class field
         void setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:
         void setvalue(int physreg);
+        
+        // Set/get value at nodes for 'h1' type fields:
+        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
+        densematrix getnodalvalues(intdensematrix nodenumbers);
 
         // Set an 'input' valued constraint on a physical region. 
         // Use the default order + 'extraintegrationdegree' to 

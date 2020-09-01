@@ -174,6 +174,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set a zero value:
         void setvalue(int physreg);
         
+        // Set/get value at nodes for 'h1' type fields:
+        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
+        densematrix getnodalvalues(intdensematrix nodenumbers);
+        
         void setconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
         void setconstraint(int physreg);
