@@ -17,4 +17,4 @@ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH
 fi
 
 
-./sparselizard;
+./sparselizard $@;
