@@ -1,6 +1,15 @@
 #include "intdensematrix.h"
 
 
+void intdensematrix::errorifempty(void)
+{
+    if (numrows*numcols == 0)
+    {
+        std::cout << "Error in 'intdensematrix' object: cannot perform operation on empty matrix" << std::endl;
+        abort();
+    }
+}
+
 intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns)
 {
     numrows = numberofrows;
@@ -111,6 +120,25 @@ long long int intdensematrix::sum(void)
     for (long long int i = 0; i < numcols*numrows; i++)
         summed += myvaluesptr[i];
     return summed;
+}
+
+std::vector<int> intdensematrix::minmax(void)
+{
+    errorifempty();
+
+    int* myvaluesptr = myvalues.get();
+    
+    int minval = myvaluesptr[0];
+    int maxval = myvaluesptr[0];
+
+    for (long long int i = 1; i < numrows*numcols; i++)
+    {
+        if (myvaluesptr[i] > maxval)
+            maxval = myvaluesptr[i];
+        if (myvaluesptr[i] < minval)
+            minval = myvaluesptr[i];
+    }
+    return {minval, maxval};
 }
 
 void intdensematrix::print(void)

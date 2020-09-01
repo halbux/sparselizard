@@ -24,6 +24,9 @@ class intdensematrix
         
         std::shared_ptr<int> myvalues = NULL;
         
+        // Throws an error if matrix is empty:
+        void errorifempty(void);
+        
     public:
         
         // Set empty matrix:
@@ -53,6 +56,9 @@ class intdensematrix
 
         // Sum all values:
         long long int sum(void);
+        
+        // Get the min and max values in out[0] and out[1] respectively:
+        std::vector<int> minmax(void);
 
         void print(void);
         void printsize(void);
