@@ -153,8 +153,6 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                 ///// Compute the dof*tf product (if any dof):
                 densematrix doftimestestfun;
                 tfformfunctionvalue = tfval.tomatrix(myselector.gettotalorientation(), tfinterpolationorder, mytfs[term]->getkietaphiderivative(), mytfs[term]->getformfunctioncomponent());
-                if (isbarycentereval)
-                    tfformfunctionvalue = densematrix(tfformfunctionvalue.countrows(), 1, 1);
                 
                 // Multiply by the weights:
                 if (not(isbarycentereval))
