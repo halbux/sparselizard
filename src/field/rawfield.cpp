@@ -840,7 +840,7 @@ densematrix rawfield::getnodalvalues(intdensematrix nodenumbers)
     for (int i = 0; i < numnodes; i++)
     {
         int curnode = nptr[i];
-        int ndr = els->getdisjointregion(0, curnode);
+        int ndr = els->getdisjointregion(0, curnode, false);
 
         if (ndr >= 0)
         {
