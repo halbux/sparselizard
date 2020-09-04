@@ -53,12 +53,16 @@ class intdensematrix
         
         // Return a vector whose ith entry gives the number of times value i appears:
         std::vector<int> countalloccurences(int maxintval);
+        // And all indexes at which it appears:
+        std::vector<std::vector<int>> findalloccurences(int maxintval);
 
         // Sum all values:
         long long int sum(void);
         
         // Get the min and max values in out[0] and out[1] respectively:
         std::vector<int> minmax(void);
+        
+        int max(void);
 
         void print(void);
         void printsize(void);

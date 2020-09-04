@@ -112,6 +112,27 @@ std::vector<int> intdensematrix::countalloccurences(int maxintval)
     return output;
 }
 
+std::vector<std::vector<int>> intdensematrix::findalloccurences(int maxintval)
+{
+    int* myvaluesptr = myvalues.get();
+ 
+    std::vector<int> numoccurences = countalloccurences(maxintval);
+    
+    std::vector<std::vector<int>> output(numoccurences.size());
+    for (int i = 0; i < numoccurences.size(); i++)
+        output[i] = std::vector<int>(numoccurences[i]);
+    
+    std::vector<int> indexes(numoccurences.size(), 0);
+    for (long long int i = 0; i < numcols*numrows; i++)
+    {
+        int curvalue = myvaluesptr[i];
+        output[curvalue][indexes[curvalue]] = i;
+        indexes[curvalue]++;
+    }
+    
+    return output;
+}
+
 long long int intdensematrix::sum(void)
 {
     int* myvaluesptr = myvalues.get();
@@ -139,6 +160,22 @@ std::vector<int> intdensematrix::minmax(void)
             minval = myvaluesptr[i];
     }
     return {minval, maxval};
+}
+
+int intdensematrix::max(void)
+{
+    errorifempty();
+
+    int* myvaluesptr = myvalues.get();
+    
+    int maxval = myvaluesptr[0];
+
+    for (long long int i = 1; i < numrows*numcols; i++)
+    {
+        if (myvaluesptr[i] > maxval)
+            maxval = myvaluesptr[i];
+    }
+    return maxval;
 }
 
 void intdensematrix::print(void)
