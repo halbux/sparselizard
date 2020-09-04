@@ -1441,6 +1441,34 @@ std::vector<int> rawfield::getinterpolationorders(void)
     return interpolationorder;
 }
 
+void rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& elementnumbers, std::vector<int>& fieldorders)
+{
+    synchronize();
+    
+    int numelems = elementnumbers.size();
+    fieldorders.resize(numelems);
+    
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    elements* els = universe::mymesh->getelements();
+
+    for (int i = 0; i < numelems; i++)
+    {
+        int curelem = elementnumbers[i];
+        int curdisjreg = els->getdisjointregion(elementtypenumber, curelem);
+        
+        int curorder = interpolationorder[curdisjreg];
+        
+        if (curorder != -1)
+            fieldorders[i] = curorder;
+        else
+        {
+            std::cout << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
+            std::cout << "Define it with field.setorder(region, order)" << std::endl;
+            abort();
+        }
+    }
+}
+
 void rawfield::errornotsameinterpolationorder(int disjreg)
 {
     synchronize();

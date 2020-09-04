@@ -225,6 +225,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Only valid for fields without subfields.
         int getinterpolationorder(int disjreg);
         std::vector<int> getinterpolationorders(void);
+        // This function returns the field interpolation order on all elements requested:
+        void getinterpolationorders(int elementtypenumber, std::vector<int>& elementnumbers, std::vector<int>& fieldorders);
         
         // Give an error if all harmonics have not the same interpolation order.
         // Only valid for fields without subfields.
