@@ -591,7 +591,7 @@ void rawfield::setname(std::string name)
 
 std::string rawfield::gettypename(bool familyonly)
 {
-    synchronize();
+    // Do not sync this.
     
     std::string out = mytypename;
 
