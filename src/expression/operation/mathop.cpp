@@ -258,9 +258,15 @@ expression mathop::getmeshsize(int integrationorder)
     return expression(op);
 }
 
-expression mathop::getfieldorder(field input)
+expression mathop::getfieldorder(field input, double alpha)
 {
     std::shared_ptr<rawfield> rf = input.getpointer();
+    
+    if (rf->gettypename() != "h1" && rf->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'mathop' namespace: field provided to 'getfieldorder' must be of type 'h1' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
+        abort();
+    }
     
     if (rf->countsubfields() > 1)
     {
@@ -269,8 +275,12 @@ expression mathop::getfieldorder(field input)
         abort();
     }
     
-    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(rf->getfirstharmonic())));
-    return expression(op);
+    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(rf->getfirstharmonic()), alpha));
+
+    if (alpha == -1.0)
+        return expression(op);
+    else
+        return abs(expression(op))-1.0;
 }
 
 std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)

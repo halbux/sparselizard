@@ -1,6 +1,12 @@
 #include "opfieldorder.h"
 
 
+opfieldorder::opfieldorder(std::shared_ptr<rawfield> fieldin, double alpha)
+{
+    myfield = fieldin;
+    myalpha = alpha;
+}
+
 std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
@@ -14,7 +20,31 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
     int elementtypenumber = elemselect.getelementtypenumber();
     std::vector<int> elems = elemselect.getelementnumbers();
     std::vector<int> fieldorders;
-    myfield->getinterpolationorders(elementtypenumber, elems, fieldorders);
+    int maxorder = myfield->getinterpolationorders(elementtypenumber, elems, fieldorders);
+    
+    if (myalpha != -1.0)
+    {
+        intdensematrix fo(numelems, 1, fieldorders);
+        std::vector<std::vector<int>> splitorders = fo.findalloccurences(maxorder);
+        
+        for (int o = 0; o <= maxorder; o++)
+        {
+            int numinorder = splitorders[o].size();
+            if (numinorder == 0)
+                continue;
+                
+            std::vector<int> elemsinorder(numinorder);
+            for (int i = 0; i < numinorder; i++)
+                elemsinorder[i] = elems[splitorders[o][i]];
+        
+            std::vector<int> lowestorders;
+            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, lowestorders);
+
+            for (int i = 0; i < numinorder; i++)
+                fieldorders[splitorders[o][i]] = lowestorders[i];
+        }
+    }
+    
     densematrix output(numelems, 1);
     double* outputvals = output.getvalues();
     for (int i = 0; i < numelems; i++)
@@ -42,7 +72,31 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
     int elementtypenumber = elemselect.getelementtypenumber();
     std::vector<int> elems = elemselect.getelementnumbers();
     std::vector<int> fieldorders;
-    myfield->getinterpolationorders(elementtypenumber, elems, fieldorders);
+    int maxorder = myfield->getinterpolationorders(elementtypenumber, elems, fieldorders);
+    
+    if (myalpha != -1.0)
+    {
+        intdensematrix fo(numelems, 1, fieldorders);
+        std::vector<std::vector<int>> splitorders = fo.findalloccurences(maxorder);
+        
+        for (int o = 0; o <= maxorder; o++)
+        {
+            int numinorder = splitorders[o].size();
+            if (numinorder == 0)
+                continue;
+                
+            std::vector<int> elemsinorder(numinorder);
+            for (int i = 0; i < numinorder; i++)
+                elemsinorder[i] = elems[splitorders[o][i]];
+        
+            std::vector<int> lowestorders;
+            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, lowestorders);
+
+            for (int i = 0; i < numinorder; i++)
+                fieldorders[splitorders[o][i]] = lowestorders[i];
+        }
+    }
+    
     densematrix output(numelems, 1);
     double* outputvals = output.getvalues();
     for (int i = 0; i < numelems; i++)
@@ -60,11 +114,16 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
 
 std::shared_ptr<operation> opfieldorder::copy(void)
 {
-    std::shared_ptr<opfieldorder> op(new opfieldorder(myfield));
+    std::shared_ptr<opfieldorder> op(new opfieldorder(myfield, myalpha));
     *op = *this;
     op->reuse = false;
     return op;
 }
 
-void opfieldorder::print(void) { std::cout << "fieldorder"; }
+void opfieldorder::print(void)
+{
+    std::cout << "fieldorder(";
+    myfield->print();
+    std::cout << ")";
+}
 

@@ -1441,7 +1441,7 @@ std::vector<int> rawfield::getinterpolationorders(void)
     return interpolationorder;
 }
 
-void rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& elementnumbers, std::vector<int>& fieldorders)
+int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& elementnumbers, std::vector<int>& fieldorders)
 {
     synchronize();
     
@@ -1451,12 +1451,15 @@ void rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& e
     disjointregions* drs = universe::mymesh->getdisjointregions();
     elements* els = universe::mymesh->getelements();
 
+    int maxorder = -1;
     for (int i = 0; i < numelems; i++)
     {
         int curelem = elementnumbers[i];
         int curdisjreg = els->getdisjointregion(elementtypenumber, curelem);
         
         int curorder = interpolationorder[curdisjreg];
+        if (curorder > maxorder)
+            maxorder = curorder;
         
         if (curorder != -1)
             fieldorders[i] = curorder;
@@ -1465,6 +1468,92 @@ void rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& e
             std::cout << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
             std::cout << "Define it with field.setorder(region, order)" << std::endl;
             abort();
+        }
+    }
+    
+    return maxorder;
+}
+
+void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, double alpha, std::vector<int>& lowestorders)
+{
+    synchronize();
+    
+    int numelems = elementnumbers.size();
+    int numorders = 1+fieldorder;
+    
+    std::vector<double> weightsforeachorder(numelems*numorders, 0.0);
+
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    elements* els = universe::mymesh->getelements();
+    
+    element myelement(elementtypenumber);
+    
+    // Create a form function iterator to iterate through all form functions of the element type.
+    hierarchicalformfunctioniterator myiterator(mytypename, elementtypenumber, fieldorder);
+
+    for (int ff = 0; ff < myiterator.count(); ff++)
+    {
+        int associatedelementtype = myiterator.getassociatedelementtype();
+        int formfunctionindex = myiterator.getformfunctionindexinnodeedgefacevolume();
+        int formfunctionorder = myiterator.getformfunctionorder();
+        
+        int num = myiterator.getnodeedgefacevolumeindex();
+        // For quad subelements in prisms and pyramids:
+        if ((elementtypenumber == 6 || elementtypenumber == 7) && associatedelementtype == 3)
+            num -= myelement.counttriangularfaces(); 
+
+        for (int i = 0; i < numelems; i++)
+        {
+            int elem = elementnumbers[i];
+            int currentsubelem = els->getsubelement(associatedelementtype, elementtypenumber, elem, num);
+            int currentdisjointregion = els->getdisjointregion(associatedelementtype, currentsubelem);
+            int rb = drs->getrangebegin(currentdisjointregion);
+            
+            double curcoef = mycoefmanager->getcoef(currentdisjointregion, formfunctionindex, currentsubelem-rb);
+            
+            weightsforeachorder[i*numorders+formfunctionorder] += std::abs(curcoef);
+        }
+        myiterator.next();
+    }    
+    
+    int minorder = -1;
+    if (mytypename == "h1")
+        minorder = 1;
+    if (mytypename == "hcurl")
+        minorder = 0;
+
+    // Deduce the output:
+    lowestorders.resize(numelems);
+    
+    for (int i = 0; i < numelems; i++)
+    {
+        int curelem = elementnumbers[i];
+        int curdisjreg = els->getdisjointregion(elementtypenumber, curelem);
+        int curorder = interpolationorder[curdisjreg];
+        // Default value if none selected below:
+        if (curorder == minorder)
+            lowestorders[i] = -(1+minorder);
+        else
+            lowestorders[i] = 1+minorder;
+    
+        double totalweight = 0.0;
+        for (int o = 0; o < numorders; o++)
+            totalweight += weightsforeachorder[i*numorders+o];
+        double weightthreshold = (1.0-1e-6)*alpha*totalweight; // noise margin
+    
+        double accumulatedweight = 0.0;
+        for (int o = 0; o < numorders; o++)
+        {
+            accumulatedweight += weightsforeachorder[i*numorders+o];
+
+            if (accumulatedweight > weightthreshold)
+            {
+                if (o == curorder)
+                    lowestorders[i] = -(1+o);
+                else
+                    lowestorders[i] = 1+o;
+                break;
+            }
         }
     }
 }

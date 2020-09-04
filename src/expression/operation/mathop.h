@@ -64,7 +64,8 @@ namespace mathop
     double gettime(void);
     
     expression getmeshsize(int integrationorder);
-    expression getfieldorder(field input);
+    // Return the field order to hold alpha % of the total coefficient weight. Return the actual field order with alpha set to -1.0.
+    expression getfieldorder(field input, double alpha = -1.0);
     
     std::vector<double> gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
     std::vector<double> gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
