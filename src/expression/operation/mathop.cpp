@@ -258,7 +258,7 @@ expression mathop::getmeshsize(int integrationorder)
     return expression(op);
 }
 
-expression mathop::getfieldorder(field input, double alpha)
+expression mathop::getfieldorder(field input, double alpha, double absthres)
 {
     std::shared_ptr<rawfield> rf = input.getpointer();
     
@@ -275,7 +275,7 @@ expression mathop::getfieldorder(field input, double alpha)
         abort();
     }
     
-    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(rf->getfirstharmonic()), alpha));
+    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(rf->getfirstharmonic()), alpha, absthres));
 
     if (alpha == -1.0)
         return expression(op);

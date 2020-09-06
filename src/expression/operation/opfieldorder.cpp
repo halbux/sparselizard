@@ -1,10 +1,11 @@
 #include "opfieldorder.h"
 
 
-opfieldorder::opfieldorder(std::shared_ptr<rawfield> fieldin, double alpha)
+opfieldorder::opfieldorder(std::shared_ptr<rawfield> fieldin, double alpha, double absthres)
 {
     myfield = fieldin;
     myalpha = alpha;
+    mythreshold = absthres;
 }
 
 std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -38,7 +39,7 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
                 elemsinorder[i] = elems[splitorders[o][i]];
         
             std::vector<int> lowestorders;
-            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, lowestorders);
+            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, mythreshold, lowestorders);
 
             for (int i = 0; i < numinorder; i++)
                 fieldorders[splitorders[o][i]] = lowestorders[i];
@@ -90,7 +91,7 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
                 elemsinorder[i] = elems[splitorders[o][i]];
         
             std::vector<int> lowestorders;
-            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, lowestorders);
+            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, mythreshold, lowestorders);
 
             for (int i = 0; i < numinorder; i++)
                 fieldorders[splitorders[o][i]] = lowestorders[i];
@@ -114,7 +115,7 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
 
 std::shared_ptr<operation> opfieldorder::copy(void)
 {
-    std::shared_ptr<opfieldorder> op(new opfieldorder(myfield, myalpha));
+    std::shared_ptr<opfieldorder> op(new opfieldorder(myfield, myalpha, mythreshold));
     *op = *this;
     op->reuse = false;
     return op;

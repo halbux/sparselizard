@@ -1474,7 +1474,7 @@ int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& el
     return maxorder;
 }
 
-void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, double alpha, std::vector<int>& lowestorders)
+void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, double alpha, double absthres, std::vector<int>& lowestorders)
 {
     synchronize();
     
@@ -1539,6 +1539,14 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         double totalweight = 0.0;
         for (int o = 0; o < numorders; o++)
             totalweight += weightsforeachorder[i*numorders+o];
+            
+        // Lowest order if total weight is too small:
+        if (totalweight < std::abs(absthres))
+        {
+            lowestorders[i] = 1+minorder;
+            continue;
+        }
+            
         double weightthreshold = (1.0-1e-6)*alpha*totalweight; // noise margin
     
         double accumulatedweight = 0.0;
