@@ -1555,7 +1555,7 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
                 break;
         }
         
-        if (lowestorders[i] == curorder)
+        if (lowestorders[i] == curorder+1)
             lowestorders[i] = -lowestorders[i];
     }
 }
