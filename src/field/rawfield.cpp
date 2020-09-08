@@ -1542,7 +1542,7 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
             continue;
         }
             
-        double weightthreshold = (1.0-1e-6)*alpha*totalweight; // noise margin
+        double weightthreshold = (1.0-1e-6)*std::abs(alpha)*totalweight; // noise margin
     
         double accumulatedweight = 0.0;
         for (int o = 0; o < numorders; o++)
