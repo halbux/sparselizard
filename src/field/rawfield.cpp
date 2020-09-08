@@ -1530,18 +1530,13 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         int curelem = elementnumbers[i];
         int curdisjreg = els->getdisjointregion(elementtypenumber, curelem);
         int curorder = interpolationorder[curdisjreg];
-        // Default value if none selected below:
-        if (curorder == minorder)
-            lowestorders[i] = -(1+minorder);
-        else
-            lowestorders[i] = 1+minorder;
     
         double totalweight = 0.0;
         for (int o = 0; o < numorders; o++)
             totalweight += weightsforeachorder[i*numorders+o];
             
         // Lowest order if total weight is too small:
-        if (totalweight < std::abs(absthres))
+        if (totalweight <= std::abs(absthres))
         {
             lowestorders[i] = 1+minorder;
             continue;
@@ -1552,17 +1547,17 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         double accumulatedweight = 0.0;
         for (int o = 0; o < numorders; o++)
         {
+            lowestorders[i] = 1+o;
+        
             accumulatedweight += weightsforeachorder[i*numorders+o];
 
             if (accumulatedweight > weightthreshold)
-            {
-                if (o == curorder)
-                    lowestorders[i] = -(1+o);
-                else
-                    lowestorders[i] = 1+o;
                 break;
-            }
         }
+        
+        if (lowestorders[i] == curorder)
+            lowestorders[i] = -lowestorders[i];
+        
     }
 }
 
