@@ -168,7 +168,11 @@ class htracker
         // For a given transition element get the node/edge/face indexes of the original element (respectively in 'on', 'oe', 'of')
         // in which each node/edge/face is (-1 if none). Data is only returned for boundaries.
         void atoriginal(int transitiontype, int transitionnumber, int& originaltype, int& originalnumber, std::vector<int>& on, std::vector<int>& oe, std::vector<int>& of);
-         
+    
+        // Take a POSITIVE value for each leaf at the origin and return one for each leaf at the target. When values have to
+        // be merged the highest value is selected. This and the target htracker cannot differ by more than one adaptation. 
+        void getattarget(std::vector<int>& olv, htracker* target, std::vector<int>& tlv);
+             
         // Get the leaf number of a transition element:
         int getleafnumber(int transitiontype, int transitionnumber);
          

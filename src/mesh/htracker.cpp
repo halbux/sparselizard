@@ -1102,6 +1102,64 @@ void htracker::atoriginal(int tt, int tn, int& ort, int& orn, std::vector<int>& 
     }
 }
 
+void htracker::getattarget(std::vector<int>& olv, htracker* target, std::vector<int>& tlv)
+{
+    tlv = std::vector<int>(target->numleaves, -1);
+
+    resetcursor();
+    target->resetcursor();
+    
+    int oln = 0;
+    int tln = 0;
+    
+    while (true)
+    {
+        // Move to next leaf:
+        while (not(isatleaf()))
+            next();
+        while (not(target->isatleaf()))
+            target->next();
+            
+        int ocd = currentdepth;
+        int tcd = target->currentdepth;
+        
+        int oic = indexesinclusters[ocd];
+        int tic = target->indexesinclusters[tcd];
+        
+        int ons = -1;
+        int tns = -1;
+        if (ocd > 0)
+            ons = numsubelems[parenttypes[ocd-1]];
+        if (tcd > 0)
+            tns = numsubelems[target->parenttypes[tcd-1]];
+        
+        // If both leaves match:
+        if (ocd == tcd)
+            tlv[tln] = olv[oln];
+        // If original tree is one deeper here:
+        if (ocd > tcd)
+            tlv[tln] = std::max(olv[oln], tlv[tln]);
+        // If target tree is one deeper here:
+        if (ocd < tcd)
+            tlv[tln] = olv[oln];
+        
+        if (ocd >= tcd || tic == tns-1)
+        {
+            // Will be reached for original and target at the same time:
+            if (oln == numleaves-1)
+                break;
+        
+            next();
+            oln++;
+        }
+        if (ocd <= tcd || oic == ons-1)
+        {
+            target->next();
+            tln++;
+        }
+    }
+}
+
 int htracker::getleafnumber(int transitiontype, int transitionnumber)
 {
     int tn = toht[transitiontype][transitionnumber];
