@@ -132,6 +132,12 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers);
         void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
         
+
+        bool adapthp(int verbosity);
+        // Get the POSITIVE values[elementtype][elementnumber] at the target mesh (take the highest value 
+        // if values must be merged). This and the target mesh cannot differ by more than one adaptation. 
+        void getattarget(std::vector<std::vector<int>>& values, std::shared_ptr<rawmesh> target);
+        
         // For p-adaptivity:
         void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
         void remove(rawfield* inrawfield);
