@@ -1034,13 +1034,7 @@ expression mathop::athp(expression expr, std::shared_ptr<rawmesh> rm, std::share
 
 bool mathop::adapt(int verbosity)
 {
-    std::shared_ptr<rawmesh> rmcritcalc = universe::mymesh;
-    std::shared_ptr<ptracker> ptcritcalc = universe::mymesh->getptracker();
-
-    bool washchanged = universe::mymesh->getoriginalmeshpointer()->adapth(verbosity);
-    bool waspchanged = universe::mymesh->adaptp(rmcritcalc, ptcritcalc, washchanged, verbosity);
-
-    return (washchanged || waspchanged);
+    return universe::mymesh->adapthp(verbosity);
 }
 
 expression mathop::zienkiewiczzhu(expression input)

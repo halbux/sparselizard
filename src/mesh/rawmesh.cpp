@@ -951,28 +951,38 @@ bool rawmesh::adapthp(int verbosity)
             {
                 int elem = rbe+e;
             
-                int ln = myhtracker->getleafnumber(typenum, elem);
-                int oldnumsplits = leavesnumsplits[ln];
-                int newnumsplits;
-                 
-                // In case the criterion range is not large enough the number of splits are all set to minimum:
-                if (hcrange < hmincritrange)
-                    newnumsplits = minnumsplits;
-                else
+                if (ishadaptive)
                 {
-                    double hcurcrit = hcritptr[rb+e];
+                    int ln = myhtracker->getleafnumber(typenum, elem);
+                    int oldnumsplits = leavesnumsplits[ln];
+                    int newnumsplits;
+                     
+                    // In case the criterion range is not large enough the number of splits are all set to minimum:
+                    if (hcrange < hmincritrange)
+                        newnumsplits = minnumsplits;
+                    else
+                    {
+                        double hcurcrit = hcritptr[rb+e];
+                        
+                        int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
+                        newnumsplits = numsplits[hinterv];
+                        
+                        // Check if the criterion is beyond the down/up change threshold.
+                        double hintervsize = hthresholds[hinterv+1]-hthresholds[hinterv];
+                        // Bring back to upper interval?
+                        if (hinterv < hthresholds.size()-2 && numsplits[hinterv+1] == oldnumsplits && hcurcrit > hthresholds[hinterv+1]-hintervsize*hthresdown)
+                            newnumsplits = oldnumsplits;
+                        // Bring back to lower interval?
+                        if (hinterv > 0 && numsplits[hinterv-1] == oldnumsplits && hcurcrit < hthresholds[hinterv]+hintervsize*hthresup)
+                            newnumsplits = oldnumsplits;
+                    }
                     
-                    int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
-                    newnumsplits = numsplits[hinterv];
-                    
-                    // Check if the criterion is beyond the down/up change threshold.
-                    double hintervsize = hthresholds[hinterv+1]-hthresholds[hinterv];
-                    // Bring back to upper interval?
-                    if (hinterv < hthresholds.size()-2 && numsplits[hinterv+1] == oldnumsplits && hcurcrit > hthresholds[hinterv+1]-hintervsize*hthresdown)
-                        newnumsplits = oldnumsplits;
-                    // Bring back to lower interval?
-                    if (hinterv > 0 && numsplits[hinterv-1] == oldnumsplits && hcurcrit < hthresholds[hinterv]+hintervsize*hthresup)
-                        newnumsplits = oldnumsplits;
+                    if (newnumsplits < oldnumsplits)
+                        groupkeepsplit[typenum][elem] = -1;
+                    if (newnumsplits == oldnumsplits)
+                        groupkeepsplit[typenum][elem] = 0;
+                    if (newnumsplits > oldnumsplits)
+                        groupkeepsplit[typenum][elem] = 1;
                 }
                 
                 for (int i = 0; i < numpadaptfields; i++)
@@ -993,14 +1003,6 @@ bool rawmesh::adapthp(int verbosity)
                         
                     neworders[i][typenum][elem] = neworder;
                 }
-                
-                
-                if (newnumsplits < oldnumsplits)
-                    groupkeepsplit[typenum][elem] = -1;
-                if (newnumsplits == oldnumsplits)
-                    groupkeepsplit[typenum][elem] = 0;
-                if (newnumsplits > oldnumsplits)
-                    groupkeepsplit[typenum][elem] = 1;
             }
         }
     }
@@ -1010,7 +1012,7 @@ bool rawmesh::adapthp(int verbosity)
     
     std::shared_ptr<rawmesh> rmold = universe::mymesh;
     
-    bool washadapted = false;//getoriginalmeshpointer()->adapth(groupkeepsplit, verbosity);
+    bool washadapted = getoriginalmeshpointer()->adapth(groupkeepsplit, verbosity);
     
     
     ///// Update the field orders to the new mesh if required:
@@ -1026,7 +1028,7 @@ bool rawmesh::adapthp(int verbosity)
     
     bool waspadapted = false;
     if (not(isorderidentical) || washadapted)
-        waspadapted = false;//universe::mymesh->adaptp(neworders, verbosity);
+        waspadapted = universe::mymesh->adaptp(neworders, verbosity);
     else
     {
         if (verbosity > 0)
@@ -1131,134 +1133,25 @@ void rawmesh::remove(rawfield* inrawfield)
     mypadaptdata.resize(curindex);
 }
 
-bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptracker> critcalcpt, bool washadapted, int verbosity)
+bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int verbosity)
 {
-    if (mypadaptdata.size() == 0)
-        return false;
-
-    double noisethreshold = 1e-8;
     int num = mypadaptdata.size();
-
-
-    ///// Evaluate the criteria and the current interpolation orders:
-    
-    std::vector<vec> crits(num), oldords(num);
-    
-    int wholedomain = myphysicalregions.createunionofall();
-    
-    // This flag here makes sure the estimators will only be updated
-    // once in the loop even if this function is called again inside:
-    universe::allowestimatorupdate(true);
-    
-    field one("one");
-    for (int i = 0; i < num; i++)
-    {
-        std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
-    
-        expression critexpr = std::get<1>(mypadaptdata[i]);
-        if (washadapted)
-            critexpr = mathop::athp(critexpr, critcalcrm, critcalcpt);
-        expression orderexpr = mathop::getfieldorder(field(curraw));
-        if (washadapted)
-            orderexpr = mathop::athp(orderexpr, critcalcrm, critcalcpt);
-            
-        crits[i] = critexpr.atbarycenter(wholedomain, one);
-        oldords[i] = orderexpr.atbarycenter(wholedomain, one);
-    }
-    int totalnumelems = crits[0].size();
-    
-    universe::allowestimatorupdate(false);
-
-    // Move to densematrix container:
-    std::vector<densematrix> critsmat(num), oldordsmat(num);
-    std::vector<intdensematrix> newordsmat(num);
-    intdensematrix ads(totalnumelems,1, 0, 1);
-    for (int i = 0; i < num; i++)
-    {
-        critsmat[i] = crits[i].getvalues(ads);
-        oldordsmat[i] = oldords[i].getvalues(ads);
-        newordsmat[i] = intdensematrix(totalnumelems,1);
-    }
-    
-    // Remove the above created region:
-    myphysicalregions.remove({wholedomain}, false);
-
-    // All vecs will have the same dofmanager:
-    std::shared_ptr<dofmanager> dofmngr = crits[0].getpointer()->getdofmanager();
-    dofmngr->selectfield(one.getpointer()->harmonic(1));
-    crits = {}; oldords = {};
-
-
-    ///// Calculate the new interpolation orders to use:
-    
-    int newmaxorder = 0;
-    
-    bool isidenticalorder = true;
-    for (int i = 0; i < num; i++)
-    {
-        std::vector<double> thresholds = std::get<2>(mypadaptdata[i]);
-        std::vector<int> orders = std::get<3>(mypadaptdata[i]);
-        double thresdown = std::get<4>(mypadaptdata[i]) + noisethreshold;
-        double thresup = std::get<5>(mypadaptdata[i]) + noisethreshold;
-        double mincritrange = std::get<6>(mypadaptdata[i]);
-        
-        int minorder = *std::min_element(orders.begin(), orders.end());
-    
-        double* critsptr = critsmat[i].getvalues();
-        double* oldordsptr = oldordsmat[i].getvalues();
-        int* newordsptr = newordsmat[i].getvalues();
-    
-        double crange = critsmat[i].maxabs();
-        
-        // Convert the thresholds from % to criterion value:
-        for (int th = 0; th < thresholds.size(); th++)
-            thresholds[th] = 0.0 + thresholds[th] * crange;
-        
-        // In case the criterion range is not large enough the element orders are all set to minimum:
-        if (crange < mincritrange)
-        {
-            for (int e = 0; e < totalnumelems; e++)
-                newordsptr[e] = minorder;
-            if (minorder > newmaxorder)
-                newmaxorder = minorder;
-        }
-        else
-        {
-            for (int e = 0; e < totalnumelems; e++)
-            {
-                int oldord = (int)std::round(oldordsptr[e]);
-                int interv = myalgorithm::findinterval(critsptr[e], thresholds);
-                newordsptr[e] = orders[interv];
-                
-                // Check if the criterion is beyond the down/up change threshold.
-                double intervsize = thresholds[interv+1]-thresholds[interv];
-                // Bring back to upper interval?
-                if (interv < thresholds.size()-2 && orders[interv+1] == oldord && critsptr[e] > thresholds[interv+1]-intervsize*thresdown)
-                    newordsptr[e] = oldord;
-                // Bring back to lower interval?
-                if (interv > 0 && orders[interv-1] == oldord && critsptr[e] < thresholds[interv]+intervsize*thresup)
-                    newordsptr[e] = oldord;
-                
-                if (newordsptr[e] > newmaxorder)
-                    newmaxorder = newordsptr[e];
-            }
-        }
-        
-        for (int e = 0; e < totalnumelems; e++)
-        {
-            if (not(isidenticalorder) || std::abs(oldordsptr[e]-(double)newordsptr[e]) > 0.1)
-            {
-                isidenticalorder = false;
-                break;
-            }
-        }
-    }
-    // Nothing to do if all new orders are identical to the old ones:
-    if (isidenticalorder && not(washadapted))
-    {
-        if (verbosity > 0)
-            std::cout << "Nothing to do for p-adaptation." << std::endl;
+    if (num == 0)
         return false;
+
+    
+    // Get the max order:
+    int newmaxorder = -1;
+    for (int f = 0; f < num; f++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int e = 0; e < neworders[f][i].size(); e++)
+            {
+                if (neworders[f][i][e] > newmaxorder)
+                    newmaxorder = neworders[f][i][e];
+            }
+        }
     }
     
     
@@ -1270,31 +1163,21 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     // newphysregsfororder[rawfield][order][elemtype].
     std::vector<std::vector<std::vector<physicalregion*>>> newphysregsfororder(num, std::vector<std::vector<physicalregion*>>(newmaxorder+1, std::vector<physicalregion*>(8, NULL)));
     
-    for (int i = 0; i < num; i++)
+    for (int f = 0; f < num; f++)
     {
-        int* newordsptr = newordsmat[i].getvalues();
-        
-        for (int d = 0; d < mydisjointregions.count(); d++)
+        for (int i = 0; i < 8; i++)
         {
-            if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
+            for (int e = 0; e < neworders[f][i].size(); e++)
             {
-                int typenum = mydisjointregions.getelementtypenumber(d);
-                int numelems = mydisjointregions.countelements(d);
-                int rb = dofmngr->getrangebegin(d,0);
-                int rbe = mydisjointregions.getrangebegin(d);
-            
-                for (int e = 0; e < numelems; e++)
+                int curorder = neworders[f][i][e];
+
+                if (newphysregsfororder[f][curorder][i] == NULL)
                 {
-                    int curorder = newordsptr[rb+e];
-        
-                    if (newphysregsfororder[i][curorder][typenum] == NULL)
-                    {
-                        newphysregsfororder[i][curorder][typenum] = myphysicalregions.get(newlastpr+1);
-                        newlastpr++;
-                    }
-                    
-                    newphysregsfororder[i][curorder][typenum]->addelement(typenum, rbe+e);
+                    newphysregsfororder[f][curorder][i] = myphysicalregions.get(newlastpr+1);
+                    newlastpr++;
                 }
+
+                newphysregsfororder[f][curorder][i]->addelement(i, e);
             }
         }
     }
@@ -1378,7 +1261,10 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
         for (int i = 0; i < num; i++)
         {
             std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
-            std::vector<int> numineachorder = newordsmat[i].countalloccurences(newmaxorder);
+            
+            std::vector<int> catords = myalgorithm::concatenate(neworders[i]);
+            intdensematrix newordsmat(catords.size(),1, catords);
+            std::vector<int> numineachorder = newordsmat.countalloccurences(newmaxorder);
 
             curraw->print();
 
@@ -1391,117 +1277,40 @@ bool rawmesh::adaptp(std::shared_ptr<rawmesh> critcalcrm, std::shared_ptr<ptrack
     return true;
 }
 
-bool rawmesh::adapth(int verbosity)
+bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosity)
 {
     if (myhadaptdata.size() == 0)
         return false;
         
     wallclock clk;
 
-    double noisethreshold = 1e-8;
     int meshdim = getmeshdimension();
     
     universe::mymesh = myhadaptedmesh;
         
     elements* elptr = universe::mymesh->getelements();
-    disjointregions* drptr = universe::mymesh->getdisjointregions();
-    physicalregions* prptr = universe::mymesh->getphysicalregions();
     
     std::shared_ptr<htracker> newhtracker(new htracker);
     *newhtracker = *(myhadaptedmesh->myhtracker);
     
-    std::vector<int> leavesnumsplits;
-    newhtracker->countsplits(leavesnumsplits);
 
-
-    ///// Evaluate the criterion:
-
-    int wholedomain = prptr->createunionofall();
-    
-    field one("one");
-    
-    universe::allowestimatorupdate(true);
-        
-    vec crit = std::get<0>(myhadaptdata[0]).atbarycenter(wholedomain, one);
-    
-    universe::allowestimatorupdate(false);
-    
-    prptr->remove({wholedomain}, false);
-
-
-    ///// Move to densematrix container:
-    
-    int totalnumelems = crit.size();
-
-    intdensematrix ads(totalnumelems,1, 0, 1);
-    densematrix critmat = crit.getvalues(ads);
-    double* critptr = critmat.getvalues();
-
-    std::shared_ptr<dofmanager> dofmngr = crit.getpointer()->getdofmanager();
-    dofmngr->selectfield(one.getpointer()->harmonic(1));
-    
-
-    ///// Calculate the number of splits to use:
-    
-    std::vector<double> thresholds = std::get<1>(myhadaptdata[0]);
-    std::vector<int> numsplits = std::get<2>(myhadaptdata[0]);
-    double thresdown = std::get<3>(myhadaptdata[0]) + noisethreshold;
-    double thresup = std::get<4>(myhadaptdata[0]) + noisethreshold;
-    double mincritrange = std::get<5>(myhadaptdata[0]);
-    
-    int minnumsplits = *std::min_element(numsplits.begin(), numsplits.end());
-
-    double crange = critmat.maxabs();
-    
-    // Convert the thresholds from % to criterion value:
-    for (int th = 0; th < thresholds.size(); th++)
-        thresholds[th] = 0.0 + thresholds[th] * crange;
+    ///// Move the decisions to the leaves:
     
     // Vector with +1 to split a leaf, 0 to keep as is and -1 to group:
     std::vector<int> vadapt(newhtracker->countleaves(), -1); // all grouped initially
     
-    for (int d = 0; d < drptr->count(); d++)
+    for (int i = 0; i < 8; i++)
     {
-        if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
+        for (int e = 0; e < groupkeepsplit[i].size(); e++)
         {
-            int typenum = drptr->getelementtypenumber(d);
-            int numelems = drptr->countelements(d);
-            int rb = dofmngr->getrangebegin(d,0);
-            int rbe = drptr->getrangebegin(d);
-        
-            for (int e = 0; e < numelems; e++)
-            {
-                int ln = newhtracker->getleafnumber(typenum, rbe+e);
-                int oldnumsplits = leavesnumsplits[ln];
-                
-                int newnumsplits;
-                    
-                // In case the criterion range is not large enough the number of splits are all set to minimum:
-                if (crange < mincritrange)
-                    newnumsplits = minnumsplits;
-                else
-                {
-                    double curcrit = critptr[rb+e];
-                    
-                    int interv = myalgorithm::findinterval(curcrit, thresholds);
-                    newnumsplits = numsplits[interv];
-                    
-                    // Check if the criterion is beyond the down/up change threshold.
-                    double intervsize = thresholds[interv+1]-thresholds[interv];
-                    // Bring back to upper interval?
-                    if (interv < thresholds.size()-2 && numsplits[interv+1] == oldnumsplits && curcrit > thresholds[interv+1]-intervsize*thresdown)
-                        newnumsplits = oldnumsplits;
-                    // Bring back to lower interval?
-                    if (interv > 0 && numsplits[interv-1] == oldnumsplits && curcrit < thresholds[interv]+intervsize*thresup)
-                        newnumsplits = oldnumsplits;
-                }
-                    
-                // Split or keep unchanged. Multiple transition elements can share the same leaf!
-                if (newnumsplits > oldnumsplits)
-                    vadapt[ln] = 1;
-                if (vadapt[ln] < 1 && newnumsplits == oldnumsplits)
-                    vadapt[ln] = 0;
-            }
+            int ln = newhtracker->getleafnumber(i, e);
+            int decision = groupkeepsplit[i][e];
+
+            // Split or keep unchanged. Multiple transition elements can share the same leaf!
+            if (decision == 1)
+                vadapt[ln] = 1;
+            if (vadapt[ln] < 1 && decision == 0)
+                vadapt[ln] = 0;
         }
     }
              
@@ -1510,50 +1319,47 @@ bool rawmesh::adapth(int verbosity)
 
     int maxnumsplits = newhtracker->getmaxdepth() + 1; // includes any new split request
     
+    std::vector<int> leavesnumsplits;
+    newhtracker->countsplits(leavesnumsplits);
+    
     for (int ns = maxnumsplits; ns > 1; ns--)
     {
         // Update to how it will be actually treated:
         newhtracker->fix(vadapt);
 
-        for (int d = 0; d < drptr->count(); d++)
+        for (int i = 0; i < 8; i++)
         {
-            if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
+            element myelement(i);
+            int numedges = myelement.countedges();
+        
+            for (int e = 0; e < groupkeepsplit[i].size(); e++)
             {
-                int typenum = drptr->getelementtypenumber(d);
-                int numelems = drptr->countelements(d);
-                int rbe = drptr->getrangebegin(d);
-                element curelem(typenum);
-                int numedges = curelem.countedges();
-            
-                for (int e = 0; e < numelems; e++)
+                int ln = newhtracker->getleafnumber(i, e);
+                int numsplits = leavesnumsplits[ln] + vadapt[ln];
+                
+                if (numsplits != ns)
+                    continue;
+                
+                // Loop on every edge of the current element:
+                for (int en = 0; en < numedges; en++)
                 {
-                    int ln = newhtracker->getleafnumber(typenum, rbe+e);
-                    int numsplits = leavesnumsplits[ln] + vadapt[ln];
-                    
-                    if (numsplits != ns)
-                        continue;
-                    
-                    // Loop on every edge of the current element:
-                    for (int en = 0; en < numedges; en++)
+                    int currentedge = elptr->getsubelement(1, i, e, en);
+                    // Get all cells touching the current edge:
+                    std::vector<int> cellsonedge = elptr->getcellsonedge(currentedge);
+
+                    for (int c = 0; c < cellsonedge.size()/2; c++)
                     {
-                        int currentedge = elptr->getsubelement(1, typenum, rbe+e, en);
-                        // Get all cells touching the current edge:
-                        std::vector<int> cellsonedge = elptr->getcellsonedge(currentedge);
+                        int curcell = cellsonedge[2*c+1];
+                        int celltype = cellsonedge[2*c+0];
+                        
+                        if (i == celltype && curcell == e)
+                            continue;
+                        
+                        int curln = newhtracker->getleafnumber(celltype, curcell);
+                        int neighbournumsplits = leavesnumsplits[curln] + vadapt[curln];
 
-                        for (int c = 0; c < cellsonedge.size()/2; c++)
-                        {
-                            int curcell = cellsonedge[2*c+1];
-                            int celltype = cellsonedge[2*c+0];
-                            
-                            if (typenum == celltype && curcell == rbe+e)
-                                continue;
-                            
-                            int curln = newhtracker->getleafnumber(celltype, curcell);
-                            int neighbournumsplits = leavesnumsplits[curln] + vadapt[curln];
-
-                            if (numsplits > neighbournumsplits+1)
-                                vadapt[curln] += numsplits-neighbournumsplits-1;                     
-                        }
+                        if (numsplits > neighbournumsplits+1)
+                            vadapt[curln] += numsplits-neighbournumsplits-1;                     
                     }
                 }
             }
