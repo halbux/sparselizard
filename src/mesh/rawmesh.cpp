@@ -931,7 +931,7 @@ bool rawmesh::adapthp(int verbosity)
         pcranges[i] = pcritmats[i].maxabs();
         
         // Convert the thresholds from % to criterion value:
-        for (int th = 0; th < pthresholds.size(); th++)
+        for (int th = 0; th < pthresholds[i].size(); th++)
             pthresholds[i][th] = 0.0 + pthresholds[i][th] * pcranges[i];
     }
     
