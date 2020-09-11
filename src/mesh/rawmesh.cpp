@@ -940,69 +940,69 @@ bool rawmesh::adapthp(int verbosity)
     bool isorderidentical = true;
     for (int d = 0; d < drptr->count(); d++)
     {
-        if (dofmngr->isdefined(d, 0)) // There is only one shape fct!
-        {
-            int typenum = drptr->getelementtypenumber(d);
-            int numelems = drptr->countelements(d);
-            int rbe = drptr->getrangebegin(d);
-            int rb = dofmngr->getrangebegin(d,0);
+        if (dofmngr->isdefined(d, 0) == false) // There is only one shape fct!
+            continue;
         
-            for (int e = 0; e < numelems; e++)
+        int typenum = drptr->getelementtypenumber(d);
+        int numelems = drptr->countelements(d);
+        int rbe = drptr->getrangebegin(d);
+        int rb = dofmngr->getrangebegin(d,0);
+        
+        for (int e = 0; e < numelems; e++)
+        {
+            int elem = rbe+e;
+        
+            if (ishadaptive)
             {
-                int elem = rbe+e;
-            
-                if (ishadaptive)
+                int ln = myhtracker->getleafnumber(typenum, elem);
+                int oldnumsplits = leavesnumsplits[ln];
+                int newnumsplits;
+                 
+                // In case the criterion range is not large enough the number of splits are all set to minimum:
+                if (hcrange < hmincritrange)
+                    newnumsplits = minnumsplits;
+                else
                 {
-                    int ln = myhtracker->getleafnumber(typenum, elem);
-                    int oldnumsplits = leavesnumsplits[ln];
-                    int newnumsplits;
-                     
-                    // In case the criterion range is not large enough the number of splits are all set to minimum:
-                    if (hcrange < hmincritrange)
-                        newnumsplits = minnumsplits;
-                    else
-                    {
-                        double hcurcrit = hcritptr[rb+e];
-                        
-                        int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
-                        newnumsplits = numsplits[hinterv];
-                        
-                        // Check if the criterion is beyond the down/up change threshold.
-                        double hintervsize = hthresholds[hinterv+1]-hthresholds[hinterv];
-                        // Bring back to upper interval?
-                        if (hinterv < hthresholds.size()-2 && numsplits[hinterv+1] == oldnumsplits && hcurcrit > hthresholds[hinterv+1]-hintervsize*hthresdown)
-                            newnumsplits = oldnumsplits;
-                        // Bring back to lower interval?
-                        if (hinterv > 0 && numsplits[hinterv-1] == oldnumsplits && hcurcrit < hthresholds[hinterv]+hintervsize*hthresup)
-                            newnumsplits = oldnumsplits;
-                    }
+                    double hcurcrit = hcritptr[rb+e];
                     
-                    if (newnumsplits < oldnumsplits)
-                        groupkeepsplit[typenum][elem] = -1;
-                    if (newnumsplits == oldnumsplits)
-                        groupkeepsplit[typenum][elem] = 0;
-                    if (newnumsplits > oldnumsplits)
-                        groupkeepsplit[typenum][elem] = 1;
+                    int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
+                    newnumsplits = numsplits[hinterv];
+                    
+                    // Check if the criterion is beyond the down/up change threshold.
+                    double hintervsize = hthresholds[hinterv+1]-hthresholds[hinterv];
+                    // Bring back to upper interval?
+                    if (hinterv < hthresholds.size()-2 && numsplits[hinterv+1] == oldnumsplits && hcurcrit > hthresholds[hinterv+1]-hintervsize*hthresdown)
+                        newnumsplits = oldnumsplits;
+                    // Bring back to lower interval?
+                    if (hinterv > 0 && numsplits[hinterv-1] == oldnumsplits && hcurcrit < hthresholds[hinterv]+hintervsize*hthresup)
+                        newnumsplits = oldnumsplits;
                 }
                 
-                for (int i = 0; i < numpadaptfields; i++)
+                if (newnumsplits < oldnumsplits)
+                    groupkeepsplit[typenum][elem] = -1;
+                if (newnumsplits == oldnumsplits)
+                    groupkeepsplit[typenum][elem] = 0;
+                if (newnumsplits > oldnumsplits)
+                    groupkeepsplit[typenum][elem] = 1;
+            }
+            
+            for (int i = 0; i < numpadaptfields; i++)
+            {
+                int oldorder = foptrs[i][rb+e];
+                int neworder = minorders[i];
+            
+                // In case the criterion range is not large enough the element orders are all set to minimum:
+                if (pcranges[i] > pmincritrange[i])
                 {
-                    int oldorder = foptrs[i][rb+e];
-                    int neworder = minorders[i];
-                
-                    // In case the criterion range is not large enough the element orders are all set to minimum:
-                    if (pcranges[i] > pmincritrange[i])
-                    {
-                        double pcurcrit = pcritptrs[i][rb+e];
-                        
-                        int pinterv = myalgorithm::findinterval(pcurcrit, pthresholds[i]);
-                        neworder = orders[i][pinterv];
-                    }
-                    if (neworder != oldorder)
-                        isorderidentical = false;
-                        
-                    neworders[i][typenum][elem] = neworder;
+                    double pcurcrit = pcritptrs[i][rb+e];
+                    
+                    int pinterv = myalgorithm::findinterval(pcurcrit, pthresholds[i]);
+                    neworder = orders[i][pinterv];
                 }
+                if (neworder != oldorder)
+                    isorderidentical = false;
+                    
+                neworders[i][typenum][elem] = neworder;
             }
         }
     }
