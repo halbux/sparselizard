@@ -1010,8 +1010,6 @@ bool rawmesh::adapthp(int verbosity)
     
     ///// Perform a h-adaptation:
     
-    std::shared_ptr<rawmesh> rmold = universe::mymesh;
-    
     bool washadapted = getoriginalmeshpointer()->adapth(groupkeepsplit, verbosity);
     
     
@@ -1020,7 +1018,7 @@ bool rawmesh::adapthp(int verbosity)
     if (washadapted)
     {
         for (int f = 0; f < numpadaptfields; f++)
-            rmold->getattarget(neworders[f], universe::mymesh);
+            getattarget(neworders[f], universe::mymesh);
     }
     
     
