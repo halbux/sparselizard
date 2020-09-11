@@ -1027,11 +1027,9 @@ bool rawmesh::adapthp(int verbosity)
     bool waspadapted = false;
     if (not(isorderidentical) || washadapted)
         waspadapted = universe::mymesh->adaptp(neworders, verbosity);
-    else
-    {
-        if (verbosity > 0)
-            std::cout << "Nothing to do for p-adaptation." << std::endl;
-    }
+
+    if (ispadaptive && not(waspadapted) && verbosity > 0)
+        std::cout << "Nothing to do for p-adaptation." << std::endl;
     
     
     return (washadapted || waspadapted);
