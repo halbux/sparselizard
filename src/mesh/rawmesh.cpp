@@ -1306,11 +1306,8 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
             int ln = newhtracker->getleafnumber(i, e);
             int decision = groupkeepsplit[i][e];
 
-            // Split or keep unchanged. Multiple transition elements can share the same leaf!
-            if (decision == 1)
-                vadapt[ln] = 1;
-            if (vadapt[ln] < 1 && decision == 0)
-                vadapt[ln] = 0;
+            // Multiple transition elements can share the same leaf!
+            vadapt[ln] = std::max(decision, vadapt[ln]);
         }
     }
              
