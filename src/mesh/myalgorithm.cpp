@@ -624,6 +624,18 @@ int myalgorithm::findinterval(double val, std::vector<double>& tics)
     }
 }
 
+std::vector<double> myalgorithm::getintervaltics(double minval, double maxval, int numintervals)
+{
+    double range = maxval - minval;
+    double step = range/((double)numintervals);
+
+    std::vector<double> output(numintervals+1, minval);
+    for (int i = 1; i < numintervals+1; i++)
+        output[i] = output[i-1] + step;
+    
+    return output;
+}
+
 std::string myalgorithm::getfileextension(std::string filename)
 {
     int index = -1;
@@ -1001,5 +1013,18 @@ std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
     }
     
     return output;
+}
+
+int myalgorithm::inequalitytoint(int a, int b)
+{
+    if (a < b)
+        return -1;
+    else
+    {
+        if (a == b)
+            return 0;
+        else
+            return 1;
+    }
 }
 

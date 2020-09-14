@@ -84,6 +84,8 @@ namespace myalgorithm
     // Return the interval number in which 'val' is. The interval tics must be sorted ascendingly.
     // Values out of bound are set to either the interval 0 or the last one. Size of 'tics' must be at least 2.
     int findinterval(double val, std::vector<double>& tics);
+    // Get the tics for equally sized intervals:
+    std::vector<double> getintervaltics(double minval, double maxval, int numintervals);
     
     // Get the file extension (dot included) in a string (works for any extension length):
     std::string getfileextension(std::string filename);
@@ -139,6 +141,9 @@ namespace myalgorithm
     
     // Concatenate vectors:
     std::vector<int> concatenate(std::vector<std::vector<int>> tocat);
+    
+    // Return -1 if a < b, 0 if a = b and +1 if a > b:
+    int inequalitytoint(int a, int b);
     
 };
 
