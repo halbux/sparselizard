@@ -67,8 +67,7 @@ class field
 
         // Set the interpolation order on a physical region.
         void setorder(int physreg, int interpolorder);
-        void setorder(expression criterion, int loworder, int highorder, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
-        void setorder(expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown = 0.0, double thresup = 0.0, double mincritrange = 0.0);
+        void setorder(expression criterion, int loworder, int highorder);
 
         // Set a value for the field on a given geometrical region.
         // Use the default order + 'extraintegrationdegree' to 

@@ -888,53 +888,39 @@ bool rawmesh::adapthp(int verbosity)
     
     ///// Make a hp-adaptivity decision for every element:
     
-    double noisethreshold = 1e-8;
-    
     // Parameters for h-adaptivity:
+    int lownumsplits, highnumsplits;
     std::vector<double> hthresholds;
-    double hthresdown, hthresup, hmincritrange, hcrange;
-    std::vector<int> numsplits, leavesnumsplits;
-    int minnumsplits;
     
     if (ishadaptive)
     {
-        hthresholds = std::get<1>(getoriginalmeshpointer()->myhadaptdata[0]);
-        numsplits = std::get<2>(getoriginalmeshpointer()->myhadaptdata[0]);
-        hthresdown = std::get<3>(getoriginalmeshpointer()->myhadaptdata[0]) + noisethreshold;
-        hthresup = std::get<4>(getoriginalmeshpointer()->myhadaptdata[0]) + noisethreshold;
-        hmincritrange = std::get<5>(getoriginalmeshpointer()->myhadaptdata[0]);
+        lownumsplits = std::get<1>(getoriginalmeshpointer()->myhadaptdata[0]);
+        highnumsplits = std::get<2>(getoriginalmeshpointer()->myhadaptdata[0]);
         
-        minnumsplits = *std::min_element(numsplits.begin(), numsplits.end());
-        hcrange = hcritmat.maxabs();
+        double hcrange = hcritmat.maxabs();
         
-        // Convert the thresholds from % to criterion value:
-        for (int th = 0; th < hthresholds.size(); th++)
-            hthresholds[th] = 0.0 + hthresholds[th] * hcrange;
+        int numintervals = highnumsplits-lownumsplits+1;
+        hthresholds = myalgorithm::getintervaltics(0.0, hcrange, numintervals);
     }
-    myhtracker->countsplits(leavesnumsplits);
     
     // Parameters for p-adaptivity:
+    std::vector<int> loworders(numpadaptfields), highorders(numpadaptfields);
     std::vector<std::vector<double>> pthresholds(numpadaptfields);
-    std::vector<double> pthresdown(numpadaptfields), pthresup(numpadaptfields), pmincritrange(numpadaptfields), pcranges(numpadaptfields);
-    std::vector<std::vector<int>> orders(numpadaptfields);
-    std::vector<int> minorders(numpadaptfields);
-    
+
     for (int i = 0; i < numpadaptfields; i++)
     {
-        pthresholds[i] = std::get<2>(mypadaptdata[i]);
-        orders[i] = std::get<3>(mypadaptdata[i]);
-        pthresdown[i] = std::get<4>(mypadaptdata[i]) + noisethreshold;
-        pthresup[i] = std::get<5>(mypadaptdata[i]) + noisethreshold;
-        pmincritrange[i] = std::get<6>(mypadaptdata[i]);
+        loworders[i] = std::get<2>(mypadaptdata[i]);
+        highorders[i] = std::get<3>(mypadaptdata[i]);
         
-        minorders[i] = *std::min_element(orders[i].begin(), orders[i].end());
-        pcranges[i] = pcritmats[i].maxabs();
+        double pcrange = pcritmats[i].maxabs();
         
-        // Convert the thresholds from % to criterion value:
-        for (int th = 0; th < pthresholds[i].size(); th++)
-            pthresholds[i][th] = 0.0 + pthresholds[i][th] * pcranges[i];
+        int numintervals = highorders[i]-loworders[i]+1;
+        pthresholds[i] = myalgorithm::getintervaltics(0.0, pcrange, numintervals);
     }
     
+    
+    std::vector<int> leavesnumsplits;
+    myhtracker->countsplits(leavesnumsplits);
     
     // Make the decision:
     bool isorderidentical = true;
@@ -956,53 +942,41 @@ bool rawmesh::adapthp(int verbosity)
             {
                 int ln = myhtracker->getleafnumber(typenum, elem);
                 int oldnumsplits = leavesnumsplits[ln];
-                int newnumsplits;
-                 
-                // In case the criterion range is not large enough the number of splits are all set to minimum:
-                if (hcrange < hmincritrange)
-                    newnumsplits = minnumsplits;
-                else
-                {
-                    double hcurcrit = hcritptr[rb+e];
-                    
-                    int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
-                    newnumsplits = numsplits[hinterv];
-                    
-                    // Check if the criterion is beyond the down/up change threshold.
-                    double hintervsize = hthresholds[hinterv+1]-hthresholds[hinterv];
-                    // Bring back to upper interval?
-                    if (hinterv < hthresholds.size()-2 && numsplits[hinterv+1] == oldnumsplits && hcurcrit > hthresholds[hinterv+1]-hintervsize*hthresdown)
-                        newnumsplits = oldnumsplits;
-                    // Bring back to lower interval?
-                    if (hinterv > 0 && numsplits[hinterv-1] == oldnumsplits && hcurcrit < hthresholds[hinterv]+hintervsize*hthresup)
-                        newnumsplits = oldnumsplits;
-                }
+            
+                double hcurcrit = hcritptr[rb+e];
+
+                int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
+                int newnumsplits = lownumsplits + hinterv;
                 
-                if (newnumsplits < oldnumsplits)
-                    groupkeepsplit[typenum][elem] = -1;
-                if (newnumsplits == oldnumsplits)
-                    groupkeepsplit[typenum][elem] = 0;
-                if (newnumsplits > oldnumsplits)
-                    groupkeepsplit[typenum][elem] = 1;
+                groupkeepsplit[typenum][elem] = myalgorithm::inequalitytoint(newnumsplits, oldnumsplits);
             }
             
             for (int i = 0; i < numpadaptfields; i++)
             {
                 int oldorder = foptrs[i][rb+e];
-                int neworder = minorders[i];
+                double pcurcrit = pcritptrs[i][rb+e];
+                
+                int pinterv = myalgorithm::findinterval(pcurcrit, pthresholds[i]);
+                int neworder = loworders[i] + pinterv;
             
-                // In case the criterion range is not large enough the element orders are all set to minimum:
-                if (pcranges[i] > pmincritrange[i])
-                {
-                    double pcurcrit = pcritptrs[i][rb+e];
+                // Smoother mesh coarsening:
+                if (ishadaptive && groupkeepsplit[typenum][elem] == -1)
+                    neworder = std::max(oldorder, neworder);
+
+                // Max one order change:
+                if (neworder < oldorder-1)
+                    neworder = oldorder-1;
+                if (neworder > oldorder+1)
+                    neworder = oldorder+1;
                     
-                    int pinterv = myalgorithm::findinterval(pcurcrit, pthresholds[i]);
-                    neworder = orders[i][pinterv];
-                }
-                if (neworder != oldorder)
-                    isorderidentical = false;
+                // Bring in bounds:
+                neworder = std::max(neworder, loworders[i]);
+                neworder = std::min(neworder, highorders[i]); 
                     
                 neworders[i][typenum][elem] = neworder;
+                
+                if (neworder != oldorder)
+                    isorderidentical = false;
             }
         }
     }
@@ -1084,7 +1058,7 @@ void rawmesh::getattarget(std::vector<std::vector<int>>& values, std::shared_ptr
     }
 }
 
-void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
+void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, int loworder, int highorder)
 {
     int index = -1;
     for (int i = 0; i < mypadaptdata.size(); i++)
@@ -1100,15 +1074,15 @@ void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, st
     std::weak_ptr<rawfield> inweak = inrawfield;
 
     if (index != -1)
-        mypadaptdata[index] = std::make_tuple(inweak, criterion, thresholds, orders, thresdown, thresup, mincritrange);
+        mypadaptdata[index] = std::make_tuple(inweak, criterion, loworder, highorder);
     else
-        mypadaptdata.push_back(std::make_tuple(inweak, criterion, thresholds, orders, thresdown, thresup, mincritrange));
+        mypadaptdata.push_back(std::make_tuple(inweak, criterion, loworder, highorder));
 }
 
 void rawmesh::remove(rawfield* inrawfield)
 {
     // To delay criterion-field destruction to after 'mypadaptdata' has a valid state (after resize):
-    std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> pad = mypadaptdata;
+    std::vector<std::tuple<std::weak_ptr<rawfield>, expression, int, int>> pad = mypadaptdata;
     
     // Remove the pointed field and all expired fields:
     int curindex = 0;
@@ -1586,8 +1560,22 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     return true;
 }
 
-void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
+void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
 {
+    if (not(criterion.isscalar()))
+    {
+        std::cout << "Error in 'rawmesh' object: expected a scalar criterion for mesh adaptivity" << std::endl;
+        abort();   
+    }
+    // The criterion cannot be multiharmonic:
+    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    if (not(criterion.isharmonicone(alldisjregs)))
+    {
+        std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
+        abort();
+    }
+    
     if (lownumsplits < 0)
     {
         std::cout << "Error in 'rawmesh' object: in 'setadaptivity' cannot use negative minimum number of splits " << lownumsplits << std::endl;
@@ -1598,95 +1586,10 @@ void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnums
         std::cout << "Error in 'rawmesh' object: in 'setadaptivity' the minimum number of splits cannot be larger than the maximum" << std::endl;
         abort();   
     }
-
-    int cnt = highnumsplits-lownumsplits+1;
-    std::vector<double> thresholds(cnt+1);
-    thresholds[0] = 0;
-    for (int i = 1; i < thresholds.size()-1; i++)
-        thresholds[i] = 1.0/cnt * i;
-    thresholds[thresholds.size()-1] = 1.0;
-
-    std::vector<int> numsplits(cnt);
-    for (int i = 0; i < cnt; i++)
-        numsplits[i] = lownumsplits + i;
         
-    setadaptivity(criterion, thresholds, numsplits, thresdown, thresup, mincritrange);
-}
-
-void rawmesh::setadaptivity(expression criterion, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
-{
-    double noiselevel = 1e-8;
-
-    if (not(criterion.isscalar()))
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expected a scalar criterion for mesh adaptivity" << std::endl;
-        abort();   
-    }
-    if (numsplits.size() == 0)
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' number of splits vector cannot be empty" << std::endl;
-        abort();   
-    }
-    if (thresholds.size() != numsplits.size()+1)
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expected a threshold vector of size " << numsplits.size()+1 << " for the number of splits vector of size " << numsplits.size() << " provided (thresholds 0.0 and 1.0 must be included)" << std::endl;
-        abort();   
-    }
-    for (int i = 0; i < thresholds.size(); i++)
-    {
-        if (thresholds[i] < 0.0-noiselevel || thresholds[i] > 1.0+noiselevel)
-        {
-            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' thresholds must be between 0.0 and 1.0" << std::endl;
-            abort();   
-        }
-    }
-    for (int i = 1; i < thresholds.size(); i++)
-    {
-        if (thresholds[i] < thresholds[i-1]+noiselevel)
-        {
-            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expecting increasing thresholds" << std::endl;
-            abort();   
-        }
-    }
-    for (int i = 1; i < numsplits.size(); i++)
-    {
-        if (numsplits[i] <= numsplits[i-1])
-        {
-            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' expecting increasing number of splits" << std::endl;
-            abort();   
-        }
-    }
-    if (thresholds[0] > noiselevel || thresholds[thresholds.size()-1] < 1.0-noiselevel)
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' thresholds 0.0 and 1.0 must be included" << std::endl;
-        abort();   
-    }
-    for (int i = 0; i < numsplits.size(); i++)
-    {
-        if (numsplits[i] < 0)
-        {
-            std::cout << "Error in 'rawmesh' object: in 'setadaptivity' number of splits cannot be negative" << std::endl;
-            abort();   
-        }
-    }
-    if (thresdown < 0.0-noiselevel || thresdown > 1.0+noiselevel || thresup < 0.0-noiselevel || thresup > 1.0+noiselevel)
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' thresholds must be between 0.0 and 1.0" << std::endl;
-        abort();   
-    }
-    
-    // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
-    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
-    if (not(criterion.isharmonicone(alldisjregs)))
-    {
-        std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
-        abort();
-    }
-    
     criterion = mathop::abs(criterion);
     
-    myhadaptdata = {std::make_tuple(criterion, thresholds, numsplits, thresdown, thresup, mincritrange)};   
+    myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits)};   
 }
 
 void rawmesh::writewithdisjointregions(std::string name)

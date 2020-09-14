@@ -52,11 +52,11 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         
         // For p-adaptivity:
         std::shared_ptr<ptracker> myptracker = NULL;
-        std::vector<std::tuple<std::weak_ptr<rawfield>, expression,std::vector<double>,std::vector<int>,double,double,double>> mypadaptdata = {};
+        std::vector<std::tuple<std::weak_ptr<rawfield>, expression, int, int>> mypadaptdata = {};
     
         // For h-adaptivity (only for original mesh):
         std::shared_ptr<rawmesh> myhadaptedmesh = NULL;
-        std::vector<std::tuple<expression,std::vector<double>,std::vector<int>,double,double,double>> myhadaptdata = {}; // only one element or empty if not h-adaptive
+        std::vector<std::tuple<expression, int, int>> myhadaptdata = {}; // only one element or empty if not h-adaptive
         // For the h-adapted mesh:
         std::shared_ptr<htracker> myhtracker = NULL;
         
@@ -139,14 +139,13 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void getattarget(std::vector<std::vector<int>>& values, std::shared_ptr<rawmesh> target);
         
         // For p-adaptivity:
-        void add(std::shared_ptr<rawfield> inrawfield, expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange);
+        void add(std::shared_ptr<rawfield> inrawfield, expression criterion, int loworder, int highorder);
         void remove(rawfield* inrawfield);
         bool adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int verbosity);
         
         // For h-adaptivity:
         bool adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosity);
-        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange);
-        void setadaptivity(expression criterion, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange);
+        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits);
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
         void writewithdisjointregions(std::string);

@@ -69,14 +69,9 @@ void mesh::write(std::string name, int verbosity)
     rawmeshptr->gethadaptedpointer()->write(name, verbosity);
 }
 
-void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double thresdown, double thresup, double mincritrange)
+void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
 {
-    rawmeshptr->setadaptivity(criterion, lownumsplits, highnumsplits, thresdown, thresup, mincritrange);
-}
-
-void mesh::setadaptivity(expression criterion, std::vector<double> thresholds, std::vector<int> numsplits, double thresdown, double thresup, double mincritrange)
-{
-    rawmeshptr->setadaptivity(criterion, thresholds, numsplits, thresdown, thresup, mincritrange);
+    rawmeshptr->setadaptivity(criterion, lownumsplits, highnumsplits);
 }
 
 void mesh::split(int n)

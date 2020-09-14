@@ -50,7 +50,7 @@ double hadapt2d(void)
 
     expression criterion = 1+ifpositive(sin(3*x*y), sin(50*x)*sin(57*y)*x*y, 0);
 
-    mymesh.setadaptivity(criterion, 0, 5, 0.2, 0.2);
+    mymesh.setadaptivity(criterion, 0, 5);
 
     v.setorder(s1, 5);
     v.setorder(s2, 4);
@@ -63,7 +63,8 @@ double hadapt2d(void)
 
     poisson += integral(sur, grad(dof(v))*grad(tf(v)));
 
-    while (adapt(1)) {}
+    for (int i = 0; i < 5; i++)
+        adapt(1);
     
     solve(poisson);
 
@@ -85,7 +86,7 @@ double hadapt3d(void)
 
     expression criterion = 1+ifpositive(sin(5*x)*sin(4*y)*sin(6*z), sin(50*x)*sin(57*y)*y*sin(53*z), 0);
 
-    mymesh.setadaptivity(criterion, 0, 5, 0.5, 0.5);
+    mymesh.setadaptivity(criterion, 0, 5);
 
     v.setconstraint(left, 10);
     v.setconstraint(right, 0);
@@ -94,7 +95,8 @@ double hadapt3d(void)
 
     poisson += integral(vol, grad(dof(v))*grad(tf(v)));
 
-    while (adapt(1)) {}
+    for (int i = 0; i < 5; i++)
+        adapt(1);
     
     solve(poisson);
 
@@ -116,7 +118,7 @@ int main(void)
     std::cout << relerror1d << " " << relerror2d << " " << relerror3d << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (relerror1d < 2e-15 && relerror2d < 2e-11 && relerror3d < 3e-13);
+    std::cout << (relerror1d < 2e-15 && relerror2d < 4e-11 && relerror3d < 9e-13);
 
     SlepcFinalize();
 

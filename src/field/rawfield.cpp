@@ -663,7 +663,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     }
 }
 
-void rawfield::setorder(expression criterion, std::vector<double> thresholds, std::vector<int> orders, double thresdown, double thresup, double mincritrange)
+void rawfield::setorder(expression criterion, int loworder, int highorder)
 {
     synchronize();
     
@@ -673,22 +673,13 @@ void rawfield::setorder(expression criterion, std::vector<double> thresholds, st
         abort();
     }
     
-    // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs((universe::mymesh->getdisjointregions())->count());
-    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
-    if (not(criterion.isharmonicone(alldisjregs)))
-    {
-        std::cout << "Error in 'rawfield' object: cannot have a multiharmonic criterion for p-adaptivity" << std::endl;
-        abort();
-    }
-
     // Set the interpolation order on the sub fields:
     for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setorder(criterion, thresholds, orders, thresdown, thresup, mincritrange);
+        mysubfields[i][0]->setorder(criterion, loworder, highorder);
     for (int i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setorder(criterion, thresholds, orders, thresdown, thresup, mincritrange);
+            myharmonics[i][0]->setorder(criterion, loworder, highorder);
     }
 
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
@@ -697,7 +688,7 @@ void rawfield::setorder(expression criterion, std::vector<double> thresholds, st
         
         criterion = mathop::abs(criterion);
         
-        universe::mymesh->add(shared_from_this(), criterion, thresholds, orders, thresdown, thresup, mincritrange);
+        universe::mymesh->add(shared_from_this(), criterion, loworder, highorder);
     }
 }
 
