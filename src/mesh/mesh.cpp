@@ -71,6 +71,31 @@ void mesh::write(std::string name, int verbosity)
 
 void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
 {
+    if (not(criterion.isscalar()))
+    {
+        std::cout << "Error in 'rawmesh' object: expected a scalar criterion for h-adaptivity" << std::endl;
+        abort();   
+    }
+    // The criterion cannot be multiharmonic:
+    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    if (not(criterion.isharmonicone(alldisjregs)))
+    {
+        std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
+        abort();
+    }
+    
+    if (lownumsplits < 0)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' cannot use negative minimum number of splits " << lownumsplits << std::endl;
+        abort();   
+    }
+    if (highnumsplits < lownumsplits)
+    {
+        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' the minimum number of splits cannot be larger than the maximum" << std::endl;
+        abort();   
+    }
+    
     rawmeshptr->setadaptivity(criterion, lownumsplits, highnumsplits);
 }
 

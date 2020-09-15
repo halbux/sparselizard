@@ -1561,32 +1561,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
 }
 
 void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
-{
-    if (not(criterion.isscalar()))
-    {
-        std::cout << "Error in 'rawmesh' object: expected a scalar criterion for mesh adaptivity" << std::endl;
-        abort();   
-    }
-    // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
-    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
-    if (not(criterion.isharmonicone(alldisjregs)))
-    {
-        std::cout << "Error in 'rawmesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
-        abort();
-    }
-    
-    if (lownumsplits < 0)
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' cannot use negative minimum number of splits " << lownumsplits << std::endl;
-        abort();   
-    }
-    if (highnumsplits < lownumsplits)
-    {
-        std::cout << "Error in 'rawmesh' object: in 'setadaptivity' the minimum number of splits cannot be larger than the maximum" << std::endl;
-        abort();   
-    }
-        
+{       
     criterion = mathop::abs(criterion);
     
     myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits)};   
