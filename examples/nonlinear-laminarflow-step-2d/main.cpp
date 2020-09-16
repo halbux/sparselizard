@@ -3,7 +3,7 @@
 // A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
 //
-// P-adaptivity is used.
+// hp-adaptivity is used for illustration.
 //
 // More information for this benchmark example can be found in:
 //
@@ -39,7 +39,7 @@ void sparselizard(void)
     int fluid = 1, inlet = 2, outlet = 3, wall = 4;
     // Height of the inlet [m]:
     double h1 = 1e-3;
-    mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 5, 15, 8, 8);
+    mesh mymesh = createmesh(2e-3, h1, 12e-3, 1e-3, 3, 12, 3, 3);
     
     // Dynamic viscosity of water [Pa.s] and density [kg/m3]:
     double mu = 8.9e-4, rho = 1000;
@@ -47,6 +47,12 @@ void sparselizard(void)
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components.
     // Field p is the relative pressure. Fields x and y are the space coordinates.
     field v("h1xy"), p("h1"), x("x"), y("y");
+    
+    // Adaptation criterion for hp-adaptivity:
+    expression adaptcriterion = norm(grad(compx(v))) + norm(grad(compy(v)));
+    
+    // Mesh adaptivity up to 5 refinement levels:
+    mymesh.setadaptivity(adaptcriterion, 0, 5);
 
     // Force the flow velocity to 0 on the wall:
     v.setconstraint(wall);
@@ -57,9 +63,7 @@ void sparselizard(void)
     // This must be added before the p-adaptivity 'setorder' calls below to compute the initial criterion.
     p.setorder(fluid, 1);
     v.setorder(fluid, 2);
-    // The interpolation order of the pressure and velocity fields is adapted based on a criterion.
-    // With the selected orders (1 to 3 for p and 2 to 4 for v) the BB condition is always satisfied.
-    expression adaptcriterion = norm(grad(compx(v))) + norm(grad(compy(v)));
+    // The interpolation order of the pressure and velocity fields is adapted (satisfies the BB condition).
     p.setorder(adaptcriterion, 1, 3);
     v.setorder(adaptcriterion, 2, 4);
 
@@ -71,7 +75,7 @@ void sparselizard(void)
 
     // This loop with the above formulation is a Newton iteration:
     int index = 0; double convergence = 1, velocity = 0.1; 
-    while (convergence > 1e-10)
+    while (convergence > 1e-5)
     {
         // Slowly increase the velocity for a high Reynolds (1 m/s flow, 1000 Reynolds still converges). 
         if (velocity < 0.299)
@@ -93,9 +97,9 @@ void sparselizard(void)
         convergence = std::abs((norm(v).integrate(fluid,2) - measuresol)/norm(v).integrate(fluid,2));
         std::cout << "Relative solution change: " << convergence << std::endl;
         
-        // Write the fields to file. Write v with an order 3 interpolation.
-        p.write(fluid, "p"+std::to_string(index)+".vtk");
-        v.write(fluid, "v"+std::to_string(index)+".vtk", 3);
+        // Write the fields to file:
+        p.write(fluid, "p"+std::to_string(index)+".vtk", 3);
+        v.write(fluid, "v"+std::to_string(index)+".vtk", 4);
         getfieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(index)+".vtk");
 
         index++;
@@ -110,7 +114,7 @@ void sparselizard(void)
     std::cout << std::endl << "Flowrate in/out for a unit width: " << flowratein << " / " << flowrateout << " m^3/s" << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (vnorm*flowrateout < 2.6327e-05 && vnorm*flowrateout > 2.6325e-05);
+    std::cout << (vnorm*flowrateout < 2.64888e-05 && vnorm*flowrateout > 2.64884e-05);
 }
 
 mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2)
