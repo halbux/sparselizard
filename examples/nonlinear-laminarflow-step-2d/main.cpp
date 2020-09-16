@@ -91,7 +91,7 @@ void sparselizard(void)
         // Generate and solve the laminar flow problem then save to the fields:
         solve(laminarflow);
         
-        // Adapt the field orders:
+        // Adapt the mesh density and the field orders:
         adapt();
 
         convergence = std::abs((norm(v).integrate(fluid,2) - measuresol)/norm(v).integrate(fluid,2));
