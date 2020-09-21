@@ -31,7 +31,7 @@ for i in $(ls examples);
 do 
 
 # Skip this script as well as all too heavy examples:
-if [ $i == "validate.sh" ] || [ $i == "electromagnetic-waveguide-time-resolution-3d" ] || [ $i == "superconductor-3d" ] || [ $i == "nonlinear-vonkarman-vortex-2d" ] || [ $i == "thermoacoustic-elasticity-axisymmetry-2d" ]
+if [ $i == "validate.sh" ] || [ $i == "electromagnetic-waveguide-time-resolution-3d" ] || [ $i == "superconductor-3d" ] || [ $i == "nonlinear-vonkarman-vortex-2d" ] || [ $i == "thermoacoustic-elasticity-axisymmetry-2d" ] || [ $i == "nonlinear-natural-convection-hpfem-2d" ]
 then
 continue
 fi
