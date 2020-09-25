@@ -1052,20 +1052,9 @@ void elements::definedisjointregions(void)
             // (no dof will ever be associated to curvature nodes).
             if (typenum != 0 || isnodeacornernode[elem])
             {
-                bool isinany = false;
                 for (int i = 0; i < numberofphysicalregions; i++)
-                {
                     temp[i] = isinphysicalregion[typenum][elem*numberofphysicalregions+i];
-                    isinany = isinany || temp[i];
-                }
-                if (isinany)
-                    indisjointregion[typenum][elem] = mydisjointregions->add(typenum, temp);
-                else
-                {
-                    element problemelem(typenum);
-                    std::cout << "Error in 'elements' object: trying to add a '" << problemelem.gettypename() << "' element that has no physical region tag" << std::endl;
-                    abort();
-                }
+                indisjointregion[typenum][elem] = mydisjointregions->add(typenum, temp);
             }
             else
                 indisjointregion[typenum][elem] = -1;
@@ -1124,7 +1113,7 @@ void elements::definedisjointregionsranges(void)
 
 std::vector<bool> elements::iscornernode(void)
 {
-    std::vector<bool> output(count(0), true);
+    std::vector<bool> output(count(0), false);
     for (int typenum = 1; typenum <= 7; typenum++)
     {
         element curvedelement(typenum, getcurvatureorder());
@@ -1134,8 +1123,8 @@ std::vector<bool> elements::iscornernode(void)
         for (int i = 0; i < count(typenum); i++)
         {    
             // The first 'numcornernodes' are corner nodes, the remaining ones not.
-            for (int node = numcornernodes; node < numcurvednodes; node++)
-                output[subelementsinelements[typenum][0][i*numcurvednodes+node]] = false;
+            for (int node = 0; node < numcornernodes; node++)
+                output[subelementsinelements[typenum][0][i*numcurvednodes+node]] = true;
         }
     }
     return output;
