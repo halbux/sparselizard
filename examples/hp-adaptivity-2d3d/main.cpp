@@ -52,8 +52,6 @@ double adapth1(void)
     // Adapt:
     while (adapt(0)) {};
     
-    getfieldorder(v).write(sur, "fo.pos");
-    
     v.setdata(sur, sol);
     
     // Relative error on 'u' adaptation:

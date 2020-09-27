@@ -167,7 +167,7 @@ void sparselizard(void)
 		T.write(fluid, "T"+std::to_string(1000 + i)+".vtu", 3);
 		
 		criterion.write(fluid, "criterion"+std::to_string(1000 + i)+".vtu", 2);
-		getfieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(1000 + i)+".vtu", 2);
+		fieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(1000 + i)+".vtu", 2);
 	    
 	    double maxcrit = criterion.max(fluid, 1)[0];
 	    

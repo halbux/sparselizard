@@ -252,25 +252,25 @@ void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency 
 void mathop::settime(double t) { universe::currenttimestep = t; }
 double mathop::gettime(void) { return universe::currenttimestep; }
 
-expression mathop::getmeshsize(int integrationorder)
+expression mathop::meshsize(int integrationorder)
 {
     std::shared_ptr<opmeshsize> op(new opmeshsize(integrationorder));
     return expression(op);
 }
 
-expression mathop::getfieldorder(field input, double alpha, double absthres)
+expression mathop::fieldorder(field input, double alpha, double absthres)
 {
     std::shared_ptr<rawfield> rf = input.getpointer();
     
     if (rf->gettypename() != "h1" && rf->gettypename() != "hcurl")
     {
-        std::cout << "Error in 'mathop' namespace: field provided to 'getfieldorder' must be of type 'h1' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
+        std::cout << "Error in 'mathop' namespace: field provided to 'fieldorder' must be of type 'h1' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
         abort();
     }
     
     if (rf->countsubfields() > 1)
     {
-        std::cout << "Error in 'mathop' namespace: field provided to 'getfieldorder' cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
+        std::cout << "Error in 'mathop' namespace: field provided to 'fieldorder' cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
         std::cout << "You could instead provide the x subfield using yourfield.compx()" << std::endl;
         abort();
     }
@@ -2216,7 +2216,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     invnormv.reuseit();
     
     int problemdimension = universe::mymesh->getmeshdimension();
-    expression meshsize = pow(getmeshsize(2), 1.0/problemdimension );
+    expression meshsize = pow(mathop::meshsize(2), 1.0/problemdimension );
      
     expression doff = dof(f);
     expression tff = tf(f);

@@ -830,7 +830,7 @@ bool rawmesh::adapthp(int verbosity)
         std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
         
         pcrits[i] = std::get<1>(mypadaptdata[i]).atbarycenter(wholedomain, one);
-        fos[i] = mathop::getfieldorder(field(curraw)).atbarycenter(wholedomain, one);
+        fos[i] = mathop::fieldorder(field(curraw)).atbarycenter(wholedomain, one);
     }
     
     universe::allowestimatorupdate(false);

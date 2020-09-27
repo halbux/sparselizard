@@ -31,7 +31,7 @@ void sparselizard(bool iswritemode)
         u.harmonic(2).setvalue(surright, array2x1(x*x*x,y*y));
         u.harmonic(3).setvalue(all, array2x1(1,2));
         
-        double focheck = getfieldorder(u.compx()).integrate(all, 5);
+        double focheck = fieldorder(u.compx()).integrate(all, 5);
         double ucheck = norm(u.harmonic(2)).integrate(all, 5) + norm(u.harmonic(3)).integrate(all, 5);
         
         std::vector<double> extradata = {focheck, ucheck};
@@ -49,7 +49,7 @@ void sparselizard(bool iswritemode)
         
         std::vector<double> extradata = u.loadraw("u.slz");
         
-        double focheck = getfieldorder(u.compx()).integrate(all, 5);
+        double focheck = fieldorder(u.compx()).integrate(all, 5);
         double ucheck = norm(u.harmonic(2)).integrate(all, 5) + norm(u.harmonic(3)).integrate(all, 5);
         
         std::cout << focheck << " " << ucheck << std::endl;

@@ -117,7 +117,7 @@ double sparselizard(double alpha)
     az.write(all, "a"+std::to_string((int)alpha)+".vtu", 2);
     curl(a).write(all, "b"+std::to_string((int)alpha)+".vtu", 2);
     // Write the adapted field order:
-    getfieldorder(az).write(all, "fieldorderaz"+std::to_string((int)alpha)+".vtu");
+    fieldorder(az).write(all, "fieldorderaz"+std::to_string((int)alpha)+".vtu");
 
 
     // The magnetostatic force acting on the motor is computed below.

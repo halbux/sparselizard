@@ -100,7 +100,7 @@ void sparselizard(void)
         // Write the fields to file:
         p.write(fluid, "p"+std::to_string(index)+".vtk", 3);
         v.write(fluid, "v"+std::to_string(index)+".vtk", 4);
-        getfieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(index)+".vtk");
+        fieldorder(v.compx()).write(fluid, "fieldorderv"+std::to_string(index)+".vtk");
 
         index++;
     }
