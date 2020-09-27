@@ -40,7 +40,7 @@ densematrix opharmonic::multiharmonicinterpolate(int numtimeevals, elementselect
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
+    densematrix output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
     output = output.flatten();
     output = output.duplicatevertically(numtimeevals);
             
