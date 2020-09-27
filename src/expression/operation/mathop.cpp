@@ -283,6 +283,32 @@ expression mathop::fieldorder(field input, double alpha, double absthres)
         return abs(expression(op))-1.0;
 }
 
+expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
+{
+    if (harmnum <= 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot get harmonic " << harmnum << std::endl;
+        abort();
+    }
+    if (not(input.isscalar()))
+    {
+        std::cout << "Error in 'mathop' namespace: in 'getharmonic' expected a scalar expression as argument" << std::endl;
+        abort();
+    }
+    
+    std::shared_ptr<operation> opin = input.getoperationinarray(0,0);
+    
+    if (opin->isdofincluded() || opin->istfincluded())
+    {
+        std::cout << "Error in 'mathop' namespace: in 'getharmonic' expected an expression without dof or tf as argument" << std::endl;
+        abort();
+    }
+
+    std::shared_ptr<opharmonic> op(new opharmonic(harmnum, opin, numfftharms));
+
+    return expression(op);
+}
+
 std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());

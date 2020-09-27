@@ -151,6 +151,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opestimator.h"
 #include "opfield.h"
 #include "opfieldorder.h"
+#include "opharmonic.h"
 #include "opinversion.h"
 #include "opinvjac.h"
 #include "opjac.h"

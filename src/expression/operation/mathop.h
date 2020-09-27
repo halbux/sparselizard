@@ -67,6 +67,9 @@ namespace mathop
     // Return the field order to hold alpha % of the total coefficient weight. Return the actual field order with alpha set to -1.0.
     expression fieldorder(field input, double alpha = -1.0, double absthres = 0.0);
     
+    // Get a single harmonic:
+    expression getharmonic(int harmnum, expression input, int numfftharms = -1);
+    
     std::vector<double> gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
     std::vector<double> gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
     std::vector<double> gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
