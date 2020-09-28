@@ -290,23 +290,29 @@ expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
         std::cout << "Error in 'mathop' namespace: cannot get harmonic " << harmnum << std::endl;
         abort();
     }
-    if (not(input.isscalar()))
-    {
-        std::cout << "Error in 'mathop' namespace: in 'getharmonic' expected a scalar expression as argument" << std::endl;
-        abort();
-    }
     
-    std::shared_ptr<operation> opin = input.getoperationinarray(0,0);
+    int m = input.countrows();
+    int n = input.countcolumns();
     
-    if (opin->isdofincluded() || opin->istfincluded())
+    std::vector<expression> exprs(m*n);
+    for (int i = 0; i < m; i++)
     {
-        std::cout << "Error in 'mathop' namespace: in 'getharmonic' expected an expression without dof or tf as argument" << std::endl;
-        abort();
+        for (int j = 0; j < n; j++)
+        {
+            std::shared_ptr<operation> opin = input.getoperationinarray(m,n);
+            
+            if (opin->isdofincluded() || opin->istfincluded())
+            {
+                std::cout << "Error in 'mathop' namespace: in 'getharmonic' expected an argument expression without dof or tf" << std::endl;
+                abort();
+            }
+
+            std::shared_ptr<opharmonic> op(new opharmonic(harmnum, opin, numfftharms));
+            exprs[i*n+j] = expression(op);
+        }
     }
 
-    std::shared_ptr<opharmonic> op(new opharmonic(harmnum, opin, numfftharms));
-
-    return expression(op);
+    return expression(m,n,exprs);
 }
 
 std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
