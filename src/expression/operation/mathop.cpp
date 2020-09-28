@@ -299,7 +299,7 @@ expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
     {
         for (int j = 0; j < n; j++)
         {
-            std::shared_ptr<operation> opin = input.getoperationinarray(m,n);
+            std::shared_ptr<operation> opin = input.getoperationinarray(i,j);
             
             if (opin->isdofincluded() || opin->istfincluded())
             {
