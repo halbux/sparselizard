@@ -211,6 +211,10 @@ namespace mathop
     void solve(formulation formul);
     void solve(std::vector<formulation> formuls);
     
+    
+    std::vector<double> linspace(double a, double b, int num);
+    std::vector<double> logspace(double a, double b, int num, double basis = 10.0);
+    
     // Convert dB to Nepers:
     expression dbtoneper(expression toconvert);
     

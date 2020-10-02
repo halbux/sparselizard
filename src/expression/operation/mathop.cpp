@@ -1425,6 +1425,49 @@ void mathop::solve(std::vector<formulation> formuls)
         solve(formuls[i]);
 }
 
+
+std::vector<double> mathop::linspace(double a, double b, int num)
+{
+    if (num < 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot call 'linspace' for " << num << " points" << std::endl;
+        abort();
+    }
+    if (num == 0)
+        return {};
+    if (num == 1)
+        return {b};
+
+    double step = (b-a)/(num-1.0);
+
+    std::vector<double> output(num);
+    for (int i = 0; i < num; i++)
+        output[i] = a + step*i;    
+
+    return output;
+}
+
+std::vector<double> mathop::logspace(double a, double b, int num, double basis)
+{
+    if (num < 0)
+    {
+        std::cout << "Error in 'mathop' namespace: cannot call 'logspace' for " << num << " points" << std::endl;
+        abort();
+    }
+    if (num == 0)
+        return {};
+    if (num == 1)
+        return {std::pow(basis, b)};
+
+    double step = (b-a)/(num-1.0);
+
+    std::vector<double> output(num);
+    for (int i = 0; i < num; i++)
+        output[i] = std::pow(basis, a + step*i);    
+
+    return output;
+}
+
 expression mathop::dbtoneper(expression toconvert)
 {
     if (toconvert.iszero())
