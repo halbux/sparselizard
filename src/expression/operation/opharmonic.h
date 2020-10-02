@@ -26,6 +26,8 @@ class opharmonic: public operation
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
+        bool isharmonicone(std::vector<int> disjregs) { return true; };
+
         std::vector<std::shared_ptr<operation>> getarguments(void) { return {myarg}; };
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);
         
