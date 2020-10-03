@@ -287,8 +287,32 @@ expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
 {
     if (harmnum <= 0)
     {
-        std::cout << "Error in 'mathop' namespace: cannot get harmonic " << harmnum << std::endl;
+        std::cout << "Error in 'mathop' namespace: in 'getharmonic' cannot have a negative or zero harmonic" << std::endl;
         abort();
+    }
+    
+    return moveharmonic({harmnum}, {1}, input, numfftharms);
+}
+
+expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> destharms, expression input, int numfftharms)
+{
+    if (origharms.size() == 0)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'moveharmonic' expected at least one harmonic as argument" << std::endl;
+        abort();
+    }
+    if (origharms.size() != destharms.size())
+    {
+        std::cout << "Error in 'mathop' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
+        abort();
+    }
+    for (int i = 0; i < origharms.size(); i++)
+    {
+        if (origharms[i] <= 0 || destharms[i] <= 0)
+        {
+            std::cout << "Error in 'mathop' namespace: in 'moveharmonic' cannot have a negative or zero harmonic" << std::endl;
+            abort();
+        }
     }
     
     int m = input.countrows();
@@ -303,11 +327,11 @@ expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
             
             if (opin->isdofincluded() || opin->istfincluded())
             {
-                std::cout << "Error in 'mathop' namespace: in 'getharmonic' expected an argument expression without dof or tf" << std::endl;
+                std::cout << "Error in 'mathop' namespace: in 'moveharmonic' expected an argument expression without dof or tf" << std::endl;
                 abort();
             }
 
-            std::shared_ptr<opharmonic> op(new opharmonic(harmnum, opin, numfftharms));
+            std::shared_ptr<opharmonic> op(new opharmonic(origharms, destharms, opin, numfftharms));
             exprs[i*n+j] = expression(op);
         }
     }

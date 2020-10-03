@@ -69,6 +69,8 @@ namespace mathop
     
     // Get a single harmonic:
     expression getharmonic(int harmnum, expression input, int numfftharms = -1);
+    // Return an expression containing the origin harmonics moved to new harmonic positions:
+    expression moveharmonic(std::vector<int> origharms, std::vector<int> destharms, expression input, int numfftharms = -1);
     
     std::vector<double> gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder);
     std::vector<double> gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder = 0);
