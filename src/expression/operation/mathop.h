@@ -69,6 +69,8 @@ namespace mathop
     
     // Get a single harmonic:
     expression getharmonic(int harmnum, expression input, int numfftharms = -1);
+    // Make a harmonic expression:
+    expression makeharmonic(std::vector<int> harms, std::vector<expression> exprs);
     // Return an expression containing the origin harmonics moved to new harmonic positions:
     expression moveharmonic(std::vector<int> origharms, std::vector<int> destharms, expression input, int numfftharms = -1);
     

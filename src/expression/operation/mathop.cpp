@@ -294,6 +294,63 @@ expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
     return moveharmonic({harmnum}, {1}, input, numfftharms);
 }
 
+expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> exprs)
+{
+    if (harms.size() == 0)
+    {
+        std::cout << "Error in 'mathop' namespace: in 'makeharmonic' expected at least one harmonic as argument" << std::endl;
+        abort();
+    }
+    if (harms.size() != exprs.size())
+    {
+        std::cout << "Error in 'mathop' namespace: in 'makeharmonic' the number of harmonics and expressions do not match" << std::endl;
+        abort();
+    }
+    
+    int m = exprs[0].countrows();
+    int n = exprs[0].countcolumns();
+    
+    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
+    
+    for (int i = 0; i < harms.size(); i++)
+    {
+        if (harms[i] <= 0)
+        {
+            std::cout << "Error in 'mathop' namespace: in 'makeharmonic' cannot have a negative or zero harmonic" << std::endl;
+            abort();
+        }
+        if (exprs[i].countrows() != m || exprs[i].countcolumns() != n)
+        {
+            std::cout << "Error in 'mathop' namespace: in 'makeharmonic' all expressions should have the same dimension" << std::endl;
+            abort();
+        }
+        if (not(exprs[i].isharmonicone(alldisjregs)))
+        {
+            std::cout << "Error in 'mathop' namespace: in 'makeharmonic' cannot have multiharmonic expressions as argument (only constant harmonic 1)" << std::endl;
+            abort();
+        }
+    }
+    
+    if (harms.size() == 1)
+        return moveharmonic({1}, {harms[0]}, exprs[0]);
+    
+    std::vector<expression> outexprs(m*n);
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            std::vector<std::shared_ptr<operation>> ops(harms.size());
+            for (int k = 0; k < harms.size(); k++)
+                ops[k] = moveharmonic({1},{harms[k]}, exprs[k].at(i,j)).getoperationinarray(0,0);
+            std::shared_ptr<opsum> op(new opsum(ops));
+            outexprs[i*n+j] = expression(op);
+        }
+    }
+    
+    return expression(m, n, outexprs);
+}
+
 expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> destharms, expression input, int numfftharms)
 {
     if (origharms.size() == 0)
