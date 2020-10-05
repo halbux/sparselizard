@@ -38,9 +38,17 @@ std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& e
         int hdest = mydestharms[i];
   
         if (horig < argmat.size() && argmat[horig].size() > 0)
-            output[hdest] = {argmat[horig][0]};
+        {
+            if (output[hdest].size() == 0)
+                output[hdest] = {argmat[horig][0]};
+            else
+                output[hdest][0].add(argmat[horig][0]);
+        }
         else
-            output[hdest] = {densematrix(numelems, evaluationcoordinates.size()/3, 0)};
+        {
+            if (output[hdest].size() == 0)
+                output[hdest] = {densematrix(numelems, evaluationcoordinates.size()/3, 0)};
+        }
     }
 
     if (reuse && universe::isreuseallowed)
