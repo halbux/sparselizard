@@ -40,7 +40,7 @@ std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& e
         if (horig < argmat.size() && argmat[horig].size() > 0)
         {
             if (output[hdest].size() == 0)
-                output[hdest] = {argmat[horig][0]};
+                output[hdest] = {argmat[horig][0].copy()};
             else
                 output[hdest][0].add(argmat[horig][0]);
         }
