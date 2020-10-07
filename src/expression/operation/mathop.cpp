@@ -28,6 +28,20 @@ int mathop::regionall(void)
     return (universe::mymesh->getphysicalregions())->createunionofall();
 }
 
+bool mathop::isinsideregion(int subphysreg, int physreg)
+{
+    std::vector<bool> subdefin = universe::mymesh->getphysicalregions()->get(subphysreg)->getdefinition();
+    std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
+    
+    for (int i = 0; i < subdefin.size(); i++)
+    {
+        if (subdefin[i] == true && defin[i] == false)
+            return false;
+    }
+
+    return true;
+}
+
 void mathop::printvector(std::vector<double> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;

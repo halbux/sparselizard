@@ -76,6 +76,11 @@ void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)
     }
 }
 
+std::vector<bool> physicalregion::getdefinition(void)
+{
+    return includesdisjointregion;
+}
+
 std::vector<int> physicalregion::getdisjointregions(void)
 {
     std::vector<int> disjointregionlist;

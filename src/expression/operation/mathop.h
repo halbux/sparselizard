@@ -37,6 +37,9 @@ namespace mathop
     int regionunion(const std::vector<int> physregs);
     int regionintersection(const std::vector<int> physregs);
     int regionall(void);
+    
+    // Check if a region is fully included in another region:
+    bool isinsideregion(int subphysreg, int physreg);
 
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);

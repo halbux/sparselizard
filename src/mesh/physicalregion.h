@@ -52,6 +52,9 @@ class physicalregion
         // Duplicates are removed. 'myelementdimension' is updated to the max dim of the disj regs.
         void setdisjointregions(std::vector<int> disjointregionlist);
 
+        // Get the definition of this physical region based on the disjoint regions it contains:
+        std::vector<bool> getdefinition(void);
+
         // Get all disjoint regions of the max dimension:
         std::vector<int> getdisjointregions(void);
         // Get all disjoint regions of a given dimension (use -1 for all):
