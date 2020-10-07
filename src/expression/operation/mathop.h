@@ -38,8 +38,10 @@ namespace mathop
     int regionintersection(const std::vector<int> physregs);
     int regionall(void);
     
-    // Check if a region is fully included in another region:
-    bool isinsideregion(int subphysreg, int physreg);
+    // Check if a region is empty/fully included in another region/touches another region:
+    bool isregionempty(int physreg);
+    bool isregioninside(int physregtocheck, int physreg);
+    bool isregiontouching(int physregtocheck, int physreg);
 
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);

@@ -28,18 +28,47 @@ int mathop::regionall(void)
     return (universe::mymesh->getphysicalregions())->createunionofall();
 }
 
-bool mathop::isinsideregion(int subphysreg, int physreg)
+bool mathop::isregionempty(int physreg)
 {
-    std::vector<bool> subdefin = universe::mymesh->getphysicalregions()->get(subphysreg)->getdefinition();
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
-    for (int i = 0; i < subdefin.size(); i++)
+    for (int i = 0; i < defin.size(); i++)
     {
-        if (subdefin[i] == true && defin[i] == false)
+        if (defin[i] == true)
+            return false;
+    }
+    
+    return true;
+}
+
+bool mathop::isregioninside(int physregtocheck, int physreg)
+{
+    std::vector<bool> tocheckdefin = universe::mymesh->getphysicalregions()->get(physregtocheck)->getdefinition();
+    std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
+    
+    // All disjoint regions must be included:
+    for (int i = 0; i < tocheckdefin.size(); i++)
+    {
+        if (tocheckdefin[i] == true && defin[i] == false)
             return false;
     }
 
     return true;
+}
+
+bool mathop::isregiontouching(int physregtocheck, int physreg)
+{
+    std::vector<bool> tocheckdefin = universe::mymesh->getphysicalregions()->get(physregtocheck)->getdefinition();
+    std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
+    
+    // At least one disjoint region must be included:
+    for (int i = 0; i < tocheckdefin.size(); i++)
+    {
+        if (tocheckdefin[i] == true && defin[i] == true)
+            return true;
+    }
+
+    return false;
 }
 
 void mathop::printvector(std::vector<double> input)
