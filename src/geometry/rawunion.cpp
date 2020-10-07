@@ -26,11 +26,11 @@ rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
     mesh();
 }
 
-std::shared_ptr<rawshape> rawunion::extrude(int physreg, double height, int numlayers)
+std::shared_ptr<rawshape> rawunion::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
 {
     std::vector<std::shared_ptr<rawshape>> extrudedshapes(sons.size());
     for (int i = 0; i < sons.size(); i++)
-        extrudedshapes[i] = sons[i]->extrude(physreg, height, numlayers);
+        extrudedshapes[i] = sons[i]->extrude(physreg, height, numlayers, extrudedirection);
 
     return std::shared_ptr<rawunion>(new rawunion(physreg, extrudedshapes));
 }

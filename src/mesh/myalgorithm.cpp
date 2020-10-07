@@ -1028,3 +1028,16 @@ int myalgorithm::inequalitytoint(int a, int b)
     }
 }
 
+void myalgorithm::normvector(std::vector<double>& tonorm)
+{
+    // Compute the norm:
+    double nrm = 0.0;
+    for (int i = 0; i < tonorm.size(); i++)
+        nrm += tonorm[i]*tonorm[i];
+    nrm = std::sqrt(nrm);
+    double invnrm = 1.0/nrm;
+
+    for (int i = 0; i < tonorm.size(); i++)
+        tonorm[i] = invnrm * tonorm[i];
+}
+

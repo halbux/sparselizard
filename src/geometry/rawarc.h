@@ -45,7 +45,7 @@ class rawarc: public rawshape
         // Order is start point, end point, center point.
         rawarc(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, int nummeshpoints);
 
-        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
         std::shared_ptr<rawshape> duplicate(void);
 

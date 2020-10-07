@@ -25,9 +25,9 @@ rawpoint::rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std:
 }
 
 
-std::shared_ptr<rawshape> rawpoint::extrude(int physreg, double height, int numlayers)
+std::shared_ptr<rawshape> rawpoint::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
 {
-    return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
+    return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers, extrudedirection));
 }
 
 std::shared_ptr<rawshape> rawpoint::duplicate(void)

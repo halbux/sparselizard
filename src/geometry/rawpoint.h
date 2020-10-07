@@ -41,7 +41,7 @@ class rawpoint: public rawshape
         // Provide to this constructor the coordinates of all mesh nodes and elements in the point cloud:
         rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
         
-        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
         std::shared_ptr<rawshape> duplicate(void);
 

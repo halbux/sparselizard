@@ -224,7 +224,7 @@ void shape::rotate(double alphax, double alphay, double alphaz)
     rawshapeptr->rotate(alphax, alphay, alphaz); 
 }
 
-shape shape::extrude(int physreg, double height, int numlayers)
+shape shape::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
 {
     errornullpointer();
 
@@ -233,11 +233,20 @@ shape shape::extrude(int physreg, double height, int numlayers)
         std::cout << "Error in 'shape' object: cannot extrude with " << numlayers << " node layers (at least two are needed)" << std::endl;
         abort();
     }
-    return shape(rawshapeptr->duplicate()->extrude(physreg, height, numlayers));
+    if (extrudedirection.size() != 3)
+    {
+        std::cout << "Error in 'shape' object: extrude direction should be a vector of length three" << std::endl;
+        abort();
+    }
+    myalgorithm::normvector(extrudedirection);
+    
+    return shape(rawshapeptr->duplicate()->extrude(physreg, height, numlayers, extrudedirection));
 }
 
-std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers)
+std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers, std::vector<double> extrudedirection)
 {
+    myalgorithm::normvector(extrudedirection);
+
     if (physreg.size() != height.size() || physreg.size() != numlayers.size())
     {
         std::cout << "Error in 'shape' object: extrude vector arguments should have the same size" << std::endl;
@@ -247,13 +256,15 @@ std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> 
     int num = physreg.size();
     std::vector<shape> output(num);
 
-    double zshift = 0.0;
+    std::vector<double> xyzshift = {0,0,0};
     for (int i = 0; i < num; i++)
     {
-        shape curextr(rawshapeptr->duplicate()->extrude(physreg[i], height[i], numlayers[i]));
-        curextr.shift(0,0,zshift);
+        shape curextr(rawshapeptr->duplicate()->extrude(physreg[i], height[i], numlayers[i], extrudedirection));
+        curextr.shift(xyzshift[0],xyzshift[1],xyzshift[2]);
         
-        zshift += height[i];
+        xyzshift[0] += height[i]*extrudedirection[0];
+        xyzshift[1] += height[i]*extrudedirection[1];
+        xyzshift[2] += height[i]*extrudedirection[2];
         
         output[i] = curextr;
     }

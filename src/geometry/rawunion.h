@@ -38,7 +38,7 @@ class rawunion: public rawshape
         // Provide to this constructor the rawshapes to unite:
         rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input);
 
-        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
         std::shared_ptr<rawshape> duplicate(void);
 

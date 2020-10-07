@@ -44,7 +44,7 @@ class rawtriangle: public rawshape
         // Provide to this constructor the contour rawlines in the triangle:
         rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputlines);
 
-        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+        std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
         std::shared_ptr<rawshape> duplicate(void);
 

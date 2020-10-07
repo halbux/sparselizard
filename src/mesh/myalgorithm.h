@@ -145,6 +145,9 @@ namespace myalgorithm
     // Return -1 if a < b, 0 if a = b and +1 if a > b:
     int inequalitytoint(int a, int b);
     
+    // Norm a vector:
+    void normvector(std::vector<double>& tonorm);
+    
 };
 
 #endif

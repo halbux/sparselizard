@@ -32,7 +32,7 @@ class rawshape : public std::enable_shared_from_this<rawshape>
         virtual void rotate(double alphax, double alphay, double alphaz, bool recursively = true);
 
 
-        virtual std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers);
+        virtual std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
         virtual std::shared_ptr<rawshape> duplicate(void);
 

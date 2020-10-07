@@ -72,8 +72,8 @@ class shape
         // Rotate the mesh by alphax, alphay and alphaz degrees around the x, y and z axis respectively:
         void rotate(double alphax, double alphay, double alphaz);
 
-        shape extrude(int physreg, double height, int numlayers);
-        std::vector<shape> extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers);
+        shape extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection = {0,0,1});
+        std::vector<shape> extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers, std::vector<double> extrudedirection = {0,0,1});
 
         // Duplicate the shape and all subshapes. 
         shape duplicate(void);

@@ -104,7 +104,7 @@ void rawshape::rotate(double alphax, double alphay, double alphaz, bool recursiv
 }
 
 
-std::shared_ptr<rawshape> rawshape::extrude(int physreg, double height, int numlayers)
+std::shared_ptr<rawshape> rawshape::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
 {
     std::cout << "Error in 'rawshape' object: 'extrude' has not been defined for this shape" << std::endl;
     abort(); 

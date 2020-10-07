@@ -1,7 +1,7 @@
 #include "rawextrusion.h"
 
 
-rawextrusion::rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers)
+rawextrusion::rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers, std::vector<double> extrudedirection)
 {
     myphysicalregion = physreg;
 
@@ -10,6 +10,8 @@ rawextrusion::rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape,
     myheight = height;
 
     mynumlayers = numlayers;
+    
+    myextrudedirection = extrudedirection;
 
     mybaseshape = innerrawshape;
 
@@ -89,7 +91,7 @@ void rawextrusion::mesh(void)
         // Create the point at the top side of the extrusion:
         std::shared_ptr<rawshape> toppoint = mybaseshape->duplicate();
         toppoint->setphysicalregion(-1);
-        toppoint->shift(0, 0, myheight);
+        toppoint->shift(myheight*myextrudedirection[0], myheight*myextrudedirection[1], myheight*myextrudedirection[2]);
 
         sons = {mybaseshape, toppoint};
 
@@ -110,9 +112,9 @@ void rawextrusion::mesh(void)
         {
             for (int j = 0; j < numnodesperlayer; j++)
             {
-                mycoords[3*index+0] = currentcoords->at(3*j+0);
-                mycoords[3*index+1] = currentcoords->at(3*j+1);
-                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
+                mycoords[3*index+0] = currentcoords->at(3*j+0) + l/(mynumlayers-1.0)*myheight*myextrudedirection[0];
+                mycoords[3*index+1] = currentcoords->at(3*j+1) + l/(mynumlayers-1.0)*myheight*myextrudedirection[1];
+                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight*myextrudedirection[2];
                 index++;
             }
         }
@@ -141,7 +143,7 @@ void rawextrusion::mesh(void)
         // Create the line at the top side of the extrusion:
         std::shared_ptr<rawshape> topline = mybaseshape->duplicate();
         topline->setphysicalregion(-1);
-        topline->shift(0, 0, myheight);
+        topline->shift(myheight*myextrudedirection[0], myheight*myextrudedirection[1], myheight*myextrudedirection[2]);
 
         // Create the lines at both sides of the quadrangle:
         if ((mybaseshape->getsons()).size() == 2)
@@ -172,9 +174,9 @@ void rawextrusion::mesh(void)
         {
             for (int j = 0; j < numnodesperlayer; j++)
             {
-                mycoords[3*index+0] = currentcoords->at(3*j+0);
-                mycoords[3*index+1] = currentcoords->at(3*j+1);
-                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
+                mycoords[3*index+0] = currentcoords->at(3*j+0) + l/(mynumlayers-1.0)*myheight*myextrudedirection[0];
+                mycoords[3*index+1] = currentcoords->at(3*j+1) + l/(mynumlayers-1.0)*myheight*myextrudedirection[1];
+                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight*myextrudedirection[2];
                 index++;
             }
         }
@@ -205,7 +207,7 @@ void rawextrusion::mesh(void)
         // Create the face at the top side of the extrusion:
         std::shared_ptr<rawshape> topface = mybaseshape->duplicate();
         topface->setphysicalregion(-1);
-        topface->shift(0, 0, myheight);
+        topface->shift(myheight*myextrudedirection[0], myheight*myextrudedirection[1], myheight*myextrudedirection[2]);
 
         // Get the contour regions:
         std::vector<std::shared_ptr<rawshape>> contourlines = mybaseshape->getsons();
@@ -248,9 +250,9 @@ void rawextrusion::mesh(void)
         {
             for (int j = 0; j < numnodesperlayer; j++)
             {
-                mycoords[3*index+0] = currentcoords->at(3*j+0);
-                mycoords[3*index+1] = currentcoords->at(3*j+1);
-                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight;
+                mycoords[3*index+0] = currentcoords->at(3*j+0) + l/(mynumlayers-1.0)*myheight*myextrudedirection[0];
+                mycoords[3*index+1] = currentcoords->at(3*j+1) + l/(mynumlayers-1.0)*myheight*myextrudedirection[1];
+                mycoords[3*index+2] = currentcoords->at(3*j+2) + l/(mynumlayers-1.0)*myheight*myextrudedirection[2];
                 index++;
             }
         }

@@ -63,9 +63,9 @@ rawline::rawline(int physreg, std::vector<double>& allcoords, std::vector<std::v
 }
  
 
-std::shared_ptr<rawshape> rawline::extrude(int physreg, double height, int numlayers)
+std::shared_ptr<rawshape> rawline::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
 {
-    return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers));
+    return std::shared_ptr<rawextrusion>(new rawextrusion(physreg, shared_from_this(), height, numlayers, extrudedirection));
 }
 
 std::shared_ptr<rawshape> rawline::duplicate(void)

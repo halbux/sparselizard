@@ -42,6 +42,9 @@ class rawextrusion: public rawshape
 
         // Extrusion length:
         double myheight;
+        
+        // Extrusion direction:
+        std::vector<double> myextrudedirection;
 
         // Unextruded rawshape:
         std::shared_ptr<rawshape> mybaseshape;
@@ -50,7 +53,7 @@ class rawextrusion: public rawshape
 
         rawextrusion(void) {};
 
-        rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers);
+        rawextrusion(int physreg, std::shared_ptr<rawshape> innerrawshape, double height, int numlayers, std::vector<double> extrudedirection);
 
         std::shared_ptr<rawshape> duplicate(void);
 
