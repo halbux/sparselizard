@@ -30,6 +30,8 @@ int mathop::regionall(void)
 
 bool mathop::isregionempty(int physreg)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
     for (int i = 0; i < defin.size(); i++)
@@ -43,6 +45,8 @@ bool mathop::isregionempty(int physreg)
 
 bool mathop::isregioninside(int physregtocheck, int physreg)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
+    
     std::vector<bool> tocheckdefin = universe::mymesh->getphysicalregions()->get(physregtocheck)->getdefinition();
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
@@ -58,6 +62,8 @@ bool mathop::isregioninside(int physregtocheck, int physreg)
 
 bool mathop::isregiontouching(int physregtocheck, int physreg)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
+    
     std::vector<bool> tocheckdefin = universe::mymesh->getphysicalregions()->get(physregtocheck)->getdefinition();
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
