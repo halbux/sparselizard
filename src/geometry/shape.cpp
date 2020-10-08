@@ -238,6 +238,7 @@ shape shape::extrude(int physreg, double height, int numlayers, std::vector<doub
         std::cout << "Error in 'shape' object: extrude direction should be a vector of length three" << std::endl;
         abort();
     }
+    
     myalgorithm::normvector(extrudedirection);
     
     return shape(rawshapeptr->duplicate()->extrude(physreg, height, numlayers, extrudedirection));
@@ -245,13 +246,13 @@ shape shape::extrude(int physreg, double height, int numlayers, std::vector<doub
 
 std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> height, std::vector<int> numlayers, std::vector<double> extrudedirection)
 {
-    myalgorithm::normvector(extrudedirection);
-
     if (physreg.size() != height.size() || physreg.size() != numlayers.size())
     {
         std::cout << "Error in 'shape' object: extrude vector arguments should have the same size" << std::endl;
         abort();
     }
+ 
+    myalgorithm::normvector(extrudedirection);
     
     int num = physreg.size();
     std::vector<shape> output(num);
@@ -259,7 +260,7 @@ std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> 
     std::vector<double> xyzshift = {0,0,0};
     for (int i = 0; i < num; i++)
     {
-        shape curextr(rawshapeptr->duplicate()->extrude(physreg[i], height[i], numlayers[i], extrudedirection));
+        shape curextr = shape(rawshapeptr->duplicate()).extrude(physreg[i], height[i], numlayers[i], extrudedirection);
         curextr.shift(xyzshift[0],xyzshift[1],xyzshift[2]);
         
         xyzshift[0] += height[i]*extrudedirection[0];
