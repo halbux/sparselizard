@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include "cblas.h"
 #include <memory>
 #include "intdensematrix.h"
 

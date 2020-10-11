@@ -1,4 +1,5 @@
 #include "densematrix.h"
+#include "cblas.h"
 
 
 void densematrix::errorifempty(void)
