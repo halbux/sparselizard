@@ -1,4 +1,5 @@
 #include "myalgorithm.h"
+#include "mathop.h"
 
 #if defined(__linux__)
 #include <parallel/algorithm>
