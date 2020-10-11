@@ -239,6 +239,59 @@ void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& t
     }
 }
 
+void myalgorithm::slicecoordinates(std::vector<double>& toslice, double minx, double miny, double minz, double dx, double dy, double dz, int nsx, int nsy, int nsz, std::vector<int>& ga, int* pn, double* pc)
+{
+    int numpoints = toslice.size()/3;
+    int numgroups = nsx*nsy*nsz;
+    
+    double invdx = 1.0/dx;
+    double invdy = 1.0/dy;
+    double invdz = 1.0/dz;
+    
+    ga = std::vector<int>(numgroups+1, 0); // one longer
+    
+    // Assign each coordinate to a group and count the number of coordinates in each group:
+    std::vector<int> nodeingroup(numpoints);
+    for (int i = 0; i < numpoints; i++)
+    {
+        int curxslice = std::floor((toslice[3*i+0]-minx)*invdx);
+        int curyslice = std::floor((toslice[3*i+1]-miny)*invdy);
+        int curzslice = std::floor((toslice[3*i+2]-minz)*invdz);
+        
+        // Bring in bounds:
+        curxslice = std::max(curxslice,0);
+        curxslice = std::min(curxslice,nsx-1);
+        curyslice = std::max(curyslice,0);
+        curyslice = std::min(curyslice,nsy-1);
+        curzslice = std::max(curzslice,0);
+        curzslice = std::min(curzslice,nsz-1);
+        
+        int curgroup = curxslice*nsy*nsz + curyslice*nsz + curzslice;
+        
+        ga[curgroup+1]++; // +1
+        nodeingroup[i] = curgroup;
+    }
+
+    // Assign the group ranges (ga[0] is zero):
+    for (int g = 1; g < numgroups+1; g++)
+        ga[g] = ga[g-1] + ga[g];
+    
+    // Populate the remaining outputs:
+    std::vector<int> indexingroup(numgroups,0);
+    for (int i = 0; i < numpoints; i++)
+    {
+        int curgroup = nodeingroup[i];
+        int curpos = ga[curgroup] + indexingroup[curgroup];
+        
+        pn[curpos] = i;
+        pc[3*curpos+0] = toslice[3*i+0];
+        pc[3*curpos+1] = toslice[3*i+1];
+        pc[3*curpos+2] = toslice[3*i+2];
+        
+        indexingroup[curgroup]++;
+    }
+}
+
 std::vector<double> myalgorithm::getcoordbounds(std::vector<double>& coords)
 {
     int numcoords = coords.size()/3;

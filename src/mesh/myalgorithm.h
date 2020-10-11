@@ -49,6 +49,13 @@ namespace myalgorithm
     // The output 'slices[i]' gives the indexes of all values of 'toslice' that are in the interval between minval+i*delta and minval+(i+1)*delta.
     // Value minval must be smaller than the smallest value in 'toslice' and minval+numslices*delta must be larger than the largest value.
     void slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices);
+    // Slice coordinates 'toslice' in the x, y and z direction into nsx*nsy*nsz groups. First slice position and distance between slices is provided as argument. Returned containers are:
+    //
+    //    - Group addresse 'ga[g]' gives the first position in 'pn' for group g (length of 'ga' is the number of groups + 1 and last value is the number of coordinates)  
+    //    - Point number 'pn[i]' gives the corresponding point number in 'toslice' (must be preallocated to number of coordinates)
+    //    - Point coordinates 'pc[3*i+0/+1/+2]' gives the x, y and z coordinates of point 'pn[i]' (must be preallocated to 3 x number of coordinates)
+    //
+    void slicecoordinates(std::vector<double>& toslice, double minx, double miny, double minz, double dx, double dy, double dz, int nsx, int nsy, int nsz, std::vector<int>& ga, int* pn, double* pc);
     
     // Return {xmin,xmax,ymin,ymax,zmin,zmax} for the coordinates {x1,y1,z1,x2,...}:
     std::vector<double> getcoordbounds(std::vector<double>& coordinates);
