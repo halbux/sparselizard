@@ -19,6 +19,7 @@ mesh::mesh(void)
 mesh::mesh(std::string filename, int verbosity, bool legacyreader)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
+    universe::mymesh = rawmeshptr;
     rawmeshptr->load(filename, verbosity, legacyreader);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
@@ -27,6 +28,7 @@ mesh::mesh(std::string filename, int verbosity, bool legacyreader)
 mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
+    universe::mymesh = rawmeshptr;
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
@@ -35,6 +37,7 @@ mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosi
 mesh::mesh(std::vector<shape> inputshapes, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
+    universe::mymesh = rawmeshptr;
     rawmeshptr->load(inputshapes, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
