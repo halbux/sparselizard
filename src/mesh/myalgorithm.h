@@ -49,7 +49,7 @@ namespace myalgorithm
     
     // Slice coordinates 'toslice' in the x, y and z direction into nsx*nsy*nsz groups. First slice position and distance between slices is provided as argument. Returned containers are:
     //
-    //    - Group addresse 'ga[g]' gives the first position in 'pn' for group g (length of 'ga' is the number of groups + 1 and last value is the number of coordinates)  
+    //    - Group address 'ga[g]' gives the first position in 'pn' for group g (length of 'ga' is the number of groups + 1 and last value is the number of coordinates)  
     //    - Point number 'pn[i]' gives the corresponding point number in 'toslice' (must be preallocated to number of coordinates)
     //    - Point coordinates 'pc[3*i+0/+1/+2]' gives the x, y and z coordinates of point 'pn[i]' (must be preallocated to 3 x number of coordinates)
     //
