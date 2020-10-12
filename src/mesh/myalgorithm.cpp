@@ -115,6 +115,9 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
 {
     int numpts = coordinates.size()/3;
     renumberingvector = std::vector<int>(numpts, -1);
+    
+    if (numpts == 0)
+        return 0;
  
     std::vector<double> noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
     double ntx = noisethreshold[0], nty = noisethreshold[1], ntz = noisethreshold[2];
