@@ -143,7 +143,7 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
             {
                 int curindex = curgroupindexes[p];
                 // If close enough to be considered identical:
-                if (renumberingvector[curindex] == -1 && std::abs(curx-curgroupcoords[3*p+0]) <= ntx && std::abs(cury-curgroupcoords[3*p+1]) <= nty && std::abs(curz-curgroupcoords[3*p+2]) <= ntz )
+                if (renumberingvector[curindex] == -1 && std::abs(curx-curgroupcoords[3*p+0]) <= ntx && std::abs(cury-curgroupcoords[3*p+1]) <= nty && std::abs(curz-curgroupcoords[3*p+2]) <= ntz)
                     renumberingvector[curindex] = numnonduplicates;
             }
         }
