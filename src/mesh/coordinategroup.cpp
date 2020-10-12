@@ -4,7 +4,6 @@
 
 coordinategroup::coordinategroup(std::vector<double>& coords)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
     mynumcoords = coords.size()/3;
     
     noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
@@ -13,8 +12,13 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         meshsize += universe::mymesh->getnodes()->getgeometrydimension(i);
     
     // Define the number of slices in the x, y and z direction:
+    int N = 100;
+    double powertouse = 2.0;
+    
     int numblocks = std::ceil((double)mynumcoords/N);
-    int ns = std::ceil( std::pow(numblocks, 1.0/problemdimension) );
+    int ns = std::ceil( std::pow(numblocks, 1.0/powertouse) );
+    // Cannot be larger than about 1000 otherwise number of groups is more than an int can hold:
+    ns = std::min(ns, 1000);
     numslices = {ns,ns,ns};
     
     // Get the coordinate x, y and z bounds as well as the distance between slices:
@@ -30,106 +34,10 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         }
     }
     
-    std::vector<double> xcoords(mynumcoords), ycoords(mynumcoords), zcoords(mynumcoords);
-    for (int i = 0; i < mynumcoords; i++)
-    {
-        xcoords[i] = coords[3*i+0];
-        ycoords[i] = coords[3*i+1];
-        zcoords[i] = coords[3*i+2];
-    }
-    
-    // Preallocate 'mygroups' and 'mygroupcoords':
-    mygroups = std::vector<std::vector<std::vector<std::vector<int>>>>(numslices[0], std::vector<std::vector<std::vector<int>>>(numslices[1], std::vector<std::vector<int>>(numslices[2], std::vector<int>(0))));
-    mygroupcoords = std::vector<std::vector<std::vector<std::vector<double>>>>(numslices[0], std::vector<std::vector<std::vector<double>>>(numslices[1], std::vector<std::vector<double>>(numslices[2], std::vector<double>(0))));
-        
+    mygroups = std::shared_ptr<int>(new int[mynumcoords]);
+    mygroupcoords = std::shared_ptr<double>(new double[3*mynumcoords]);
 
-    std::vector<std::vector<int>> xslices;
-    myalgorithm::slicecoordinates(noisethreshold[0], xcoords, bounds[0], delta[0], numslices[0], xslices);
-    
-    // Loop on all x slices:
-    for (int i = 0; i < numslices[0]; i++)
-    {
-        // Get the y coordinates vector for the current slice:
-        std::vector<double> curycoords(xslices[i].size());
-        for (int j = 0; j < xslices[i].size(); j++)
-            curycoords[j] = ycoords[xslices[i][j]];
-            
-        // Slice the current slice in y slices:
-        std::vector<std::vector<int>> yslices;
-        myalgorithm::slicecoordinates(noisethreshold[1], curycoords, bounds[2], delta[1], numslices[1], yslices);
-        
-        // Loop on all y slices:
-        for (int j = 0; j < numslices[1]; j++)
-        {
-            // Get the z coordinates vector for the current slice:
-            std::vector<double> curzcoords(yslices[j].size());
-            for (int k = 0; k < yslices[j].size(); k++)
-                curzcoords[k] = zcoords[xslices[i][yslices[j][k]]];
-                
-            // Slice the current slice in z slices:
-            std::vector<std::vector<int>> zslices;
-            myalgorithm::slicecoordinates(noisethreshold[2], curzcoords, bounds[4], delta[2], numslices[2], zslices);
-            
-            for (int k = 0; k < numslices[2]; k++)
-            {
-                // Populate the groups:
-                mygroups[i][j][k] = std::vector<int>(zslices[k].size());
-                for (int l = 0; l < zslices[k].size(); l++)
-                    mygroups[i][j][k][l] = xslices[i][yslices[j][zslices[k][l]]];
-            
-                mygroupcoords[i][j][k] = std::vector<double>(3*zslices[k].size());
-                for (int l = 0; l < zslices[k].size(); l++)
-                {
-                    int cur = mygroups[i][j][k][l];
-                    mygroupcoords[i][j][k][3*l+0] = coords[3*cur+0];
-                    mygroupcoords[i][j][k][3*l+1] = coords[3*cur+1];
-                    mygroupcoords[i][j][k][3*l+2] = coords[3*cur+2];
-                }
-            }
-        }
-    }
-}
-
-
-void coordinategroup::select(double x, double y, double z, double r)
-{
-    xselect = x;
-    yselect = y;
-    zselect = z;
-    myradius = r;
-    
-    // Take an extra noise margin to be sure not to miss any candidate slice:
-    int x1 = std::max( (int)std::floor( ( x-r-noisethreshold[0] - bounds[0] )/delta[0] ), 0);
-    int x2 = std::min( (int)std::ceil( ( x+r+noisethreshold[0] - bounds[0] )/delta[0] ) - 1, numslices[0]-1);
-    int y1 = std::max( (int)std::floor( ( y-r-noisethreshold[1] - bounds[2] )/delta[1] ), 0);
-    int y2 = std::min( (int)std::ceil( ( y+r+noisethreshold[1] - bounds[2] )/delta[1] ) - 1, numslices[1]-1);
-    int z1 = std::max( (int)std::floor( ( z-r-noisethreshold[2] - bounds[4] )/delta[2] ), 0);
-    int z2 = std::min( (int)std::ceil( ( z+r+noisethreshold[2] - bounds[4] )/delta[2] ) - 1, numslices[2]-1);
-    
-    int numx = 0, numy = 0, numz = 0;;
-    for (int i = x1; i <= x2; i++)
-        numx++;
-    for (int i = y1; i <= y2; i++)
-        numy++;
-    for (int i = z1; i <= z2; i++)
-        numz++;
-    
-    selectedgroups.resize(3*numx*numy*numz);
-    
-    int index = 0;
-    for (int i = x1; i <= x2; i++)
-    {
-        for (int j = y1; j <= y2; j++)
-        {
-            for (int k = z1; k <= z2; k++)
-            {
-                selectedgroups[3*index+0] = i;
-                selectedgroups[3*index+1] = j;
-                selectedgroups[3*index+2] = k;
-                index++;
-            }
-        }
-    }
+    myalgorithm::slicecoordinates(coords, bounds[0], bounds[2], bounds[4], delta[0], delta[1], delta[2], numslices[0], numslices[1], numslices[2], mygroupads, mygroups.get(), mygroupcoords.get());
 }
 
 int coordinategroup::countcoordinates(void)
@@ -137,19 +45,76 @@ int coordinategroup::countcoordinates(void)
     return mynumcoords;
 }
 
-int coordinategroup::countgroups(void)
+void coordinategroup::select(double x, double y, double z, double r)
 {
-    return selectedgroups.size()/3;
+    // Take an extra noise margin to be sure not to miss any candidate slice:
+    selx1 = std::floor( ( x-r-noisethreshold[0] - bounds[0] )/delta[0] );
+    selx2 = std::floor( ( x+r+noisethreshold[0] - bounds[0] )/delta[0] );
+    
+    sely1 = std::floor( ( y-r-noisethreshold[1] - bounds[2] )/delta[1] );
+    sely2 = std::floor( ( y+r+noisethreshold[1] - bounds[2] )/delta[1] );
+    
+    selz1 = std::floor( ( z-r-noisethreshold[2] - bounds[4] )/delta[2] );
+    selz2 = std::floor( ( z+r+noisethreshold[2] - bounds[4] )/delta[2] );
+    
+    // Bring in bounds:
+    selx1 = std::max(selx1, 0);
+    selx1 = std::min(selx1, numslices[0]-1);
+    selx2 = std::max(selx2, 0);
+    selx2 = std::min(selx2, numslices[0]-1);
+
+    sely1 = std::max(sely1, 0);
+    sely1 = std::min(sely1, numslices[1]-1);
+    sely2 = std::max(sely2, 0);
+    sely2 = std::min(sely2, numslices[1]-1);
+    
+    selz1 = std::max(selz1, 0);
+    selz1 = std::min(selz1, numslices[2]-1);
+    selz2 = std::max(selz2, 0);
+    selz2 = std::min(selz2, numslices[2]-1);
+    
+    curselx = selx1; cursely = sely1; curselz = selz1;
+    curg = curselx*numslices[1]*numslices[2] + cursely*numslices[2] + curselz;
 }
 
-std::vector<int>* coordinategroup::getgroupindexes(int g)
+bool coordinategroup::next(void)
 {
-    return &(mygroups[selectedgroups[3*g+0]][selectedgroups[3*g+1]][selectedgroups[3*g+2]]);
+    if (curselz == selz2)
+    {
+        if (cursely == sely2)
+        {
+            if (curselx == selx2)
+                return false;
+            else
+                curselx++;
+                
+            cursely = sely1;
+        }
+        else
+            cursely++;
+        
+        curselz = selz1;
+    }
+    else
+        curselz++;
+        
+    curg = curselx*numslices[1]*numslices[2] + cursely*numslices[2] + curselz;
+        
+    return true;
 }
 
-std::vector<double>* coordinategroup::getgroupcoordinates(int g)
+int coordinategroup::countgroupcoordinates(void)
 {
-    return &(mygroupcoords[selectedgroups[3*g+0]][selectedgroups[3*g+1]][selectedgroups[3*g+2]]);
+    return (mygroupads[curg+1]-mygroupads[curg]);
+}
+        
+int* coordinategroup::getgroupindexes(void)
+{
+    return mygroups.get()+mygroupads[curg];
 }
 
+double* coordinategroup::getgroupcoordinates(void)
+{
+    return mygroupcoords.get()+3*mygroupads[curg];
+}
 

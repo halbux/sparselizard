@@ -36,6 +36,7 @@ namespace myalgorithm
     // coordinateswithoutduplicates(renumberingvector,:) = coordinates.
     // The output gives the number of non-duplicated nodes.
     int removeduplicatedcoordinates(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& renumberingvector);
+    int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
     
     // This is for a vector of ints:
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
@@ -46,9 +47,6 @@ namespace myalgorithm
     
     void tuple3sort(std::vector<std::tuple<int,int,double>>& tosort);
     
-    // The output 'slices[i]' gives the indexes of all values of 'toslice' that are in the interval between minval+i*delta and minval+(i+1)*delta.
-    // Value minval must be smaller than the smallest value in 'toslice' and minval+numslices*delta must be larger than the largest value.
-    void slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices);
     // Slice coordinates 'toslice' in the x, y and z direction into nsx*nsy*nsz groups. First slice position and distance between slices is provided as argument. Returned containers are:
     //
     //    - Group addresse 'ga[g]' gives the first position in 'pn' for group g (length of 'ga' is the number of groups + 1 and last value is the number of coordinates)  

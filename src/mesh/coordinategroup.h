@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 class coordinategroup
 {
@@ -16,9 +17,6 @@ class coordinategroup
     private:
 
         int mynumcoords = 0;
-
-        // Target N elements per block on a structured grid:
-        int N = 100;
         
         // Bounds gives {xmin, xmax, ymin, ymax, zmin, zmax}:
         std::vector<double> bounds = {};
@@ -29,28 +27,30 @@ class coordinategroup
         
         std::vector<double> noisethreshold = {};
     
-        // Element indexes in each group:
-        std::vector<std::vector<std::vector<std::vector<int>>>> mygroups = {};
-        std::vector<std::vector<std::vector<std::vector<double>>>> mygroupcoords = {};
+        // First index in 'mygroups' of each group (last element is number of coordinates):
+        std::vector<int> mygroupads = {};
+        // Coordinate indexes in each group:
+        std::shared_ptr<int> mygroups;
+        // Coordinates in each group:
+        std::shared_ptr<double> mygroupcoords;
         
-
-        // Selected coordinate to locate in the boxes:        
-        double xselect, yselect, zselect, myradius;
-        
-        std::vector<int> selectedgroups = {};
+        int selx1, selx2, sely1, sely2, selz1, selz2;
+        int curselx, cursely, curselz, curg;
     
     public:
     
         coordinategroup(void) {};
         coordinategroup(std::vector<double>& coords);
 
-        void select(double x, double y, double z, double maxelemsize);
-        
         int countcoordinates(void);
-        int countgroups(void);
-                
-        std::vector<int>* getgroupindexes(int groupnum);
-        std::vector<double>* getgroupcoordinates(int groupnum);
+        
+        void select(double x, double y, double z, double radius);
+        // Move to next group. Return false if none.
+        bool next(void);
+        
+        int countgroupcoordinates(void);
+        int* getgroupindexes(void);
+        double* getgroupcoordinates(void);
             
 };
 

@@ -1,5 +1,8 @@
 #include "myalgorithm.h"
 #include "mathop.h"
+#include "universe.h"
+#include "disjointregions.h"
+#include "lagrangeformfunction.h"
 
 #if defined(__linux__)
 #include <parallel/algorithm>
@@ -108,6 +111,50 @@ int myalgorithm::removeduplicatedcoordinates(std::vector<double> noisethreshold,
     return newnodenumber + 1;
 }
 
+int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector)
+{
+    int numpts = coordinates.size()/3;
+    renumberingvector = std::vector<int>(numpts, -1);
+ 
+    std::vector<double> noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
+    double ntx = noisethreshold[0], nty = noisethreshold[1], ntz = noisethreshold[2];
+
+    coordinategroup coordgroup(coordinates);
+
+    int numnonduplicates = 0;
+    for (int i = 0; i < numpts; i++)
+    {
+        // If already merged there is nothing to do:
+        if (renumberingvector[i] != -1)
+            continue;
+        renumberingvector[i] = numnonduplicates;
+    
+        double curx = coordinates[3*i+0], cury = coordinates[3*i+1], curz = coordinates[3*i+2];
+        
+        coordgroup.select(curx,cury,curz, 0);
+        do
+        {
+            int numcoordsingroup = coordgroup.countgroupcoordinates();
+            int* curgroupindexes = coordgroup.getgroupindexes();
+            double* curgroupcoords = coordgroup.getgroupcoordinates();
+    
+            // Loop on each point in the group:
+            for (int p = 0; p < numcoordsingroup; p++)
+            {
+                int curindex = curgroupindexes[p];
+                // If close enough to be considered identical:
+                if (renumberingvector[curindex] == -1 && std::abs(curx-curgroupcoords[3*p+0]) <= ntx && std::abs(cury-curgroupcoords[3*p+1]) <= nty && std::abs(curz-curgroupcoords[3*p+2]) <= ntz )
+                    renumberingvector[curindex] = numnonduplicates;
+            }
+        }
+        while (coordgroup.next());
+        
+        numnonduplicates++;
+    }
+    
+    return numnonduplicates;
+}
+
 void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector)
 {
     if (reorderingvector.size() != tosort.size())
@@ -196,47 +243,6 @@ void myalgorithm::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
     #else
     std::sort(tosort.begin(), tosort.end(), sortfun);
     #endif
-}
-
-void myalgorithm::slicecoordinates(double noisethreshold, std::vector<double>& toslice, double minval, double delta, int numslices, std::vector<std::vector<int>>& slices)
-{
-    int num = toslice.size();
-    
-    // To be sure not to miss any value:
-    minval -= noisethreshold;
-    delta += 2.0*noisethreshold;
-    
-    slices = {};
-    
-    // Create a vector giving the slice in which each value is:
-    std::vector<int> inslice(num);
-    std::vector<int> countinslice(numslices,0);
-    for (int i = 0; i < num; i++)
-    {
-        int curslice = std::floor((toslice[i]-minval)/delta);
-        if (curslice >= 0 && curslice < numslices)
-        {
-            inslice[i] = curslice;
-            countinslice[curslice]++;
-        }
-        else
-        {
-            std::cout << "Error in 'myalgorithm': value to slice is out of range (numerical noise threshold exceeded)" << std::endl;
-            abort();
-        }
-    }
-    
-    // Preallocate 'slices':
-    for (int s = 0; s < numslices; s++)
-        slices.push_back(std::vector<int>(countinslice[s]));
-    // Populate 'slices':
-    std::vector<int> curposinslice(numslices,0);
-    for (int i = 0; i < num; i++)
-    {
-        int s = inslice[i];
-        slices[s][curposinslice[s]] = i;
-        curposinslice[s]++;
-    }
 }
 
 void myalgorithm::slicecoordinates(std::vector<double>& toslice, double minx, double miny, double minz, double dx, double dy, double dz, int nsx, int nsy, int nsz, std::vector<int>& ga, int* pn, double* pc)
@@ -484,10 +490,6 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
     return 1;
 }
 
-#include "universe.h"
-#include "disjointregions.h"
-#include "lagrangeformfunction.h"
-
 void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
@@ -531,19 +533,17 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
         
         // Loop on all candidate groups:
         coordgroup.select(xbary,ybary,zbary, *std::max_element(elemdist.begin(),elemdist.end()));
-        for (int g = 0; g < coordgroup.countgroups(); g++)
+        do
         {
-            std::vector<int>* curgroupindexes = coordgroup.getgroupindexes(g);
-            int numcoordsingroup = curgroupindexes->size();
-            if (numcoordsingroup == 0)
-                continue;
-            std::vector<double>* curgroupcoords = coordgroup.getgroupcoordinates(g);
+            int numcoordsingroup = coordgroup.countgroupcoordinates();
+            int* curgroupindexes = coordgroup.getgroupindexes();
+            double* curgroupcoords = coordgroup.getgroupcoordinates();
             
             // Loop on all coordinates in the current group:
             for (int c = 0; c < numcoordsingroup; c++)
             {
-                int curindex = curgroupindexes->at(c);
-                double curx = curgroupcoords->at(3*c+0), cury = curgroupcoords->at(3*c+1), curz = curgroupcoords->at(3*c+2);
+                int curindex = curgroupindexes[c];
+                double curx = curgroupcoords[3*c+0], cury = curgroupcoords[3*c+1], curz = curgroupcoords[3*c+2];
 
                 // Only process when not yet found and when the coordinate is close enough to the element barycenter.
                 if (elems[curindex] != -1 || std::abs(curx-xbary) > elemdist[0] || std::abs(cury-ybary) > elemdist[1] || std::abs(curz-zbary) > elemdist[2]) {}
@@ -593,6 +593,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                 }
             }
         }
+        while (coordgroup.next());
     }
 }
 
