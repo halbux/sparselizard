@@ -85,32 +85,6 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
         });
 }
 
-int myalgorithm::removeduplicatedcoordinates(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& renumberingvector)
-{
-    // There is a x, y and z coordinate for every nodes:
-    int numberofnodes = coordinates.size()/3;
-    
-    if (renumberingvector.size() != numberofnodes)
-        renumberingvector.resize(numberofnodes);
-    
-    if (numberofnodes == 0)
-        return 0;
-    
-    int newnodenumber = 0;
-    renumberingvector[0] = 0;
-    for (int i = 1; i < numberofnodes; i++)
-    {
-        // If the node is not close enough to the previous one (i.e. is not a duplicate):
-        if (std::abs(coordinates[3*i+0] - coordinates[3*(i-1)+0]) > noisethreshold[0] || std::abs(coordinates[3*i+1] - coordinates[3*(i-1)+1]) > noisethreshold[1] || std::abs(coordinates[3*i+2] - coordinates[3*(i-1)+2]) > noisethreshold[2])
-            newnodenumber++;
-
-        // Create a vector whose ith node gives the new node number for node i:
-        renumberingvector[i] = newnodenumber;
-    }
-
-    return newnodenumber + 1;
-}
-
 int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector)
 {
     int numpts = coordinates.size()/3;
@@ -833,7 +807,7 @@ int myalgorithm::factorial(int n)
     return out;
 }
 
-void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode, std::vector<double> noisethreshold)
+void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
 {
     std::vector<int> nn(8), ne(8);
     for (int i = 0; i < 8; i++)
@@ -883,33 +857,19 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         }
     }
     
-    // Sort the barycenter coordinates:
-    std::vector<double> sortedbarys(barys.size());
-    std::vector<int> reorderingvector;
-    stablecoordinatesort(noisethreshold, barys, reorderingvector);
-    for (int i = 0; i < reorderingvector.size(); i++)
-    {
-        sortedbarys[3*i+0] = barys[3*reorderingvector[i]+0];
-        sortedbarys[3*i+1] = barys[3*reorderingvector[i]+1];
-        sortedbarys[3*i+2] = barys[3*reorderingvector[i]+2];
-    }
-    std::vector<int> renum(reorderingvector.size());
-    for (int i = 0; i < reorderingvector.size(); i++)
-        renum[reorderingvector[i]] = i;
-    
     // Remove duplicated barycenters:
     std::vector<int> renumberingvector;
-    int numunique = removeduplicatedcoordinates(noisethreshold, sortedbarys, renumberingvector);
+    int numunique = removeduplicates(barys, renumberingvector);
     
     // Assign a unique edge number for each edge:
     edgenumbers = std::vector<int>(numedges);
     for (int i = 0; i < numedges; i++)
-        edgenumbers[i] = renumberingvector[renum[i]];
+        edgenumbers[i] = renumberingvector[i];
     
     // Calculate which edges must be split:
     std::vector<bool> isanodeatnum(numunique,false);
     for (int i = 0; i < numnodes; i++)
-        isanodeatnum[renumberingvector[renum[numedges+i]]] = true;
+        isanodeatnum[renumberingvector[numedges+i]] = true;
 
     isbarycenteronnode = std::vector<bool>(numedges,false);
     for (int i = 0; i < numedges; i++)

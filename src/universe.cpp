@@ -1,6 +1,8 @@
 #include "universe.h"
 
 
+double universe::roundoffnoiselevel = 1e-12;
+
 std::shared_ptr<rawmesh> universe::mymesh = NULL;
 
 bool universe::isaxisymmetric = false;

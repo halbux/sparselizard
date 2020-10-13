@@ -31,11 +31,10 @@ namespace myalgorithm
     // Same as above but first sort according to a vector of integers:
     void stablecoordinatesort(std::vector<double> noisethreshold, std::vector<int>& elems, std::vector<double>& coordinates, std::vector<int>& reorderingvector);
     
-    // 'removeduplicatedcoordinates' outputs a vector that can be used to 
+    // 'removeduplicates' outputs a vector that can be used to 
     // renumber the nodes so that all duplicates are removed:
     // coordinateswithoutduplicates(renumberingvector,:) = coordinates.
     // The output gives the number of non-duplicated nodes.
-    int removeduplicatedcoordinates(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& renumberingvector);
     int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
     
     // This is for a vector of ints:
@@ -123,8 +122,8 @@ namespace myalgorithm
     // Provide the corner coordinates of each element concatenated in each element type.
     // This function returns (flattened from lowest type to highest) the edge number of
     // each edge in an element as well as a bool whose value is true if the edge barycenter
-    // is close enough (according to 'noisethreshold') to any node in the corner coordinates.
-    void assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode, std::vector<double> noisethreshold);
+    // is close enough to any node in the corner coordinates.
+    void assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode);
     
     // For a vector 'vec' of repeating blocks [b0 b1 b2 ...] the output is [b0[sel[0]] b1[sel[0]] ... b0[sel[1]] b1[sel[1]] ...].
     std::vector<double> separate(std::vector<double>& v, int blocklen, std::vector<int> sel);

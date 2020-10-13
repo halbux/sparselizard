@@ -610,7 +610,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
     }
 }
 
-void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::vector<double> noisethreshold)
+void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
 {
     elements* myelements = getoriginalmesh()->getelements();
     
@@ -625,7 +625,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac, std::
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
     std:vector<bool> isedgesplit;
-    myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit, noisethreshold);
+    myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
     
 
     // Preallocate output containers to upper bound size:

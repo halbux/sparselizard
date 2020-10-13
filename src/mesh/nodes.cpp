@@ -5,11 +5,6 @@
 
 nodes::nodes(void) {}
 
-nodes::nodes(double roundoffnoise)
-{
-    roundoffnoiselevel = roundoffnoise;
-}
-
 void nodes::setnumber(int numberofnodes)
 {
     mycoordinates.resize(3*numberofnodes);
@@ -60,15 +55,13 @@ std::vector<int> nodes::sortbycoordinates(void)
     return renumberingvector;
 }
 
-// 'removeduplicates' assumes that the nodes are already sorted coordinatewise 
-// thus the duplicated nodes follow each other in 'mycoordinates'.
 std::vector<int> nodes::removeduplicates(void)
 {
     int numberofnodes = count();
     
     // 'noderenumbering' will give the renumbering corresponding to removed duplicates:
     std::vector<int> noderenumbering;
-    int numberofnonduplicates = myalgorithm::removeduplicatedcoordinates(getnoisethreshold(), mycoordinates, noderenumbering);
+    int numberofnonduplicates = myalgorithm::removeduplicates(mycoordinates, noderenumbering);
 
     for (int i = 0; i < noderenumbering.size(); i++)
     {
@@ -116,7 +109,8 @@ double nodes::getgeometrydimension(int coord)
 
 std::vector<double> nodes::getnoisethreshold(void)
 {
-    return std::vector<double> {roundoffnoiselevel*getgeometrydimension(0), roundoffnoiselevel*getgeometrydimension(1), roundoffnoiselevel*getgeometrydimension(2)};
+    double rons = universe::roundoffnoiselevel;
+    return std::vector<double> {rons*getgeometrydimension(0), rons*getgeometrydimension(1), rons*getgeometrydimension(2)};
 }
 
 void nodes::fixifaxisymmetric(void)
@@ -124,7 +118,7 @@ void nodes::fixifaxisymmetric(void)
     if (universe::isaxisymmetric == false)
         return;
 
-    double xnoiselevel = getgeometrydimension(0) * roundoffnoiselevel;
+    double xnoiselevel = getgeometrydimension(0) * universe::roundoffnoiselevel;
 
     int numberofnodes = count();
     for (int i = 0; i < numberofnodes; i++)

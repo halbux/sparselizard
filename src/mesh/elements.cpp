@@ -687,12 +687,11 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
     int numberoftriangles = numberofsubelementsineveryelement[elementtypenumber][2];
     int numberofquadrangles = numberofsubelementsineveryelement[elementtypenumber][3];
     
-    std::vector<double> noisethreshold = mynodes->getnoisethreshold();
     std::vector<double> barycentercoordinates = computebarycenters(elementtypenumber);
     
     // 'elementrenumbering' will give the renumbering corresponding to removed duplicates:
     std::vector<int> elementrenumbering;
-    int numberofnonduplicates = myalgorithm::removeduplicatedcoordinates(noisethreshold, barycentercoordinates, elementrenumbering);
+    int numberofnonduplicates = myalgorithm::removeduplicates(barycentercoordinates, elementrenumbering);
     
     for (int i = 0; i < elementrenumbering.size(); i++)
     {

@@ -118,7 +118,7 @@ int main(void)
     std::cout << relerror1d << " " << relerror2d << " " << relerror3d << std::endl;
 
     // Code validation line. Can be removed.
-    std::cout << (relerror1d < 2e-15 && relerror2d < 4e-11 && relerror3d < 9e-13);
+    std::cout << (relerror1d < 2e-15 && relerror2d < 4e-11 && relerror3d < 2e-12);
 
     SlepcFinalize();
 

@@ -269,7 +269,6 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     mynodes.fixifaxisymmetric();
     
     myelements.explode();
-    sortbybarycenters();
     removeduplicates();
     myregiondefiner.defineregions();
     
@@ -484,7 +483,6 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     mynodes.fixifaxisymmetric();
 
     myelements.explode();
-    sortbybarycenters();
     removeduplicates();
     myregiondefiner.defineregions();
     
@@ -1361,7 +1359,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     myhadaptedmesh->myhtracker = newhtracker;
     
     std::vector<std::vector<double>> ac;
-    newhtracker->getadaptedcoordinates(ac, mynodes.getnoisethreshold());
+    newhtracker->getadaptedcoordinates(ac);
     
     // Initialize nodes size:
     int numnodes = 0;
@@ -1423,7 +1421,6 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     myhadaptedmesh->myelements.explode();
 
     std::vector<int> lasttype = {-1,0,1,3};
-    myhadaptedmesh->sortbybarycenters(lasttype[meshdim]);
     myhadaptedmesh->removeduplicates(lasttype[meshdim]);
     
     
