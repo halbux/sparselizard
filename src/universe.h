@@ -30,7 +30,7 @@ class universe
     
     public:
 
-        // 'Round-off noise level on the node coordinates:
+        // Round-off noise level on the node coordinates:
         static double roundoffnoiselevel;
         
         static std::shared_ptr<rawmesh> mymesh;
