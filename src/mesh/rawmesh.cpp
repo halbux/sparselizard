@@ -286,6 +286,7 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     }
     
     myelements.orient();
+    errorondisconnecteddisjointregion();
     
     if (verbosity > 0)
         printcount();
@@ -500,6 +501,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     }
     
     myelements.orient();
+    errorondisconnecteddisjointregion();
     
     if (verbosity > 0)
         printcount();
@@ -1520,6 +1522,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     }
     
     myhadaptedmesh->myelements.orient();
+    myhadaptedmesh->errorondisconnecteddisjointregion();
 
     
     // Optional output:
@@ -1674,7 +1677,7 @@ void rawmesh::errorondisconnecteddisjointregion(void)
         if (drdim < dim && isinmaxdim == false)
         {
             std::vector<std::string> typnm = {"point", "line", "face", "volume"};
-            std::cout << "Error in 'rawmesh' object: found a " << typnm[drdim] << " not connected to any " << typnm[drdim+1] << std::endl;
+            std::cout << "Error in 'mesh' object: found a " << typnm[drdim] << " not connected to any " << typnm[drdim+1] << std::endl;
             std::cout << "Remove it or increase the roundoff noise threshold to merge it" << std::endl;
             abort();
         }
