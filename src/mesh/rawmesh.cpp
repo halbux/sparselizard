@@ -1646,6 +1646,36 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
     }
 }
 
+bool rawmesh::isanyfloating(void)
+{
+    int dim = getmeshdimension();
+    
+    // At index i this is true if the ith physical region is of highest dim:
+    int numpr = myphysicalregions.count(-1);
+    std::vector<bool> isprmaxdim(numpr);
+    for (int i = 0; i < numpr; i++)
+        isprmaxdim[i] = (myphysicalregions.getatindex(i)->getelementdimension() == dim);
+    
+    // Loop on all disjoint regions:
+    for (int d = 0; d < mydisjointregions.count(); d++)
+    {
+        // Check if it is included in at least one physical region of max dim:
+        bool isinmaxdim = false;
+        for (int i = 0; i < numpr; i++)
+        {
+            if (isprmaxdim[i] && mydisjointregions.isinphysicalregion(d,i))
+            {
+                isinmaxdim = true;
+                break;
+            }
+        }
+        if (isinmaxdim == false)
+            return true;
+    }
+    
+    return false;
+}
+
 std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
 {
     if (myhadaptedmesh == NULL)
