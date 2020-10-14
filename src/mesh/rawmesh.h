@@ -157,8 +157,8 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // Print the elements in every physical region:
         void printelementsinphysicalregions(bool isdebug = false);
         
-        // Check for floating lower dimension geometrical entities (e.g. disconnected faces in 3D):
-        bool isanyfloating(void);
+        // Check for disconnected lower dimension geometrical entities (e.g. disconnected faces in 3D):
+        void errorondisconnecteddisjointregion(void);
         
         std::shared_ptr<rawmesh> gethadaptedpointer(void);
         std::shared_ptr<rawmesh> getoriginalmeshpointer(void);

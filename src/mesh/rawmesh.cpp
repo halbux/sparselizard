@@ -1646,7 +1646,7 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
     }
 }
 
-bool rawmesh::isanyfloating(void)
+void rawmesh::errorondisconnecteddisjointregion(void)
 {
     int dim = getmeshdimension();
     
@@ -1659,6 +1659,8 @@ bool rawmesh::isanyfloating(void)
     // Loop on all disjoint regions:
     for (int d = 0; d < mydisjointregions.count(); d++)
     {
+        int drdim = mydisjointregions.getelementdimension(d);
+            
         // Check if it is included in at least one physical region of max dim:
         bool isinmaxdim = false;
         for (int i = 0; i < numpr; i++)
@@ -1669,11 +1671,14 @@ bool rawmesh::isanyfloating(void)
                 break;
             }
         }
-        if (isinmaxdim == false)
-            return true;
+        if (drdim < dim && isinmaxdim == false)
+        {
+            std::vector<std::string> typnm = {"point", "line", "face", "volume"};
+            std::cout << "Error in 'rawmesh' object: found a " << typnm[drdim] << " not connected to any " << typnm[drdim+1] << std::endl;
+            std::cout << "Remove it or increase the roundoff noise threshold to merge it" << std::endl;
+            abort();
+        }
     }
-    
-    return false;
 }
 
 std::shared_ptr<rawmesh> rawmesh::gethadaptedpointer(void)
