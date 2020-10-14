@@ -12,24 +12,22 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
         meshsize += universe::mymesh->getnodes()->getgeometrydimension(i);
     
     // Define the number of slices in the x, y and z direction:
-    int N = 100;
-    double powertouse = 2.0;
-    
-    int numblocks = std::ceil((double)mynumcoords/N);
-    int ns = std::ceil( std::pow(numblocks, 1.0/powertouse) );
-    // Cannot be larger than about 1000 otherwise number of groups is more than an int can hold:
+    double powertouse = universe::mymesh->getmeshdimension();
+    int ns = std::ceil(std::pow(mynumcoords, 1.0/powertouse));
+    // Limit number of groups to what an int can hold:
     ns = std::min(ns, 1000);
     numslices = {ns,ns,ns};
     
     // Get the coordinate x, y and z bounds as well as the distance between slices:
     bounds = myalgorithm::getcoordbounds(coords);
-    delta = {(bounds[1]-bounds[0])/numslices[0], (bounds[3]-bounds[2])/numslices[1], (bounds[5]-bounds[4])/numslices[2]};
+    delta = {std::abs(bounds[1]-bounds[0])/numslices[0], std::abs(bounds[3]-bounds[2])/numslices[1], std::abs(bounds[5]-bounds[4])/numslices[2]};
+    
     // This solves the non-existing dimension issues:
     for (int i = 0; i < 3; i++)
     {
         if (delta[i] < 1e-6*meshsize)
         {
-            delta[i] = 2.0*meshsize;
+            delta[i] = meshsize;
             numslices[i] = 1;
         }
     }
