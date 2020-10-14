@@ -1676,7 +1676,7 @@ void rawmesh::errorondisconnecteddisjointregion(void)
         }
         if (isinmaxdim == false)
         {
-            std::vector<std::string> typnm = {"point", "line", "face", "volume"};
+            std::vector<std::string> typnm = {"node", "line", "face", "volume"};
             std::cout << "Error in 'mesh' object: found a " << typnm[drdim] << " not connected to any " << typnm[dim] << std::endl;
             std::cout << "Remove it or increase the roundoff noise threshold to merge it" << std::endl;
             abort();
