@@ -13,9 +13,10 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     
     // Define the number of slices in the x, y and z direction:
     double powertouse = universe::mymesh->getmeshdimension();
-    int ns = std::ceil(std::pow(mynumcoords, 1.0/powertouse));
+    int ns = std::pow(mynumcoords, 1.0/powertouse);
     // Limit number of groups to what an int can hold:
     ns = std::min(ns, 1000);
+    ns = std::max(ns, 1);
     numslices = {ns,ns,ns};
     
     // Get the coordinate x, y and z bounds as well as the distance between slices:
