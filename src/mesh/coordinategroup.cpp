@@ -15,7 +15,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     double powertouse = universe::mymesh->getmeshdimension();
     int ns = std::pow(mynumcoords, 1.0/powertouse);
     // Limit number of groups to what an int can hold:
-    ns = std::min(ns, 1000);
+    // ns = std::min(ns, 1000);
     ns = std::max(ns, 1);
     numslices = {ns,ns,ns};
     
@@ -26,7 +26,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     // This solves the non-existing dimension issues:
     for (int i = 0; i < 3; i++)
     {
-        if (delta[i] < 1e-6*meshsize)
+        if (std::abs(bounds[2*i+1]-bounds[2*i+0]) < 1e-6*meshsize)
         {
             delta[i] = meshsize;
             numslices[i] = 1;
