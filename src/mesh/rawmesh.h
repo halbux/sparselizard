@@ -67,11 +67,6 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // 'writetofile' hands over to the function writing the format of the mesh file.
         void writetofile(std::string);
 
-        // 'sortbybarycenters' sorts the elements (and nodes) according to 
-        // the x then y then z coordinates of their barycenter. Round off
-        // noise on the coordinates is taken into account in the sorting.
-        void sortbybarycenters(int lasttypetoprocess = 7);
-        
         // 'removeduplicates' removes the duplicated elements (and nodes).
         void removeduplicates(int lasttypetoprocess = 7);
         

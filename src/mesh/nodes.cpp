@@ -35,26 +35,6 @@ void nodes::print(void)
     std::cout.precision(oldprecision);
 }
 
-std::vector<int> nodes::sortbycoordinates(void)
-{
-    int numberofnodes = count();
-    
-    // 'reorderingvector' gives the relation between the indexes before and after node sorting:
-    std::vector<int> reorderingvector;
-    myalgorithm::stablecoordinatesort(getnoisethreshold(), mycoordinates, reorderingvector);
-
-    // Reorder the nodes.:
-    reorder(reorderingvector);
-    
-    // sortedcoordinates = coordinates(reorderingvector,:).
-    // sortedcoordinates(renumberingvector,:) = coordinates.
-    std::vector<int> renumberingvector(numberofnodes);
-    for (int i = 0; i < numberofnodes; i++)
-        renumberingvector[reorderingvector[i]] = i;
-    
-    return renumberingvector;
-}
-
 std::vector<int> nodes::removeduplicates(void)
 {
     int numberofnodes = count();

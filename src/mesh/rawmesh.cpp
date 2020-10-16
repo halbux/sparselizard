@@ -140,24 +140,6 @@ void rawmesh::writetofile(std::string name)
     }
 }
 
-void rawmesh::sortbybarycenters(int lasttypetoprocess)
-{
-    for (int elementtypenumber = 0; elementtypenumber <= lasttypetoprocess; elementtypenumber++)
-    {
-        if (myelements.count(elementtypenumber) == 0)
-            continue;
-        // Sort the elements of the current type by their barycenters:
-        std::vector<int> renumberingvector = myelements.sortbybarycenters(elementtypenumber);
-        
-        // Renumber the elements in the physical regions:
-        for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
-        {
-            physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
-            currentphysicalregion->renumberelements(elementtypenumber, renumberingvector);
-        }
-    }
-}
-
 void rawmesh::removeduplicates(int lasttypetoprocess)
 {
     for (int elementtypenumber = 0; elementtypenumber <= lasttypetoprocess; elementtypenumber++)

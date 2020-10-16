@@ -650,28 +650,6 @@ std::vector<double> elements::computebarycenters(int elementtypenumber)
     return barycentercoordinates;
 }
 
-std::vector<int> elements::sortbybarycenters(int elementtypenumber)
-{
-    // Get the barycenters of the straight version of all elements of type 'elementtypenumber':
-    std::vector<double> barycentercoordinates = computebarycenters(elementtypenumber);
-    
-    // 'reorderingvector' gives the relation between the indexes before and after element sorting:
-    std::vector<int> reorderingvector;
-    myalgorithm::stablecoordinatesort(mynodes->getnoisethreshold(), barycentercoordinates, reorderingvector);
-
-    // sortedcoordinates = coordinates(reorderingvector,:).
-    // sortedcoordinates(renumberingvector,:) = coordinates.
-    std::vector<int> renumberingvector(count(elementtypenumber));
-    for (int i = 0; i < count(elementtypenumber); i++)
-        renumberingvector[reorderingvector[i]] = i;
-    
-    // Renumber and reorder the elements in all containers:
-    renumber(elementtypenumber, renumberingvector);
-    reorder(elementtypenumber, reorderingvector);
-    
-    return renumberingvector;
-}
-
 std::vector<int> elements::removeduplicates(int elementtypenumber)
 {
     // For point elements (i.e. to remove node duplicates):

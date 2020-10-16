@@ -34,11 +34,6 @@ class nodes
         // Print node coordinates for debugging:
         void print(void);
         
-        // 'sortbycoordinates' sorts the nodes according to their x, y and 
-        // z coordinates with highest sorting priority for x then y and then z. 
-        // 'mycoordinates' is updated accordingly.
-        std::vector<int> sortbycoordinates(void);
-        
         // 'removeduplicates' removes the duplicated nodes in 'mycoordinates'.
         std::vector<int> removeduplicates(void);    
         

@@ -169,10 +169,6 @@ class elements
         // Only the corner element nodes are used.
         std::vector<double> computebarycenters(int elementtypenumber);
         
-        // 'sortbybarycenters' outputs a vector v such 
-        // that sortedpointsinelements(v,:) = pointsinelements.
-        std::vector<int> sortbybarycenters(int elementtypenumber);
-        
         // 'removeduplicates' removes the duplicated elements.
         std::vector<int> removeduplicates(int elementtypenumber);
 
