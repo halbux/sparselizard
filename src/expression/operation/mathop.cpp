@@ -726,6 +726,17 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
     return output;
 }
 
+void mathop::settimederivative(vec dtx)
+{
+    universe::xdtxdtdtx[1] = {dtx};
+}
+
+void mathop::settimederivative(vec dtx, vec dtdtx)
+{
+    universe::xdtxdtdtx[1] = {dtx};
+    universe::xdtxdtdtx[2] = {dtdtx};
+}
+
 expression mathop::dx(expression input) { return input.spacederivative(1); }
 expression mathop::dy(expression input) { return input.spacederivative(2); }
 expression mathop::dz(expression input) { return input.spacederivative(3); }

@@ -101,6 +101,10 @@ namespace mathop
     
     // Load a mesh file into a shape. Return the list of shapes of all dimensions {{0D},{1D},{2D},{3D}} (if any):
     std::vector<std::vector<shape>> loadshape(std::string meshfile);
+    
+    // Make the time derivative vectors available in the universe:
+    void settimederivative(vec dtx);
+    void settimederivative(vec dtx, vec dtdtx);
 
     expression dx(expression input);
     expression dy(expression input);
