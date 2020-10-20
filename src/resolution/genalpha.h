@@ -50,11 +50,18 @@ class genalpha
         std::vector<formulation> tosolvebefore = {};
         std::vector<formulation> tosolveafter = {};
         
+        // Current timestep:
+        double dt = -1;
+        
         // The displacement u, speed v and acceleration a at the current time step:
         vec u, v, a;
         
+        // Objects required at every timestep (possibly reused):
+        vec rhs; mat K, C, M, leftmat, matu, matv, mata;
+        // Parameters for which these objects are defined:
+        double defbeta = -1, defgamma = -1, defalphaf = -1, defalpham = -1, defdt = -1;
         
-        std::vector<std::vector<vec>> run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity);
+        int run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime);
         
     public:
     
@@ -68,18 +75,20 @@ class genalpha
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
         
-        std::vector<vec> getcurrentsolution(void) { return {u, v, a}; };
+        std::vector<vec> getsolution(void) { return {u, v, a}; };
+        void setsolution(std::vector<vec> sol);
+        
+        // Get the timestep:
+        double gettimestep(void) { return dt; };
         
         // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
         void presolve(std::vector<formulation> formuls);
         void postsolve(std::vector<formulation> formuls);
         
-        // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
-        // seconds. output[0] gives the u time-solutions while output[1] gives v and output[2] gives a. 
-        // One solution every 'outputeverynthtimestep' time steps is output.
-        std::vector<std::vector<vec>> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
+        // Advance the solution by the provided timestep.
+        void runlinear(double timestep, int verbosity = 1, bool autoadvancetime = true);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        std::vector<std::vector<vec>> runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit = -1, int outputeverynthtimestep = 1, int verbosity = 1);
+        int runnonlinear(double timestep, int maxnumnlit = -1, int verbosity = 2, bool autoadvancetime = true);
         
 };
 

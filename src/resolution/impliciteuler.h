@@ -47,11 +47,18 @@ class impliciteuler
         std::vector<formulation> tosolvebefore = {};
         std::vector<formulation> tosolveafter = {};
         
+        // Current timestep:
+        double dt = -1;
+        
         // Vector x and dt(x) at the current time step:
         vec x, dtx;
         
+        // Objects required at every timestep (possibly reused):
+        vec rhs; mat K, C, leftmat;
+        // Parameters for which these objects are defined:
+        double defdt = -1;
         
-        std::vector<std::vector<vec>> run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity);
+        int run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime);
         
     public:
 
@@ -63,18 +70,20 @@ class impliciteuler
         // Set the relaxation factor for the inner nonlinear fixed-point iteration:
         void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };
         
-        std::vector<vec> getcurrentsolution(void) { return {x, dtx}; };
+        std::vector<vec> getsolution(void) { return {x, dtx}; };
+        void setsolution(std::vector<vec> sol);
+        
+        // Get the timestep:
+        double gettimestep(void) { return dt; };
         
         // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
         void presolve(std::vector<formulation> formuls);
         void postsolve(std::vector<formulation> formuls);
         
-        // Solve from 'starttime' to 'endtime' with constant time steps of 'timestep' 
-        // seconds. output[0] gives the x time-solutions while output[1] gives dt(x). 
-        // One solution every 'outputeverynthtimestep' time steps is output.
-        std::vector<std::vector<vec>> runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep = 1, int verbosity = 1);
+        // Advance the solution by the provided timestep.
+        void runlinear(double timestep, int verbosity = 1, bool autoadvancetime = true);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        std::vector<std::vector<vec>> runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit = -1, int outputeverynthtimestep = 1, int verbosity = 1);
+        int runnonlinear(double timestep, int maxnumnlit = -1, int verbosity = 2, bool autoadvancetime = true);
         
 };
 

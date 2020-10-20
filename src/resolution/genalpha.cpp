@@ -33,177 +33,151 @@ void genalpha::setparameter(double rinf)
     gamma = 0.5-alpham+alphaf;
 }
 
+void genalpha::setsolution(std::vector<vec> sol)
+{
+    if (sol.size() != 3)
+    {
+        std::cout << "Error in 'genalpha' object: expected a vector of length three to set the solution" << std::endl;
+        abort();  
+    }
+    u = sol[0]; v = sol[1]; a = sol[2];
+}
+
 void genalpha::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
 void genalpha::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
         
-std::vector<std::vector<vec>> genalpha::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
+void genalpha::runlinear(double timestep, int verbosity, bool autoadvancetime)
 {
-    return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);
+    run(true, timestep, -1, verbosity, autoadvancetime);
 }
 
-std::vector<std::vector<vec>> genalpha::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+int genalpha::runnonlinear(double timestep, int maxnumnlit, int verbosity, bool autoadvancetime)
 {
-    return run(false, starttime, timestep, endtime, maxnumnlit, outputeverynthtimestep, verbosity);
+    return run(false, timestep, maxnumnlit, verbosity, autoadvancetime);
 }
 
-std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime)
 {
-    // Solve end time rounding issues:
-    endtime += endtime*1e-12;
-    
-    if (starttime > endtime)
-        return {};
-    
-    if (outputeverynthtimestep <= 0)
-        outputeverynthtimestep = 1;
-    
+    double inittime = universe::currenttimestep;
+
+    dt = timestep;
+    // Update and print the time:
+    universe::currenttimestep += dt;
+    char spacer = ':';
+    if (islinear || verbosity < 2)
+        spacer = ' ';
+    if (verbosity > 0)
+        std::cout << "@" << universe::currenttimestep << "s" << spacer << std::flush;
+
     // Make all time derivatives available in the universe:
     universe::xdtxdtdtx = {{u},{v},{a}};
         
     // Set all fields in the formulation to the initial displacement:
     mathop::setdata(u);
     
-    vec rhs; mat K, C, M, leftmat, matu, matv, mata;
-    
-    // Count the number of time steps to step through and the number of vectors to output:
-    int numtimesteps = 0; int outputsize = 0;
-    for (double t = starttime; t <= endtime; t = t + timestep)
+    // Nonlinear loop:
+    double relchange = 1; int nlit = 0;
+    vec unext = u, vnext = v, anext = a;
+    while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
     {
-        if (numtimesteps%outputeverynthtimestep == 0)
-            outputsize++;
-        numtimesteps++;
-    }
-    
-    
-    // Start the generalized alpha iteration:
-    std::cout << "Generalized alpha (b " << beta << ", g " << gamma << ", af " << alphaf << ", am " << alpham << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
-    std::vector<std::vector<vec>> output(3, std::vector<vec>(outputsize));
-    output[0][0] = u; output[1][0] = v; output[2][0] = a;
-    
-    // We already have everything for time step 0 so we start at 1:
-    int timestepindex = 1;
-    for (double t = starttime + timestep; t <= endtime; t = t + timestep)
-    {        
-        std::cout << timestepindex << "@" << t << "sec" << std::flush;
+        // Solve all formulations that must be solved at the beginning of the nonlinear loop:
+        mathop::solve(tosolvebefore);
 
-        mathop::settime(t-alphaf*timestep);
+        // Make all time derivatives available in the universe:
+        universe::xdtxdtdtx = {{unext},{vnext},{anext}};
+    
+        vec utolcalc = unext;
         
-        // Nonlinear loop:
-        double relchange = 1; int nlit = 0;
-        vec unext = u, vnext = v, anext = a;
-        while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
+        // Reassemble only the non-constant matrices:
+        bool isfirstcall = (K.getpointer() == NULL);
+        if (isconstant[1] == false || isfirstcall)
         {
-            // Solve all formulations that must be solved at the beginning of the nonlinear loop:
-            mathop::solve(tosolvebefore);
-
-
-            // Make all time derivatives available in the universe:
-            universe::xdtxdtdtx = {{unext},{vnext},{anext}};
-        
-            vec utolcalc = unext;
-            
-            // Reassemble only the non-constant matrices:
-            if (isconstant[1] == false || timestepindex == 1)
-            {
-                myformulation.generatestiffnessmatrix();
-                K = myformulation.K(false, true);
-            }
-            if (isconstant[2] == false || timestepindex == 1)
-            {
-                myformulation.generatedampingmatrix();
-                C = myformulation.C(false, true);
-            }
-            if (isconstant[3] == false || timestepindex == 1)
-            {
-                myformulation.generatemassmatrix();
-                M = myformulation.M(false, false);
-            }
-            if (isconstant[0] == false || timestepindex == 1)
-            {
-                myformulation.generaterhs();
-                rhs = myformulation.rhs();
-            }
-            else
-                rhs.updateconstraints();
-            
-            // Reuse matrices when possible (including the factorization):
-            if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || timestepindex == 1)
-            {
-                leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*timestep)*C + ((1.0-alphaf)*beta*timestep*timestep)*K;
-                leftmat.reusefactorization();
-                
-                matu = -K;
-                matv = ((alphaf-1.0)*timestep)*K-C;
-                mata = ((1.0-alphaf)*(gamma-1.0)*timestep)*C+((1.0-alphaf)*(beta-0.5)*timestep*timestep)*K - alpham*M;
-            }
-            
-            // Update the acceleration. 
-            // The acceleration is imposed on the Dirichlet-constrained dofs.
-            // The displacement update relation is used to make sure the 
-            // acceleration constraint leads to the exact constrained 
-            // displacement at the next time step:
-            vec unextdirichlet(myformulation); 
-            unextdirichlet.updateconstraints();
-            vec anextdirichlet = (1.0-alpham)/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a );
-            // Here are the constrained values of the next acceleration:
-            intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-            densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
-            // Here for the conditional constraints:
-            intdensematrix condconstrainedindexes = (myformulation.getdofmanager()->getconditionalconstraintdata()).first;
-            densematrix condconstranextdirichletval = anextdirichlet.getpointer()->getvalues(condconstrainedindexes);
-            
-            vec rightvec = matu*u + matv*v + mata*a + rhs;
-            // Force the acceleration on the constrained dofs:
-            rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
-            rightvec.getpointer()->setvalues(condconstrainedindexes, condconstranextdirichletval);
-            
-            anext = mathop::solve(leftmat, rightvec);
-
-            // Update unext and vnext:
-            unext = u + timestep*v + ((0.5-beta)*timestep*timestep)*a + (beta*timestep*timestep)*anext;
-            vnext = v + (timestep*(1-gamma))*a + (gamma*timestep)*anext;
-            
-            // Update all fields in the formulation:
-            mathop::setdata(unext);
-            
-            relchange = (unext-utolcalc).norm()/unext.norm();
-            
-            if (islinear == false && verbosity > 0)
-                std::cout << " " << relchange << std::flush;
-
-            nlit++; 
-
-
-            // Solve all formulations that must be solved at the end of the nonlinear loop:
-            mathop::solve(tosolveafter);
-            
-            
-            if (islinear)
-                break;
+            myformulation.generatestiffnessmatrix();
+            K = myformulation.K(false, true);
         }
-
-        u = unext; v = vnext; a = anext;
-        
-        if (islinear == false)
-            std::cout << " (" << nlit << "NL it)" << std::flush;
-        if (timestepindex < numtimesteps-1)
-        std::cout << " -> " << std::flush;
-        
-        // Only one every 'outputeverynthtimestep' solutions is output:
-        if (timestepindex%outputeverynthtimestep == 0)
+        if (isconstant[2] == false || isfirstcall)
         {
-            output[0][timestepindex/outputeverynthtimestep] = u;
-            output[1][timestepindex/outputeverynthtimestep] = v;
-            output[2][timestepindex/outputeverynthtimestep] = a;
+            myformulation.generatedampingmatrix();
+            C = myformulation.C(false, true);
         }
-        timestepindex++;
+        if (isconstant[3] == false || isfirstcall)
+        {
+            myformulation.generatemassmatrix();
+            M = myformulation.M(false, false);
+        }
+        if (isconstant[0] == false || isfirstcall)
+        {
+            myformulation.generaterhs();
+            rhs = myformulation.rhs();
+        }
+        else
+            rhs.updateconstraints();
+        
+        // Reuse matrices when possible (including the factorization):
+        if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || isfirstcall || defdt != dt || defbeta != beta || defgamma != gamma || defalphaf != alphaf || defalpham != alpham)
+        {
+            leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*dt)*C + ((1.0-alphaf)*beta*dt*dt)*K;
+            leftmat.reusefactorization();
+            
+            matu = -K;
+            matv = ((alphaf-1.0)*dt)*K-C;
+            mata = ((1.0-alphaf)*(gamma-1.0)*dt)*C+((1.0-alphaf)*(beta-0.5)*dt*dt)*K - alpham*M;
+            
+            defdt = dt; defbeta = beta; defgamma = gamma; defalphaf = alphaf; defalpham = alpham;
+        }
+        
+        // Update the acceleration. 
+        // The acceleration is imposed on the Dirichlet-constrained dofs.
+        // The displacement update relation is used to make sure the 
+        // acceleration constraint leads to the exact constrained 
+        // displacement at the next time step:
+        vec unextdirichlet(myformulation); 
+        unextdirichlet.updateconstraints();
+        vec anextdirichlet = (1.0-alpham)/(beta*dt*dt)*( unextdirichlet-u - dt*v - dt*dt*(0.5-beta)*a );
+        // Here are the constrained values of the next acceleration:
+        intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
+        densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
+        // Here for the conditional constraints:
+        intdensematrix condconstrainedindexes = (myformulation.getdofmanager()->getconditionalconstraintdata()).first;
+        densematrix condconstranextdirichletval = anextdirichlet.getpointer()->getvalues(condconstrainedindexes);
+        
+        vec rightvec = matu*u + matv*v + mata*a + rhs;
+        // Force the acceleration on the constrained dofs:
+        rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
+        rightvec.getpointer()->setvalues(condconstrainedindexes, condconstranextdirichletval);
+        
+        anext = mathop::solve(leftmat, rightvec);
+
+        // Update unext and vnext:
+        unext = u + dt*v + ((0.5-beta)*dt*dt)*a + (beta*dt*dt)*anext;
+        vnext = v + (dt*(1-gamma))*a + (gamma*dt)*anext;
+        
+        // Update all fields in the formulation:
+        mathop::setdata(unext);
+        
+        relchange = (unext-utolcalc).norm()/unext.norm();
+        
+        if (islinear == false && verbosity > 1)
+            std::cout << " " << relchange << std::flush;
+
+        nlit++; 
+
+        // Solve all formulations that must be solved at the end of the nonlinear loop:
+        mathop::solve(tosolveafter);
+        
+        if (islinear)
+            break;
     }
-    std::cout << std::endl;
+
+    u = unext; v = vnext; a = anext;
     
-    // Remove all time derivatives from the universe:
-    universe::xdtxdtdtx = {{},{},{}};
+    if (verbosity > 1 && islinear == false)
+        std::cout << " (" << nlit << "NL it) " << std::flush;
     
-    return output;
+    if (autoadvancetime == false)
+        universe::currenttimestep = inittime;
+        
+    return nlit;
 }
 
 
