@@ -74,7 +74,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
         vec xtolcalc = xnext;
         
         // Reassemble only the non-constant matrices:
-        bool isfirstcall = (K.getpointer() == NULL);
+        bool isfirstcall = not(K.isdefined());
         if (isconstant[1] == false || isfirstcall)
         {
             myformulation.generatestiffnessmatrix();

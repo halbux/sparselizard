@@ -47,6 +47,8 @@ class mat
         // Create a matrix with structure based on a formulation and with initial values:
         mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
      
+        bool isdefined(void) { return (rawmatptr != NULL); };
+         
         long long int countrows(void);
         long long int countcolumns(void);
         

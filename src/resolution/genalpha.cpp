@@ -89,7 +89,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
         vec utolcalc = unext;
         
         // Reassemble only the non-constant matrices:
-        bool isfirstcall = (K.getpointer() == NULL);
+        bool isfirstcall = not(K.isdefined());
         if (isconstant[1] == false || isfirstcall)
         {
             myformulation.generatestiffnessmatrix();
