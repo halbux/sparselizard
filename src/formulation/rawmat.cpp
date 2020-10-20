@@ -19,10 +19,17 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input)
 }
         
 rawmat::~rawmat(void) 
-{ 
-    MatDestroy(&mymat);
-    if (ludefined) 
-        KSPDestroy(&myksp);
+{
+    // Avoid crashes when destroy is called after PetscFinalize (not allowed).
+    PetscBool ispetscinitialized;
+    PetscInitialized(&ispetscinitialized);
+
+    if (ispetscinitialized == PETSC_TRUE)
+    {
+        MatDestroy(&mymat);
+        if (ludefined) 
+            KSPDestroy(&myksp);
+    }
 }
 
 long long int rawmat::countrows(void) 
