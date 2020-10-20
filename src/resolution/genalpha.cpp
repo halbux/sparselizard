@@ -1,10 +1,9 @@
 #include "genalpha.h"
 
-genalpha::genalpha(formulation formul, vec initdisplacement, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant)
+genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant)
 {
     myformulation = formul;
     
-    u = initdisplacement;
     v = initspeed;
     a = initacceleration;
     
@@ -14,7 +13,7 @@ genalpha::genalpha(formulation formul, vec initdisplacement, vec initspeed, vec 
         isconstant = isrhskcmconstant;
     if (isconstant.size() != 4)
     {
-        std::cout << "Error in 'genalpha' object: expected a length 4 or empty vector as fifth argument" << std::endl;
+        std::cout << "Error in 'genalpha' object: expected a length 4 or empty vector as fourth argument" << std::endl;
         abort();  
     }
 }
@@ -33,14 +32,14 @@ void genalpha::setparameter(double rinf)
     gamma = 0.5-alpham+alphaf;
 }
 
-void genalpha::setsolution(std::vector<vec> sol)
+void genalpha::settimederivative(std::vector<vec> sol)
 {
-    if (sol.size() != 3)
+    if (sol.size() != 2)
     {
-        std::cout << "Error in 'genalpha' object: expected a vector of length three to set the solution" << std::endl;
+        std::cout << "Error in 'genalpha' object: expected a vector of length two to set the time derivatives" << std::endl;
         abort();  
     }
-    u = sol[0]; v = sol[1]; a = sol[2];
+    v = sol[0]; a = sol[1];
 }
 
 void genalpha::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
@@ -70,10 +69,11 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
         std::cout << "@" << universe::currenttimestep << "s" << spacer << std::flush;
 
     // Make all time derivatives available in the universe:
-    universe::xdtxdtdtx = {{u},{v},{a}};
+    universe::xdtxdtdtx = {{},{v},{a}};
         
-    // Set all fields in the formulation to the initial displacement:
-    mathop::setdata(u);
+    // Get the data from all fields to create the u vector:
+    vec u(myformulation);
+    u.setdata();
     
     // Nonlinear loop:
     double relchange = 1; int nlit = 0;
@@ -84,7 +84,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
         mathop::solve(tosolvebefore);
 
         // Make all time derivatives available in the universe:
-        universe::xdtxdtdtx = {{unext},{vnext},{anext}};
+        universe::xdtxdtdtx = {{},{vnext},{anext}};
     
         vec utolcalc = unext;
         
@@ -169,7 +169,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
             break;
     }
 
-    u = unext; v = vnext; a = anext;
+    v = vnext; a = anext;
     
     if (verbosity > 1 && islinear == false)
         std::cout << " (" << nlit << "NL it) " << std::flush;

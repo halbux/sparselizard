@@ -53,8 +53,8 @@ class genalpha
         // Current timestep:
         double dt = -1;
         
-        // The displacement u, speed v and acceleration a at the current time step:
-        vec u, v, a;
+        // The speed v and acceleration a at the current time step:
+        vec v, a;
         
         // Objects required at every timestep (possibly reused):
         vec rhs; mat K, C, M, leftmat, matu, matv, mata;
@@ -65,7 +65,7 @@ class genalpha
         
     public:
     
-        genalpha(formulation formul, vec initdisplacement, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant = {false, false, false, false});
+        genalpha(formulation formul, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant = {false, false, false, false});
         
         // Manually specify all four parameters:
         void setparameter(double b, double g, double af, double am) { beta = b; gamma = g; alphaf = af; alpham = am; };
@@ -75,8 +75,8 @@ class genalpha
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
         
-        std::vector<vec> getsolution(void) { return {u, v, a}; };
-        void setsolution(std::vector<vec> sol);
+        std::vector<vec> gettimederivative(void) { return {v, a}; };
+        void settimederivative(std::vector<vec> sol);
         
         // Get the timestep:
         double gettimestep(void) { return dt; };

@@ -1,10 +1,9 @@
 #include "impliciteuler.h"
 
-impliciteuler::impliciteuler(formulation formul, vec xinit, vec dtxinit, std::vector<bool> isrhskcconstant)
+impliciteuler::impliciteuler(formulation formul, vec dtxinit, std::vector<bool> isrhskcconstant)
 {
     myformulation = formul;
     
-    x = xinit;
     dtx = dtxinit;
     
     if (isrhskcconstant.size() == 0)
@@ -13,19 +12,14 @@ impliciteuler::impliciteuler(formulation formul, vec xinit, vec dtxinit, std::ve
         isconstant = isrhskcconstant;
     if (isconstant.size() != 3)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a length 3 or empty vector as fourth argument" << std::endl;
+        std::cout << "Error in 'impliciteuler' object: expected a length 3 or empty vector as third argument" << std::endl;
         abort();  
     }
 }
 
-void impliciteuler::setsolution(std::vector<vec> sol)
+void impliciteuler::settimederivative(vec sol)
 {
-    if (sol.size() != 2)
-    {
-        std::cout << "Error in 'impliciteuler' object: expected a vector of length two to set the solution" << std::endl;
-        abort();  
-    }
-    x = sol[0]; dtx = sol[1];
+    dtx = sol;
 }
 
 void impliciteuler::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
@@ -55,10 +49,11 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
         std::cout << "@" << universe::currenttimestep << "s" << spacer << std::flush;
     
     // Make all time derivatives available in the universe:
-    universe::xdtxdtdtx = {{x},{dtx},{}};
+    universe::xdtxdtdtx = {{},{dtx},{}};
         
-    // Set all fields in the formulation to the initial solution:
-    mathop::setdata(x);
+    // Get the data from all fields to create the x vector:
+    vec x(myformulation);
+    x.setdata();
     
     // Nonlinear loop:
     double relchange = 1; int nlit = 0;
@@ -69,7 +64,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
         mathop::solve(tosolvebefore);
 
         // Make all time derivatives available in the universe:
-        universe::xdtxdtdtx = {{xnext},{dtxnext},{}};
+        universe::xdtxdtdtx = {{},{dtxnext},{}};
         
         vec xtolcalc = xnext;
         
@@ -124,7 +119,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
             break;
     }
     
-    x = xnext; dtx = dtxnext;
+    dtx = dtxnext;
     
     if (verbosity > 1 && islinear == false)
         std::cout << " (" << nlit << "NL it) " << std::flush;

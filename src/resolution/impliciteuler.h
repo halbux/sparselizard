@@ -50,8 +50,8 @@ class impliciteuler
         // Current timestep:
         double dt = -1;
         
-        // Vector x and dt(x) at the current time step:
-        vec x, dtx;
+        // Vector dt(x) at the current time step:
+        vec dtx;
         
         // Objects required at every timestep (possibly reused):
         vec rhs; mat K, C, leftmat;
@@ -62,7 +62,7 @@ class impliciteuler
         
     public:
 
-        impliciteuler(formulation formul, vec xinit, vec dtxinit, std::vector<bool> isrhskcconstant = {false, false, false});
+        impliciteuler(formulation formul, vec dtxinit, std::vector<bool> isrhskcconstant = {false, false, false});
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { tol = newtol; };
@@ -70,8 +70,8 @@ class impliciteuler
         // Set the relaxation factor for the inner nonlinear fixed-point iteration:
         void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };
         
-        std::vector<vec> getsolution(void) { return {x, dtx}; };
-        void setsolution(std::vector<vec> sol);
+        vec gettimederivative(void) { return dtx; };
+        void settimederivative(vec sol);
         
         // Get the timestep:
         double gettimestep(void) { return dt; };
