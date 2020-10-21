@@ -62,9 +62,6 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
     {
         // Solve all formulations that must be solved at the beginning of the nonlinear loop:
         mathop::solve(tosolvebefore);
-
-        // Make all time derivatives available in the universe:
-        universe::xdtxdtdtx = {{},{dtxnext},{}};
         
         vec xtolcalc = xnext;
         
@@ -114,6 +111,9 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
         
         // Solve all formulations that must be solved at the end of the nonlinear loop:
         mathop::solve(tosolveafter);
+        
+        // Make all time derivatives available in the universe:
+        universe::xdtxdtdtx = {{},{dtxnext},{}};
         
         if (islinear)
             break;

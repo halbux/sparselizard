@@ -82,9 +82,6 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
     {
         // Solve all formulations that must be solved at the beginning of the nonlinear loop:
         mathop::solve(tosolvebefore);
-
-        // Make all time derivatives available in the universe:
-        universe::xdtxdtdtx = {{},{vnext},{anext}};
     
         vec utolcalc = unext;
         
@@ -164,6 +161,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
 
         // Solve all formulations that must be solved at the end of the nonlinear loop:
         mathop::solve(tosolveafter);
+        
+        // Make all time derivatives available in the universe:
+        universe::xdtxdtdtx = {{},{vnext},{anext}};
         
         if (islinear)
             break;
