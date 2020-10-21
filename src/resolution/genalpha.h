@@ -31,7 +31,7 @@ class genalpha
         double beta = 0.25, gamma = 0.5, alphaf = 0.0, alpham = 0.0;
         
         // The convergence tolerance for the fixed-point nonlinear iteration:
-        double tol = 1e-3;
+        double nltol = 1e-3;
         
         // Set 'isconstant[i]' to true and the corresponding matrix/vector is 
         // supposed constant in time and will only be generated once then reused.
@@ -73,7 +73,7 @@ class genalpha
         void setparameter(double rinf);
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
-        void settolerance(double newtol) { tol = newtol; };
+        void settolerance(double newtol) { nltol = newtol; };
         
         std::vector<vec> gettimederivative(void) { return {v, a}; };
         void settimederivative(std::vector<vec> sol);

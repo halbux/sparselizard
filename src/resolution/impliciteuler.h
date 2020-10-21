@@ -26,7 +26,7 @@ class impliciteuler
         formulation myformulation;
         
         // The convergence tolerance for the fixed-point nonlinear iteration:
-        double tol = 1e-3;
+        double nltol = 1e-3;
         
         // The relaxation factor for the nonlinear iteration:
         double relaxationfactor = 1.0;
@@ -65,7 +65,7 @@ class impliciteuler
         impliciteuler(formulation formul, vec dtxinit, std::vector<bool> isrhskcconstant = {false, false, false});
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
-        void settolerance(double newtol) { tol = newtol; };
+        void settolerance(double newtol) { nltol = newtol; };
         
         // Set the relaxation factor for the inner nonlinear fixed-point iteration:
         void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };

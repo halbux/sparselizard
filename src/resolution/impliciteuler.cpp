@@ -58,7 +58,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
     // Nonlinear loop:
     double relchange = 1; int nlit = 0;
     vec xnext = x, dtxnext = dtx;
-    while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
+    while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
     {
         // Solve all formulations that must be solved at the beginning of the nonlinear loop:
         mathop::solve(tosolvebefore);
