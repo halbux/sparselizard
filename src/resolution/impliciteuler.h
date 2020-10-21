@@ -73,9 +73,6 @@ class impliciteuler
         vec gettimederivative(void) { return dtx; };
         void settimederivative(vec sol);
         
-        // Get the timestep:
-        double gettimestep(void) { return dt; };
-        
         // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
         void presolve(std::vector<formulation> formuls);
         void postsolve(std::vector<formulation> formuls);
