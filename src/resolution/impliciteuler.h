@@ -69,7 +69,7 @@ class impliciteuler
         void setverbosity(int verbosity) { myverbosity = verbosity; };
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
-        void settolerance(double newtol) { nltol = newtol; };
+        void settolerance(double tol) { nltol = tol; };
         
         // Set the relaxation factor for the inner nonlinear fixed-point iteration:
         void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };

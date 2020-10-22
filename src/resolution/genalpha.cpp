@@ -109,6 +109,22 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     else
         dt = timestep;
 
+    // Get the data from all fields to create the u vector:
+    vec u(myformulation);
+    u.setdata();
+    // Get the initial value of the fields in all other formulations to solve:
+    std::vector<vec> presols(tosolvebefore.size()), postsols(tosolveafter.size());
+    for (int i = 0; i < presols.size(); i++)
+    {
+        presols[i] = vec(tosolvebefore[i]);
+        presols[i].setdata();
+    }
+    for (int i = 0; i < postsols.size(); i++)
+    {
+        postsols[i] = vec(tosolveafter[i]);
+        postsols[i].setdata();
+    }
+
     // Time-adaptivity loop:
     int nlit;
     vec unext, vnext, anext;
@@ -126,10 +142,6 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     
         // Make all time derivatives available in the universe:
         universe::xdtxdtdtx = {{},{v},{a}};
-            
-        // Get the data from all fields to create the u vector:
-        vec u(myformulation);
-        u.setdata();
         
         // Nonlinear loop:
         double relchange = 1; nlit = 0;
@@ -248,6 +260,10 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 dt *= rfact;
                 // Reset fields for a new resolution:
                 mathop::setdata(u);
+                for (int i = 0; i < presols.size(); i++)
+                    mathop::setdata(presols[i]);
+                for (int i = 0; i < postsols.size(); i++)
+                    mathop::setdata(postsols[i]);
             }
                 
             dt = std::min(dt, maxdt);

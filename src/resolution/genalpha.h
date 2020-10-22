@@ -79,7 +79,7 @@ class genalpha
         void setparameter(double rinf);
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
-        void settolerance(double newtol) { nltol = newtol; };
+        void settolerance(double tol) { nltol = tol; };
         
         std::vector<vec> gettimederivative(void) { return {v, a}; };
         void settimederivative(std::vector<vec> sol);
