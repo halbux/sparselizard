@@ -119,8 +119,10 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
         char spacer = ':';
         if (islinear || myverbosity < 3)
             spacer = ' ';
-        if (myverbosity > 1)
+        if (myverbosity > 1 && istadapt)
             std::cout << "@" << inittime << "+" << dt << "s" << spacer << std::flush;
+        if (myverbosity > 1 && not(istadapt))
+            std::cout << "@" << inittime+dt << "s" << spacer << std::flush;
     
         // Make all time derivatives available in the universe:
         universe::xdtxdtdtx = {{},{v},{a}};
@@ -251,7 +253,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             dt = std::min(dt, maxdt);
             dt = std::max(dt, mindt);
 
-            if (myverbosity > 2)
+            if (istadapt && myverbosity > 2)
                 std::cout << "(" << errormeasure << ") " << std::flush;
             
             if (breakit)
