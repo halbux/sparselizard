@@ -1,7 +1,9 @@
 #include "impliciteuler.h"
 
-impliciteuler::impliciteuler(formulation formul, vec dtxinit, std::vector<bool> isrhskcconstant)
+impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std::vector<bool> isrhskcconstant)
 {
+    myverbosity = verbosity;
+
     myformulation = formul;
     
     dtx = dtxinit;
@@ -25,27 +27,25 @@ void impliciteuler::settimederivative(vec sol)
 void impliciteuler::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
 void impliciteuler::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
 
-void impliciteuler::runlinear(double timestep, int verbosity, bool autoadvancetime)
+void impliciteuler::runlinear(double timestep)
 {
-    run(true, timestep, -1, verbosity, autoadvancetime);
+    run(true, timestep, -1);
 }
 
-int impliciteuler::runnonlinear(double timestep, int maxnumnlit, int verbosity, bool autoadvancetime)
+int impliciteuler::runnonlinear(double timestep, int maxnumnlit)
 {
-    return run(false, timestep, maxnumnlit, verbosity, autoadvancetime);
+    return run(false, timestep, maxnumnlit);
 }
 
-int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime)
+int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
 {
-    double inittime = universe::currenttimestep;
-
     dt = timestep;
     // Update and print the time:
     universe::currenttimestep += dt;
     char spacer = ':';
-    if (islinear || verbosity < 2)
+    if (islinear || myverbosity < 2)
         spacer = ' ';
-    if (verbosity > 0)
+    if (myverbosity > 0)
         std::cout << "@" << universe::currenttimestep << "s" << spacer << std::flush;
     
     // Make all time derivatives available in the universe:
@@ -104,7 +104,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
         
         relchange = (xnext-xtolcalc).norm()/xnext.norm();
         
-        if (islinear == false && verbosity > 1)
+        if (islinear == false && myverbosity > 1)
             std::cout << " " << relchange << std::flush;
 
         nlit++; 
@@ -121,11 +121,8 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit, int verbo
     
     dtx = dtxnext;
     
-    if (verbosity > 1 && islinear == false)
+    if (myverbosity > 1 && islinear == false)
         std::cout << " (" << nlit << "NL it) " << std::flush;
-    
-   if (autoadvancetime == false)
-        universe::currenttimestep = inittime;
     
     return nlit;
 }

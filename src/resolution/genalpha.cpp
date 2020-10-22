@@ -1,7 +1,9 @@
 #include "genalpha.h"
 
-genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant)
+genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int verbosity, std::vector<bool> isrhskcmconstant)
 {
+    myverbosity = verbosity;
+
     myformulation = formul;
     
     v = initspeed;
@@ -76,17 +78,17 @@ void genalpha::setadaptivity(double tol, double mints, double maxts, double reff
 void genalpha::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
 void genalpha::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
         
-void genalpha::runlinear(double timestep, int verbosity, bool autoadvancetime)
+void genalpha::runlinear(double timestep)
 {
-    run(true, timestep, -1, verbosity, autoadvancetime);
+    run(true, timestep, -1);
 }
 
-int genalpha::runnonlinear(double timestep, int maxnumnlit, int verbosity, bool autoadvancetime)
+int genalpha::runnonlinear(double timestep, int maxnumnlit)
 {
-    return run(false, timestep, maxnumnlit, verbosity, autoadvancetime);
+    return run(false, timestep, maxnumnlit);
 }
 
-int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime)
+int genalpha::run(bool islinear, double timestep, int maxnumnlit)
 {
     if (timestep < 0 && mindt == -1)
     {
@@ -106,20 +108,20 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
     }
     else
         dt = timestep;
-        
-    // Update and print the time:
-    universe::currenttimestep += dt;
-    char spacer = ':';
-    if (islinear || verbosity < 2)
-        spacer = ' ';
-    if (verbosity > 0)
-        std::cout << "@" << universe::currenttimestep << "s" << spacer << std::flush;
 
     // Time-adaptivity loop:
     int nlit;
     vec unext, vnext, anext;
     while (true)
     {
+        // Update and print the time:
+        universe::currenttimestep = inittime+dt;
+        char spacer = ':';
+        if (islinear || myverbosity < 3)
+            spacer = ' ';
+        if (myverbosity > 1)
+            std::cout << "@" << inittime << "+" << dt << "s" << spacer << std::flush;
+    
         // Make all time derivatives available in the universe:
         universe::xdtxdtdtx = {{},{v},{a}};
             
@@ -206,7 +208,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
-            if (islinear == false && verbosity > 1)
+            if (islinear == false && myverbosity > 2)
                 std::cout << " " << relchange << std::flush;
 
             nlit++; 
@@ -221,6 +223,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
                 break;
         }
         
+        if (myverbosity > 2 && islinear == false)
+            std::cout << " (" << nlit << "NL it) " << std::flush;
+        
         if (istadapt == false)
             break;
         else
@@ -229,7 +234,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
             double errormeasure = (u+dt*vnext - unext).norm()/unext.norm();
 
             bool breakit = false;
-            if ((islinear || nlit < maxnumnlit) && (errormeasure <= tatol || dt <= mindt))
+            if ((islinear || maxnumnlit <= 0 || nlit < maxnumnlit) && (errormeasure <= tatol || dt <= mindt))
             {
                 // If the error is low enough to coarsen the timestep:
                 if (errormeasure <= cthres*tatol)
@@ -246,27 +251,19 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit, int verbosity,
             dt = std::min(dt, maxdt);
             dt = std::max(dt, mindt);
 
-            std::string str = " ";
-            if (islinear)
-                str = "";
-            if (verbosity == 1)
-                std::cout << str << "(dt " << dt << ") " << std::flush;
-            if (verbosity > 1)
-                std::cout << str << "(dt " << dt << " -> " << errormeasure << ") " << std::flush;
+            if (myverbosity > 2)
+                std::cout << "(" << errormeasure << ") " << std::flush;
             
             if (breakit)
                 break;
         }
     }
+    
+    if (myverbosity == 1)
+        std::cout << "@" << inittime+dt << "s " << std::flush;
 
     v = vnext; a = anext;
     
-    if (verbosity > 1 && islinear == false)
-        std::cout << " (" << nlit << "NL it) " << std::flush;
-    
-    if (autoadvancetime == false)
-        universe::currenttimestep = inittime;
-        
     return nlit;
 }
 

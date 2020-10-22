@@ -25,6 +25,8 @@ class genalpha
 {
     private:
         
+        int myverbosity = 1;
+        
         formulation myformulation;
         
         // The four parameters for generalized alpha (set to unconditionally stable Newmark by default):
@@ -63,11 +65,13 @@ class genalpha
         // Parameters for which these objects are defined:
         double defbeta = -1, defgamma = -1, defalphaf = -1, defalpham = -1, defdt = -1;
         
-        int run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime);
+        int run(bool islinear, double timestep, int maxnumnlit);
         
     public:
     
-        genalpha(formulation formul, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant = {false, false, false, false});
+        genalpha(formulation formul, vec initspeed, vec initacceleration, int verbosity = 3, std::vector<bool> isrhskcmconstant = {false, false, false, false});
+    
+        void setverbosity(int verbosity) { myverbosity = verbosity; };
         
         // Manually specify all four parameters:
         void setparameter(double b, double g, double af, double am) { beta = b; gamma = g; alphaf = af; alpham = am; };
@@ -91,9 +95,9 @@ class genalpha
         void postsolve(std::vector<formulation> formuls);
         
         // Advance the solution by the provided timestep.
-        void runlinear(double timestep, int verbosity = 1, bool autoadvancetime = true);
+        void runlinear(double timestep = -1);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        int runnonlinear(double timestep, int maxnumnlit = -1, int verbosity = 2, bool autoadvancetime = true);
+        int runnonlinear(double timestep = -1, int maxnumnlit = -1);
         
 };
 

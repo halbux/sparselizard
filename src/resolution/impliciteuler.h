@@ -23,6 +23,8 @@ class impliciteuler
 {
     private:
         
+        int myverbosity = 1;
+        
         formulation myformulation;
         
         // The convergence tolerance for the fixed-point nonlinear iteration:
@@ -58,11 +60,13 @@ class impliciteuler
         // Parameters for which these objects are defined:
         double defdt = -1;
         
-        int run(bool islinear, double timestep, int maxnumnlit, int verbosity, bool autoadvancetime);
+        int run(bool islinear, double timestep, int maxnumnlit);
         
     public:
 
-        impliciteuler(formulation formul, vec dtxinit, std::vector<bool> isrhskcconstant = {false, false, false});
+        impliciteuler(formulation formul, vec dtxinit, int verbosity = 1, std::vector<bool> isrhskcconstant = {false, false, false});
+        
+        void setverbosity(int verbosity) { myverbosity = verbosity; };
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double newtol) { nltol = newtol; };
@@ -78,9 +82,9 @@ class impliciteuler
         void postsolve(std::vector<formulation> formuls);
         
         // Advance the solution by the provided timestep.
-        void runlinear(double timestep, int verbosity = 1, bool autoadvancetime = true);
+        void runlinear(double timestep);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        int runnonlinear(double timestep, int maxnumnlit = -1, int verbosity = 2, bool autoadvancetime = true);
+        int runnonlinear(double timestep, int maxnumnlit = -1);
         
 };
 
