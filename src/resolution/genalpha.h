@@ -56,6 +56,7 @@ class genalpha
         double dt = -1;
         // Time-adaptivity settings:
         double mindt = -1, maxdt = -1, tatol = -1, rfact = -1, cfact = -1, cthres = -1;
+        int myerrormeasureid = -1;
         
         // The speed v and acceleration a at the current time step:
         vec v, a;
@@ -88,7 +89,7 @@ class genalpha
         double gettimestep(void) { return dt; };
         
         // Set the time-adaptivity settings:
-        void setadaptivity(double tol, double mints, double maxts, double reffact = 0.5, double coarfact = 2.0, double coarthres = 0.5);
+        void setadaptivity(double tol, double mints, double maxts, double reffact = 0.5, double coarfact = 2.0, double coarthres = 0.5, int errormeasure = 1);
         
         // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
         void presolve(std::vector<formulation> formuls);

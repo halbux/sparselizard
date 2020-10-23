@@ -44,7 +44,7 @@ void genalpha::settimederivative(std::vector<vec> sol)
     v = sol[0]; a = sol[1];
 }
 
-void genalpha::setadaptivity(double tol, double mints, double maxts, double reffact, double coarfact, double coarthres)
+void genalpha::setadaptivity(double tol, double mints, double maxts, double reffact, double coarfact, double coarthres, int errormeasureid)
 {
     if (tol < 0 || mints < 0 || maxts < 0 || reffact < 0 || coarfact < 0 || coarthres < 0)
     {
@@ -71,8 +71,14 @@ void genalpha::setadaptivity(double tol, double mints, double maxts, double reff
         std::cout << "Error in 'genalpha' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
         abort();        
     }
+    
+    if (errormeasureid < 0 || errormeasureid > 1)
+    {
+        std::cout << "Error in 'genalpha' object: unknown error measure id " << errormeasureid << std::endl;
+        abort();        
+    }
 
-    mindt = mints; maxdt = maxts; tatol = tol; rfact = reffact; cfact = coarfact; cthres = coarthres;
+    mindt = mints; maxdt = maxts; tatol = tol; rfact = reffact; cfact = coarfact; cthres = coarthres; myerrormeasureid = errormeasureid;
 }
 
 void genalpha::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
@@ -244,8 +250,13 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             break;
         else
         {
+            double errormeasure;
+            // Deviation from constant v to measure the error:
+            if (myerrormeasureid == 0)
+                errormeasure = dt*(vnext - v).norm()/unext.norm();
             // Comparison with order 1 to measure the error:
-            double errormeasure = (u+dt*vnext - unext).norm()/unext.norm();
+            if (myerrormeasureid == 1)
+                errormeasure = (u+dt*vnext - unext).norm()/unext.norm();
 
             bool breakit = false;
             if (dt <= mindt || errormeasure <= tatol && (islinear || maxnumnlit <= 0 || nlit < maxnumnlit))
