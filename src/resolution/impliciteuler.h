@@ -51,6 +51,8 @@ class impliciteuler
         
         // Current timestep:
         double dt = -1;
+        // Time-adaptivity settings:
+        double mindt = -1, maxdt = -1, tatol = -1, rfact = -1, cfact = -1, cthres = -1;
         
         // Vector dt(x) at the current time step:
         vec dtx;
@@ -64,7 +66,7 @@ class impliciteuler
         
     public:
 
-        impliciteuler(formulation formul, vec dtxinit, int verbosity = 1, std::vector<bool> isrhskcconstant = {false, false, false});
+        impliciteuler(formulation formul, vec dtxinit, int verbosity = 3, std::vector<bool> isrhskcconstant = {false, false, false});
         
         void setverbosity(int verbosity) { myverbosity = verbosity; };
         
@@ -77,14 +79,20 @@ class impliciteuler
         vec gettimederivative(void) { return dtx; };
         void settimederivative(vec sol);
         
+        void settimestep(double timestep) { dt = timestep; };
+        double gettimestep(void) { return dt; };
+
+        // Set the time-adaptivity settings:
+        void setadaptivity(double tol, double mints, double maxts, double reffact = 0.5, double coarfact = 2.0, double coarthres = 0.5);
+        
         // Define a list of formulations to solve at the beginning/end of the nonlinear loop:
         void presolve(std::vector<formulation> formuls);
         void postsolve(std::vector<formulation> formuls);
         
         // Advance the solution by the provided timestep.
-        void runlinear(double timestep);
+        void runlinear(double timestep = -1);
         // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        int runnonlinear(double timestep, int maxnumnlit = -1);
+        int runnonlinear(double timestep = -1, int maxnumnlit = -1);
         
 };
 
