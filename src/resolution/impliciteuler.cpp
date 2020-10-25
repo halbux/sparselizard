@@ -58,12 +58,12 @@ void impliciteuler::setadaptivity(double tol, double mints, double maxts, double
 void impliciteuler::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
 void impliciteuler::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
 
-void impliciteuler::runlinear(double timestep)
+void impliciteuler::next(double timestep)
 {
     run(true, timestep, -1);
 }
 
-int impliciteuler::runnonlinear(double timestep, int maxnumnlit)
+int impliciteuler::next(double timestep, int maxnumnlit)
 {
     return run(false, timestep, maxnumnlit);
 }

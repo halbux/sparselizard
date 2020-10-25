@@ -78,12 +78,12 @@ void genalpha::setadaptivity(double tol, double mints, double maxts, double reff
 void genalpha::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
 void genalpha::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
         
-void genalpha::runlinear(double timestep)
+void genalpha::next(double timestep)
 {
     run(true, timestep, -1);
 }
 
-int genalpha::runnonlinear(double timestep, int maxnumnlit)
+int genalpha::next(double timestep, int maxnumnlit)
 {
     return run(false, timestep, maxnumnlit);
 }

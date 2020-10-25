@@ -89,10 +89,9 @@ class impliciteuler
         void presolve(std::vector<formulation> formuls);
         void postsolve(std::vector<formulation> formuls);
         
-        // Advance the solution by the provided timestep.
-        void runlinear(double timestep = -1);
-        // Set 'maxnumnlit' to <= 0 for an unlimited number of nonlinear iterations.
-        int runnonlinear(double timestep = -1, int maxnumnlit = -1);
+        // Advance the solution by the provided timestep for a linear/nonlinear problem.
+        void next(double timestep);
+        int next(double timestep, int maxnumnlit);
         
 };
 
