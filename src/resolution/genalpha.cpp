@@ -130,8 +130,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     vec unext, vnext, anext;
     while (true)
     {
-        // Update and print the time:
-        universe::currenttimestep = inittime+dt;
+        // Print the time:
         char spacer = ':';
         if (islinear || myverbosity < 3)
             spacer = ' ';
@@ -148,6 +147,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
         unext = u; vnext = v; anext = a;
         while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
+            double t = inittime+dt;
+            universe::currenttimestep = t;
+            
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
             mathop::solve(tosolvebefore);
         
@@ -155,6 +157,15 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             
             // Reassemble only the non-constant matrices:
             bool isfirstcall = not(K.isdefined());
+            
+            universe::currenttimestep = t-alphaf*dt;
+            if (isconstant[0] == false || isfirstcall)
+            {
+                myformulation.generaterhs();
+                rhs = myformulation.rhs();
+            }
+            else
+                rhs.updateconstraints();
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
@@ -165,18 +176,13 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 myformulation.generatedampingmatrix();
                 C = myformulation.C(false, true);
             }
+            universe::currenttimestep = t-alpham*dt;
             if (isconstant[3] == false || isfirstcall)
             {
                 myformulation.generatemassmatrix();
                 M = myformulation.M(false, false);
             }
-            if (isconstant[0] == false || isfirstcall)
-            {
-                myformulation.generaterhs();
-                rhs = myformulation.rhs();
-            }
-            else
-                rhs.updateconstraints();
+            universe::currenttimestep = t;
             
             // Reuse matrices when possible (including the factorization):
             if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || isfirstcall || defdt != dt || defbeta != beta || defgamma != gamma || defalphaf != alphaf || defalpham != alpham)

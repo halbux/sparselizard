@@ -135,6 +135,13 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             
             // Reassemble only the non-constant matrices:
             bool isfirstcall = not(K.isdefined());
+            if (isconstant[0] == false || isfirstcall)
+            {
+                myformulation.generaterhs();
+                rhs = myformulation.rhs();
+            }
+            else
+                rhs.updateconstraints();
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
@@ -145,13 +152,6 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
                 myformulation.generatedampingmatrix();
                 C = myformulation.C(false, true);
             }
-            if (isconstant[0] == false || isfirstcall)
-            {
-                myformulation.generaterhs();
-                rhs = myformulation.rhs();
-            }
-            else
-                rhs.updateconstraints();
             
             // Reuse matrices when possible (including the factorization):
             if (isconstant[1] == false || isconstant[2] == false || isfirstcall || defdt != dt)
