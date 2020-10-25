@@ -229,11 +229,11 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     
     if (myverbosity == 1)
         std::cout << "@" << inittime+dt << "s " << std::flush;
-    
-    dtx = dtxnext;
-    
     if (myverbosity > 1 && islinear == false)
         std::cout << " (" << nlit << "NL it) " << std::flush;
+    
+    dtx = dtxnext;
+    mytimes.push_back(universe::currenttimestep);
     
     return nlit;
 }

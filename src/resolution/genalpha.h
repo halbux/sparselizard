@@ -54,6 +54,9 @@ class genalpha
         
         // Current timestep:
         double dt = -1;
+        // All time values stepped-through:
+        std::vector<double> mytimes = {};
+        
         // Time-adaptivity settings:
         double mindt = -1, maxdt = -1, tatol = -1, rfact = -1, cfact = -1, cthres = -1;
         
@@ -86,6 +89,10 @@ class genalpha
         
         void settimestep(double timestep) { dt = timestep; };
         double gettimestep(void) { return dt; };
+        
+        // Count the number of timesteps computed:
+        int count(void) { return mytimes.size(); };
+        std::vector<double> gettimes(void) { return mytimes; };
         
         // Set the time-adaptivity settings:
         void setadaptivity(double tol, double mints, double maxts, double reffact = 0.5, double coarfact = 2.0, double coarthres = 0.5);
