@@ -5,6 +5,11 @@ impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std
     myverbosity = verbosity;
 
     myformulation = formul;
+    if (myformulation.ismassmatrixdefined())
+    {
+        std::cout << "Error in 'impliciteuler' object: formulation provided cannot have a mass matrix (use another time resolution algorithm)" << std::endl;
+        abort();  
+    }
     
     dtx = dtxinit;
     
