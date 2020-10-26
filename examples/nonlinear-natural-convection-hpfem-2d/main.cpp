@@ -128,39 +128,26 @@ void sparselizard(void)
 	//zero flux BC
 	convec+=integral(fluid,-(-kappa*grad(dof(T)))* normal(fluidskin) *tf(T,zflux));  // WHAT? normal --> elements devraient etre une boundary! pas fluid FIXME
 	    
-	vec init(convec), dtinit(convec);
-	
-	//initial state - if starting from 0 only
-	//T=0 around the disk - mandatory
+    // Initial state: Tc on disk, 0 on fluid and 0 dt(T):
 	T.setvalue(fluid);
-	init.setdata(fluid,T);
-	init.setdata(fluid,p);
-	init.setdata(fluid,v);
+	vec dtinit(convec);
 	
-	
-	// implicite Euler for time resolution 
-    // initiation with the init and dtinit vectors
-	// the falses is for not reusing any computed matrices - Non linearity
-    impliciteuler eul(convec, init, dtinit, {false,false,false});
+	// implicit Euler for time resolution 
+    // initiation with the dtinit vector
+    impliciteuler eul(convec, dtinit);
 	//set solver parameters
 	eul.settolerance(1e-3);
 	eul.setrelaxationfactor(.55);
-	
-	//save initial 0 state
-	v.write(fluid, "v1000.vtu",2);		
-	p.write(fluid, "p1000.vtu",2);
-	T.write(fluid, "T1000.vtu",2); 
 	
 	// Time step and number of time steps:
 	double ts = 0.01;
 	int nts = 1000;
 			
+	settime(0);
 	for (int i = 0; i < nts; i++)
 	{
 		// Call the nonlinear solver and save the vector of solution
-		vec sol = eul.runnonlinear(ts*i, ts, ts*(i+1), 20)[0][0];
-
-	    setdata(sol);
+		eul.next(ts, 20);
 
 		v.write(fluid, "v"+std::to_string(1000 + i)+".vtu", 3);		
 		p.write(fluid, "p"+std::to_string(1000 + i)+".vtu", 3);
@@ -171,7 +158,7 @@ void sparselizard(void)
 	    
 	    double maxcrit = criterion.max(fluid, 1)[0];
 	    
-		std::cout<< "@" << i << " -----------------------------------------------> " << maxcrit << " (#dofs is " << sol.size() << ")" << std::endl;
+		std::cout << std::endl << "@" << i << " -----------------------------------------------> " << maxcrit << " (#dofs is " << convec.countdofs() << ")" << std::endl;
 		
 	    adapt(1);
 	}

@@ -68,6 +68,8 @@ class vec
         // Only the data corresponding to the physical region is transferred.
         // 'op' can be 'add' or 'set'.
         void setdata(int physreg, field myfield, std::string op = "set");
+        // Transfer data from all fields to this vector.
+        void setdata(void);
         
         // Allow/forbid automatic updating of the vec value during hp-adaptivity:
         void automaticupdate(bool updateit);

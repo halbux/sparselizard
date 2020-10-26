@@ -73,7 +73,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             std::vector<std::string> messtr = {"","dt","dtdt"};
             std::cout << "Error in 'opfield' object: the " << messtr[timederivativeorder] << "(";
             myfield->print();
-            std::cout << ") value was not made available by a time resolution" << std::endl;
+            std::cout << ") value was not made available by a time resolution or by a call to 'settimederivative'" << std::endl;
             abort();
         }
         cmbkp = myfield->harmonic(1)->resetcoefmanager();

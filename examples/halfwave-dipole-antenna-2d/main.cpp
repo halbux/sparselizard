@@ -86,9 +86,8 @@ void sparselizard(void)
     
     // Write the Poynting vector E x H.
     expression S = crossproduct(E, H);
-    // This involves a product that makes new harmonics appear at 2x1GHz (harmonics 4 and 5) plus a 
-    // constant component (harmonic 1). An FFT is thus required (performed on 6 timesteps below):
-    S.write(wholedomain, 6, "S.pos", 2);
+    // This involves a product that makes new harmonics appear at 2x1GHz (harmonics 4 and 5) plus a constant component (harmonic 1).
+    S.write(wholedomain, "S.pos", 2);
     // Also save in time at 50 timesteps of a period:
     S.write(wholedomain, "S.pos", 2, 50);
     

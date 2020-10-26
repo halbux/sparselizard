@@ -96,7 +96,15 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
     }
 }
 
-rawvec::~rawvec(void) { VecDestroy(&myvec); }
+rawvec::~rawvec(void)
+{
+    // Avoid crashes when destroy is called after PetscFinalize (not allowed).
+    PetscBool ispetscinitialized;
+    PetscInitialized(&ispetscinitialized);
+
+    if (ispetscinitialized == PETSC_TRUE)
+        VecDestroy(&myvec);
+}
 
 void rawvec::allowvaluesynchronizing(bool allowit)
 {

@@ -111,6 +111,21 @@ int formulation::countdofs(void)
     return mydofmanager->countdofs(); 
 }
 
+bool formulation::isstiffnessmatrixdefined(void)
+{
+    return (mycontributions[1].size() != 0);
+}
+
+bool formulation::isdampingmatrixdefined(void)
+{
+    return (mycontributions[2].size() != 0);
+}
+
+bool formulation::ismassmatrixdefined(void)
+{
+    return (mycontributions[3].size() != 0);
+}
+
 void formulation::generate(int m, int contributionnumber)
 {
     isstructurelocked = true;

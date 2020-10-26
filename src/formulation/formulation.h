@@ -67,6 +67,10 @@ class formulation
         
         int countdofs(void);
         
+        bool isstiffnessmatrixdefined(void);
+        bool isdampingmatrixdefined(void);
+        bool ismassmatrixdefined(void);
+        
         // Generate all blocks:
         void generate(void);
         // Generate all contributions of K, C, M or rhs:

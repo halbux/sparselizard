@@ -1,10 +1,11 @@
 #include "genalpha.h"
 
-genalpha::genalpha(formulation formul, vec initdisplacement, vec initspeed, vec initacceleration, std::vector<bool> isrhskcmconstant)
+genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int verbosity, std::vector<bool> isrhskcmconstant)
 {
+    myverbosity = verbosity;
+
     myformulation = formul;
     
-    u = initdisplacement;
     v = initspeed;
     a = initacceleration;
     
@@ -14,7 +15,7 @@ genalpha::genalpha(formulation formul, vec initdisplacement, vec initspeed, vec 
         isconstant = isrhskcmconstant;
     if (isconstant.size() != 4)
     {
-        std::cout << "Error in 'genalpha' object: expected a length 4 or empty vector as fifth argument" << std::endl;
+        std::cout << "Error in 'genalpha' object: expected a length 4 or empty vector as fourth argument" << std::endl;
         abort();  
     }
 }
@@ -33,108 +34,167 @@ void genalpha::setparameter(double rinf)
     gamma = 0.5-alpham+alphaf;
 }
 
+void genalpha::settimederivative(std::vector<vec> sol)
+{
+    if (sol.size() != 2)
+    {
+        std::cout << "Error in 'genalpha' object: expected a vector of length two to set the time derivatives" << std::endl;
+        abort();  
+    }
+    v = sol[0]; a = sol[1];
+}
+
+void genalpha::setadaptivity(double tol, double mints, double maxts, double reffact, double coarfact, double coarthres)
+{
+    if (tol < 0 || mints < 0 || maxts < 0 || reffact < 0 || coarfact < 0 || coarthres < 0)
+    {
+        std::cout << "Error in 'genalpha' object: expected positive arguments for adaptivity" << std::endl;
+        abort();  
+    }
+    if (mints > maxts)
+    {
+        std::cout << "Error in 'genalpha' object: min timestep cannot be larger than max for adaptivity" << std::endl;
+        abort();      
+    }
+    if (reffact > 1)
+    {
+        std::cout << "Error in 'genalpha' object: expected a refinement factor lower than one for adaptivity" << std::endl;
+        abort();      
+    }
+    if (coarfact < 1)
+    {
+        std::cout << "Error in 'genalpha' object: expected a coarsening factor larger than one for adaptivity" << std::endl;
+        abort();        
+    }
+    if (coarthres > 1)
+    {
+        std::cout << "Error in 'genalpha' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
+        abort();        
+    }
+
+    mindt = mints; maxdt = maxts; tatol = tol; rfact = reffact; cfact = coarfact; cthres = coarthres;
+}
+
 void genalpha::presolve(std::vector<formulation> formuls) { tosolvebefore = formuls; }
 void genalpha::postsolve(std::vector<formulation> formuls) { tosolveafter = formuls; }
         
-std::vector<std::vector<vec>> genalpha::runlinear(double starttime, double timestep, double endtime, int outputeverynthtimestep, int verbosity)
+void genalpha::next(double timestep)
 {
-    return run(true, starttime, timestep, endtime, -1, outputeverynthtimestep, verbosity);
+    run(true, timestep, -1);
 }
 
-std::vector<std::vector<vec>> genalpha::runnonlinear(double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+int genalpha::next(double timestep, int maxnumnlit)
 {
-    return run(false, starttime, timestep, endtime, maxnumnlit, outputeverynthtimestep, verbosity);
+    return run(false, timestep, maxnumnlit);
 }
 
-std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, double timestep, double endtime, int maxnumnlit, int outputeverynthtimestep, int verbosity)
+int genalpha::run(bool islinear, double timestep, int maxnumnlit)
 {
-    // Solve end time rounding issues:
-    endtime += endtime*1e-12;
-    
-    if (starttime > endtime)
-        return {};
-    
-    if (outputeverynthtimestep <= 0)
-        outputeverynthtimestep = 1;
-    
-    // Make all time derivatives available in the universe:
-    universe::xdtxdtdtx = {{u},{v},{a}};
-        
-    // Set all fields in the formulation to the initial displacement:
-    mathop::setdata(u);
-    
-    vec rhs; mat K, C, M, leftmat, matu, matv, mata;
-    
-    // Count the number of time steps to step through and the number of vectors to output:
-    int numtimesteps = 0; int outputsize = 0;
-    for (double t = starttime; t <= endtime; t = t + timestep)
+    if (timestep < 0 && mindt == -1)
     {
-        if (numtimesteps%outputeverynthtimestep == 0)
-            outputsize++;
-        numtimesteps++;
+        std::cout << "Error in 'genalpha' object: requested an adaptive timestep but adaptivity settings have not been defined" << std::endl;
+        abort();
     }
-    
-    
-    // Start the generalized alpha iteration:
-    std::cout << "Generalized alpha (b " << beta << ", g " << gamma << ", af " << alphaf << ", am " << alpham << ") for " << numtimesteps << " timesteps in range " << starttime << " to " << endtime << " sec:" << std::endl;
-    std::vector<std::vector<vec>> output(3, std::vector<vec>(outputsize));
-    output[0][0] = u; output[1][0] = v; output[2][0] = a;
-    
-    // We already have everything for time step 0 so we start at 1:
-    int timestepindex = 1;
-    for (double t = starttime + timestep; t <= endtime; t = t + timestep)
-    {        
-        std::cout << timestepindex << "@" << t << "sec" << std::flush;
 
-        mathop::settime(t-alphaf*timestep);
+    double inittime = universe::currenttimestep;
+
+    // Adaptive timestep:
+    bool istadapt = false;
+    if (timestep < 0)
+    {
+        istadapt = true;
+        if (dt < 0)
+            dt = maxdt;
+    }
+    else
+        dt = timestep;
+
+    // Get the data from all fields to create the u vector:
+    vec u(myformulation);
+    u.setdata();
+    // Get the initial value of the fields in all other formulations to solve:
+    std::vector<vec> presols(tosolvebefore.size()), postsols(tosolveafter.size());
+    for (int i = 0; i < presols.size(); i++)
+    {
+        presols[i] = vec(tosolvebefore[i]);
+        presols[i].setdata();
+    }
+    for (int i = 0; i < postsols.size(); i++)
+    {
+        postsols[i] = vec(tosolveafter[i]);
+        postsols[i].setdata();
+    }
+
+    // Time-adaptivity loop:
+    int nlit;
+    vec unext, vnext, anext;
+    while (true)
+    {
+        // Print the time:
+        char spacer = ':';
+        if (islinear || myverbosity < 3)
+            spacer = ' ';
+        if (myverbosity > 1 && istadapt)
+            std::cout << "@" << inittime << "+" << dt << "s" << spacer << std::flush;
+        if (myverbosity > 1 && not(istadapt))
+            std::cout << "@" << inittime+dt << "s" << spacer << std::flush;
+    
+        // Make all time derivatives available in the universe:
+        universe::xdtxdtdtx = {{},{v},{a}};
         
         // Nonlinear loop:
-        double relchange = 1; int nlit = 0;
-        vec unext = u, vnext = v, anext = a;
-        while (relchange > tol && (maxnumnlit <= 0 || nlit < maxnumnlit))
+        double relchange = 1; nlit = 0;
+        unext = u; vnext = v; anext = a;
+        while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
+            double t = inittime+dt;
+            universe::currenttimestep = t;
+            
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
             mathop::solve(tosolvebefore);
-
-
-            // Make all time derivatives available in the universe:
-            universe::xdtxdtdtx = {{unext},{vnext},{anext}};
         
             vec utolcalc = unext;
             
             // Reassemble only the non-constant matrices:
-            if (isconstant[1] == false || timestepindex == 1)
-            {
-                myformulation.generatestiffnessmatrix();
-                K = myformulation.K(false, true);
-            }
-            if (isconstant[2] == false || timestepindex == 1)
-            {
-                myformulation.generatedampingmatrix();
-                C = myformulation.C(false, true);
-            }
-            if (isconstant[3] == false || timestepindex == 1)
-            {
-                myformulation.generatemassmatrix();
-                M = myformulation.M(false, false);
-            }
-            if (isconstant[0] == false || timestepindex == 1)
+            bool isfirstcall = not(K.isdefined());
+            
+            universe::currenttimestep = t-alphaf*dt;
+            if (isconstant[0] == false || isfirstcall)
             {
                 myformulation.generaterhs();
                 rhs = myformulation.rhs();
             }
             else
                 rhs.updateconstraints();
+            if (isconstant[1] == false || isfirstcall)
+            {
+                myformulation.generatestiffnessmatrix();
+                K = myformulation.K(false, true);
+            }
+            if (isconstant[2] == false || isfirstcall)
+            {
+                myformulation.generatedampingmatrix();
+                C = myformulation.C(false, true);
+            }
+            universe::currenttimestep = t-alpham*dt;
+            if (isconstant[3] == false || isfirstcall)
+            {
+                myformulation.generatemassmatrix();
+                M = myformulation.M(false, false);
+            }
+            universe::currenttimestep = t;
             
             // Reuse matrices when possible (including the factorization):
-            if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || timestepindex == 1)
+            if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || isfirstcall || defdt != dt || defbeta != beta || defgamma != gamma || defalphaf != alphaf || defalpham != alpham)
             {
-                leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*timestep)*C + ((1.0-alphaf)*beta*timestep*timestep)*K;
+                leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*dt)*C + ((1.0-alphaf)*beta*dt*dt)*K;
                 leftmat.reusefactorization();
                 
                 matu = -K;
-                matv = ((alphaf-1.0)*timestep)*K-C;
-                mata = ((1.0-alphaf)*(gamma-1.0)*timestep)*C+((1.0-alphaf)*(beta-0.5)*timestep*timestep)*K - alpham*M;
+                matv = ((alphaf-1.0)*dt)*K-C;
+                mata = ((1.0-alphaf)*(gamma-1.0)*dt)*C+((1.0-alphaf)*(beta-0.5)*dt*dt)*K - alpham*M;
+                
+                defdt = dt; defbeta = beta; defgamma = gamma; defalphaf = alphaf; defalpham = alpham;
             }
             
             // Update the acceleration. 
@@ -144,7 +204,7 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             // displacement at the next time step:
             vec unextdirichlet(myformulation); 
             unextdirichlet.updateconstraints();
-            vec anextdirichlet = (1.0-alpham)/(beta*timestep*timestep)*( unextdirichlet-u - timestep*v - timestep*timestep*(0.5-beta)*a );
+            vec anextdirichlet = (1.0-alpham)/(beta*dt*dt)*( unextdirichlet-u - dt*v - dt*dt*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
             intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
             densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
@@ -160,50 +220,76 @@ std::vector<std::vector<vec>> genalpha::run(bool islinear, double starttime, dou
             anext = mathop::solve(leftmat, rightvec);
 
             // Update unext and vnext:
-            unext = u + timestep*v + ((0.5-beta)*timestep*timestep)*a + (beta*timestep*timestep)*anext;
-            vnext = v + (timestep*(1-gamma))*a + (gamma*timestep)*anext;
+            unext = u + dt*v + ((0.5-beta)*dt*dt)*a + (beta*dt*dt)*anext;
+            vnext = v + (dt*(1-gamma))*a + (gamma*dt)*anext;
             
             // Update all fields in the formulation:
             mathop::setdata(unext);
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
-            if (islinear == false && verbosity > 0)
+            if (islinear == false && myverbosity > 2)
                 std::cout << " " << relchange << std::flush;
 
             nlit++; 
 
-
             // Solve all formulations that must be solved at the end of the nonlinear loop:
             mathop::solve(tosolveafter);
             
+            // Make all time derivatives available in the universe:
+            universe::xdtxdtdtx = {{},{vnext},{anext}};
             
             if (islinear)
                 break;
         }
-
-        u = unext; v = vnext; a = anext;
         
-        if (islinear == false)
-            std::cout << " (" << nlit << "NL it)" << std::flush;
-        if (timestepindex < numtimesteps-1)
-        std::cout << " -> " << std::flush;
+        if (myverbosity > 2 && islinear == false)
+            std::cout << " (" << nlit << "NL it) " << std::flush;
         
-        // Only one every 'outputeverynthtimestep' solutions is output:
-        if (timestepindex%outputeverynthtimestep == 0)
+        if (istadapt == false)
+            break;
+        else
         {
-            output[0][timestepindex/outputeverynthtimestep] = u;
-            output[1][timestepindex/outputeverynthtimestep] = v;
-            output[2][timestepindex/outputeverynthtimestep] = a;
+            // Deviation from constant v to measure the error:
+            double errormeasure = dt*(vnext - v).norm()/unext.norm();
+
+            bool breakit = false;
+            if (dt <= mindt || errormeasure <= tatol && (islinear || maxnumnlit <= 0 || nlit < maxnumnlit))
+            {
+                // If the error is low enough to coarsen the timestep:
+                if (errormeasure <= cthres*tatol)
+                    dt *= cfact;
+                breakit = true;
+            }
+            else
+            {
+                dt *= rfact;
+                // Reset fields for a new resolution:
+                mathop::setdata(u);
+                for (int i = 0; i < presols.size(); i++)
+                    mathop::setdata(presols[i]);
+                for (int i = 0; i < postsols.size(); i++)
+                    mathop::setdata(postsols[i]);
+            }
+                
+            dt = std::min(dt, maxdt);
+            dt = std::max(dt, mindt);
+
+            if (istadapt && myverbosity > 2)
+                std::cout << "(" << errormeasure << ") " << std::flush;
+            
+            if (breakit)
+                break;
         }
-        timestepindex++;
     }
-    std::cout << std::endl;
     
-    // Remove all time derivatives from the universe:
-    universe::xdtxdtdtx = {{},{},{}};
+    if (myverbosity == 1)
+        std::cout << "@" << inittime+dt << "s " << std::flush;
+
+    v = vnext; a = anext;
+    mytimes.push_back(universe::currenttimestep);
     
-    return output;
+    return nlit;
 }
 
 

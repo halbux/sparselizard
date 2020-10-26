@@ -87,6 +87,15 @@ void vec::setdata(int physreg, field myfield, std::string op)
     vectorfieldselect(rawvecptr, myfield.getpointer()).setdata(physreg, myfield, op);
 }
 
+void vec::setdata(void)
+{
+    errorifpointerisnull();
+    
+    std::vector<std::shared_ptr<rawfield>> rfs = rawvecptr->getdofmanager()->getfields();
+    for (int i = 0; i < rfs.size(); i++)
+        rfs[i]->transferdata(-1, vectorfieldselect(rawvecptr, rfs[i]), "set");
+}
+
 void vec::automaticupdate(bool updateit)
 {
     errorifpointerisnull();
