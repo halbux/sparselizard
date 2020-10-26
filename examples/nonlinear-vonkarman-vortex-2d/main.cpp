@@ -50,20 +50,21 @@ void sparselizard(void)
     laminarflow += integral(fluid, predefinednavierstokes(dof(v), tf(v), v, dof(p), tf(p), mu, rho, 0, 0, true) );
     
     // Define the object for an implicit Euler time resolution.
-    // An all zero initial guess for the fields and their time derivative is set with 'vec(laminarflow)'.
-    impliciteuler eul(laminarflow, vec(laminarflow), vec(laminarflow));
+    // The initial field values are taken as the fields are.
+    // An all zero initial time derivative is set with 'vec(laminarflow)'.
+    impliciteuler eul(laminarflow, vec(laminarflow));
     // Set the relative tolerance on the inner nonlinear iteration:
     eul.settolerance(1e-4);
     
-    // Run from 0sec to 90sec by steps of 0.2sec:
-    std::vector<vec> sols = eul.runnonlinear(0, 0.2, 90)[0];
-    
-    for (int i = 0; i < sols.size(); i++)
+    // Run from 0 sec to 90 sec by steps of 0.2 sec (450 timesteps):
+    settime(0);
+    for (int i = 0; i < 450; i++)
     {
-        // Transfer the solution at the ith timestep to field v:
-        v.setdata(fluid, sols[i]);
-        // Write field v with an order 2 interpolation to ParaView .vtk format:
-        v.write(fluid, "v" + std::to_string(1000 + i) + ".vtk", 2);
+        // Compute one timestep with an unlimited number of nonlinear iterations (-1):
+        eul.next(0.2, -1);
+        
+        // Write field v with an order 2 interpolation to ParaView .vtu format:
+        v.write(fluid, "v" + std::to_string(1000 + i) + ".vtu", 2);
     }
 }
 

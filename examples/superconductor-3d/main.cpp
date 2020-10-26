@@ -109,41 +109,31 @@ void sparselizard(void)
     magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*grad(tf(v)), +1 );
     
     
-    // Start the implicit Euler time resolution with an all zero solution and time derivative:
-    vec initsol(magdyn), initdtsol(magdyn);
+    // Start the implicit Euler time resolution with the field values and a zero time derivative:
+    impliciteuler eul(magdyn, vec(magdyn));
     
-    impliciteuler eul(magdyn, initsol, initdtsol);
     // Tolerance on the nonlinear iteration:
     eul.settolerance(1e-3);
     // Relaxation factor for the nonlinear iteration (decrease to improve convergence):
     eul.setrelaxationfactor(0.5);
     
-    // Use a 5 seconds timestep:
+    // Use a 5 seconds timestep and run until 150 sec (30 timesteps):
+    int numsteps = 30;
     double timestep = 5.0;
-    // Run from 0 to 150 sec with a fixed-point nonlinear iteration at every timestep.
-    // Set the maximum number of nonlinear iterations to 25.
-    std::vector<std::vector<vec>> sols = eul.runnonlinear(0.0, timestep, 150.0, 25);
+    std::vector<double> bcenter(numsteps);
     
-    // Field a is available at every timestep in sols[0] and its time derivative in sols[1]:
-    std::vector<vec> asol = sols[0];
-    std::vector<vec> dtasol = sols[1];
-    
-    // Loop over all time solutions:
-    std::vector<double> bcenter(asol.size());
-    for (int i = 0; i < asol.size(); i++)
+    settime(0);
+    for (int i = 0; i < numsteps; i++)
     {
-        // Set variable t() to the time of the current timestep:
-        settime(timestep*i);
-        
-        // Make the data of vector asol[i] available in field a:
-        a.setdata(wholedomain, asol[i]);
+        // Use a fixed-point nonlinear iteration at every timestep (25 nl iterations max).
+        eul.next(timestep, 25);
         
         // Write b = curl(a) to disk:
         norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtk"); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];
-        std::cout << "b source " << timestep*i << " mT --> b tube center " << bcenter[i]*1e3 << " mT" << std::endl;
+        std::cout << std::endl << "b source " << timestep*(i+1) << " mT --> b tube center " << bcenter[i]*1e3 << " mT" << std::endl;
     }
     // Write to file the field at the tube center for all timesteps:
     writevector("bcenter.csv", bcenter);

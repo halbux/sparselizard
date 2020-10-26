@@ -87,51 +87,40 @@ void sparselizard(void)
     magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*tf(a), +1 );
     
     
-    // Start the implicit Euler time resolution with an all zero solution and time derivative:
-    vec initsol(magdyn), initdtsol(magdyn);
+    // Start the implicit Euler time resolution with the field values and a zero time derivative:
+    impliciteuler eul(magdyn, vec(magdyn), 0);
     
-    impliciteuler eul(magdyn, initsol, initdtsol);
     // Tolerance on the nonlinear iteration:
     eul.settolerance(1e-4);
     
-    // Use a 1 second timestep:
+    // Use a 1 second timestep and run until 150 sec (150 timesteps):
+    int numsteps = 150;
     double timestep = 1.0;
-    // Run from 0 to 150 sec with a fixed-point nonlinear iteration at every timestep:
-    std::vector<std::vector<vec>> sols = eul.runnonlinear(0.0, timestep, 150.0);
-    // Field a is available at every timestep in sols[0] and its time derivative in sols[1]:
-    std::vector<vec> asol = sols[0];
-    std::vector<vec> dtasol = sols[1];
+    std::vector<double> bcenter(numsteps);
     
-    // Loop over all time solutions:
-    std::vector<double> bcenter(asol.size());
-    for (int i = 0; i < asol.size(); i++)
+    settime(0);
+    for (int i = 0; i < numsteps; i++)
     {
-        // Set variable t() to the time of the current timestep:
-        settime(timestep*i);
-        
-        // Make the data of vector asol[i] available in field az:
-        az.setdata(wholedomain, asol[i]);
+        // Use a fixed-point nonlinear iteration at every timestep (unlimited number of nl iterations with -1).
+        int numnlits = eul.next(timestep, -1);
         
         // Write a and b = curl(a) to disk:
-        norm(a).write(wholedomain, "norma" + std::to_string(i+1000) + ".vtu"); 
-        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtu"); 
+        norm(a).write(wholedomain, "norma" + std::to_string(i) + ".vtu"); 
+        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i) + ".vtu"); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         // Interpolate at a x coordinate slightly away from 0 to avoid NaN issues:
         bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];
-        std::cout << "b source " << timestep*i << " mT --> b tube center " << bcenter[i]*1e3 << " mT" << std::endl;
+        std::cout << "b source " << timestep*(i+1) << " mT --> b tube center " << bcenter[i]*1e3 << " mT (" << numnlits << " NL its)" << std::endl;
     }
     // Combine all timesteps in a ParaView .pvd file for convenience:
-    std::vector<double> timestepvalues(151);
-    for (int i = 0; i < 151; i++)
-        timestepvalues[i] = timestep*i;
-    grouptimesteps("normbtotal.pvd", "normbtotal", 1000, timestepvalues);
+    grouptimesteps("normbtotal.pvd", "normbtotal", 0, eul.gettimes());
     
     // Write to file the field at the tube center for all timesteps:
     writevector("bcenter.csv", bcenter);
     
     // Code validation line. Can be removed:
-    std::cout << (bcenter[asol.size()-1] < 0.03746 && bcenter[asol.size()-1] > 0.03744);
+    std::cout << (bcenter[numsteps-1] < 0.03746 && bcenter[numsteps-1] > 0.03744);
 }
 
 int main(void)

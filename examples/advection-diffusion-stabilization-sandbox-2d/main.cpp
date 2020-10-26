@@ -41,10 +41,7 @@ void sparselizard()
     double delta = 0.1;
     
     // Timestep and end time for the simulation:
-    double ts = 0.1, tend = 5.0;	
-    
-    // This will hold the solution vectors for every timestep:
-    std::vector<vec> sol;
+    double ts = 0.1, tend = 4.99;
 
 
     std::cout << std::endl << "No stabilization:" << std::endl;
@@ -53,14 +50,13 @@ void sparselizard()
     adnostab += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     
     c.setvalue(sur, cinit);
-    vec init(adnostab);
-    init.setdata(sur, c);
-    genalpha genanostab(adnostab, init, vec(adnostab), vec(adnostab), {true,true,true,true});
+    genalpha genanostab(adnostab, vec(adnostab), vec(adnostab), 1, {true,true,true,true});
     genanostab.setparameter(0.75);
-    sol = genanostab.runlinear(0, ts, tend, 2)[0];
-    c.setdata(sur, sol[sol.size()-1]);
+    settime(0);
+    while (gettime() < tend)
+        genanostab.next(ts);
     c.write(sur, "cnostab.vtu", 2);
-
+        
 
     std::cout << std::endl << "Isotropic:" << std::endl;
     formulation adiso;
@@ -69,14 +65,13 @@ void sparselizard()
     adiso += integral(sur, predefinedstabilization("iso", delta, c, v, 0.0, 0.0));
 
     c.setvalue(sur, cinit);
-    vec initiso(adiso);
-    initiso.setdata(sur, c);
-    genalpha genaiso(adiso, initiso, vec(adiso), vec(adiso), {true,true,true,true});
+    genalpha genaiso(adiso, vec(adiso), vec(adiso), 1, {true,true,true,true});
     genaiso.setparameter(0.75);
-    sol = genaiso.runlinear(0, ts, tend, 2)[0];
-    c.setdata(sur, sol[sol.size()-1]);
+    settime(0);
+    while (gettime() < tend)
+        genaiso.next(ts);
     c.write(sur, "ciso.vtu", 2);
-
+    
 
     std::cout << std::endl << "Streamline anisotropic:" << std::endl;
     formulation adaniso;
@@ -85,12 +80,11 @@ void sparselizard()
     adaniso += integral(sur, predefinedstabilization("aniso", delta, c, v, 0.0, 0.0));
 
     c.setvalue(sur, cinit);
-    vec initaniso(adaniso);
-    initaniso.setdata(sur, c);
-    genalpha genaaniso(adaniso, initaniso, vec(adaniso), vec(adaniso), {true,true,true,true});
+    genalpha genaaniso(adaniso, vec(adaniso), vec(adaniso), 1, {true,true,true,true});
     genaaniso.setparameter(0.75);
-    sol = genaaniso.runlinear(0, ts, tend, 2)[0];
-    c.setdata(sur, sol[sol.size()-1]);
+    settime(0);
+    while (gettime() < tend)
+        genaaniso.next(ts);
     c.write(sur, "caniso.vtu", 2);
 
 
@@ -109,13 +103,11 @@ void sparselizard()
     adcomb += integral(sur, predefinedstabilization("cws", deltac, c, v, 1e-6, res));
     
     c.setvalue(sur, cinit);
-    vec initcomb(adcomb);
-    initcomb.setdata(sur, c);
-
-    genalpha genacomb(adcomb, initcomb, vec(adcomb), vec(adcomb), {true,true,true,true});
+    genalpha genacomb(adcomb, vec(adcomb), vec(adcomb), 1, {true,true,true,true});
     genacomb.setparameter(0.75);
-    sol = genacomb.runlinear(0, ts, tend, 2)[0];
-    c.setdata(sur, sol[sol.size()-1]);
+    settime(0);
+    while (gettime() < tend)
+        genacomb.next(ts);
     c.write(sur, "ccombined.vtu", 2);
     
 

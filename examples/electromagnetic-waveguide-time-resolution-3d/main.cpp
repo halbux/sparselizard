@@ -40,7 +40,7 @@ void sparselizard(void)
     maxwell += integral(wholedomain, -curl(dof(E))*curl(tf(E)) - 1/(c*c)*dtdt(dof(E))*tf(E));
     
     // Define the generalized alpha object to time-solve formulation 'maxwell' 
-    // with initial all zero solution vectors 'vec(maxwell)'.
+    // with initial all zero time derivative vectors 'vec(maxwell)'.
     // The general system to solve in time is M*dtdtx + C*dtx + K*x = b.
     //
     // The last argument is a vector 'isconstant' telling if the:
@@ -54,24 +54,21 @@ void sparselizard(void)
     // are time dependent but the other excitation sources are not. 
     //
     // Setting properly the 'isconstant' vector can give a dramatic speedup
-    // since it may avoid reassembling or allow reusing the LU factorisation.
+    // since it may avoid reassembling or allow reusing the matrix factorization.
     //
-    genalpha ga(maxwell, vec(maxwell), vec(maxwell), vec(maxwell), {true, true, true, true});
+    genalpha ga(maxwell, vec(maxwell), vec(maxwell), 1, {true, true, true, true});
     
-    // Run the generalized alpha time resolution from the time in the first argument
-    // to the time in the third argument by timesteps given as second argument.
-    // The last argument is optional (default is 1). When set to an integer 'n'
-    // only one every n timesteps is added to the output vector.
-    std::vector<vec> solvec = ga.runlinear(0, 0.025*1.0/freq, 20*1.0/freq, 4)[0];
+    double timestep = 0.025*1.0/freq;
+    int numsteps = 400;
     
-    // Now save all data in the 'solvec' vector (which contains the solution at every nth timestep).
-    for (int ts = 0; ts < solvec.size(); ts++)
+    settime(0);
+    for (int ts = 0; ts < numsteps; ts++)
     {
-        std::cout << ts << " ";
-        // Transfer the data to the electric field:
-        E.setdata(wholedomain, solvec[ts]);
+        // Compute one timestep:
+        ga.next(timestep);
+        
         // Write with an order 2 interpolation and with the name of your choice:
-        E.write(wholedomain, "E"+std::to_string(ts+100)+".pos",2); 
+        E.write(wholedomain, "E"+std::to_string(ts+100)+".pos", 2); 
     }
 }
 
