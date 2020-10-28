@@ -114,13 +114,11 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     {
         // Update and print the time:
         universe::currenttimestep = inittime+dt;
-        char spacer = ':';
-        if (islinear || myverbosity < 3)
-            spacer = ' ';
+
         if (myverbosity > 1 && istadapt)
-            std::cout << "@" << inittime << "+" << dt << "s" << spacer << std::flush;
-        if (myverbosity == 1 || myverbosity > 1 && not(istadapt))
-            std::cout << "@" << inittime+dt << "s" << spacer << std::flush;
+            std::cout << "@" << inittime << "+" << dt << "s " << std::flush;
+        if (myverbosity > 1 && not(istadapt))
+            std::cout << "@" << inittime+dt << "s " << std::flush;
         
         // Make all time derivatives available in the universe:
         universe::xdtxdtdtx = {{},{dtx},{}};
@@ -174,8 +172,8 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             
             relchange = (xnext-xtolcalc).norm()/xnext.norm();
             
-            if (islinear == false && myverbosity > 1)
-                std::cout << " " << relchange << std::flush;
+            if (islinear == false && myverbosity > 2)
+                std::cout << relchange << " " << std::flush;
 
             nlit++; 
             
@@ -189,8 +187,8 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
                 break;
         }
         
-        if (myverbosity > 2 && islinear == false)
-            std::cout << " (" << nlit << "NL it) " << std::flush;
+        if (myverbosity > 1 && islinear == false)
+            std::cout << "(" << nlit << "NL it) " << std::flush;
         
         if (istadapt == false)
             break;
@@ -228,6 +226,9 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
                 break;
         }
     }
+    
+    if (myverbosity == 1)
+        std::cout << "@" << inittime+dt << "s " << std::flush;
     
     dtx = dtxnext;
     mytimes.push_back(universe::currenttimestep);

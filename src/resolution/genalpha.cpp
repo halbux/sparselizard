@@ -128,13 +128,10 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     while (true)
     {
         // Print the time:
-        char spacer = ':';
-        if (islinear || myverbosity < 3)
-            spacer = ' ';
         if (myverbosity > 1 && istadapt)
-            std::cout << "@" << inittime << "+" << dt << "s" << spacer << std::flush;
-        if (myverbosity == 1 || myverbosity > 1 && not(istadapt))
-            std::cout << "@" << inittime+dt << "s" << spacer << std::flush;
+            std::cout << "@" << inittime << "+" << dt << "s " << std::flush;
+        if (myverbosity > 1 && not(istadapt))
+            std::cout << "@" << inittime+dt << "s " << std::flush;
     
         // Make all time derivatives available in the universe:
         universe::xdtxdtdtx = {{},{v},{a}};
@@ -226,7 +223,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             relchange = (unext-utolcalc).norm()/unext.norm();
             
             if (islinear == false && myverbosity > 2)
-                std::cout << " " << relchange << std::flush;
+                std::cout << relchange << " " << std::flush;
 
             nlit++; 
 
@@ -240,8 +237,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 break;
         }
         
-        if (myverbosity > 2 && islinear == false)
-            std::cout << " (" << nlit << "NL it) " << std::flush;
+        if (myverbosity > 1 && islinear == false)
+            std::cout << "(" << nlit << "NL it) " << std::flush;
         
         if (istadapt == false)
             break;
@@ -279,6 +276,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 break;
         }
     }
+    
+    if (myverbosity == 1)
+        std::cout << "@" << inittime+dt << "s " << std::flush;
     
     v = vnext; a = anext;
     mytimes.push_back(universe::currenttimestep);
