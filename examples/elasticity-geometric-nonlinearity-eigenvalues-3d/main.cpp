@@ -4,7 +4,7 @@
 //
 // Small-strain GEOMETRIC NONLINEARITY is used to simulate this prestressed membrane.
 //
-// With minimal extra effort the buckling of the membrane can be simulated with the Newmark time 
+// With minimal extra effort the buckling of the membrane can be simulated with the genalpha time 
 // resolution available in sparselizard.
 
 
@@ -102,7 +102,7 @@ void sparselizard(void)
     K.removeconstraints();
     M.removeconstraints();
     
-    // Create the object to solve the generalised eigenvalue problem K*x = lambda*M*x :
+    // Create the object to solve the generalized eigenvalue problem K*x = lambda*M*x :
     eigenvalue eig(K, M);
     
     // Compute the 5 eigenvalues closest to the target magnitude 0.0 (i.e. the 5 first ones):
