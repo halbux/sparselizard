@@ -86,7 +86,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     {
         istadapt = true;
         if (dt < 0)
-            dt = maxdt;
+            dt = mindt;
     }
     else
         dt = timestep;
