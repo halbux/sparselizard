@@ -254,7 +254,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             if (dt <= mindt || errormeasure <= tatol && (islinear || maxnumnlit <= 0 || nlit < maxnumnlit))
             {
                 // If the error is low enough to coarsen the timestep:
-                if (errormeasure <= cthres*tatol)
+                if (errormeasure <= cthres*tatol && (islinear || maxnumnlit <= 0 || nlit < maxnumnlit))
                     dt *= cfact;
                 breakit = true;
             }
