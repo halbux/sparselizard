@@ -286,4 +286,3 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     return nlit;
 }
 
-

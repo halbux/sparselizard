@@ -236,4 +236,3 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     return nlit;
 }
 
-
