@@ -119,7 +119,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             spacer = ' ';
         if (myverbosity > 1 && istadapt)
             std::cout << "@" << inittime << "+" << dt << "s" << spacer << std::flush;
-        if (myverbosity >= 1 && not(istadapt))
+        if (myverbosity == 1 || myverbosity > 1 && not(istadapt))
             std::cout << "@" << inittime+dt << "s" << spacer << std::flush;
         
         // Make all time derivatives available in the universe:
