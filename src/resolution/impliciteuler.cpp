@@ -12,14 +12,11 @@ impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std
     }
     
     dtx = dtxinit;
+    isconstant = isrhskcconstant;
     
-    if (isrhskcconstant.size() == 0)
-        isconstant = {false,false,false};
-    else
-        isconstant = isrhskcconstant;
     if (isconstant.size() != 3)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a length 3 or empty vector as third argument" << std::endl;
+        std::cout << "Error in 'impliciteuler' object: expected a length 3 vector as fourth argument" << std::endl;
         abort();  
     }
 }

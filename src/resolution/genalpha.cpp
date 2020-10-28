@@ -8,14 +8,11 @@ genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int 
     
     v = initspeed;
     a = initacceleration;
-    
-    if (isrhskcmconstant.size() == 0)
-        isconstant = {false,false,false,false};
-    else
-        isconstant = isrhskcmconstant;
+    isconstant = isrhskcmconstant;
+        
     if (isconstant.size() != 4)
     {
-        std::cout << "Error in 'genalpha' object: expected a length 4 or empty vector as fourth argument" << std::endl;
+        std::cout << "Error in 'genalpha' object: expected a length 4 vector as fifth argument" << std::endl;
         abort();  
     }
 }
