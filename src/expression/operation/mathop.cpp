@@ -5,6 +5,21 @@
 #include "rawvolume.h"
 
 
+int mathop::getversion(void)
+{
+    return 202010;
+}
+
+std::string mathop::getversionname(void)
+{
+    return "adaptive falcon";
+}
+
+void mathop::printversion(void)
+{
+    std::cout << "sparselizard " << std::to_string(getversion()) << " \"" << getversionname() << "\"." << std::endl;
+}
+
 double mathop::getpi(void)
 {
     return 3.1415926535897932384;

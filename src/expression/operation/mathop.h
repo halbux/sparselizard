@@ -31,6 +31,11 @@ class shape;
 
 namespace mathop
 {
+    // Get the code version number and name:
+    void printversion(void);
+    int getversion(void);
+    std::string getversionname(void);
+    
     double getpi(void);
 
     // Perform operations (union, intersection) on physical regions:
