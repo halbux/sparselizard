@@ -269,7 +269,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             dt = std::min(dt, maxdt);
             dt = std::max(dt, mindt);
 
-            if (istadapt && myverbosity > 2)
+            if (myverbosity > 2)
                 std::cout << "(" << errormeasure << ") " << std::flush;
             
             if (breakit)
