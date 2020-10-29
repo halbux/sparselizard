@@ -228,7 +228,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     }
     
     if (myverbosity == 1)
-        std::cout << "@" << inittime+dt << "s " << std::flush;
+        std::cout << "@" << universe::currenttimestep << "s " << std::flush;
     
     dtx = dtxnext;
     mytimes.push_back(universe::currenttimestep);

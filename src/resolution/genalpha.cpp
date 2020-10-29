@@ -274,7 +274,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     }
     
     if (myverbosity == 1)
-        std::cout << "@" << inittime+dt << "s " << std::flush;
+        std::cout << "@" << universe::currenttimestep << "s " << std::flush;
     
     v = vnext; a = anext;
     mytimes.push_back(universe::currenttimestep);
