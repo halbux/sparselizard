@@ -111,15 +111,18 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     u.setdata();
     // Get the initial value of the fields in all other formulations to solve:
     std::vector<vec> presols(tosolvebefore.size()), postsols(tosolveafter.size());
-    for (int i = 0; i < presols.size(); i++)
+    if (istadapt)
     {
-        presols[i] = vec(tosolvebefore[i]);
-        presols[i].setdata();
-    }
-    for (int i = 0; i < postsols.size(); i++)
-    {
-        postsols[i] = vec(tosolveafter[i]);
-        postsols[i].setdata();
+        for (int i = 0; i < presols.size(); i++)
+        {
+            presols[i] = vec(tosolvebefore[i]);
+            presols[i].setdata();
+        }
+        for (int i = 0; i < postsols.size(); i++)
+        {
+            postsols[i] = vec(tosolveafter[i]);
+            postsols[i].setdata();
+        }
     }
 
     // Time-adaptivity loop:
