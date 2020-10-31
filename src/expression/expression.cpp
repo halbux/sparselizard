@@ -267,6 +267,36 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
     myoperations = expr.myoperations;
 }
 
+expression::expression(int m, int n, std::vector<densematrix> customfct(std::vector<densematrix>), std::vector<expression> exprs)
+{
+    mynumrows = m; mynumcols = n;
+
+    if (m <= 0 || n <= 0)
+    {
+        std::cout << "Error in 'expression' object: custom expression size cannot be zero or negative" << std::endl;
+        abort();
+    }
+    
+    // Get all argument operations:
+    std::vector<std::shared_ptr<operation>> argops = {};
+    for (int i = 0; i < exprs.size(); i++)
+    {
+        for (int j = 0; j < exprs[i].myoperations.size(); j++)
+            argops.push_back(exprs[i].myoperations[j]);
+    }
+    
+    myoperations.resize(m*n);
+    std::vector<std::weak_ptr<opcustom>> weakops(m*n);
+    for (int i = 0; i < m*n; i++)
+    {
+        std::shared_ptr<opcustom> op(new opcustom(i, customfct, argops));
+        myoperations[i] = op;
+        weakops[i] = op;
+    }
+    for (int i = 0; i < m*n; i++)
+        (weakops[i].lock())->setfamily(weakops);
+}
+
 expression::expression(std::shared_ptr<operation> input)
 {
     mynumrows = 1; mynumcols = 1;

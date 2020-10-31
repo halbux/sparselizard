@@ -131,7 +131,6 @@ class operation : public std::enable_shared_from_this<operation>
         // Evaluate an operation that only contains x, y and/or z fields without derivatives.
         virtual std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
-        
         // For dof interpolation:
         virtual bool ison(void) {};
         virtual void setoncontext(oncontext& cntxt) {};
@@ -146,6 +145,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opcondition.h"
 #include "opconstant.h"
 #include "opcos.h"
+#include "opcustom.h"
 #include "opdetjac.h"
 #include "opdof.h"
 #include "opestimator.h"

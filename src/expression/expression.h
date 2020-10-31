@@ -84,6 +84,8 @@ class expression
         expression(spline spl, expression arg);
         // Piecewise expression definition:
         expression(std::vector<double> pos, std::vector<expression> exprs, expression tocompare);
+        // Custom expression based on a user-defined function:
+        expression(int m, int n, std::vector<densematrix> customfct(std::vector<densematrix>), std::vector<expression> exprs);
         
         // Define a 1x1 expression from an operation:
         expression(std::shared_ptr<operation>);
