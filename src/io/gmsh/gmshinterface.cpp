@@ -20,6 +20,12 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
     std::vector<double> coords, parametricCoord;
     gmsh::model::mesh::getNodes(nodeTags, coords, parametricCoord, -1, -1, false, false);
 
+    if (nodeTags.size() == 0)
+    {
+        std::cout << "Error in 'gmshinterface' namespace: no mesh node found in mesh loaded from gmsh api" << std::endl;
+        abort();
+    }
+
     int maxnodetag = *std::max_element(nodeTags.begin(), nodeTags.end());
     
     int numberofnodes = coords.size()/3;
