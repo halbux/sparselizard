@@ -74,6 +74,7 @@ class mat
         mat operator+(void);
         mat operator-(void);
         mat operator*(double input);
+        mat operator/(double input);
         mat operator*(mat input);
         mat operator+(mat input);
         mat operator-(mat input);

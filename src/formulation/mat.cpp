@@ -94,6 +94,8 @@ mat mat::operator*(double input)
     return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
 }
 
+mat mat::operator/(double input) { return *this*(1.0/input); }
+
 mat mat::operator*(mat input)
 {
     Mat A = getpetsc();

@@ -165,6 +165,8 @@ vec vec::operator*(double input)
     return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
 }
 
+vec vec::operator/(double input) { return *this*(1.0/input); }
+
 vec vec::operator+(vec input)
 {
     vec copied = copy();

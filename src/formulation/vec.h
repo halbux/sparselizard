@@ -91,6 +91,7 @@ class vec
         vec operator+(void);
         vec operator-(void);
         vec operator*(double input);
+        vec operator/(double input);
         vec operator+(vec input);
         vec operator-(vec input);
         
