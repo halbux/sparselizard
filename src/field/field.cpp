@@ -350,10 +350,10 @@ expression field::operator-(double val) { return (expression)*this - val; }
 expression field::operator*(double val) { return (expression)*this * val; }
 expression field::operator/(double val) { return (expression)*this / val; }
 
-expression field::operator+(parameter& param) { return (expression)*this + param; }
-expression field::operator-(parameter& param) { return (expression)*this - param; }
-expression field::operator*(parameter& param) { return (expression)*this * param; }
-expression field::operator/(parameter& param) { return (expression)*this / param; }       
+expression field::operator+(parameter param) { return (expression)*this + param; }
+expression field::operator-(parameter param) { return (expression)*this - param; }
+expression field::operator*(parameter param) { return (expression)*this * param; }
+expression field::operator/(parameter param) { return (expression)*this / param; }       
  
 
 expression operator+(double val, field inputfield) { return inputfield+val; }
@@ -361,9 +361,9 @@ expression operator-(double val, field inputfield) { return -inputfield+val; }
 expression operator*(double val, field inputfield) { return inputfield*val; }
 expression operator/(double val, field inputfield) { return ( (expression)val )/( (expression)inputfield ); }
 
-expression operator+(parameter& param, field inputfield) { return inputfield+param; }
-expression operator-(parameter& param, field inputfield) { return -inputfield+param; }
-expression operator*(parameter& param, field inputfield) { return inputfield*param; }
-expression operator/(parameter& param, field inputfield) { return ( (expression)param ) / ( (expression)inputfield ); }
+expression operator+(parameter param, field inputfield) { return inputfield+param; }
+expression operator-(parameter param, field inputfield) { return -inputfield+param; }
+expression operator*(parameter param, field inputfield) { return inputfield*param; }
+expression operator/(parameter param, field inputfield) { return ( (expression)param ) / ( (expression)inputfield ); }
 
 

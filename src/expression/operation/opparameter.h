@@ -8,9 +8,9 @@
 #define OPPARAMETER_H
 
 #include "operation.h"
-#include "parameter.h"
+#include "rawparameter.h"
 
-class parameter;
+class rawparameter;
 
 class opparameter: public operation
 {
@@ -22,16 +22,16 @@ class opparameter: public operation
         int myrow;
         int mycolumn;
         
-        parameter* myparameter;
+        std::shared_ptr<rawparameter> myparameter;
     
     public:
         
-        opparameter(parameter* input, int row, int col) { myparameter = input; myrow = row; mycolumn = col; };
+        opparameter(std::shared_ptr<rawparameter> input, int row, int col) { myparameter = input; myrow = row; mycolumn = col; };
         
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         
-        parameter* getparameterpointer(void) { return myparameter; };
+        std::shared_ptr<rawparameter> getparameterpointer(void) { return myparameter; };
         
         bool isharmonicone(std::vector<int> disjregs);
         

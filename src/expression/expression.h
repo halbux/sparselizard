@@ -72,7 +72,7 @@ class expression
         // Implicit conversion from field, double and parameter to expression:
         expression(field);
         expression(double);
-        expression(parameter&);
+        expression(parameter);
         expression(int numrows, int numcols, std::vector<expression>);
         // Concatenate expressions to create a new one:
         expression(const std::vector<std::vector<expression>> input);
@@ -256,10 +256,10 @@ class expression
         expression operator*(double);
         expression operator/(double);
         
-        expression operator+(parameter&);
-        expression operator-(parameter&);
-        expression operator*(parameter&);
-        expression operator/(parameter&);
+        expression operator+(parameter);
+        expression operator-(parameter);
+        expression operator*(parameter);
+        expression operator/(parameter);
 };
 
 // Define the left version of the operators based on the right one.
@@ -273,10 +273,10 @@ expression operator-(field, expression);
 expression operator*(field, expression);
 expression operator/(field, expression);
 
-expression operator+(parameter&, expression);
-expression operator-(parameter&, expression);
-expression operator*(parameter&, expression);
-expression operator/(parameter&, expression);
+expression operator+(parameter, expression);
+expression operator-(parameter, expression);
+expression operator*(parameter, expression);
+expression operator/(parameter, expression);
 
 #endif
 

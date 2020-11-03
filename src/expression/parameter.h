@@ -8,21 +8,15 @@
 #define PARAMETER_H
 
 #include <iostream>
-#include "operation.h"
-#include "densematrix.h"
-#include "disjointregions.h"
 #include "universe.h"
-#include "mesh.h"
-#include "elementselector.h"
+#include "rawparameter.h"
 #include "parameterselectedregion.h"
-#include "disjointregionselector.h"
 #include "expression.h"
 #include "field.h"
 #include "vec.h"
 
 class field;
 class vec;
-class operation;
 class expression;
 class parameterselectedregion;
 
@@ -31,62 +25,22 @@ class parameter
 
     private:
 
-        int mynumrows;
-        int mynumcols;
-
-        // myexpressions[disjreg][i*mynumcols+j] stores the ith row, jth 
-        // columns of the parameter expression defined on disjreg.
-        std::vector<std::vector<std::shared_ptr<operation>>> myoperations = {};
-
-        // Store a number associated to the operation on a given disjoint 
-        // region. The operations on the disjoint regions on which the 
-        // parameter has been defined with the same .set call have the same 
-        // number because they are the same. This enables to interpolate on 
-        // groups of disjoint regions that share the same operation number.
-        int maxopnum = -1;
-        std::vector<int> opnums = {};
-        
-        
-        int mymeshnumber = 0;
-        
-        // Track the calls to 'set'.
-        std::vector<std::pair<int, expression>> mystructuretracker = {};
-        
-        // Synchronize with the hp-adapted mesh:
-        void synchronize(void);
-        // To avoid infinite recursive calls:
-        bool issynchronizing = false;
-
-
-        // Give an error if the parameter is undefined on at least one disj. reg.
-        void errorifundefined(std::vector<int> disjregs);
-
-        // Get the operation numbers for the requested disjoint regions.
-        std::vector<int> getopnums(std::vector<int> disjregs);
-
+        // The actual parameter:
+        std::shared_ptr<rawparameter> rawparamptr = NULL;
+    
     public:
 
         parameter(void);
         parameter(int numrows, int numcols);
-
-        // A parameter cannot store an expression with a dof or a tf.
-        // It can also only store expression arrays of a same dimension. 
-        void set(int physreg, expression);
-
-        std::shared_ptr<operation> get(int disjreg, int row, int col);
 
         int countrows(void);
         int countcolumns(void);
 
         parameterselectedregion operator|(int physreg);
 
-        std::vector<std::vector<densematrix>> interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-
-        void simplify(int row, int col, int disjreg);
-
         void print(void);
 
+        std::shared_ptr<rawparameter> getpointer(void) { return rawparamptr; };
 
 
         vec atbarycenter(int physreg, field onefield);
@@ -116,10 +70,10 @@ class parameter
         expression operator+(void);
         expression operator-(void);
 
-        expression operator+(parameter&);
-        expression operator-(parameter&);
-        expression operator*(parameter&);
-        expression operator/(parameter&);
+        expression operator+(parameter);
+        expression operator-(parameter);
+        expression operator*(parameter);
+        expression operator/(parameter);
 
         expression operator+(double);
         expression operator-(double);
@@ -129,9 +83,9 @@ class parameter
 };
 
 // Define the left version of the operators based on the right one.
-expression operator+(double, parameter&);
-expression operator-(double, parameter&);
-expression operator*(double, parameter&);
-expression operator/(double, parameter&);
+expression operator+(double, parameter);
+expression operator-(double, parameter);
+expression operator*(double, parameter);
+expression operator/(double, parameter);
 
 #endif

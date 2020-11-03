@@ -9,9 +9,9 @@
 
 #include <iostream>
 #include "expression.h"
-#include "parameter.h"
+#include "rawparameter.h"
 
-class parameter;
+class rawparameter;
 class expression;
 
 class parameterselectedregion
@@ -19,12 +19,12 @@ class parameterselectedregion
 
     private:
         
-        parameter* myparam;
+        std::shared_ptr<rawparameter> myparam;
         int myphysreg;
     
     public:
         
-        parameterselectedregion(parameter* param, int physreg) { myparam = param; myphysreg = physreg; };
+        parameterselectedregion(std::shared_ptr<rawparameter> param, int physreg) { myparam = param; myphysreg = physreg; };
 
         void operator=(expression input);
 };

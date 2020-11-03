@@ -37,7 +37,7 @@ expression::expression(field input)
 
 expression::expression(double input) { mynumrows = 1; mynumcols = 1; myoperations = {std::shared_ptr<opconstant>(new opconstant(input))}; }
 
-expression::expression(parameter& input)
+expression::expression(parameter input)
 {
     mynumrows = input.countrows();
     mynumcols = input.countcolumns();
@@ -46,7 +46,7 @@ expression::expression(parameter& input)
     for (int row = 0; row < mynumrows; row++)
     {
         for (int col = 0; col < mynumcols; col++)
-            myoperations[row*mynumcols+col] = std::shared_ptr<opparameter>(new opparameter(&input, row, col));
+            myoperations[row*mynumcols+col] = std::shared_ptr<opparameter>(new opparameter(input.getpointer(), row, col));
     }
 }
 
@@ -2252,10 +2252,10 @@ expression expression::operator-(double val) { return this->getcopy() - (express
 expression expression::operator*(double val) { return this->getcopy() * (expression)val; }
 expression expression::operator/(double val) { return this->getcopy() / (expression)val; }
 
-expression expression::operator+(parameter& param) { return this->getcopy() + (expression)param; }
-expression expression::operator-(parameter& param) { return this->getcopy() - (expression)param; }
-expression expression::operator*(parameter& param) { return this->getcopy() * (expression)param; }
-expression expression::operator/(parameter& param) { return this->getcopy() / (expression)param; }
+expression expression::operator+(parameter param) { return this->getcopy() + (expression)param; }
+expression expression::operator-(parameter param) { return this->getcopy() - (expression)param; }
+expression expression::operator*(parameter param) { return this->getcopy() * (expression)param; }
+expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
 
 
 expression operator+(double val, expression expr) { return expr+val; }
@@ -2268,7 +2268,7 @@ expression operator-(field inputfield, expression expr) { return -expr+inputfiel
 expression operator*(field inputfield, expression expr) { return expr*inputfield; }
 expression operator/(field inputfield, expression expr) { return ( (expression)inputfield ) / expr; }
 
-expression operator+(parameter& param, expression expr) { return expr+param; }
-expression operator-(parameter& param, expression expr) { return -expr+param; }
-expression operator*(parameter& param, expression expr) { return expr*param; }
-expression operator/(parameter& param, expression expr) { return ( (expression)param ) / expr; }
+expression operator+(parameter param, expression expr) { return expr+param; }
+expression operator-(parameter param, expression expr) { return -expr+param; }
+expression operator*(parameter param, expression expr) { return expr*param; }
+expression operator/(parameter param, expression expr) { return ( (expression)param ) / expr; }

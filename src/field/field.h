@@ -180,10 +180,10 @@ class field
         expression operator*(double);
         expression operator/(double);
 
-        expression operator+(parameter&);
-        expression operator-(parameter&);
-        expression operator*(parameter&);
-        expression operator/(parameter&);
+        expression operator+(parameter);
+        expression operator-(parameter);
+        expression operator*(parameter);
+        expression operator/(parameter);
 
 };
 
@@ -193,9 +193,9 @@ expression operator-(double, field);
 expression operator*(double, field);
 expression operator/(double, field);
 
-expression operator+(parameter&, field);
-expression operator-(parameter&, field);
-expression operator*(parameter&, field);
-expression operator/(parameter&, field);
+expression operator+(parameter, field);
+expression operator-(parameter, field);
+expression operator*(parameter, field);
+expression operator/(parameter, field);
 
 #endif
