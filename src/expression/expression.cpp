@@ -1214,7 +1214,7 @@ void expression::print(void)
         for (int col = 0; col < mynumcols; col++)
         {
             std::cout << " @ row " << row << ", col " << col << " :" << std::endl;
-            myoperations[row*mynumcols+col]->print();
+            myoperations[row*mynumcols+col]->simplify({})->print();
             std::cout << std::endl;
         }
     }
