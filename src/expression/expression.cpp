@@ -282,7 +282,14 @@ expression::expression(int m, int n, std::vector<densematrix> customfct(std::vec
     for (int i = 0; i < exprs.size(); i++)
     {
         for (int j = 0; j < exprs[i].myoperations.size(); j++)
+        {
+            if (exprs[i].myoperations[j]->isdofincluded() || exprs[i].myoperations[j]->istfincluded())
+            {
+                std::cout << "Error in 'expression' object: custom expression argument cannot include a dof or tf" << std::endl;
+                abort();
+            }
             argops.push_back(exprs[i].myoperations[j]);
+        }
     }
     
     myoperations.resize(m*n);
