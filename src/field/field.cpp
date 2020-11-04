@@ -68,6 +68,7 @@ void field::print(void) { errorifpointerisnull(); rawfieldptr->print(); }
 void field::setorder(int physreg, int interpolorder) 
 { 
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     
     if (interpolorder < 0)
     {
@@ -124,30 +125,35 @@ void field::setorder(expression criterion, int loworder, int highorder)
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg)
 {
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg);
 }
 
@@ -203,17 +209,52 @@ densematrix field::getnodalvalues(intdensematrix nodenumbers)
     return rawfieldptr->getnodalvalues(nodenumbers);
 }
 
-void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
-void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree); }
-void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree); }
-void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree); }
-void field::setconstraint(int physreg) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg); }
+void field::setconstraint(int physreg, expression input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree);
+}
 
-void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr) { errorifpointerisnull(); rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr); }
+void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree);
+}
+
+void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree);
+}
+
+void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    rawfieldptr->setconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
+}
+
+void field::setconstraint(int physreg)
+{
+    errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    rawfieldptr->setconstraint(physreg);
+}
+
+void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr)
+{
+    errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr);
+}
 
 void field::setgauge(int physreg) 
 { 
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     
     if (rawfieldptr->gettypename() != "hcurl")
     {
@@ -227,6 +268,7 @@ void field::setgauge(int physreg)
 void field::setdata(int physreg, vectorfieldselect myvec, std::string op) 
 { 
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     
     if (op != "set" && op != "add")
     {
@@ -329,6 +371,7 @@ void field::write(int physreg, expression meshdeform, std::string filename, int 
 void field::writeraw(int physreg, std::string filename, bool isbinary, std::vector<double> extradata)
 {
     errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
     {

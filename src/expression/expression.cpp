@@ -403,16 +403,20 @@ void expression::reordercolumns(std::vector<int> neworder)
 
 std::vector<double> expression::max(int physreg, int refinement, std::vector<double> xyzrange)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return max(physreg, NULL, refinement, xyzrange);
 }
 
 std::vector<double> expression::max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return max(physreg, &meshdeform, refinement, xyzrange);
 }
 
 std::vector<double> expression::min(int physreg, int refinement, std::vector<double> xyzrange)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, NULL, refinement, xyzrange);
     if (output.size() > 0)
@@ -422,6 +426,8 @@ std::vector<double> expression::min(int physreg, int refinement, std::vector<dou
 
 std::vector<double> expression::min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     // The actual min value is minus the max value found:
     std::vector<double> output =  (-this->getcopy()).max(physreg, &meshdeform, refinement, xyzrange);
     if (output.size() > 0)
@@ -522,16 +528,20 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
 
 void expression::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     interpolate(physreg, NULL, xyzcoord, interpolated, isfound);
 }
 
 void expression::interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
 }
 
 std::vector<double> expression::interpolate(int physreg, const std::vector<double> xyzcoord)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     std::vector<double> xyz = xyzcoord;
 
     if (xyz.size() != 3)
@@ -553,6 +563,8 @@ std::vector<double> expression::interpolate(int physreg, const std::vector<doubl
 
 std::vector<double> expression::interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     std::vector<double> xyz = xyzcoord;
 
     if (xyz.size() != 3)
@@ -721,8 +733,16 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 }
 
 
-double expression::integrate(int physreg, int integrationorder) { return integrate(physreg, NULL, integrationorder); }
-double expression::integrate(int physreg, expression meshdeform, int integrationorder) { return integrate(physreg, &meshdeform, integrationorder); }
+double expression::integrate(int physreg, int integrationorder)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return integrate(physreg, NULL, integrationorder);
+}
+double expression::integrate(int physreg, expression meshdeform, int integrationorder)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return integrate(physreg, &meshdeform, integrationorder);
+}
 
 double expression::integrate(int physreg, expression* meshdeform, int integrationorder)
 {
@@ -804,22 +824,26 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
 }
 
 void expression::write(int physreg, int numfftharms, std::string filename, int lagrangeorder)
-{
+{   
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     write(physreg, numfftharms, NULL, filename, lagrangeorder, -1);
 }
 
 void expression::write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     write(physreg, numfftharms, &meshdeform, filename, lagrangeorder, -1);
 }
 
 void expression::write(int physreg, std::string filename, int lagrangeorder, int numtimesteps)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     write(physreg, -1, NULL, filename, lagrangeorder, numtimesteps);
 }
 
 void expression::write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     write(physreg, -1, &meshdeform, filename, lagrangeorder, numtimesteps);
 }
 
