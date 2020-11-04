@@ -1937,7 +1937,7 @@ void expression::expand(void)
     else
     {
         std::cout << "Error in 'expression' object: expand is only defined for scalar expressions" << std::endl;
-        std::cout << "Did you try to define a non scalarisable formulation?" << std::endl;
+        std::cout << "Did you try to define a nonscalar formulation?" << std::endl;
         abort();
     }
 }

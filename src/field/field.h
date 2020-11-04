@@ -38,6 +38,8 @@ class field
 
         // The actual field:
         std::shared_ptr<rawfield> rawfieldptr = NULL;
+        
+        void errorifpointerisnull(void);
 
     public:
 

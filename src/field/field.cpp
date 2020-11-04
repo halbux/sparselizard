@@ -1,6 +1,15 @@
 #include "field.h"
 
 
+void field::errorifpointerisnull(void)
+{
+    if (rawfieldptr == NULL)
+    {
+        std::cout << "Error in 'field' object: cannot perform the operation (field is undefined)" << std::endl;
+        abort();
+    }
+}
+
 field::field(std::string fieldtypename) { rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false)); }
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers) 
 { 
@@ -48,16 +57,18 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, 
     rawfieldptr->setspanningtree(spantree);
 }
 
-int field::countcomponents(void) { return rawfieldptr->countcomponents(); }
+int field::countcomponents(void) { errorifpointerisnull(); return rawfieldptr->countcomponents(); }
 
-std::vector<int> field::getharmonics(void) { return rawfieldptr->getharmonics(); }
-void field::printharmonics(void) { rawfieldptr->printharmonics(); }
+std::vector<int> field::getharmonics(void) { errorifpointerisnull(); return rawfieldptr->getharmonics(); }
+void field::printharmonics(void) { errorifpointerisnull(); rawfieldptr->printharmonics(); }
 
-void field::setname(std::string name) { rawfieldptr->setname(name); }
-void field::print(void) { rawfieldptr->print(); }
+void field::setname(std::string name) { errorifpointerisnull(); rawfieldptr->setname(name); }
+void field::print(void) { errorifpointerisnull(); rawfieldptr->print(); }
 
 void field::setorder(int physreg, int interpolorder) 
 { 
+    errorifpointerisnull();
+    
     if (interpolorder < 0)
     {
         std::cout << "Error in 'field' object: cannot use negative interpolation order " << interpolorder << std::endl;
@@ -73,6 +84,8 @@ void field::setorder(int physreg, int interpolorder)
 
 void field::setorder(expression criterion, int loworder, int highorder)
 {
+    errorifpointerisnull();
+    
     std::string tn = rawfieldptr->gettypename();
     
     if (not(criterion.isscalar()))
@@ -110,31 +123,38 @@ void field::setorder(expression criterion, int loworder, int highorder)
 
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
+    errorifpointerisnull();
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
+    errorifpointerisnull();
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
+    errorifpointerisnull();
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
+    errorifpointerisnull();
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg)
 {
+    errorifpointerisnull();
     rawfieldptr->setvalue(physreg);
 }
 
 void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
 {
+    errorifpointerisnull();
+    
     if (nodenumbers.count() != values.count())
     {
         std::cout << "Error in 'field' object: argument size mismatch in 'setnodalvalues'" << std::endl;
@@ -162,6 +182,8 @@ void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
 
 densematrix field::getnodalvalues(intdensematrix nodenumbers)
 {
+    errorifpointerisnull();
+    
     if (nodenumbers.count() > 0)
     {
         int numnodes = universe::mymesh->getelements()->count(0);
@@ -181,16 +203,18 @@ densematrix field::getnodalvalues(intdensematrix nodenumbers)
     return rawfieldptr->getnodalvalues(nodenumbers);
 }
 
-void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
-void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree); }
-void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree); }
-void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree) { rawfieldptr->setconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree); }
-void field::setconstraint(int physreg) { rawfieldptr->setconstraint(physreg); }
+void field::setconstraint(int physreg, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree); }
+void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree); }
+void field::setconstraint(int physreg) { errorifpointerisnull(); rawfieldptr->setconstraint(physreg); }
 
-void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr) { rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr); }
+void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr) { errorifpointerisnull(); rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr); }
 
 void field::setgauge(int physreg) 
 { 
+    errorifpointerisnull();
+    
     if (rawfieldptr->gettypename() != "hcurl")
     {
         std::cout << "Error in 'field' object: cannot gauge shape function " << rawfieldptr->gettypename() << " (only hcurl)" << std::endl;
@@ -202,6 +226,8 @@ void field::setgauge(int physreg)
 
 void field::setdata(int physreg, vectorfieldselect myvec, std::string op) 
 { 
+    errorifpointerisnull();
+    
     if (op != "set" && op != "add")
     {
         std::cout << "Error in 'field' object: operation " << op << " is unknown in .setdata (use 'set' or 'add')" << std::endl;
@@ -219,21 +245,26 @@ void field::setdata(int physreg, vec myvec, std::string op)
 
 void field::automaticupdate(bool updateit)
 {
+    errorifpointerisnull();
     rawfieldptr->allowvaluesynchronizing(updateit);
 }
 
 void field::noautomaticupdate(void)
 {
+    errorifpointerisnull();
     rawfieldptr->allowvaluesynchronizing(false);
 }
 
 void field::setupdateaccuracy(int extraintegrationorder)
 {
+    errorifpointerisnull();
     rawfieldptr->setupdateaccuracy(extraintegrationorder);
 }
 
 field field::comp(int component) 
 { 
+    errorifpointerisnull();
+    
     if (component < 0 || component > 2)
     {
         std::cout << "Error in 'field' object: cannot use component number " << component << " (only 0, 1 and 2 are allowed)" << std::endl;
@@ -244,6 +275,8 @@ field field::comp(int component)
 
 field field::harmonic(const std::vector<int> harmonicnumbers)
 {
+    errorifpointerisnull();
+    
     if (harmonicnumbers.size() == 0)
     {
         std::cout << "Error in 'field' object: no harmonics provided to the .harmonic function" << std::endl;
@@ -260,7 +293,6 @@ field field::harmonic(const std::vector<int> harmonicnumbers)
     }
     return field(rawfieldptr->harmonic(harmonicnumbers));
 }
-
 
 
 
@@ -296,11 +328,7 @@ void field::write(int physreg, expression meshdeform, std::string filename, int 
 
 void field::writeraw(int physreg, std::string filename, bool isbinary, std::vector<double> extradata)
 {
-    if (rawfieldptr == NULL)
-    {
-        std::cout << "Error in 'field' object: cannot write raw field data (field undefined)" << std::endl;
-        abort();
-    }
+    errorifpointerisnull();
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
     {
@@ -320,11 +348,7 @@ void field::writeraw(int physreg, std::string filename, bool isbinary, std::vect
 
 std::vector<double> field::loadraw(std::string filename, bool isbinary)
 {
-    if (rawfieldptr == NULL)
-    {
-        std::cout << "Error in 'field' object: cannot load raw field data (field undefined)" << std::endl;
-        abort();
-    }
+    errorifpointerisnull();
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
         return rawfieldptr->loadraw(filename, isbinary);

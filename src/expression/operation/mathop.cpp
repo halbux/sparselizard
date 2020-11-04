@@ -1563,6 +1563,13 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
 
 void mathop::solve(formulation formul)
 {
+    // Make sure the problem is of the form Ax = b:
+    if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
+    {
+        std::cout << "Error in 'mathop' namespace: formulation to solve cannot have a damping/mass matrix (use a time resolution algorithm)" << std::endl;
+        abort();  
+    }
+    
     // Remove leftovers (if any):
     mat A = formul.A(); vec b = formul.b();
     // Generate:
