@@ -3,8 +3,14 @@
 
 std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    std::cout << "Error in 'optime' object: time variable 't' cannot be computed without FFT" << std::endl;
-    abort();
+    if (universe::fundamentalfrequency != -1)
+    {
+        std::cout << "Error in 'optime' object: in harmonic domain the time variable 't' cannot be computed without FFT" << std::endl;
+        abort();
+    }
+
+    densematrix output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
+    return {{},{output}};
 }
 
 densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
