@@ -43,6 +43,11 @@ int mathop::regionall(void)
     return (universe::mymesh->getphysicalregions())->createunionofall();
 }
 
+bool mathop::isregiondefined(int physreg)
+{
+    return (universe::mymesh->getphysicalregions()->getindex(physreg) != -1);
+}
+
 bool mathop::isregionempty(int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
