@@ -3,16 +3,37 @@
 
 std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    densematrix output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
-    
-    // This can only be on the cos0 harmonic:
-    return {{},{output}};
+    std::cout << "Error in 'optime' object: time variable 't' cannot be computed without FFT" << std::endl;
+    abort();
 }
 
 densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    std::cout << "Error in 'optime' object: time variable 't' is not supported (non-periodic)" << std::endl;
-    abort();
+    // Get the value from the universe if available and reuse is enabled:
+    if (reuse && universe::isreuseallowed)
+    {
+        int precomputedindex = universe::getindexofprecomputedvaluefft(shared_from_this());
+        if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
+    }
+    
+    int ncols = elemselect.countinselection() * evaluationcoordinates.size()/3;
+    densematrix output(numtimeevals, ncols);
+    double* outptr = output.getvalues();
+    
+    double period = 1.0/universe::getfundamentalfrequency();
+    double dt = period/numtimeevals;
+    
+    for (int i = 0; i < numtimeevals; i++)
+    {
+        double tval = dt*i;
+        for (int j = 0; j < ncols; j++)
+            outptr[i*ncols+j] = tval;
+    }
+            
+    if (reuse && universe::isreuseallowed)
+        universe::setprecomputedfft(shared_from_this(), output);
+    
+    return output;
 }
 
 std::shared_ptr<operation> optime::copy(void)
