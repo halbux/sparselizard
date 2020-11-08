@@ -89,9 +89,6 @@ densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int 
     double pi = 3.141592653589793238;
     double phasestep = 2.0*pi / ((double)(numtimevals));
 
-    for(int i = 0; i < numtimevals; i++)
-        timevals[i] = i*phasestep;
-        
     // The end result goes here. Initial value is 0.
     densematrix output(numtimevals, mym*myn, 0);
     
