@@ -1,0 +1,6 @@
+option(BUILD_DATA_SAVING "Build example DATA_SAVING." OFF)
+if(BUILD_DATA_SAVING OR BUILD_ALL_EXAMPLES)
+  custom_add_executable_from_dir(DATA_SAVING ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(DATA_SAVING sparselizard)
+  custom_copy_file(DATA_SAVING ${CMAKE_CURRENT_SOURCE_DIR} "*.msh;*.geo")
+endif(BUILD_DATA_SAVING OR BUILD_ALL_EXAMPLES)

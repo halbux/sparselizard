@@ -2,14 +2,14 @@
 #include "universe.h"
 
 
-#ifndef HAVE_GMSHAPI
+#ifndef SPARSELIZARD_HAS_GMSH
 void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
     std::cout << "Error in 'gmshinterface' namespace: GMSH API is not available" << std::endl;
     abort();
 }
 #endif
-#ifdef HAVE_GMSHAPI
+#ifdef SPARSELIZARD_HAS_GMSH
 #include "gmsh.h"
 void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
@@ -773,4 +773,3 @@ char gmshinterface::getelementidentifierinposformat(int ourtypenumber)
             return 'Y';
     }
 }
-

@@ -3,6 +3,9 @@
 
 
 #include "sparselizardbase.h"
+
+#ifdef SPARSELIZARD_HAS_GMSH
+
 #include "gmsh.h"
 
 
@@ -101,6 +104,15 @@ void sparselizard(void)
     std::cout << (compz(u).integrate(vol, u, 5) < -1.24776e-10 && compz(u).integrate(vol, u, 5) > -1.24780e-10);
 }
 
+#else
+
+void sparselizard(void)
+{
+        std::cout << "Sparselizard was built without GMSH support." << std::endl;
+}
+
+#endif
+
 int main(void)
 {	
     SlepcInitialize(0,{},0,0);
@@ -111,4 +123,3 @@ int main(void)
 
     return 0;
 }
-

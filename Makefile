@@ -3,7 +3,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
 # With or without the GMSH API:
 ifneq ("$(wildcard ~/SLlibs/gmsh)","")
-    LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc -L ~/SLlibs/gmsh/lib -l gmsh -D HAVE_GMSHAPI
+    LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc -L ~/SLlibs/gmsh/lib -l gmsh -D SPARSELIZARD_HAS_GMSH
     INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux-c-opt/include/ -I ~/SLlibs/gmsh/include
 else
     LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc
@@ -48,7 +48,7 @@ all: $(OBJECTS) libsparselizard.so
 	@echo "Linking."
 	@$(CXX) $(BUILD_DIR)/main.o $(OBJECTS) $(LIBS) -o $(BIN)
 	@echo "Done."
-	
+
 # Include all .d files
 -include $(DEP)
 
@@ -58,7 +58,7 @@ $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@# Compile .cpp file. MMD creates the dependencies.
 	@$(CXX) $(CXX_FLAGS) $(LIBS) $(INCL) $(INCLUDES) -MMD -c $< -o $@
-	
+
 
 clean :
 	# Removes all files created.
