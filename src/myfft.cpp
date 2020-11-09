@@ -83,9 +83,6 @@ void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, do
 
 densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int numtimevals, int mym, int myn)
 {
-    // Get all times at which to evaluate:
-    std::vector<double> timevals(numtimevals);
-    
     double pi = 3.141592653589793238;
     double phasestep = 2.0*pi / ((double)(numtimevals));
 
