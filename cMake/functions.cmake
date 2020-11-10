@@ -28,3 +28,10 @@ function(custom_copy_file TARGET DIR GLOBS)
     endforeach()
   endforeach()
 endfunction(custom_copy_file)
+
+# add tests
+function(custom_add_test_from_dir TARGET LIBRARY DIRS)
+  custom_add_executable_from_dir(${TARGET} ${DIRS})
+  target_link_libraries(${TARGET} ${LIBRARY})
+  add_test(${TARGET} ${TARGET})
+endfunction()

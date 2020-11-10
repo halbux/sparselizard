@@ -1,0 +1,2 @@
+custom_add_test_from_dir(test_datastructures sparselizard ${CMAKE_CURRENT_SOURCE_DIR})
+ConfigureCATCH(test_datastructures)
