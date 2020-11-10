@@ -15,6 +15,6 @@
 namespace gptriangle
 {   
     void set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights);
-};
+}
 
 #endif

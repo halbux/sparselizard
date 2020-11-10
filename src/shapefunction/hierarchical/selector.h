@@ -39,6 +39,6 @@ namespace selector
 {
     // Get a pointer to the selected form function:
     std::shared_ptr<hierarchicalformfunction> select(int elementtypenumber, std::string formfunctiontypename);
-};
+}
 
 #endif

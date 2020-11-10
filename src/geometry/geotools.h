@@ -73,6 +73,6 @@ namespace geotools
     std::vector<double> appendcoords(std::vector<std::shared_ptr<rawshape>> rawshapes);
     // Append the elements of multiple rawshapes:
     std::vector<std::vector<int>> appendelems(std::vector<std::shared_ptr<rawshape>> rawshapes);
-};
+}
 
 #endif

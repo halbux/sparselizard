@@ -22,6 +22,6 @@ namespace nastraninterface
 {
     // Load the mesh to the 'nodes', 'elements' and 'physicalregions' objects.
     void readfromfile(std::string name, nodes&, elements&, physicalregions&);
-};
+}
 
 #endif

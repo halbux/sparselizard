@@ -25,6 +25,6 @@ namespace legendre
     std::vector<polynomial> ls(int maxn, polynomial x, polynomial t);
     // Scaled integrated Legendre polynomials Ls(x,t):
     std::vector<polynomial> Ls(int maxn, polynomial x, polynomial t);
-};
+}
 
 #endif
