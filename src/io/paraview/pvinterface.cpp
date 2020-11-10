@@ -12,7 +12,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite)
     if (timetags.size() == 0)
         writetovtkfile(name, datatowrite, -1);
 
-    for (int i = 0; i < timetags.size(); i++)
+    for (size_t i = 0; i < timetags.size(); i++)
     {
         std::string curname = namenoext + "_" + std::to_string(i) + ".vtk";
         writetovtkfile(curname, datatowrite, i);
@@ -30,7 +30,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite)
     if (timetags.size() == 0)
         writetovtufile(name, datatowrite, -1);
 
-    for (int i = 0; i < timetags.size(); i++)
+    for (size_t i = 0; i < timetags.size(); i++)
     {
         std::string curname = namenoext + "_" + std::to_string(i) + ".vtu";
         writetovtufile(curname, datatowrite, i);

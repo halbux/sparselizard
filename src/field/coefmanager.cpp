@@ -14,7 +14,7 @@ coefmanager::coefmanager(std::string fieldtypename, disjointregions* drs)
     // Preallocate 'coefs' for the number of disjoint regions:
     coefs.resize(mydisjointregions.count());
     // Resize coefs to accomodate an inital order 1 interpolated field:
-    for (int i = 0; i < coefs.size(); i++)
+    for (size_t i = 0; i < coefs.size(); i++)
         fitinterpolationorder(i, 1);
 }
 
@@ -68,9 +68,9 @@ void coefmanager::print(bool databoundsonly)
 {
     std::cout << std::endl << "Field of type " << myfieldtypename << ":" << std::endl;
     
-    for (int d = 0; d < coefs.size(); d++)
+    for (size_t d = 0; d < coefs.size(); d++)
     {
-        for (int ff = 0; ff < coefs[d].size(); ff++)
+        for (size_t ff = 0; ff < coefs[d].size(); ff++)
         {
             if (coefs[d][ff].size() == 0)
                 continue;
@@ -80,7 +80,7 @@ void coefmanager::print(bool databoundsonly)
             double datamin = coefs[d][ff][0];
             double datamax = coefs[d][ff][0];
             
-            for (int e = 0; e < coefs[d][ff].size(); e++)
+            for (size_t e = 0; e < coefs[d][ff].size(); e++)
             {
                 double val = coefs[d][ff][e];
                 

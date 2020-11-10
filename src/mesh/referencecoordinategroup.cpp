@@ -21,7 +21,7 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
     std::iota(coordnums.begin(), coordnums.end(), 0);
     std::vector<double> kietaphis(3*numcoords,0.0);
     
-    for (int d = 0; d < inputdisjregs.size(); d++)
+    for (size_t d = 0; d < inputdisjregs.size(); d++)
         myalgorithm::getreferencecoordinates(mycoordgroup, inputdisjregs[d], elems, kietaphis);
         
     evalat(elems, kietaphis, coordnums);  
@@ -30,7 +30,7 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
 void referencecoordinategroup::evalat(int elemtypenum)
 {
     int numintype = 0;
-    for (int i = 0; i < myinputelems.size()/2; i++)
+    for (size_t i = 0; i < myinputelems.size()/2; i++)
     {
         if (myinputelems[2*i+0] == elemtypenum)
             numintype++;
@@ -41,7 +41,7 @@ void referencecoordinategroup::evalat(int elemtypenum)
     std::vector<int> coordnums(numintype);
 
     int index = 0;
-    for (int i = 0; i < myinputelems.size()/2; i++)
+    for (size_t i = 0; i < myinputelems.size()/2; i++)
     {
         if (myinputelems[2*i+0] == elemtypenum)
         {
@@ -95,7 +95,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
     std::vector<int> elemscp = elems;
     std::vector<int> coordnumscp = coordnums;
     std::vector<double> kietaphiscp = kietaphis;
-    for (int i = 0; i < elems.size(); i++)
+    for (size_t i = 0; i < elems.size(); i++)
     {
         elems[i] = elemscp[reorderingvector[i]];
         coordnums[i] = coordnumscp[reorderingvector[i]];
@@ -106,7 +106,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
 
     // Count the number of elements with a given number of ref coords:
     int maxnumrefcoords = 1; int curnumrefcoords = 1;
-    for (int i = 1; i < elems.size(); i++)
+    for (size_t i = 1; i < elems.size(); i++)
     {
         if (elems[i] == elems[i-1])
         {
@@ -120,7 +120,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
     std::vector<int> numelemswithnumrefcoords(maxnumrefcoords+1,0);
     numelemswithnumrefcoords[1] = 1;
     curnumrefcoords = 1;
-    for (int i = 1; i < elems.size(); i++)
+    for (size_t i = 1; i < elems.size(); i++)
     {
         if (elems[i] == elems[i-1])
         {
@@ -148,7 +148,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
     }
     std::vector<int> curindexes(maxnumrefcoords+1,0);
     int first = 0;
-    for (int i = 1; i <= elems.size(); i++)
+    for (size_t i = 1; i <= elems.size(); i++)
     {
         if (i < elems.size() && elems[i] == elems[i-1])
             continue;
@@ -181,7 +181,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
         std::vector<int> myelemsreordered(myelems[n].size());
         std::vector<int> mycoordnumsreordered(myelems[n].size());
         std::vector<double> mykietaphisreordered(3*myelems[n].size());
-        for (int i = 0; i < reordvec.size(); i++)
+        for (size_t i = 0; i < reordvec.size(); i++)
         {
             myelemsreordered[i] = myelems[n][reordvec[i]];
             mycoordnumsreordered[i] = mycoordnums[n][reordvec[i]];
@@ -192,7 +192,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
         // Sort by blocks of n coordinates:
         myalgorithm::stablesort(noisethreshold, mykietaphisreordered, reordvec, 3*n);
     
-        for (int i = 0; i < reordvec.size(); i++)
+        for (size_t i = 0; i < reordvec.size(); i++)
         {
             for (int j = 0; j < n; j++)
             {
@@ -252,7 +252,7 @@ bool referencecoordinategroup::next(void)
     
     // Get the numbers of the reference coordinates:
     mycurcoordnums.resize(numelemsinrange*mynumrefcoords);
-    for (int i = 0; i < mycurcoordnums.size(); i++)
+    for (size_t i = 0; i < mycurcoordnums.size(); i++)
         mycurcoordnums[i] = curcoords->at(myrangebegin+i);
     
 

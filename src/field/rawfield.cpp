@@ -10,9 +10,9 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     // Synchronize all subfields and harmonics:
     if (mysubfields.size() != 0 || myharmonics.size() != 0)
     {
-        for (int i = 0; i < mysubfields.size(); i++)
+        for (size_t i = 0; i < mysubfields.size(); i++)
             mysubfields[i][0]->synchronize();
-        for (int h = 0; h < myharmonics.size(); h++)
+        for (size_t h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
                 myharmonics[h][0]->synchronize();
@@ -42,7 +42,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     {
         if (physregsfororder.size() == 0)
         {
-            for (int i = 0; i < myordertracker.size(); i++)
+            for (size_t i = 0; i < myordertracker.size(); i++)
                 setorder(myordertracker[i].first, myordertracker[i].second, false);
         }
         else
@@ -55,18 +55,18 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     else
     {
         interpolationorder = disjregsfororder;
-        for (int i = 0; i < interpolationorder.size(); i++)
+        for (size_t i = 0; i < interpolationorder.size(); i++)
             mycoefmanager->fitinterpolationorder(i, interpolationorder[i]); 
     }
-    for (int i = 0; i < myconstraintphysregtracker.size(); i++)
+    for (size_t i = 0; i < myconstraintphysregtracker.size(); i++)
     {
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(myconstraintphysregtracker[i]))->getdisjointregions(-1);
-        for (int j = 0; j < selecteddisjregs.size(); j++)
+        for (size_t j = 0; j < selecteddisjregs.size(); j++)
             myconstraints[selecteddisjregs[j]] = myconstraintcalctracker[i];
     }
-    for (int i = 0; i < myconditionalconstrainttracker.size(); i++)
+    for (size_t i = 0; i < myconditionalconstrainttracker.size(); i++)
         setconditionalconstraint(std::get<0>(myconditionalconstrainttracker[i]), std::get<1>(myconditionalconstrainttracker[i]), std::get<2>(myconditionalconstrainttracker[i]));
-    for (int i = 0; i < mygaugetracker.size(); i++)
+    for (size_t i = 0; i < mygaugetracker.size(); i++)
         setgauge(mygaugetracker[i]);
         
     // Update the coef manager with the new nodal/edge/face/volume shape function coefficients:
@@ -184,7 +184,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     std::vector<int> alldrsindim = drs->getindim(dim);
     // Count the number of non-empty diagonal blocks:
     int numblocks = 0, preallocsize = 0;
-    for (int d = 0; d < alldrsindim.size(); d++)
+    for (size_t d = 0; d < alldrsindim.size(); d++)
     {
         int curdr = alldrsindim[d];
         int numelemsindr = drs->countelements(curdr);
@@ -204,7 +204,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         intdensematrix renumtodiagblocks(dm->countdofs(), 1);
         int* renumptr = renumtodiagblocks.getvalues();
         int index = 0;
-        for (int d = 0; d < alldrsindim.size(); d++)
+        for (size_t d = 0; d < alldrsindim.size(); d++)
         {
             int curdr = alldrsindim[d];
             int numelemsindr = drs->countelements(curdr);
@@ -268,9 +268,9 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
 
 void rawfield::allowsynchronizing(bool allowit)
 {
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->allowsynchronizing(allowit);
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->allowsynchronizing(allowit);
@@ -281,9 +281,9 @@ void rawfield::allowsynchronizing(bool allowit)
 
 void rawfield::allowvaluesynchronizing(bool allowit)
 {
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->allowvaluesynchronizing(allowit);
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->allowvaluesynchronizing(allowit);
@@ -294,9 +294,9 @@ void rawfield::allowvaluesynchronizing(bool allowit)
 
 void rawfield::setupdateaccuracy(int extraintegrationorder)
 {
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setupdateaccuracy(extraintegrationorder);
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setupdateaccuracy(extraintegrationorder);
@@ -362,7 +362,7 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         if (harmonicnumbers.size() != 0)
         {
             myharmonics.resize(*max_element(harmonicnumbers.begin(), harmonicnumbers.end())+1);
-            for (int h = 0; h < harmonicnumbers.size(); h++)
+            for (size_t h = 0; h < harmonicnumbers.size(); h++)
                 myharmonics[harmonicnumbers[h]] = { std::shared_ptr<rawfield>(new rawfield(mytypename, {}, ismultiharm)) };
         }    
         else
@@ -452,7 +452,7 @@ std::vector<int> rawfield::getharmonics(void)
     {
         std::vector<int> harms = {};
 
-        for (int h = 0; h < myharmonics.size(); h++)
+        for (size_t h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
                 harms.push_back(h);
@@ -476,7 +476,7 @@ int rawfield::getfirstharmonic(void)
             return 1;
         else
         {
-            for (int h = 0; h < myharmonics.size(); h++)
+            for (size_t h = 0; h < myharmonics.size(); h++)
             {
                 if (myharmonics[h].size() == 1)
                     return h;
@@ -516,7 +516,7 @@ void rawfield::printharmonics(void)
             std::cout << " +vc0*cos(0*pif0t)";
             return;
         }
-        for (int h = 0; h < myharmonics.size(); h++)
+        for (size_t h = 0; h < myharmonics.size(); h++)
         {
             // Make sure the harmonic exists:
             if (myharmonics[h].size() != 0)
@@ -541,7 +541,7 @@ std::shared_ptr<coefmanager> rawfield::resetcoefmanager(void)
     
     mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, myptracker->getdisjointregions()));
     
-    for (int i = 0; i < interpolationorder.size(); i++)
+    for (size_t i = 0; i < interpolationorder.size(); i++)
         mycoefmanager->fitinterpolationorder(i, interpolationorder[i]);
     
     return outcm;
@@ -580,9 +580,9 @@ void rawfield::setname(std::string name)
     
     myname = name;
     
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setname(name);
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setname(name);
@@ -642,9 +642,9 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     }
         
     // Set the interpolation order on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setorder(physreg, interpolorder, iscalledbyuser);
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setorder(physreg, interpolorder, iscalledbyuser);
@@ -655,7 +655,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
         // Consider ALL disjoint regions in the physical region with (-1):
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
         
-        for (int i = 0; i < selecteddisjregs.size(); i++)
+        for (size_t i = 0; i < selecteddisjregs.size(); i++)
         {
             interpolationorder[selecteddisjregs[i]] = interpolorder;
             mycoefmanager->fitinterpolationorder(selecteddisjregs[i], interpolorder);
@@ -674,9 +674,9 @@ void rawfield::setorder(expression criterion, int loworder, int highorder)
     }
     
     // Set the interpolation order on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setorder(criterion, loworder, highorder);
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setorder(criterion, loworder, highorder);
@@ -708,7 +708,7 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
     }
     
     // Set the values on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
 
     if (mysubfields.size() == 0)
@@ -864,7 +864,7 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
     }
         
     // Set the constraints on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setconstraint(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
         
     if (mysubfields.size() == 0)
@@ -891,12 +891,12 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
                 myconstraintcalctracker.push_back(constraintcomputation);
             }
         
-            for (int i = 0; i < selecteddisjregs.size(); i++)
+            for (size_t i = 0; i < selecteddisjregs.size(); i++)
                 myconstraints[selecteddisjregs[i]] = constraintcomputation;
         }
         else
         {
-            for (int h = 0; h < myharmonics.size(); h++)
+            for (size_t h = 0; h < myharmonics.size(); h++)
             {
                 if (myharmonics[h].size() > 0)
                 {
@@ -906,7 +906,7 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
                         myharmonics[h][0]->myconstraintcalctracker.push_back(constraintcomputation);
                     }
                 
-                    for (int i = 0; i < selecteddisjregs.size(); i++)
+                    for (size_t i = 0; i < selecteddisjregs.size(); i++)
                         myharmonics[h][0]->myconstraints[selecteddisjregs[i]] = constraintcomputation;
                 }
             }
@@ -957,10 +957,10 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
     }
         
     // Set the constraints on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setconditionalconstraint(physreg, condexpr, valexpr.at(i,0));
     // Set the constraints on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setconditionalconstraint(physreg, condexpr, valexpr);
@@ -971,7 +971,7 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
         // Consider only the NODAL disjoint regions in the physical region with (0):
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(0);
 
-        for (int i = 0; i < selecteddisjregs.size(); i++)
+        for (size_t i = 0; i < selecteddisjregs.size(); i++)
             myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
     }
 }
@@ -985,10 +985,10 @@ void rawfield::setgauge(int physreg)
         mygaugetracker.push_back(physreg);
         
     // Set the gauge on the subfields (if any):
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setgauge(physreg);
     // Set the gauge on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setgauge(physreg);
@@ -999,7 +999,7 @@ void rawfield::setgauge(int physreg)
         // Get ALL disjoint regions in the physical region (not only ders, to remove grad type form functions).
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
-        for (int i = 0; i < selecteddisjregs.size(); i++)
+        for (size_t i = 0; i < selecteddisjregs.size(); i++)
             isitgauged[selecteddisjregs[i]] = true;
     }
 }
@@ -1009,10 +1009,10 @@ void rawfield::setspanningtree(spanningtree spantree)
     synchronize();
     
     // Set the spanning tree on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
+    for (size_t i = 0; i < mysubfields.size(); i++)
         mysubfields[i][0]->setspanningtree(spantree);
     // Set the spanning tree on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
+    for (size_t i = 0; i < myharmonics.size(); i++)
     {
         if (myharmonics[i].size() > 0)
             myharmonics[i][0]->setspanningtree(spantree);
@@ -1089,7 +1089,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
     // Get the data of every subfield:
     if (mysubfields.size() > 0)
     {
-        for (int i = 0; i < mysubfields.size(); i++)
+        for (size_t i = 0; i < mysubfields.size(); i++)
             mysubfields[i][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op);
     }
     else
@@ -1104,7 +1104,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
         // Get the data of every harmonic:
         if (myharmonics.size() > 0)
         {
-            for (int h = 0; h < myharmonics.size(); h++)
+            for (size_t h = 0; h < myharmonics.size(); h++)
             {
                 if (myharmonics[h].size() > 0)
                     myharmonics[h][0]->setdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op);
@@ -1129,7 +1129,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
                 selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
             }
 
-            for (int i = 0; i < selecteddisjregs.size(); i++)
+            for (size_t i = 0; i < selecteddisjregs.size(); i++)
             {
                 int disjreg = selecteddisjregs[i];
 
@@ -1200,7 +1200,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     // Transfer the data of every subfield:
     if (mysubfields.size() > 0)
     {
-        for (int i = 0; i < mysubfields.size(); i++)
+        for (size_t i = 0; i < mysubfields.size(); i++)
             mysubfields[i][0]->transferdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->mysubfields[i][0]), op);
         return;
     }
@@ -1215,7 +1215,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     // Transfer the data of every harmonic:
     if (myharmonics.size() > 0)
     {
-        for (int h = 0; h < myharmonics.size(); h++)
+        for (size_t h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
                 myharmonics[h][0]->transferdata(physreg, vectorfieldselect(selectedvec, selectedrawfield->harmonic(h)), op);
@@ -1239,7 +1239,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
         selecteddisjregs = dofmngr->getdisjointregionsofselectedfield();
     }
 
-    for (int i = 0; i < selecteddisjregs.size(); i++)
+    for (size_t i = 0; i < selecteddisjregs.size(); i++)
     {
         int disjreg = selecteddisjregs[i];
 
@@ -1306,7 +1306,7 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
         std::shared_ptr<rawfield> harmsrawfield(new rawfield());
         *harmsrawfield = *this;
         // Replace every subfield by a new one with only the requested harmonics:
-        for (int i = 0; i < mysubfields.size(); i++)
+        for (size_t i = 0; i < mysubfields.size(); i++)
             harmsrawfield->mysubfields[i][0] = mysubfields[i][0]->harmonic(harmonicnumbers);
         return harmsrawfield;
     }
@@ -1334,7 +1334,7 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
         harmsrawfield->myharmonics = std::vector<std::vector<std::shared_ptr<rawfield>>>(maxharmnum+1, std::vector<std::shared_ptr<rawfield>>(0));
         
         // Add only the requested harmonics:
-        for (int i = 0; i < harmonicnumbers.size(); i++)
+        for (size_t i = 0; i < harmonicnumbers.size(); i++)
         {
             if (harmonicnumbers[i] < myharmonics.size() && myharmonics[harmonicnumbers[i]].size() > 0)
                 harmsrawfield->myharmonics[harmonicnumbers[i]] = {myharmonics[harmonicnumbers[i]][0]};
@@ -1556,7 +1556,7 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
         if (myharmonics.size() > 0)
         {
             std::vector<int> harms = getharmonics();
-            for (int h = 0; h < harms.size(); h++)
+            for (size_t h = 0; h < harms.size(); h++)
             {
                 if (myharmonics[harms[h]][0]->getinterpolationorder(disjreg) == myharmonics[harms[0]][0]->getinterpolationorder(disjreg))
                     continue;
@@ -1584,12 +1584,12 @@ std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> rawfield::ge
     
     if (mysubfields.size() > 0)
     {
-        for (int i = 0; i < mysubfields.size(); i++)
+        for (size_t i = 0; i < mysubfields.size(); i++)
         {
             if (mysubfields[i].size() > 0)
             {
                 std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> cur = mysubfields[i][0]->getallsons();
-                for (int f = 0; f < cur.size(); f++)
+                for (size_t f = 0; f < cur.size(); f++)
                 {
                     cur[f].first[0] = i;
                     output.push_back(cur[f]);
@@ -1601,12 +1601,12 @@ std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> rawfield::ge
     
     if (myharmonics.size() > 0)
     {
-        for (int h = 0; h < myharmonics.size(); h++)
+        for (size_t h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
             {
                 std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> cur = myharmonics[h][0]->getallsons();
-                for (int f = 0; f < cur.size(); f++)
+                for (size_t f = 0; f < cur.size(); f++)
                 {
                     cur[f].first[1] = h;
                     output.push_back(cur[f]);
@@ -1737,17 +1737,17 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
     std::vector<double> flatdoubledata(doubledatasize);
     
     int curindex = 0;
-    for (int i = 0; i < extradata.size(); i++)
+    for (size_t i = 0; i < extradata.size(); i++)
     {
         flatdoubledata[curindex] = extradata[i];
         curindex++;
     }
     
-    for (int i = 0; i < doubledata.size(); i++)
+    for (size_t i = 0; i < doubledata.size(); i++)
     {
-        for (int j = 0; j < doubledata[i].size(); j++)
+        for (size_t j = 0; j < doubledata[i].size(); j++)
         {
-            for (int k = 0; k < doubledata[i][j].size(); k++)
+            for (size_t k = 0; k < doubledata[i][j].size(); k++)
             {
                 flatdoubledata[curindex] = doubledata[i][j][k];
                 curindex++;
@@ -1815,12 +1815,12 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
         std::cout << "Error in 'rawfield' object: harmonic list in field loaded from file '" << filename << "' does not match current field." << std::endl << std::endl;
 
         std::cout << "Harmonics in loaded field (" << harmoniclist.size() << "): ";
-        for (int i = 0; i < harmoniclist.size(); i++)
+        for (size_t i = 0; i < harmoniclist.size(); i++)
             std::cout << harmoniclist[i] << " ";
         std::cout << std::endl;
         
         std::cout << "Harmonics in current field (" << harmsinthisfield.size() << "): ";
-        for (int i = 0; i < harmsinthisfield.size(); i++)
+        for (size_t i = 0; i < harmsinthisfield.size(); i++)
             std::cout << harmsinthisfield[i] << " ";
         std::cout << std::endl << std::endl;
         abort();
@@ -1865,7 +1865,7 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     
     // Load the extra data at the double data vector begin:
     std::vector<double> extradata(intdata[indexinintvec+1]);
-    for (int i = 0; i < extradata.size(); i++)
+    for (size_t i = 0; i < extradata.size(); i++)
         extradata[i] = doubledata[i];
     
     // Calculate the number of sons:
@@ -1953,7 +1953,7 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
 
     for (int num = 0; num < numcurvednodes; num++)
     {
-        for (int i = 0; i < elementlist.size(); i++)
+        for (size_t i = 0; i < elementlist.size(); i++)
         {
             int elem = elementlist[i];
             // Get the node to which the current form function is associated:
@@ -1994,7 +1994,7 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
 
     // Group disj. regs. with same interpolation order (and same element type number).
     std::vector<int> interpolorders(alldisjregs.size());
-    for (int i = 0; i < alldisjregs.size(); i++)
+    for (size_t i = 0; i < alldisjregs.size(); i++)
         interpolorders[i] = getinterpolationorder(alldisjregs[i]);
     disjointregionselector mydisjregselector(alldisjregs, {interpolorders});
     for (int i = 0; i < mydisjregselector.countgroups(); i++)
@@ -2011,14 +2011,14 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         // Preallocate the harmonics not in 'out':
         if (out.size() < currentinterp.size())
             out.resize(currentinterp.size());
-        for (int h = 0; h < currentinterp.size(); h++)
+        for (size_t h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1 && out[h].size() == 0)
                 out[h] = {densematrix(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
         }
         
         // Insert 'currentinterp' in 'out':
-        for (int h = 0; h < currentinterp.size(); h++)
+        for (size_t h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1)
                 out[h][0].insertatrows(elemselect.getelementindexes(), currentinterp[h][0]);
@@ -2059,7 +2059,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
 
         for (int num = 0; num < numcurvednodes; num++)
         {
-            for (int i = 0; i < elementlist.size(); i++)
+            for (size_t i = 0; i < elementlist.size(); i++)
             {
                 int elem = elementlist[i];
                 // Get the node to which the current form function is associated:
@@ -2092,7 +2092,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
             if ((elementtypenumber == 6 || elementtypenumber == 7) && associatedelementtype == 3)
                 num -= myelement.counttriangularfaces();
 
-            for (int i = 0; i < elementlist.size(); i++)
+            for (size_t i = 0; i < elementlist.size(); i++)
             {
                 int elem = elementlist[i];
                 // Get the subelement to which the current form function is associated:
@@ -2152,7 +2152,7 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         {
             std::vector<std::vector<densematrix>> coefstimesformfunctions(myharmonics.size());
 
-            for (int harm = 1; harm < myharmonics.size(); harm++)
+            for (size_t harm = 1; harm < myharmonics.size(); harm++)
             {
                 if (myharmonics[harm].size() == 0)
                     continue;

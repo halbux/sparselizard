@@ -35,7 +35,7 @@ densematrix opparameter::multiharmonicinterpolate(int numtimeevals, elementselec
 
 bool opparameter::isharmonicone(std::vector<int> disjregs) 
 { 
-    for (int i = 0; i < disjregs.size(); i++)
+    for (size_t i = 0; i < disjregs.size(); i++)
     {
         if ( (myparameter->get(disjregs[i], myrow, mycolumn))->isharmonicone({disjregs[i]}) == false )
             return false;
@@ -45,14 +45,14 @@ bool opparameter::isharmonicone(std::vector<int> disjregs)
 
 std::shared_ptr<operation> opparameter::simplify(std::vector<int> disjregs)
 {
-    for (int i = 0; i < disjregs.size(); i++)
+    for (size_t i = 0; i < disjregs.size(); i++)
         myparameter->simplify(myrow, mycolumn, disjregs[i]);
     return shared_from_this();
 }
 
 bool opparameter::isvalueorientationdependent(std::vector<int> disjregs)
 {
-    for (int i = 0; i < disjregs.size(); i++)
+    for (size_t i = 0; i < disjregs.size(); i++)
     {
         if ( (myparameter->get(disjregs[i], myrow, mycolumn))->isvalueorientationdependent({disjregs[i]}) == true )
             return true;

@@ -85,7 +85,7 @@ bool nasdataline::addline(std::string linetoadd)
             
             vertices.resize(eleminfo[1]);
             
-            for (int i = 0; i < vertices.size(); i++)
+            for (size_t i = 0; i < vertices.size(); i++)
             {
                 std::string curstrng = linetoadd.substr(24+8*i,8);
                 if (curstrng[0] == '+')
@@ -110,7 +110,7 @@ bool nasdataline::addline(std::string linetoadd)
             
             vertices.resize(eleminfo[1]);
 
-            for (int i = 0; i < vertices.size(); i++)
+            for (size_t i = 0; i < vertices.size(); i++)
             {
                 std::string curstrng = curline.getstringtonextcomma();
                 if (curstrng[0] == '+')

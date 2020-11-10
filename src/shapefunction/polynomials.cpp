@@ -32,11 +32,11 @@ polynomials::polynomials(std::vector<polynomial> input)
     mycoeffs = std::vector<double>(mynumpolys * mynummonomials, 0.0);
     for (int pol = 0; pol < mynumpolys; pol++)
     {
-        for (int k = 0; k < input[pol].mycoefficients.size(); k++)
+        for (size_t k = 0; k < input[pol].mycoefficients.size(); k++)
         {
-            for (int e = 0; e < input[pol].mycoefficients[k].size(); e++)
+            for (size_t e = 0; e < input[pol].mycoefficients[k].size(); e++)
             {
-                for (int p = 0; p < input[pol].mycoefficients[k][e].size(); p++)
+                for (size_t p = 0; p < input[pol].mycoefficients[k][e].size(); p++)
                     mycoeffs[pol*mynummonomials+k*myetalen*myphilen+e*myphilen+p] = input[pol].mycoefficients[k][e][p];
             }
         }
@@ -167,7 +167,7 @@ void polynomials::print(void)
 {
     std::cout << "Number of polynomials is " << mynumpolys << " with " << mynummonomials << " monomials (" << mykilen << "x" << myetalen << "x" << myphilen << ")" << std::endl;
     std::cout << "Coefficients are:" << std::endl;
-    for (int i = 0; i < mycoeffs.size(); i++)
+    for (size_t i = 0; i < mycoeffs.size(); i++)
         std::cout << mycoeffs[i] << " ";
     std::cout << std::endl;
 }

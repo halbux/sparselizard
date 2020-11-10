@@ -113,12 +113,12 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     std::vector<vec> presols(tosolvebefore.size()), postsols(tosolveafter.size());
     if (istadapt)
     {
-        for (int i = 0; i < presols.size(); i++)
+        for (size_t i = 0; i < presols.size(); i++)
         {
             presols[i] = vec(tosolvebefore[i]);
             presols[i].setdata();
         }
-        for (int i = 0; i < postsols.size(); i++)
+        for (size_t i = 0; i < postsols.size(); i++)
         {
             postsols[i] = vec(tosolveafter[i]);
             postsols[i].setdata();
@@ -259,9 +259,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 dt *= rfact;
                 // Reset fields for a new resolution:
                 mathop::setdata(u);
-                for (int i = 0; i < presols.size(); i++)
+                for (size_t i = 0; i < presols.size(); i++)
                     mathop::setdata(presols[i]);
-                for (int i = 0; i < postsols.size(); i++)
+                for (size_t i = 0; i < postsols.size(); i++)
                     mathop::setdata(postsols[i]);
             }
                 

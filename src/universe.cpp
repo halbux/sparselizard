@@ -76,7 +76,7 @@ std::vector< densematrix > universe::opcomputedfft = {};
 
 int universe::getindexofprecomputedvalue(std::shared_ptr<operation> op)
 {
-    for (int i = 0; i < oppointers.size(); i++)
+    for (size_t i = 0; i < oppointers.size(); i++)
     {
         if (oppointers[i].get() == op.get())
             return i;
@@ -86,7 +86,7 @@ int universe::getindexofprecomputedvalue(std::shared_ptr<operation> op)
 
 int universe::getindexofprecomputedvaluefft(std::shared_ptr<operation> op)
 {
-    for (int i = 0; i < oppointersfft.size(); i++)
+    for (size_t i = 0; i < oppointersfft.size(); i++)
     {
         if (oppointersfft[i].get() == op.get())
             return i;
@@ -97,7 +97,7 @@ int universe::getindexofprecomputedvaluefft(std::shared_ptr<operation> op)
 std::vector<std::vector<densematrix>> universe::getprecomputed(int index)
 {
     std::vector<std::vector<densematrix>> output = opcomputed[index];
-    for (int h = 0; h < output.size(); h++)
+    for (size_t h = 0; h < output.size(); h++)
     {
         if (output[h].size() == 1)
             output[h][0] = output[h][0].copy();
@@ -114,7 +114,7 @@ void universe::setprecomputed(std::shared_ptr<operation> op, std::vector<std::ve
 {
     oppointers.push_back(op);
     opcomputed.push_back(val);
-    for (int h = 0; h < val.size(); h++)
+    for (size_t h = 0; h < val.size(); h++)
     {
         if (val[h].size() == 1)
             opcomputed[opcomputed.size()-1][h][0] = val[h][0].copy();
@@ -140,7 +140,7 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
 {
     // Find the type name in the container:
     int typenameindex = -1;
-    for (int i = 0; i < formfuncpolys.size(); i++)
+    for (size_t i = 0; i < formfuncpolys.size(); i++)
     {
         if (formfuncpolys[i].first == fftypename)
         {
@@ -185,11 +185,11 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
 
 void universe::resethff(void)
 {
-    for (int typenameindex = 0; typenameindex < formfuncpolys.size(); typenameindex++)
+    for (size_t typenameindex = 0; typenameindex < formfuncpolys.size(); typenameindex++)
     {
-        for (int elementtypenumber = 0; elementtypenumber < (formfuncpolys[typenameindex].second).size(); elementtypenumber++)
+        for (size_t elementtypenumber = 0; elementtypenumber < (formfuncpolys[typenameindex].second).size(); elementtypenumber++)
         {
-            for (int interpolorder = 0; interpolorder < formfuncpolys[typenameindex].second[elementtypenumber].size(); interpolorder++)
+            for (size_t interpolorder = 0; interpolorder < formfuncpolys[typenameindex].second[elementtypenumber].size(); interpolorder++)
             {
                 if (formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
                     formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(false);

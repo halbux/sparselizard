@@ -8,7 +8,7 @@ void spanningtree::growsubtrees(void)
     isnodeintree = std::vector<bool>(myelements->count(0),false);
 
     numberofsubtrees = 0;
-    for (int i = 0; i < isprioritydisjointregion.size(); i++)
+    for (size_t i = 0; i < isprioritydisjointregion.size(); i++)
     {
         if (isprioritydisjointregion[i] == false)
             continue;
@@ -37,7 +37,7 @@ void spanningtree::growsubtree(int nodenumber, int subtreenumber)
     std::vector<int> edgecandidates = myelements->getedgesonnode(nodenumber);    
 
     // Loop on all edge candidates:
-    for (int i = 0; i < edgecandidates.size(); i++)
+    for (size_t i = 0; i < edgecandidates.size(); i++)
     {
         int currentedge = edgecandidates[i];
 
@@ -79,7 +79,7 @@ void spanningtree::connectsubtrees(void)
 
     // Count the number of edges in each subtree for preallocation:
     std::vector<int> numedgesinsubtree(numberofsubtrees,0);
-    for (int i = 0; i < insubtree.size(); i++)
+    for (size_t i = 0; i < insubtree.size(); i++)
     {
         if (insubtree[i] != -1)
             numedgesinsubtree[insubtree[i]]++;
@@ -90,7 +90,7 @@ void spanningtree::connectsubtrees(void)
         edgesinsubtree[i].resize(numedgesinsubtree[i]);
     // Populate:
     std::vector<int> indexinsubtree(numberofsubtrees,0);
-    for (int i = 0; i < insubtree.size(); i++)
+    for (size_t i = 0; i < insubtree.size(); i++)
     {
         if (insubtree[i] != -1)
         {
@@ -103,7 +103,7 @@ void spanningtree::connectsubtrees(void)
     ///// Create the overall tree by connecting the subtrees:
 
     issubtreeintree = std::vector<bool>(numberofsubtrees,false);
-    for (int i = 0; i < isnodeintree.size(); i++)
+    for (size_t i = 0; i < isnodeintree.size(); i++)
     {
         if (isnodeintree[i] == false)
             growtree(i);
@@ -129,14 +129,14 @@ void spanningtree::growtree(int nodenumber)
     std::vector<int> edgecandidates = myelements->getedgesonnode(nodenumber);    
 
     // Add to the tree all not yet added subtrees on the edges candidates:
-    for (int i = 0; i < edgecandidates.size(); i++)
+    for (size_t i = 0; i < edgecandidates.size(); i++)
     {
         int currentsubtree = insubtree[edgecandidates[i]];
 
         // Add the subtree to the tree if not already added:
         if (currentsubtree != -1 && issubtreeintree[currentsubtree] == false)
         {
-            for (int i = 0; i < edgesinsubtree[currentsubtree].size(); i++)
+            for (size_t i = 0; i < edgesinsubtree[currentsubtree].size(); i++)
             {
                 int node1 = myelements->getsubelement(0, 1, edgesinsubtree[currentsubtree][i], 0);
                 int node2 = myelements->getsubelement(0, 1, edgesinsubtree[currentsubtree][i], 1);
@@ -151,7 +151,7 @@ void spanningtree::growtree(int nodenumber)
             issubtreeintree[currentsubtree] = true;
 
             // Grow tree from every added edge:
-            for (int i = 0; i < edgesinsubtree[currentsubtree].size(); i++)
+            for (size_t i = 0; i < edgesinsubtree[currentsubtree].size(); i++)
             {
                 int node1 = myelements->getsubelement(0, 1, edgesinsubtree[currentsubtree][i], 0);
                 int node2 = myelements->getsubelement(0, 1, edgesinsubtree[currentsubtree][i], 1);
@@ -163,7 +163,7 @@ void spanningtree::growtree(int nodenumber)
     }
 
     // Add to the tree all edges that do not create a loop:
-    for (int i = 0; i < edgecandidates.size(); i++)
+    for (size_t i = 0; i < edgecandidates.size(); i++)
     {
         int currentedge = edgecandidates[i];
 
@@ -192,12 +192,12 @@ void spanningtree::grow(void)
     // Get a vector with all disjoint edge regions in the physical regions provided:
     isprioritydisjointregion = std::vector<bool>(mydisjointregions->count(), false);
 
-    for (int i = 0; i < startphysregs.size(); i++)
+    for (size_t i = 0; i < startphysregs.size(); i++)
     {
         // Get all disjoint edge regions in the current physical region:
         std::vector<int> edgedisjregs = ((universe::mymesh->getphysicalregions())->get(startphysregs[i]))->getdisjointregions(1);
 
-        for (int j = 0; j < edgedisjregs.size(); j++)
+        for (size_t j = 0; j < edgedisjregs.size(); j++)
             isprioritydisjointregion[edgedisjregs[j]] = true;
     }
 

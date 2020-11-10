@@ -24,7 +24,7 @@ std::vector<std::vector<densematrix>> opsum::interpolate(elementselector& elemse
     // Compute first all the sum terms and get the max number of harmonics.
     int maxnumberofharmonics = 0;
     std::vector< std::vector<std::vector<densematrix>> > computedterms(sumterms.size());
-    for (int i = 0; i < sumterms.size(); i++)
+    for (size_t i = 0; i < sumterms.size(); i++)
     {
         computedterms[i] = sumterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
         if (computedterms[i].size() > maxnumberofharmonics)
@@ -37,7 +37,7 @@ std::vector<std::vector<densematrix>> opsum::interpolate(elementselector& elemse
     // Sum all harmonics together (ignore harmonic sin0):
     for (int harm = 1; harm < maxnumberofharmonics; harm++)
     {
-        for (int i = 0; i < sumterms.size(); i++)
+        for (size_t i = 0; i < sumterms.size(); i++)
         {
             // If the sum term exists for the current harmonic:
             if (harm < computedterms[i].size() && computedterms[i][harm].size() == 1)
@@ -68,7 +68,7 @@ densematrix opsum::multiharmonicinterpolate(int numtimeevals, elementselector& e
     
     densematrix output = sumterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
-    for (int i = 1; i < sumterms.size(); i++)
+    for (size_t i = 1; i < sumterms.size(); i++)
         output.add(sumterms[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform));
     
     if (reuse && universe::isreuseallowed)
@@ -79,7 +79,7 @@ densematrix opsum::multiharmonicinterpolate(int numtimeevals, elementselector& e
 
 std::shared_ptr<operation> opsum::expand(void)
 {
-    for (int i = 0; i < sumterms.size(); i++)
+    for (size_t i = 0; i < sumterms.size(); i++)
     {
         // We only want to expand operations that include a dof() or tf().
         if (sumterms[i]->isdofincluded() || sumterms[i]->istfincluded())
@@ -95,7 +95,7 @@ void opsum::group(void)
 {
     std::vector<std::shared_ptr<operation>> groupedsumterms = {};
     
-    for (int i = 0; i < sumterms.size(); i++)
+    for (size_t i = 0; i < sumterms.size(); i++)
     {
         sumterms[i]->group();
 
@@ -155,10 +155,10 @@ std::shared_ptr<operation> opsum::copy(void)
 std::vector<double> opsum::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated(xcoords.size(), 0);
-    for (int i = 0; i < sumterms.size(); i++)
+    for (size_t i = 0; i < sumterms.size(); i++)
     {
         std::vector<double> current = sumterms[i]->evaluate(xcoords, ycoords, zcoords);
-        for (int j = 0; j < xcoords.size(); j++)
+        for (size_t j = 0; j < xcoords.size(); j++)
             evaluated[j] += current[j];
     }
     return evaluated;
@@ -167,7 +167,7 @@ std::vector<double> opsum::evaluate(std::vector<double>& xcoords, std::vector<do
 void opsum::print(void)
 {
     std::cout << "(";
-    for (int i = 0; i < sumterms.size(); i++)
+    for (size_t i = 0; i < sumterms.size(); i++)
     {
         if (i > 0)
             std::cout << " + ";

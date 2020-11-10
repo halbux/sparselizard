@@ -62,7 +62,7 @@ densematrix::densematrix(std::vector<densematrix> input)
     // Calculate the final concatenated size:
     numcols = input[0].countcolumns();
     numrows = input[0].countrows();
-    for (long long int i = 1; i < input.size(); i++)
+    for (size_t i = 1; i < input.size(); i++)
     {
         numrows += input[i].countrows();
         if (input[i].countcolumns() != numcols)
@@ -74,7 +74,7 @@ densematrix::densematrix(std::vector<densematrix> input)
     double* myvaluesptr = new double[numrows*numcols];
     
     long long int index = 0;
-    for (long long int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         double* curvals = input[i].getvalues();
         for (long long int j = 0; j < input[i].count(); j++)
@@ -120,7 +120,7 @@ void densematrix::insertatrows(std::vector<int> selectedrows, densematrix toinse
     double* myvaluesptr = myvalues.get();
     double* toinsertvaluesptr = toinsert.myvalues.get();
     
-    for (long long int i = 0; i < selectedrows.size(); i++)
+    for (size_t i = 0; i < selectedrows.size(); i++)
     {
         for (long long int col = 0; col < numcols; col++)
             myvaluesptr[selectedrows[i]*numcols+col] = toinsertvaluesptr[i*numcols+col];
@@ -134,7 +134,7 @@ void densematrix::insertatcolumns(std::vector<int> selectedcolumns, densematrix 
     
     for (long long int row = 0; row < numrows; row++)
     {
-        for (long long int j = 0; j < selectedcolumns.size(); j++)
+        for (size_t j = 0; j < selectedcolumns.size(); j++)
             myvaluesptr[row*numcols+selectedcolumns[j]] = toinsertvaluesptr[row*toinsert.numcols+j];
     }
 }
@@ -704,7 +704,7 @@ densematrix densematrix::extractcols(std::vector<int> selected)
 densematrix densematrix::extractrows(long long int rangebegin, long long int rangeend)
 {
     std::vector<int> selected(rangeend-rangebegin+1);
-    for (long long int i = 0; i < selected.size(); i++)
+    for (size_t i = 0; i < selected.size(); i++)
         selected[i] = rangebegin + i;
         
     return extractrows(selected);
@@ -713,7 +713,7 @@ densematrix densematrix::extractrows(long long int rangebegin, long long int ran
 densematrix densematrix::extractcols(long long int rangebegin, long long int rangeend)
 {
     std::vector<int> selected(rangeend-rangebegin+1);
-    for (long long int i = 0; i < selected.size(); i++)
+    for (size_t i = 0; i < selected.size(); i++)
         selected[i] = rangebegin + i;
         
     return extractcols(selected);

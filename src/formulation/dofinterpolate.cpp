@@ -73,7 +73,7 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
 
     // Calculate the maximum number of shape functions over all disjoint regions for preallocation.
     mymaxnumff = 0;
-    for (int i = 0; i < ondisjregs.size(); i++)
+    for (size_t i = 0; i < ondisjregs.size(); i++)
     {
         int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(ondisjregs[i]); 
         int doforder = mydoffield->getinterpolationorder(ondisjregs[i]);
@@ -87,13 +87,13 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     // Preallocate the matrix containers:
     int totalnumels = elemselec.count();
     myvals = std::vector<densematrix>(mydofops.size());
-    for (int i = 0; i < mydofops.size(); i++)
+    for (size_t i = 0; i < mydofops.size(); i++)
         myvals[i] = densematrix(totalnumels, mymaxnumff*mynumrefcoords, 0);
     // Preallocate the adresses matrix for each harmonic:
     std::vector<int> dofharms = mydoffield->getharmonics();
     mydofnums = std::vector<std::vector<intdensematrix>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<intdensematrix>(0));
    
-    for (int h = 0; h < dofharms.size(); h++)
+    for (size_t h = 0; h < dofharms.size(); h++)
         mydofnums[dofharms[h]] = {intdensematrix(totalnumels, mymaxnumff*mynumrefcoords, -2)};
            
 
@@ -110,7 +110,7 @@ void dofinterpolate::eval(void)
     std::vector<int> dofharms = mydoffield->getharmonics();
     
     std::vector<int> dofinterpolorders(ondisjregs.size());
-    for (int i = 0; i < ondisjregs.size(); i++)
+    for (size_t i = 0; i < ondisjregs.size(); i++)
         dofinterpolorders[i] = mydoffield->getinterpolationorder(ondisjregs[i]);
 
 
@@ -161,7 +161,7 @@ void dofinterpolate::eval(void)
             // Evaluate the shape functions for all total orientations and all reference derivatives:
             hfc.evaluate(kietaphi);
             
-            for (int h = 0; h < dofharms.size(); h++)
+            for (size_t h = 0; h < dofharms.size(); h++)
             {
                 mydofmanager->selectfield(mydoffield->harmonic(dofharms[h]));
                 int* dofnumsptr = mydofnums[dofharms[h]][0].getvalues();
@@ -179,12 +179,12 @@ void dofinterpolate::eval(void)
                     std::vector<densematrix> evaled(mydofops.size());
                     if (h == 0)
                     {
-                        for (int df = 0; df < mydofops.size(); df++)
+                        for (size_t df = 0; df < mydofops.size(); df++)
                             evaled[df] = hfc.tomatrix(totalorient, doforder, mydofops[df]->getkietaphiderivative(), mydofops[df]->getformfunctioncomponent());
                     }
                     
                     // Loop on all selected elements:
-                    for (int e = 0; e < elems.size(); e++)
+                    for (size_t e = 0; e < elems.size(); e++)
                     {
                         for (int ep = 0; ep < numrefcoords; ep++)
                         {
@@ -200,7 +200,7 @@ void dofinterpolate::eval(void)
                             // Same for all harmonics. Do it only once.
                             if (h == 0)
                             {
-                                for (int df = 0; df < mydofops.size(); df++)
+                                for (size_t df = 0; df < mydofops.size(); df++)
                                 {
                                     for (int ff = 0; ff < curnumff; ff++)
                                         myvals[df].getvalues()[rowstart+mynumrefcoords*ff+callingevalpt] = evaled[df].getvalues()[ff*numrefcoords+ep];
@@ -228,7 +228,7 @@ void dofinterpolate::eval(void)
                 while (myselector.next());
             }
             // Keep track of which coordinates were found:
-            for (int c = 0; c < coordindexes.size(); c++)
+            for (size_t c = 0; c < coordindexes.size(); c++)
                 isfound[coordindexes[c]] = true;
         }
     }
@@ -236,7 +236,7 @@ void dofinterpolate::eval(void)
     // Do something if some coordinates were not found:
     if (mydofops[0]->getoncontext()->iserrorifnotfound())
     {
-        for (int i = 0; i < isfound.size(); i++)
+        for (size_t i = 0; i < isfound.size(); i++)
         {    
             if (isfound[i] == false)
             {

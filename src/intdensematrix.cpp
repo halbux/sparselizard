@@ -119,7 +119,7 @@ std::vector<std::vector<int>> intdensematrix::findalloccurences(int maxintval)
     std::vector<int> numoccurences = countalloccurences(maxintval);
     
     std::vector<std::vector<int>> output(numoccurences.size());
-    for (int i = 0; i < numoccurences.size(); i++)
+    for (size_t i = 0; i < numoccurences.size(); i++)
         output[i] = std::vector<int>(numoccurences[i]);
     
     std::vector<int> indexes(numoccurences.size(), 0);

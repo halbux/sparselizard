@@ -5,7 +5,7 @@ disjointregionselector::disjointregionselector(std::vector<int> disjointregionnu
 {
     // Get the element type number in every disjoint region:
     std::vector<int> typenums(disjointregionnumbers.size());
-    for (int i = 0; i < disjointregionnumbers.size(); i++)
+    for (size_t i = 0; i < disjointregionnumbers.size(); i++)
         typenums[i] = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjointregionnumbers[i]);
     criteria.push_back(typenums);
     
@@ -15,7 +15,7 @@ disjointregionselector::disjointregionselector(std::vector<int> disjointregionnu
     // The < operator is overloaded by a lambda function.
     std::sort(renumberingvector.begin(), renumberingvector.end(), [&](int elem1, int elem2)
     { 
-        for (int i = 0; i < criteria.size(); i++)
+        for (size_t i = 0; i < criteria.size(); i++)
         {
             if (criteria[i][elem1] < criteria[i][elem2])
                 return true;
@@ -28,18 +28,18 @@ disjointregionselector::disjointregionselector(std::vector<int> disjointregionnu
     
     // Sort all criteria accordingly:
     std::vector<std::vector<int>> criteriabackup = criteria;
-    for (int i = 0; i < criteria.size(); i++)
+    for (size_t i = 0; i < criteria.size(); i++)
     {
-        for (int j = 0; j < criteria[i].size(); j++)
+        for (size_t j = 0; j < criteria[i].size(); j++)
             criteria[i][j] = criteriabackup[i][renumberingvector[j]];
     }        
     
     // Split in groups:
     int currentgroup = -1;
-    for (int i = 0; i < disjointregionnumbers.size(); i++)
+    for (size_t i = 0; i < disjointregionnumbers.size(); i++)
     {
         bool newgroup = false;
-        for (int j = 0; j < criteria.size(); j++)
+        for (size_t j = 0; j < criteria.size(); j++)
             newgroup = newgroup || i == 0 || criteria[j][i] != criteria[j][i-1];
         
         if (newgroup)

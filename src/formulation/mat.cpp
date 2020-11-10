@@ -59,7 +59,7 @@ void mat::permute(intdensematrix rowpermute, intdensematrix colpermute)
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(rawmatptr->getdofmanager(), permutedmat));
 }
 
-void mat::removeconstraints(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->removeconstraints(); };
+void mat::removeconstraints(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->removeconstraints(); }
 
 void mat::reusefactorization(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->reuselu(); }
 
@@ -69,7 +69,7 @@ std::shared_ptr<rawmat> mat::getpointer(void)
     return rawmatptr;
 }
         
-Mat mat::getpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getpetsc(); }   
+Mat mat::getpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getpetsc(); }
 
 void mat::print(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->print(); }
 

@@ -18,7 +18,7 @@ void ptracker::updaterenumbering(std::vector<std::vector<int>>& renumber)
     for (int i = 0; i < 8; i++)
     {
         std::vector<int> oldrenum = elementrenumbering[i]; 
-        for (int j = 0; j < elementrenumbering[i].size(); j++)
+        for (size_t j = 0; j < elementrenumbering[i].size(); j++)
             elementrenumbering[i][j] = renumber[i][oldrenum[j]];
     }
 }
@@ -32,12 +32,12 @@ void ptracker::getrenumbering(std::shared_ptr<ptracker> mt, std::vector<std::vec
         renumbering[i].resize(elementrenumbering[i].size());
         if (mt != NULL)
         {
-            for (int j = 0; j < elementrenumbering[i].size(); j++)
+            for (size_t j = 0; j < elementrenumbering[i].size(); j++)
                 renumbering[i][elementrenumbering[i][j]] = mt->elementrenumbering[i][j];
         }
         else
         {
-            for (int j = 0; j < elementrenumbering[i].size(); j++)
+            for (size_t j = 0; j < elementrenumbering[i].size(); j++)
                 renumbering[i][elementrenumbering[i][j]] = j;
         }
     }
@@ -69,10 +69,10 @@ void ptracker::getindisjointregions(std::vector<std::vector<int>>& indisjregs)
 
 void ptracker::print(void)
 {
-    for (int i = 0; i < elementrenumbering.size(); i++)
+    for (size_t i = 0; i < elementrenumbering.size(); i++)
     {
         std::cout << std::endl << "Element type number " << i << ":" << std::endl << std::endl;
-        for (int j = 0; j < elementrenumbering[i].size(); j++)
+        for (size_t j = 0; j < elementrenumbering[i].size(); j++)
             std::cout << j << " --> " << elementrenumbering[i][j] << std::endl;
     }
     std::cout << std::endl;

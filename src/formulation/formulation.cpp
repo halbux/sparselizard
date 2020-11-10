@@ -5,7 +5,7 @@ formulation::formulation(void) { mydofmanager = std::shared_ptr<dofmanager>(new 
 
 void formulation::operator+=(std::vector<integration> integrationobject)
 {
-    for (int i = 0; i < integrationobject.size(); i++)
+    for (size_t i = 0; i < integrationobject.size(); i++)
         *this += integrationobject[i];
 }
 
@@ -33,7 +33,7 @@ void formulation::operator+=(integration integrationobject)
     std::vector<std::vector<std::shared_ptr<operation>>> tfs = coeffdoftf[2];
 
     // Loop on all slices:
-    for (int slice = 0; slice < tfs.size(); slice++)
+    for (size_t slice = 0; slice < tfs.size(); slice++)
     {
         // In a given slice all dof and tf fields are the same, have the 
         // same applied time derivatives and are selected on a same 
@@ -67,11 +67,11 @@ void formulation::operator+=(integration integrationobject)
         if (doffield != NULL && dofs[slice][0]->ison() == false)
         {
             std::vector<int> dofharms = doffield->getharmonics();
-            for (int h = 0; h < dofharms.size(); h++)
+            for (size_t h = 0; h < dofharms.size(); h++)
                 mydofmanager->addtostructure(doffield->harmonic(dofharms[h]), dofphysreg);
         }
         std::vector<int> tfharms = tffield->getharmonics();
-        for (int h = 0; h < tfharms.size(); h++)
+        for (size_t h = 0; h < tfharms.size(); h++)
             mydofmanager->addtostructure(tffield->harmonic(tfharms[h]), tfphysreg);
 
         // Create the contribution:
@@ -148,7 +148,7 @@ void formulation::generate(int m, int contributionnumber)
         mymat[m-1] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
 
     std::vector<contribution> contributionstogenerate = mycontributions[m][contributionnumber];
-    for (int i = 0; i < contributionstogenerate.size(); i++)
+    for (size_t i = 0; i < contributionstogenerate.size(); i++)
     {
         if (m == 0)
             contributionstogenerate[i].generate(myvec, NULL, not(isconstraintcomputation));
@@ -162,9 +162,9 @@ void formulation::generate(int m, int contributionnumber)
 
 void formulation::generate(void)
 {
-    for (int i = 0; i < mycontributions.size(); i++)
+    for (size_t i = 0; i < mycontributions.size(); i++)
     {
-        for (int j = 0; j < mycontributions[i].size(); j++)
+        for (size_t j = 0; j < mycontributions[i].size(); j++)
             generate(i, j);
     }
 }
@@ -172,44 +172,44 @@ void formulation::generate(void)
 void formulation::generatestiffnessmatrix(void)
 {
     int i = 1;
-    for (int j = 0; j < mycontributions[i].size(); j++)
+    for (size_t j = 0; j < mycontributions[i].size(); j++)
         generate(i, j);
 }
 
 void formulation::generatedampingmatrix(void)
 {
     int i = 2;
-    for (int j = 0; j < mycontributions[i].size(); j++)
+    for (size_t j = 0; j < mycontributions[i].size(); j++)
         generate(i, j);
 }
 
 void formulation::generatemassmatrix(void)
 {
     int i = 3;
-    for (int j = 0; j < mycontributions[i].size(); j++)
+    for (size_t j = 0; j < mycontributions[i].size(); j++)
         generate(i, j);
 }
 
 void formulation::generaterhs(void)
 {
     int i = 0;
-    for (int j = 0; j < mycontributions[i].size(); j++)
+    for (size_t j = 0; j < mycontributions[i].size(); j++)
         generate(i, j);
 }
 
 
 void formulation::generate(std::vector<int> contributionnumbers)
 {
-    for (int i = 0; i < mycontributions.size(); i++)
+    for (size_t i = 0; i < mycontributions.size(); i++)
     {
-        for (int j = 0; j < contributionnumbers.size(); j++)
+        for (size_t j = 0; j < contributionnumbers.size(); j++)
             generate(i, contributionnumbers[j]);
     }
 }
 
 void formulation::generate(int contributionnumber)
 {
-    for (int i = 0; i < mycontributions.size(); i++)
+    for (size_t i = 0; i < mycontributions.size(); i++)
             generate(i, contributionnumber);
 }
 

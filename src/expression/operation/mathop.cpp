@@ -54,7 +54,7 @@ bool mathop::isregionempty(int physreg)
 
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
-    for (int i = 0; i < defin.size(); i++)
+    for (size_t i = 0; i < defin.size(); i++)
     {
         if (defin[i] == true)
             return false;
@@ -71,7 +71,7 @@ bool mathop::isregioninside(int physregtocheck, int physreg)
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
     // All disjoint regions must be included:
-    for (int i = 0; i < tocheckdefin.size(); i++)
+    for (size_t i = 0; i < tocheckdefin.size(); i++)
     {
         if (tocheckdefin[i] == true && defin[i] == false)
             return false;
@@ -88,7 +88,7 @@ bool mathop::isregiontouching(int physregtocheck, int physreg)
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
     // At least one disjoint region must be included:
-    for (int i = 0; i < tocheckdefin.size(); i++)
+    for (size_t i = 0; i < tocheckdefin.size(); i++)
     {
         if (tocheckdefin[i] == true && defin[i] == true)
             return true;
@@ -100,7 +100,7 @@ bool mathop::isregiontouching(int physregtocheck, int physreg)
 void mathop::printvector(std::vector<double> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         std::cout << input[i] << " ";
     std::cout << std::endl;
 }
@@ -108,7 +108,7 @@ void mathop::printvector(std::vector<double> input)
 void mathop::printvector(std::vector<int> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         std::cout << input[i] << " ";
     std::cout << std::endl;
 }
@@ -116,7 +116,7 @@ void mathop::printvector(std::vector<int> input)
 void mathop::printvector(std::vector<bool> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         std::cout << input[i] << " ";
     std::cout << std::endl;
 }
@@ -382,7 +382,7 @@ expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> 
     std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     
-    for (int i = 0; i < harms.size(); i++)
+    for (size_t i = 0; i < harms.size(); i++)
     {
         if (harms[i] <= 0)
         {
@@ -410,7 +410,7 @@ expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> 
         for (int j = 0; j < n; j++)
         {
             std::vector<std::shared_ptr<operation>> ops(harms.size());
-            for (int k = 0; k < harms.size(); k++)
+            for (size_t k = 0; k < harms.size(); k++)
                 ops[k] = moveharmonic({1},{harms[k]}, exprs[k].at(i,j)).getoperationinarray(0,0);
             std::shared_ptr<opsum> op(new opsum(ops));
             outexprs[i*n+j] = expression(op);
@@ -432,7 +432,7 @@ expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> des
         std::cout << "Error in 'mathop' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
         abort();
     }
-    for (int i = 0; i < origharms.size(); i++)
+    for (size_t i = 0; i < origharms.size(); i++)
     {
         if (origharms[i] <= 0 || destharms[i] <= 0)
         {
@@ -534,7 +534,7 @@ std::vector<double> mathop::printtotalforce(int physreg, expression* meshdeform,
     std::cout << "Total force on region " << physreg << " is ";
     std::vector<std::string> compstr = {"x","y","z"};
 
-    for (int c = 0; c < totforce.size(); c++)
+    for (size_t c = 0; c < totforce.size(); c++)
     {
         std::cout << "f" << compstr[c] << " = " << totforce[c];
         if (c != totforce.size()-1)
@@ -675,10 +675,10 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
     }
     
     std::vector<int> physregnums = loadedphysregs->getallnumbers();
-    int numphysregs = physregnums.size();
+    size_t numphysregs = physregnums.size();
         
     std::vector<std::vector<shape>> output(4,std::vector<shape>(0));
-    for (int i = 0; i < numphysregs; i++)
+    for (size_t i = 0; i < numphysregs; i++)
     {
         int curphysreg = physregnums[i];
         physicalregion* pr = loadedphysregs->get(curphysreg);
@@ -691,11 +691,11 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
         std::vector<std::vector<int>> nodesinelements(8);
         for (int j = 0; j < 8; j++)
         {
-            int numelems = curelemlist->at(j).size();
+            size_t numelems = curelemlist->at(j).size();
             element myelem(j,curvatureorder);
             int numnodes = myelem.countcurvednodes();
             nodesinelements[j].resize(numnodes*numelems);
-            for (int k = 0; k < numelems; k++)
+            for (size_t k = 0; k < numelems; k++)
             {
                 int curelem = curelemlist->at(j)[k];
                 for (int l = 0; l < numnodes; l++)
@@ -707,7 +707,7 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
         int nodeindex = 0;
         for (int j = 0; j < 8; j++)
         {
-            for (int k = 0; k < nodesinelements[j].size(); k++)
+            for (size_t k = 0; k < nodesinelements[j].size(); k++)
             {
                 int curnode = nodesinelements[j][k];
                 if (renumbernodes[curnode] == -1)
@@ -720,7 +720,7 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
         }
         // Create the vector of node coordinates:
         std::vector<double> nodecoordinates(3*nodeindex);
-        for (int j = 0; j < renumbernodes.size(); j++)
+        for (size_t j = 0; j < renumbernodes.size(); j++)
         {
             if (renumbernodes[j] != -1)
             {
@@ -1373,7 +1373,7 @@ std::vector<vec> mathop::solve(mat A, std::vector<vec> b, std::string soltype)
         std::cout << "Error in 'mathop' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
         abort();
     }
-    for (int i = 0; i < b.size(); i++)
+    for (size_t i = 0; i < b.size(); i++)
     {
         if (A.countrows() != b[i].size())
         {
@@ -1588,7 +1588,7 @@ void mathop::solve(formulation formul)
 
 void mathop::solve(std::vector<formulation> formuls)
 {
-    for (int i = 0; i < formuls.size(); i++)
+    for (size_t i = 0; i < formuls.size(); i++)
         solve(formuls[i]);
 }
 
@@ -1651,7 +1651,7 @@ void mathop::setdata(vec invec)
     // Get all fields in the vec structure:
     std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
     
-    for (int i = 0; i < allfields.size(); i++)
+    for (size_t i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, invec|field(allfields[i]));
 }
 
@@ -2268,7 +2268,7 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
     epsilon.reuseit();
 
     std::vector<std::vector<expression>> exprs(dxyztfu.size());
-    for (int i = 0; i < dxyztfu.size(); i++)
+    for (size_t i = 0; i < dxyztfu.size(); i++)
         exprs[i] = {dxyztfu[i]};
 
     // Scalar gradient here:

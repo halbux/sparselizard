@@ -50,19 +50,19 @@ void hierarchicalformfunctioncontainer::evaluate(std::vector<double> evaluationp
 {
     myevaluationpoints = evaluationpoints;
 
-    for (int h = 0; h < val.size(); h++)
+    for (size_t h = 0; h < val.size(); h++)
     {
-        for (int i = 0; i < val[h].size(); i++)
+        for (size_t i = 0; i < val[h].size(); i++)
         {
-            for (int j = 0; j < val[h][i].size(); j++)
+            for (size_t j = 0; j < val[h][i].size(); j++)
             {
-                for (int k = 0; k < val[h][i][j].size(); k++)
+                for (size_t k = 0; k < val[h][i][j].size(); k++)
                 {
-                    for (int l = 0; l < val[h][i][j][k].size(); l++)
+                    for (size_t l = 0; l < val[h][i][j][k].size(); l++)
                     {
-                        for (int m = 0; m < val[h][i][j][k][l].size(); m++)
+                        for (size_t m = 0; m < val[h][i][j][k][l].size(); m++)
                         {
-                            for (int n = 0; n < val[h][i][j][k][l][m].size(); n++)
+                            for (size_t n = 0; n < val[h][i][j][k][l][m].size(); n++)
                                 val[h][i][j][k][l][m][n] = ffpoly[h][i][j][k][l][n].evalat(evaluationpoints, m);
                         }
                     }
@@ -114,25 +114,25 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int h, int i, int j, int
 void hierarchicalformfunctioncontainer::print(bool printallderivatives)
 {
     std::cout.precision(17);
-    for (int h = 0; h < val.size(); h++)
+    for (size_t h = 0; h < val.size(); h++)
     {
-        for (int i = 0; i < val[h].size(); i++)
+        for (size_t i = 0; i < val[h].size(); i++)
         {
-            for (int j = 0; j < val[h][i].size(); j++)
+            for (size_t j = 0; j < val[h][i].size(); j++)
             {
-                for (int k = 0; k < val[h][i][j].size(); k++)
+                for (size_t k = 0; k < val[h][i][j].size(); k++)
                 {
-                    for (int l = 0; l < val[h][i][j][k].size(); l++)
+                    for (size_t l = 0; l < val[h][i][j][k].size(); l++)
                     {
-                        for (int m = 0; m < val[h][i][j][k][l].size(); m++)
+                        for (size_t m = 0; m < val[h][i][j][k][l].size(); m++)
                         {
                             if (not(printallderivatives) && m > 0)
                                 continue;
                             
-                            for (int n = 0; n < val[h][i][j][k][l][m].size(); n++)
+                            for (size_t n = 0; n < val[h][i][j][k][l][m].size(); n++)
                             {
                                 std::cout << "order " << h << "; dim " << i << "; sub elem index " << j << "; orientation " << k << "; number " << l << "; derivative " << m << "; comp " << n << ": ";
-                                for (int o = 0; o < val[h][i][j][k][l][m][n].size(); o++)
+                                for (size_t o = 0; o < val[h][i][j][k][l][m][n].size(); o++)
                                     std::cout << val[h][i][j][k][l][m][n][o] << " ";
                                 std::cout << std::endl;
                             }

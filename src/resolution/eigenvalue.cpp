@@ -4,7 +4,7 @@
 void eigenvalue::errorifdirichletnotremoved(std::vector<mat> input)
 {
     // Make sure the Dirichlet constraints have been removed:
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         if (input[i].getpointer()->getdofmanager()->countconstraineddofs() > 0)
         {
@@ -132,7 +132,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         PEPCreate( PETSC_COMM_WORLD, &pep );
         
         Mat* petscmats = new Mat[mymats.size()];
-        for (int i = 0; i < mymats.size(); i++)
+        for (size_t i = 0; i < mymats.size(); i++)
             petscmats[i] = mymats[i].getpetsc();
         
         PEPSetOperators( pep, mymats.size(), petscmats );

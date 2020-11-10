@@ -14,7 +14,7 @@ field::field(std::string fieldtypename) { rawfieldptr = std::shared_ptr<rawfield
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers) 
 { 
     // Make sure all harmonic numbers are positive and non zero:
-    for (int i = 0; i < harmonicnumbers.size(); i++)
+    for (size_t i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {
@@ -39,7 +39,7 @@ field::field(std::string fieldtypename, spanningtree spantree)
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree)
 {
     // Make sure all harmonic numbers are positive and non zero:
-    for (int i = 0; i < harmonicnumbers.size(); i++)
+    for (size_t i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {
@@ -325,7 +325,7 @@ field field::harmonic(const std::vector<int> harmonicnumbers)
         abort();
     }    
     // Make sure all harmonic numbers are positive and non zero:
-    for (int i = 0; i < harmonicnumbers.size(); i++)
+    for (size_t i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {

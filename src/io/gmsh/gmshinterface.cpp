@@ -296,7 +296,7 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
             std::vector<int> alldisjointregions = physicalregionobject->getdisjointregions();
 
             // Iterate on all disjoint regions in the physical region:
-            for (int h = 0; h < alldisjointregions.size(); h++)
+            for (size_t h = 0; h < alldisjointregions.size(); h++)
             {
                 // Get the unique element type in the disjoint region:
                 int typenumber = mydisjointregions.getelementtypenumber(alldisjointregions[h]);
@@ -346,7 +346,7 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
     std::vector<int> activeelementtypes = datatowrite.getactiveelementtypes();
     
     // Loop on all active element types:
-    for (int i = 0; i < activeelementtypes.size(); i++)
+    for (size_t i = 0; i < activeelementtypes.size(); i++)
     {
         int elemtypenum = activeelementtypes[i];
         element myelement(elemtypenum);
@@ -510,22 +510,22 @@ void gmshinterface::writeinterpolationscheme(std::string name, std::vector<std::
     {
         posfile << "\nINTERPOLATION_SCHEME";
         
-        for (int m = 0; m < poly.size(); m++)
+        for (size_t m = 0; m < poly.size(); m++)
         {
             posfile << "\n{\n";
             
             // Print the polynomial coefficients:
-            for (int p = 0; p < poly[m].size(); p++)
+            for (size_t p = 0; p < poly[m].size(); p++)
             {
                 posfile << "  {";
 
                 std::vector<std::vector<std::vector<double>>> polyformfunctions = poly[m][p].get();
 
-                for (int i = 0; i < polyformfunctions.size(); i++)
+                for (size_t i = 0; i < polyformfunctions.size(); i++)
                 {
-                    for (int j = 0; j < polyformfunctions[i].size(); j++)
+                    for (size_t j = 0; j < polyformfunctions[i].size(); j++)
                     {
-                        for (int k = 0; k < polyformfunctions[i][j].size(); k++)
+                        for (size_t k = 0; k < polyformfunctions[i][j].size(); k++)
                         {
                             if (i == polyformfunctions.size() - 1 && j == polyformfunctions[i].size() - 1 && k == polyformfunctions[i][j].size() - 1)
                                 posfile << polyformfunctions[i][j][k];
@@ -546,11 +546,11 @@ void gmshinterface::writeinterpolationscheme(std::string name, std::vector<std::
             // Print the list of monomials:
             std::vector<std::vector<std::vector<double>>> polyformfunctions = poly[m][0].get();
 
-            for (int i = 0; i < polyformfunctions.size(); i++)
+            for (size_t i = 0; i < polyformfunctions.size(); i++)
             {
-                for (int j = 0; j < polyformfunctions[i].size(); j++)
+                for (size_t j = 0; j < polyformfunctions[i].size(); j++)
                 {
-                    for (int k = 0; k < polyformfunctions[i][j].size(); k++)
+                    for (size_t k = 0; k < polyformfunctions[i][j].size(); k++)
                     {
                         posfile << "  {" << i << "," << j << "," << k << "}";
                         if (i == polyformfunctions.size() - 1 && j == polyformfunctions[i].size() - 1 && k == polyformfunctions[i][j].size() - 1)

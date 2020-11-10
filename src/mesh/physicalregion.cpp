@@ -35,7 +35,7 @@ int physicalregion::countelements(void)
 {
     std::vector<int> alldisjointregions = getdisjointregions();
     int numelem = 0;
-    for (int i = 0; i < alldisjointregions.size(); i++)
+    for (size_t i = 0; i < alldisjointregions.size(); i++)
         numelem += mydisjointregions->countelements(alldisjointregions[i]);
     return numelem;
 }
@@ -68,7 +68,7 @@ void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)
     std::fill(includesdisjointregion.begin(), includesdisjointregion.end(), false);
 
     myelementdimension = mydisjointregions->getelementdimension(disjointregionlist[0]);
-    for (int i = 0; i < disjointregionlist.size(); i++)
+    for (size_t i = 0; i < disjointregionlist.size(); i++)
     {
         includesdisjointregion[disjointregionlist[i]] = true;
         if (myelementdimension < mydisjointregions->getelementdimension(disjointregionlist[i]))
@@ -84,7 +84,7 @@ std::vector<bool> physicalregion::getdefinition(void)
 std::vector<int> physicalregion::getdisjointregions(void)
 {
     std::vector<int> disjointregionlist;
-    for (int i = 0; i < includesdisjointregion.size(); i++)
+    for (size_t i = 0; i < includesdisjointregion.size(); i++)
     {
         // Only disjoint regions including elements of the same 
         // dimension as in the physical region are selected.
@@ -97,7 +97,7 @@ std::vector<int> physicalregion::getdisjointregions(void)
 std::vector<int> physicalregion::getdisjointregions(int dim)
 {
     std::vector<int> disjointregionlist;
-    for (int i = 0; i < includesdisjointregion.size(); i++)
+    for (size_t i = 0; i < includesdisjointregion.size(); i++)
     {
         if (includesdisjointregion[i])
         {
@@ -112,7 +112,7 @@ std::vector<int> physicalregion::getdisjointregions(int dim)
 void physicalregion::renumberelements(int elementtypenumber, std::vector<int>& elementrenumbering)
 {
     // Update 'elementlist'.
-    for (int i = 0; i < elementlist[elementtypenumber].size(); i++)
+    for (size_t i = 0; i < elementlist[elementtypenumber].size(); i++)
         elementlist[elementtypenumber][i] = elementrenumbering[elementlist[elementtypenumber][i]];
 }
 
@@ -152,7 +152,7 @@ std::vector<std::vector<int>>* physicalregion::getelementlist(void)
     {
         // First preallocate:
         std::vector<int> sizes(8,0);
-        for (int d = 0; d < includesdisjointregion.size(); d++)
+        for (size_t d = 0; d < includesdisjointregion.size(); d++)
         {
             if (includesdisjointregion[d] && mydisjointregions->getelementdimension(d) == myelementdimension)
                 sizes[mydisjointregions->getelementtypenumber(d)] += mydisjointregions->countelements(d);
@@ -162,7 +162,7 @@ std::vector<std::vector<int>>* physicalregion::getelementlist(void)
     
         // Loop on all disjoint regions of the right dimension:
         std::vector<int> curindexes(8,0);
-        for (int d = 0; d < includesdisjointregion.size(); d++)
+        for (size_t d = 0; d < includesdisjointregion.size(); d++)
         {
             if (includesdisjointregion[d] && mydisjointregions->getelementdimension(d) == myelementdimension)
             {

@@ -1416,7 +1416,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
     }
     
     // Populate:
-    int index = 0;
+    size_t index = 0;
     for (int e = 0; e < ne; e++)
     {
         std::vector<double> coords(3*ncn);
@@ -1431,7 +1431,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
         {
             std::vector<double> cursplit = calculatecoordinates(curvedsubcoords[throughedgenum][i], coords);
 
-            for (int j = 0; j < cursplit.size(); j++)
+            for (size_t j = 0; j < cursplit.size(); j++)
                 splitcoords[tn][index+j] = cursplit[j];
             index += cursplit.size();
         }
@@ -1455,7 +1455,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
             curvedtetsubcoords[i] = mystraighttet.calculatecoordinates(curvedtetrefcoords, cc);
         }
     
-        int index = 0;
+        size_t index = 0;
         for (int e = 0; e < ne; e++)
         {
             std::vector<double> coords(3*ncn);
@@ -1466,7 +1466,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
             {
                 std::vector<double> cursplit = calculatecoordinates(curvedtetsubcoords[i], coords);
 
-                for (int j = 0; j < cursplit.size(); j++)
+                for (size_t j = 0; j < cursplit.size(); j++)
                     splitcoords[4][index+j] = cursplit[j];
                 index += cursplit.size();
             }
@@ -1714,7 +1714,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
     std::vector<std::vector<bool>> connectivitythroughedge(edgefacingpair.size());
     
     // Add connection:
-    for (int i = 0; i < edgefacingpair.size(); i++)
+    for (size_t i = 0; i < edgefacingpair.size(); i++)
     {
         connectivitythroughedge[i] = connectivity;
     
@@ -1728,7 +1728,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
     // Connect the tets:
     std::vector<std::vector<bool>> tetdefs;
     deducetets(connectivity, tetdefs);
-    int numtets = tetdefs.size();
+    size_t numtets = tetdefs.size();
     
     std::vector<int> minnumtet = {1,2,3,4,5,7,8};
     // If a through-edge must be inserted:
@@ -1743,22 +1743,22 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
     // Convert the boolean tetrahedra definition to node numbers:
     std::vector<std::vector<int>> output(8, std::vector<int>(0));
     output[4] = std::vector<int>(numtets*4);
-    for (int i = 0; i < numtets; i++)
+    for (size_t i = 0; i < numtets; i++)
     {
-        int index = 0;
+        size_t index = 0;
         for (int j = 0; j < 10; j++)
         {
             if (tetdefs[i][j])
             {
                 output[4][4*i+index] = j;
-                index++;   
+                index++;
             }
         }
     }
     
     // Reorder the tetrahedra nodes if needed:
     std::vector<double> rc = {0,0,0, 1,0,0, 0,1,0, 0,0,1, 0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
-    for (int i = 0; i < numtets; i++)
+    for (size_t i = 0; i < numtets; i++)
     {
         int p0 = output[4][4*i+0];
         int p1 = output[4][4*i+1];
@@ -1791,7 +1791,7 @@ void element::getsplitconnectivity(std::vector<bool>& connectivity, std::vector<
 {
     connectivity = std::vector<bool>(6*6, false);
 
-    for (int j = 0; j < splitdefinition[2].size()/3; j++)
+    for (size_t j = 0; j < splitdefinition[2].size()/3; j++)
     {
         for (int n = 0; n < 3; n++)
         {
@@ -1812,7 +1812,7 @@ void element::getsplitconnectivity(std::vector<bool>& volumeconnectivity, std::v
     std::vector<int> fnd = getfacesdefinitionsbasedonnodes();
     std::vector<int> fed = getfacesdefinitionsbasedonedges();
     // Face edge definition is provided in a special format:
-    for (int i = 0; i < fed.size(); i++)
+    for (size_t i = 0; i < fed.size(); i++)
         fed[i] = std::abs(fed[i])-1;                                        
     
     // Loop on each face:
@@ -1940,7 +1940,7 @@ void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refco
         }
     }
         
-    for (int i = 0; i < nums.size(); i++)
+    for (size_t i = 0; i < nums.size(); i++)
     {
         refcoords[3*i+0] = refs[3*nums[i]+0];
         refcoords[3*i+1] = refs[3*nums[i]+1];

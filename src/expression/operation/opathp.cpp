@@ -56,7 +56,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
         (universe::mymesh->gethtracker())->getattarget(ads, rcs, myrawmesh->gethtracker().get(), tel, trc);
         
         // Recombine:
-        for (int i = 0; i < elemnumshere.size()/2; i++)
+        for (size_t i = 0; i < elemnumshere.size()/2; i++)
         {
             int typ = elemnumshere[2*i+0];
             int ind = indexinrcsoforigin[i];
@@ -80,7 +80,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
         std::vector<std::vector<int>> hererenumbering;
         (myrawmesh->getptracker())->getrenumbering(myptracker, hererenumbering);
 
-        for (int i = 0; i < elemnumshere.size()/2; i++)
+        for (size_t i = 0; i < elemnumshere.size()/2; i++)
             elemnumshere[2*i+1] = hererenumbering[elemnumshere[2*i+0]][elemnumshere[2*i+1]];
     }
 
@@ -127,7 +127,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
                       
                 // Place the interpolated values at the right position in the output densematrix:
                 std::vector<int> originds = myselector.getoriginalindexes();
-                for (int j = 0; j < originds.size(); j++)
+                for (size_t j = 0; j < originds.size(); j++)
                 {
                     int curorigelem = originds[j];
                     for (int k = 0; k < numrefcoords; k++)

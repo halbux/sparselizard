@@ -96,7 +96,7 @@ std::vector<std::pair<int,double>> harmonic::getproduct(int harm1, int harm2, in
     std::vector<std::pair<int,double>> harmsofproduct = getproduct(harm1, newharm2);
 
     // Multiply the coefficient by the extra 2*pi*fi like factor from the time derivation:
-    for (int p = 0; p < harmsofproduct.size(); p++)
+    for (size_t p = 0; p < harmsofproduct.size(); p++)
         harmsofproduct[p].second *= getderivationfactor(harm2timederivativeorder, harm2);
 
     return harmsofproduct;
@@ -131,7 +131,7 @@ std::vector<std::vector<densematrix>> harmonic::timederivative(int timederivativ
     if (timederivativeorder == 0)
         return input;
    
-    for (int h = 0; h < input.size(); h++)
+    for (size_t h = 0; h < input.size(); h++)
     {
         if (input[h].size() == 1)
             input[h][0].multiplyelementwise(getderivationfactor(timederivativeorder, h));
@@ -144,7 +144,7 @@ std::vector<std::vector<densematrix>> harmonic::timederivative(int timederivativ
             input.push_back({});
         
         // Harmonic 1 is zero anyway. Start at 2.
-        for (int h = 2; h < input.size(); h = h+2)
+        for (size_t h = 2; h < input.size(); h = h+2)
         {
             std::vector<densematrix> temp = input[h];
             input[h] = input[h+1];

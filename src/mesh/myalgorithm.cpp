@@ -592,7 +592,7 @@ std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& t
 void myalgorithm::splitvector(std::vector<int>& vec, std::vector<bool>& select, std::vector<int>& falses, std::vector<int>& trues)
 {
     int numtrue = 0;
-    for (int i = 0; i < select.size(); i++)
+    for (size_t i = 0; i < select.size(); i++)
     {
         if (select[i])
             numtrue++;
@@ -602,7 +602,7 @@ void myalgorithm::splitvector(std::vector<int>& vec, std::vector<bool>& select, 
     falses = std::vector<int>(select.size()-numtrue);
     
     int indt = 0, indf = 0;
-    for (int i = 0; i < select.size(); i++)
+    for (size_t i = 0; i < select.size(); i++)
     {
         if (select[i])
         {
@@ -885,7 +885,7 @@ std::vector<double> myalgorithm::separate(std::vector<double>& v, int blocklen, 
     
     std::vector<double> output(sel.size() * numblocks);
     
-    for (int s = 0; s < sel.size(); s++)
+    for (size_t s = 0; s < sel.size(); s++)
     {
         for (int b = 0; b < numblocks; b++)
             output[s*numblocks+b] = v[b*blocklen + sel[s]];
@@ -898,7 +898,7 @@ std::vector<int> myalgorithm::chainrenumbering(std::vector<int>& originalrenum, 
 {
     std::vector<int> output(originalrenum.size());
 
-    for (int i = 0; i < originalrenum.size(); i++)
+    for (size_t i = 0; i < originalrenum.size(); i++)
         output[i] = newrenum[originalrenum[i]];
 
     return output;
@@ -908,7 +908,7 @@ std::vector<int> myalgorithm::invertrenumbering(std::vector<int>& renum)
 {
     std::vector<int> output(renum.size());
 
-    for (int i = 0; i < renum.size(); i++)
+    for (size_t i = 0; i < renum.size(); i++)
         output[renum[i]] = i;
 
     return output;
@@ -918,7 +918,7 @@ std::vector<int> myalgorithm::getreordering(std::vector<int>& renum)
 {
     std::vector<int> out(renum.size());
     
-    for (int i = 0; i < renum.size(); i++)
+    for (size_t i = 0; i < renum.size(); i++)
         out[renum[i]] = i;
     
     return out;
@@ -989,7 +989,7 @@ void myalgorithm::toaddressdata(std::vector<int>& elems, std::vector<double>& re
             continue;
     
         ads[i] = std::vector<int>(cnt[i].size()+1,0);
-        for (int j = 1; j < ads[i].size(); j++)
+        for (size_t j = 1; j < ads[i].size(); j++)
             ads[i][j] = ads[i][j-1] + 3*cnt[i][j-1];
             
         rcs[i] = std::vector<double>(3*countintype[i]);
@@ -1016,14 +1016,14 @@ std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
 {
     // Get the total size:
     int len = 0;
-    for (int i = 0; i < tocat.size(); i++)
+    for (size_t i = 0; i < tocat.size(); i++)
         len += tocat[i].size();
         
     std::vector<int> output(len);
     int index = 0;
-    for (int i = 0; i < tocat.size(); i++)
+    for (size_t i = 0; i < tocat.size(); i++)
     {
-        for (int j = 0; j < tocat[i].size(); j++)
+        for (size_t j = 0; j < tocat[i].size(); j++)
         {
             output[index] = tocat[i][j];
             index++;
@@ -1050,12 +1050,12 @@ void myalgorithm::normvector(std::vector<double>& tonorm)
 {
     // Compute the norm:
     double nrm = 0.0;
-    for (int i = 0; i < tonorm.size(); i++)
+    for (size_t i = 0; i < tonorm.size(); i++)
         nrm += tonorm[i]*tonorm[i];
     nrm = std::sqrt(nrm);
     double invnrm = 1.0/nrm;
 
-    for (int i = 0; i < tonorm.size(); i++)
+    for (size_t i = 0; i < tonorm.size(); i++)
         tonorm[i] = invnrm * tonorm[i];
 }
 

@@ -99,7 +99,7 @@ std::vector<double> opcondition::evaluate(std::vector<double>& xcoords, std::vec
     std::vector<double> evaldtrue = mytrue->evaluate(xcoords, ycoords, zcoords);
     std::vector<double> evaldfalse = myfalse->evaluate(xcoords, ycoords, zcoords);
 
-    for (int i = 0; i < evaldcond.size(); i++)
+    for (size_t i = 0; i < evaldcond.size(); i++)
     {
         if (evaldcond[i] < 0)
             evaldtrue[i] = evaldfalse[i];

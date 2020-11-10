@@ -203,7 +203,7 @@ int htracker::next(void)
                 for (int j = 0; j < cornerrefcoords[i].size()/nn[i]/3; j++)
                 {
                     std::vector<double> cc(3*nn[i]);
-                    for (int k = 0; k < cc.size(); k++)
+                    for (size_t k = 0; k < cc.size(); k++)
                         cc[k] = cornerrefcoords[i][j*3*nn[i]+k];
                     
                     parentrefcoords[currentdepth+1][ind] = myelems[t].calculatecoordinates(cc, parentrefcoords[currentdepth][ic]);
@@ -450,7 +450,7 @@ void htracker::adapt(std::vector<int>& operations)
 {
     // Calculate an upper bound for the size of the new 'splitdata' vector:
     int upperbound = splitdata.size();
-    for (int i = 0; i < operations.size(); i++)
+    for (size_t i = 0; i < operations.size(); i++)
     {
         if (operations[i] == 1)
             upperbound += 10; // 10 is the max size increase in a split
@@ -593,7 +593,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
             if (withphysicals)
                 physcoords = myelems[parenttypes[0]].calculatecoordinates(refcoords, oc, 0, ns == 0);
             
-            for (int i = 0; i < refcoords.size(); i++)
+            for (size_t i = 0; i < refcoords.size(); i++)
             {
                 arc[t][iarc[t]+i] = refcoords[i];
                 if (withphysicals)
@@ -624,7 +624,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
-    std:vector<bool> isedgesplit;
+    std::vector<bool> isedgesplit;
     myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
     
 
@@ -696,7 +696,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
                 // Bring inside the untransitioned element (if split at all):
                 curcoords = myelems[t].calculatecoordinates(curcoords, cornerarc[t], iarc[t], splitnum == 0);
                 
-                for (int i = 0; i < curcoords.size(); i++)
+                for (size_t i = 0; i < curcoords.size(); i++)
                     transitionsrefcoords[si][3*nn[si]*ite[si]+i] = curcoords[i];
                 
                 // Make curved:
@@ -706,7 +706,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
                 // Calculate actual coordinates: 
                 curcoords = mycurvedelems[parenttypes[0]].calculatecoordinates(curcoords, oc, 0);
 
-                for (int i = 0; i < curcoords.size(); i++)
+                for (size_t i = 0; i < curcoords.size(); i++)
                     ac[si][3*ncn[si]*ite[si]+i] = curcoords[i];
                     
                 leavesoftransitions[si][ite[si]] = ln;
@@ -941,7 +941,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                         polynomials syspolys = polys[i].sum(xyz);
                 
                         // Loop on all actives:
-                        for (int j = 0; j < activesintrans.size(); j++)
+                        for (size_t j = 0; j < activesintrans.size(); j++)
                         {                        
                             std::vector<double> kietaphi = {0.0,0.0,0.0};
                             std::vector<double> rhs = {orc[3*activesintrans[j]+0], orc[3*activesintrans[j]+1], orc[3*activesintrans[j]+2]};
@@ -982,7 +982,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     }
     
     // Sanity check:
-    for (int i = 0; i < maporctorc.size(); i++)
+    for (size_t i = 0; i < maporctorc.size(); i++)
     {
         if (maporctorc[i] < 0)
         {
@@ -1170,7 +1170,7 @@ void htracker::print(void)
 {
     std::cout << "#leaves is " << numleaves << " | max #splits is " << maxdepth << std::endl;
 
-    for (int i = 0; i < splitdata.size(); i++)
+    for (size_t i = 0; i < splitdata.size(); i++)
         std::cout << splitdata[i];
         
     std::cout << " (" << splitdata.size() << " bits)" << std::endl;

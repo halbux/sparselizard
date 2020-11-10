@@ -96,7 +96,7 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
             name << intdata.size() << std::endl << doubledata.size() << std::endl;
 
             // Write the int data to the file:
-            for (int i = 0; i < intdata.size(); i++)
+            for (size_t i = 0; i < intdata.size(); i++)
                 name << intdata[i] << std::endl;
 
             // To write all doubles with enough digits to the file:
@@ -126,9 +126,9 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
 
         datavals[0] = intdata.size();
         datavals[1] = doubledata.size();
-        for (int i = 0; i < intdata.size(); i++)
+        for (size_t i = 0; i < intdata.size(); i++)
             datavals[2 + i] = intdata[i];
-        for (int i = 0; i < doubledata.size(); i++)
+        for (size_t i = 0; i < doubledata.size(); i++)
             datavals[2+intdata.size() + i] = doubledata[i];
             
         // Let petsc write the binary file for us:
@@ -168,7 +168,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             doubledata.resize(std::stoi(currentline));
 
             // Load the intdata:
-            for (int i = 0; i < intdata.size(); i++)
+            for (size_t i = 0; i < intdata.size(); i++)
             {
                 std::getline(name, currentline);
                 myalgorithm::osclean(currentline);
@@ -176,7 +176,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             }
             
             // Load the doubledata:
-            for (int i = 0; i < doubledata.size(); i++)
+            for (size_t i = 0; i < doubledata.size(); i++)
             {
                 std::getline(name, currentline);
                 myalgorithm::osclean(currentline);

@@ -12,7 +12,7 @@ rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
     }
     
     int mydimension = input[0]->getdimension();
-    for (int i = 1; i < input.size(); i++)
+    for (size_t i = 1; i < input.size(); i++)
     {
         if (input[i]->getdimension() != mydimension)
         {
@@ -29,7 +29,7 @@ rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
 std::shared_ptr<rawshape> rawunion::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
 {
     std::vector<std::shared_ptr<rawshape>> extrudedshapes(sons.size());
-    for (int i = 0; i < sons.size(); i++)
+    for (size_t i = 0; i < sons.size(); i++)
         extrudedshapes[i] = sons[i]->extrude(physreg, height, numlayers, extrudedirection);
 
     return std::shared_ptr<rawunion>(new rawunion(physreg, extrudedshapes));

@@ -315,11 +315,11 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
 {
     std::vector<int> renumtoelems(count(origintype), -1);
     std::vector<bool> isprocessed(elems.size(), false);
-    for (int i = 0; i < elems.size(); i++)
+    for (size_t i = 0; i < elems.size(); i++)
         renumtoelems[elems[i]] = i;
 
-    int numrc = refcoords.size()/3;
-    int numpoints = elems.size() * numrc;
+    size_t numrc = refcoords.size()/3;
+    size_t numpoints = elems.size() * numrc;
     element mysubelement(origintype);
     int subnumnodes = mysubelement.countnodes();
     std::vector<double> cornerrcs(3*subnumnodes);
@@ -329,7 +329,7 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
     
     std::vector<int> nodeindexincurelem(count(0));
 
-    for (int i = 0; i < targetdisjregs.size(); i++)
+    for (size_t i = 0; i < targetdisjregs.size(); i++)
     {
         int d = targetdisjregs[i];
         int tn = mydisjointregions->getelementtypenumber(d);
@@ -370,7 +370,7 @@ void elements::getrefcoordsondisjregs(int origintype, std::vector<int>& elems, s
                         
                     std::vector<double> rcsintarget = mysubelement.calculatecoordinates(refcoords, cornerrcs, 0, (origintype == 0));
                     
-                    for (int r = 0; r < numrc; r++)
+                    for (size_t r = 0; r < numrc; r++)
                     {
                         targetelems[2*origindex*numrc+2*r+0] = tn;
                         targetelems[2*origindex*numrc+2*r+1] = rb+e;
@@ -411,7 +411,7 @@ std::vector<double>* elements::getsphereradius(int elementtypenumber)
             std::vector<double> ynodes = getnodecoordinates(elementtypenumber, i, 1);
             std::vector<double> znodes = getnodecoordinates(elementtypenumber, i, 2);
             
-            for (int j = 0; j < xnodes.size(); j++)
+            for (size_t j = 0; j < xnodes.size(); j++)
             {
                 double curdist = std::sqrt( std::pow(mybarys->at(3*i+0)-xnodes[j], 2) + std::pow(mybarys->at(3*i+1)-ynodes[j], 2) + std::pow(mybarys->at(3*i+2)-znodes[j], 2) );
                 if (curdist > maxdist)
@@ -441,7 +441,7 @@ std::vector<double>* elements::getboxdimensions(int elementtypenumber)
                 std::vector<double> curnodescoords = getnodecoordinates(elementtypenumber, i, c);
                 
                 double maxdist = 0;
-                for (int j = 0; j < curnodescoords.size(); j++)
+                for (size_t j = 0; j < curnodescoords.size(); j++)
                 {
                     double curdist = std::abs(mybarys->at(3*i+c)-curnodescoords[j]);
                     if (curdist > maxdist)
@@ -510,7 +510,7 @@ void elements::printsubelements(void)
         if (subelementsinelements[elementtypenumber][0].size() != 0)
         {
             std::cout << "Points in " << myelement.gettypenameconjugation(2) << ":" << std::endl;
-            for (int i = 0; i < subelementsinelements[elementtypenumber][0].size()/myelement.countcurvednodes(); i++)
+            for (size_t i = 0; i < subelementsinelements[elementtypenumber][0].size()/myelement.countcurvednodes(); i++)
             {
                 std::cout << std::left << std::setw(8) << i << " ";
                 for (int j = 0; j < myelement.countcurvednodes(); j++)
@@ -522,7 +522,7 @@ void elements::printsubelements(void)
         if (subelementsinelements[elementtypenumber][1].size() != 0)
         {
             std::cout << "Lines in " << myelement.gettypenameconjugation(2) << ":" << std::endl;
-            for (int i = 0; i < subelementsinelements[elementtypenumber][1].size()/myelement.countedges(); i++)
+            for (size_t i = 0; i < subelementsinelements[elementtypenumber][1].size()/myelement.countedges(); i++)
             {
                 std::cout << std::left << std::setw(8) << i << " ";
                 for (int j = 0; j < myelement.countedges(); j++)
@@ -534,7 +534,7 @@ void elements::printsubelements(void)
         if (subelementsinelements[elementtypenumber][2].size() != 0)
         {
             std::cout << "Triangles in " << myelement.gettypenameconjugation(2) << ":" << std::endl;
-            for (int i = 0; i < subelementsinelements[elementtypenumber][2].size()/myelement.counttriangularfaces(); i++)
+            for (size_t i = 0; i < subelementsinelements[elementtypenumber][2].size()/myelement.counttriangularfaces(); i++)
             {
                 std::cout << std::left << std::setw(8) << i << " ";
                 for (int j = 0; j < myelement.counttriangularfaces(); j++)
@@ -546,7 +546,7 @@ void elements::printsubelements(void)
         if (subelementsinelements[elementtypenumber][3].size() != 0)
         {
             std::cout << "Quadrangles in " << myelement.gettypenameconjugation(2) << ":" << std::endl;
-            for (int i = 0; i < subelementsinelements[elementtypenumber][3].size()/myelement.countquadrangularfaces(); i++)
+            for (size_t i = 0; i < subelementsinelements[elementtypenumber][3].size()/myelement.countquadrangularfaces(); i++)
             {
                 std::cout << std::left << std::setw(8) << i << " ";
                 for (int j = 0; j < myelement.countquadrangularfaces(); j++)
@@ -569,7 +569,7 @@ void elements::printtotalorientations(void)
         element myelement(elementtypenumber);
         std::cout << "Total orientations for all " << myelement.gettypenameconjugation(2) << ":" << std::endl;
         
-        for (int i = 0; i < totalorientations[elementtypenumber].size(); i++)
+        for (size_t i = 0; i < totalorientations[elementtypenumber].size(); i++)
             std::cout << std::left << std::setw(12) << i << std::left << std::setw(12) << totalorientations[elementtypenumber][i] << std::endl;
     }
     std::cout << std::endl;
@@ -671,7 +671,7 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
     std::vector<int> elementrenumbering;
     int numberofnonduplicates = myalgorithm::removeduplicates(barycentercoordinates, elementrenumbering);
     
-    for (int i = 0; i < elementrenumbering.size(); i++)
+    for (size_t i = 0; i < elementrenumbering.size(); i++)
     {
         if (elementrenumbering[i] != i)
         {
@@ -717,22 +717,22 @@ void elements::renumber(int elementtypenumber, std::vector<int>& renumberingvect
         {
             // Renumber the point elements (i.e. the nodes):
             case 0:
-                for (int i = 0; i < subelementsinelements[typenum][0].size(); i++)
+                for (size_t i = 0; i < subelementsinelements[typenum][0].size(); i++)
                     subelementsinelements[typenum][0][i] = renumberingvector[subelementsinelements[typenum][0][i]];
                 break;
             // Renumber the line elements:
             case 1:
-                for (int i = 0; i < subelementsinelements[typenum][1].size(); i++)
+                for (size_t i = 0; i < subelementsinelements[typenum][1].size(); i++)
                     subelementsinelements[typenum][1][i] = renumberingvector[subelementsinelements[typenum][1][i]];
                 break;
             // Renumber the triangle elements:
             case 2:
-                for (int i = 0; i < subelementsinelements[typenum][2].size(); i++)
+                for (size_t i = 0; i < subelementsinelements[typenum][2].size(); i++)
                     subelementsinelements[typenum][2][i] = renumberingvector[subelementsinelements[typenum][2][i]];
                 break;
             // Renumber the quadrangle elements:
             case 3:
-                for (int i = 0; i < subelementsinelements[typenum][3].size(); i++)
+                for (size_t i = 0; i < subelementsinelements[typenum][3].size(); i++)
                     subelementsinelements[typenum][3][i] = renumberingvector[subelementsinelements[typenum][3][i]];
                 break;
         }
@@ -752,13 +752,13 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
         int numberofquadrangles = numberofsubelementsineveryelement[elementtypenumber][3];
         
         std::vector<int> pointsinelementspart = subelementsinelements[elementtypenumber][0];
-        for (int i = 0; i < subelementsinelements[elementtypenumber][0].size()/numberofnodes; i++)
+        for (size_t i = 0; i < subelementsinelements[elementtypenumber][0].size()/numberofnodes; i++)
         {
             for (int j = 0; j < numberofnodes; j++)
                 subelementsinelements[elementtypenumber][0][numberofnodes*i+j] = pointsinelementspart[numberofnodes*elementreordering[i]+j]; 
         }
         std::vector<int> linesinelementspart = subelementsinelements[elementtypenumber][1];
-        for (int i = 0; i < subelementsinelements[elementtypenumber][1].size()/numberoflines; i++)
+        for (size_t i = 0; i < subelementsinelements[elementtypenumber][1].size()/numberoflines; i++)
         {
             for (int j = 0; j < numberoflines; j++)
                 subelementsinelements[elementtypenumber][1][numberoflines*i+j] = linesinelementspart[numberoflines*elementreordering[i]+j]; 
@@ -766,7 +766,7 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
         if (numberoftriangles != 0)
         {
             std::vector<int> trianglesinelementspart = subelementsinelements[elementtypenumber][2];
-            for (int i = 0; i < subelementsinelements[elementtypenumber][2].size()/numberoftriangles; i++)
+            for (size_t i = 0; i < subelementsinelements[elementtypenumber][2].size()/numberoftriangles; i++)
             {
                 for (int j = 0; j < numberoftriangles; j++)
                     subelementsinelements[elementtypenumber][2][numberoftriangles*i+j] = trianglesinelementspart[numberoftriangles*elementreordering[i]+j]; 
@@ -775,7 +775,7 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
         if (numberofquadrangles != 0)
         {
             std::vector<int> quadranglesinelementspart = subelementsinelements[elementtypenumber][3];
-            for (int i = 0; i < subelementsinelements[elementtypenumber][3].size()/numberofquadrangles; i++)
+            for (size_t i = 0; i < subelementsinelements[elementtypenumber][3].size()/numberofquadrangles; i++)
             {
                 for (int j = 0; j < numberofquadrangles; j++)
                     subelementsinelements[elementtypenumber][3][numberofquadrangles*i+j] = quadranglesinelementspart[numberofquadrangles*elementreordering[i]+j]; 
@@ -785,15 +785,15 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     
     
     std::vector<int> indisjointregionpart = indisjointregion[elementtypenumber];
-    for (int i = 0; i < indisjointregion[elementtypenumber].size(); i++)
+    for (size_t i = 0; i < indisjointregion[elementtypenumber].size(); i++)
         indisjointregion[elementtypenumber][i] = indisjointregionpart[elementreordering[i]];
 
     std::vector<int> totalorientationspart = totalorientations[elementtypenumber];
-    for (int i = 0; i < totalorientations[elementtypenumber].size(); i++)
+    for (size_t i = 0; i < totalorientations[elementtypenumber].size(); i++)
         totalorientations[elementtypenumber][i] = totalorientationspart[elementreordering[i]];
 
     std::vector<double> barycenterspart = barycenters[elementtypenumber];
-    for (int i = 0; i < barycenters[elementtypenumber].size()/3; i++)
+    for (size_t i = 0; i < barycenters[elementtypenumber].size()/3; i++)
     {
         barycenters[elementtypenumber][3*i+0] = barycenterspart[3*elementreordering[i]+0];
         barycenters[elementtypenumber][3*i+1] = barycenterspart[3*elementreordering[i]+1];
@@ -801,11 +801,11 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     }
     
     std::vector<double> sphereradiuspart = sphereradius[elementtypenumber];
-    for (int i = 0; i < sphereradius[elementtypenumber].size(); i++)
+    for (size_t i = 0; i < sphereradius[elementtypenumber].size(); i++)
         sphereradius[elementtypenumber][i] = sphereradiuspart[elementreordering[i]];
     
     std::vector<double> boxdimensionspart = boxdimensions[elementtypenumber];
-    for (int i = 0; i < boxdimensions[elementtypenumber].size()/3; i++)
+    for (size_t i = 0; i < boxdimensions[elementtypenumber].size()/3; i++)
     {
         boxdimensions[elementtypenumber][3*i+0] = boxdimensionspart[3*elementreordering[i]+0];
         boxdimensions[elementtypenumber][3*i+1] = boxdimensionspart[3*elementreordering[i]+1];
@@ -935,7 +935,7 @@ void elements::definedisjointregions(void)
         for (int typenum = 0; typenum <= 7; typenum++)
         {
             // Iterate on all elements of the given type:
-            for (int i = 0; i < (*elementsinphysicalregion)[typenum].size(); i++)
+            for (size_t i = 0; i < (*elementsinphysicalregion)[typenum].size(); i++)
                 isinphysicalregion[typenum][(*elementsinphysicalregion)[typenum][i] * numberofphysicalregions + physregindex] = true;
         }
     }
@@ -949,7 +949,7 @@ void elements::definedisjointregions(void)
         int numberoftriangles = numberofsubelementsineveryelement[typenum][2];
         int numberofquadrangles = numberofsubelementsineveryelement[typenum][3];
 
-        for (int elem = 0; elem < subelementsinelements[typenum][0].size()/numberofcurvednodes; elem++)
+        for (size_t elem = 0; elem < subelementsinelements[typenum][0].size()/numberofcurvednodes; elem++)
         {
             for (int i = 0; i < numberofcurvednodes; i++)
             {
@@ -962,7 +962,7 @@ void elements::definedisjointregions(void)
             }
         }
         
-        for (int elem = 0; elem < subelementsinelements[typenum][1].size()/numberoflines; elem++)
+        for (size_t elem = 0; elem < subelementsinelements[typenum][1].size()/numberoflines; elem++)
         {
             for (int i = 0; i < numberoflines; i++)
             {
@@ -977,7 +977,7 @@ void elements::definedisjointregions(void)
 
         if (numberoftriangles != 0)
         {
-            for (int elem = 0; elem < subelementsinelements[typenum][2].size()/numberoftriangles; elem++)
+            for (size_t elem = 0; elem < subelementsinelements[typenum][2].size()/numberoftriangles; elem++)
             {
                 for (int i = 0; i < numberoftriangles; i++)
                 {
@@ -993,7 +993,7 @@ void elements::definedisjointregions(void)
         
         if (numberofquadrangles != 0)
         {
-            for (int elem = 0; elem < subelementsinelements[typenum][3].size()/numberofquadrangles; elem++)
+            for (size_t elem = 0; elem < subelementsinelements[typenum][3].size()/numberofquadrangles; elem++)
             {
                 for (int i = 0; i < numberofquadrangles; i++)
                 {
@@ -1073,7 +1073,7 @@ void elements::definedisjointregionsranges(void)
 {
     for (int typenum = 0; typenum <= 7; typenum++)
     {
-        for (int i = 0; i < indisjointregion[typenum].size(); i++)
+        for (size_t i = 0; i < indisjointregion[typenum].size(); i++)
         {
             if (i == 0)
                 mydisjointregions->setrangebegin(indisjointregion[typenum][i], 0);

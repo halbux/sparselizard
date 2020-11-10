@@ -70,7 +70,7 @@ std::vector<int> disjointregions::getindim(int dim)
 {
     std::vector<int> output(elementtypenumbers.size());
     int num = 0;
-    for (int d = 0; d < output.size(); d++)
+    for (size_t d = 0; d < output.size(); d++)
     {
         if (getelementdimension(d) == dim)
         {
@@ -87,7 +87,7 @@ std::vector<int> disjointregions::getintype(int elementtypenumber)
 {
     std::vector<int> output(elementtypenumbers.size());
     int num = 0;
-    for (int d = 0; d < output.size(); d++)
+    for (size_t d = 0; d < output.size(); d++)
     {
         if (getelementtypenumber(d) == elementtypenumber)
         {
@@ -107,15 +107,15 @@ bool disjointregions::isinphysicalregion(int disjointregionnumber, int physicalr
 
 void disjointregions::removephysicalregions(std::vector<bool> istoremove)
 {
-    for (int i = 0; i < disjointregionsdefinition.size(); i++)
+    for (size_t i = 0; i < disjointregionsdefinition.size(); i++)
     {
-        int index = 0;
-        for (int j = 0; j < disjointregionsdefinition[i].size(); j++)
+        size_t index = 0;
+        for (size_t j = 0; j < disjointregionsdefinition[i].size(); j++)
         {
             if (not(istoremove[j]))
             {
                 disjointregionsdefinition[i][index] = disjointregionsdefinition[i][j];
-                index++;    
+                index++;
             }
         }
         disjointregionsdefinition[i].resize(index);

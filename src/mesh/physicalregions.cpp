@@ -13,11 +13,11 @@ int physicalregions::createunion(const std::vector<int> input)
     errornotsamedim(input);
 
     std::vector<int> disjregs = {};
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         // Get all disjoint regions with -1:
         std::vector<int> disjregsinthisphysreg = get(input[i])->getdisjointregions(-1);
-        for (int j = 0; j < disjregsinthisphysreg.size(); j++)
+        for (size_t j = 0; j < disjregsinthisphysreg.size(); j++)
             disjregs.push_back(disjregsinthisphysreg[j]);
     }
     int newphysregnum = getmaxphysicalregionnumber() + 1;
@@ -33,7 +33,7 @@ int physicalregions::createintersection(const std::vector<int> input)
     errorundefined(input);
 
     std::vector<int> disjregs = {};
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         // Get all disjoint regions with -1:
         std::vector<int> disjregsinthisphysreg = get(input[i])->getdisjointregions(-1);
@@ -58,7 +58,7 @@ int physicalregions::createunionofall(void)
     std::vector<int> tounite = {};
     
     // Get all regions of max dimension:
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (myphysicalregions[i]->getelementdimension() == problemdimension)
             tounite.push_back(myphysicalregionnumbers[i]);
@@ -85,7 +85,7 @@ int physicalregions::getmaxphysicalregionnumber(void)
 physicalregion* physicalregions::get(int physicalregionnumber)
 {        
     // Try to find the physical region number in 'myphysicalregionnumbers':
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (myphysicalregionnumbers[i] == physicalregionnumber)
             return myphysicalregions[i].get();
@@ -111,7 +111,7 @@ int physicalregions::count(int dim)
     else
     {
         int num = 0;
-        for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+        for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
         {
             if (myphysicalregions[i]->getelementdimension() == dim)
                 num++;
@@ -123,7 +123,7 @@ int physicalregions::count(int dim)
 int physicalregions::countelements(void)
 {
     int numelem = 0;
-    for (int i = 0; i < myphysicalregions.size(); i++)
+    for (size_t i = 0; i < myphysicalregions.size(); i++)
         numelem += myphysicalregions[i]->countelements();
     
     return numelem;
@@ -136,8 +136,8 @@ std::vector<int> physicalregions::getallnumbers(int dim)
     else
     {
         std::vector<int> out(count(dim));
-        int index = 0;
-        for (int i = 0; i < myphysicalregions.size(); i++)
+        size_t index = 0;
+        for (size_t i = 0; i < myphysicalregions.size(); i++)
         {
             if (myphysicalregions[i]->getelementdimension() == dim)
             {   
@@ -156,7 +156,7 @@ int physicalregions::getnumber(int physicalregionindex)
 
 int physicalregions::getindex(int physicalregionnumber)
 {
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (myphysicalregionnumbers[i] == physicalregionnumber)
             return i;
@@ -170,12 +170,12 @@ void physicalregions::inphysicalregions(int elementtypenumber, int totalnumelems
     int dim = myelem.getelementdimension();
 
     std::vector<int> numprinelems(totalnumelemsintype, 0);
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (myphysicalregions[i]->getelementdimension() != dim)
             continue;
         std::vector<int>* ellist = &(myphysicalregions[i]->getelementlist()->at(elementtypenumber));
-        for (int j = 0; j < ellist->size(); j++)
+        for (size_t j = 0; j < ellist->size(); j++)
             numprinelems[ellist->at(j)]++;
     }
 
@@ -186,13 +186,13 @@ void physicalregions::inphysicalregions(int elementtypenumber, int totalnumelems
     // Populate:
     prs = std::vector<int>(addresses[totalnumelemsintype]);
     std::vector<int> ind(totalnumelemsintype, 0);
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (myphysicalregions[i]->getelementdimension() != dim)
             continue;
         int curpr = myphysicalregionnumbers[i];
         std::vector<int>* ellist = &(myphysicalregions[i]->getelementlist()->at(elementtypenumber));
-        for (int j = 0; j < ellist->size(); j++)
+        for (size_t j = 0; j < ellist->size(); j++)
         {
             int curel = ellist->at(j);
             prs[addresses[curel]+ind[curel]] = curpr;
@@ -206,7 +206,7 @@ void physicalregions::remove(std::vector<int> toremove, bool ispartofdisjregstru
     // Tag regions to remove:
     std::vector<bool> istoremove(myphysicalregionnumbers.size(), false);
 
-    for (int i = 0; i < toremove.size(); i++)
+    for (size_t i = 0; i < toremove.size(); i++)
     {
         int curindex = getindex(toremove[i]);
         if (curindex != -1)
@@ -214,7 +214,7 @@ void physicalregions::remove(std::vector<int> toremove, bool ispartofdisjregstru
     }
 
     int index = 0;
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    for (size_t i = 0; i < myphysicalregionnumbers.size(); i++)
     {
         if (not(istoremove[i]))
         {
@@ -233,7 +233,7 @@ void physicalregions::remove(std::vector<int> toremove, bool ispartofdisjregstru
 
 void physicalregions::errorundefined(std::vector<int> physregs)
 {
-    for (int i = 0; i < physregs.size(); i++)
+    for (size_t i = 0; i < physregs.size(); i++)
     {
         if (getindex(physregs[i]) == -1)
         {
@@ -250,7 +250,7 @@ void physicalregions::errornotsamedim(std::vector<int> physregs)
 
     int dim = get(physregs[0])->getelementdimension();
 
-    for (int i = 1; i < physregs.size(); i++)
+    for (size_t i = 1; i < physregs.size(); i++)
     {
         int curdim = get(physregs[i])->getelementdimension();
         if (dim != curdim)
@@ -265,7 +265,7 @@ void physicalregions::copy(disjointregions* drs, physicalregions* target)
 {
     *target = *this;
     
-    for (int i = 0; i < myphysicalregions.size(); i++)
+    for (size_t i = 0; i < myphysicalregions.size(); i++)
         target->myphysicalregions[i] = myphysicalregions[i]->copy(target, drs);
     
     target->mydisjointregions = drs;

@@ -4,7 +4,7 @@
 int hierarchicalformfunction::gettypenumber(std::string fftypename)
 {
     int outtypenum = -1;
-    for (int i = 0; i < mytypenames.size(); i++)
+    for (size_t i = 0; i < mytypenames.size(); i++)
     {
         if (mytypenames[i] == fftypename)
         {

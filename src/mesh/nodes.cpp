@@ -43,7 +43,7 @@ std::vector<int> nodes::removeduplicates(void)
     std::vector<int> noderenumbering;
     int numberofnonduplicates = myalgorithm::removeduplicates(mycoordinates, noderenumbering);
 
-    for (int i = 0; i < noderenumbering.size(); i++)
+    for (size_t i = 0; i < noderenumbering.size(); i++)
     {
         if (noderenumbering[i] != i)
         {
