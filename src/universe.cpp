@@ -65,6 +65,58 @@ void universe::forbidreuse(void)
     opcomputedfft = {};
 }
 
+std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> universe::selectsubset(int totnumelems, std::vector<int>& selectedelementindexes)
+{
+    int numselected = selectedelementindexes.size();
+
+    auto output = std::make_tuple(computedjacobian, oppointers, oppointersfft, opcomputed, opcomputedfft);
+    
+    // Replace the jacobian with a subset of it:
+    if (computedjacobian != NULL)
+    {
+        std::shared_ptr<jacobian> newjac(new jacobian);
+        *newjac = computedjacobian->extractsubset(selectedelementindexes);
+        computedjacobian = newjac;
+    }
+        
+    // Replace the computed ops by their subset:
+    for (int i = 0; i < opcomputed.size(); i++)
+    {
+        for (int h = 0; h < opcomputed[i].size(); h++)
+        {
+            if (opcomputed[i][h].size() > 0)
+                opcomputed[i][h][0] = opcomputed[i][h][0].extractrows(selectedelementindexes);
+        }
+    }
+    
+    // In the multiharmonic case columns must be selected:
+    std::vector<int> mhcols;
+    if (opcomputedfft.size() > 0)
+    {
+        int numevalpts = opcomputedfft[0].countcolumns()/totnumelems;
+        mhcols = std::vector<int>(numselected*numevalpts);
+        for (int i = 0; i < numselected; i++)
+        {
+            for (int j = 0; j < numevalpts; j++)
+                mhcols[i*numevalpts+j] = selectedelementindexes[i]*numevalpts+j;
+        }
+    }
+    for (int i = 0; i < opcomputedfft.size(); i++)
+        opcomputedfft[i] = opcomputedfft[i].extractcols(mhcols);
+    
+    return output;
+}
+
+void universe::restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> input)
+{
+    computedjacobian = std::get<0>(input);
+    
+    oppointers = std::get<1>(input);
+    oppointersfft = std::get<2>(input);
+    opcomputed = std::get<3>(input);
+    opcomputedfft = std::get<4>(input);
+}
+
 
 std::shared_ptr<jacobian> universe::computedjacobian = NULL;
 
