@@ -53,10 +53,15 @@ class jacobian
 
     public:
         
+        jacobian(void) {};
+        
         // The Jacobian is computed on the mesh deformed by vector expression 
         // 'meshdeform'. The expression must be constant in time (harmonic 1).
         jacobian(elementselector& elemselect, std::vector<double> evaluationcoordinates, expression* meshdeform);
 
+        // Return a jacobian object holding an element subset of this jacobian:
+        jacobian extractsubset(std::vector<int>& selectedelementindexes);
+        
         // The detjac and jac terms are computed in the constructor.
         densematrix getdetjac(void);    
         densematrix getjac(int row, int column);
