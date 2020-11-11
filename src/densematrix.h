@@ -153,8 +153,8 @@ class densematrix
         densematrix duplicatehorizontally(int n);
 
         // Extract a set of rows/columns from the matrix:
-        densematrix extractrows(std::vector<int> selected);
-        densematrix extractcols(std::vector<int> selected);
+        densematrix extractrows(std::vector<int>& selected);
+        densematrix extractcols(std::vector<int>& selected);
         // Extract the rows/columns in a given range:
         densematrix extractrows(long long int rangebegin, long long int rangeend);
         densematrix extractcols(long long int rangebegin, long long int rangeend);

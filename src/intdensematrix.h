@@ -87,8 +87,8 @@ class intdensematrix
         intdensematrix duplicatecolsonebyone(int n);
 
         // Extract a set of rows/columns from the matrix:
-        intdensematrix extractrows(std::vector<int> selected);
-        intdensematrix extractcols(std::vector<int> selected);
+        intdensematrix extractrows(std::vector<int>& selected);
+        intdensematrix extractcols(std::vector<int>& selected);
 
 };
 

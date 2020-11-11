@@ -301,7 +301,7 @@ intdensematrix intdensematrix::duplicatecolsonebyone(int n)
     return output;
 }
 
-intdensematrix intdensematrix::extractrows(std::vector<int> selected)
+intdensematrix intdensematrix::extractrows(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
 
@@ -319,7 +319,7 @@ intdensematrix intdensematrix::extractrows(std::vector<int> selected)
     return output;
 }
 
-intdensematrix intdensematrix::extractcols(std::vector<int> selected)
+intdensematrix intdensematrix::extractcols(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
 

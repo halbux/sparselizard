@@ -663,7 +663,7 @@ densematrix densematrix::duplicatehorizontally(int n)
     return output;
 }
 
-densematrix densematrix::extractrows(std::vector<int> selected)
+densematrix densematrix::extractrows(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
 
@@ -681,7 +681,7 @@ densematrix densematrix::extractrows(std::vector<int> selected)
     return output;
 }
 
-densematrix densematrix::extractcols(std::vector<int> selected)
+densematrix densematrix::extractcols(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
     
