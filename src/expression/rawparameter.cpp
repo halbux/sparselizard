@@ -117,19 +117,14 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
 {
     synchronize();
     
+    int numelems = elemselect.countinselection();
+    int numevalpts = evaluationcoordinates.size()/3;
+    
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
     // Make sure the parameter has been defined:
     errorifundefined(alldisjregs);
-    
-    // We have stored in the universe data defined on a set of disjoint 
-    // regions. Here we will interpolate on subsets of disjoint regions 
-    // so the data stored cannot be used during these interpolations.
-    // Since we do not want to discard the computed data we simply
-    // set 'isreuseallowed' temporarily to false.
-    bool wasreuseallowed = universe::isreuseallowed;
-    universe::isreuseallowed = false;
     
     std::vector<std::vector<densematrix>> out = {};
     
@@ -142,10 +137,14 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         elemselect.selectdisjointregions(mydisjregs);
         if (elemselect.countinselection() == 0)
             continue;
+            
+        std::vector<int> selectedelementindexes = elemselect.getelementindexes();
         elementselector myselection = elemselect.extractselection();
         
+        auto allstorage = universe::selectsubset(numelems, selectedelementindexes);
         // IMPORTANT: Harmonic numbers can be different from one disj. reg. to the other:
         std::vector<std::vector<densematrix>> currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->interpolate(myselection, evaluationcoordinates, meshdeform);
+        universe::restore(allstorage);
         
         // Preallocate the harmonics not yet in 'out':
         if (out.size() < currentinterp.size())
@@ -153,7 +152,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         for (int h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1 && out[h].size() == 0)
-                out[h] = {densematrix(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
+                out[h] = {densematrix(numelems, numevalpts, 0)};
         }
         
         // Insert 'currentinterp' in 'out':
@@ -166,9 +165,6 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
     // Unselect the disjoint regions:
     elemselect.selectdisjointregions({});
     
-    // Reset the reuse right:
-    universe::isreuseallowed = wasreuseallowed;
-    
     return out;
 }
 
@@ -176,22 +172,17 @@ densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtime
 {
     synchronize();
     
+    int numelems = elemselect.countinselection();
+    int numevalpts = evaluationcoordinates.size()/3;
+    
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
     // Make sure the parameter has been defined:
     errorifundefined(alldisjregs);
     
-    // We have stored in the universe data defined on a set of disjoint 
-    // regions. Here we will interpolate on subsets of disjoint regions 
-    // so the data stored cannot be used during these interpolations.
-    // Since we do not want to discard the computed data we simply
-    // set 'isreuseallowed' temporarily to false.
-    bool wasreuseallowed = universe::isreuseallowed;
-    universe::isreuseallowed = false;
-    
     // Preallocate the output matrix:
-    densematrix out(numtimeevals, elemselect.countincurrentorientation() * evaluationcoordinates.size()/3);
+    densematrix out(numtimeevals, numelems * numevalpts);
     
     // Group disj. regs. with same operation number (and same element type number).
     disjointregionselector mydisjregselector(alldisjregs, {getopnums(alldisjregs)});
@@ -202,22 +193,25 @@ densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtime
         elemselect.selectdisjointregions(mydisjregs);
         if (elemselect.countinselection() == 0)
             continue;
+            
+        std::vector<int> selectedelementindexes = elemselect.getelementindexes();
         elementselector myselection = elemselect.extractselection();
         
-        std::vector<int> selectedelementindexes = elemselect.getelementindexes();
-        std::vector<int> selectedcolumns(selectedelementindexes.size()*evaluationcoordinates.size()/3);
+        std::vector<int> selectedcolumns(selectedelementindexes.size()*numevalpts);
         for (int j = 0; j < selectedelementindexes.size(); j++)
         {
-            for (int k = 0; k < evaluationcoordinates.size()/3; k++)
-                selectedcolumns[j*evaluationcoordinates.size()/3+k] = selectedelementindexes[j]*evaluationcoordinates.size()/3+k;
+            for (int k = 0; k < numevalpts; k++)
+                selectedcolumns[j*numevalpts+k] = selectedelementindexes[j]*numevalpts+k;
         }
-        out.insertatcolumns(selectedcolumns, myoperations[mydisjregs[0]][row*mynumcols+col]->multiharmonicinterpolate(numtimeevals, myselection, evaluationcoordinates, meshdeform));
+        
+        auto allstorage = universe::selectsubset(numelems, selectedelementindexes);
+        densematrix currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->multiharmonicinterpolate(numtimeevals, myselection, evaluationcoordinates, meshdeform);
+        universe::restore(allstorage);
+        
+        out.insertatcolumns(selectedcolumns, currentinterp);
     }
     // Unselect the disjoint regions:
     elemselect.selectdisjointregions({});
-    
-    // Reset the reuse right:
-    universe::isreuseallowed = wasreuseallowed;
     
     return out;
 }    
