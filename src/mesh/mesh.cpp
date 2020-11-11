@@ -10,6 +10,15 @@ void mesh::errorifloaded(void)
     }
 }
 
+void mesh::errorifnotloaded(void)
+{
+    if (not(isloaded))
+    {
+        std::cout << "Error in 'mesh' object: cannot perform the requested operation (mesh has not been loaded)" << std::endl;
+        abort();
+    }
+}
+
 mesh::mesh(void)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
@@ -69,11 +78,14 @@ void mesh::load(std::vector<shape> inputshapes, int verbosity)
 
 void mesh::write(std::string name, int verbosity)
 {
+    errorifnotloaded();
     rawmeshptr->gethadaptedpointer()->write(name, verbosity);
 }
 
 void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
 {
+    errorifnotloaded();
+    
     if (not(criterion.isscalar()))
     {
         std::cout << "Error in 'mesh' object: expected a scalar criterion for h-adaptivity" << std::endl;
@@ -110,6 +122,7 @@ void mesh::split(int n)
 
 void mesh::move(int physreg, expression u)
 {
+    errorifnotloaded();
     if (rawmeshptr->getmeshnumber() == 0)
         rawmeshptr->move(physreg, u);
     rawmeshptr->gethadaptedpointer()->move(physreg, u);
@@ -117,6 +130,7 @@ void mesh::move(int physreg, expression u)
 
 void mesh::move(expression u)
 {
+    errorifnotloaded();
     if (rawmeshptr->getmeshnumber() == 0)
         rawmeshptr->move(-1, u);
     rawmeshptr->gethadaptedpointer()->move(-1, u);
@@ -124,47 +138,55 @@ void mesh::move(expression u)
         
 void mesh::shift(int physreg, double x, double y, double z)
 {
+    errorifnotloaded();
     rawmeshptr->shift(physreg, x, y, z);
     rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
 }
 
 void mesh::shift(double x, double y, double z)
 {
+    errorifnotloaded();
     rawmeshptr->shift(-1, x, y, z);
     rawmeshptr->gethadaptedpointer()->shift(-1, x, y, z);
 }
 
 void mesh::rotate(int physreg, double ax, double ay, double az)
 {
+    errorifnotloaded();
     rawmeshptr->rotate(physreg, ax, ay, az);
     rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
 }
 
 void mesh::rotate(double ax, double ay, double az)
 {
+    errorifnotloaded();
     rawmeshptr->rotate(-1, ax, ay, az);
     rawmeshptr->gethadaptedpointer()->rotate(-1, ax, ay, az);
 }
 
 void mesh::scale(int physreg, double x, double y, double z)
 {
+    errorifnotloaded();
     rawmeshptr->scale(physreg, x, y, z);
     rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
 }
 
 void mesh::scale(double x, double y, double z)
 {
+    errorifnotloaded();
     rawmeshptr->scale(-1, x, y, z);
     rawmeshptr->gethadaptedpointer()->scale(-1, x, y, z);
 }
 
 int mesh::getmeshdimension(void)
 {
+    errorifnotloaded();
     return rawmeshptr->getmeshdimension();
 }
 
 std::vector<int> mesh::getphysicalregionnumbers(int dim)
 {
+    errorifnotloaded();
     return rawmeshptr->getphysicalregionnumbers(dim);
 }
 
@@ -200,6 +222,7 @@ void mesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector
 
 void mesh::use(void)
 {
+    errorifnotloaded();
     universe::mymesh = rawmeshptr->gethadaptedpointer();
 }
 
