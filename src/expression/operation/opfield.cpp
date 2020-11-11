@@ -55,10 +55,10 @@ std::vector<std::vector<densematrix>> opfield::interpolate(int kietaphiderivativ
 
 std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    // Get the value from the universe if available and reuse is enabled:
-    if (reuse && universe::isreuseallowed)
+    // Get the value from the universe if available:
+    if (universe::isreuseallowed)
     {
-        int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
+        int precomputedindex = universe::getindexofprecomputedvalue(myfield, timederivativeorder, spacederivative, kietaphiderivative, formfunctioncomponent);
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
 
@@ -148,7 +148,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     if (myfield->ismultiharmonic() && timederivativeorder > 0)
         output = harmonic::timederivative(timederivativeorder, output);
 
-    if (reuse && universe::isreuseallowed)
+    if (universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), output);
 
     return output;
@@ -156,10 +156,10 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
 
 densematrix opfield::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    // Get the value from the universe if available and reuse is enabled:
-    if (reuse && universe::isreuseallowed)
+    // Get the value from the universe if available:
+    if (universe::isreuseallowed)
     {
-        int precomputedindex = universe::getindexofprecomputedvaluefft(shared_from_this());
+        int precomputedindex = universe::getindexofprecomputedvaluefft(myfield, timederivativeorder, spacederivative, kietaphiderivative, formfunctioncomponent);
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
 
@@ -167,7 +167,7 @@ densematrix opfield::multiharmonicinterpolate(int numtimeevals, elementselector&
     // Compute at 'numtimevals' instants in time the multiharmonic field:
     densematrix output = myfft::inversefft(interpolatedfield, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
 
-    if (reuse && universe::isreuseallowed)
+    if (universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);
     return output;
 }

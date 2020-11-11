@@ -146,6 +146,46 @@ int universe::getindexofprecomputedvaluefft(std::shared_ptr<operation> op)
     return -1;
 }
 
+int universe::getindexofprecomputedvalue(std::shared_ptr<rawparameter> param, int row, int col)
+{
+    for (int i = 0; i < oppointers.size(); i++)
+    {
+        if (oppointers[i]->isparameter() && (oppointers[i]->getparameterpointer()).get() == param.get() && oppointers[i]->getselectedrow() == row && oppointers[i]->getselectedcol() == col)
+            return i;
+    }
+    return -1;
+}
+
+int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawparameter> param, int row, int col)
+{
+    for (int i = 0; i < oppointersfft.size(); i++)
+    {
+        if (oppointersfft[i]->isparameter() && (oppointersfft[i]->getparameterpointer()).get() == param.get() && oppointersfft[i]->getselectedrow() == row && oppointersfft[i]->getselectedcol() == col)
+            return i;
+    }
+    return -1;
+}
+
+int universe::getindexofprecomputedvalue(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc)
+{
+    for (int i = 0; i < oppointers.size(); i++)
+    {
+        if (oppointers[i]->isfield() && (oppointers[i]->getfieldpointer()).get() == rf.get() && oppointers[i]->getformfunctioncomponent() == ffc && oppointers[i]->getspacederivative() == sd && oppointers[i]->getkietaphiderivative() == kepd && oppointers[i]->gettimederivative() == td)
+            return i;
+    }
+    return -1;
+}
+
+int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc)
+{
+    for (int i = 0; i < oppointersfft.size(); i++)
+    {
+        if (oppointersfft[i]->isfield() && (oppointersfft[i]->getfieldpointer()).get() == rf.get() && oppointersfft[i]->getformfunctioncomponent() == ffc && oppointersfft[i]->getspacederivative() == sd && oppointersfft[i]->getkietaphiderivative() == kepd && oppointersfft[i]->gettimederivative() == td)
+            return i;
+    }
+    return -1;
+}
+
 std::vector<std::vector<densematrix>> universe::getprecomputed(int index)
 {
     std::vector<std::vector<densematrix>> output = opcomputed[index];

@@ -14,7 +14,7 @@ class opfield: public operation
 
     private:
 
-        bool reuse = false;
+        // Fields are always reused
 
         int timederivativeorder = 0;
         // 0 is no derivative, 1 is x, 2 is y and 3 is z.
@@ -61,7 +61,7 @@ class opfield: public operation
 
         std::shared_ptr<operation> copy(void);
 
-        void reuseit(bool istobereused) { reuse = istobereused; };
+        void reuseit(bool istobereused) {}; // always reused
 
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 

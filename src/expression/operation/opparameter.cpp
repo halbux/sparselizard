@@ -3,32 +3,32 @@
 
 std::vector<std::vector<densematrix>> opparameter::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    // Get the value from the universe if available and reuse is enabled:
-    if (reuse && universe::isreuseallowed)
+    // Get the value from the universe if available:
+    if (universe::isreuseallowed)
     {
-        int precomputedindex = universe::getindexofprecomputedvalue(shared_from_this());
+        int precomputedindex = universe::getindexofprecomputedvalue(myparameter, myrow, mycolumn);
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
     std::vector<std::vector<densematrix>> output = myparameter->interpolate(myrow, mycolumn, elemselect, evaluationcoordinates, meshdeform);
     
-    if (reuse && universe::isreuseallowed)
+    if (universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), output);
     return output;
 }
 
 densematrix opparameter::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    // Get the value from the universe if available and reuse is enabled:
-    if (reuse && universe::isreuseallowed)
+    // Get the value from the universe if available:
+    if (universe::isreuseallowed)
     {
-        int precomputedindex = universe::getindexofprecomputedvaluefft(shared_from_this());
+        int precomputedindex = universe::getindexofprecomputedvaluefft(myparameter, myrow, mycolumn);
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
     densematrix output = myparameter->multiharmonicinterpolate(myrow, mycolumn, numtimeevals, elemselect, evaluationcoordinates, meshdeform);
             
-    if (reuse && universe::isreuseallowed)
+    if (universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);
     return output;
 }

@@ -16,7 +16,7 @@
 #include <cmath>
 #include <memory>
 #include "rawfield.h"
-#include "parameter.h"
+#include "rawparameter.h"
 #include "selector.h"
 #include "elementselector.h"
 #include "hierarchicalformfunction.h"
@@ -25,6 +25,7 @@
 // ALL SON-OPERATIONS ARE INCLUDED AT THE END OF THIS HEADER.
 
 class rawfield;
+class rawparameter;
 class oncontext;
 
 class operation : public std::enable_shared_from_this<operation>
@@ -61,6 +62,7 @@ class operation : public std::enable_shared_from_this<operation>
         virtual bool isproduct(void) { return false; };
         virtual bool isfield(void) { return false; };
         virtual bool isconstant(void) { return false; };
+        virtual bool isparameter(void) { return false; };
         
         // True if the expression is a constant 0:
         bool iszero(void);
@@ -74,6 +76,13 @@ class operation : public std::enable_shared_from_this<operation>
         
         // Get the value of a constant expression:
         virtual double getvalue(void) {};
+        
+        // Get the rawparameter of a parameter operation:
+        virtual std::shared_ptr<rawparameter> getparameterpointer(void) {};
+        
+        // Get the selected row/column of a parameter operation:
+        virtual int getselectedrow(void) {};
+        virtual int getselectedcol(void) {};
         
         // Get the field pointer of expressions including a field:
         virtual std::shared_ptr<rawfield> getfieldpointer(void);

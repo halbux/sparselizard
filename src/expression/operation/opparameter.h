@@ -17,7 +17,7 @@ class opparameter: public operation
 
     private:
         
-        bool reuse = false;
+        // Parameters are always reused
         
         int myrow;
         int mycolumn;
@@ -31,7 +31,12 @@ class opparameter: public operation
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         
+        bool isparameter(void) { return true; };
+        
         std::shared_ptr<rawparameter> getparameterpointer(void) { return myparameter; };
+        
+        int getselectedrow(void) { return myrow; };
+        int getselectedcol(void) { return mycolumn; };
         
         bool isharmonicone(std::vector<int> disjregs);
         
@@ -40,7 +45,7 @@ class opparameter: public operation
         
         std::shared_ptr<operation> copy(void);
         
-        void reuseit(bool istobereused) { reuse = istobereused; };
+        void reuseit(bool istobereused) {}; // always reused
         
         void print(void);
 

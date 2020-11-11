@@ -76,6 +76,10 @@ class universe
         // Returns -1 if not yet precomputed.
         static int getindexofprecomputedvalue(std::shared_ptr<operation> op);
         static int getindexofprecomputedvaluefft(std::shared_ptr<operation> op);
+        static int getindexofprecomputedvalue(std::shared_ptr<rawparameter> param, int row, int col);
+        static int getindexofprecomputedvaluefft(std::shared_ptr<rawparameter> param, int row, int col);
+        static int getindexofprecomputedvalue(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc);
+        static int getindexofprecomputedvaluefft(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc);
         // Returns a copy to avoid any modification of the data stored here:
         static std::vector<std::vector<densematrix>> getprecomputed(int index);
         static densematrix getprecomputedfft(int index);
