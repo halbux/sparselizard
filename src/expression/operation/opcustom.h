@@ -14,6 +14,8 @@ class opcustom: public operation
 
     private:
         
+        // Custom operations are always reused
+        
         int myoutindex = -1;
         
         std::vector<std::shared_ptr<operation>> myargs = {};
@@ -35,6 +37,8 @@ class opcustom: public operation
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);
         
         std::shared_ptr<operation> copy(void);
+        
+        void reuseit(bool istobereused) {}; // always reused
         
         void print(void);
 
