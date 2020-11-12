@@ -14,7 +14,7 @@ void mesh::errorifnotloaded(void)
 {
     if (not(isloaded))
     {
-        std::cout << "Error in 'mesh' object: cannot perform the requested operation (mesh has not been loaded)" << std::endl;
+        std::cout << "Error in 'mesh' object: cannot perform the requested operation (mesh is not loaded)" << std::endl;
         abort();
     }
 }
