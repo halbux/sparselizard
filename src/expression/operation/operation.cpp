@@ -66,6 +66,15 @@ bool operation::isharmonicone(std::vector<int> disjregs)
     return true;
 }
 
+std::shared_ptr<rawparameter> operation::getparameterpointer(void)
+{
+    std::cout << "Error in 'operation' object: cannot get the rawparameter pointer" << std::endl;
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    std::cout << std::endl;
+    abort();
+}
+
 std::shared_ptr<rawfield> operation::getfieldpointer(void)
 {
     std::cout << "Error in 'operation' object: cannot get the field pointer" << std::endl;
@@ -73,7 +82,7 @@ std::shared_ptr<rawfield> operation::getfieldpointer(void)
     this->print();
     std::cout << std::endl;
     abort();
-}         
+}
 
 void operation::reuseit(bool istobereused)
 {

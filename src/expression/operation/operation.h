@@ -78,7 +78,7 @@ class operation : public std::enable_shared_from_this<operation>
         virtual double getvalue(void) {};
         
         // Get the rawparameter of a parameter operation:
-        virtual std::shared_ptr<rawparameter> getparameterpointer(void) {};
+        virtual std::shared_ptr<rawparameter> getparameterpointer(void);
         
         // Get the selected row/column of a parameter operation:
         virtual int getselectedrow(void) {};
