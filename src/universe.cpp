@@ -65,7 +65,7 @@ void universe::forbidreuse(void)
     opcomputedfft = {};
 }
 
-std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> universe::selectsubset(int totnumelems, std::vector<int>& selectedelementindexes)
+std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> universe::selectsubset(int numevalpts, std::vector<int>& selectedelementindexes)
 {
     int numselected = selectedelementindexes.size();
 
@@ -93,7 +93,6 @@ std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,st
     std::vector<int> mhcols;
     if (opcomputedfft.size() > 0)
     {
-        int numevalpts = opcomputedfft[0].countcolumns()/totnumelems;
         mhcols = std::vector<int>(numselected*numevalpts);
         for (int i = 0; i < numselected; i++)
         {

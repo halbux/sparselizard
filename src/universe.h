@@ -59,7 +59,7 @@ class universe
         static void forbidreuse(void);
         
         // Select an element subset of the available storage and return the unselected storage:
-        static std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> selectsubset(int totnumelems, std::vector<int>& selectedelementindexes);
+        static std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> selectsubset(int numevalpts, std::vector<int>& selectedelementindexes);
         // Restore the storage to a state before subset selection:
         static void restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >>);
         

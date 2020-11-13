@@ -141,7 +141,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         std::vector<int> selectedelementindexes = elemselect.getelementindexes();
         elementselector myselection = elemselect.extractselection();
         
-        auto allstorage = universe::selectsubset(numelems, selectedelementindexes);
+        auto allstorage = universe::selectsubset(numevalpts, selectedelementindexes);
         // IMPORTANT: Harmonic numbers can be different from one disj. reg. to the other:
         std::vector<std::vector<densematrix>> currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->interpolate(myselection, evaluationcoordinates, meshdeform);
         universe::restore(allstorage);
@@ -204,7 +204,7 @@ densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtime
                 selectedcolumns[j*numevalpts+k] = selectedelementindexes[j]*numevalpts+k;
         }
         
-        auto allstorage = universe::selectsubset(numelems, selectedelementindexes);
+        auto allstorage = universe::selectsubset(numevalpts, selectedelementindexes);
         densematrix currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->multiharmonicinterpolate(numtimeevals, myselection, evaluationcoordinates, meshdeform);
         universe::restore(allstorage);
         
