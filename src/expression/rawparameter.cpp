@@ -159,7 +159,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         for (int h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1)
-                out[h][0].insertatrows(elemselect.getelementindexes(), currentinterp[h][0]);
+                out[h][0].insertatrows(selectedelementindexes, currentinterp[h][0]);
         }
     }
     // Unselect the disjoint regions:
