@@ -84,15 +84,6 @@ std::shared_ptr<rawfield> operation::getfieldpointer(void)
     abort();
 }
 
-void operation::reuseit(bool istobereused)
-{
-    std::cout << "Error in 'operation' object: cannot reuse the operation" << std::endl;
-    std::cout << "Operation was:" << std::endl;
-    this->print();
-    std::cout << std::endl;
-    abort();
-}
-
 bool operation::isreused(void)
 {
     std::cout << "Error in 'operation' object: cannot call 'isreused' on the operation" << std::endl;

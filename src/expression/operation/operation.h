@@ -96,7 +96,7 @@ class operation : public std::enable_shared_from_this<operation>
         // 'op' including at least once this operation is 
         // interpolated this operation is only computed once 
         // and then reused for all other occurences in 'op'. 
-        virtual void reuseit(bool istobereused);
+        virtual void reuseit(bool istobereused) {};
         virtual bool isreused(void);
         
         // Set derivatives for fields, dofs and tfs:

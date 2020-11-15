@@ -38,8 +38,6 @@ class opcustom: public operation
         
         std::shared_ptr<operation> copy(void);
         
-        void reuseit(bool istobereused) {}; // always reused
-        
         void print(void);
 
 };

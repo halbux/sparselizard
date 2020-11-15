@@ -1172,11 +1172,6 @@ void expression::reuseit(bool istobereused)
     {
         if (myoperations[i]->isdofincluded() == false && myoperations[i]->istfincluded() == false)
             myoperations[i]->reuseit(istobereused);
-        else
-        {
-            std::cout << "Error in 'expression' object: cannot reuse an expression including a dof() or tf()" << std::endl;
-            abort();
-        }
     }
 }
 
@@ -2280,6 +2275,16 @@ expression expression::operator+(parameter param) { return this->getcopy() + (ex
 expression expression::operator-(parameter param) { return this->getcopy() - (expression)param; }
 expression expression::operator*(parameter param) { return this->getcopy() * (expression)param; }
 expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
+
+void expression::operator=(expression input)
+{
+    mynumrows = input.mynumrows;
+    mynumcols = input.mynumcols;
+    myoperations = input.myoperations;
+    inrefcoord = input.inrefcoord;
+
+    reuseit();
+}
 
 
 expression operator+(double val, expression expr) { return expr+val; }
