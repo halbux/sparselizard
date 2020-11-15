@@ -1294,7 +1294,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
                 {
                     int currentedge = elptr->getsubelement(1, i, e, en);
                     // Get all cells touching the current edge:
-                    std::vector<int> cellsonedge = elptr->getcellsonedge(currentedge);
+                    std::vector<int> cellsonedge = elptr->getcellsontype(1, currentedge);
 
                     for (int c = 0; c < cellsonedge.size()/2; c++)
                     {

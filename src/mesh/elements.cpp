@@ -188,15 +188,15 @@ std::vector<int> elements::getedgesonnode(int nodenumber)
     return output;
 }
 
-void elements::populatecellsatedges(void)
+void elements::populatecellsattype(int subtype, std::vector<int>& act, std::vector<int>& ct)
 {
     int celldim = getdimension();
 
-    // Get the number of edges:
-    int numedges = count(1);
-    // Get the number of cells of each type and the number of edges in each cell:
+    // Get the number of subs:
+    int numsubs = count(subtype);
+    // Get the number of cells of each type and the number of subs in each cell:
     std::vector<int> numcells(8,0);
-    std::vector<int> ne(8);
+    std::vector<int> ns(8);
     int prealloc = 0;
     for (int i = 0; i < 8; i++)
     {
@@ -204,68 +204,68 @@ void elements::populatecellsatedges(void)
         if (myelem.getelementdimension() == celldim)
         {
             numcells[i] = count(i);
-            ne[i] = myelem.countedges();
-            prealloc += numcells[i]*ne[i];   
+            ns[i] = myelem.counttype(subtype);
+            prealloc += numcells[i]*ns[i];   
         }
     }
 
 
     // Preallocate vectors:
-    adresscellsatedges = std::vector<int>(numedges,0);
-    cellsatedges = std::vector<int>(2*prealloc);
+    act = std::vector<int>(numsubs,0);
+    ct = std::vector<int>(2*prealloc);
 
 
-    // Vector to count the number of cells touching every edge:
-    std::vector<int> numcellsonedge(numedges,0);
+    // Vector to count the number of cells touching every sub:
+    std::vector<int> numcellsonsub(numsubs,0);
 
     // Loop on all cells:
     for (int i = 0; i < 8; i++)
     {
         for (int c = 0; c < numcells[i]; c++)
         {
-            for (int e = 0; e < ne[i]; e++)
-                numcellsonedge[getsubelement(1,i,c,e)]++;
+            for (int s = 0; s < ns[i]; s++)
+                numcellsonsub[getsubelement(subtype,i,c,s)]++;
         }
     }
 
-    for (int e = 1; e < numedges; e++)
-        adresscellsatedges[e] = adresscellsatedges[e-1] + 2*numcellsonedge[e-1];
+    for (int s = 1; s < numsubs; s++)
+        act[s] = act[s-1] + 2*numcellsonsub[s-1];
 
-    std::vector<int> currentcellinedge(numedges,0); 
+    std::vector<int> currentcellinsub(numsubs,0); 
     for (int i = 0; i < 8; i++)
     {
         for (int c = 0; c < numcells[i]; c++)
         {
-            for (int e = 0; e < ne[i]; e++)
+            for (int s = 0; s < ns[i]; s++)
             {
-                int curedge = getsubelement(1,i,c,e);
-                cellsatedges[adresscellsatedges[curedge]+2*currentcellinedge[curedge]+0] = i;
-                cellsatedges[adresscellsatedges[curedge]+2*currentcellinedge[curedge]+1] = c;
+                int cursub = getsubelement(subtype,i,c,s);
+                ct[act[cursub]+2*currentcellinsub[cursub]+0] = i;
+                ct[act[cursub]+2*currentcellinsub[cursub]+1] = c;
                 
-                currentcellinedge[curedge]++;
+                currentcellinsub[cursub]++;
             }
         }
     }
 }
 
-int elements::countcellsonedge(int edgenumber)
+int elements::countcellsontype(int subtype, int subnumber)
 {
-    if (cellsatedges.size() == 0)
-        populatecellsatedges();
+    if (adresscellsattype[subtype].size() == 0)
+        populatecellsattype(subtype, adresscellsattype[subtype], cellsattype[subtype]);
 
-    if (edgenumber+1 < adresscellsatedges.size())
-        return (adresscellsatedges[edgenumber+1]-adresscellsatedges[edgenumber])/2;
+    if (subnumber+1 < adresscellsattype[subtype].size())
+        return (adresscellsattype[subtype][subnumber+1]-adresscellsattype[subtype][subnumber])/2;
     else
-        return (cellsatedges.size()-adresscellsatedges[edgenumber])/2;
+        return (cellsattype[subtype].size()-adresscellsattype[subtype][subnumber])/2;
 }
 
-std::vector<int> elements::getcellsonedge(int edgenumber)
+std::vector<int> elements::getcellsontype(int subtype, int subnumber)
 {
-    int numcellsatedge = countcellsonedge(edgenumber);
+    int numcellsatsub = countcellsontype(subtype, subnumber);
 
-    std::vector<int> output(2*numcellsatedge);
-    for (int i = 0; i < 2*numcellsatedge; i++)
-        output[i] = cellsatedges[adresscellsatedges[edgenumber]+i];
+    std::vector<int> output(2*numcellsatsub);
+    for (int i = 0; i < 2*numcellsatsub; i++)
+        output[i] = cellsattype[subtype][adresscellsattype[subtype][subnumber]+i];
 
     return output;
 }
@@ -815,8 +815,8 @@ void elements::reorder(int elementtypenumber, std::vector<int> &elementreorderin
     adressedgesatnodes = {};
     edgesatnodes = {};
     
-    adresscellsatedges = {};
-    cellsatedges = {};
+    adresscellsattype = std::vector<std::vector<int>>(4, std::vector<int>(0));
+    cellsattype = std::vector<std::vector<int>>(4, std::vector<int>(0));
 }
 
 void elements::explode(void)

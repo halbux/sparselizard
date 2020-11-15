@@ -79,12 +79,12 @@ class elements
         // Create the two vectors above:
         void populateedgesatnodes(void);
         
-        // Entries in 'cellsatedges' from index 'adresscellsatedges[i]' to 'adresscellsatedges[i+1]-1' are all cells 
-        // (highest dimension elements) touching edge i and their type number in format {type0,cell0,type1,...}.
-        std::vector<int> adresscellsatedges = {};
-        std::vector<int> cellsatedges = {};
+        // Entries in 'cellsattype[0/1/2/3]' from index 'adresscellsattype[][i]' to 'adresscellsattype[][i+1]-1' are all cells 
+        // (highest dimension elements) touching node/edge/tri/quad i and their type number in format {type0,cell0,type1,...}.
+        std::vector<std::vector<int>> adresscellsattype = std::vector<std::vector<int>>(4, std::vector<int>(0));
+        std::vector<std::vector<int>> cellsattype = std::vector<std::vector<int>>(4, std::vector<int>(0));
         // Create the two vectors above:
-        void populatecellsatedges(void);
+        void populatecellsattype(int subtype, std::vector<int>& act, std::vector<int>& ct);
 
     public:
         
@@ -125,9 +125,9 @@ class elements
         int countedgesonnode(int nodenumber);
         std::vector<int> getedgesonnode(int nodenumber);
         // Get a vector containing all cells (highest dimension elements)
-        // touching edge 'edgenumber'. Format is {type0,cell0,type1,...}.
-        int countcellsonedge(int edgenumber);
-        std::vector<int> getcellsonedge(int edgenumber);
+        // touching node/edge/tri/quad 'subnumber'. Format is {type0,cell0,type1,...}.
+        int countcellsontype(int subtype, int subnumber);
+        std::vector<int> getcellsontype(int subtype, int subnumber);
         
         // Get the x, y or z coordinate of all nodes in the element 
         // (for xyz respectively set to 0, 1 or 2).
