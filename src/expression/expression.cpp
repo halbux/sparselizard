@@ -2276,16 +2276,6 @@ expression expression::operator-(parameter param) { return this->getcopy() - (ex
 expression expression::operator*(parameter param) { return this->getcopy() * (expression)param; }
 expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
 
-void expression::operator=(expression input)
-{
-    mynumrows = input.mynumrows;
-    mynumcols = input.mynumcols;
-    myoperations = input.myoperations;
-    inrefcoord = input.inrefcoord;
-
-    reuseit();
-}
-
 
 expression operator+(double val, expression expr) { return expr+val; }
 expression operator-(double val, expression expr) { return -expr+val; }

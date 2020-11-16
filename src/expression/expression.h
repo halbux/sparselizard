@@ -260,8 +260,6 @@ class expression
         expression operator-(parameter);
         expression operator*(parameter);
         expression operator/(parameter);
-        
-        void operator=(expression);
 };
 
 // Define the left version of the operators based on the right one.
