@@ -83,7 +83,7 @@ std::vector<bool> physicalregion::getdefinition(void)
 
 std::vector<int> physicalregion::getdisjointregions(void)
 {
-    std::vector<int> disjointregionlist;
+    std::vector<int> disjointregionlist = {};
     for (int i = 0; i < includesdisjointregion.size(); i++)
     {
         // Only disjoint regions including elements of the same 
@@ -96,7 +96,7 @@ std::vector<int> physicalregion::getdisjointregions(void)
 
 std::vector<int> physicalregion::getdisjointregions(int dim)
 {
-    std::vector<int> disjointregionlist;
+    std::vector<int> disjointregionlist = {};
     for (int i = 0; i < includesdisjointregion.size(); i++)
     {
         if (includesdisjointregion[i])
@@ -105,6 +105,17 @@ std::vector<int> physicalregion::getdisjointregions(int dim)
             if (mydisjointregions->getelementdimension(i) == dim || dim == -1)
                 disjointregionlist.push_back(i);
         }
+    }
+    return disjointregionlist;
+}
+
+std::vector<int> physicalregion::getdisjointregionsoftype(int elementtypenumber)
+{
+    std::vector<int> disjointregionlist = {};
+    for (int i = 0; i < includesdisjointregion.size(); i++)
+    {
+        if (includesdisjointregion[i] && elementtypenumber == mydisjointregions->getelementtypenumber(i))
+            disjointregionlist.push_back(i);
     }
     return disjointregionlist;
 }

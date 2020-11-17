@@ -82,6 +82,9 @@ namespace myalgorithm
     // Split a vector in two vectors according to 'select':
     void splitvector(std::vector<int>& vec, std::vector<bool>& select, std::vector<int>& falses, std::vector<int>& trues);
     
+    // Select indexes of a vector:
+    void select(std::vector<int>& vals, std::vector<int>& selectedindexes, std::vector<int>& selected);
+    
     // Norm each block in the vector:
     std::vector<double> normblocks(std::vector<double>& tonorm, int blocklen);
     

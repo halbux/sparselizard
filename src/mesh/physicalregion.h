@@ -59,6 +59,8 @@ class physicalregion
         std::vector<int> getdisjointregions(void);
         // Get all disjoint regions of a given dimension (use -1 for all):
         std::vector<int> getdisjointregions(int dim);
+        // Get all disjoint regions of a given element type:
+        std::vector<int> getdisjointregionsoftype(int elementtypenumber);
         
         // 'renumberelements' updates the element numbers in 'elementlist' based on the input vector.
         // 'elementtypenumber' is the uncurved version of the actual element.

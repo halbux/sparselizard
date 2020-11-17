@@ -617,6 +617,15 @@ void myalgorithm::splitvector(std::vector<int>& vec, std::vector<bool>& select, 
     }
 }
 
+void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindexes, std::vector<int>& selected)
+{
+    int numselected = selectedindexes.size();
+    selected.resize(numselected);
+
+    for (int i = 0; i < numselected; i++)
+        selected[i] = vals[selectedindexes[i]];
+}
+
 std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blocklen)
 {
     int numblocks = tonorm.size()/blocklen;
