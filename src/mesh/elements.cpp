@@ -81,6 +81,72 @@ int elements::gettotalorientation(int elementtypenumber, int elementnumber)
         return 0;
 }
 
+std::vector<bool> elements::isflipped(int subelementtypenumber, std::vector<int>& subelementnumbers, int elementtypenumber, std::vector<int>& elementnumbers)
+{
+    int numelems = elementnumbers.size();
+    std::vector<bool> output(numelems, false);
+
+    // Points cannot be flipped:
+    if (subelementtypenumber == 0)
+        return output;
+
+    element parent(elementtypenumber, mycurvatureorder);
+    element sub(subelementtypenumber, mycurvatureorder);
+    
+    int numsubsinparent = parent.counttype(subelementtypenumber);
+    int numcurvednodesinparent = parent.countcurvednodes();
+    int numtrisinparent = parent.counttriangularfaces();
+    
+    int numnodesinsub = sub.countnodes();
+    int numcurvednodesinsub = sub.countcurvednodes();
+
+    std::vector<int> cornernodesinparent;
+    if (subelementtypenumber == 1)
+        cornernodesinparent = parent.getedgesdefinitionsbasedonnodes();
+    else
+        cornernodesinparent = parent.getfacesdefinitionsbasedonnodes();
+    int trishift = 0;
+    if (subelementtypenumber == 3)
+        trishift = 3*numtrisinparent;
+    
+    for (int e = 0; e < numelems; e++)
+    {
+        int curparent = elementnumbers[e];
+        int cursub = subelementnumbers[e];
+        
+        // Find the subelement index in the parent:
+        int subindex = -1;
+        for (int i = 0; i < numsubsinparent; i++)
+        {
+            int subnum = subelementsinelements[elementtypenumber][subelementtypenumber][curparent*numsubsinparent+i]; // subs are never points thanks to above check
+            if (cursub == subnum)
+                subindex = i;
+        }
+        if (subindex == -1)
+        {
+            std::cout << "Error in 'elements' object: in 'isflipped' could not find " << sub.gettypename() <<  " " << cursub << " in " << parent.gettypename() << " " << curparent << std::endl;
+            abort();
+        }
+        
+        // Extract the corner nodes of the sub:
+        std::vector<int> subcorners(numnodesinsub);
+        for (int i = 0; i < numnodesinsub; i++)
+            subcorners[i] = subelementsinelements[subelementtypenumber][0][cursub*numcurvednodesinsub+i];
+        
+        // Extract the corner nodes of the subelement in the parent:
+        int firstcorner = trishift+numnodesinsub*subindex;
+        
+        std::vector<int> subcornersinparent(numnodesinsub);
+        for (int i = 0; i < numnodesinsub; i++)
+            subcornersinparent[i] = subelementsinelements[elementtypenumber][0][curparent*numcurvednodesinparent + cornernodesinparent[firstcorner+i]];
+
+        // Compare orientation between sub and sub in parent:
+        output[e] = myalgorithm::isflipped(subcorners, subcornersinparent);
+    }
+
+    return output;
+}
+
 
 int elements::count(int elementtypenumber)
 {

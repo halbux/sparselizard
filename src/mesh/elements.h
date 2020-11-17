@@ -111,6 +111,9 @@ class elements
         int getdisjointregion(int elementtypenumber, int elementnumber, bool errorifnegative = true);
         int gettotalorientation(int elementtypenumber, int elementnumber);
         
+        // Check if a subelement has the same orientation as in its parent element:
+        std::vector<bool> isflipped(int subelementtypenumber, std::vector<int>& subelementnumbers, int elementtypenumber, std::vector<int>& elementnumbers);
+        
         // Return the number of elements of a given type:
         int count(int elementtypenumber);
         // Return the number of elements of a given dimension:
