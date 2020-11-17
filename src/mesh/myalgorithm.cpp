@@ -626,6 +626,32 @@ void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindex
         selected[i] = vals[selectedindexes[i]];
 }
 
+bool myalgorithm::isflipped(std::vector<int>& a, std::vector<int>& b)
+{
+    int num = a.size();
+    if (num == 1)
+        return false;
+    if (num == 2)
+        return (a[0] != b[0]);
+
+    // Find the corresponding node in b of a[0]:
+    int ba0 = -1;
+    for (int i = 0; i < num; i++)
+    {
+        if (b[i] == a[0])
+        {
+            ba0 = i;
+            break;
+        }
+    }
+    
+    // Decide with position of neighbour:
+    if (b[(ba0+1)%num] == a[1])
+        return false;
+    else
+        return true;
+}
+
 std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blocklen)
 {
     int numblocks = tonorm.size()/blocklen;
