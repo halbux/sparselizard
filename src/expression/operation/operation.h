@@ -168,6 +168,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opmeshsize.h"
 #include "opmod.h"
 #include "opon.h"
+#include "oporientation.h"
 #include "opparameter.h"
 #include "oppower.h"
 #include "opproduct.h"
