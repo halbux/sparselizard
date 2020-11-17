@@ -45,13 +45,7 @@ int orientation::countorientations(int elemtypenum)
             return 6;
         case 3:
             return 8;
-        case 4:
-            return 1;
-        case 5:
-            return 1;
-        case 6:
-            return 1;
-        case 7:
+        default:                                                   // 4, 5, 6, 7
             return 1;
     }
 }

@@ -44,11 +44,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
     std::vector<int> tfinterpolorders(selectedelemdisjregs.size());
     std::vector<int> dofinterpolorders(selectedelemdisjregs.size(),0);
     // All harmonics must have the same interpolation order!
-    for (int i = 0; i < selectedelemdisjregs.size(); i++)
+    for (size_t i = 0; i < selectedelemdisjregs.size(); i++)
         tfinterpolorders[i] = tffield->getinterpolationorder(selectedelemdisjregs[i]);
     if (doffield != NULL)
     {
-        for (int i = 0; i < selectedelemdisjregs.size(); i++)
+        for (size_t i = 0; i < selectedelemdisjregs.size(); i++)
             dofinterpolorders[i] = doffield->getinterpolationorder(selectedelemdisjregs[i]);
     }
     
@@ -102,7 +102,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         bool isorientationdependent = tfformfunction->isorientationdependent(tfinterpolationorder);
         if (doffield != NULL)
             isorientationdependent = isorientationdependent || dofformfunction->isorientationdependent(dofinterpolationorder);
-        for (int term = 0; term < mytfs.size(); term++)
+        for (size_t term = 0; term < mytfs.size(); term++)
         {
             mycoeffs[term] = mycoeffs[term]->simplify(mydisjregs);
             isorientationdependent = (isorientationdependent || mycoeffs[term]->isvalueorientationdependent(mydisjregs) || (meshdeformationptr != NULL && meshdeformationptr->isvalueorientationdependent(mydisjregs)));
@@ -135,7 +135,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             
             // Compute all terms in the contribution sum:
             densematrix tfformfunctionvalue, dofformfunctionvalue;
-            for (int term = 0; term < mytfs.size(); term++)
+            for (size_t term = 0; term < mytfs.size(); term++)
             {
                 ///// Compute the coefficients:
                 // currentcoeff[i][0] holds the ith harmonic of the coefficient. 
@@ -175,7 +175,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
 
                 ///// Since the interpolation orders are identical for all harmonics
                 // we can premultiply all coefficients by the same dof*tf product.
-                for (int h = 0; h < currentcoeff.size(); h++)
+                for (size_t h = 0; h < currentcoeff.size(); h++)
                 {
                     if (currentcoeff[h].size() > 0)
                     {
@@ -200,18 +200,18 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     multiharmonicdoftimederivativeorder = mydofs[term]->gettimederivative();
 
                 ///// Add the term to the corresponding stiffness block:
-                for (int currentcoefharm = 0; currentcoefharm < currentcoeff.size(); currentcoefharm++)
+                for (size_t currentcoefharm = 0; currentcoefharm < currentcoeff.size(); currentcoefharm++)
                 {
                     if (currentcoeff[currentcoefharm].size() == 0)
                         continue;
                     
-                    for (int dofharmindex = 0; dofharmindex < dofharms.size(); dofharmindex++)
+                    for (size_t dofharmindex = 0; dofharmindex < dofharms.size(); dofharmindex++)
                     {
                         int currentdofharm = dofharms[dofharmindex];
                         // Perform the product of the coefficient and the dof harmonic:
                         std::vector<std::pair<int, double>> harmsofproduct = harmonic::getproduct(currentcoefharm, currentdofharm, multiharmonicdoftimederivativeorder);
                         // Loop on all product harmonics:
-                        for (int p = 0; p < harmsofproduct.size(); p++)
+                        for (size_t p = 0; p < harmsofproduct.size(); p++)
                         {
                             int currentharm = harmsofproduct[p].first;
                             // currentharmcoef can be + or - 0.5 or 1 (+ the time derivation factor).
@@ -234,11 +234,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             universe::forbidreuse();
             
             // Get the adresses of all stiffnesses in the assembled matrix.
-            for (int htf = 0; htf < tfharms.size(); htf++)
+            for (size_t htf = 0; htf < tfharms.size(); htf++)
             {
                 int currenttfharm = tfharms[htf];
 
-                for (int hdof = 0; hdof < dofharms.size(); hdof++)
+                for (size_t hdof = 0; hdof < dofharms.size(); hdof++)
                 {
                     int currentdofharm = dofharms[hdof];
                     

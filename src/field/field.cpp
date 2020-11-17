@@ -14,7 +14,7 @@ field::field(std::string fieldtypename) { rawfieldptr = std::shared_ptr<rawfield
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers) 
 { 
     // Make sure all harmonic numbers are positive and non zero:
-    for (int i = 0; i < harmonicnumbers.size(); i++)
+    for (size_t i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {
@@ -39,7 +39,7 @@ field::field(std::string fieldtypename, spanningtree spantree)
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree)
 {
     // Make sure all harmonic numbers are positive and non zero:
-    for (int i = 0; i < harmonicnumbers.size(); i++)
+    for (size_t i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {
@@ -325,7 +325,7 @@ field field::harmonic(const std::vector<int> harmonicnumbers)
         abort();
     }    
     // Make sure all harmonic numbers are positive and non zero:
-    for (int i = 0; i < harmonicnumbers.size(); i++)
+    for (size_t i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {
@@ -373,13 +373,14 @@ void field::writeraw(int physreg, std::string filename, bool isbinary, std::vect
     errorifpointerisnull();
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
 
-    if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
+    if (isbinary == true && (((filename.size() >= 5) && filename.substr(filename.size()-4,4) == ".slz") ||
+                             ((filename.size() >= 8) && filename.substr(filename.size()-7,7) == ".slz.gz")))
     {
         rawfieldptr->writeraw(physreg, filename, isbinary, extradata);
         return;
     }
     
-    if (isbinary == false && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz"))
+    if (isbinary == false && ((filename.size() >= 5) && filename.substr(filename.size()-4,4) == ".slz"))
     {
         rawfieldptr->writeraw(physreg, filename, isbinary, extradata);
         return;
@@ -393,10 +394,14 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
 {
     errorifpointerisnull();
 
-    if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
+    if ((isbinary == true) && (((filename.size() >= 5) &&
+                                (filename.substr(filename.size()-4,4) == ".slz")) ||
+                               ((filename.size() >= 8) &&
+                                (filename.substr(filename.size()-7,7) == ".slz.gz"))))
         return rawfieldptr->loadraw(filename, isbinary);
     
-    if (isbinary == false && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz"))
+    if ((isbinary == false) && ((filename.size() >= 5) &&
+                                (filename.substr(filename.size()-4,4) == ".slz")))
         return rawfieldptr->loadraw(filename, isbinary);
     
     std::cout << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to load raw field data" << std::endl;

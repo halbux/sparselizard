@@ -13,7 +13,7 @@ int hcurltriangle::count(int order)
     return (order-1)*(order+1) + 3*(order+1);
 }
 
-int hcurltriangle::count(int order, int dim, int num)
+int hcurltriangle::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -41,7 +41,7 @@ int hcurltriangle::count(int order, int dim, int num)
         case 2:
             return (order-1)*(order+1);
         // Volume based form functions:
-        case 3:
+        default:
             return 0;
     }
 }

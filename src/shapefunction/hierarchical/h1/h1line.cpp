@@ -11,7 +11,7 @@ int h1line::count(int order)
     return (order+1);
 }
 
-int h1line::count(int order, int dim, int num)
+int h1line::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,7 +32,7 @@ int h1line::count(int order, int dim, int num)
         case 2:
             return 0;
         // Volume based form functions:
-        case 3:
+        default:
             return 0;
     }
 }

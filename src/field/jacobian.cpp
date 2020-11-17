@@ -365,14 +365,14 @@ jacobian jacobian::extractsubset(std::vector<int>& selectedelementindexes)
     if (xcoord.isdefined())
         subjac.xcoord = xcoord.extractrows(selectedelementindexes);
 
-    for (int i = 0; i < jac.size(); i++)
+    for (size_t i = 0; i < jac.size(); i++)
     {
         if (jac[i].isdefined())
             subjac.jac[i] = jac[i].extractrows(selectedelementindexes);
     }
 
     subjac.invjac = std::vector<densematrix>(invjac.size());
-    for (int i = 0; i < invjac.size(); i++)
+    for (size_t i = 0; i < invjac.size(); i++)
     {
         if (invjac[i].isdefined())
             subjac.invjac[i] = invjac[i].extractrows(selectedelementindexes);
@@ -502,8 +502,3 @@ densematrix jacobian::getinvjac(int row, int column)
 
     return invjac[3*row+column];
 }
-
-
-
-
-

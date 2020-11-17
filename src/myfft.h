@@ -36,6 +36,6 @@ namespace myfft
     
     // Make sure notsame[i] has the same harmonic content for every i (fill with zeros if not).
     void sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& notsame);
-};
+}
 
 #endif

@@ -53,8 +53,8 @@ bool mathop::isregionempty(int physreg)
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
 
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
-    
-    for (int i = 0; i < defin.size(); i++)
+
+    for (size_t i = 0; i < defin.size(); i++)
     {
         if (defin[i] == true)
             return false;
@@ -71,7 +71,7 @@ bool mathop::isregioninside(int physregtocheck, int physreg)
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
     // All disjoint regions must be included:
-    for (int i = 0; i < tocheckdefin.size(); i++)
+    for (size_t i = 0; i < tocheckdefin.size(); i++)
     {
         if (tocheckdefin[i] == true && defin[i] == false)
             return false;
@@ -88,7 +88,7 @@ bool mathop::isregiontouching(int physregtocheck, int physreg)
     std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
     
     // At least one disjoint region must be included:
-    for (int i = 0; i < tocheckdefin.size(); i++)
+    for (size_t i = 0; i < tocheckdefin.size(); i++)
     {
         if (tocheckdefin[i] == true && defin[i] == true)
             return true;
@@ -100,7 +100,7 @@ bool mathop::isregiontouching(int physregtocheck, int physreg)
 void mathop::printvector(std::vector<double> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         std::cout << input[i] << " ";
     std::cout << std::endl;
 }
@@ -108,7 +108,7 @@ void mathop::printvector(std::vector<double> input)
 void mathop::printvector(std::vector<int> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         std::cout << input[i] << " ";
     std::cout << std::endl;
 }
@@ -116,7 +116,7 @@ void mathop::printvector(std::vector<int> input)
 void mathop::printvector(std::vector<bool> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         std::cout << input[i] << " ";
     std::cout << std::endl;
 }
@@ -136,7 +136,7 @@ void mathop::writevector(std::string filename, std::vector<double> towrite, char
         // To write all doubles with enough digits to the file:
         name << std::setprecision(17);
 
-        for (int i = 0; i < towrite.size()-1; i++)
+        for (size_t i = 0; i < towrite.size()-1; i++)
             name << towrite[i] << delimiter;
         name << towrite[towrite.size()-1];
 
@@ -241,7 +241,7 @@ expression mathop::normal(int physreg)
         else
             output = array2x1(expr.invjac(0,1), expr.invjac(1,1))/mynorm;
     }
-    if (problemdimension == 3)
+    else
     {
         expression mynorm = sqrt(expr.invjac(0,2)*expr.invjac(0,2)+expr.invjac(1,2)*expr.invjac(1,2)+expr.invjac(2,2)*expr.invjac(2,2));
         mynorm.reuseit();
@@ -268,7 +268,7 @@ expression mathop::tangent(void)
     expression expr;
     if (problemdimension == 1)
         return 1.0;
-    if (problemdimension == 2)
+    else if (problemdimension == 2)
     {
         expression mynorm = sqrt(expr.jac(0,0)*expr.jac(0,0)+expr.jac(0,1)*expr.jac(0,1));
         mynorm.reuseit();
@@ -277,7 +277,7 @@ expression mathop::tangent(void)
         else
             return array2x1(expr.jac(0,0), expr.jac(0,1))/mynorm;
     }
-    if (problemdimension == 3)
+    else
     {
         expression mynorm = sqrt(expr.jac(0,0)*expr.jac(0,0)+expr.jac(0,1)*expr.jac(0,1)+expr.jac(0,2)*expr.jac(0,2));
         mynorm.reuseit();
@@ -302,7 +302,10 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
     if (isscalar == false && compzevals.size() == 0)
         compzevals = std::vector<double>(n,0);
 
-    if (xcoords.size() != n || ycoords.size() != n || zcoords.size() != n || compxevals.size() != n || (isscalar == false && (compyevals.size() != n || compzevals.size() != n)))
+    if ((xcoords.size() != (size_t) n) || (ycoords.size() != (size_t) n) ||
+        (zcoords.size() != (size_t) n) || (compxevals.size() != (size_t) n) ||
+        (isscalar == false && ((compyevals.size() != (size_t) n) ||
+                               (compzevals.size() != (size_t) n))))
     {
         std::cout << "Error in 'mathop' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
         abort();
@@ -394,8 +397,8 @@ expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> 
     
     std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
-    
-    for (int i = 0; i < harms.size(); i++)
+
+    for (size_t i = 0; i < harms.size(); i++)
     {
         if (harms[i] <= 0)
         {
@@ -423,7 +426,7 @@ expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> 
         for (int j = 0; j < n; j++)
         {
             std::vector<std::shared_ptr<operation>> ops(harms.size());
-            for (int k = 0; k < harms.size(); k++)
+            for (size_t k = 0; k < harms.size(); k++)
                 ops[k] = moveharmonic({1},{harms[k]}, exprs[k].at(i,j)).getoperationinarray(0,0);
             std::shared_ptr<opsum> op(new opsum(ops));
             outexprs[i*n+j] = expression(op);
@@ -445,7 +448,7 @@ expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> des
         std::cout << "Error in 'mathop' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
         abort();
     }
-    for (int i = 0; i < origharms.size(); i++)
+    for (size_t i = 0; i < origharms.size(); i++)
     {
         if (origharms[i] <= 0 || destharms[i] <= 0)
         {
@@ -547,7 +550,7 @@ std::vector<double> mathop::printtotalforce(int physreg, expression* meshdeform,
     std::cout << "Total force on region " << physreg << " is ";
     std::vector<std::string> compstr = {"x","y","z"};
 
-    for (int c = 0; c < totforce.size(); c++)
+    for (size_t c = 0; c < totforce.size(); c++)
     {
         std::cout << "f" << compstr[c] << " = " << totforce[c];
         if (c != totforce.size()-1)
@@ -720,7 +723,7 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
         int nodeindex = 0;
         for (int j = 0; j < 8; j++)
         {
-            for (int k = 0; k < nodesinelements[j].size(); k++)
+            for (size_t k = 0; k < nodesinelements[j].size(); k++)
             {
                 int curnode = nodesinelements[j][k];
                 if (renumbernodes[curnode] == -1)
@@ -733,7 +736,7 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
         }
         // Create the vector of node coordinates:
         std::vector<double> nodecoordinates(3*nodeindex);
-        for (int j = 0; j < renumbernodes.size(); j++)
+        for (size_t j = 0; j < renumbernodes.size(); j++)
         {
             if (renumbernodes[j] != -1)
             {
@@ -980,7 +983,7 @@ expression mathop::div(expression input)
             return dx(input);
         case 2:
             return compx(dx(input))+compy(dy(input));
-        case 3:
+        default:
             return compx(dx(input))+compy(dy(input))+compz(dz(input));
     }
 
@@ -1026,7 +1029,7 @@ expression mathop::curl(expression input)
                 return expression(3,1,{0, 0, 0});
             case 2:
                 return expression(3,1,{0, 0, compy(dx(input))-compx(dy(input))});
-            case 3:
+            default:
                 return expression(3,1,{compz(dy(input))-compy(dz(input)), compx(dz(input))-compz(dx(input)), compy(dx(input))-compx(dy(input))});
         }
     }
@@ -1386,7 +1389,7 @@ std::vector<vec> mathop::solve(mat A, std::vector<vec> b, std::string soltype)
         std::cout << "Error in 'mathop' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
         abort();
     }
-    for (int i = 0; i < b.size(); i++)
+    for (size_t i = 0; i < b.size(); i++)
     {
         if (A.countrows() != b[i].size())
         {
@@ -1447,7 +1450,7 @@ std::vector<vec> mathop::solve(mat A, std::vector<vec> b, std::string soltype)
     return outvecs;
 }
 
-densematrix mathop::solve(mat A, densematrix b, std::string soltype)
+densematrix mathop::solve(mat A, densematrix b, std::string soltype)  // FIXME: use soltype?
 {
     int numrhs = b.countrows();
     int len = b.countcolumns();
@@ -1495,7 +1498,7 @@ densematrix mathop::solve(mat A, densematrix b, std::string soltype)
     return densesols;
 }
 
-int mykspmonitor(KSP ksp, PetscInt iter, PetscReal resnorm, void* unused)
+int mykspmonitor(KSP, PetscInt iter, PetscReal resnorm, void*)
 {
     std::cout << iter << " KSP residual norm " << resnorm << std::endl;
     return 0;
@@ -1601,7 +1604,7 @@ void mathop::solve(formulation formul)
 
 void mathop::solve(std::vector<formulation> formuls)
 {
-    for (int i = 0; i < formuls.size(); i++)
+    for (size_t i = 0; i < formuls.size(); i++)
         solve(formuls[i]);
 }
 
@@ -1663,8 +1666,8 @@ void mathop::setdata(vec invec)
     
     // Get all fields in the vec structure:
     std::vector<std::shared_ptr<rawfield>> allfields = invec.getpointer()->getdofmanager()->getfields();
-    
-    for (int i = 0; i < allfields.size(); i++)
+
+    for (size_t i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, invec|field(allfields[i]));
 }
 
@@ -1679,14 +1682,15 @@ expression mathop::strain(expression input)
         abort();
     }
 
-    expression gradu = input;
+    expression gradu = input;                                         // FIXME: see below
     if (input.countcolumns() == 1)
-        gradu = mathop::grad(input);
+        gradu = mathop::grad(input);                                  // FIXME: return expression is missing
 
     if (input.countrows() == 2)
         return expression(3,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(1,0) + gradu.at(0,1)});
     if (input.countrows() == 3)
         return expression(6,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(2,2), gradu.at(2,1) + gradu.at(1,2), gradu.at(0,2) + gradu.at(2,0), gradu.at(0,1) + gradu.at(1,0)});
+    throw std::logic_error("Unreachable");
 }
 
 expression mathop::greenlagrangestrain(expression input)
@@ -1716,7 +1720,7 @@ expression mathop::greenlagrangestrain(expression input)
         output.reuseit();
         return output;
     }
-    if (input.countrows() == 3)
+    else
     {
         expression dxcompxu = entry(0,0,gradu), dxcompyu = entry(1,0,gradu), dxcompzu = entry(2,0,gradu);
         expression dycompxu = entry(0,1,gradu), dycompyu = entry(1,1,gradu), dycompzu = entry(2,1,gradu);
@@ -2052,7 +2056,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
         std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
-    if (dofu.countrows() == 2)
+    else if (dofu.countrows() == 2)
     {
         if (myoption == "planestrain")
             H = expression(3,3, {H.at(0,0),H.at(0,1),H.at(0,5), H.at(1,0),H.at(1,1),H.at(1,5), H.at(5,0),H.at(5,1),H.at(5,5) });
@@ -2101,7 +2105,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
         std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
         abort();
     }
-    if (dofu.countrows() == 3)
+    else
     {
         if (myoption.length() > 0)
         {
@@ -2129,7 +2133,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
         std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
-    if (dofu.countrows() == 2)
+    else if (dofu.countrows() == 2)
     {
         if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 3))
         {
@@ -2214,7 +2218,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
         std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
         abort();
     }
-    if (dofu.countrows() == 3)
+    else
     {
         if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 6))
         {
@@ -2281,7 +2285,7 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
     epsilon.reuseit();
 
     std::vector<std::vector<expression>> exprs(dxyztfu.size());
-    for (int i = 0; i < dxyztfu.size(); i++)
+    for (size_t i = 0; i < dxyztfu.size(); i++)
         exprs[i] = {dxyztfu[i]};
 
     // Scalar gradient here:
@@ -2297,6 +2301,7 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu)) );
     if (gradtfu.countcolumns() == 3)
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) - pow(compz(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu) + 2 * compx(E) * compz(E) * entry(2,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) - pow(compz(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu) + 2 * compy(E) * compz(E) * entry(2,1,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(2,2,gradtfu) - pow(compy(E),2) * entry(2,2,gradtfu) + pow(compz(E),2) * entry(2,2,gradtfu) + 2 * compz(E) * compx(E) * entry(0,2,gradtfu) + 2 * compz(E) * compy(E) * entry(1,2,gradtfu)) );
+    throw std::logic_error("Unreachable");
 }
 
 expression mathop::predefinedmagnetostaticforce(expression tfu, expression H, expression mu)
@@ -2566,4 +2571,3 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     std::cout << "Error in 'mathop' namespace: unknown stabilization method '" << stabtype << "' (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
     abort();
 }
-

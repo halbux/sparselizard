@@ -48,7 +48,7 @@ void nastraninterface::readfromfile(std::string name, nodes& mynodes, elements& 
         mynodes.setnumber(nodecoords.size());
         std::vector<double>* nodecoordinates = mynodes.getcoordinates();
         
-        for (int i = 0; i < nodecoords.size(); i++)
+        for (size_t i = 0; i < nodecoords.size(); i++)
         {
             nodecoordinates->at(3*i+0) = nodecoords[i][0];
             nodecoordinates->at(3*i+1) = nodecoords[i][1];

@@ -31,28 +31,36 @@ class hierarchicalformfunction
         std::string gettypename(int fftypenumber);
 
         // Get the number of form functions of order <= 'order':
-        virtual int count(int order) {};
+        virtual int count([[maybe_unused]] int order) {
+            throw std::logic_error("Statically called virtual method");
+        };
         // Get the number of form functions of order <= 'order' that are associated to the num th
         // - node   in case dim = 0 
         // - edge   in case dim = 1
         // - face   in case dim = 2 
         // - volume in case dim = 3 
-        virtual int count(int order, int dim, int num) {};
+        virtual int count([[maybe_unused]] int order,
+                          [[maybe_unused]] int dim,
+                          [[maybe_unused]] int num) {
+            throw std::logic_error("Statically called virtual method");
+        };
 
         // Get the number of components in the form function.
-        virtual int countcomponents(void) {};
+        virtual int countcomponents(void) { throw std::logic_error("Statically called virtual method"); };
 
         // 'evalat' takes an integer giving the highest order up to which to output the form function polynomials.
-        virtual hierarchicalformfunctioncontainer evalat(int maxorder) {};
+        virtual hierarchicalformfunctioncontainer evalat([[maybe_unused]] int maxorder) {
+            throw std::logic_error("Statically called virtual method");
+        };
 
         // If 'isorientationdependent' is false then the assembly can
         // be carried out without taking care of the element orientation.
         // This provides an assembly speedup. By default it is not used.
-        virtual bool isorientationdependent(int order) { return true; };
+        virtual bool isorientationdependent([[maybe_unused]] int order) { return true; };
 
         // Return a vector whose index i is true if the ith form function
         // associated to highest dimension elements is of gradient type.
-        virtual std::vector<bool> isgradienttype(int order) { return std::vector<bool>(0); };
+        virtual std::vector<bool> isgradienttype([[maybe_unused]] int order) { return std::vector<bool>(0); };
 };
 
 #endif

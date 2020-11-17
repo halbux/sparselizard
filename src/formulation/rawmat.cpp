@@ -63,7 +63,7 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
             
         if (zerorows)
         {
-            for (int i = 0; i < accumulatedrowindices.size(); i++)
+            for (size_t i = 0; i < accumulatedrowindices.size(); i++)
             {
                 int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
                 for (long long int j = 0; j < accumulatedrowindices[i].count(); j++)
@@ -75,7 +75,7 @@ void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zeroc
         }
         if (zerocolumns)
         {
-            for (int i = 0; i < accumulatedcolindices.size(); i++)
+            for (size_t i = 0; i < accumulatedcolindices.size(); i++)
             {
                 int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
                 for (long long int j = 0; j < accumulatedcolindices[i].count(); j++)
@@ -115,7 +115,8 @@ void rawmat::removeconstraints(void)
     if (nnz >= 0) 
     {
         MatDestroy(&mymat);
-        Mat newmat; mymat = newmat;
+        Mat newmat = nullptr;
+        mymat = newmat;
     }
         
     // Bring 'petscrows' from CSR to ijk format:
@@ -161,7 +162,7 @@ void rawmat::process(void)
     // Concatenate all accumulated fragments!
     // Remove negative indexes. First get the overall length.
     long long int veclen = 0;
-    for (int i = 0; i < accumulatedvals.size(); i++)
+    for (size_t i = 0; i < accumulatedvals.size(); i++)
     {
         int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
         int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
@@ -177,7 +178,7 @@ void rawmat::process(void)
     std::vector<std::tuple<int,int,double>> tupl(veclen);
     
     long long int ind = 0;
-    for (int i = 0; i < accumulatedvals.size(); i++)
+    for (size_t i = 0; i < accumulatedvals.size(); i++)
     {
         double* valsptr = accumulatedvals[i].getvalues();
         int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();

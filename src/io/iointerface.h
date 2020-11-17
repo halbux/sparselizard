@@ -35,6 +35,6 @@ namespace iointerface
     
     // Read first an int vector then a double vector from ASCII or binary format:
     void load(std::string filename, std::vector<int>& intdata, std::vector<double>& doubledata, bool isbinary);
-};
+}
 
 #endif

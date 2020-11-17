@@ -80,9 +80,9 @@ std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,st
     }
         
     // Replace the computed ops by their subset:
-    for (int i = 0; i < opcomputed.size(); i++)
+    for (size_t i = 0; i < opcomputed.size(); i++)
     {
-        for (int h = 0; h < opcomputed[i].size(); h++)
+        for (size_t h = 0; h < opcomputed[i].size(); h++)
         {
             if (opcomputed[i][h].size() > 0)
                 opcomputed[i][h][0] = opcomputed[i][h][0].extractrows(selectedelementindexes);
@@ -100,7 +100,7 @@ std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,st
                 mhcols[i*numevalpts+j] = selectedelementindexes[i]*numevalpts+j;
         }
     }
-    for (int i = 0; i < opcomputedfft.size(); i++)
+    for (size_t i = 0; i < opcomputedfft.size(); i++)
         opcomputedfft[i] = opcomputedfft[i].extractcols(mhcols);
     
     return output;
@@ -127,7 +127,7 @@ std::vector< densematrix > universe::opcomputedfft = {};
 
 int universe::getindexofprecomputedvalue(std::shared_ptr<operation> op)
 {
-    for (int i = 0; i < oppointers.size(); i++)
+    for (size_t i = 0; i < oppointers.size(); i++)
     {
         if (oppointers[i].get() == op.get())
             return i;
@@ -137,7 +137,7 @@ int universe::getindexofprecomputedvalue(std::shared_ptr<operation> op)
 
 int universe::getindexofprecomputedvaluefft(std::shared_ptr<operation> op)
 {
-    for (int i = 0; i < oppointersfft.size(); i++)
+    for (size_t i = 0; i < oppointersfft.size(); i++)
     {
         if (oppointersfft[i].get() == op.get())
             return i;
@@ -147,7 +147,7 @@ int universe::getindexofprecomputedvaluefft(std::shared_ptr<operation> op)
 
 int universe::getindexofprecomputedvalue(std::shared_ptr<rawparameter> param, int row, int col)
 {
-    for (int i = 0; i < oppointers.size(); i++)
+    for (size_t i = 0; i < oppointers.size(); i++)
     {
         if (oppointers[i]->isparameter() && (oppointers[i]->getparameterpointer()).get() == param.get() && oppointers[i]->getselectedrow() == row && oppointers[i]->getselectedcol() == col)
             return i;
@@ -157,7 +157,7 @@ int universe::getindexofprecomputedvalue(std::shared_ptr<rawparameter> param, in
 
 int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawparameter> param, int row, int col)
 {
-    for (int i = 0; i < oppointersfft.size(); i++)
+    for (size_t i = 0; i < oppointersfft.size(); i++)
     {
         if (oppointersfft[i]->isparameter() && (oppointersfft[i]->getparameterpointer()).get() == param.get() && oppointersfft[i]->getselectedrow() == row && oppointersfft[i]->getselectedcol() == col)
             return i;
@@ -167,7 +167,7 @@ int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawparameter> param,
 
 int universe::getindexofprecomputedvalue(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc)
 {
-    for (int i = 0; i < oppointers.size(); i++)
+    for (size_t i = 0; i < oppointers.size(); i++)
     {
         if (oppointers[i]->isfield() && (oppointers[i]->getfieldpointer()).get() == rf.get() && oppointers[i]->getformfunctioncomponent() == ffc && oppointers[i]->getspacederivative() == sd && oppointers[i]->getkietaphiderivative() == kepd && oppointers[i]->gettimederivative() == td)
             return i;
@@ -177,7 +177,7 @@ int universe::getindexofprecomputedvalue(std::shared_ptr<rawfield> rf, int td, i
 
 int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc)
 {
-    for (int i = 0; i < oppointersfft.size(); i++)
+    for (size_t i = 0; i < oppointersfft.size(); i++)
     {
         if (oppointersfft[i]->isfield() && (oppointersfft[i]->getfieldpointer()).get() == rf.get() && oppointersfft[i]->getformfunctioncomponent() == ffc && oppointersfft[i]->getspacederivative() == sd && oppointersfft[i]->getkietaphiderivative() == kepd && oppointersfft[i]->gettimederivative() == td)
             return i;
@@ -188,7 +188,7 @@ int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawfield> rf, int td
 std::vector<std::vector<densematrix>> universe::getprecomputed(int index)
 {
     std::vector<std::vector<densematrix>> output = opcomputed[index];
-    for (int h = 0; h < output.size(); h++)
+    for (size_t h = 0; h < output.size(); h++)
     {
         if (output[h].size() == 1)
             output[h][0] = output[h][0].copy();
@@ -205,7 +205,7 @@ void universe::setprecomputed(std::shared_ptr<operation> op, std::vector<std::ve
 {
     oppointers.push_back(op);
     opcomputed.push_back(val);
-    for (int h = 0; h < val.size(); h++)
+    for (size_t h = 0; h < val.size(); h++)
     {
         if (val[h].size() == 1)
             opcomputed[opcomputed.size()-1][h][0] = val[h][0].copy();
@@ -231,7 +231,7 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
 {
     // Find the type name in the container:
     int typenameindex = -1;
-    for (int i = 0; i < formfuncpolys.size(); i++)
+    for (size_t i = 0; i < formfuncpolys.size(); i++)
     {
         if (formfuncpolys[i].first == fftypename)
         {
@@ -241,7 +241,8 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
     }
 
     // In case the form function polynomials are available:
-    if (typenameindex != -1 && formfuncpolys[typenameindex].second[elementtypenumber].size() > interpolorder && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
+    if (typenameindex != -1 && formfuncpolys[typenameindex].second[elementtypenumber].size() > (size_t) interpolorder &&
+        formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
     {
         if (isreuseallowed && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].isvalueready())
             return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
@@ -260,7 +261,7 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
         formfuncpolys.push_back( std::make_pair(fftypename, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >>(8,std::vector< std::vector<hierarchicalformfunctioncontainer> >(0))) );
         typenameindex = formfuncpolys.size() - 1;
     }
-    if (formfuncpolys[typenameindex].second[elementtypenumber].size() <= interpolorder)
+    if (formfuncpolys[typenameindex].second[elementtypenumber].size() <= (size_t) interpolorder)
         formfuncpolys[typenameindex].second[elementtypenumber].resize(interpolorder+1);
 
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fftypename);
@@ -276,11 +277,11 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
 
 void universe::resethff(void)
 {
-    for (int typenameindex = 0; typenameindex < formfuncpolys.size(); typenameindex++)
+    for (size_t typenameindex = 0; typenameindex < formfuncpolys.size(); typenameindex++)
     {
-        for (int elementtypenumber = 0; elementtypenumber < (formfuncpolys[typenameindex].second).size(); elementtypenumber++)
+        for (size_t elementtypenumber = 0; elementtypenumber < (formfuncpolys[typenameindex].second).size(); elementtypenumber++)
         {
-            for (int interpolorder = 0; interpolorder < formfuncpolys[typenameindex].second[elementtypenumber].size(); interpolorder++)
+            for (size_t interpolorder = 0; interpolorder < formfuncpolys[typenameindex].second[elementtypenumber].size(); interpolorder++)
             {
                 if (formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
                     formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(false);

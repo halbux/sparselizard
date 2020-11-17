@@ -32,13 +32,13 @@ void opdof::increasetimederivativeorder(int amount)
     }
 }
 
-bool opdof::isharmonicone(std::vector<int> disjregs)
+bool opdof::isharmonicone(std::vector<int> disjregs)                  // TODO: use disjregs
 {
     std::vector<int> myharms = myfield->getharmonics();
     return (myharms.size() == 1 && myharms[0] == 1);
 }
 
-bool opdof::isvalueorientationdependent(std::vector<int> disjregs)
+bool opdof::isvalueorientationdependent(std::vector<int>)
 {
     std::cout << "Error in 'opdof' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
     abort();
@@ -100,4 +100,3 @@ oncontext* opdof::getoncontext(void)
 {
     return &(myoncontext[0]);
 }
-

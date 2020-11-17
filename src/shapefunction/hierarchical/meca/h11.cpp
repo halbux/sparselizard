@@ -11,7 +11,7 @@ int h11::count(int order)
     return 11;
 }
 
-int h11::count(int order, int dim, int num)
+int h11::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,14 +32,14 @@ int h11::count(int order, int dim, int num)
         case 2:
             return 0;
         // Volume based form functions:
-        case 3:
+        default:
             return 3;
     }
 }
 
 
 
-hierarchicalformfunctioncontainer h11::evalat(int maxorder) 
+hierarchicalformfunctioncontainer h11::evalat(int maxorder)  // FIXME: use order
 {    
     element hexahedron("hexahedron");
     hierarchicalformfunctioncontainer val("h11", hexahedron.gettypenumber());

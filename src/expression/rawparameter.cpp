@@ -16,7 +16,7 @@ void rawparameter::synchronize(void)
     opnums = std::vector<int>(universe::mymesh->getdisjointregions()->count(),-1);
 
     // Rebuild the structure:
-    for (int i = 0; i < mystructuretracker.size(); i++)
+    for (size_t i = 0; i < mystructuretracker.size(); i++)
         set(mystructuretracker[i].first, mystructuretracker[i].second);
     
     
@@ -28,7 +28,7 @@ void rawparameter::errorifundefined(std::vector<int> disjregs)
 {
     synchronize();
 
-    for (int i = 0; i < disjregs.size(); i++)
+    for (size_t i = 0; i < disjregs.size(); i++)
     {
         if (myoperations[disjregs[i]].size() == 1 && myoperations[disjregs[i]][0] == NULL)
         {
@@ -43,7 +43,7 @@ std::vector<int> rawparameter::getopnums(std::vector<int> disjregs)
     synchronize();
     
     std::vector<int> output(disjregs.size());
-    for (int i = 0; i < disjregs.size(); i++)
+    for (size_t i = 0; i < disjregs.size(); i++)
         output[i] = opnums[disjregs[i]];
     return output;
 }
@@ -75,7 +75,7 @@ void rawparameter::set(int physreg, expression input)
     // Consider ALL disjoint regions in the physical region with (-1):
     std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
-    for (int i = 0; i < selecteddisjregs.size(); i++)
+    for (size_t i = 0; i < selecteddisjregs.size(); i++)
     {
         opnums[selecteddisjregs[i]] = maxopnum;
         for (int row = 0; row < mynumrows; row++)
@@ -117,7 +117,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
 {
     synchronize();
     
-    int numelems = elemselect.countinselection();
+    // int numelems = elemselect.countinselection(); // FIXME: what was numelems for?
     int numevalpts = evaluationcoordinates.size()/3;
     
     // Get all disjoint regions in the element selector:
@@ -149,17 +149,17 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         // Preallocate the harmonics not yet in 'out':
         if (out.size() < currentinterp.size())
             out.resize(currentinterp.size());
-        for (int h = 0; h < currentinterp.size(); h++)
+        for (size_t h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1 && out[h].size() == 0)
-                out[h] = {densematrix(numelems, numevalpts, 0)};
+                out[h] = {densematrix(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
         }
         
         // Insert 'currentinterp' in 'out':
-        for (int h = 0; h < currentinterp.size(); h++)
+        for (size_t h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1)
-                out[h][0].insertatrows(selectedelementindexes, currentinterp[h][0]);
+                out[h][0].insertatrows(elemselect.getelementindexes(), currentinterp[h][0]);
         }
     }
     // Unselect the disjoint regions:
@@ -193,12 +193,12 @@ densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtime
         elemselect.selectdisjointregions(mydisjregs);
         if (elemselect.countinselection() == 0)
             continue;
-            
+
         std::vector<int> selectedelementindexes = elemselect.getelementindexes();
         elementselector myselection = elemselect.extractselection();
         
         std::vector<int> selectedcolumns(selectedelementindexes.size()*numevalpts);
-        for (int j = 0; j < selectedelementindexes.size(); j++)
+        for (size_t j = 0; j < selectedelementindexes.size(); j++)
         {
             for (int k = 0; k < numevalpts; k++)
                 selectedcolumns[j*numevalpts+k] = selectedelementindexes[j]*numevalpts+k;
@@ -233,7 +233,7 @@ void rawparameter::print(void)
     std::cout << std::endl;
     std::cout << "Printing parameter of size " << mynumrows << "x" << mynumcols;
     std::cout << std::endl;
-    for (int i = 0; i < myoperations.size(); i++)
+    for (size_t i = 0; i < myoperations.size(); i++)
     {   
         if (myoperations[i][0] != NULL)
         {

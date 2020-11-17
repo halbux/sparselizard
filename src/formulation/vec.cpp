@@ -37,7 +37,7 @@ void vec::permute(intdensematrix rowpermute, bool invertit)
         VecPermute(getpetsc(), rowpermutis, PETSC_TRUE);
 }
 
-void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
+void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); }
         
 void vec::updateconstraints(void)
 {
@@ -48,7 +48,7 @@ void vec::updateconstraints(void)
        std::iota(disjregs.begin(), disjregs.end(), 0);
     
     std::vector<std::shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
-    for (int i = 0; i < fieldsindofmanager.size(); i++)
+    for (size_t i = 0; i < fieldsindofmanager.size(); i++)
         rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
@@ -92,7 +92,7 @@ void vec::setdata(void)
     errorifpointerisnull();
     
     std::vector<std::shared_ptr<rawfield>> rfs = rawvecptr->getdofmanager()->getfields();
-    for (int i = 0; i < rfs.size(); i++)
+    for (size_t i = 0; i < rfs.size(); i++)
         rfs[i]->transferdata(-1, vectorfieldselect(rawvecptr, rfs[i]), "set");
 }
 

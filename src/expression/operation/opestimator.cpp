@@ -56,7 +56,7 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
     return argmat;
 }
 
-densematrix opestimator::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densematrix opestimator::multiharmonicinterpolate(int, elementselector&, std::vector<double>&, expression*)
 {
     std::cout << "Error in 'opestimator' object: cannot perform a multiharmonic interpolation on the estimator" << std::endl;
     abort();
@@ -129,8 +129,8 @@ void opestimator::estimatezienkiewiczzhu(void)
             universe::forbidreuse();
 
             double* interpvals = interpolated.getvalues();
-            
-            for (int e = 0; e < elemnums.size(); e++)
+
+            for (size_t e = 0; e < elemnums.size(); e++)
             {
                 int curelem = elemnums[e];
                 for (int n = 0; n < nn; n++)

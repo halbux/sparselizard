@@ -22,7 +22,7 @@ void rawmesh::splitmesh(void)
     // Loop on all physical regions:
     int numnodes = 0;
     std::vector< std::vector<std::vector<double>> > splitcoords(prn.size(), std::vector<std::vector<double>>(8, std::vector<double>(0)));
-    for (int p = 0; p < prn.size(); p++)
+    for (size_t p = 0; p < prn.size(); p++)
     {
         physicalregion* curpr = myphysicalregions.getatindex(p);
         std::vector<std::vector<int>>* curelemlist = curpr->getelementlist();
@@ -57,7 +57,7 @@ void rawmesh::splitmesh(void)
             {
                 int el = curelemlist->at(i)[e];
                 std::vector<double> curcoords = myelements.getnodecoordinates(i,el);
-                for (int j = 0; j < curcoords.size(); j++)
+                for (size_t j = 0; j < curcoords.size(); j++)
                     coords[3*ncn[i]*e+j] = curcoords[j];
             }
             element myelem(i,co);
@@ -67,7 +67,7 @@ void rawmesh::splitmesh(void)
             // Group with the existing splitcoords[p]:
             for (int j = 0; j < 8; j++)
             {
-                for (int k = 0; k < tempsplit[j].size(); k++)
+                for (size_t k = 0; k < tempsplit[j].size(); k++)
                     splitcoords[p][j][indexes[j]+k] = tempsplit[j][k];
                 indexes[j] += tempsplit[j].size();
             }
@@ -83,7 +83,7 @@ void rawmesh::splitmesh(void)
     mynodes.setnumber(numnodes);
     std::vector<double>* nc = mynodes.getcoordinates();
     int nindex = 0;
-    for (int p = 0; p < splitcoords.size(); p++)
+    for (size_t p = 0; p < splitcoords.size(); p++)
     {
         physicalregion* curpr = myphysicalregions.get(prn[p]);
         
@@ -295,7 +295,7 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
 
 void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
 {
-    int numfiles = meshfiles.size();
+    size_t numfiles = meshfiles.size();
     if (numfiles == 0)
     {
         std::cout << "Error in 'mesh' object: expected at least one mesh file to load" << std::endl;
@@ -307,7 +307,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     int meshdim = -1;
 
     int maxphysreg = 0;
-    for (int i = 0; i < numfiles; i++)
+    for (size_t i = 0; i < numfiles; i++)
     {
         allshapes[i] = mathop::loadshape(meshfiles[i]);
         
@@ -317,8 +317,9 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
         
             if (i == 0 && curcount > 0)
                 meshdim = d;
-                
-            if (i > 0 && allshapes[i][meshdim].size() == 0 || i > 0 && d > meshdim && allshapes[i][d].size() > 0)
+
+            if (((i > 0) && (allshapes[i][meshdim].size() == 0)) ||
+                ((i > 0) && (d > meshdim) && (allshapes[i][d].size() > 0)))
             {
                 std::cout << "Error in 'mesh' object: expected a " << meshdim << "D mesh in '" << meshfiles[i] << "'" << std::endl;
                 abort();
@@ -338,7 +339,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     
     std::vector<shape> flat = {};
     std::vector<double> prevcoordbounds;
-    for (int i = 0; i < numfiles; i++)
+    for (size_t i = 0; i < numfiles; i++)
     {
         shape curunion("union", maxphysreg+1+i, allshapes[i][meshdim]);
         
@@ -358,7 +359,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     
         for (int d = 0; d < 4; d++)
         {
-            for (int s = 0; s < allshapes[i][d].size(); s++)
+            for (size_t s = 0; s < allshapes[i][d].size(); s++)
             {
                 if (mergeduplicates == false)
                     allshapes[i][d][s].getpointer()->shift(shiftvec[i],0,0, false);
@@ -379,7 +380,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     // Shift back to the original position:
     if (mergeduplicates == false)
     {
-        for (int i = 0; i < numfiles; i++)
+        for (size_t i = 0; i < numfiles; i++)
         {
             shift(maxphysreg+1+i, -shiftvec[i],0,0);
             myhadaptedmesh->shift(maxphysreg+1+i, -shiftvec[i],0,0);
@@ -408,7 +409,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     }
 
     // Make sure all shapes have a valid physical region number:
-    for (int i = 0; i < inputshapes.size(); i++)
+    for (size_t i = 0; i < inputshapes.size(); i++)
     {
         if (inputshapes[i].getphysicalregion() <= 0)
         {
@@ -419,7 +420,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
 
     // Get the number of nodes for preallocation:
     int numberofnodes = 0;
-    for (int i = 0; i < inputshapes.size(); i++)
+    for (size_t i = 0; i < inputshapes.size(); i++)
         numberofnodes += ( inputshapes[i].getpointer()->getcoords() )->size()/3;
     mynodes.setnumber(numberofnodes);
     std::vector<double>* nodecoordinates = mynodes.getcoordinates();
@@ -428,11 +429,11 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     // The node numbers must be shifted from a shape to the other to avoid same numbers:
     int offset = 0;
     // Loop on every input shape:
-    for (int i = 0; i < inputshapes.size(); i++)
+    for (size_t i = 0; i < inputshapes.size(); i++)
     {
         // Append the nodes:
         std::vector<double>* nodecoords = inputshapes[i].getpointer()->getcoords();
-        for (int j = 0; j < nodecoords->size(); j++)
+        for (size_t j = 0; j < nodecoords->size(); j++)
             nodecoordinates->at(3*offset+j) = nodecoords->at(j);
 
         // Append the elements:
@@ -440,7 +441,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
         physicalregion* currentphysicalregion = myphysicalregions.get(physreg);
         std::vector<std::vector<int>>* elems = inputshapes[i].getpointer()->getelems();
         // Loop on all element types:
-        for (int typenum = 0; typenum < elems->size(); typenum++)
+        for (size_t typenum = 0; typenum < elems->size(); typenum++)
         {
             element currentelem(typenum, curvatureorder);
             // Number of nodes in every element of current type number:
@@ -448,7 +449,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
 
             std::vector<int> nodesincurrentelement(numnodesinelem);
 
-            for (int e = 0; e < (elems->at(typenum)).size()/numnodesinelem; e++)
+            for (size_t e = 0; e < (elems->at(typenum)).size()/numnodesinelem; e++)
             {
                 for (int m = 0; m < numnodesinelem; m++)
                     nodesincurrentelement[m] = (elems->at(typenum))[e*numnodesinelem+m] + offset;
@@ -546,8 +547,8 @@ std::vector<bool> rawmesh::isnodeinphysicalregion(int physreg)
     
         // Get only the disjoint regions with highest dimension elements:
         std::vector<int> selecteddisjregs = myphysicalregions.get(physreg)->getdisjointregions();
-    
-        for (int i = 0; i < selecteddisjregs.size(); i++)
+
+        for (size_t i = 0; i < selecteddisjregs.size(); i++)
         {
             int disjreg = selecteddisjregs[i];
             int numelems = mydisjointregions.countelements(disjreg);
@@ -630,7 +631,7 @@ void rawmesh::move(int physreg, expression u)
             std::vector<int> elementnumbers = myselector.getelementnumbers();
 
             // Loop on all elements:
-            for (int e = 0; e < elementnumbers.size(); e++)
+            for (size_t e = 0; e < elementnumbers.size(); e++)
             {
                 for (int n = 0; n < ncn; n++)
                 {
@@ -871,7 +872,7 @@ bool rawmesh::adapthp(int verbosity)
     ///// Make a hp-adaptivity decision for every element:
     
     // Parameters for h-adaptivity:
-    int lownumsplits, highnumsplits;
+    int lownumsplits, highnumsplits;                                  // FIXME: provide defaults
     std::vector<double> hthresholds;
     
     if (ishadaptive)
@@ -924,12 +925,12 @@ bool rawmesh::adapthp(int verbosity)
             {
                 int ln = myhtracker->getleafnumber(typenum, elem);
                 int oldnumsplits = leavesnumsplits[ln];
-            
-                double hcurcrit = hcritptr[rb+e];
+
+                double hcurcrit = hcritptr[rb+e];                     // FIXME: provide defaults
 
                 int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
-                int newnumsplits = lownumsplits + hinterv;
-                
+                int newnumsplits = lownumsplits + hinterv;            // FIXME: provide defaults
+
                 groupkeepsplit[typenum][elem] = myalgorithm::inequalitytoint(newnumsplits, oldnumsplits);
             }
             
@@ -999,8 +1000,9 @@ void rawmesh::getattarget(std::vector<std::vector<int>>& values, std::shared_ptr
     std::shared_ptr<htracker> httarg = target->gethtracker();
         
     int numleaves = ht->countleaves();
-    int numleavestarg = httarg->countleaves();
-        
+    // int numleavestarg = httarg->countleaves();
+    // TODO: how numleavestarg was used?
+
     // Send from elements to leaves:
     std::vector<int> leafvalues(numleaves, -1);
     for (int i = 0; i < 8; i++)
@@ -1043,7 +1045,7 @@ void rawmesh::getattarget(std::vector<std::vector<int>>& values, std::shared_ptr
 void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, int loworder, int highorder)
 {
     int index = -1;
-    for (int i = 0; i < mypadaptdata.size(); i++)
+    for (size_t i = 0; i < mypadaptdata.size(); i++)
     {
         std::shared_ptr<rawfield> currawfield = (std::get<0>(mypadaptdata[i])).lock();
         if (currawfield.get() == inrawfield.get())
@@ -1067,8 +1069,8 @@ void rawmesh::remove(rawfield* inrawfield)
     std::vector<std::tuple<std::weak_ptr<rawfield>, expression, int, int>> pad = mypadaptdata;
     
     // Remove the pointed field and all expired fields:
-    int curindex = 0;
-    for (int i = 0; i < mypadaptdata.size(); i++)
+    size_t curindex = 0;
+    for (size_t i = 0; i < mypadaptdata.size(); i++)
     {
         std::weak_ptr<rawfield> curwp = std::get<0>(mypadaptdata[i]);
         if (not(curwp.expired()))
@@ -1098,7 +1100,7 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     {
         for (int i = 0; i < 8; i++)
         {
-            for (int e = 0; e < neworders[f][i].size(); e++)
+            for (size_t e = 0; e < neworders[f][i].size(); e++)
             {
                 if (neworders[f][i][e] > newmaxorder)
                     newmaxorder = neworders[f][i][e];
@@ -1119,7 +1121,7 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     {
         for (int i = 0; i < 8; i++)
         {
-            for (int e = 0; e < neworders[f][i].size(); e++)
+            for (size_t e = 0; e < neworders[f][i].size(); e++)
             {
                 int curorder = neworders[f][i][e];
 
@@ -1174,9 +1176,9 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     for (int i = 0; i < num; i++)
     {
         std::vector<int> curphysregsfororder = {};
-        
-        for (int o = 0; o < newphysregsfororder[i].size(); o++)
-        {   
+
+        for (size_t o = 0; o < newphysregsfororder[i].size(); o++)
+        {
             for (int typenum = 0; typenum < 8; typenum++)
             {
                 if (newphysregsfororder[i][o][typenum] != NULL)
@@ -1197,7 +1199,7 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     ///// Remove the physical regions created:
     
     std::vector<int> prtoremove(newlastpr-lastphysregnum);
-    for (int i = 0; i < prtoremove.size(); i++)
+    for (size_t i = 0; i < prtoremove.size(); i++)
         prtoremove[i] = lastphysregnum+1+i;
     myphysicalregions.remove(prtoremove, true);
     
@@ -1253,7 +1255,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     for (int i = 0; i < 8; i++)
     {
-        for (int e = 0; e < groupkeepsplit[i].size(); e++)
+        for (size_t e = 0; e < groupkeepsplit[i].size(); e++)
         {
             int ln = newhtracker->getleafnumber(i, e);
             int decision = groupkeepsplit[i][e];
@@ -1280,8 +1282,8 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
         {
             element myelement(i);
             int numedges = myelement.countedges();
-        
-            for (int e = 0; e < groupkeepsplit[i].size(); e++)
+
+            for (size_t e = 0; e < groupkeepsplit[i].size(); e++)
             {
                 int ln = newhtracker->getleafnumber(i, e);
                 int numsplits = leavesnumsplits[ln] + vadapt[ln];
@@ -1296,9 +1298,9 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
                     // Get all cells touching the current edge:
                     std::vector<int> cellsonedge = elptr->getcellsontype(1, currentedge);
 
-                    for (int c = 0; c < cellsonedge.size()/2; c++)
+                    for (size_t c = 0; c < cellsonedge.size()/2; c++)
                     {
-                        int curcell = cellsonedge[2*c+1];
+                        size_t curcell = cellsonedge[2*c+1];
                         int celltype = cellsonedge[2*c+0];
                         
                         if (i == celltype && curcell == e)
@@ -1319,7 +1321,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     // Nothing to do if all new number of splits are identical to the old ones:
     newhtracker->fix(vadapt);
     bool isidentical = true;
-    for (int i = 0; i < vadapt.size(); i++)
+    for (size_t i = 0; i < vadapt.size(); i++)
     {
         if (vadapt[i] != 0)
         {
@@ -1430,7 +1432,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
             
             if (isanypratdim[0])
             {
-                for (int n = 0; n < on.size(); n++)
+                for (size_t n = 0; n < on.size(); n++)
                 {
                     if (on[n] != -1)
                     {
@@ -1445,7 +1447,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
             }
             if (isanypratdim[1])
             {
-                for (int e = 0; e < oe.size(); e++)
+                for (size_t e = 0; e < oe.size(); e++)
                 {
                     if (oe[e] != -1)
                     {
@@ -1460,7 +1462,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
             }
             if (isanypratdim[2])
             {
-                for (int f = 0; f < of.size(); f++)
+                for (size_t f = 0; f < of.size(); f++)
                 {
                     if (of[f] != -1)
                     {
@@ -1573,7 +1575,7 @@ void rawmesh::printphysicalregions(void)
         
         std::vector<int> disjointregionlist = currentphysicalregion->getdisjointregions();
         // Print the disjoint region list:
-        for (int i = 0; i < disjointregionlist.size(); i++)
+        for (size_t i = 0; i < disjointregionlist.size(); i++)
             std::cout << disjointregionlist[i] << " ";
         
         std::cout << std::endl;
@@ -1616,12 +1618,12 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
             
             std::vector<std::vector<int>>* elemlist = currentphysicalregion->getelementlist();
 
-            for (int i = 0; i < elemlist->size(); i++)
+            for (size_t i = 0; i < elemlist->size(); i++)
             {
                 if (elemlist->at(i).size() > 0)
                 {
                     std::cout << " (" << i << "): ";
-                    for (int j = 0; j < elemlist->at(i).size(); j++)
+                    for (size_t j = 0; j < elemlist->at(i).size(); j++)
                         std::cout << elemlist->at(i)[j] << " ";
                 }
             }
@@ -1678,4 +1680,3 @@ std::shared_ptr<rawmesh> rawmesh::getoriginalmeshpointer(void)
 {
     return myhtracker->getoriginalmesh();
 }
-

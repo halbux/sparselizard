@@ -68,7 +68,7 @@ void element::setnodes(std::vector<int>& nodelist)
         std::cout << "Error: element type has not been defined yet" << std::endl;
         abort();
     }
-    if (nodelist.size() != countcurvednodes())
+    if (nodelist.size() != (size_t) countcurvednodes())
     {
         std::cout << "Error: trying to define an order " << getcurvatureorder() << " " << gettypename() << " with " << nodelist.size() << " nodes. There should be " << countcurvednodes() << std::endl;
         abort();
@@ -101,6 +101,8 @@ std::string element::gettypename(void)
             return "prism";
         case 7:
             return "pyramid";
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -128,6 +130,8 @@ std::string element::gettypenameconjugation(int numberofelements)
                 return "prisms";
             case 7:
                 return "pyramids";
+            default:
+                throw std::invalid_argument("Unknown type");
         }
     }
 }
@@ -198,6 +202,8 @@ int element::countcurvednodes(void)
             for (int i = 0; i < order + 1; i++)
                 curvednumberofnodes = curvednumberofnodes + pow(i + 1,2);
             break;
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 
     return curvednumberofnodes;
@@ -215,6 +221,7 @@ int element::getelementdimension(void)
         return 2;
     if (straighttypenumber > 3)
         return 3;
+    throw std::invalid_argument("Unknown type");
 }
 
 
@@ -251,6 +258,8 @@ int element::counttype(int typenum)
                 // Pyramid:
                 case 7:
                     return 5;
+                default:
+                    throw std::invalid_argument("Unknown type");
             }
         }
         // Line:
@@ -282,6 +291,8 @@ int element::counttype(int typenum)
                 // Pyramid:
                 case 7:
                     return 8;
+                default:
+                    throw std::invalid_argument("Unknown type");
             }
         }
         // Triangle:
@@ -313,6 +324,8 @@ int element::counttype(int typenum)
                 // Pyramid:
                 case 7:
                     return 4;
+                default:
+                    throw std::invalid_argument("Unknown type");
             }
         }
         // Quadrangle:
@@ -344,6 +357,8 @@ int element::counttype(int typenum)
                 // Pyramid:
                 case 7:
                     return 1;
+                default:
+                    throw std::invalid_argument("Unknown type");
             }
         }
         // Tetrahedron:
@@ -378,6 +393,8 @@ int element::counttype(int typenum)
             else
                 return 0;
         }
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -393,6 +410,8 @@ int element::countdim(int dim)
             return counttype(2)+counttype(3);
         case 3:
             return counttype(4)+counttype(5)+counttype(6)+counttype(7);
+        default:
+            throw std::invalid_argument("Unknown argument");
     }
 }
 
@@ -457,6 +476,8 @@ bool element::isinsideelement(double ki, double eta, double phi)
         // Pyramid:
         case 7:
             return (std::abs(ki) < 1-phi+roundoffnoise && std::abs(eta) < 1-phi+roundoffnoise && phi > -roundoffnoise && phi < 1+roundoffnoise);
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -742,6 +763,8 @@ std::vector<double> element::getedgebarycenter(std::vector<double>& nc)
                     0.5*(nc[3*3+0]+nc[3*0+0]), 0.5*(nc[3*3+1]+nc[3*0+1]), 0.5*(nc[3*3+2]+nc[3*0+2]),
                     0.5*(nc[3*3+0]+nc[3*2+0]), 0.5*(nc[3*3+1]+nc[3*2+1]), 0.5*(nc[3*3+2]+nc[3*2+2]),
                     0.5*(nc[3*3+0]+nc[3*1+0]), 0.5*(nc[3*3+1]+nc[3*1+1]), 0.5*(nc[3*3+2]+nc[3*1+2])};
+        default:
+            throw std::invalid_argument("Not implemented");
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
 }
@@ -759,6 +782,8 @@ std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
                     (nc[3*0+0]+nc[3*1+0]+nc[3*3+0])/3.0, (nc[3*0+1]+nc[3*1+1]+nc[3*3+1])/3.0, (nc[3*0+2]+nc[3*1+2]+nc[3*3+2])/3.0,
                     (nc[3*0+0]+nc[3*3+0]+nc[3*2+0])/3.0, (nc[3*0+1]+nc[3*3+1]+nc[3*2+1])/3.0, (nc[3*0+2]+nc[3*3+2]+nc[3*2+2])/3.0,
                     (nc[3*3+0]+nc[3*1+0]+nc[3*2+0])/3.0, (nc[3*3+1]+nc[3*1+1]+nc[3*2+1])/3.0, (nc[3*3+2]+nc[3*1+2]+nc[3*2+2])/3.0};
+        default:
+            throw std::invalid_argument("Not implemented");
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
 }
@@ -791,6 +816,8 @@ double element::measurereferenceelement(void)
         // Pyramid:
         case 7:
             return 4.0/3.0;
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -828,6 +855,8 @@ bool element::istriangularface(int facenum)
                 return true;
             else
                 return false;
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -913,8 +942,8 @@ std::vector<int> element::getnodesinsurface(int surfaceindex, bool faceistriangl
         offset = 3*counttriangularfaces();
     }
     int numberofinteriorsurfacenodes = numberofnodesinsurface - numberofedgesinsurface * numberofinteriorlinenodes - numberofcornernodesinsurface;
-    std::vector<int> nodesinsurface(numberofnodesinsurface);
-    
+    std::vector<int> nodesinsurface(numberofnodesinsurface);          // FIXME: provide default or throw error
+
     // Add the corner nodes of the surface to 'nodesinsurface':
     for (int i = 0; i < numberofcornernodesinsurface; i++)
         nodesinsurface[i] = curvednodelist[cornernodesinallsurfaces[offset+numberofcornernodesinsurface*surfaceindex+i]];
@@ -997,6 +1026,8 @@ std::vector<int> element::getedgesdefinitionsbasedonnodes(void)
         // Pyramid:
         case 7:
             return {0,1,0,3,0,4,1,2,1,4,2,3,2,4,3,4};
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -1028,6 +1059,8 @@ std::vector<int> element::getfacesdefinitionsbasedonnodes(void)
         // Pyramid:
         case 7:
             return {0,1,4,3,0,4,1,2,4,2,3,4,0,3,2,1};
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -1059,6 +1092,8 @@ std::vector<int> element::getfacesdefinitionsbasedonedges(void)
         //Pyramid:
         case 7:
             return {1,5,-3,-2,3,-8,4,7,-5,6,8,-7,2,-6,-4,-1};
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -1169,6 +1204,8 @@ std::vector<double> element::listnodecoordinates(void)
                 abort();
             }
             break;
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 
     return output;
@@ -1194,7 +1231,7 @@ int element::deducetypenumber(int elemdim, int numnodes)
                 return 3;
             if (elemdim == 3)
                 return 4;
-            break;
+            throw std::invalid_argument("Not quadrangle or tetrahedron");
         }
         // Pyramid:
         case 5:
@@ -1205,6 +1242,8 @@ int element::deducetypenumber(int elemdim, int numnodes)
         // Hexahedron:
         case 8:
             return 5;
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -1431,7 +1470,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
         {
             std::vector<double> cursplit = calculatecoordinates(curvedsubcoords[throughedgenum][i], coords);
 
-            for (int j = 0; j < cursplit.size(); j++)
+            for (size_t j = 0; j < cursplit.size(); j++)
                 splitcoords[tn][index+j] = cursplit[j];
             index += cursplit.size();
         }
@@ -1466,7 +1505,7 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
             {
                 std::vector<double> cursplit = calculatecoordinates(curvedtetsubcoords[i], coords);
 
-                for (int j = 0; j < cursplit.size(); j++)
+                for (size_t j = 0; j < cursplit.size(); j++)
                     splitcoords[4][index+j] = cursplit[j];
                 index += cursplit.size();
             }
@@ -1548,6 +1587,8 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
         return 1;
     if (l25 <= l04 && l25 <= l13)
         return 2;
+    // default
+    return 0;
 }
 
 std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers)
@@ -1579,6 +1620,8 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
             universe::setsplitdefinition(splitdef, 4, splitnum, edgenumbers);
             return splitdef;
         }
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
         
@@ -1625,6 +1668,8 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
         }
         case 7:
             return {{},{},{0,3,5, 3,1,4, 3,4,5, 5,4,2},{},{},{},{},{}};
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }    
 
@@ -1664,6 +1709,8 @@ std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
             return {{},{},{4,1,5, 4,5,6, 5,2,6},{0,4,6,3},{},{},{},{}};
         case 15:
             return {{},{},{},{0,4,8,7, 4,1,5,8, 7,8,6,3, 8,5,2,6},{},{},{},{}};
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 
@@ -1714,7 +1761,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
     std::vector<std::vector<bool>> connectivitythroughedge(edgefacingpair.size());
     
     // Add connection:
-    for (int i = 0; i < edgefacingpair.size(); i++)
+    for (size_t i = 0; i < edgefacingpair.size(); i++)
     {
         connectivitythroughedge[i] = connectivity;
     
@@ -1791,7 +1838,7 @@ void element::getsplitconnectivity(std::vector<bool>& connectivity, std::vector<
 {
     connectivity = std::vector<bool>(6*6, false);
 
-    for (int j = 0; j < splitdefinition[2].size()/3; j++)
+    for (size_t j = 0; j < splitdefinition[2].size()/3; j++)
     {
         for (int n = 0; n < 3; n++)
         {
@@ -1812,7 +1859,7 @@ void element::getsplitconnectivity(std::vector<bool>& volumeconnectivity, std::v
     std::vector<int> fnd = getfacesdefinitionsbasedonnodes();
     std::vector<int> fed = getfacesdefinitionsbasedonedges();
     // Face edge definition is provided in a special format:
-    for (int i = 0; i < fed.size(); i++)
+    for (size_t i = 0; i < fed.size(); i++)
         fed[i] = std::abs(fed[i])-1;                                        
     
     // Loop on each face:
@@ -1940,7 +1987,7 @@ void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refco
         }
     }
         
-    for (int i = 0; i < nums.size(); i++)
+    for (size_t i = 0; i < nums.size(); i++)
     {
         refcoords[3*i+0] = refs[3*nums[i]+0];
         refcoords[3*i+1] = refs[3*nums[i]+1];

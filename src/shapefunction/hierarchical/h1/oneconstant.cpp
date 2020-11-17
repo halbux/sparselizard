@@ -19,7 +19,7 @@ int oneconstant::count(int order)
         return 0;
 }
 
-int oneconstant::count(int order, int dim, int num)
+int oneconstant::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -41,8 +41,8 @@ int oneconstant::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder) 
-{    
+hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder) // FIXME: use maxorder
+{
     element myelement(myelementtypenumber);
     int elemdim = myelement.getelementdimension();
     

@@ -11,7 +11,7 @@ int q6::count(int order)
     return 6;
 }
 
-int q6::count(int order, int dim, int num)
+int q6::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,14 +32,14 @@ int q6::count(int order, int dim, int num)
         case 2:
             return 2;
         // Volume based form functions:
-        case 3:
+        default:
             return 0;
     }
 }
 
 
 
-hierarchicalformfunctioncontainer q6::evalat(int maxorder) 
+hierarchicalformfunctioncontainer q6::evalat(int maxorder) // FIXME: use maxorder
 {    
     element quadrangle("quadrangle");
     hierarchicalformfunctioncontainer val("q6", quadrangle.gettypenumber());

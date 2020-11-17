@@ -56,7 +56,7 @@ bool iointerface::isonlyisoparametric(std::string filename)
 
 void iointerface::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
 {
-    int numsteps = timevals.size();
+    size_t numsteps = timevals.size();
     
     if (numsteps != filestogroup.size())
     {
@@ -71,7 +71,7 @@ void iointerface::grouptimesteps(std::string filename, std::vector<std::string> 
     }
         
     // Check that all file names end with .vtu:
-    for (int i = 0; i < numsteps; i++)
+    for (size_t i = 0; i < numsteps; i++)
     {
         std::string curfile = filestogroup[i];
         if (curfile.size() < 5 || curfile.substr(curfile.size()-4,4) != ".vtu")
@@ -96,13 +96,13 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
             name << intdata.size() << std::endl << doubledata.size() << std::endl;
 
             // Write the int data to the file:
-            for (int i = 0; i < intdata.size(); i++)
+            for (size_t i = 0; i < intdata.size(); i++)
                 name << intdata[i] << std::endl;
 
             // To write all doubles with enough digits to the file:
             name << std::setprecision(17);
 
-            for (int i = 0; i < doubledata.size()-1; i++)
+            for (size_t i = 0; i < doubledata.size()-1; i++)
                 name << doubledata[i] << std::endl;
             name << doubledata[doubledata.size()-1];
 
@@ -126,9 +126,9 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
 
         datavals[0] = intdata.size();
         datavals[1] = doubledata.size();
-        for (int i = 0; i < intdata.size(); i++)
+        for (size_t i = 0; i < intdata.size(); i++)
             datavals[2 + i] = intdata[i];
-        for (int i = 0; i < doubledata.size(); i++)
+        for (size_t i = 0; i < doubledata.size(); i++)
             datavals[2+intdata.size() + i] = doubledata[i];
             
         // Let petsc write the binary file for us:
@@ -168,7 +168,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             doubledata.resize(std::stoi(currentline));
 
             // Load the intdata:
-            for (int i = 0; i < intdata.size(); i++)
+            for (size_t i = 0; i < intdata.size(); i++)
             {
                 std::getline(name, currentline);
                 myalgorithm::osclean(currentline);
@@ -176,7 +176,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             }
             
             // Load the doubledata:
-            for (int i = 0; i < doubledata.size(); i++)
+            for (size_t i = 0; i < doubledata.size(); i++)
             {
                 std::getline(name, currentline);
                 myalgorithm::osclean(currentline);

@@ -18,7 +18,7 @@ spline::spline(std::string filename, char delimiter)
     std::vector<double> xin(data.size()/2);
     std::vector<double> yin(data.size()/2);
     
-    for (int i = 0; i < data.size()/2; i++)
+    for (size_t i = 0; i < data.size()/2; i++)
     {
         xin[i] = data[2*i+0];
         yin[i] = data[2*i+1];

@@ -1,7 +1,7 @@
 #include "opconstant.h"
 
 
-std::vector<std::vector<densematrix>> opconstant::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> opconstant::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     densematrix output(elemselect.countinselection(), evaluationcoordinates.size()/3, constantvalue);
     
@@ -9,7 +9,7 @@ std::vector<std::vector<densematrix>> opconstant::interpolate(elementselector& e
     return {{},{output}};
 }
 
-densematrix opconstant::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densematrix opconstant::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     densematrix output(numtimeevals, elemselect.countinselection() * evaluationcoordinates.size()/3, constantvalue);
     
@@ -24,7 +24,7 @@ std::shared_ptr<operation> opconstant::copy(void)
     return op;
 }
 
-std::vector<double> opconstant::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+std::vector<double> opconstant::evaluate(std::vector<double>& xcoords, std::vector<double>&, std::vector<double>&)
 {
     std::vector<double> evaluated(xcoords.size(), constantvalue);
     return evaluated;

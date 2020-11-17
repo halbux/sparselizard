@@ -14,7 +14,7 @@ int h1prism::count(int order)
     return countforline * countfortriangle;
 }
 
-int h1prism::count(int order, int dim, int num)
+int h1prism::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is required here!
     
@@ -37,7 +37,7 @@ int h1prism::count(int order, int dim, int num)
             else
                 return pow(order-1,2);
         // Volume based form functions:
-        case 3:
+        default:
             return 0.5*(order-2)*pow(order-1,2);
     }
 }
@@ -148,7 +148,7 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                 // Define the nodes f1, f2 and f3 in face [f1 f2 f3]:
                 int f1 = nodesinfaces[3*face+reorderingtoreferencetriangularfaceorientation[orientation][0]] + 1;
                 int f2 = nodesinfaces[3*face+reorderingtoreferencetriangularfaceorientation[orientation][1]] + 1;
-                int f3 = nodesinfaces[3*face+reorderingtoreferencetriangularfaceorientation[orientation][2]] + 1;
+                int f3 = nodesinfaces[3*face+reorderingtoreferencetriangularfaceorientation[orientation][2]] + 1; // FIXME: unused f3
 
                 // Defining the Legendre polynomials Ls and ls for all required orders:
                 vector<polynomial> Ls = legendre::Ls(maxorder, lambda[f1]-lambda[f2],lambda[f1]+lambda[f2]);
@@ -185,12 +185,12 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                 // Define the nodes f1, f2, f3 and f4  in face [f1 f2 f3 f4]:
                 int f1 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][0]] + 1;
                 int f2 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][1]] + 1;
-                int f3 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][2]] + 1;
+                int f3 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][2]] + 1; // FIXME: unused f3
                 int f4 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][3]] + 1;
                 
                 int f2star;
                 // If mu[f1] = mu[f2]:
-                if (f1 <= 3 && f2 <= 3 || f1 > 3 && f2 > 3)
+                if ((f1 <= 3 && f2 <= 3) || (f1 > 3 && f2 > 3))
                     f2star = f2;
                 else
                     f2star = f4;

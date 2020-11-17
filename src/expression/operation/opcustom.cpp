@@ -21,7 +21,7 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
     int numevalpts = evaluationcoordinates.size()/3;
     
     std::vector<densematrix> fctargs(myargs.size());
-    for (int i = 0; i < myargs.size(); i++)
+    for (size_t i = 0; i < myargs.size(); i++)
     {
         std::vector<std::vector<densematrix>> argmat = myargs[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
         if (argmat.size() != 2 || argmat[1].size() != 1)
@@ -40,7 +40,7 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
         std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densematrix objects (expected " << myfamily.size() <<  ")" << std::endl;
         abort();
     }
-    for (int i = 0; i < output.size(); i++)
+    for (size_t i = 0; i < output.size(); i++)
     {
         if (output[i].isdefined() == false)
         {
@@ -56,7 +56,7 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
     
     if (universe::isreuseallowed)
     {
-        for (int i = 0; i < myfamily.size(); i++)
+        for (size_t i = 0; i < myfamily.size(); i++)
         {
             if (myfamily[i].expired() == false)
                 universe::setprecomputed(myfamily[i].lock(), {{},{output[i]}});
@@ -79,7 +79,7 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
     int numevalpts = evaluationcoordinates.size()/3;
     
     std::vector<densematrix> fctargs(myargs.size());
-    for (int i = 0; i < myargs.size(); i++)
+    for (size_t i = 0; i < myargs.size(); i++)
         fctargs[i] = myargs[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
     std::vector<densematrix> output = myfunction(fctargs);
@@ -90,7 +90,7 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
         std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densematrix objects (expected " << myfamily.size() <<  ")" << std::endl;
         abort();
     }
-    for (int i = 0; i < output.size(); i++)
+    for (size_t i = 0; i < output.size(); i++)
     {
         if (output[i].isdefined() == false)
         {
@@ -106,7 +106,7 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
     
     if (universe::isreuseallowed)
     {
-        for (int i = 0; i < myfamily.size(); i++)
+        for (size_t i = 0; i < myfamily.size(); i++)
         {
             if (myfamily[i].expired() == false)
                 universe::setprecomputedfft(myfamily[i].lock(), output[i]);
@@ -118,7 +118,7 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
 
 std::shared_ptr<operation> opcustom::simplify(std::vector<int> disjregs)
 {
-    for (int i = 0; i < myargs.size(); i++)
+    for (size_t i = 0; i < myargs.size(); i++)
         myargs[i] = myargs[i]->simplify(disjregs);
     
     return shared_from_this();

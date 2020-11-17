@@ -11,7 +11,7 @@ int h1tetrahedron::count(int order)
     return 1.0/6.0*(order+1)*(order+2)*(order+3);
 }
 
-int h1tetrahedron::count(int order, int dim, int num)
+int h1tetrahedron::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,7 +32,7 @@ int h1tetrahedron::count(int order, int dim, int num)
         case 2:
             return 0.5*(order-2)*(order-1);
         // Volume based form functions:
-        case 3:
+        default:
             return 1.0/6.0*(order-3)*(order-2)*(order-1);
     }
 }

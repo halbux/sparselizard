@@ -32,12 +32,12 @@ std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& e
     int maxdestharm = *std::max_element(mydestharms.begin(), mydestharms.end());
     std::vector<std::vector<densematrix>> output(maxdestharm+1, std::vector<densematrix>(0));
 
-    for (int i = 0; i < myorigharms.size(); i++)
+    for (size_t i = 0; i < myorigharms.size(); i++)
     {
         int horig = myorigharms[i];
         int hdest = mydestharms[i];
-  
-        if (horig < argmat.size() && argmat[horig].size() > 0)
+
+        if ((size_t) horig < argmat.size() && argmat[horig].size() > 0)
         {
             if (output[hdest].size() == 0)
                 output[hdest] = {argmat[horig][0].copy()};
@@ -76,9 +76,9 @@ densematrix opharmonic::multiharmonicinterpolate(int numtimeevals, elementselect
     return output;
 }
 
-bool opharmonic::isharmonicone(std::vector<int> disjregs)
+bool opharmonic::isharmonicone(std::vector<int> disjregs)             // TODO: use disjregs?
 {
-    for (int i = 0; i < mydestharms.size(); i++)
+    for (size_t i = 0; i < mydestharms.size(); i++)
     {
         if (mydestharms[i] != 1)
             return false;

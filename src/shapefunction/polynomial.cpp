@@ -8,11 +8,11 @@ void polynomial::set(const std::vector<std::vector<std::vector<double>>>& coeffi
 
 void polynomial::print(void)
 {
-    for (int kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
     {
-        for (int etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
         {
-            for (int phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
             {
                 double currentcoef = mycoefficients[kiorder][etaorder][phiorder];
                 // Skip 0 coefficients:
@@ -78,13 +78,13 @@ std::vector<double> polynomial::evalat(const std::vector<double>& evaluationpoin
         double kipower = 1;
     
         // Loop on all coefficients:
-        for (int kiorder = firstkiorder; kiorder < mycoefficients.size(); kiorder++)
+        for (size_t kiorder = firstkiorder; kiorder < mycoefficients.size(); kiorder++)
         {        
             double etapower = 1;
-            for (int etaorder = firstetaorder; etaorder < mycoefficients[kiorder].size(); etaorder++)
+            for (size_t etaorder = firstetaorder; etaorder < mycoefficients[kiorder].size(); etaorder++)
             {
                 double phipower = 1;
-                for (int phiorder = firstphiorder; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+                for (size_t phiorder = firstphiorder; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
                 {
                     // Skip zero coefficients:
                     if (mycoefficients[kiorder][etaorder][phiorder] != 0)
@@ -136,11 +136,11 @@ polynomial polynomial::operator*(polynomial tomultiply)
                                 continue;
                                 
                             // First preallocate 'output' for the current product term (if required):
-                            if (output.mycoefficients.size() < kiorder+kiorderthis+1)
+                            if (output.mycoefficients.size() < (size_t) kiorder+kiorderthis+1)
                                 output.mycoefficients.resize(kiorder+kiorderthis+1);
-                            if (output.mycoefficients[kiorder+kiorderthis].size() < etaorder+etaorderthis+1)
+                            if (output.mycoefficients[kiorder+kiorderthis].size() < (size_t) etaorder+etaorderthis+1)
                                 output.mycoefficients[kiorder+kiorderthis].resize(etaorder+etaorderthis+1);
-                            if (output.mycoefficients[kiorder+kiorderthis][etaorder+etaorderthis].size() < phiorder+phiorderthis+1)
+                            if (output.mycoefficients[kiorder+kiorderthis][etaorder+etaorderthis].size() < (size_t) phiorder+phiorderthis+1)
                                 output.mycoefficients[kiorder+kiorderthis][etaorder+etaorderthis].resize(phiorder+phiorderthis+1);
                             
                             // Multiply and add to 'output':
@@ -162,14 +162,14 @@ polynomial polynomial::operator+(polynomial toadd)
         output.mycoefficients.resize(toadd.mycoefficients.size());
             
     // Loop on all coefficients of 'toadd':
-    for (int kiorder = 0; kiorder < toadd.mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < toadd.mycoefficients.size(); kiorder++)
     {        
-        for (int etaorder = 0; etaorder < toadd.mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < toadd.mycoefficients[kiorder].size(); etaorder++)
         {
             if (output.mycoefficients[kiorder].size() < toadd.mycoefficients[kiorder].size())
                 output.mycoefficients[kiorder].resize(toadd.mycoefficients[kiorder].size());
                 
-            for (int phiorder = 0; phiorder < toadd.mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < toadd.mycoefficients[kiorder][etaorder].size(); phiorder++)
             {
                 if (output.mycoefficients[kiorder][etaorder].size() < toadd.mycoefficients[kiorder][etaorder].size())
                     output.mycoefficients[kiorder][etaorder].resize(toadd.mycoefficients[kiorder][etaorder].size());
@@ -189,14 +189,14 @@ polynomial polynomial::operator-(polynomial tosubtract)
         output.mycoefficients.resize(tosubtract.mycoefficients.size());
             
     // Loop on all coefficients of 'tosubtract':
-    for (int kiorder = 0; kiorder < tosubtract.mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < tosubtract.mycoefficients.size(); kiorder++)
     {        
-        for (int etaorder = 0; etaorder < tosubtract.mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < tosubtract.mycoefficients[kiorder].size(); etaorder++)
         {
             if (output.mycoefficients[kiorder].size() < tosubtract.mycoefficients[kiorder].size())
                 output.mycoefficients[kiorder].resize(tosubtract.mycoefficients[kiorder].size());
                 
-            for (int phiorder = 0; phiorder < tosubtract.mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < tosubtract.mycoefficients[kiorder][etaorder].size(); phiorder++)
             {
                 if (output.mycoefficients[kiorder][etaorder].size() < tosubtract.mycoefficients[kiorder][etaorder].size())
                     output.mycoefficients[kiorder][etaorder].resize(tosubtract.mycoefficients[kiorder][etaorder].size());
@@ -218,11 +218,11 @@ polynomial polynomial::operator-()
     polynomial output = *this;
     
     // Loop on all coefficients:
-    for (int kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
     {
-        for (int etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
         {
-            for (int phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
             {
                 // Flip the sign of the coefficient:
                 output.mycoefficients[kiorder][etaorder][phiorder] = -mycoefficients[kiorder][etaorder][phiorder];
@@ -237,11 +237,11 @@ polynomial polynomial::operator*(double val)
     polynomial output = *this;
     
     // Loop on all coefficients:
-    for (int kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
     {
-        for (int etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
         {
-            for (int phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
             {
                 // Multiply the coefficient by 'val':
                 output.mycoefficients[kiorder][etaorder][phiorder] = val*mycoefficients[kiorder][etaorder][phiorder];
@@ -284,16 +284,16 @@ polynomial polynomial::operator-(double val)
 void polynomial::dki(void)
 {
     // Shift all ki vectors back down one order - dump order 0 in ki:
-    for (int kiorder = 1; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 1; kiorder < mycoefficients.size(); kiorder++)
         mycoefficients[kiorder-1] = mycoefficients[kiorder];
     if (mycoefficients.size() > 0)
         mycoefficients.pop_back();
     // One also has to take into account the extra factor coming from a derivative:    
-    for (int kiorder = 1; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 1; kiorder < mycoefficients.size(); kiorder++)
     {
-        for (int etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
         {
-            for (int phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
                 mycoefficients[kiorder][etaorder][phiorder] = (kiorder+1) * mycoefficients[kiorder][etaorder][phiorder];
         }
     }
@@ -302,16 +302,16 @@ void polynomial::dki(void)
 void polynomial::deta(void)
 {
     // Shift all eta vectors back down one order - dump order 0 in eta:
-    for (int kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
     {
-        for (int etaorder = 1; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 1; etaorder < mycoefficients[kiorder].size(); etaorder++)
             mycoefficients[kiorder][etaorder-1] = mycoefficients[kiorder][etaorder];
         if (mycoefficients[kiorder].size() > 0)
             mycoefficients[kiorder].pop_back();
         // One also has to take into account the extra factor coming from a derivative:    
-        for (int etaorder = 1; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 1; etaorder < mycoefficients[kiorder].size(); etaorder++)
         {
-            for (int phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 0; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
                 mycoefficients[kiorder][etaorder][phiorder] = (etaorder+1) * mycoefficients[kiorder][etaorder][phiorder];
         }
     }
@@ -320,16 +320,16 @@ void polynomial::deta(void)
 void polynomial::dphi(void)
 {
     // Shift all phi vectors back down one order - dump order 0 in phi:
-    for (int kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
+    for (size_t kiorder = 0; kiorder < mycoefficients.size(); kiorder++)
     {
-        for (int etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
+        for (size_t etaorder = 0; etaorder < mycoefficients[kiorder].size(); etaorder++)
         {
-            for (int phiorder = 1; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 1; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
                 mycoefficients[kiorder][etaorder][phiorder-1] = mycoefficients[kiorder][etaorder][phiorder];
             if (mycoefficients[kiorder][etaorder].size() > 0)
                 mycoefficients[kiorder][etaorder].pop_back();
             // One also has to take into account the extra factor coming from a derivative:    
-            for (int phiorder = 1; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
+            for (size_t phiorder = 1; phiorder < mycoefficients[kiorder][etaorder].size(); phiorder++)
                 mycoefficients[kiorder][etaorder][phiorder] = (phiorder+1) * mycoefficients[kiorder][etaorder][phiorder];
         }
     }
@@ -357,6 +357,8 @@ polynomial polynomial::derivative(int whichderivative)
             dphipoly.dphi();
             return dphipoly;
         }
+        default:
+            throw std::invalid_argument("Unknown type");
     }
 }
 

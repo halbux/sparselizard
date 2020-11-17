@@ -37,15 +37,16 @@ void nodes::print(void)
 
 std::vector<int> nodes::removeduplicates(void)
 {
-    int numberofnodes = count();
-    
+    // int numberofnodes = count();
+    // TODO: what was numberofnodes doing here?
+
     // 'noderenumbering' will give the renumbering corresponding to removed duplicates:
     std::vector<int> noderenumbering;
     int numberofnonduplicates = myalgorithm::removeduplicates(mycoordinates, noderenumbering);
 
-    for (int i = 0; i < noderenumbering.size(); i++)
+    for (size_t i = 0; i < noderenumbering.size(); i++)
     {
-        if (noderenumbering[i] != i)
+        if ((size_t) noderenumbering[i] != i)
         {
             mycoordinates[3*noderenumbering[i]+0] = mycoordinates[3*i+0];
             mycoordinates[3*noderenumbering[i]+1] = mycoordinates[3*i+1];
@@ -116,4 +117,3 @@ void nodes::fixifaxisymmetric(void)
         }
     }
 }
-

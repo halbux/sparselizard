@@ -85,7 +85,7 @@ bool nasdataline::addline(std::string linetoadd)
             
             vertices.resize(eleminfo[1]);
             
-            for (int i = 0; i < vertices.size(); i++)
+            for (size_t i = 0; i < vertices.size(); i++)
             {
                 std::string curstrng = linetoadd.substr(24+8*i,8);
                 if (curstrng[0] == '+')
@@ -93,7 +93,7 @@ bool nasdataline::addline(std::string linetoadd)
                 vertices[i] = std::stoi(curstrng) - 1;
                 currentvertexindex = i+1;
             }
-            if (currentvertexindex == vertices.size())
+            if ((size_t) currentvertexindex == vertices.size())
             {
                 currentvertexindex = 0;
                 return true;
@@ -110,7 +110,7 @@ bool nasdataline::addline(std::string linetoadd)
             
             vertices.resize(eleminfo[1]);
 
-            for (int i = 0; i < vertices.size(); i++)
+            for (size_t i = 0; i < vertices.size(); i++)
             {
                 std::string curstrng = curline.getstringtonextcomma();
                 if (curstrng[0] == '+')
@@ -118,7 +118,7 @@ bool nasdataline::addline(std::string linetoadd)
                 vertices[i] = std::stoi(curstrng) - 1;
                 currentvertexindex = i+1;
             }
-            if (currentvertexindex == vertices.size())
+            if ((size_t) currentvertexindex == vertices.size())
             {
                 currentvertexindex = 0;
                 return true;
@@ -137,7 +137,7 @@ bool nasdataline::addline(std::string linetoadd)
         {
             curline.getstringtonextwhitespace();
 
-            int i;
+            size_t i;
             for (i = 0; i < vertices.size()-currentvertexindex; i++)
             {
                 std::string curstrng = linetoadd.substr(8+8*i,8);
@@ -146,7 +146,7 @@ bool nasdataline::addline(std::string linetoadd)
                 vertices[currentvertexindex+i] = std::stoi(curstrng) - 1;
             }
             currentvertexindex += i;
-            if (currentvertexindex == vertices.size())
+            if ((size_t) currentvertexindex == vertices.size())
             {
                 currentvertexindex = 0;
                 return true;
@@ -158,7 +158,7 @@ bool nasdataline::addline(std::string linetoadd)
         {
             curline.getstringtonextcomma();
 
-            int i;
+            size_t i;
             for (i = 0; i < vertices.size()-currentvertexindex; i++)
             {
                 std::string curstrng = curline.getstringtonextcomma();
@@ -167,7 +167,7 @@ bool nasdataline::addline(std::string linetoadd)
                 vertices[currentvertexindex+i] = std::stoi(curstrng) - 1;
             }
             currentvertexindex += i;
-            if (currentvertexindex == vertices.size())
+            if ((size_t) currentvertexindex == vertices.size())
             {
                 currentvertexindex = 0;
                 return true;

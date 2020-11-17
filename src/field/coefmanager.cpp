@@ -14,18 +14,18 @@ coefmanager::coefmanager(std::string fieldtypename, disjointregions* drs)
     // Preallocate 'coefs' for the number of disjoint regions:
     coefs.resize(mydisjointregions.count());
     // Resize coefs to accomodate an inital order 1 interpolated field:
-    for (int i = 0; i < coefs.size(); i++)
+    for (size_t i = 0; i < coefs.size(); i++)
         fitinterpolationorder(i, 1);
 }
 
 bool coefmanager::isdefined(int disjreg, int formfunctionindex)
 {
-    return (formfunctionindex < coefs[disjreg].size());
+    return ((size_t) formfunctionindex < coefs[disjreg].size());
 }
 
 int coefmanager::countformfunctions(int disjreg)
 {
-    return coefs[disjreg].size();
+    return (int) coefs[disjreg].size();                               // FIXME: cast size_t to int is bad
 }
 
 void coefmanager::fitinterpolationorder(int disjreg, int interpolationorder)
@@ -37,14 +37,15 @@ void coefmanager::fitinterpolationorder(int disjreg, int interpolationorder)
     // Get the number of form functions associated to dimension elementdimension:
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, myfieldtypename);
     int numberofformfunctions = myformfunction->count(interpolationorder, elementdimension, 0);
-    
-    if (coefs[disjreg].size() != numberofformfunctions)
+
+    if (coefs[disjreg].size() != (size_t) numberofformfunctions)
         coefs[disjreg].resize(numberofformfunctions);
 }
 
 double coefmanager::getcoef(int disjreg, int formfunctionindex, int elementindexindisjointregion)
 {
-    if (formfunctionindex < coefs[disjreg].size() && coefs[disjreg][formfunctionindex].size() != 0)
+    if (((size_t) formfunctionindex < coefs[disjreg].size()) &&
+        (coefs[disjreg][formfunctionindex].size() != 0))
         return coefs[disjreg][formfunctionindex][elementindexindisjointregion];
     else
         return 0;
@@ -67,10 +68,10 @@ void coefmanager::setcoef(int disjreg, int formfunctionindex, int elementindexin
 void coefmanager::print(bool databoundsonly)
 {
     std::cout << std::endl << "Field of type " << myfieldtypename << ":" << std::endl;
-    
-    for (int d = 0; d < coefs.size(); d++)
+
+    for (size_t d = 0; d < coefs.size(); d++)
     {
-        for (int ff = 0; ff < coefs[d].size(); ff++)
+        for (size_t ff = 0; ff < coefs[d].size(); ff++)
         {
             if (coefs[d][ff].size() == 0)
                 continue;
@@ -79,8 +80,8 @@ void coefmanager::print(bool databoundsonly)
             
             double datamin = coefs[d][ff][0];
             double datamax = coefs[d][ff][0];
-            
-            for (int e = 0; e < coefs[d][ff].size(); e++)
+
+            for (size_t e = 0; e < coefs[d][ff].size(); e++)
             {
                 double val = coefs[d][ff][e];
                 

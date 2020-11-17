@@ -82,7 +82,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     
     if (myerrorifnotfound)
     {
-        for (int i = 0; i < isfound.size(); i++)
+        for (size_t i = 0; i < isfound.size(); i++)
         {
             if (isfound[i] == false)
             {
@@ -96,7 +96,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     
     // Place the interpolated values in a std::vector<std::vector<densematrix>>:
     std::vector<std::vector<densematrix>> outvec(interpolated.size(), std::vector<densematrix>(0));
-    for (int h = 0; h < interpolated.size(); h++)
+    for (size_t h = 0; h < interpolated.size(); h++)
     {
         if (interpolated[h].size() > 0)
         {
@@ -190,7 +190,7 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
 
     if (myerrorifnotfound)
     {
-        for (int i = 0; i < isfound.size(); i++)
+        for (size_t i = 0; i < isfound.size(); i++)
         {
             if (isfound[i] == false)
             {

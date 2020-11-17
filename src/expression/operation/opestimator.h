@@ -37,7 +37,7 @@ class opestimator: public operation
         std::vector<std::shared_ptr<operation>> getarguments(void) { return {myarg}; };
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);
         
-        bool isvalueorientationdependent(std::vector<int> disjregs) { return false; };
+        bool isvalueorientationdependent([[maybe_unused]] std::vector<int> disjregs) { return false; };
         
         std::shared_ptr<operation> copy(void);
         

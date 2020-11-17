@@ -11,7 +11,7 @@ int hcurlhexahedron::count(int order)
     return 3*order*order*(order+1) + 6*2*order*(order+1) + 12*(order+1);
 }
 
-int hcurlhexahedron::count(int order, int dim, int num)
+int hcurlhexahedron::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,7 +32,7 @@ int hcurlhexahedron::count(int order, int dim, int num)
         case 2:
             return 2*order*(order+1);
         // Volume based form functions:
-        case 3:
+        default:
             return 3*order*order*(order+1);
     }
 }
@@ -333,5 +333,3 @@ std::vector<bool> hcurlhexahedron::isgradienttype(int maxorder)
 
     return output;
 }
-
-

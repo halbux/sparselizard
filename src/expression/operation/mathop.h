@@ -295,6 +295,6 @@ namespace mathop
     
     // Stabilization for advection-diffusion problems:
     expression predefinedstabilization(std::string stabtype, expression delta, expression f, expression v, expression diffusivity, expression residual);
-};
+}
 
 #endif

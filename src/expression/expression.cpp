@@ -56,7 +56,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     mynumcols = numcols;
 
     // In case the user provides only the diagonal part of a square diagonal matrix:
-    if (mynumrows == mynumcols && input.size() == mynumrows)
+    if (mynumrows == mynumcols && input.size() == (size_t) mynumrows)
     {
         std::vector<expression> fullinput(mynumrows*mynumcols);
         for (int i = 0; i < mynumrows; i++)
@@ -73,7 +73,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
     }
 
     // In case the user provides only the lower triangular part of a square symmetric matrix:
-    if (mynumrows == mynumcols && input.size() == mynumrows*(mynumcols+1)/2)
+    if (mynumrows == mynumcols && input.size() == (size_t) (mynumrows*(mynumcols+1)/2))
     {
         std::vector<expression> fullinput(mynumrows*mynumcols);
         int index = 0;
@@ -95,7 +95,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
         input = fullinput;
     }
 
-    if (mynumrows*mynumcols != input.size())
+    if ((size_t) (mynumrows*mynumcols) != input.size())
     {
         std::cout << "Error in 'expression' object: a vector of length " << mynumrows*mynumcols << " is required" << std::endl;
         abort();
@@ -128,7 +128,7 @@ expression::expression(const std::vector<std::vector<expression>> input)
         // Get the final expression dimension:
         int numcols = input[0][0].mynumcols;
         int numrows = 0;
-        for (int i = 0; i < input[0].size(); i++)
+        for (size_t i = 0; i < input[0].size(); i++)
         {
             if (input[0][i].mynumcols != numcols)
             {
@@ -143,7 +143,7 @@ expression::expression(const std::vector<std::vector<expression>> input)
         myoperations.resize(numrows*numcols);
 
         int index = 0;
-        for (int i = 0; i < input[0].size(); i++)
+        for (size_t i = 0; i < input[0].size(); i++)
         {
             for (int j = 0; j < input[0][i].mynumrows*input[0][i].mynumcols; j++)
             {
@@ -156,7 +156,7 @@ expression::expression(const std::vector<std::vector<expression>> input)
 
     // Combine all rows in each column:
     std::vector<std::vector<expression>> exprs(1,std::vector<expression>(input.size()));
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         expression rowsconcatenated({input[i]});
         exprs[0][i] = rowsconcatenated.transpose();
@@ -225,7 +225,7 @@ expression::expression(spline spl, expression arg)
 expression::expression(std::vector<double> pos, std::vector<expression> exprs, expression tocompare)
 {
     int numintervals = pos.size()+1;
-    if (numintervals != exprs.size())
+    if ((size_t) numintervals != exprs.size())
     {
         std::cout << "Error in 'expression' object: expected " << numintervals << " expressions to define the " << numintervals << " intervals from -infinity to +infinity" << std::endl;
         abort();
@@ -241,7 +241,7 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
         abort();
     }
     // Make sure the positions are sorted ascendingly:
-    for (int i = 1; i < pos.size(); i++)
+    for (size_t i = 1; i < pos.size(); i++)
     {
         if (pos[i] <= pos[i-1])
         {
@@ -279,9 +279,9 @@ expression::expression(int m, int n, std::vector<densematrix> customfct(std::vec
     
     // Get all argument operations:
     std::vector<std::shared_ptr<operation>> argops = {};
-    for (int i = 0; i < exprs.size(); i++)
+    for (size_t i = 0; i < exprs.size(); i++)
     {
-        for (int j = 0; j < exprs[i].myoperations.size(); j++)
+        for (size_t j = 0; j < exprs[i].myoperations.size(); j++)
         {
             if (exprs[i].myoperations[j]->isdofincluded() || exprs[i].myoperations[j]->istfincluded())
             {
@@ -350,7 +350,7 @@ expression expression::getcolumn(int colnum)
 
 void expression::reorderrows(std::vector<int> neworder)
 {
-    if (mynumrows != neworder.size())
+    if ((size_t) mynumrows != neworder.size())
     {
         std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
         abort();
@@ -359,7 +359,7 @@ void expression::reorderrows(std::vector<int> neworder)
     int minval = *min_element(neworder.begin(), neworder.end());
     int maxval = *max_element(neworder.begin(), neworder.end());
 
-    if (minval < 0 || maxval >= neworder.size())
+    if (minval < 0 || (size_t) maxval >= neworder.size())
     {
         std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (out of range integers)" << std::endl;
         abort();
@@ -376,7 +376,7 @@ void expression::reorderrows(std::vector<int> neworder)
 
 void expression::reordercolumns(std::vector<int> neworder)
 {
-    if (mynumcols != neworder.size())
+    if ((size_t) mynumcols != neworder.size())
     {
         std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
         abort();
@@ -385,7 +385,7 @@ void expression::reordercolumns(std::vector<int> neworder)
     int minval = *min_element(neworder.begin(), neworder.end());
     int maxval = *max_element(neworder.begin(), neworder.end());
 
-    if (minval < 0 || maxval >= neworder.size())
+    if (minval < 0 || (size_t) maxval >= neworder.size())
     {
         std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (out of range integers)" << std::endl;
         abort();
@@ -668,7 +668,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
             std::vector<int> elemens = rcg.getelements();
             int numrefcoords = kietaphi.size()/3;
             
-            for (int c = 0; c < coordindexes.size(); c++)
+            for (size_t c = 0; c < coordindexes.size(); c++)
                 isfound[coordindexes[c]] = true;
         
             // Loop on all total orientations (if required):
@@ -688,14 +688,14 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     if (interpolated.size() < interp.size())
                         interpolated.resize(interp.size());
                     
-                    for (int h = 0; h < interp.size(); h++)
+                    for (size_t h = 0; h < interp.size(); h++)
                     {
                         if (interp[h].size() > 0)
                         {
                             if (interpolated[h].size() == 0)
                                 interpolated[h] = std::vector<double>(numcoords,0.0);
                                 
-                            for (int e = 0; e < origindexes.size(); e++)
+                            for (size_t e = 0; e < origindexes.size(); e++)
                             {
                                 for (int c = 0; c < numrefcoords; c++)
                                     interpolated[h][coordindexes[origindexes[e]*numrefcoords+c]] = interp[h][0].getvalues()[e*numrefcoords+c];
@@ -713,7 +713,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
                     for (int tim = 0; tim < numtimeevals; tim++)
                     {
-                        for (int e = 0; e < origindexes.size(); e++)
+                        for (size_t e = 0; e < origindexes.size(); e++)
                         {
                             for (int c = 0; c < numrefcoords; c++)
                                 interpolated[0][numcoords*tim+coordindexes[origindexes[e]*numrefcoords+c]] = interp.getvalues()[origindexes.size()*numrefcoords*tim+e*numrefcoords+c];
@@ -957,7 +957,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
             // Get a vector containing all harmonic numbers in 'expr' on the current disjoint regions:
             if (numtimesteps <= 0)
             {
-                for (int h = 0; h < expr[0].size(); h++)
+                for (size_t h = 0; h < expr[0].size(); h++)
                 {
                     if (expr[0][h].size() == 1)
                     {
@@ -972,7 +972,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
             if (numtimesteps <= 0)
             {
-                for (int h = 0; h < harms.size(); h++)
+                for (size_t h = 0; h < harms.size(); h++)
                 {
                     datatowrite[harms[h]][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
                     std::vector<densematrix> curdata(countrows());
@@ -995,7 +995,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Write the data:
     if (numtimesteps <= 0)
     {
-        for (int h = 0; h < datatowrite.size(); h++)
+        for (size_t h = 0; h < datatowrite.size(); h++)
         {
             if (datatowrite[h].size() == 1)
             {
@@ -1093,24 +1093,24 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         interpolate(physreg, NULL, curcoords, k1, isfound);
         k1scaled = myalgorithm::normblocks(k1,3);
         std::vector<double> ynplushk1over2 = curcoords;
-        for (int i = 0; i < curcoords.size(); i++)
+        for (size_t i = 0; i < curcoords.size(); i++)
             ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1scaled[i];
         interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
         k2scaled = myalgorithm::normblocks(k2,3);
         std::vector<double> ynplushk2over2 = curcoords;
-        for (int i = 0; i < curcoords.size(); i++)
+        for (size_t i = 0; i < curcoords.size(); i++)
             ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2scaled[i];
         interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
         k3scaled = myalgorithm::normblocks(k3,3);
         std::vector<double> ynplushk3 = curcoords;
-        for (int i = 0; i < curcoords.size(); i++)
+        for (size_t i = 0; i < curcoords.size(); i++)
             ynplushk3[i] += h[(i-i%3)/3]*k3scaled[i];
         interpolate(physreg, NULL, ynplushk3, k4, isfound);
         k4scaled = myalgorithm::normblocks(k4,3);
 
 
         isdone = true;
-        for (int i = 0; i < isfound.size(); i++)
+        for (size_t i = 0; i < isfound.size(); i++)
         {
             if (isfound[i] == false)
                 isactive[i] = false;
@@ -1119,7 +1119,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         }
 
         // Append data to write to disk:
-        for (int i = 0; i < isactive.size(); i++)
+        for (size_t i = 0; i < isactive.size(); i++)
         {
             if (isactive[i])
             {
@@ -1134,14 +1134,14 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         }
 
         // Update the coordinates:
-        for (int i = 0; i < curcoords.size(); i++)
+        for (size_t i = 0; i < curcoords.size(); i++)
             curcoords[i] += h[(i-i%3)/3]/6.0*( k1scaled[i]+2.0*k2scaled[i]+2.0*k3scaled[i]+k4scaled[i] );
     }
 
 
     // Write to file:
     iodata datatowrite(1, 1, true, {});
-    for (int m = 0; m < xcoords.size(); m++)
+    for (size_t m = 0; m < xcoords.size(); m++)
     {
         int numlines = xcoords[m].size();
         if (numlines == 0)
@@ -1168,7 +1168,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 
 void expression::reuseit(bool istobereused)
 {
-    for (int i = 0; i < myoperations.size(); i++)
+    for (size_t i = 0; i < myoperations.size(); i++)
     {
         if (myoperations[i]->isdofincluded() == false && myoperations[i]->istfincluded() == false)
             myoperations[i]->reuseit(istobereused);
@@ -1281,13 +1281,15 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     // Define the rotation matrices needed:
     expression R,RT,K,KT,invK,invKT;
     
-    if (leftop != "" && leftop[0] == 'R' || rightop != "" && rightop[0] == 'R')
+    if ((leftop != "" && leftop[0] == 'R') ||
+        (rightop != "" && rightop[0] == 'R'))
     {
         R = mathop::rotation(ax, ay, az)[0];
         RT = mathop::transpose(R);   
     }
         
-    if (leftop != "" && leftop[0] == 'K' || rightop != "" && rightop[0] == 'K')
+    if ((leftop != "" && leftop[0] == 'K') ||
+        (rightop != "" && rightop[0] == 'K'))
     {
         std::vector<expression> Ks = mathop::rotation(ax, ay, az, "voigt");
         K = Ks[0]; invK = Ks[1];
@@ -1334,7 +1336,7 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     if (rightop == "K-T")
         rotated = rotated*invKT;
         
-    for (int i = 0; i < rotated.myoperations.size(); i++)
+    for (size_t i = 0; i < rotated.myoperations.size(); i++)
         rotated.myoperations[i] = rotated.myoperations[i]->simplify({});
     
     myoperations = rotated.myoperations;
@@ -1821,9 +1823,9 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
             
             std::vector<std::shared_ptr<operation>> allterms = {};
-            for (int m = 0; m < dofs.size(); m++)
+            for (size_t m = 0; m < dofs.size(); m++)
             {
-                for (int n = 0; n < dofs[m].size(); n++)
+                for (size_t n = 0; n < dofs[m].size(); n++)
                 {
                     // The coefficient is a new opon object:
                     std::shared_ptr<operation> curcoef(new opon(physreg, coordshift, coeffs[m][n]->copy(), errorifnotfound));
@@ -1907,7 +1909,7 @@ expression expression::invjac(void)
             else
                 return expression(3,3,{invjac(0,0),invjac(0,1),0,   invjac(1,0),invjac(1,1),0,   0,0,1});
         }
-        case 3:
+        default:
             return expression(3,3,{invjac(0,0),invjac(0,1),invjac(0,2),   invjac(1,0),invjac(1,1),invjac(1,2),   invjac(2,0),invjac(2,1),invjac(2,2)});
     }
 }
@@ -1926,7 +1928,7 @@ expression expression::jac(void)
             else
                 return expression(3,3,{jac(0,0),jac(0,1),0,   jac(1,0),jac(1,1),0,   0,0,1});
         }
-        case 3:
+        default:
             return expression(3,3,{jac(0,0),jac(0,1),jac(0,2),   jac(1,0),jac(1,1),jac(1,2),   jac(2,0),jac(2,1),jac(2,2)});
     }
 }
@@ -1988,7 +1990,7 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
         sumterms = {myoperations[0]};
 
     // Loop on all elementary sum terms in the formulation:
-    for (int i = 0; i < sumterms.size(); i++)
+    for (size_t i = 0; i < sumterms.size(); i++)
     {
         // Deal with the very specific case of a tf() term without
         // coefficient by multiplying it by a constant 1 to get a product:
@@ -2046,7 +2048,7 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             // Know which slice (i.e. dof field-tf field combination) we are at.
             // In a given slice all dofs and tfs must be defined on the same physical region!
             int currentslice = -1;
-            for (int slice = 0; slice < tfs.size(); slice++)
+            for (size_t slice = 0; slice < tfs.size(); slice++)
             {
                 // The pointed field, the physical region and the time derivative must be identical:
                 if (dofs[slice][0]->getfieldpointer() == currentdof->getfieldpointer() && tfs[slice][0]->getfieldpointer() == currenttf->getfieldpointer() && dofs[slice][0]->getphysicalregion() == currentdof->getphysicalregion() && tfs[slice][0]->getphysicalregion() == currenttf->getphysicalregion() && dofs[slice][0]->gettimederivative() == currentdof->gettimederivative() && tfs[slice][0]->gettimederivative() == currenttf->gettimederivative())
@@ -2110,12 +2112,12 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             }
 
             // Find the appropriate indexes in the current slice to put the split terms:
-            for (int term = 0; term < currenttfsplit.size(); term++)
+            for (size_t term = 0; term < currenttfsplit.size(); term++)
             {
                 // In the current slice find the entry at which to
                 // add the current coef, tf and dof (if existing).
                 int currententry = -1;
-                for (int entry = 0; entry < tfs[currentslice].size(); entry++)
+                for (size_t entry = 0; entry < tfs[currentslice].size(); entry++)
                 {
                     if (dofs[currentslice][entry]->getformfunctioncomponent() == currentdofsplit[term]->getformfunctioncomponent() && dofs[currentslice][entry]->getkietaphiderivative() == currentdofsplit[term]->getkietaphiderivative() && tfs[currentslice][entry]->getformfunctioncomponent() == currenttfsplit[term]->getformfunctioncomponent() && tfs[currentslice][entry]->getkietaphiderivative() == currenttfsplit[term]->getkietaphiderivative())
                     {

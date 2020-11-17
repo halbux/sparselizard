@@ -8,7 +8,7 @@ opfieldorder::opfieldorder(std::shared_ptr<rawfield> fieldin, double alpha, doub
     mythreshold = absthres;
 }
 
-std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -60,7 +60,7 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
     return {{},{output}};
 }
 
-densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -127,4 +127,3 @@ void opfieldorder::print(void)
     myfield->print();
     std::cout << ")";
 }
-

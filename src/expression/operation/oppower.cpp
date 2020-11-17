@@ -71,7 +71,7 @@ std::vector<double> oppower::evaluate(std::vector<double>& xcoords, std::vector<
     std::vector<double> evaluatedbase = mybase->evaluate(xcoords, ycoords, zcoords);
     std::vector<double> evaluatedexponent = myexponent->evaluate(xcoords, ycoords, zcoords);
 
-    for (int i = 0; i < xcoords.size(); i++)
+    for (size_t i = 0; i < xcoords.size(); i++)
         evaluatedbase[i] = std::pow(evaluatedbase[i], evaluatedexponent[i]);
     return evaluatedbase;
 }

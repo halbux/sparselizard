@@ -34,7 +34,7 @@ void opfield::increasetimederivativeorder(int amount)
     }
 }
 
-bool opfield::isharmonicone(std::vector<int> disjregs)
+bool opfield::isharmonicone(std::vector<int> disjregs)                // FIXME: use disjregs?
 {
     std::vector<int> myharms = myfield->getharmonics();
     return (myharms.size() == 1 && myharms[0] == 1);
@@ -120,13 +120,13 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             // Computing the x, y and z derivatives for all harmonics based on the
             // Jacobian matrix and the computed ki, eta and phi derivatives.
             // Skip the sin0 harmonic.
-            for (int harm = 1; harm < dkiargmat.size(); harm++)
+            for (size_t harm = 1; harm < dkiargmat.size(); harm++)
             {
                 // Skip any non existent harmonic:
                 if (dkiargmat[harm].size() == 0)
                     continue;
 
-                    dkiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,0));
+                dkiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,0));
                 if (elementdimension > 1)
                 {
                     detaargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,1));
@@ -177,7 +177,7 @@ bool opfield::isvalueorientationdependent(std::vector<int> disjregs)
     if (myfield->gettypename() == "x" || myfield->gettypename() == "y" || myfield->gettypename() == "z")
         return false;
 
-    for (int i = 0; i < disjregs.size(); i++)
+    for (size_t i = 0; i < disjregs.size(); i++)
     {
         int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjregs[i]);
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, myfield->gettypename());

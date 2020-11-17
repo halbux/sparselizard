@@ -3,13 +3,13 @@
 using namespace std;
 
 
-int hcurlpyramid::count(int order)
+int hcurlpyramid::count(int)
 {
     std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
     abort();  
 }
 
-int hcurlpyramid::count(int order, int dim, int num)
+int hcurlpyramid::count(int, int, int)
 {
     std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
     abort();  
@@ -17,8 +17,8 @@ int hcurlpyramid::count(int order, int dim, int num)
 
 
 
-hierarchicalformfunctioncontainer hcurlpyramid::evalat(int maxorder) 
-{    
+hierarchicalformfunctioncontainer hcurlpyramid::evalat(int)
+{
     std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
     abort();  
 }

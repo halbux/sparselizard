@@ -33,7 +33,7 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
     std::vector<double>* nodecoordinates = mynodes.getcoordinates();
     // Renumbering in case the numbers are not consecutive/not starting from 0:
     std::vector<int> noderenumbering(maxnodetag+1);
-    for (int i = 0; i < coords.size(); i++)
+    for (size_t i = 0; i < coords.size(); i++)
         nodecoordinates->at(i) = coords[i];
     for (int i = 0; i < numberofnodes; i++)
         noderenumbering[nodeTags[i]] = i;
@@ -75,14 +75,14 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
         physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(dim+1) + currentphysicalregionnumber);
         
         // Loop on all entities in the physical region:
-        for (int j = 0; j < entitiesinphysreg[i].size(); j++)
+        for (size_t j = 0; j < entitiesinphysreg[i].size(); j++)
         {
             std::vector<std::vector<std::size_t>> elemnodeTags, elementTags;
             std::vector<int> elementTypes;
 
             gmsh::model::mesh::getElements(elementTypes, elementTags, elemnodeTags, dim, entitiesinphysreg[i][j]);
 
-            for (int t = 0; t < elementTypes.size(); t++)
+            for (size_t t = 0; t < elementTypes.size(); t++)
             {
                 int currentcurvedelementtype = convertgmshelementtypenumber(elementTypes[t]);
                 element elementobject(currentcurvedelementtype);
@@ -91,8 +91,8 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
                 int curvatureorder = elementobject.getcurvatureorder();
                 int numcurvednodes = elementobject.countcurvednodes();
                 std::vector<int> nodesincurrentelement(numcurvednodes);
-                    
-                for (int e = 0; e < elementTags[t].size(); e++)
+
+                for (size_t e = 0; e < elementTags[t].size(); e++)
                 {
                     for (int n = 0; n < numcurvednodes; n++)
                         nodesincurrentelement[n] = noderenumbering[ elemnodeTags[t][e*numcurvednodes+n] ];
@@ -140,7 +140,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         }
 
         // Move to the node section and read the number of nodes:
-        int numberofnodes;
+        int numberofnodes;                                            // FIXME: set default
         while (std::getline(meshfile, currentline))
         {
             myalgorithm::osclean(currentline);
@@ -189,7 +189,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         int elementindexincurrenttype = 0;
         std::vector<int> nodesinpreviouselement = {};
 
-        for (int i = 0; i < numberofelements; i++)
+        for (int i = 0; i < numberofelements; i++)                    // FIXME: set numberofelements default
         {
             std::getline(meshfile, currentline);
             myalgorithm::osclean(currentline);
@@ -296,7 +296,7 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
             std::vector<int> alldisjointregions = physicalregionobject->getdisjointregions();
 
             // Iterate on all disjoint regions in the physical region:
-            for (int h = 0; h < alldisjointregions.size(); h++)
+            for (size_t h = 0; h < alldisjointregions.size(); h++)
             {
                 // Get the unique element type in the disjoint region:
                 int typenumber = mydisjointregions.getelementtypenumber(alldisjointregions[h]);
@@ -346,7 +346,7 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
     std::vector<int> activeelementtypes = datatowrite.getactiveelementtypes();
     
     // Loop on all active element types:
-    for (int i = 0; i < activeelementtypes.size(); i++)
+    for (size_t i = 0; i < activeelementtypes.size(); i++)
     {
         int elemtypenum = activeelementtypes[i];
         element myelement(elemtypenum);
@@ -509,23 +509,23 @@ void gmshinterface::writeinterpolationscheme(std::string name, std::vector<std::
     if (posfile.is_open())
     {
         posfile << "\nINTERPOLATION_SCHEME";
-        
-        for (int m = 0; m < poly.size(); m++)
+
+        for (size_t m = 0; m < poly.size(); m++)
         {
             posfile << "\n{\n";
             
             // Print the polynomial coefficients:
-            for (int p = 0; p < poly[m].size(); p++)
+            for (size_t p = 0; p < poly[m].size(); p++)
             {
                 posfile << "  {";
 
                 std::vector<std::vector<std::vector<double>>> polyformfunctions = poly[m][p].get();
 
-                for (int i = 0; i < polyformfunctions.size(); i++)
+                for (size_t i = 0; i < polyformfunctions.size(); i++)
                 {
-                    for (int j = 0; j < polyformfunctions[i].size(); j++)
+                    for (size_t j = 0; j < polyformfunctions[i].size(); j++)
                     {
-                        for (int k = 0; k < polyformfunctions[i][j].size(); k++)
+                        for (size_t k = 0; k < polyformfunctions[i][j].size(); k++)
                         {
                             if (i == polyformfunctions.size() - 1 && j == polyformfunctions[i].size() - 1 && k == polyformfunctions[i][j].size() - 1)
                                 posfile << polyformfunctions[i][j][k];
@@ -546,11 +546,11 @@ void gmshinterface::writeinterpolationscheme(std::string name, std::vector<std::
             // Print the list of monomials:
             std::vector<std::vector<std::vector<double>>> polyformfunctions = poly[m][0].get();
 
-            for (int i = 0; i < polyformfunctions.size(); i++)
+            for (size_t i = 0; i < polyformfunctions.size(); i++)
             {
-                for (int j = 0; j < polyformfunctions[i].size(); j++)
+                for (size_t j = 0; j < polyformfunctions[i].size(); j++)
                 {
-                    for (int k = 0; k < polyformfunctions[i][j].size(); k++)
+                    for (size_t k = 0; k < polyformfunctions[i][j].size(); k++)
                     {
                         posfile << "  {" << i << "," << j << "," << k << "}";
                         if (i == polyformfunctions.size() - 1 && j == polyformfunctions[i].size() - 1 && k == polyformfunctions[i][j].size() - 1)
@@ -772,4 +772,5 @@ char gmshinterface::getelementidentifierinposformat(int ourtypenumber)
         case 7:
             return 'Y';
     }
+    throw std::invalid_argument("Unknown argument");
 }

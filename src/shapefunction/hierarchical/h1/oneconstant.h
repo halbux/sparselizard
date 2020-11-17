@@ -39,7 +39,7 @@ class oneconstant: public hierarchicalformfunction
         // If 'isorientationdependent' is false then the assembly can
         // be carried out without taking care of the element orientation.
         // This provides an assembly speedup.
-        bool isorientationdependent(int order) { return false; };
+        bool isorientationdependent(int) { return false; };
 };
 
 #endif

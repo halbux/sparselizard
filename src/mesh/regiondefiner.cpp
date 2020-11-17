@@ -56,7 +56,7 @@ void regiondefiner::defineskinregion(int regnum)
         }
 
         // All single occurences are skin elements:
-        for (int j = 0; j < numoccurences.size(); j++)
+        for (size_t j = 0; j < numoccurences.size(); j++)
         {
             if (numoccurences[j] == 1)
                 newphysreg->addelement(skinelemtype, j);
@@ -100,7 +100,7 @@ void regiondefiner::defineboxregion(int regnum)
                 continue;
 
             // Loop on all elements:
-            for (int elem = 0; elem < curelemtype->size(); elem++)
+            for (size_t elem = 0; elem < curelemtype->size(); elem++)
             {
                 int curelem = curelemtype->at(elem);
 
@@ -169,7 +169,7 @@ void regiondefiner::definesphereregion(int regnum)
                 continue;
 
             // Loop on all elements:
-            for (int elem = 0; elem < curelemtype->size(); elem++)
+            for (size_t elem = 0; elem < curelemtype->size(); elem++)
             {
                 int curelem = curelemtype->at(elem);
 
@@ -209,7 +209,7 @@ void regiondefiner::defineexclusionregion(int regnum)
         
     // Make sure the regions are of same dimension:
     int physregdim = myphysicalregions->get(toexcludefrom[regnum])->getelementdimension();
-    for (int i = 0; i < toexclude[regnum].size(); i++)
+    for (size_t i = 0; i < toexclude[regnum].size(); i++)
     {
         int curdim = myphysicalregions->get(toexclude[regnum][i])->getelementdimension();
         if (curdim != physregdim)
@@ -235,21 +235,21 @@ void regiondefiner::defineexclusionregion(int regnum)
         int numelemsintype = myelements->count(i);
         std::vector<bool> inexcluded(numelemsintype, false);
         // First add all elements from which to exclude:
-        for (int e = 0; e < curelemtype->size(); e++)
+        for (size_t e = 0; e < curelemtype->size(); e++)
             inexcluded[curelemtype->at(e)] = true;
 
         // Now remove the elements to exclude:
-        for (int j = 0; j < toexclude[regnum].size(); j++)
+        for (size_t j = 0; j < toexclude[regnum].size(); j++)
         {
             physicalregion* curtoexclude = myphysicalregions->get(toexclude[regnum][j]);
             std::vector<int>* curelemtypetoexclude = &(curtoexclude->getelementlist()->at(i));
 
-            for (int e = 0; e < curelemtypetoexclude->size(); e++)
+            for (size_t e = 0; e < curelemtypetoexclude->size(); e++)
                 inexcluded[curelemtypetoexclude->at(e)] = false;
         }
 
         // All trues must be added:
-        for (int j = 0; j < inexcluded.size(); j++)
+        for (size_t j = 0; j < inexcluded.size(); j++)
         {
             if (inexcluded[j])
                 newphysreg->addelement(i, j);
@@ -456,7 +456,7 @@ bool regiondefiner::isanyregiondefined(void)
 
 bool regiondefiner::isanycoordinatedependentregiondefined(void)
 {
-    for (int i = 0; i < mypriority.size(); i++)
+    for (size_t i = 0; i < mypriority.size(); i++)
     {
         if (mypriority[i][0] == 1 || mypriority[i][0] == 2)
             return true;
@@ -468,7 +468,7 @@ bool regiondefiner::isanycoordinatedependentregiondefined(void)
 
 void regiondefiner::defineregions(void)
 {
-    for (int i = 0; i < mypriority.size(); i++)
+    for (size_t i = 0; i < mypriority.size(); i++)
     {
         if (mypriority[i][0] == 0)
             defineskinregion(mypriority[i][1]);

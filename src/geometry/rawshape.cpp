@@ -35,7 +35,7 @@ void rawshape::move(expression xmove, expression ymove, expression zmove, bool r
     if (recursively)
     {
         std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
-        for (int i = 0; i < subshapes.size(); i++)
+        for (size_t i = 0; i < subshapes.size(); i++)
             subshapes[i]->move(xmove, ymove, zmove, false);
     }
 }
@@ -58,7 +58,7 @@ void rawshape::shift(double shiftx, double shifty, double shiftz, bool recursive
     if (recursively)
     {
         std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
-        for (int i = 0; i < subshapes.size(); i++)
+        for (size_t i = 0; i < subshapes.size(); i++)
             subshapes[i]->shift(shiftx, shifty, shiftz, false);
     }
 }
@@ -81,7 +81,7 @@ void rawshape::scale(double scalex, double scaley, double scalez, bool recursive
     if (recursively)
     {
         std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
-        for (int i = 0; i < subshapes.size(); i++)
+        for (size_t i = 0; i < subshapes.size(); i++)
             subshapes[i]->scale(scalex, scaley, scalez, false);
     }
 }
@@ -98,13 +98,13 @@ void rawshape::rotate(double alphax, double alphay, double alphaz, bool recursiv
     if (recursively)
     {
         std::vector<rawshape*> subshapes = geotools::unique(geotools::getpointers(getsubshapesrecursively()));
-        for (int i = 0; i < subshapes.size(); i++)
+        for (size_t i = 0; i < subshapes.size(); i++)
             subshapes[i]->rotate(alphax, alphay, alphaz, false);
     }
 }
 
 
-std::shared_ptr<rawshape> rawshape::extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection)
+std::shared_ptr<rawshape> rawshape::extrude(int, double, int, std::vector<double>)
 {
     std::cout << "Error in 'rawshape' object: 'extrude' has not been defined for this shape" << std::endl;
     abort(); 
@@ -122,7 +122,7 @@ void rawshape::flip(void)
     abort(); 
 }
 
-void rawshape::setphysicalregion(int physreg) 
+void rawshape::setphysicalregion(int)
 {
     std::cout << "Error in 'rawshape' object: 'setphysicalregion' has not been defined for this shape" << std::endl;
     abort(); 
@@ -159,13 +159,13 @@ std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapesrecursively(void)
     std::vector<std::shared_ptr<rawshape>> subshapes = getsubshapes();
 
     int index = 0;
-    for (int i = 0; i < subshapes.size(); i++)
+    for (size_t i = 0; i < subshapes.size(); i++)
     {
         output[index] = subshapes[i];
         index++;
 
         std::vector<std::shared_ptr<rawshape>> toappend = subshapes[i]->getsubshapesrecursively();
-        for (int j = 0; j < toappend.size(); j++)
+        for (size_t j = 0; j < toappend.size(); j++)
             output[index+j] = toappend[j];
         index += toappend.size();
     }
@@ -173,7 +173,7 @@ std::vector<std::shared_ptr<rawshape>> rawshape::getsubshapesrecursively(void)
     return output;
 }
 
-void rawshape::setsubshapes(std::vector<std::shared_ptr<rawshape>> subshapes)
+void rawshape::setsubshapes(std::vector<std::shared_ptr<rawshape>>)
 {
     std::cout << "Error in 'rawshape' object: 'setsubshapes' has not been defined for this shape" << std::endl;
     abort(); 
@@ -212,7 +212,7 @@ int rawshape::countsubshapesrecursively(void)
 
     int numsubshapes = subshapes.size();
 
-    for (int i = 0; i < subshapes.size(); i++)
+    for (size_t i = 0; i < subshapes.size(); i++)
         numsubshapes += subshapes[i]->countsubshapesrecursively();
 
     return numsubshapes;
@@ -236,7 +236,7 @@ void rawshape::replicatelinks(std::shared_ptr<rawshape> origin)
     std::vector<std::shared_ptr<rawshape>> linkedsubshapes(reorderingvector.size());
 
     linkedsubshapes[reorderingvector[0]] = subshapes[reorderingvector[0]];
-    for (int i = 1; i < reorderingvector.size(); i++)
+    for (size_t i = 1; i < reorderingvector.size(); i++)
     {
         if (originsubshapes[reorderingvector[i]] != originsubshapes[reorderingvector[i-1]])
             linkedsubshapes[reorderingvector[i]] = subshapes[reorderingvector[i]];
@@ -277,6 +277,3 @@ void rawshape::mesh(void)
     std::cout << "Error in 'rawshape' object: 'mesh' has not been defined for this shape" << std::endl;
     abort();
 }
-
-
-

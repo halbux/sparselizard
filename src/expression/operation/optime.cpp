@@ -1,7 +1,7 @@
 #include "optime.h"
 
 
-std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     if (universe::fundamentalfrequency != -1)
     {
@@ -13,7 +13,7 @@ std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elems
     return {{},{output}};
 }
 
-densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)

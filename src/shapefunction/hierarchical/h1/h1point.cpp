@@ -11,7 +11,7 @@ int h1point::count(int order)
     return 1;
 }
 
-int h1point::count(int order, int dim, int num)
+int h1point::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,15 +32,15 @@ int h1point::count(int order, int dim, int num)
         case 2:
             return 0;
         // Volume based form functions:
-        case 3:
+        default:
             return 0;
     }
 }
 
 
 
-hierarchicalformfunctioncontainer h1point::evalat(int maxorder) 
-{    
+hierarchicalformfunctioncontainer h1point::evalat(int maxorder) // TODO: use maxorder
+{
     element point("point");
     hierarchicalformfunctioncontainer val("h1", point.gettypenumber());
 

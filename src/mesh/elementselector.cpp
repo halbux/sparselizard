@@ -16,8 +16,8 @@ void elementselector::prepare(bool isorientationdependent)
         std::vector<int> disjointregionsbackup = disjointregions;
         std::vector<int> elemsbackup = elems;
         std::vector<int> originalindexesbackup = originalindexes;
-        
-        for (int i = 0; i < totalorientations.size(); i++)
+
+        for (size_t i = 0; i < totalorientations.size(); i++)
         {
             totalorientations[i] = totalorientationsbackup[renumberingvector[i]];
             disjointregions[i] = disjointregionsbackup[renumberingvector[i]];
@@ -34,7 +34,8 @@ void elementselector::prepare(bool isorientationdependent)
         currentrangeend = totalorientations.size() - 1;
     else
     {
-        while (currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
+        while (((size_t) currentrangeend < totalorientations.size()) &&
+               (totalorientations[currentrangeend] == currenttotalorientation))
             currentrangeend++;
         currentrangeend--;
     }   
@@ -49,7 +50,7 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
 
     // Get the total number of elements in all disjoint regions for preallocation.
     int totalnumberofelements = 0;
-    for (int i = 0; i < mydisjointregionnumbers.size(); i++)
+    for (size_t i = 0; i < mydisjointregionnumbers.size(); i++)
         totalnumberofelements += universe::mymesh->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
     
     // Create 'disjointregions', 'totalorientations' and 'elems':
@@ -61,7 +62,7 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
     
     int currentindex = 0;
     elements* myelements = universe::mymesh->getelements();
-    for (int i = 0; i < mydisjointregionnumbers.size(); i++)
+    for (size_t i = 0; i < mydisjointregionnumbers.size(); i++)
     {
         int numelemindisjreg = universe::mymesh->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
         int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[i]);
@@ -95,7 +96,7 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, std::ve
     int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
     
     elements* myelements = universe::mymesh->getelements();
-    for (int i = 0; i < elemnums.size(); i++)
+    for (size_t i = 0; i < elemnums.size(); i++)
     {
         disjointregions[i] = myelements->getdisjointregion(myelementtypenumber, elemnums[i]);
         totalorientations[i] = myelements->gettotalorientation(myelementtypenumber, elemnums[i]);
@@ -119,13 +120,13 @@ bool elementselector::next(void)
 {
     currentrangebegin = currentrangeend+1;
     currentrangeend++;
-    
-    if (currentrangebegin >= totalorientations.size())
+
+    if ((size_t) currentrangebegin >= totalorientations.size())
         return false;
     
     currenttotalorientation = totalorientations[currentrangebegin];
-    
-    while (currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
+
+    while ((size_t) currentrangeend < totalorientations.size() && totalorientations[currentrangeend] == currenttotalorientation)
         currentrangeend++;
     currentrangeend--;
     
@@ -149,7 +150,7 @@ void elementselector::selectdisjointregions(std::vector<int> disjregs)
 
 int elementselector::countinselection(void)
 {
-    if (currentrangebegin >= totalorientations.size())
+    if ((size_t) currentrangebegin >= totalorientations.size())
         return 0;
     else
     {
@@ -160,7 +161,7 @@ int elementselector::countinselection(void)
         {
             // 'isdisjregrequested[disjreg]' is true if disjreg is in 'selecteddisjointregions'.
             std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
-            for (int i = 0; i < selecteddisjointregions.size(); i++)
+            for (size_t i = 0; i < selecteddisjointregions.size(); i++)
                 isdisjregrequested[selecteddisjointregions[i]] = true;
             
             int numinselection = 0;
@@ -189,7 +190,7 @@ std::vector<int> elementselector::getelementnumbers(void)
     {
         // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
         std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
-        for (int i = 0; i < selecteddisjointregions.size(); i++)
+        for (size_t i = 0; i < selecteddisjointregions.size(); i++)
             isdisjregrequested[selecteddisjointregions[i]] = true;
         
         int index = 0;
@@ -220,7 +221,7 @@ std::vector<int> elementselector::getelementindexes(void)
     {
         // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
         std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
-        for (int i = 0; i < selecteddisjointregions.size(); i++)
+        for (size_t i = 0; i < selecteddisjointregions.size(); i++)
             isdisjregrequested[selecteddisjointregions[i]] = true;
         
         int index = 0;
@@ -251,7 +252,7 @@ std::vector<int> elementselector::getoriginalindexes(void)
     {
         // 'isdisjregrequested[disjreg]' is true if disjreg is in 'disjregs'.
         std::vector<bool> isdisjregrequested(*std::max_element(mydisjointregionnumbers.begin(), mydisjointregionnumbers.end())+1, false);
-        for (int i = 0; i < selecteddisjointregions.size(); i++)
+        for (size_t i = 0; i < selecteddisjointregions.size(); i++)
             isdisjregrequested[selecteddisjointregions[i]] = true;
         
         int index = 0;
@@ -299,5 +300,3 @@ elementselector elementselector::extractselection(void)
     
     return extracted;
 }
-
-

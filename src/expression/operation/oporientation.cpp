@@ -1,7 +1,7 @@
 #include "oporientation.h"
 
 
-std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression*)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -50,7 +50,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         
         // Select the cell which is in 'myphysreg':
         int numfound = 0;
-        for (int c = 0; c < cellstouching.size()/2; c++)
+        for (size_t c = 0; c < cellstouching.size()/2; c++)
         {
             int ctt = cellstouching[2*c+0];
             int ctn = cellstouching[2*c+1];
@@ -83,7 +83,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     intdensematrix celltypmat(celltypes.size(), 1, celltypes);
     std::vector<std::vector<int>> indexes = celltypmat.findalloccurences(8);
     
-    for (int t = 0; t < indexes.size(); t++)
+    for (size_t t = 0; t < indexes.size(); t++)
     {
         if (indexes[t].size() == 0)
             continue;
@@ -97,7 +97,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         // 1D must be treated differently:
         if (problemdimension == 1)
         {
-            for (int i = 0; i < indexes[t].size(); i++)
+            for (size_t i = 0; i < indexes[t].size(); i++)
             {
                 int cornera, cornerb;
                 cornera = els->getsubelement(0, 1, cellnumsintype[i], 0);
@@ -128,14 +128,14 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         
         double* subdetjacptr = subdetjac.getvalues();
         
-        for (int i = 0; i < indexes[t].size(); i++)
+        for (size_t i = 0; i < indexes[t].size(); i++)
         {
             bool isflip = isflipped[i];
             bool ispos = (subdetjacptr[i] > 0);
             if (problemdimension == 2)
                 ispos = not(ispos);
             
-            if (ispos && isflip || not(ispos) && not(isflip))
+            if ((ispos && isflip) || (not(ispos) && not(isflip)))
                 outptr[indexes[t][i]] = -1;
         }
     }

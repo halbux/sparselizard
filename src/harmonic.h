@@ -37,6 +37,6 @@ namespace harmonic
     double getderivationfactor(int timederivativeorder, int harm);
     // Apply the time derivative to 'input':
     std::vector<std::vector<densematrix>> timederivative(int timederivativeorder, std::vector<std::vector<densematrix>> input);
-};
+}
 
 #endif

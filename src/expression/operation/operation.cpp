@@ -1,7 +1,7 @@
 #include "operation.h"
 
 
-std::vector<std::vector<densematrix>> operation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densematrix>> operation::interpolate(elementselector&, std::vector<double>&, expression*)
 {
     std::cout << "Error in 'operation' object: cannot interpolate the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> operation::interpolate(elementselector& el
     abort();
 }
 
-densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densematrix operation::multiharmonicinterpolate(int, elementselector&, std::vector<double>&, expression*)
 {
     std::cout << "Error in 'operation' object: cannot interpolate the multiharmonic operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -19,7 +19,7 @@ densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselecto
     abort();
 }
 
-std::vector<std::vector<densematrix>> operation::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densematrix>> operation::interpolate(int, elementselector&, std::vector<double>&)
 {
     std::cout << "Error in 'operation' object: expression provided for mesh deformation is invalid" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -34,7 +34,7 @@ bool operation::isdofincluded(void)
 { 
     std::vector<std::shared_ptr<operation>> arguments = getarguments();
 
-    for (int i = 0; i < arguments.size(); i++)
+    for (size_t i = 0; i < arguments.size(); i++)
     {
         if (arguments[i]->isdofincluded())
             return true;
@@ -45,8 +45,8 @@ bool operation::isdofincluded(void)
 bool operation::istfincluded(void)
 { 
     std::vector<std::shared_ptr<operation>> arguments = getarguments();
-    
-    for (int i = 0; i < arguments.size(); i++)
+
+    for (size_t i = 0; i < arguments.size(); i++)
     {
         if (arguments[i]->istfincluded())
             return true;
@@ -57,8 +57,8 @@ bool operation::istfincluded(void)
 bool operation::isharmonicone(std::vector<int> disjregs)
 {
     std::vector<std::shared_ptr<operation>> arguments = getarguments();
-    
-    for (int i = 0; i < arguments.size(); i++)
+
+    for (size_t i = 0; i < arguments.size(); i++)
     {
         if (arguments[i]->isharmonicone(disjregs) == false)
             return false;
@@ -92,8 +92,8 @@ bool operation::isreused(void)
     std::cout << std::endl;
     abort();
 }
-        
-void operation::setspacederivative(int whichderivative)
+
+void operation::setspacederivative(int)
 {
     std::cout << "Error in 'operation' object: either you are trying to apply a space derivative to something else than fields, dof() and tf() or the field does not allow this kind of space derivative" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -102,7 +102,7 @@ void operation::setspacederivative(int whichderivative)
     abort();
 }   
 
-void operation::setkietaphiderivative(int whichderivative)
+void operation::setkietaphiderivative(int)
 {
     std::cout << "Error in 'operation' object: can only apply reference-element space derivatives to fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -111,7 +111,7 @@ void operation::setkietaphiderivative(int whichderivative)
     abort();
 }   
 
-void operation::increasetimederivativeorder(int derivativeorder)
+void operation::increasetimederivativeorder(int)
 {
     std::cout << "Error in 'operation' object: can only apply time derivatives to fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -126,7 +126,7 @@ bool operation::isvalueorientationdependent(std::vector<int> disjregs)
     
     if (arguments.size() > 0)
     {
-        for (int i = 0; i < arguments.size(); i++)
+        for (size_t i = 0; i < arguments.size(); i++)
         {
             if (arguments[i]->isvalueorientationdependent(disjregs))
                 return true;
@@ -135,7 +135,7 @@ bool operation::isvalueorientationdependent(std::vector<int> disjregs)
     return false;
 }
 
-std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+std::vector<double> operation::evaluate(std::vector<double>&, std::vector<double>&, std::vector<double>&)
 {
     std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -143,5 +143,3 @@ std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vecto
     std::cout << std::endl;
     abort();
 }
-        
-

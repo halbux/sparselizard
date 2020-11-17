@@ -59,7 +59,7 @@ void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, do
     // First compute the max(abs()) of all harmonics:
     std::vector<double> maxabs(input.size(), 0);
     
-    for (int harm = 1; harm < input.size(); harm++)
+    for (size_t harm = 1; harm < input.size(); harm++)
     {
         if (input[harm].size() > 0)
             maxabs[harm] = input[harm][0].maxabs();
@@ -67,14 +67,14 @@ void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, do
     
     // Compute the overall harm max:
     double harmmax = 0;
-    for (int i = 1; i < input.size(); i++)
+    for (size_t i = 1; i < input.size(); i++)
     {
         if (maxabs[i] > harmmax)
             harmmax = maxabs[i];
     }
     
     // Kill the too small harmonics:
-    for (int harm = 1; harm < input.size(); harm++)
+    for (size_t harm = 1; harm < input.size(); harm++)
     {
         if (input[harm].size() > 0 && (maxabs[harm] == 0 || maxabs[harm] < threshold*harmmax))
             input[harm] = {};
@@ -93,7 +93,7 @@ densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int 
     densematrix sincoseval(numtimevals,1);
     double* valvec = sincoseval.getvalues();
     
-    for (int harm = 1; harm < input.size(); harm++)
+    for (size_t harm = 1; harm < input.size(); harm++)
     {
         if (input[harm].size() != 0)
         {
@@ -143,19 +143,19 @@ void myfft::sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& no
         return;
 
     int maxlen = notsame[0].size();
-    for (int i = 1; i < notsame.size(); i++)
+    for (size_t i = 1; i < notsame.size(); i++)
     {
-        if (notsame[i].size() > maxlen)
+        if (notsame[i].size() > (size_t) maxlen)
             maxlen = notsame[i].size();
     }
     // Make sure the length of all notsame[i] is the same:
-    for (int i = 0; i < notsame.size(); i++)
+    for (size_t i = 0; i < notsame.size(); i++)
         notsame[i].resize(maxlen);
         
     for (int h = 0; h < maxlen; h++)
     {
         int curnumrows = -1, curnumcols = -1;
-        for (int i = 0; i < notsame.size(); i++)
+        for (size_t i = 0; i < notsame.size(); i++)
         {
             if (notsame[i][h].size() == 1)
             {
@@ -168,7 +168,7 @@ void myfft::sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& no
             continue;
             
         // Fill with full zero if an entry is missing:
-        for (int i = 0; i < notsame.size(); i++)
+        for (size_t i = 0; i < notsame.size(); i++)
         {
             if (notsame[i][h].size() == 0)
                 notsame[i][h] = {densematrix(curnumrows, curnumcols, 0.0)};

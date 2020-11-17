@@ -200,10 +200,10 @@ int htracker::next(void)
             int ind = 0;
             for (int i = 0; i < 8; i++)
             {
-                for (int j = 0; j < cornerrefcoords[i].size()/nn[i]/3; j++)
+                for (size_t j = 0; j < cornerrefcoords[i].size()/nn[i]/3; j++)
                 {
                     std::vector<double> cc(3*nn[i]);
-                    for (int k = 0; k < cc.size(); k++)
+                    for (size_t k = 0; k < cc.size(); k++)
                         cc[k] = cornerrefcoords[i][j*3*nn[i]+k];
                     
                     parentrefcoords[currentdepth+1][ind] = myelems[t].calculatecoordinates(cc, parentrefcoords[currentdepth][ic]);
@@ -450,7 +450,7 @@ void htracker::adapt(std::vector<int>& operations)
 {
     // Calculate an upper bound for the size of the new 'splitdata' vector:
     int upperbound = splitdata.size();
-    for (int i = 0; i < operations.size(); i++)
+    for (size_t i = 0; i < operations.size(); i++)
     {
         if (operations[i] == 1)
             upperbound += 10; // 10 is the max size increase in a split
@@ -579,8 +579,9 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
     {
         int t = parenttypes[currentdepth];
         int ns = currentdepth;
-        int ic = indexesinclusters[currentdepth];
-    
+        // int ic = indexesinclusters[currentdepth];
+        // TODO: how ic was used?
+
         if (withphysicals && ns == 0)
             oc = myelements->getnodecoordinates(t, origindexintype);
     
@@ -592,8 +593,8 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
             std::vector<double> physcoords;
             if (withphysicals)
                 physcoords = myelems[parenttypes[0]].calculatecoordinates(refcoords, oc, 0, ns == 0);
-            
-            for (int i = 0; i < refcoords.size(); i++)
+
+            for (size_t i = 0; i < refcoords.size(); i++)
             {
                 arc[t][iarc[t]+i] = refcoords[i];
                 if (withphysicals)
@@ -624,7 +625,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
-    std:vector<bool> isedgesplit;
+    std::vector<bool> isedgesplit;
     myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
     
 
@@ -685,8 +686,8 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
         
             std::vector<double> splitrefcoords;
             myelems[t].numstorefcoords(splitrefnums[si], splitrefcoords);
-        
-            for (int se = 0; se < splitrefcoords.size()/nn[si]/3; se++)
+
+            for (size_t se = 0; se < splitrefcoords.size()/nn[si]/3; se++)
             {
                 // Get the ref. coords. of the current transition element:
                 std::vector<double> curcoords(3*nn[si]);
@@ -695,8 +696,8 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
         
                 // Bring inside the untransitioned element (if split at all):
                 curcoords = myelems[t].calculatecoordinates(curcoords, cornerarc[t], iarc[t], splitnum == 0);
-                
-                for (int i = 0; i < curcoords.size(); i++)
+
+                for (size_t i = 0; i < curcoords.size(); i++)
                     transitionsrefcoords[si][3*nn[si]*ite[si]+i] = curcoords[i];
                 
                 // Make curved:
@@ -706,7 +707,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
                 // Calculate actual coordinates: 
                 curcoords = mycurvedelems[parenttypes[0]].calculatecoordinates(curcoords, oc, 0);
 
-                for (int i = 0; i < curcoords.size(); i++)
+                for (size_t i = 0; i < curcoords.size(); i++)
                     ac[si][3*ncn[si]*ite[si]+i] = curcoords[i];
                     
                 leavesoftransitions[si][ite[si]] = ln;
@@ -791,7 +792,7 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
         // This is needed because .size() gives an unsigned int --> .size()-1 underflows
         if (ad[i].size() == 0)
             continue;
-        for (int j = 0; j < ad[i].size()-1; j++)
+        for (size_t j = 0; j < ad[i].size()-1; j++)
         {
             int origelem = oen[leavesoftransitions[i][j]];
             cnt[origelem] += ad[i][j+1]-ad[i][j];
@@ -808,7 +809,7 @@ void htracker::tooriginal(std::vector<std::vector<int>>& ad, std::vector<std::ve
         // This is needed because .size() gives an unsigned int --> .size()-1 underflows
         if (ad[i].size() == 0)
             continue;
-        for (int j = 0; j < ad[i].size()-1; j++)
+        for (size_t j = 0; j < ad[i].size()-1; j++)
         {
             int nr = (ad[i][j+1]-ad[i][j])/3;
             
@@ -865,8 +866,9 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     {
         int t = parenttypes[currentdepth];
         int ns = currentdepth;
-        int ic = indexesinclusters[currentdepth];
-    
+        // int ic = indexesinclusters[currentdepth];
+        // TODO: how ic was used
+
         // Update 'actives':
         if (ns == 0)
         {
@@ -905,7 +907,8 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             // Loop on all transition elements of this leaf:
             for (int i = 0; i < 8; i++)
             {
-                while (ti[i] < leavesoftransitions[i].size() && leavesoftransitions[i][ti[i]] == ln)
+                while (((size_t) ti[i] < leavesoftransitions[i].size()) &&
+                       (leavesoftransitions[i][ti[i]] == ln))
                 {
                     // Get the reference coordinates of the current transition element:
                     std::vector<double> currefcoords(3*nn[i]);
@@ -941,8 +944,8 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                         polynomials syspolys = polys[i].sum(xyz);
                 
                         // Loop on all actives:
-                        for (int j = 0; j < activesintrans.size(); j++)
-                        {                        
+                        for (size_t j = 0; j < activesintrans.size(); j++)
+                        {
                             std::vector<double> kietaphi = {0.0,0.0,0.0};
                             std::vector<double> rhs = {orc[3*activesintrans[j]+0], orc[3*activesintrans[j]+1], orc[3*activesintrans[j]+2]};
                             
@@ -982,7 +985,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     }
     
     // Sanity check:
-    for (int i = 0; i < maporctorc.size(); i++)
+    for (size_t i = 0; i < maporctorc.size(); i++)
     {
         if (maporctorc[i] < 0)
         {
@@ -1033,7 +1036,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<st
         map[i] = std::vector<int>(trc[i].size()/3);
     
         int index = 0;
-        for (int j = 0; j < tad[i].size()-1; j++)
+        for (size_t j = 0; j < tad[i].size()-1; j++)
         {
             for (int k = 0; k < (tad[i][j+1]-tad[i][j])/3; k++)
             {
@@ -1053,8 +1056,8 @@ void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<st
         
         targettranselems[i] = std::vector<int>(2*nr);
         targetrefcoords[i] = std::vector<double>(3*nr);
-        
-        for (int j = 0; j < ad[i].size()-1; j++)
+
+        for (size_t j = 0; j < ad[i].size()-1; j++)
         {
             int pos = ad[i][j]/3;
             int userpos = userad[i][touser[i][j]]/3;
@@ -1170,9 +1173,9 @@ void htracker::print(void)
 {
     std::cout << "#leaves is " << numleaves << " | max #splits is " << maxdepth << std::endl;
 
-    for (int i = 0; i < splitdata.size(); i++)
+    for (size_t i = 0; i < splitdata.size(); i++)
         std::cout << splitdata[i];
-        
+
     std::cout << " (" << splitdata.size() << " bits)" << std::endl;
 }
 
@@ -1180,4 +1183,3 @@ int htracker::countbits(void)
 {
     return splitdata.size();
 }
-

@@ -43,7 +43,7 @@ int hcurlprism::count(int order, int dim, int num)
             else
                 return 2*order*(order+1);
         // Volume based form functions:
-        case 3:
+        default:
             return 1.5*(order+1)*order*(order-1);
     }
 }
@@ -218,12 +218,12 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                 // Define the nodes f1, f2, f3 and f4  in face [f1 f2 f3 f4]:
                 int f1 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][0]] + 1;
                 int f2 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][1]] + 1;
-                int f3 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][2]] + 1;
+                int f3 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][2]] + 1; // f3 is unused
                 int f4 = nodesinfaces[offset+4*quadfaceindex+reorderingtoreferencequadrangularfaceorientation[orientation][3]] + 1;
                 
                 int f2star;
                 // If mu[f1] = mu[f2]:
-                if (f1 <= 3 && f2 <= 3 || f1 > 3 && f2 > 3)
+                if (((f1 <= 3) && (f2 <= 3)) || ((f1 > 3) && (f2 > 3)))
                     f2star = f2;
                 else
                     f2star = f4;

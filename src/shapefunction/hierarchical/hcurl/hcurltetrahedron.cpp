@@ -13,7 +13,7 @@ int hcurltetrahedron::count(int order)
     return 0.5*(order-2)*(order-1)*(order+1) + 4*(order-1)*(order+1) + 6*(order+1);
 }
 
-int hcurltetrahedron::count(int order, int dim, int num)
+int hcurltetrahedron::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -41,7 +41,7 @@ int hcurltetrahedron::count(int order, int dim, int num)
         case 2:
             return (order-1)*(order+1);
         // Volume based form functions:
-        case 3:
+        default:
             return 0.5*(order-2)*(order-1)*(order+1);
     }
 }

@@ -75,6 +75,7 @@ int hierarchicalformfunctioniterator::getformfunctionorder(void)
         if (currentformfunctionindexinnodeedgefacevolume < myformfunction->count(i, currentdimension, currentnodeedgefacevolumeindex) )
             return i;
     }
+    throw std::logic_error("Unreachable");
 }
 
 int hierarchicalformfunctioniterator::getassociatedelementtype(void)
@@ -94,7 +95,7 @@ int hierarchicalformfunctioniterator::getassociatedelementtype(void)
             if (myelement.istriangularface(currentnodeedgefacevolumeindex))
                 return 2;
             return 3;
-        case 3:
+        default:
             // It is myelementtypenumber itself!
             return myelementtypenumber;
     }

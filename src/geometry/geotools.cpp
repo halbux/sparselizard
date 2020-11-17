@@ -82,6 +82,7 @@ double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::v
         return -180.0/pi*std::atan(-vnormal[1]/vnormal[2]);
     if (xy == "yrot")
         return 180.0/pi*std::atan(-vnormal[0]/vnormal[2]);
+    throw std::logic_error("Unreachable");
 }
 
 void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<double>* coords)
@@ -172,7 +173,7 @@ std::vector<std::shared_ptr<rawshape>> geotools::orient(std::vector<std::shared_
     else
         prevnodecoord = p3coord;
 
-    for (int i = 2; i < input.size(); i++)
+    for (size_t i = 2; i < input.size(); i++)
     {
         // Get the coordinates of the points in the current line:
         std::vector<double> p1c = *(input[i]->getsons()[0]->getcoords());
@@ -193,7 +194,7 @@ std::vector<std::shared_ptr<rawshape>> geotools::orient(std::vector<std::shared_
 
 
     // Flip the lines that must be flipped:
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
         if (flipline[i] == true)
             input[i]->flip();
@@ -206,7 +207,7 @@ std::vector< std::shared_ptr<rawshape> > geotools::getrawshapes(std::vector<shap
 {
     std::vector< std::shared_ptr<rawshape> > rawshapes(shapes.size());
 
-    for (int i = 0; i < shapes.size(); i++)
+    for (size_t i = 0; i < shapes.size(); i++)
     {
         std::shared_ptr<rawshape> currentrawshapeptr = shapes[i].getpointer();
 
@@ -226,7 +227,7 @@ std::vector<shape> geotools::getshapes(std::vector< std::shared_ptr<rawshape> > 
 {
     std::vector<shape> shapes(rawshapes.size());
 
-    for (int i = 0; i < rawshapes.size(); i++)
+    for (size_t i = 0; i < rawshapes.size(); i++)
         shapes[i] = shape(rawshapes[i]);
     
     return shapes;
@@ -235,7 +236,7 @@ std::vector<shape> geotools::getshapes(std::vector< std::shared_ptr<rawshape> > 
 std::vector<rawshape*> geotools::getpointers(std::vector< std::shared_ptr<rawshape> > sharedptrs)
 {
     std::vector<rawshape*> output(sharedptrs.size());
-    for (int i = 0; i < output.size(); i++)
+    for (size_t i = 0; i < output.size(); i++)
         output[i] = sharedptrs[i].get();
 
     return output;
@@ -245,8 +246,8 @@ std::vector< std::shared_ptr<rawshape> > geotools::flip(std::vector< std::shared
 {
     std::vector< std::shared_ptr<rawshape> > output(input.size());
 
-    for (int i = 0; i < input.size(); i++)
-        output[i] = input[input.size()-1-i];    
+    for (size_t i = 0; i < input.size(); i++)
+        output[i] = input[input.size()-1-i];
 
     return output;
 }
@@ -263,7 +264,7 @@ std::vector<std::shared_ptr<rawshape>> geotools::duplicate(std::vector<std::shar
 {
     std::vector<std::shared_ptr<rawshape>> output(input.size());
 
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         output[i] = input[i]->duplicate();
 
     return output;
@@ -273,15 +274,15 @@ std::vector<std::shared_ptr<rawshape>> geotools::concatenate(std::vector<std::ve
 {
     // Compute the total number of rawshapes:
     int numrawshapes = 0;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
         numrawshapes += input[i].size();
 
     std::vector<std::shared_ptr<rawshape>> output(numrawshapes);
 
     int index = 0;
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
-        for (int j = 0; j < input[i].size(); j++)
+        for (size_t j = 0; j < input[i].size(); j++)
         {
             output[index] = input[i][j];
             index++;
@@ -315,21 +316,21 @@ std::vector<double> geotools::appendcoords(std::vector<std::shared_ptr<rawshape>
 {
     std::vector< std::vector<double>* > coordsptrs(rawshapes.size());
 
-    for (int i = 0; i < rawshapes.size(); i++)
+    for (size_t i = 0; i < rawshapes.size(); i++)
         coordsptrs[i] = rawshapes[i]->getcoords();
     
 
     // First calculate the total size:
     int totallen = 0;
-    for (int i = 0; i < coordsptrs.size(); i++)
+    for (size_t i = 0; i < coordsptrs.size(); i++)
         totallen += coordsptrs[i]->size();
 
     std::vector<double> output(totallen);
 
     int index = 0;
-    for (int i = 0; i < coordsptrs.size(); i++)
+    for (size_t i = 0; i < coordsptrs.size(); i++)
     {
-        for (int j = 0; j < coordsptrs[i]->size(); j++)
+        for (size_t j = 0; j < coordsptrs[i]->size(); j++)
         {
             output[index] = coordsptrs[i]->at(j);
             index++;
@@ -342,7 +343,7 @@ std::vector<std::vector<int>> geotools::appendelems(std::vector<std::shared_ptr<
 {
     std::vector< std::vector<std::vector<int>>* > elemsptrs(rawshapes.size());
 
-    for (int i = 0; i < rawshapes.size(); i++)
+    for (size_t i = 0; i < rawshapes.size(); i++)
         elemsptrs[i] = rawshapes[i]->getelems();
     
 
@@ -353,15 +354,15 @@ std::vector<std::vector<int>> geotools::appendelems(std::vector<std::shared_ptr<
     {
         // First calculate the total size:
         int totallen = 0;
-        for (int i = 0; i < elemsptrs.size(); i++)
+        for (size_t i = 0; i < elemsptrs.size(); i++)
             totallen += elemsptrs[i]->at(e).size();
 
         output[e] = std::vector<int>(totallen);
 
         int index = 0, nodenumshift = 0;
-        for (int i = 0; i < elemsptrs.size(); i++)
+        for (size_t i = 0; i < elemsptrs.size(); i++)
         {
-            for (int j = 0; j < elemsptrs[i]->at(e).size(); j++)
+            for (size_t j = 0; j < elemsptrs[i]->at(e).size(); j++)
             {
                 output[e][index] = elemsptrs[i]->at(e)[j] + nodenumshift;
                 index++;
@@ -371,6 +372,3 @@ std::vector<std::vector<int>> geotools::appendelems(std::vector<std::shared_ptr<
     }
     return output;
 }
-
-
-

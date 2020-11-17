@@ -32,16 +32,16 @@ void iodata::combine(void)
     
         for (int s = 0; s < 3; s++)
             mycoords[s][i] = {densematrix(mycoords[s][i])};
-        for (int comp = 0; comp < mydata.size(); comp++)
+        for (size_t comp = 0; comp < mydata.size(); comp++)
             mydata[comp][i] = {densematrix(mydata[comp][i])};
     }
 }
 
 bool iodata::isscalar(void) { return isscalardata; }
-int iodata::getinterpolorder(void) { return myinterpolorder; };
-int iodata::getgeointerpolorder(void) { return mygeointerpolorder; };
+int iodata::getinterpolorder(void) { return myinterpolorder; }
+int iodata::getgeointerpolorder(void) { return mygeointerpolorder; }
 
-std::vector<double> iodata::gettimetags(void) { return mytimevals; };
+std::vector<double> iodata::gettimetags(void) { return mytimevals; }
 
 bool iodata::ispopulated(int elemtypenum)
 {
@@ -86,7 +86,7 @@ void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
             vals.push_back(densematrix(vals[0].countrows(), vals[0].countcolumns(), 0.0));
     }
 
-    for (int comp = 0; comp < vals.size(); comp++)
+    for (size_t comp = 0; comp < vals.size(); comp++)
         mydata[comp][elemtypenum].push_back(vals[comp]);
 }
 
@@ -164,4 +164,3 @@ std::vector<densematrix> iodata::getdata(int elemtypenum, int timestepindex)
             return {mydata[0][elemtypenum][0].extractcols(col1,col2), mydata[1][elemtypenum][0].extractcols(col1,col2), mydata[2][elemtypenum][0].extractcols(col1,col2)};
     }
 }
-

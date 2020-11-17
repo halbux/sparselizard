@@ -17,7 +17,7 @@ void rawvec::synchronize(void)
         dm = *mydofmanager; // backup
         *mydofmanager = mycurrentstructure[0];
         
-        for (int i = 0; i < dmfields.size(); i++)
+        for (size_t i = 0; i < dmfields.size(); i++)
         {
             mydofmanager->selectfield(dmfields[i]);
             mycurrentstructure[0].selectfield(dmfields[i]);
@@ -31,7 +31,7 @@ void rawvec::synchronize(void)
           
         *mydofmanager = dm; // restore
         
-        for (int i = 0; i < dmfields.size(); i++)
+        for (size_t i = 0; i < dmfields.size(); i++)
         {
             mydofmanager->selectfield(dmfields[i]);
             datafields[i]->synchronize({}, mydofmanager->getselectedfieldorders());
@@ -55,7 +55,7 @@ void rawvec::synchronize(void)
     if (isvaluesynchronizingallowed)
     {
         // Transfer the data back to the vector:
-        for (int i = 0; i < datafields.size(); i++)
+        for (size_t i = 0; i < datafields.size(); i++)
             datafields[i]->transferdata(-1, vec(shared_from_this())|field(dmfields[i]), "set");
     }
     
@@ -155,7 +155,8 @@ void rawvec::removeconstraints(void)
     
     // Destroy the vector since it will be replaced:
     VecDestroy(&myvec);
-    Vec newvec; myvec = newvec;
+    Vec newvec = nullptr;
+    myvec = newvec;
     
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
@@ -178,7 +179,7 @@ void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::
     std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getconstraints();
 
     // Loop on all disjoint regions:
-    for (int d = 0; d < disjregs.size(); d++)
+    for (size_t d = 0; d < disjregs.size(); d++)
     {
         int disjreg = disjregs[d];
 
@@ -201,7 +202,7 @@ void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::
 
             // Loop on all disjoint regions who share the same constraint-computation-formulation:
             std::shared_ptr<integration> currentconstraint = fieldconstraints[disjreg];
-            for (int i = d; i < disjregs.size(); i++)
+            for (size_t i = d; i < disjregs.size(); i++)
             {
                 if (mydofmanager->isdefined(disjregs[i], 0) && fieldconstraints[disjregs[i]] == currentconstraint)
                 {
@@ -388,7 +389,7 @@ void rawvec::load(std::string filename)
         if (fileext == ".txt")
         {
             std::vector<double> loadedvals = mathop::loadvector(filename, ',', true);
-            if (loadedvals.size() != size())
+            if (loadedvals.size() != (size_t) size())
             {
                 std::cout << "Error in 'rawvec' object: loaded data size (" << loadedvals.size() << ") does not match the vector size (" << size() << ") " << std::endl;
                 abort();

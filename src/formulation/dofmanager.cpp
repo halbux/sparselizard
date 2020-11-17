@@ -18,7 +18,7 @@ void dofmanager::synchronize(void)
     rangeend = {};
 
     // Rebuild the structure:
-    for (int i = 0; i < mystructuretracker.size(); i++)
+    for (size_t i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
     // Select the same field again:
@@ -36,7 +36,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
 
     // Find the field index of 'fieldtoadd' (if present):
     int fieldindex = -1;
-    for (int i = 0; i < myfields.size(); i++)
+    for (size_t i = 0; i < myfields.size(); i++)
     {
         if (myfields[i].get() == fieldtoadd.get())
         {
@@ -69,7 +69,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
     }
     
     // Add an entry for every form function - if not already existing:
-    for (int i = 0; i < selecteddisjointregions.size(); i++)
+    for (size_t i = 0; i < selecteddisjointregions.size(); i++)
     {
         int disjreg = selecteddisjointregions[i];
         
@@ -82,7 +82,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         int numberofformfunctions = myformfunction->count(fieldtoadd->getinterpolationorder(disjreg), elementdimension, 0);
         
         // Only treat the form functions not yet in the dof structure.
-        if (rangebegin[fieldindex][disjreg].size() < numberofformfunctions)
+        if (rangebegin[fieldindex][disjreg].size() < (size_t) numberofformfunctions)
         {
             int numffdefinedbeforeresize = rangebegin[fieldindex][disjreg].size();
             int currentnumberofdofs = mydisjointregions->countelements(disjreg);
@@ -136,7 +136,7 @@ void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
     synchronize();
     
     selectedfieldnumber = -1;
-    for (int i = 0; i < myfields.size(); i++)
+    for (size_t i = 0; i < myfields.size(); i++)
     {
         if (myfields[i].get() == selectedfield.get())
         {
@@ -164,7 +164,7 @@ std::vector<int> dofmanager::getdisjointregionsofselectedfield(void)
     
     std::vector<int> output(rangebegin[selectedfieldnumber].size());
     int index = 0;
-    for (int i = 0; i < output.size(); i++)
+    for (size_t i = 0; i < output.size(); i++)
     {
         if (rangebegin[selectedfieldnumber][i].size() > 0)
         {
@@ -194,8 +194,8 @@ int dofmanager::getrangeend(int disjreg, int formfunc)
 bool dofmanager::isdefined(int disjreg, int formfunc)
 {
     synchronize();
-    
-    return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
+
+    return ((size_t) formfunc < rangebegin[selectedfieldnumber][disjreg].size());
 }
         
 int dofmanager::countconstraineddofs(void)
@@ -203,10 +203,10 @@ int dofmanager::countconstraineddofs(void)
     synchronize();
     
     int numconstraineddofs = 0;
-    
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+
+    for (size_t fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is constrained on the disjoint region and there is at least one form function:
             if (rangebegin[fieldindex][disjreg].size() > 0 && myfields[fieldindex]->isconstrained(disjreg))
@@ -224,14 +224,14 @@ intdensematrix dofmanager::getconstrainedindexes(void)
     int* myval = output.getvalues();
     
     int currentindex = 0;
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    for (size_t fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is constrained on the disjoint region.
             if (myfields[fieldindex]->isconstrained(disjreg))
             {
-                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+                for (size_t ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
                 {
                     int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
                     for (int i = 0; i < numdofshere; i++)
@@ -251,10 +251,10 @@ int dofmanager::countgaugeddofs(void)
     synchronize();
     
     int numgaugeddofs = 0;
-    
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+
+    for (size_t fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // Constraints have priority over the gauge!
             if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
@@ -265,8 +265,8 @@ int dofmanager::countgaugeddofs(void)
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
                 std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
                 std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
-       
-                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+
+                for (size_t ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
                 {
                     // The lowest order hcurl form function is gauged only on the spanning tree:
                     if (elementtype == 1 && ff == 0)
@@ -292,9 +292,9 @@ intdensematrix dofmanager::getgaugedindexes(void)
     int* myval = output.getvalues();
     
     int currentindex = 0;
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    for (size_t fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // Constraints have priority over the gauge!
             if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
@@ -305,15 +305,16 @@ intdensematrix dofmanager::getgaugedindexes(void)
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
                 std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
                 std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
-       
-                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+
+                for (size_t ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
                 {
                     // The lowest order hcurl form function is gauged only on the spanning tree.
                     // All other form functions are gauged on all dofs in the disjoint region.
                     int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
                     for (int i = 0; i < numdofshere; i++)
                     {
-                        if ((elementtype != 1 || ff != 0) && isitgradienttype[ff] || elementtype == 1 && ff == 0 && myspantree->isintree(i, disjreg))
+                        if (((elementtype != 1 || ff != 0) && isitgradienttype[ff]) ||
+                            (elementtype == 1 && ff == 0 && myspantree->isintree(i, disjreg)))
                         {
                             myval[currentindex] = rangebegin[fieldindex][disjreg][ff] + i;
                             currentindex++;
@@ -334,13 +335,13 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     std::vector<intdensematrix> indexmat = {};
     std::vector<densematrix> condvalvec = {};
     std::vector<densematrix> constrvalvec = {};
-    
-    
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+
+
+    for (size_t fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
         // First get the list of disjoint NODE regions on which the rawfield is conditionally constrained:
         std::vector<bool> isdisjregactive(rangebegin[fieldindex].size(), false);
-        for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
         {
             // Only the nodes are constrained:
             if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
@@ -355,7 +356,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
         std::vector<std::vector<expression>> condconstrexpr = myfields[fieldindex]->getconditionalconstraints();
     
         // Loop on all disjoint regions:
-        for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
         {
             if (isdisjregactive[disjreg] == false)
                 continue;
@@ -364,7 +365,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             
             // Combine all disjoint regions that share the same condop and constrop operations:
             std::vector<int> curdisjregs = {};
-            for (int i = disjreg; i < isdisjregactive.size(); i++)
+            for (size_t i = disjreg; i < isdisjregactive.size(); i++)
             {
                 if (isdisjregactive[i] && condop == condconstrexpr[i][0].getoperationinarray(0,0) && constrop == condconstrexpr[i][1].getoperationinarray(0,0))
                 {
@@ -388,7 +389,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
             int* curindexmatptr = curindexmat.getvalues();
             int index = 0;
-            for (int i = 0; i < curdisjregs.size(); i++)
+            for (size_t i = 0; i < curdisjregs.size(); i++)
             {
                 // There is only a single shape function per node!
                 for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
@@ -407,7 +408,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
 
     // Count the number of active conditional constraints:
     int numactive = 0;
-    for (int i = 0; i < condvalvec.size(); i++)
+    for (size_t i = 0; i < condvalvec.size(); i++)
     {
         double* condvalptr = condvalvec[i].getvalues();
         for (int j = 0; j < condvalvec[i].count(); j++)
@@ -425,7 +426,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     double* valptr = condconstrval.getvalues();
     
     int index = 0;
-    for (int i = 0; i < condvalvec.size(); i++)
+    for (size_t i = 0; i < condvalvec.size(); i++)
     {
         double* condvalptr = condvalvec[i].getvalues();
         double* constrvalptr = constrvalvec[i].getvalues();
@@ -457,15 +458,15 @@ std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
     std::shared_ptr<dofmanager> newdofmanager(new dofmanager);
     *(newdofmanager.get()) = *this;
     newdofmanager->numberofdofs = 0;
-    
-    for (int fieldindex = 0; fieldindex < newdofmanager->rangebegin.size(); fieldindex++)
+
+    for (size_t fieldindex = 0; fieldindex < newdofmanager->rangebegin.size(); fieldindex++)
     {
-        for (int disjreg = 0; disjreg < newdofmanager->rangebegin[fieldindex].size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < newdofmanager->rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is not constrained on the disjoint region:
             if (newdofmanager->myfields[fieldindex]->isconstrained(disjreg) == false)
             {
-                for (int ff = 0; ff < newdofmanager->rangebegin[fieldindex][disjreg].size(); ff++)
+                for (size_t ff = 0; ff < newdofmanager->rangebegin[fieldindex][disjreg].size(); ff++)
                 {
                     // Update the range begin and end:
                     int numdofshere = newdofmanager->rangeend[fieldindex][disjreg][0] - newdofmanager->rangebegin[fieldindex][disjreg][0] + 1;
@@ -543,10 +544,10 @@ void dofmanager::print(void)
     synchronize();
     
     std::cout << "Showing the content of the dof manager (" << numberofdofs << " dofs in total):" << std::endl << std::endl;
-    
-    for (int i = 0; i < myfields.size(); i++)
+
+    for (size_t i = 0; i < myfields.size(); i++)
     {
-        for (int disjreg = 0; disjreg < rangebegin[i].size(); disjreg++)
+        for (size_t disjreg = 0; disjreg < rangebegin[i].size(); disjreg++)
         {
             // Only print not-empty entries:
             if (rangebegin[i][disjreg].size() != 0)
@@ -572,7 +573,7 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
     // on the disjoint region number i and false otherwise.
     std::vector<int> fielddisjregs = ((universe::mymesh->getphysicalregions())->get(fieldphysreg))->getdisjointregions(-1); // Get all disj regs with (-1)
     std::vector<bool> isfielddefinedondisjointregion(mydisjointregions->count(),false);
-    for (int i = 0; i < fielddisjregs.size(); i++)
+    for (size_t i = 0; i < fielddisjregs.size(); i++)
         isfielddefinedondisjointregion[fielddisjregs[i]] = true;
                     
     element myelement(elementtypenumber);
@@ -601,7 +602,7 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, inputfield->gettypename());
         int currentnumberofformfunctions, previousdisjreg;       
 
-        for (int i = 0; i < elementlist.size(); i++)
+        for (size_t i = 0; i < elementlist.size(); i++)
         {
             int elem = elementlist[i];
             // Get the subelement to which the current form function is associated:
@@ -610,13 +611,14 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
             int currentdisjointregion = myelements->getdisjointregion(associatedelementtype, currentsubelem);
             
             // The current subelement might require less form functions:
-            if (i == 0 || currentdisjointregion != previousdisjreg)
+            if (i == 0 || currentdisjointregion != previousdisjreg)   // FIXME: set default for previousdisjreg
                 currentnumberofformfunctions = myformfunction->count(inputfield->getinterpolationorder(currentdisjointregion), associatedelementdimension, myiterator.getnodeedgefacevolumeindex());
 
             previousdisjreg = currentdisjointregion;
             
             // If not in a disjoint region on which the field is defined set -2 adress.
-            if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)
+            if (isfielddefinedondisjointregion[currentdisjointregion] &&
+                formfunctionindex < currentnumberofformfunctions)     // FIXME: set default for currentnumberofformfunctions
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
@@ -634,4 +636,3 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
 
     return output;
 }
-

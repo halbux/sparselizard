@@ -56,6 +56,6 @@ namespace gmshinterface
     int converttogmshelementtypenumber(int ourtypenumber);
     
     char getelementidentifierinposformat(int ourtypenumber);
-};
+}
 
 #endif

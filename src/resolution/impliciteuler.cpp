@@ -98,12 +98,12 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     std::vector<vec> presols(tosolvebefore.size()), postsols(tosolveafter.size());
     if (istadapt)
     {
-        for (int i = 0; i < presols.size(); i++)
+        for (size_t i = 0; i < presols.size(); i++)
         {
             presols[i] = vec(tosolvebefore[i]);
             presols[i].setdata();
         }
-        for (int i = 0; i < postsols.size(); i++)
+        for (size_t i = 0; i < postsols.size(); i++)
         {
             postsols[i] = vec(tosolveafter[i]);
             postsols[i].setdata();
@@ -201,7 +201,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             double errormeasure = dt*(dtxnext - dtx).norm()/xnext.norm();
 
             bool breakit = false;
-            if (dt <= mindt || errormeasure <= tatol && (islinear || maxnumnlit <= 0 || nlit < maxnumnlit))
+            if ((dt <= mindt) || ((errormeasure <= tatol) && (islinear || (maxnumnlit <= 0) || (nlit < maxnumnlit))))
             {
                 // If the error is low enough to coarsen the timestep:
                 if (errormeasure <= cthres*tatol && (islinear || maxnumnlit <= 0 || nlit < maxnumnlit))
@@ -213,9 +213,9 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
                 dt *= rfact;
                 // Reset fields for a new resolution:
                 mathop::setdata(x);
-                for (int i = 0; i < presols.size(); i++)
+                for (size_t i = 0; i < presols.size(); i++)
                     mathop::setdata(presols[i]);
-                for (int i = 0; i < postsols.size(); i++)
+                for (size_t i = 0; i < postsols.size(); i++)
                     mathop::setdata(postsols[i]);
             }
                 

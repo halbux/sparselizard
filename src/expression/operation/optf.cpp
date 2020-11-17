@@ -12,19 +12,19 @@ void optf::setspacederivative(int whichderivative)
     spacederivative = whichderivative; 
 }
 
-void optf::increasetimederivativeorder(int amount)
-{    
+void optf::increasetimederivativeorder(int)
+{
     std::cout << "Error in 'optf' object: cannot apply a time derivative to the test function" << std::endl;
     abort();
 }
 
-bool optf::isharmonicone(std::vector<int> disjregs) 
-{ 
-    std::vector<int> myharms = myfield->getharmonics(); 
+bool optf::isharmonicone(std::vector<int> disjregs)                   // TODO: use disjregs?
+{
+    std::vector<int> myharms = myfield->getharmonics();
     return (myharms.size() == 1 && myharms[0] == 1);
 }
 
-bool optf::isvalueorientationdependent(std::vector<int> disjregs)
+bool optf::isvalueorientationdependent(std::vector<int>)
 {
     std::cout << "Error in 'optf' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
     abort();

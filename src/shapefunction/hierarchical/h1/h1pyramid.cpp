@@ -3,23 +3,22 @@
 using namespace std;
 
 
-int h1pyramid::count(int order)
+int h1pyramid::count(int)
 {
     std::cout << "Error in 'h1pyramid' object: shape functions not defined for pyramids" << std::endl;
     abort();  
 }
 
-int h1pyramid::count(int order, int dim, int num)
+int h1pyramid::count(int, int, int)
 {
     std::cout << "Error in 'h1pyramid' object: shape functions not defined for pyramids" << std::endl;
-    abort();  
+    abort();
 }
 
 
 
-hierarchicalformfunctioncontainer h1pyramid::evalat(int maxorder) 
-{    
+hierarchicalformfunctioncontainer h1pyramid::evalat(int)
+{
     std::cout << "Error in 'h1pyramid' object: shape functions not defined for pyramids" << std::endl;
-    abort();  
+    abort();
 }
-

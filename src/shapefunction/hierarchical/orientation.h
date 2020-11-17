@@ -100,6 +100,6 @@ namespace orientation
     int getorientationofedge(std::vector<int>& physicalnodesinedge);
     int getorientationoftriangle(std::vector<int>& physicalnodesintriangle);
     int getorientationofquadrangle(std::vector<int>& physicalnodesinquadrangle);
-};
+}
 
 #endif

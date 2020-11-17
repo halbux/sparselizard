@@ -220,10 +220,10 @@ void rawextrusion::mesh(void)
         std::vector<std::shared_ptr<rawshape>> contourfaces(contourlines.size());
 
         std::vector<std::shared_ptr<rawshape>> verticallines(contourlines.size());
-        for (int i = 0; i < contourlines.size(); i++)
+        for (size_t i = 0; i < contourlines.size(); i++)
             verticallines[i] = std::shared_ptr<rawline>(new rawline(-1, {contourlines[i]->getsons()[0], topcontourlines[i]->getsons()[0]}, mynumlayers));
         
-        for (int i = 0; i < contourfaces.size(); i++)
+        for (size_t i = 0; i < contourfaces.size(); i++)
             contourfaces[i] = std::shared_ptr<rawquadrangle>(new rawquadrangle(-1, {contourlines[i], verticallines[(i+1)%verticallines.size()], topcontourlines[i], verticallines[i]}));
 
         sons = geotools::concatenate({{mybaseshape}, contourfaces, {topface}});

@@ -14,7 +14,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
     bool isonlycos0 = (product.size() == 2 && product[1].size() == 1);
     
     // Multiply 'product' by all remaining terms:
-    for (int i = 1; i < productterms.size(); i++)
+    for (size_t i = 1; i < productterms.size(); i++)
     {
         std::vector<std::vector<densematrix>> currentterm = productterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);        
         bool iscurrenttermonlycos0 = (currentterm.size() == 2 && currentterm[1].size() == 1);
@@ -27,7 +27,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
         }
         if (isonlycos0 && not(iscurrenttermonlycos0))
         {
-            for (int harm = 1; harm < currentterm.size(); harm++)
+            for (size_t harm = 1; harm < currentterm.size(); harm++)
             {
                 if (currentterm[harm].size() == 1)
                     currentterm[harm][0].multiplyelementwise(product[1][0]);
@@ -38,7 +38,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
         }
         if (not(isonlycos0) && iscurrenttermonlycos0)
         {
-            for (int harm = 1; harm < product.size(); harm++)
+            for (size_t harm = 1; harm < product.size(); harm++)
             {
                 if (product[harm].size() == 1)
                     product[harm][0].multiplyelementwise(currentterm[1][0]);
@@ -52,13 +52,13 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
             std::vector<std::vector<densematrix>> tempproduct = {};
         
             // Loop on all product harmonics:
-            for (int pharm = 0; pharm < product.size(); pharm++)
+            for (size_t pharm = 0; pharm < product.size(); pharm++)
             {
                 if (product[pharm].size() == 0)
                     continue;
                 
                 // Loop on all harmonics of the current term:
-                for (int charm = 0; charm < currentterm.size(); charm++)
+                for (size_t charm = 0; charm < currentterm.size(); charm++)
                 {
                     if (currentterm[charm].size() == 0)
                         continue;
@@ -69,7 +69,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
                 
                     std::vector<std::pair<int, double>> harmsofproduct = harmonic::getproduct(pharm, charm);
 
-                    for (int p = 0; p < harmsofproduct.size(); p++)
+                    for (size_t p = 0; p < harmsofproduct.size(); p++)
                     {
                         int currentharm = harmsofproduct[p].first;
                         // currentharmcoef can be + or - 0.5 or 1.
@@ -77,8 +77,8 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
                         
                         if (currentharm == 0)
                             continue;
-                        
-                        if (tempproduct.size() < currentharm+1)
+
+                        if (tempproduct.size() < (size_t) currentharm+1)
                             tempproduct.resize(currentharm+1);
                             
                         if (tempproduct[currentharm].size() == 1)
@@ -108,8 +108,8 @@ densematrix opproduct::multiharmonicinterpolate(int numtimeevals, elementselecto
     }
     
     densematrix output = productterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-    
-    for (int i = 1; i < productterms.size(); i++)
+
+    for (size_t i = 1; i < productterms.size(); i++)
         output.multiplyelementwise(productterms[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform));
     
     if (reuse && universe::isreuseallowed)
@@ -122,7 +122,7 @@ std::shared_ptr<operation> opproduct::expand(void)
 {
     // Expand all factors including a dof or tf. It is not required 
     // to expand the other ones for the formulations.
-    for (int i = 0; i < productterms.size(); i++)
+    for (size_t i = 0; i < productterms.size(); i++)
     {
         // We only want to expand operations that include a dof() or tf().
         if (productterms[i]->isdofincluded() || productterms[i]->istfincluded())
@@ -135,10 +135,12 @@ std::shared_ptr<operation> opproduct::expand(void)
     // Everything is first put in form of a sum, possibly with a single sum term.
     // If there is no dof or tf this leads to treating a sum as a monolithic block.
     std::vector<std::shared_ptr<operation>> prodtrms(productterms.size());
-    for (int i = 0; i < productterms.size(); i++)
+    for (size_t i = 0; i < productterms.size(); i++)
     {
         prodtrms[i] = productterms[i];
-        if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()))
+        if (not(productterms[i]->issum()) ||
+            (not(productterms[i]->isdofincluded()) &&
+             not(productterms[i]->istfincluded())))
         {
             std::shared_ptr<opsum> op(new opsum);
             op->addterm(productterms[i]);
@@ -149,7 +151,7 @@ std::shared_ptr<operation> opproduct::expand(void)
     std::shared_ptr<operation> expanded = prodtrms[0];
     
     // Multiply 'expanded' by all other factors, one at a time:
-    for (int i = 1; i < prodtrms.size(); i++)
+    for (size_t i = 1; i < prodtrms.size(); i++)
     {
         // Use the sum*sum expansion rule since we have only sums:
         std::shared_ptr<opsum> opersum(new opsum);
@@ -180,8 +182,8 @@ std::shared_ptr<operation> opproduct::expand(void)
 void opproduct::group(void)
 {
     std::vector<std::shared_ptr<operation>> groupedproductterms = {};
-    
-    for (int i = 0; i < productterms.size(); i++)
+
+    for (size_t i = 0; i < productterms.size(); i++)
     {
         productterms[i]->group();
 
@@ -250,10 +252,10 @@ std::shared_ptr<operation> opproduct::copy(void)
 std::vector<double> opproduct::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated(xcoords.size(), 1);
-    for (int i = 0; i < productterms.size(); i++)
+    for (size_t i = 0; i < productterms.size(); i++)
     {
         std::vector<double> current = productterms[i]->evaluate(xcoords, ycoords, zcoords);
-        for (int j = 0; j < xcoords.size(); j++)
+        for (size_t j = 0; j < xcoords.size(); j++)
             evaluated[j] *= current[j];
     }
     return evaluated;
@@ -261,7 +263,7 @@ std::vector<double> opproduct::evaluate(std::vector<double>& xcoords, std::vecto
 
 void opproduct::print(void)
 {
-    for (int i = 0; i < productterms.size(); i++)
+    for (size_t i = 0; i < productterms.size(); i++)
     {
         if (i > 0) 
             std::cout << " * ";

@@ -159,6 +159,6 @@ namespace myalgorithm
     // Norm a vector:
     void normvector(std::vector<double>& tonorm);
     
-};
+}
 
 #endif

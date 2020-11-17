@@ -11,7 +11,7 @@ int hcurlquadrangle::count(int order)
     return 2*order*(order+1) + 4*(order+1);
 }
 
-int hcurlquadrangle::count(int order, int dim, int num)
+int hcurlquadrangle::count(int order, int dim, [[maybe_unused]] int num)
 {
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
@@ -32,7 +32,7 @@ int hcurlquadrangle::count(int order, int dim, int num)
         case 2:
             return 2*order*(order+1);
         // Volume based form functions:
-        case 3:
+        default:
             return 0;
     }
 }

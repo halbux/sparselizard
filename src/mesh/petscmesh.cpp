@@ -26,7 +26,7 @@ petscmesh::petscmesh(std::string filename)
     bool isvalidext = false;
     
     std::string curfileext = myalgorithm::getfileextension(filename);
-    for (int i = 0; i < supportedextensions.size(); i++)
+    for (size_t i = 0; i < supportedextensions.size(); i++)
     {
         if (supportedextensions[i] == curfileext)
         {
@@ -44,7 +44,7 @@ petscmesh::petscmesh(std::string filename)
     
     std::cout << "Error while loading mesh file '" << filename << "'." << std::endl;
     std::cout << "Supported mesh formats are ";
-    for (int i = 0; i < supportedextensions.size()-1; i++)
+    for (size_t i = 0; i < supportedextensions.size()-1; i++)
         std::cout << "'" << supportedextensions[i] << "', ";
     std::cout << "'" << supportedextensions[supportedextensions.size()-1] << "'." << std::endl;
     abort();
