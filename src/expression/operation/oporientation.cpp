@@ -176,6 +176,7 @@ std::shared_ptr<operation> oporientation::copy(void)
 {
     std::shared_ptr<oporientation> op(new oporientation(myphysreg));
     *op = *this;
+    op->reuse = false;
     return op;
 }
 
