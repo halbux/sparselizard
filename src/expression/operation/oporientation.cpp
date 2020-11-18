@@ -14,7 +14,6 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     int numevalpts = evaluationcoordinates.size()/3;
     
     int problemdimension = universe::mymesh->getmeshdimension();
-    int physregdim = universe::mymesh->getphysicalregions()->get(myphysreg)->getelementdimension();
     std::vector<bool> prdef = universe::mymesh->getphysicalregions()->get(myphysreg)->getdefinition();
     int elemdim = elemselect.getelementdimension();
     int elemtypenum = elemselect.getelementtypenumber();
