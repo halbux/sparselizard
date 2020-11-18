@@ -69,7 +69,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     
     if (isnotfound)
     {
-        std::cout << "Error in 'oporientation' object: found a " << geonames[elemdim] << " not in contact with the requested physical region"  << std::endl;
+        std::cout << "Error in 'oporientation' object: found a " << geonames[elemdim] << " not in contact with the requested physical region" << std::endl;
         std::cout << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " not touching the argument region?" << std::endl;
         abort();
     }
