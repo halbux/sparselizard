@@ -80,7 +80,6 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         abort();
     }
     
-    // Calculate the detjac sign:
     intdensematrix celltypmat(celltypes.size(), 1, celltypes);
     std::vector<std::vector<int>> indexes = celltypmat.findalloccurences(8);
     
