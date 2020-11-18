@@ -89,8 +89,8 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         if (indexes[t].size() == 0)
             continue;
             
-        std::vector<int> elemnumsintype;
-        myalgorithm::select(cellnums, indexes[t], elemnumsintype);
+        std::vector<int> cellnumsintype;
+        myalgorithm::select(cellnums, indexes[t], cellnumsintype);
         
         std::vector<int> subelemnums;
         myalgorithm::select(elemnums, indexes[t], subelemnums);
@@ -100,16 +100,14 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         {
             for (int i = 0; i < indexes[t].size(); i++)
             {
-                std::vector<double> xcoords = els->getnodecoordinates(t, elemnumsintype[i], 0);
-                
                 int cornera, cornerb;
-                cornera = els->getsubelement(0, 1, elemnumsintype[i], 0);
+                cornera = els->getsubelement(0, 1, cellnumsintype[i], 0);
                 if (subelemnums[i] == cornera)
-                    cornerb = els->getsubelement(0, 1, elemnumsintype[i], 1);
+                    cornerb = els->getsubelement(0, 1, cellnumsintype[i], 1);
                 else
                 {
                     cornerb = cornera;
-                    cornera = els->getsubelement(0, 1, elemnumsintype[i], 1);
+                    cornera = els->getsubelement(0, 1, cellnumsintype[i], 1);
                 }
 
                 if (nodecoords->at(3*cornerb+0) - nodecoords->at(3*cornera+0) > 0)
@@ -119,11 +117,11 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         }
         
         // Check if node order flipped compared to in parent:
-        std::vector<bool> isflipped = els->isflipped(elemtypenum, subelemnums, t, elemnumsintype);
+        std::vector<bool> isflipped = els->isflipped(elemtypenum, subelemnums, t, cellnumsintype);
         
         // Check detjac sign of parent:
         std::vector<int> disjregs = universe::mymesh->getphysicalregions()->get(myphysreg)->getdisjointregionsoftype(t);
-        elementselector subselect(disjregs, elemnumsintype, false);
+        elementselector subselect(disjregs, cellnumsintype, false);
         
         gausspoints gp(t, 0);
         jacobian subjac(subselect, gp.getcoordinates(), NULL);
