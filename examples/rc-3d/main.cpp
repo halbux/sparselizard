@@ -70,12 +70,12 @@ void sparselizard(void)
     // Compute the total current flowing trough the electrode face.
     // Since the computation involves a gradient that has to be 
     // calculated in the volume (and not on the electrode face) 
-    // one can not simply call (normal(electrode)*J).integrate(electrode,4)
+    // one can not simply call (normal(conductor)*J).integrate(electrode,4)
     // since with this a surface gradient will be calculated.
     // 'on()' is called to force the evaluation in the volume.
     
-    double Iinphase = (-normal(electrode) * on(conductor, sigma*(-grad(v.harmonic(2)))) ).integrate(electrode, 4);
-    double Iquadrature = (-normal(electrode) * on(conductor, sigma*(-grad(v.harmonic(3)))) ).integrate(electrode, 4);
+    double Iinphase = (-normal(conductor) * on(conductor, sigma*(-grad(v.harmonic(2)))) ).integrate(electrode, 4);
+    double Iquadrature = (-normal(conductor) * on(conductor, sigma*(-grad(v.harmonic(3)))) ).integrate(electrode, 4);
     double normI = sqrt(Iinphase*Iinphase + Iquadrature*Iquadrature);
     // The voltage and currents are known, thus R and C are known as well:
     double R = appliedvoltage/pow(normI,2) * Iinphase;

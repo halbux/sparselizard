@@ -43,9 +43,6 @@ void sparselizard(void)
     T.setorder(all, 2);
 	
 		
-	//normal tracking and fixing
-	normal(fluidskin).write(fluidskin, "normal.pos", 2);
-		
 	//fluid material properties around equilibrium ( 293 K and 1 Bar )
 	//----------------------------------------------------------------
 
@@ -126,7 +123,7 @@ void sparselizard(void)
 	//advection part 2 - compressible - can be removed if fluid incompressible
 	convec+=integral(fluid,rho0*Cp*div(v)*dof(T)*tf(T));
 	//zero flux BC
-	convec+=integral(fluid,-(-kappa*grad(dof(T)))* normal(fluidskin) *tf(T,zflux));  // WHAT? normal --> elements devraient etre une boundary! pas fluid FIXME
+	convec+=integral(fluidskin,-(-kappa*grad(dof(T)))* -normal(fluid) *tf(T,zflux));  // WHAT? normal --> elements devraient etre une boundary! pas fluid FIXME
 	    
     // Initial state: Tc on disk, 0 on fluid and 0 dt(T):
 	T.setvalue(fluid);

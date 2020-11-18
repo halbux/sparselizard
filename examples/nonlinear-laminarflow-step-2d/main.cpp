@@ -109,8 +109,8 @@ void sparselizard(void)
     double vnorm = norm(v).interpolate(fluid, {5e-3, 1e-3, 0.0})[0];
 
     // Output the input and output flowrate for a unit width:
-    double flowratein = (normal(inlet)*v).integrate(inlet, 4);
-    double flowrateout = -(normal(outlet)*v).integrate(outlet, 4);
+    double flowratein = (-normal(fluid)*v).integrate(inlet, 4);
+    double flowrateout = (normal(fluid)*v).integrate(outlet, 4);
     std::cout << std::endl << "Flowrate in/out for a unit width: " << flowratein << " / " << flowrateout << " m^3/s" << std::endl;
 
     // Code validation line. Can be removed.

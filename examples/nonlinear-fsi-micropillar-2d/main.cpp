@@ -43,10 +43,6 @@ void sparselizard(void)
     // Define the fluid-structure interface:
     int fsinterface = regionintersection({fluid, solid});
 
-    // Confirm that the normal at the interface is pointing outwards to the pillars:
-    normal(fsinterface).write(fsinterface, "normal.pos");
-
-
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components in 2D.
     // Field p is the relative pressure. Field u is the mechanical deflection. Field umesh stores
     // the smoothed mesh deformation while field y is the y coordinate.
@@ -104,7 +100,7 @@ void sparselizard(void)
 
     // Add the hydrodynamic load pI - mu*( grad(v) + transpose(grad(v)) ) normal to the FSI interface (on the mesh deformed by 'umesh').
     // The gradient in the viscous force term has to be evaluated on the fluid elements (here with a call to 'on').
-    fsi += integral(fsinterface, umesh, ( p * -normal(fsinterface) - on(fluid, mu*( grad(v) + transpose(grad(v)) ) ) * -normal(fsinterface) ) * tf(u) );
+    fsi += integral(fsinterface, umesh, ( p * normal(fluid) - on(fluid, mu*( grad(v) + transpose(grad(v)) ) ) * normal(fluid) ) * tf(u) );
 
 
     double uprev = 0, umax = 1;

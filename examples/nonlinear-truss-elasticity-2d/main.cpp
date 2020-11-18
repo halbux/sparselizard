@@ -34,7 +34,7 @@ void sparselizard(void)
     elasticity += integral(solid, predefinedelasticity(dof(u), tf(u), u, E, nu, 0.0, "planestress"));
     // Add a pressure force on the 'load' line. Compute the force on the mesh deformed by field u.
     // The normal direction moves with the mesh due to the 'u' argument.
-    elasticity += integral(load, u, 0.8e3*normal(load)*tf(u));
+    elasticity += integral(load, u, -0.8e3*normal(solid)*tf(u));
 
     double prevumax = 1, umax = 2;
     while (std::abs(umax-prevumax)/std::abs(prevumax) > 1e-8)

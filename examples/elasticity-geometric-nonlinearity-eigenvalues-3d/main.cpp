@@ -51,7 +51,7 @@ void sparselizard(void)
     // With u provided as second argument all calculations are performed on the deformed 
     // mesh for this term (thus the normal is updated with the deflection).
     double pressure = 1e5;
-    elasticity += integral(top, u, -pressure*normal(top)*tf(u), 0, 1);
+    elasticity += integral(top, u, -pressure*normal(toplayer)*tf(u), 0, 1);
     
     // Add the inertia terms to the formulation (required for eigenvalue computation).
     // The contribution below has a different tag (2) to be able to exclude it from 

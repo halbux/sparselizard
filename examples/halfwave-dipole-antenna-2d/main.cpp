@@ -53,11 +53,8 @@ void sparselizard(void)
     // This is the weak formulation in time for electromagnetic waves:
     maxwell += integral(wholedomain, -curl(dof(E))*curl(tf(E)) - 1/(c*c)*dtdt(dof(E))*tf(E));
     
-    // The OUTWARD pointing normal is required for the wave radiation condition.
-    // Depending on the 'boundary' lines orientation the normal can be flipped.
-    // To confirm the normal direction it is written to disk below:
-    expression n = -normal(boundary);
-    n.write(boundary, "normal.pos");
+    // The outward pointing normal is required for the wave radiation condition:
+    expression n = normal(wholedomain);
     
     // Silver-Mueller radiation condition to force outgoing electromagnetic waves:
     maxwell += integral(boundary, -1/c * crossproduct(crossproduct(n, dt(dof(E))), n) * tf(E)); 

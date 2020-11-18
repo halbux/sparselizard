@@ -53,15 +53,6 @@ void sparselizard(void)
     int mechacoucoupl = regionintersection({fluid,membrane});
     int slip = regionunion({botcoupl,wall});
 
-    //normal tracking (for better BC setting... if needed)
-    normal(regionunion({axis,wall,botcoupl})).write(regionunion({axis,wall,botcoupl}),"normal.vtu");
-    parameter nsign;
-    nsign|axis=1;
-    nsign|wall=1;
-    nsign|botcoupl=-1;
-    expression nor=(nsign*normal(slip));
-    nor.write(regionunion({axis,wall,botcoupl}),"fixed_normal.vtu");
-
 
     //Unknown fields defintion
     //--------------------------
@@ -161,7 +152,7 @@ void sparselizard(void)
     // Elastoacoustic coupling terms.
     //-----------------------------------
     //stress transmission from fluid to solid along the normal (carreful normal direction for the sign !!!)
-    chambre += integral(botcoupl, dof(p)*normal(mechacoucoupl)*tf(u) );
+    chambre += integral(botcoupl, dof(p)*normal()*tf(u) );
     //Use of Lagrange multipliers Lx and Ly to link membrane and fluid velocity
     //Vectorial form for ease of implementation
     chambre += integral(botcoupl, -dof(L)*tf(u));
@@ -169,8 +160,8 @@ void sparselizard(void)
     chambre += integral(botcoupl, (dt(dof(u))-dof(v))*tf(L));
 
     //Coupling for the upper region (pure mechanical)
-    chambre += integral(topcoupl, -dof(p)*normal(topcoupl)*tf(u) * scaling);
-    chambre += integral(topcoupl, rho0*normal(topcoupl)*dtdt(dof(u))*tf(p)/scaling);
+    chambre += integral(topcoupl, -dof(p)*normal()*tf(u) * scaling);
+    chambre += integral(topcoupl, rho0*normal()*dtdt(dof(u))*tf(p)/scaling);
 
     //Constrained type boundary conditions
     //--------------------------------------

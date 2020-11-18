@@ -61,7 +61,7 @@ void sparselizard(void)
     v.write(fluid, "v.vtk", 2);
     
     // Output the flowrate for a unit width:
-    double flowrate = (normal(inlet)*v).integrate(inlet, 4);
+    double flowrate = (-normal(fluid)*v).integrate(inlet, 4);
     std::cout << std::endl << "Flowrate for a unit width: " << flowrate << " m^3/s" << std::endl;
     
     // Code validation line. Can be removed.
