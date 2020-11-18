@@ -60,10 +60,10 @@ namespace mathop
     // Compute the L2 norm of an expression:
     expression norm(expression expr);
 
-    // Normal vector with unit norm:
-    expression normal(int physreg);
+    // Normal vector with unit norm and pointing outward of a physical region:
+    expression normal(int physreg = -1);
     // Tangent vector with unit norm:
-    expression tangent(int physreg);
+    expression tangent(void);
 
     // Write scalar or vector values at given coordinates to file:
     void scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals = {}, std::vector<double> compzevals = {});

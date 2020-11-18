@@ -213,44 +213,57 @@ expression mathop::norm(expression expr)
 expression mathop::normal(int physreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
-    int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
 
-    if (elementdimension >= problemdimension)
+    if (physreg >= 0)
     {
-        std::cout << "Error in 'mathop' namespace: can only compute a normal to a region of lower dimension than the geometry" << std::endl;
-        abort();
+        universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
+        int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
+
+        if (elementdimension != problemdimension)
+        {
+            std::cout << "Error in 'mathop' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
+            abort();
+        }
     }
+    
+    expression output;
 
     expression expr;
     if (problemdimension == 1)
-        return 1.0;
+        output = 1.0;
     if (problemdimension == 2)
     {
         expression mynorm = sqrt(expr.invjac(0,1)*expr.invjac(0,1)+expr.invjac(1,1)*expr.invjac(1,1));
         mynorm.reuseit();
         if (universe::isaxisymmetric)
-            return array3x1(expr.invjac(0,1), expr.invjac(1,1), 0)/mynorm;
+            output = array3x1(expr.invjac(0,1), expr.invjac(1,1), 0)/mynorm;
         else
-            return array2x1(expr.invjac(0,1), expr.invjac(1,1))/mynorm;
+            output = array2x1(expr.invjac(0,1), expr.invjac(1,1))/mynorm;
     }
     if (problemdimension == 3)
     {
         expression mynorm = sqrt(expr.invjac(0,2)*expr.invjac(0,2)+expr.invjac(1,2)*expr.invjac(1,2)+expr.invjac(2,2)*expr.invjac(2,2));
         mynorm.reuseit();
-        return array3x1(expr.invjac(0,2), expr.invjac(1,2), expr.invjac(2,2))/mynorm;
+        output = array3x1(expr.invjac(0,2), expr.invjac(1,2), expr.invjac(2,2))/mynorm;
     }
+    
+    if (physreg >= 0)
+    {
+        std::shared_ptr<oporientation> op(new oporientation(physreg));
+        expression exprorient(op);
+        exprorient.reuseit();
+        output = exprorient*output;
+    }
+
+    output.reuseit();
+
+    return output;
 }
 
-expression mathop::tangent(int physreg)
+expression mathop::tangent(void)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
-    int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-
-    if (elementdimension != 1 && elementdimension != 2)
-    {
-        std::cout << "Error in 'mathop' namespace: can only compute a tangent to a line or face region" << std::endl;
-        abort();
-    }
 
     expression expr;
     if (problemdimension == 1)
