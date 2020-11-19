@@ -200,8 +200,8 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
 void petscmesh::view(void)
 {
     PetscViewer v;
-    PetscViewerFormat format = PETSC_VIEWER_ASCII_VTK;
-    PetscViewerASCIIOpen(PETSC_COMM_SELF, "petscview.txt", &v);
+    PetscViewerFormat format = PETSC_VIEWER_ASCII_CSV;
+    PetscViewerASCIIOpen(PETSC_COMM_SELF, "petscview.csv", &v);
     PetscViewerPushFormat(v, format);
     DMView(mypetscmesh, v);
     PetscViewerDestroy(&v);
