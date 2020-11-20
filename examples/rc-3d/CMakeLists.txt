@@ -1,0 +1,6 @@
+option(BUILD_RC_3D "Build example RC_3D." OFF)
+if(BUILD_RC_3D OR BUILD_ALL_EXAMPLES)
+  custom_add_executable_from_dir(RC_3D ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(RC_3D sparselizard)
+  custom_copy_file(RC_3D ${CMAKE_CURRENT_SOURCE_DIR} "*.msh;*.geo")
+endif(BUILD_RC_3D OR BUILD_ALL_EXAMPLES)

@@ -1,0 +1,6 @@
+option(BUILD_GMSH_API_LINK "Build example GMSH_API_LINK." OFF)
+if(BUILD_GMSH_API_LINK OR BUILD_ALL_EXAMPLES)
+  custom_add_executable_from_dir(GMSH_API_LINK ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(GMSH_API_LINK sparselizard)
+  custom_copy_file(GMSH_API_LINK ${CMAKE_CURRENT_SOURCE_DIR} "*.msh;*.geo")
+endif(BUILD_GMSH_API_LINK OR BUILD_ALL_EXAMPLES)

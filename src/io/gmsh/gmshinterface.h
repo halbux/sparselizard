@@ -25,6 +25,7 @@
 #include "polynomial.h"
 #include "iodata.h"
 #include "lagrangeformfunction.h"
+#include "config.h"
 
 namespace gmshinterface
 {
