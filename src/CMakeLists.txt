@@ -47,8 +47,20 @@ target_include_directories(sparselizard PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 
 # compiler warnings
+# choose what to build
+option(STRICT_WARNINGS "Show all warnings." OFF)
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang|GNU")
-    target_compile_options(sparselizard PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)
+  target_compile_options(sparselizard PRIVATE -Wall -Wextra -Wunreachable-code -Wpedantic)
+  # disable some warnings
+  if(NOT STRICT_WARNINGS)
+    message(WARNING
+      "=============================================\n"
+      "Some useful compiler warnings were disabled.\n"
+      "Consider adding -DSTRICT_WARNINGS=YES option.\n"
+      "=============================================")
+    target_compile_options(sparselizard PRIVATE -Wno-comment -Wno-unused-parameter -Wno-sign-compare
+      -Wno-return-type -Wno-pedantic -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-parentheses)
+  endif(NOT STRICT_WARNINGS)
 endif()
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(sparselizard PRIVATE -Wweak-vtables -Wexit-time-destructors -Wglobal-constructors -Wmissing-noreturn )
