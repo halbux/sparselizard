@@ -48,3 +48,26 @@ In order to create a new simulation:
 1. Replace target name `default` with the unique one in `simulations/newsim/CMakeLists.txt`
 1. Add line `add_subdirectory(newsim)` to the `simulations/CMakeLists.txt`
 1. Build as usual. Executable file will be located in `build/simulations/newsim` folder
+
+# Docker image
+
+With [Docker](https://www.docker.com/) you can run your simulations using containerized development
+environment.
+
+Run your simulation in three steps:
+
+1. Install [Docker](https://docs.docker.com/engine/install/)
+1. Create image:
+   ```bash
+   docker build -t sparselizard_debian_testing:latest -f docker/debian-testing.dockerfile  .
+   ```
+1. Build:
+   ```bash
+   docker run -it --rm -v "$(pwd):/workdir" sparselizard_debian_testing
+   ```
+
+*Notes:*
+* Docker container is running in interactive mode, so you can interrupt it from keyboard
+* By default UID 1000 is used. It may be adjusted in `docker/debian-testing.dockerfile`
+* Binaries and libraries created using Docker container are linked inside this container and cannot
+  be used without it
