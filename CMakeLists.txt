@@ -19,11 +19,12 @@ include(GNUInstallDirs)
 # Aux functions
 include(cMake/functions.cmake)
 include(cMake/SetupBLAS.cmake)
-include(cMake/SetupMPI.cmake)
-include(cMake/SetupPETSC.cmake)
-include(cMake/SetupSLEPC.cmake)
 include(cMake/SetupGMSH.cmake)
 include(cMake/SetupMETIS.cmake)
+include(cMake/SetupMPI.cmake)
+include(cMake/SetupMUMPS.cmake)
+include(cMake/SetupPETSC.cmake)
+include(cMake/SetupSLEPC.cmake)
 
 # add libsparselizard target
 add_subdirectory(src)

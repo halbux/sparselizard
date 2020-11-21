@@ -13,6 +13,7 @@ RUN apt-get update -q \
         libopenmpi-dev \
         libpetsc-real-dev \
         libslepc-real-dev \
+        libmumps-dev \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 
