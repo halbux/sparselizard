@@ -51,20 +51,22 @@ In order to create a new simulation:
 
 # Docker image
 
-With [Docker](https://www.docker.com/) you can run your simulations using containerized development
+With [Docker](https://www.docker.com/) you can test your simulations using containerized development
 environment.
 
-Run your simulation in three steps:
+Prepare Docker image:
 
 1. Install [Docker](https://docs.docker.com/engine/install/)
 1. Create image:
    ```bash
    docker build -t sparselizard_debian_testing:latest -f docker/debian-testing.dockerfile  .
    ```
-1. Build:
-   ```bash
-   docker run -it --rm -v "$(pwd):/workdir" sparselizard_debian_testing
-   ```
+
+Build and run examples:
+
+```bash
+docker run -it --rm -v "$(pwd):/workdir" sparselizard_debian_testing
+```
 
 *Notes:*
 * Docker container is running in interactive mode, so you can interrupt it from keyboard

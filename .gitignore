@@ -34,5 +34,8 @@
 # Default build dir
 build/
 
+# Docker build dir
+docker_build/
+
 # CCLS cache
 .ccls-cache/
