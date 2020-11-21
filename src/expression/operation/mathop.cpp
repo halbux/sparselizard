@@ -27,12 +27,17 @@ double mathop::getpi(void)
 
 int mathop::regionunion(const std::vector<int> physregs)
 {
+    universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    universe::mymesh->getphysicalregions()->errornotsamedim(physregs);
+    
     universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs);
     return (universe::mymesh->getphysicalregions())->createunion(physregs);
 }
 
 int mathop::regionintersection(const std::vector<int> physregs)
 {
+    universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    
     universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs);
     return (universe::mymesh->getphysicalregions())->createintersection(physregs);
 }
