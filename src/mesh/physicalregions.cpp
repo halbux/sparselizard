@@ -7,7 +7,7 @@ physicalregions::physicalregions(disjointregions& inputdisjointregions)
     mydisjointregions = &inputdisjointregions;
 }
 
-int physicalregions::createunion(const std::vector<int> input)
+int physicalregions::createunion(std::vector<int> input, bool createifexisting)
 {
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
@@ -17,6 +17,13 @@ int physicalregions::createunion(const std::vector<int> input)
         for (int j = 0; j < disjregsinthisphysreg.size(); j++)
             disjregs.push_back(disjregsinthisphysreg[j]);
     }
+    if (createifexisting == false)
+    {
+        int existingnumber = find(disjregs);
+        if (existingnumber >= 0)
+            return existingnumber;
+    }
+    
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
     physicalregion* newphysreg = get(newphysregnum);
@@ -25,7 +32,7 @@ int physicalregions::createunion(const std::vector<int> input)
     return newphysregnum;
 }
 
-int physicalregions::createintersection(const std::vector<int> input)
+int physicalregions::createintersection(std::vector<int> input, bool createifexisting)
 {
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
@@ -38,6 +45,13 @@ int physicalregions::createintersection(const std::vector<int> input)
         else
             disjregs = disjregsinthisphysreg;
     }
+    if (createifexisting == false)
+    {
+        int existingnumber = find(disjregs);
+        if (existingnumber >= 0)
+            return existingnumber;
+    }
+    
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
     physicalregion* newphysreg = get(newphysregnum);
@@ -46,20 +60,23 @@ int physicalregions::createintersection(const std::vector<int> input)
     return newphysregnum;
 }
 
-int physicalregions::createunionofall(void)
+int physicalregions::createunionofall(bool createifexisting)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
-    
-    std::vector<int> tounite = {};
-    
-    // Get all regions of max dimension:
-    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
-    {
-        if (myphysicalregions[i]->getelementdimension() == problemdimension)
-            tounite.push_back(myphysicalregionnumbers[i]);
-    }
+    std::vector<int> disjregs = myalgorithm::getequallyspaced(0, 1, mydisjointregions->count());
 
-    return createunion(tounite);
+    if (createifexisting == false)
+    {
+        int existingnumber = find(disjregs);
+        if (existingnumber >= 0)
+            return existingnumber;
+    }
+    
+    int newphysregnum = getmaxphysicalregionnumber() + 1;
+    
+    physicalregion* newphysreg = get(newphysregnum);
+    newphysreg->setdisjointregions(disjregs);
+    
+    return newphysregnum;
 }
 
 int physicalregions::createfromdisjointregionlist(std::vector<int> drs)
@@ -155,6 +172,20 @@ int physicalregions::getindex(int physicalregionnumber)
     {
         if (myphysicalregionnumbers[i] == physicalregionnumber)
             return i;
+    }
+    return -1;
+}
+
+int physicalregions::find(std::vector<int>& disjregsinphysreg)
+{
+    std::vector<bool> argdef(mydisjointregions->count(), false);
+    for (int i = 0; i < disjregsinphysreg.size(); i++)
+        argdef[disjregsinphysreg[i]] = true;
+
+    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+    {
+        if (myphysicalregions[i]->getdefinition() == argdef)
+            return myphysicalregionnumbers[i];
     }
     return -1;
 }

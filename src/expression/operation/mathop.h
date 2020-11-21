@@ -39,8 +39,8 @@ namespace mathop
     double getpi(void);
 
     // Perform operations (union, intersection) on physical regions:
-    int regionunion(const std::vector<int> physregs);
-    int regionintersection(const std::vector<int> physregs);
+    int regionunion(std::vector<int> physregs);
+    int regionintersection(std::vector<int> physregs);
     int regionall(void);
     
     // Check if a region is defined/empty/fully included in another region/touches another region:

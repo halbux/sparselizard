@@ -25,27 +25,27 @@ double mathop::getpi(void)
     return 3.1415926535897932384;
 }
 
-int mathop::regionunion(const std::vector<int> physregs)
+int mathop::regionunion(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
     universe::mymesh->getphysicalregions()->errornotsamedim(physregs);
     
-    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs);
-    return (universe::mymesh->getphysicalregions())->createunion(physregs);
+    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs, false);
+    return (universe::mymesh->getphysicalregions())->createunion(physregs, false);
 }
 
-int mathop::regionintersection(const std::vector<int> physregs)
+int mathop::regionintersection(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
     
-    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs);
-    return (universe::mymesh->getphysicalregions())->createintersection(physregs);
+    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs, false);
+    return (universe::mymesh->getphysicalregions())->createintersection(physregs, false);
 }
 
 int mathop::regionall(void)
 {
-    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunionofall();
-    return (universe::mymesh->getphysicalregions())->createunionofall();
+    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunionofall(false);
+    return (universe::mymesh->getphysicalregions())->createunionofall(false);
 }
 
 bool mathop::isregiondefined(int physreg)
