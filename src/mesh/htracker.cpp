@@ -624,7 +624,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
-    std:vector<bool> isedgesplit;
+    std::vector<bool> isedgesplit;
     myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
     
 
