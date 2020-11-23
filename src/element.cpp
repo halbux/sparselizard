@@ -102,6 +102,8 @@ std::string element::gettypename(void)
         case 7:
             return "pyramid";
     }
+    
+    abort(); // fix return warning
 }
 
 std::string element::gettypenameconjugation(int numberofelements)
@@ -130,6 +132,8 @@ std::string element::gettypenameconjugation(int numberofelements)
                 return "pyramids";
         }
     }
+    
+    abort(); // fix return warning
 }
 
 bool element::iscurved(void)
@@ -215,6 +219,8 @@ int element::getelementdimension(void)
         return 2;
     if (straighttypenumber > 3)
         return 3;
+        
+    abort(); // fix return warning
 }
 
 
@@ -379,6 +385,8 @@ int element::counttype(int typenum)
                 return 0;
         }
     }
+    
+    abort(); // fix return warning
 }
 
 int element::countdim(int dim)
@@ -394,6 +402,8 @@ int element::countdim(int dim)
         case 3:
             return counttype(4)+counttype(5)+counttype(6)+counttype(7);
     }
+    
+    abort(); // fix return warning
 }
 
 int element::countnodes(void)
@@ -458,6 +468,8 @@ bool element::isinsideelement(double ki, double eta, double phi)
         case 7:
             return (std::abs(ki) < 1-phi+roundoffnoise && std::abs(eta) < 1-phi+roundoffnoise && phi > -roundoffnoise && phi < 1+roundoffnoise);
     }
+    
+    abort(); // fix return warning
 }
 
 void element::isinsideelement(std::vector<double>& coords, std::vector<double>& cc, std::vector<bool>& isinside, double roundoffnoise)
@@ -744,6 +756,8 @@ std::vector<double> element::getedgebarycenter(std::vector<double>& nc)
                     0.5*(nc[3*3+0]+nc[3*1+0]), 0.5*(nc[3*3+1]+nc[3*1+1]), 0.5*(nc[3*3+2]+nc[3*1+2])};
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
@@ -761,6 +775,8 @@ std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
                     (nc[3*3+0]+nc[3*1+0]+nc[3*2+0])/3.0, (nc[3*3+1]+nc[3*1+1]+nc[3*2+1])/3.0, (nc[3*3+2]+nc[3*1+2]+nc[3*2+2])/3.0};
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
+    
+    abort(); // fix return warning
 }
 
 double element::measurereferenceelement(void)
@@ -792,6 +808,8 @@ double element::measurereferenceelement(void)
         case 7:
             return 4.0/3.0;
     }
+    
+    abort(); // fix return warning
 }
 
 bool element::istriangularface(int facenum)
@@ -829,6 +847,8 @@ bool element::istriangularface(int facenum)
             else
                 return false;
     }
+    
+    abort(); // fix return warning
 }
 
 bool element::ishorizontaledge(int edgenum)
@@ -837,7 +857,6 @@ bool element::ishorizontaledge(int edgenum)
         return false;
     else
         return true;
-    
 }
 
 std::vector<int> element::getnodesinline(int lineindex)
@@ -998,6 +1017,8 @@ std::vector<int> element::getedgesdefinitionsbasedonnodes(void)
         case 7:
             return {0,1,0,3,0,4,1,2,1,4,2,3,2,4,3,4};
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<int> element::getfacesdefinitionsbasedonnodes(void)
@@ -1029,6 +1050,8 @@ std::vector<int> element::getfacesdefinitionsbasedonnodes(void)
         case 7:
             return {0,1,4,3,0,4,1,2,4,2,3,4,0,3,2,1};
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<int> element::getfacesdefinitionsbasedonedges(void)
@@ -1060,6 +1083,8 @@ std::vector<int> element::getfacesdefinitionsbasedonedges(void)
         case 7:
             return {1,5,-3,-2,3,-8,4,7,-5,6,8,-7,2,-6,-4,-1};
     }
+    
+    abort(); // fix return warning
 }
 
 bool element::iselementedgeorface(void)
@@ -1206,6 +1231,8 @@ int element::deducetypenumber(int elemdim, int numnodes)
         case 8:
             return 5;
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int fi, bool returnnodecoords)
@@ -1548,6 +1575,8 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
         return 1;
     if (l25 <= l04 && l25 <= l13)
         return 2;
+        
+    abort(); // fix return warning
 }
 
 std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers)
@@ -1580,6 +1609,8 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
             return splitdef;
         }
     }
+    
+    abort(); // fix return warning
 }
         
 std::vector<std::vector<int>> element::splitline(int splitnum)
@@ -1626,6 +1657,8 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
         case 7:
             return {{},{},{0,3,5, 3,1,4, 3,4,5, 5,4,2},{},{},{},{},{}};
     }
+    
+    abort(); // fix return warning
 }    
 
 std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
@@ -1665,6 +1698,8 @@ std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
         case 15:
             return {{},{},{},{0,4,8,7, 4,1,5,8, 7,8,6,3, 8,5,2,6},{},{},{},{}};
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers)

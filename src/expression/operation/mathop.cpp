@@ -288,6 +288,8 @@ expression mathop::tangent(void)
         mynorm.reuseit();
         return array3x1(expr.jac(0,0), expr.jac(0,1), expr.jac(0,2))/mynorm;
     }
+    
+    abort(); // fix return warning
 }
 
 void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals, std::vector<double> compzevals)
@@ -989,6 +991,7 @@ expression mathop::div(expression input)
             return compx(dx(input))+compy(dy(input))+compz(dz(input));
     }
 
+    abort(); // fix return warning
 }
 
 expression mathop::curl(expression input)
@@ -1047,6 +1050,8 @@ expression mathop::curl(expression input)
         expr = transpose(expr.jac())*expr/expr.detjac();
         return expr;
     }
+    
+    abort(); // fix return warning
 }
 
 expression mathop::crossproduct(expression a, expression b)
@@ -1692,6 +1697,8 @@ expression mathop::strain(expression input)
         return expression(3,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(1,0) + gradu.at(0,1)});
     if (input.countrows() == 3)
         return expression(6,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(2,2), gradu.at(2,1) + gradu.at(1,2), gradu.at(0,2) + gradu.at(2,0), gradu.at(0,1) + gradu.at(1,0)});
+        
+    abort(); // fix return warning
 }
 
 expression mathop::greenlagrangestrain(expression input)
@@ -1737,6 +1744,8 @@ expression mathop::greenlagrangestrain(expression input)
         output.reuseit();
         return output;
     }
+    
+    abort(); // fix return warning
 }
 
 expression mathop::vonmises(expression stress)
@@ -2115,6 +2124,8 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
         }
         return -( H*strain(dofu) ) * strain(tfu);
     }
+    
+    abort(); // fix return warning
 }
 
 expression mathop::predefinedelasticity(expression dofu, expression tfu, field u, expression E, expression nu, expression prestress, std::string myoption)
@@ -2263,6 +2274,8 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
         else
             return -(H*ei)*deltae - (Si+prestress)*deltaeta - (Si+prestress)*deltae;
     }
+    
+    abort(); // fix return warning
 }
 
 expression mathop::predefinedelectrostaticforce(expression tfu, expression E, expression epsilon)
@@ -2302,6 +2315,8 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu)) );
     if (gradtfu.countcolumns() == 3)
         return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) - pow(compz(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu) + 2 * compx(E) * compz(E) * entry(2,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) - pow(compz(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu) + 2 * compy(E) * compz(E) * entry(2,1,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(2,2,gradtfu) - pow(compy(E),2) * entry(2,2,gradtfu) + pow(compz(E),2) * entry(2,2,gradtfu) + 2 * compz(E) * compx(E) * entry(0,2,gradtfu) + 2 * compz(E) * compy(E) * entry(1,2,gradtfu)) );
+        
+    abort(); // fix return warning
 }
 
 expression mathop::predefinedmagnetostaticforce(expression tfu, expression H, expression mu)

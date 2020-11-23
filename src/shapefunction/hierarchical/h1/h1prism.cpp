@@ -40,6 +40,8 @@ int h1prism::count(int order, int dim, int num)
         case 3:
             return 0.5*(order-2)*pow(order-1,2);
     }
+    
+    abort(); // fix return warning
 }
 
 

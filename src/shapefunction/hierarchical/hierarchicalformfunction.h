@@ -31,19 +31,19 @@ class hierarchicalformfunction
         std::string gettypename(int fftypenumber);
 
         // Get the number of form functions of order <= 'order':
-        virtual int count(int order) {};
+        virtual int count(int order) { abort(); }; // fix return warning
         // Get the number of form functions of order <= 'order' that are associated to the num th
         // - node   in case dim = 0 
         // - edge   in case dim = 1
         // - face   in case dim = 2 
         // - volume in case dim = 3 
-        virtual int count(int order, int dim, int num) {};
+        virtual int count(int order, int dim, int num) { abort(); }; // fix return warning
 
         // Get the number of components in the form function.
-        virtual int countcomponents(void) {};
+        virtual int countcomponents(void) { abort(); }; // fix return warning
 
         // 'evalat' takes an integer giving the highest order up to which to output the form function polynomials.
-        virtual hierarchicalformfunctioncontainer evalat(int maxorder) {};
+        virtual hierarchicalformfunctioncontainer evalat(int maxorder) { abort(); }; // fix return warning
 
         // If 'isorientationdependent' is false then the assembly can
         // be carried out without taking care of the element orientation.

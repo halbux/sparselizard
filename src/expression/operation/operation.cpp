@@ -135,6 +135,15 @@ bool operation::isvalueorientationdependent(std::vector<int> disjregs)
     return false;
 }
 
+std::shared_ptr<operation> operation::copy(void)
+{
+    std::cout << "Error in 'operation' object: cannot copy the operation" << std::endl;
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    std::cout << std::endl;
+    abort();
+}
+
 std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;

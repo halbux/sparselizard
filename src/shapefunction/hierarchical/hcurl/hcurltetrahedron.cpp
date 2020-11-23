@@ -44,6 +44,8 @@ int hcurltetrahedron::count(int order, int dim, int num)
         case 3:
             return 0.5*(order-2)*(order-1)*(order+1);
     }
+    
+    abort(); // fix return warning
 }
 
 

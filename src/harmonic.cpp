@@ -76,6 +76,8 @@ std::vector<std::pair<int,double>> harmonic::getproduct(int harm1, int harm2)
         else
             return {std::make_pair(getharmonicnumber(std::abs(freq1+freq2), true),0.5)};
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<std::pair<int,double>> harmonic::getproduct(int harm1, int harm2, int harm2timederivativeorder)

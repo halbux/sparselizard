@@ -54,6 +54,8 @@ int orientation::countorientations(int elemtypenum)
         case 7:
             return 1;
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<int> orientation::getedgesorientationsfromtotalorientation(int totalorientation, int elementtypenumber)

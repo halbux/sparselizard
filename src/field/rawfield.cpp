@@ -485,6 +485,8 @@ int rawfield::getfirstharmonic(void)
     }
     else
         return mysubfields[0][0]->getfirstharmonic();
+        
+    abort(); // fix return warning
 }
 
 bool rawfield::isharmonicincluded(int harmonic)

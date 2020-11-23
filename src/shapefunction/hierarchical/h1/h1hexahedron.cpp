@@ -35,6 +35,8 @@ int h1hexahedron::count(int order, int dim, int num)
         case 3:
             return pow(order-1,3);
     }
+    
+    abort(); // fix return warning
 }
 
 

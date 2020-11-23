@@ -46,6 +46,8 @@ int hcurlprism::count(int order, int dim, int num)
         case 3:
             return 1.5*(order+1)*order*(order-1);
     }
+    
+    abort(); // fix return warning
 }
 
 

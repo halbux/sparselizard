@@ -35,6 +35,8 @@ int hcurlhexahedron::count(int order, int dim, int num)
         case 3:
             return 3*order*order*(order+1);
     }
+    
+    abort(); // fix return warning
 }
 
 

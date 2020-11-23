@@ -35,6 +35,8 @@ int h11::count(int order, int dim, int num)
         case 3:
             return 3;
     }
+    
+    abort(); // fix return warning
 }
 
 

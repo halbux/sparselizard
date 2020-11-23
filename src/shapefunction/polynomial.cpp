@@ -358,6 +358,8 @@ polynomial polynomial::derivative(int whichderivative)
             return dphipoly;
         }
     }
+    
+    abort(); // fix return warning
 }
 
 

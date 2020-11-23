@@ -75,6 +75,8 @@ int hierarchicalformfunctioniterator::getformfunctionorder(void)
         if (currentformfunctionindexinnodeedgefacevolume < myformfunction->count(i, currentdimension, currentnodeedgefacevolumeindex) )
             return i;
     }
+    
+    abort(); // fix return warning
 }
 
 int hierarchicalformfunctioniterator::getassociatedelementtype(void)
@@ -98,6 +100,8 @@ int hierarchicalformfunctioniterator::getassociatedelementtype(void)
             // It is myelementtypenumber itself!
             return myelementtypenumber;
     }
+    
+    abort(); // fix return warning
 }
 
 void hierarchicalformfunctioniterator::print(void)

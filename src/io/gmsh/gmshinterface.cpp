@@ -772,5 +772,7 @@ char gmshinterface::getelementidentifierinposformat(int ourtypenumber)
         case 7:
             return 'Y';
     }
+    
+    abort(); // fix return warning
 }
 

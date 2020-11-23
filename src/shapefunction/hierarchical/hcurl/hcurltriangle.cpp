@@ -44,6 +44,8 @@ int hcurltriangle::count(int order, int dim, int num)
         case 3:
             return 0;
     }
+    
+    abort(); // fix return warning
 }
 
 

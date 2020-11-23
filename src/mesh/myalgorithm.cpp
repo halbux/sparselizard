@@ -210,6 +210,8 @@ bool sortfun(const std::tuple<int,int,double>& elem1, const std::tuple<int,int,d
         return true;
     if (std::get<1>(elem1) >= std::get<1>(elem2))
         return false;
+        
+    abort(); // fix return warning
 }
     
 void myalgorithm::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
@@ -689,6 +691,8 @@ int myalgorithm::findinterval(double val, std::vector<double>& tics)
         if (val >= tics[i] && val <= tics[i+1])
             return i;
     }
+    
+    abort(); // fix return warning
 }
 
 std::vector<double> myalgorithm::getintervaltics(double minval, double maxval, int numintervals)

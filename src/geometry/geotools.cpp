@@ -82,6 +82,8 @@ double geotools::getplanerotation(std::string xy, std::vector<double> p1, std::v
         return -180.0/pi*std::atan(-vnormal[1]/vnormal[2]);
     if (xy == "yrot")
         return 180.0/pi*std::atan(-vnormal[0]/vnormal[2]);
+        
+    abort(); // fix return warning
 }
 
 void geotools::rotate(double alphax, double alphay, double alphaz, std::vector<double>* coords)
