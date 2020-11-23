@@ -37,8 +37,6 @@ void nodes::print(void)
 
 std::vector<int> nodes::removeduplicates(void)
 {
-    int numberofnodes = count();
-    
     // 'noderenumbering' will give the renumbering corresponding to removed duplicates:
     std::vector<int> noderenumbering;
     int numberofnonduplicates = myalgorithm::removeduplicates(mycoordinates, noderenumbering);

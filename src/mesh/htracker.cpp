@@ -579,7 +579,6 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
     {
         int t = parenttypes[currentdepth];
         int ns = currentdepth;
-        int ic = indexesinclusters[currentdepth];
     
         if (withphysicals && ns == 0)
             oc = myelements->getnodecoordinates(t, origindexintype);
@@ -865,7 +864,6 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     {
         int t = parenttypes[currentdepth];
         int ns = currentdepth;
-        int ic = indexesinclusters[currentdepth];
     
         // Update 'actives':
         if (ns == 0)

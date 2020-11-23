@@ -999,7 +999,6 @@ void rawmesh::getattarget(std::vector<std::vector<int>>& values, std::shared_ptr
     std::shared_ptr<htracker> httarg = target->gethtracker();
         
     int numleaves = ht->countleaves();
-    int numleavestarg = httarg->countleaves();
         
     // Send from elements to leaves:
     std::vector<int> leafvalues(numleaves, -1);

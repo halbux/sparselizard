@@ -1439,7 +1439,6 @@ int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& el
     int numelems = elementnumbers.size();
     fieldorders.resize(numelems);
     
-    disjointregions* drs = universe::mymesh->getdisjointregions();
     elements* els = universe::mymesh->getelements();
 
     int maxorder = -1;
@@ -1775,7 +1774,7 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     
     
     ///// Extract the file format number:
-    int fileformatnum = intdata[0];
+    // int fileformatnum = intdata[0];
     
     
     ///// Extract the field type number and make sure the field type names match:
@@ -1924,8 +1923,6 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     
     int elementdimension = elemselect.getelementdimension();
     int problemdimension = universe::mymesh->getmeshdimension();
-    int numberofelements = elemselect.countinselection();
-    int numberofgausspoints = evaluationcoordinates.size()/3;
     int elementtypenumber = elemselect.getelementtypenumber();
     
     std::vector<densematrix> output(elementdimension*problemdimension);
