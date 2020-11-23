@@ -111,7 +111,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
             // Get the element dimension in the selected elements:
             int elementdimension = elemselect.getelementdimension();
 
-                dkiargmat = myfield->interpolate(1, formfunctioncomponent, elemselect, evaluationcoordinates);
+            dkiargmat = myfield->interpolate(1, formfunctioncomponent, elemselect, evaluationcoordinates);
             if (elementdimension > 1)
                 detaargmat = myfield->interpolate(2, formfunctioncomponent, elemselect, evaluationcoordinates);
             if (elementdimension > 2)
@@ -126,7 +126,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
                 if (dkiargmat[harm].size() == 0)
                     continue;
 
-                    dkiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,0));
+                dkiargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,0));
                 if (elementdimension > 1)
                 {
                     detaargmat[harm][0].multiplyelementwise(myjac->getinvjac(spacederivative-1,1));
