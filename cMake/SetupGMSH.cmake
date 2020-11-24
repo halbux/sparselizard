@@ -21,7 +21,7 @@ endif()
 message(STATUS "Looking for gmsh library")
 
 FIND_LIBRARY(GMSH_LIBRARIES
-    NAMES libgmsh.so
+    NAMES gmsh
     PATHS
     "${GMSH_PATH}/lib"
     REQUIRED OFF)

@@ -23,7 +23,7 @@ endif()
 message(STATUS "Looking for metis library at " ${PETSC_PATH})
 
 FIND_LIBRARY(BLAS_LIBRARIES
-    NAMES libopenblas.so
+    NAMES openblas
     PATHS
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"

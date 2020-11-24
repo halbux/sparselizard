@@ -23,7 +23,7 @@ endif()
 message(STATUS "Looking for slepc library at " ${PETSC_PATH})
 
 FIND_LIBRARY(SLEPC_LIBRARIES
-    NAMES libslepc.so
+    NAMES slepc
     PATHS
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"

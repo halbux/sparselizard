@@ -35,7 +35,7 @@ endif()
 message(STATUS "Looking for petsc library at " ${PETSC_PATH})
 
 FIND_LIBRARY(PETSC_LIBRARIES
-    NAMES libpetsc.so
+    NAMES petsc
     PATHS
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
