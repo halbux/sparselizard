@@ -19,7 +19,7 @@ set(SRC_DIR_LIST
   ${CMAKE_CURRENT_SOURCE_DIR}/expression/operation
   ${CMAKE_CURRENT_SOURCE_DIR}/gausspoint)
 
-custom_add_library_from_dir(sparselizard ${SRC_DIR_LIST})
+custom_add_library_from_dir(sparselizard "${SRC_DIR_LIST}")
 
 target_include_directories(sparselizard PUBLIC ${SRC_DIR_LIST})
 
