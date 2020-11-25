@@ -10,7 +10,7 @@ FIND_PATH(BLAS_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
-    REQUIRED ON)
+    )
 
 if(BLAS_INCLUDE_PATH)
     message(STATUS "Blas header cblas.h found at " ${BLAS_INCLUDE_PATH})
@@ -28,7 +28,7 @@ FIND_LIBRARY(BLAS_LIBRARIES
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
-    REQUIRED ON)
+    )
 
 if(BLAS_LIBRARIES)
     message(STATUS "Blas library found at " ${BLAS_LIBRARIES})
