@@ -34,7 +34,7 @@ ConfigurePETSC(sparselizard)
 ConfigureSLEPC(sparselizard)
 
 if(NOT (${BLAS_FOUND} AND ${METIS_FOUND} AND ${MUMPS_FOUND} AND ${PETSC_FOUND} AND ${SLEPC_FOUND}))
-    message(FATAL_ERROR "\nAt least one required library (blas, metis, mumps, petsc, slepc) was not found.")
+    message(FATAL_ERROR "\nAt least one required library (blas, metis, mumps, petsc, slepc) not found.")
 endif()
 
 # set configure file
