@@ -1,9 +1,0 @@
-#pragma once
-
-#cmakedefine SPARSELIZARD_HAS_BLAS
-#cmakedefine SPARSELIZARD_HAS_GMSH
-#cmakedefine SPARSELIZARD_HAS_METIS
-#cmakedefine SPARSELIZARD_HAS_MUMPS
-#cmakedefine SPARSELIZARD_HAS_PETSC
-#cmakedefine SPARSELIZARD_HAS_SLEPC
-

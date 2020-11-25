@@ -2,14 +2,14 @@
 #include "universe.h"
 
 
-#ifndef HAVE_GMSHAPI
+#ifndef HAVE_GMSH
 void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
     std::cout << "Error in 'gmshinterface' namespace: GMSH API is not available" << std::endl;
     abort();
 }
 #endif
-#ifdef HAVE_GMSHAPI
+#ifdef HAVE_GMSH
 #include "gmsh.h"
 void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {    
