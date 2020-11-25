@@ -8,7 +8,7 @@ FIND_PATH(GMSH_INCLUDE_PATH
     NAMES gmsh.h
     PATHS
     "${GMSH_PATH}/include"
-    REQUIRED OFF)
+    )
 
 if(GMSH_INCLUDE_PATH)
     message(STATUS "Gmsh headers found at " ${GMSH_INCLUDE_PATH})
@@ -24,7 +24,7 @@ FIND_LIBRARY(GMSH_LIBRARIES
     NAMES gmsh
     PATHS
     "${GMSH_PATH}/lib"
-    REQUIRED OFF)
+    )
 
 if(GMSH_LIBRARIES)
     message(STATUS "Gmsh library found at " ${GMSH_LIBRARIES})

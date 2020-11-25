@@ -10,7 +10,7 @@ FIND_PATH(METIS_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
-    REQUIRED ON)
+    )
 
 if(METIS_INCLUDE_PATH)
     message(STATUS "Metis headers found at " ${METIS_INCLUDE_PATH})
@@ -28,7 +28,7 @@ FIND_LIBRARY(METIS_LIBRARIES
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
-    REQUIRED ON)
+    )
 
 if(METIS_LIBRARIES)
     message(STATUS "Metis library found at " ${METIS_LIBRARIES})
@@ -39,11 +39,10 @@ endif()
 
 if(METIS_INCLUDE_PATH AND METIS_LIBRARIES)
     SET(METIS_FOUND YES PARENT_SCOPE)
+
+    TARGET_INCLUDE_DIRECTORIES(${TARGET} PUBLIC ${METIS_INCLUDE_PATH})
+    TARGET_LINK_LIBRARIES(${TARGET} PUBLIC ${METIS_LIBRARIES})
 endif()
-
-
-TARGET_INCLUDE_DIRECTORIES(${TARGET} PUBLIC ${METIS_INCLUDE_PATH})
-TARGET_LINK_LIBRARIES(${TARGET} PUBLIC ${METIS_LIBRARIES})
 
 
 endfunction(ConfigureMETIS)
