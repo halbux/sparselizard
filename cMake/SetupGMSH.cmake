@@ -2,7 +2,7 @@ function(ConfigureGMSH TARGET)
 
 
 # Find gmsh headers:
-message(STATUS "Looking for gmsh headers")
+message(STATUS "Looking for gmsh headers at " ${GMSH_PATH})
 
 FIND_PATH(GMSH_INCLUDE_PATH
     NAMES gmsh.h
@@ -18,7 +18,7 @@ endif()
 
 
 # Find gmsh library:
-message(STATUS "Looking for gmsh library")
+message(STATUS "Looking for gmsh library at " ${GMSH_PATH})
 
 FIND_LIBRARY(GMSH_LIBRARIES
     NAMES gmsh
