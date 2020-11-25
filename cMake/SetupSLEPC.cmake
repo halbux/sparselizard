@@ -2,8 +2,6 @@ function(ConfigureSLEPC TARGET)
 
 
 # Find slepc headers:
-message(STATUS "Looking for slepc headers at " ${PETSC_PATH})
-
 FIND_PATH(SLEPC_INCLUDE_PATH
     NAMES slepc.h
     PATHS
@@ -20,8 +18,6 @@ endif()
 
 
 # Find slepc library:
-message(STATUS "Looking for slepc library at " ${PETSC_PATH})
-
 FIND_LIBRARY(SLEPC_LIBRARIES
     NAMES slepc
     PATHS

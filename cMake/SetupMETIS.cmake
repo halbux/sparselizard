@@ -2,8 +2,6 @@ function(ConfigureMETIS TARGET)
 
 
 # Find metis headers:
-message(STATUS "Looking for metis headers at " ${PETSC_PATH})
-
 FIND_PATH(METIS_INCLUDE_PATH
     NAMES metis.h
     PATHS
@@ -20,8 +18,6 @@ endif()
 
 
 # Find metis library:
-message(STATUS "Looking for metis library at " ${PETSC_PATH})
-
 FIND_LIBRARY(METIS_LIBRARIES
     NAMES metis
     PATHS

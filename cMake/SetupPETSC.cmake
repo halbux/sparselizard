@@ -2,8 +2,6 @@ function(ConfigurePETSC TARGET)
 
 
 # Find petsc headers:
-message(STATUS "Looking for petsc headers at " ${PETSC_PATH})
-
 FIND_PATH(PETSC_INCLUDE_PATH
     NAMES petsc.h
     PATHS
@@ -32,8 +30,6 @@ endif()
 
 
 # Find petsc library:
-message(STATUS "Looking for petsc library at " ${PETSC_PATH})
-
 FIND_LIBRARY(PETSC_LIBRARIES
     NAMES petsc
     PATHS

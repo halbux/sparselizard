@@ -2,8 +2,6 @@ function(ConfigureBLAS TARGET)
 
 
 # Find blas headers:
-message(STATUS "Looking for blas headers at " ${PETSC_PATH})
-
 FIND_PATH(BLAS_INCLUDE_PATH
     NAMES cblas.h
     PATHS
@@ -20,8 +18,6 @@ endif()
 
 
 # Find blas library:
-message(STATUS "Looking for blas library at " ${PETSC_PATH})
-
 FIND_LIBRARY(BLAS_LIBRARIES
     NAMES openblas
     PATHS
