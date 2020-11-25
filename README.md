@@ -26,7 +26,7 @@ In order to create a new simulation:
 
 1. Copy `simulations/default` folder with different name. Let's say that the new folder is
    `simulations/newsim`
-1. Replace target name `default` with the unique one in `simulations/newsim/CMakeLists.txt`
+1. Replace target name `default` with the new one in `simulations/newsim/CMakeLists.txt`
 1. Add line `add_subdirectory(newsim)` to the `simulations/CMakeLists.txt`
 1. Build as usual. Executable file will be located in `build/simulations/newsim` folder
 
