@@ -19,8 +19,8 @@ else()
 endif()
 
 
-# Find metis library:
-message(STATUS "Looking for metis library at " ${PETSC_PATH})
+# Find blas library:
+message(STATUS "Looking for blas library at " ${PETSC_PATH})
 
 FIND_LIBRARY(BLAS_LIBRARIES
     NAMES openblas
