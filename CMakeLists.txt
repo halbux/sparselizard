@@ -29,9 +29,9 @@ include(cMake/SetupMUMPS.cmake)
 include(cMake/SetupPETSC.cmake)
 include(cMake/SetupSLEPC.cmake)
 
-# add libsparselizard target
+# Add libsparselizard target
 add_subdirectory(src)
 
-# add simulations targets
+# Add simulations targets
 add_subdirectory(simulations)
 
