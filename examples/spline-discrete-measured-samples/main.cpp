@@ -5,7 +5,7 @@
 // The sampling points should not be placed too close to each other to avoid numerical issues.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

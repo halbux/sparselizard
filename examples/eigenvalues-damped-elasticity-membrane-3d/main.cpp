@@ -2,7 +2,7 @@
 // 3D disk that is clamped at its outer face and subject to proportional damping.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

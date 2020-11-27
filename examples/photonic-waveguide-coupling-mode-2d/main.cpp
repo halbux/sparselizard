@@ -22,7 +22,7 @@
 //
 // Credits: R. Haouari
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 using namespace mathop;
 

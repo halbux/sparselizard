@@ -2,7 +2,7 @@
 // conducting trace connected to a circular-shaped parallel-plate air capacitor.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

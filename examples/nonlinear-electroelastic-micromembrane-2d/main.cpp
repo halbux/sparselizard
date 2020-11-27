@@ -9,7 +9,7 @@
 // is adapted to every geometrical region.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

@@ -11,7 +11,7 @@
 // - mu is the dynamic viscosity of air [Pa.s]
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

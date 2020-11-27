@@ -2,7 +2,7 @@
 // The 'disk.msh' file is loaded and a thin extra disk slice is added on top of it.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

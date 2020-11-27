@@ -12,7 +12,7 @@
 // Micromembranes Vibrating in a Fluid" (A Halbach, C Geuzaine).
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

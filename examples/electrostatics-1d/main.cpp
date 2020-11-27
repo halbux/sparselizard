@@ -2,7 +2,7 @@
 // the left point is forced at 10 V and the right point is at 2 V.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

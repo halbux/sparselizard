@@ -5,7 +5,7 @@
 // The silicon and PZT crystals are rotated to align with a selected orientation.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

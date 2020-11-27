@@ -10,7 +10,7 @@
 // Mechanical coupling with a glass membrane and radiation simulated as well 
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 #include <iostream>
 #include <fstream>
 #include <string>

@@ -17,7 +17,7 @@
 // want it to be constrained.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

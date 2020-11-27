@@ -8,7 +8,7 @@
 // This allows to work with the non-matching mesh at the interface when the rotor moves.  
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

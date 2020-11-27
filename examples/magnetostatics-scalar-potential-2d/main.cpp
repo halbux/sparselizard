@@ -5,7 +5,7 @@
 // The permanent magnets are treated as pre-magnetized pieces of non-magnetic material (since all magnetic domains are already fully oriented).
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

@@ -2,7 +2,7 @@
 // force is applied. The disk is clamped at its outer face.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

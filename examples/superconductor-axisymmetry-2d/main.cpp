@@ -12,7 +12,7 @@
 // high-temperature superconductors: a 3D finite element method using a single time-step iteration" (G. Lousberg)
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

@@ -2,7 +2,7 @@
 // The GMSH API must be available (run the appropriate script in 'install_external_libs' for that).
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 #include "gmsh.h"
 
 

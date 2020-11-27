@@ -16,7 +16,7 @@
 // Region number -1 is used for all construction geometries (not used in the simulation).
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

@@ -7,7 +7,7 @@
 // values can then be saved to .csv using 'writevector' and 'polarplot' could be used in Matlab for visualization. 
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

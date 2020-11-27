@@ -9,7 +9,7 @@
 // 'greenlagrangestrain' function instead of the 'strain' function to correctly compute the strains (see documentation and examples).
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

@@ -6,7 +6,7 @@
 // account. Because of this the problem is nonlinear and requires an iterative resolution to converge.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

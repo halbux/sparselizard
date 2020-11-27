@@ -4,7 +4,7 @@
 // The geometry is a square of side 'a' with 'n' mesh points in the x and y direction.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

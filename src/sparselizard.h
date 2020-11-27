@@ -3,8 +3,8 @@
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
-#ifndef SPARSELIZARDBASE_H
-#define SPARSELIZARDBASE_H
+#ifndef SPARSELIZARD_H
+#define SPARSELIZARD_H
 
 #include "mesh.h"
 #include "field.h"
@@ -21,7 +21,7 @@
 #include "intdensematrix.h"
 #include "spline.h"
 
-class sparselizardbase
+class sparselizard
 {
     private:
         

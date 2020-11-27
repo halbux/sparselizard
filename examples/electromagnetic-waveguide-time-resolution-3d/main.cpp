@@ -3,7 +3,7 @@
 // initial all-zero conditions.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

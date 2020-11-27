@@ -10,7 +10,7 @@
 // P-adaptivity is used.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

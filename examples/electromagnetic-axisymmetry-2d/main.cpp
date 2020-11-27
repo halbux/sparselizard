@@ -1,6 +1,6 @@
 // This is a benchmark example to validate 2D axisymmetry with 'hcurl' fields for electromagnetic waves.
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

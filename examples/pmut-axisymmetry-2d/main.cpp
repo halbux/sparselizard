@@ -24,7 +24,7 @@
 // It should thus be no surprise that the resonance frequencies and deflections do not match the paper values.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

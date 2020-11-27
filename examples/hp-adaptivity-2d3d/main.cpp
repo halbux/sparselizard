@@ -1,7 +1,7 @@
 // The purpose of this example is to check that hp-adaptivity works as expected when the software is modified.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

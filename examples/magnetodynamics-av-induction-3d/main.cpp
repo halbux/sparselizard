@@ -11,7 +11,7 @@
 // software (Patrick Dular and Christophe Geuzaine).
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

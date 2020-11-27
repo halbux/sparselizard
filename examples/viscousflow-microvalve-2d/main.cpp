@@ -6,7 +6,7 @@
 // infinite parallel plates with a thin gap. Only the geometry has to be adapted.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

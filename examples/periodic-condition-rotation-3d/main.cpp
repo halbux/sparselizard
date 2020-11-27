@@ -6,7 +6,7 @@
 // In the .nas mesh used the meshes on both faces of the periodic condition do not match.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

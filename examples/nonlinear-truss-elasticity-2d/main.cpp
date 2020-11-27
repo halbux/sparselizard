@@ -3,7 +3,7 @@
 // Geometric nonlinearity is taken into account.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

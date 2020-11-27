@@ -8,7 +8,7 @@
 // resolution available in sparselizard.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;

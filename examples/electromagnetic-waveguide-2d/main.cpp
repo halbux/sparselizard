@@ -2,7 +2,7 @@
 // 2D waveguide made of a perfect conductor.
 
 
-#include "sparselizardbase.h"
+#include "sparselizard.h"
 
 
 using namespace mathop;
