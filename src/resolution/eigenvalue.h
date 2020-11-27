@@ -54,13 +54,13 @@ class eigenvalue
         void compute(int numeigenvaluestocompute, double targeteigenvaluemagnitude = 0.0);
         
         // Get the number of eigs found:
-        int count(void) { return eigenvaluereal.size(); };
+        int count(void);
         
-        std::vector<double> geteigenvaluerealpart();
-        std::vector<double> geteigenvalueimaginarypart();
+        std::vector<double> geteigenvaluerealpart(void);
+        std::vector<double> geteigenvalueimaginarypart(void);
         
-        std::vector<vec> geteigenvectorrealpart();
-        std::vector<vec> geteigenvectorimaginarypart();
+        std::vector<vec> geteigenvectorrealpart(void);
+        std::vector<vec> geteigenvectorimaginarypart(void);
         
         // Print the eigenvalues:
         void printeigenvalues(void);

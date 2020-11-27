@@ -203,6 +203,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
     }
 }
 
+int eigenvalue::count(void) { return eigenvaluereal.size(); }
+
 std::vector<double> eigenvalue::geteigenvaluerealpart(void) { return eigenvaluereal; }
 std::vector<double> eigenvalue::geteigenvalueimaginarypart(void) { return eigenvalueimaginary; }
 std::vector<vec> eigenvalue::geteigenvectorrealpart(void) { return eigenvectorreal; }
