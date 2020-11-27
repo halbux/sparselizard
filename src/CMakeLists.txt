@@ -21,6 +21,8 @@ set(SRC_DIR_LIST
 
 custom_add_library_from_dir(sparselizard "${SRC_DIR_LIST}")
 
+custom_copy_file(sparselizard "${SRC_DIR_LIST}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/include" "*.h")
+
 target_include_directories(sparselizard PUBLIC ${SRC_DIR_LIST})
 
 target_compile_features(sparselizard PRIVATE cxx_std_11)
