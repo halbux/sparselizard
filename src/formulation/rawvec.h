@@ -18,7 +18,7 @@
 #include "memory.h"
 #include "petsc.h"
 #include "petscvec.h"
-#include "mathop.h"
+#include "sl.h"
 #include "ptracker.h"
 #include "rawmesh.h"
 

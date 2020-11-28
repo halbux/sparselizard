@@ -196,7 +196,7 @@ void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::
             if (fieldconstraints[disjreg]->isprojectionofzero == false)
             {
                 projectconstraint.generate();
-                constraintvalvec = mathop::solve(projectconstraint.A(), projectconstraint.b());
+                constraintvalvec = sl::solve(projectconstraint.A(), projectconstraint.b());
             }
 
             // Loop on all disjoint regions who share the same constraint-computation-formulation:
@@ -352,7 +352,7 @@ void rawvec::write(std::string filename)
             intdensematrix adresses(1,size(),0,1);
             densematrix curvals = getvalues(adresses);
             curvals.getvalues(towrite);
-            mathop::writevector(filename, towrite, ',', true);
+            sl::writevector(filename, towrite, ',', true);
             return;
         }
         if (fileext == ".bin")
@@ -387,7 +387,7 @@ void rawvec::load(std::string filename)
         
         if (fileext == ".txt")
         {
-            std::vector<double> loadedvals = mathop::loadvector(filename, ',', true);
+            std::vector<double> loadedvals = sl::loadvector(filename, ',', true);
             if (loadedvals.size() != size())
             {
                 std::cout << "Error in 'rawvec' object: loaded data size (" << loadedvals.size() << ") does not match the vector size (" << size() << ") " << std::endl;

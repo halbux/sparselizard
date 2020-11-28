@@ -1,7 +1,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 int main(void)
 {	

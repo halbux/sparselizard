@@ -7,7 +7,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 mesh createmesh(double a, int n);
 

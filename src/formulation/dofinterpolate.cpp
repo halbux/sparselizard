@@ -30,11 +30,11 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     {
         expression shiftexpr = *(myoncontext->getshift());
     
-        xdef = x+mathop::compx(shiftexpr);
+        xdef = x+sl::compx(shiftexpr);
         if (shiftexpr.countrows() > 1)
-            ydef = y+mathop::compy(shiftexpr);
+            ydef = y+sl::compy(shiftexpr);
         if (shiftexpr.countrows() > 2)
-            zdef = z+mathop::compz(shiftexpr);
+            zdef = z+sl::compz(shiftexpr);
     }   
 
     bool isorientationdependent = (myoncontext->isshifted() && myoncontext->getshift()->isvalueorientationdependent(elsel.getdisjointregions()));

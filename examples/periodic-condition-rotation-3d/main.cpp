@@ -9,7 +9,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 void processmesh(void);
 

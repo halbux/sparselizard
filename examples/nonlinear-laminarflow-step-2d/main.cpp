@@ -28,7 +28,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 // First four arguments give the geometry dimension, last four arguments give the mesh size:
 mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, int nh1, int nh2);

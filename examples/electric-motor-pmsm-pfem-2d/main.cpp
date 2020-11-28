@@ -13,7 +13,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 // Input is rotor angular position in degrees. Output is torque in Nm.
 

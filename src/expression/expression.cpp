@@ -260,7 +260,7 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
         
         expression oneless(posoneless, exprsoneless, tocompare);
         
-        expr = mathop::ifpositive(tocompare-pos[numintervals-2], exprs[numintervals-1], oneless);
+        expr = sl::ifpositive(tocompare-pos[numintervals-2], exprs[numintervals-1], oneless);
     }
     
     mynumrows = expr.mynumrows; mynumcols = expr.mynumcols;
@@ -1222,7 +1222,7 @@ vec expression::atbarycenter(int physreg, field onefield)
     // Compute the expression at the barycenter:
     formulation formul;
     
-    integration myterm(physreg, - mathop::tf(onefield)*(this->getcopy()));
+    integration myterm(physreg, - sl::tf(onefield)*(this->getcopy()));
     myterm.isbarycentereval = true;
 
     formul += myterm;
@@ -1283,16 +1283,16 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     
     if (leftop != "" && leftop[0] == 'R' || rightop != "" && rightop[0] == 'R')
     {
-        R = mathop::rotation(ax, ay, az)[0];
-        RT = mathop::transpose(R);   
+        R = sl::rotation(ax, ay, az)[0];
+        RT = sl::transpose(R);   
     }
         
     if (leftop != "" && leftop[0] == 'K' || rightop != "" && rightop[0] == 'K')
     {
-        std::vector<expression> Ks = mathop::rotation(ax, ay, az, "voigt");
+        std::vector<expression> Ks = sl::rotation(ax, ay, az, "voigt");
         K = Ks[0]; invK = Ks[1];
-        KT = mathop::transpose(K);
-        invKT = mathop::transpose(invK);
+        KT = sl::transpose(K);
+        invKT = sl::transpose(invK);
     }
     
     
@@ -1811,7 +1811,7 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
         {
             // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftfpolynomial').
             field dummy("h1");
-            expression curexpr = expression(onexpr.myoperations[i]) * mathop::tf(dummy);
+            expression curexpr = expression(onexpr.myoperations[i]) * sl::tf(dummy);
             curexpr.expand();
         
             int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();

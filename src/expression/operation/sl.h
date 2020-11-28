@@ -5,8 +5,8 @@
 //
 // Thanks to R. Haouari for the stabilization terms.
 
-#ifndef MATHOP_H
-#define MATHOP_H
+#ifndef SL_H
+#define SL_H
 
 #include <iostream>
 #include <string>
@@ -29,7 +29,7 @@ class parameter;
 class formulation;
 class shape;
 
-namespace mathop
+namespace sl
 {
     // Get the code version number and name:
     void printversion(void);

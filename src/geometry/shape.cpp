@@ -203,7 +203,7 @@ void shape::move(expression u)
         abort();
     }
     u = u.resize(3,1);
-    rawshapeptr->move(mathop::compx(u), mathop::compy(u), mathop::compz(u));
+    rawshapeptr->move(sl::compx(u), sl::compy(u), sl::compz(u));
 }
 
 void shape::shift(double shiftx, double shifty, double shiftz)

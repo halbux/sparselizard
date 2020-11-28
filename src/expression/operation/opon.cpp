@@ -31,11 +31,11 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     
     if (mycoordshift.size() > 0)
     {
-        xdef = x+mathop::compx(mycoordshift[0]);
+        xdef = x+sl::compx(mycoordshift[0]);
         if (mycoordshift[0].countrows() > 1)
-            ydef = y+mathop::compy(mycoordshift[0]);
+            ydef = y+sl::compy(mycoordshift[0]);
         if (mycoordshift[0].countrows() > 2)
-            zdef = z+mathop::compz(mycoordshift[0]);
+            zdef = z+sl::compz(mycoordshift[0]);
     }   
     expression xyz(3, 1, {xdef,ydef,zdef});
     
@@ -139,11 +139,11 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
     
     if (mycoordshift.size() > 0)
     {
-        xdef = x+mathop::compx(mycoordshift[0]);
+        xdef = x+sl::compx(mycoordshift[0]);
         if (mycoordshift[0].countrows() > 1)
-            ydef = y+mathop::compy(mycoordshift[0]);
+            ydef = y+sl::compy(mycoordshift[0]);
         if (mycoordshift[0].countrows() > 2)
-            zdef = z+mathop::compz(mycoordshift[0]);
+            zdef = z+sl::compz(mycoordshift[0]);
     }   
     expression xyz(3, 1, {xdef,ydef,zdef});
     

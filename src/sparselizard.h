@@ -15,7 +15,7 @@
 #include "petsc.h"
 #include "wallclock.h"
 #include "mat.h"
-#include "mathop.h"
+#include "sl.h"
 #include "resolution.h"
 #include "densematrix.h"
 #include "intdensematrix.h"

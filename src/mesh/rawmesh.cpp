@@ -215,7 +215,7 @@ std::shared_ptr<rawmesh> rawmesh::copy(void)
 
 std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt)
 {
-    // All calls from mathop::adapt immediately return (myptracker always equals targetpt).
+    // All calls from sl::adapt immediately return (myptracker always equals targetpt).
     if (myptracker == targetpt)
         return shared_from_this();
 
@@ -317,7 +317,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     int maxphysreg = 0;
     for (int i = 0; i < numfiles; i++)
     {
-        allshapes[i] = mathop::loadshape(meshfiles[i]);
+        allshapes[i] = sl::loadshape(meshfiles[i]);
         
         for (int d = 0; d < 4; d++)
         {
@@ -820,7 +820,7 @@ bool rawmesh::adapthp(int verbosity)
         std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
         
         pcrits[i] = std::get<1>(mypadaptdata[i]).atbarycenter(wholedomain, one);
-        fos[i] = mathop::fieldorder(field(curraw)).atbarycenter(wholedomain, one);
+        fos[i] = sl::fieldorder(field(curraw)).atbarycenter(wholedomain, one);
     }
     
     universe::allowestimatorupdate(false);
@@ -1551,7 +1551,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
 
 void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
 {       
-    criterion = mathop::abs(criterion);
+    criterion = sl::abs(criterion);
     
     myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits)};   
 }

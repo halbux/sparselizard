@@ -12,7 +12,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 // First arguments give the geometry size, last arguments give the number of nodes for meshing.
 mesh createmesh(double length, double width, double thsi, double tracetilt, double ltrace, double wtrace, double rtrace, double thtrace, int numtraces, int nx, int ny, int nz, int nltrace, int nwtrace, int nthtrace);

@@ -148,7 +148,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             universe::currenttimestep = t;
             
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
-            mathop::solve(tosolvebefore);
+            sl::solve(tosolvebefore);
         
             vec utolcalc = unext;
             
@@ -210,14 +210,14 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
             
-            anext = mathop::solve(leftmat, rightvec);
+            anext = sl::solve(leftmat, rightvec);
 
             // Update unext and vnext:
             unext = u + dt*v + ((0.5-beta)*dt*dt)*a + (beta*dt*dt)*anext;
             vnext = v + (dt*(1-gamma))*a + (gamma*dt)*anext;
             
             // Update all fields in the formulation:
-            mathop::setdata(unext);
+            sl::setdata(unext);
             
             relchange = (unext-utolcalc).norm()/unext.norm();
             
@@ -227,7 +227,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             nlit++; 
 
             // Solve all formulations that must be solved at the end of the nonlinear loop:
-            mathop::solve(tosolveafter);
+            sl::solve(tosolveafter);
             
             // Make all time derivatives available in the universe:
             universe::xdtxdtdtx = {{},{vnext},{anext}};
@@ -258,11 +258,11 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             {
                 dt *= rfact;
                 // Reset fields for a new resolution:
-                mathop::setdata(u);
+                sl::setdata(u);
                 for (int i = 0; i < presols.size(); i++)
-                    mathop::setdata(presols[i]);
+                    sl::setdata(presols[i]);
                 for (int i = 0; i < postsols.size(); i++)
-                    mathop::setdata(postsols[i]);
+                    sl::setdata(postsols[i]);
             }
                 
             dt = std::min(dt, maxdt);

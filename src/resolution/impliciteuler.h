@@ -16,7 +16,7 @@
 #include <vector>
 #include "vec.h"
 #include "universe.h"
-#include "mathop.h"
+#include "sl.h"
 #include "formulation.h"
 
 class impliciteuler

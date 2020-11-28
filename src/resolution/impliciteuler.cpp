@@ -132,7 +132,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
         while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
-            mathop::solve(tosolvebefore);
+            sl::solve(tosolvebefore);
             
             vec xtolcalc = xnext;
             
@@ -166,12 +166,12 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             }
             
             // Update the solution xnext.
-            xnext = relaxationfactor * mathop::solve(leftmat, C*x+dt*rhs) + (1.0-relaxationfactor)*xnext;
+            xnext = relaxationfactor * sl::solve(leftmat, C*x+dt*rhs) + (1.0-relaxationfactor)*xnext;
             
             dtxnext = 1.0/dt*(xnext-x);
             
             // Update all fields in the formulation:
-            mathop::setdata(xnext);
+            sl::setdata(xnext);
             
             relchange = (xnext-xtolcalc).norm()/xnext.norm();
             
@@ -181,7 +181,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             nlit++; 
             
             // Solve all formulations that must be solved at the end of the nonlinear loop:
-            mathop::solve(tosolveafter);
+            sl::solve(tosolveafter);
             
             // Make all time derivatives available in the universe:
             universe::xdtxdtdtx = {{},{dtxnext},{}};
@@ -212,11 +212,11 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             {
                 dt *= rfact;
                 // Reset fields for a new resolution:
-                mathop::setdata(x);
+                sl::setdata(x);
                 for (int i = 0; i < presols.size(); i++)
-                    mathop::setdata(presols[i]);
+                    sl::setdata(presols[i]);
                 for (int i = 0; i < postsols.size(); i++)
-                    mathop::setdata(postsols[i]);
+                    sl::setdata(postsols[i]);
             }
                 
             dt = std::min(dt, maxdt);

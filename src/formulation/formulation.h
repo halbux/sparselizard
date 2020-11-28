@@ -15,7 +15,7 @@
 #include "vec.h"
 #include "mat.h"
 #include "expression.h"
-#include "mathop.h"
+#include "sl.h"
 #include "universe.h"
 #include "memory.h"
 #include "densematrix.h"

@@ -132,7 +132,7 @@ void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
     
     formulation evalatnodes;
     
-    integration myterm(physreg, -mathop::athp(field(originalthis), myrawmesh, myptracker) * mathop::tf(thisfield));
+    integration myterm(physreg, -sl::athp(field(originalthis), myrawmesh, myptracker) * sl::tf(thisfield));
     myterm.isbarycentereval = true;    
     
     evalatnodes += myterm;
@@ -175,7 +175,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     // Create the formulation to get block A and v:
     formulation blockAv;
     // A and v blocks of the projection:
-    blockAv += mathop::integral(physreg, mathop::dof(thisfield) * mathop::tf(thisfield) - mathop::athp(field(originalthis), myrawmesh, myptracker) * mathop::tf(thisfield), myupdateaccuracy);
+    blockAv += sl::integral(physreg, sl::dof(thisfield) * sl::tf(thisfield) - sl::athp(field(originalthis), myrawmesh, myptracker) * sl::tf(thisfield), myupdateaccuracy);
   
     std::shared_ptr<dofmanager> dm = blockAv.getdofmanager();
     dm->selectfield(shared_from_this());
@@ -232,9 +232,9 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
             // Create the formulation to get block B and w:
             formulation blockB;
             // To get the structure right:
-            blockB += mathop::integral(dirichletphysreg, 0 * mathop::dof(thisfield) * mathop::tf(thisfield), myupdateaccuracy);
+            blockB += sl::integral(dirichletphysreg, 0 * sl::dof(thisfield) * sl::tf(thisfield), myupdateaccuracy);
             // B block of the projection:
-            blockB += mathop::integral(physreg, mathop::dof(thisfield, dirichletphysreg) * mathop::tf(thisfield), myupdateaccuracy);
+            blockB += sl::integral(physreg, sl::dof(thisfield, dirichletphysreg) * sl::tf(thisfield), myupdateaccuracy);
             // Get block B:
             blockB.generatestiffnessmatrix();
             mat B = blockB.A();
@@ -688,7 +688,7 @@ void rawfield::setorder(expression criterion, int loworder, int highorder)
     {
         ispadaptive = true;
         
-        criterion = mathop::abs(criterion);
+        criterion = sl::abs(criterion);
         
         universe::mymesh->add(shared_from_this(), criterion, loworder, highorder);
     }
@@ -720,15 +720,15 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
         // Compute the projection of the expression (skip for a zero expression):
         formulation projectedvalue;
         if (meshdeform == NULL)
-            projectedvalue += integration(physreg, numfftharms, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree);
+            projectedvalue += integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree);
         else
-            projectedvalue += integration(physreg, numfftharms, *meshdeform, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree);
+            projectedvalue += integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree);
         // Define an all-zero vector:
         vec solvec(projectedvalue);
         if (input.iszero() == false)
         {
             projectedvalue.generate();
-            solvec = mathop::solve(projectedvalue.A(), projectedvalue.b());
+            solvec = sl::solve(projectedvalue.A(), projectedvalue.b());
         }
         
         setdata(physreg, solvec|thisfield, "set");
@@ -878,9 +878,9 @@ void rawfield::setconstraint(int physreg, int numfftharms, expression* meshdefor
         std::shared_ptr<integration> constraintcomputation;
         
         if (meshdeform == NULL)
-            constraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree));
+            constraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
         else
-            constraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, mathop::dof(thisfield)*mathop::tf(thisfield) - mathop::tf(thisfield)*input, extraintegrationdegree));
+            constraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
         
         if (input.iszero())
             constraintcomputation->isprojectionofzero = true;

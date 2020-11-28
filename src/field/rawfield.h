@@ -31,7 +31,7 @@
 #include "universe.h"
 #include "expression.h"
 #include "integration.h"
-#include "mathop.h"
+#include "sl.h"
 #include "harmonic.h"
 #include "densematrix.h"
 #include "element.h"

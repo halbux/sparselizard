@@ -17,7 +17,7 @@
 
 using namespace std;
 
-using namespace mathop;
+using namespace sl;
 
 // Arguments are:
 // r cavity, membrane radius

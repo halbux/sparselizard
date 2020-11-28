@@ -1,5 +1,5 @@
 #include "spline.h"
-#include "mathop.h"
+#include "sl.h"
 #include "mat.h"
 #include "vec.h"
 #include "myalgorithm.h"
@@ -7,7 +7,7 @@
 
 spline::spline(std::string filename, char delimiter)
 {
-    std::vector<double> data = mathop::loadvector(filename, delimiter, false);
+    std::vector<double> data = sl::loadvector(filename, delimiter, false);
     
     if (data.size()%2 != 0)
     {
@@ -111,7 +111,7 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     mat A(len, Arows, Acols, Av);
     vec b(len, intdensematrix(len,1,0,1), bv);
     
-    vec k = mathop::solve(A,b);
+    vec k = sl::solve(A,b);
     densematrix kv = k.getvalues(intdensematrix(len,1,0,1));
     double* kvals = kv.getvalues();
     
@@ -258,6 +258,6 @@ void spline::write(std::string filename, int numsplits, char delimiter)
         data[2*i+1] = evaledvals[i];
     }
     
-    mathop::writevector(filename, data, delimiter, false);
+    sl::writevector(filename, data, delimiter, false);
 }
 

@@ -6,7 +6,7 @@
 #include "gmsh.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 int main(void)
 {	

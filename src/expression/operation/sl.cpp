@@ -1,31 +1,31 @@
-#include "mathop.h"
+#include "sl.h"
 #include "rawpoint.h"
 #include "rawline.h"
 #include "rawsurface.h"
 #include "rawvolume.h"
 
 
-int mathop::getversion(void)
+int sl::getversion(void)
 {
     return 202010;
 }
 
-std::string mathop::getversionname(void)
+std::string sl::getversionname(void)
 {
     return "adaptive falcon";
 }
 
-void mathop::printversion(void)
+void sl::printversion(void)
 {
     std::cout << "sparselizard " << std::to_string(getversion()) << " \"" << getversionname() << "\"." << std::endl;
 }
 
-double mathop::getpi(void)
+double sl::getpi(void)
 {
     return 3.1415926535897932384;
 }
 
-int mathop::regionunion(std::vector<int> physregs)
+int sl::regionunion(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
     universe::mymesh->getphysicalregions()->errornotsamedim(physregs);
@@ -34,7 +34,7 @@ int mathop::regionunion(std::vector<int> physregs)
     return (universe::mymesh->getphysicalregions())->createunion(physregs, false);
 }
 
-int mathop::regionintersection(std::vector<int> physregs)
+int sl::regionintersection(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
     
@@ -42,18 +42,18 @@ int mathop::regionintersection(std::vector<int> physregs)
     return (universe::mymesh->getphysicalregions())->createintersection(physregs, false);
 }
 
-int mathop::regionall(void)
+int sl::regionall(void)
 {
     universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunionofall(false);
     return (universe::mymesh->getphysicalregions())->createunionofall(false);
 }
 
-bool mathop::isregiondefined(int physreg)
+bool sl::isregiondefined(int physreg)
 {
     return (universe::mymesh->getphysicalregions()->getindex(physreg) != -1);
 }
 
-bool mathop::isregionempty(int physreg)
+bool sl::isregionempty(int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
 
@@ -68,7 +68,7 @@ bool mathop::isregionempty(int physreg)
     return true;
 }
 
-bool mathop::isregioninside(int physregtocheck, int physreg)
+bool sl::isregioninside(int physregtocheck, int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
@@ -85,7 +85,7 @@ bool mathop::isregioninside(int physregtocheck, int physreg)
     return true;
 }
 
-bool mathop::isregiontouching(int physregtocheck, int physreg)
+bool sl::isregiontouching(int physregtocheck, int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
@@ -102,7 +102,7 @@ bool mathop::isregiontouching(int physregtocheck, int physreg)
     return false;
 }
 
-void mathop::printvector(std::vector<double> input)
+void sl::printvector(std::vector<double> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
     for (int i = 0; i < input.size(); i++)
@@ -110,7 +110,7 @@ void mathop::printvector(std::vector<double> input)
     std::cout << std::endl;
 }
 
-void mathop::printvector(std::vector<int> input)
+void sl::printvector(std::vector<int> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
     for (int i = 0; i < input.size(); i++)
@@ -118,7 +118,7 @@ void mathop::printvector(std::vector<int> input)
     std::cout << std::endl;
 }
 
-void mathop::printvector(std::vector<bool> input)
+void sl::printvector(std::vector<bool> input)
 {
     std::cout << "Vector size is " << input.size() << std::endl;
     for (int i = 0; i < input.size(); i++)
@@ -126,7 +126,7 @@ void mathop::printvector(std::vector<bool> input)
     std::cout << std::endl;
 }
 
-void mathop::writevector(std::string filename, std::vector<double> towrite, char delimiter, bool writesize)
+void sl::writevector(std::string filename, std::vector<double> towrite, char delimiter, bool writesize)
 {
     if (towrite.size() == 0)
         return;
@@ -154,7 +154,7 @@ void mathop::writevector(std::string filename, std::vector<double> towrite, char
     }
 }
 
-std::vector<double> mathop::loadvector(std::string filename, char delimiter, bool sizeincluded)
+std::vector<double> sl::loadvector(std::string filename, char delimiter, bool sizeincluded)
 {
     std::vector<double> output = {};
 
@@ -194,7 +194,7 @@ std::vector<double> mathop::loadvector(std::string filename, char delimiter, boo
     return output;
 }
 
-expression mathop::norm(expression expr)
+expression sl::norm(expression expr)
 {
     if (expr.isscalar())
         return abs(expr);
@@ -215,7 +215,7 @@ expression mathop::norm(expression expr)
     return sqrt(mynorm);
 }
 
-expression mathop::normal(int physreg)
+expression sl::normal(int physreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
@@ -227,7 +227,7 @@ expression mathop::normal(int physreg)
 
         if (elementdimension != problemdimension)
         {
-            std::cout << "Error in 'mathop' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
+            std::cout << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
             abort();
         }
     }
@@ -266,7 +266,7 @@ expression mathop::normal(int physreg)
     return output;
 }
 
-expression mathop::tangent(void)
+expression sl::tangent(void)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
@@ -292,7 +292,7 @@ expression mathop::tangent(void)
     abort(); // fix return warning
 }
 
-void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals, std::vector<double> compzevals)
+void sl::scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals, std::vector<double> compzevals)
 {
     int n = xcoords.size();
 
@@ -311,7 +311,7 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
 
     if (xcoords.size() != n || ycoords.size() != n || zcoords.size() != n || compxevals.size() != n || (isscalar == false && (compyevals.size() != n || compzevals.size() != n)))
     {
-        std::cout << "Error in 'mathop' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
+        std::cout << "Error in 'sl' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
         abort();
     }
 
@@ -326,40 +326,40 @@ void mathop::scatterwrite(std::string filename, std::vector<double> xcoords, std
 }
 
 
-void mathop::setaxisymmetry(void)
+void sl::setaxisymmetry(void)
 {
     // Make sure the call is done before loading the mesh:
     if (universe::mymesh != NULL)
     {
-        std::cout << "Error in 'mathop' namespace: 'setaxisymmetry' must be called before loading the mesh" << std::endl;
+        std::cout << "Error in 'sl' namespace: 'setaxisymmetry' must be called before loading the mesh" << std::endl;
         abort();
     }
     universe::isaxisymmetric = true;
 }
 
-void mathop::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
-void mathop::settime(double t) { universe::currenttimestep = t; }
-double mathop::gettime(void) { return universe::currenttimestep; }
+void sl::setfundamentalfrequency(double f) { universe::fundamentalfrequency = f; }
+void sl::settime(double t) { universe::currenttimestep = t; }
+double sl::gettime(void) { return universe::currenttimestep; }
 
-expression mathop::meshsize(int integrationorder)
+expression sl::meshsize(int integrationorder)
 {
     std::shared_ptr<opmeshsize> op(new opmeshsize(integrationorder));
     return expression(op);
 }
 
-expression mathop::fieldorder(field input, double alpha, double absthres)
+expression sl::fieldorder(field input, double alpha, double absthres)
 {
     std::shared_ptr<rawfield> rf = input.getpointer();
     
     if (rf->gettypename() != "h1" && rf->gettypename() != "hcurl")
     {
-        std::cout << "Error in 'mathop' namespace: field provided to 'fieldorder' must be of type 'h1' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
+        std::cout << "Error in 'sl' namespace: field provided to 'fieldorder' must be of type 'h1' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
         abort();
     }
     
     if (rf->countsubfields() > 1)
     {
-        std::cout << "Error in 'mathop' namespace: field provided to 'fieldorder' cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
+        std::cout << "Error in 'sl' namespace: field provided to 'fieldorder' cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
         std::cout << "You could instead provide the x subfield using yourfield.compx()" << std::endl;
         abort();
     }
@@ -372,27 +372,27 @@ expression mathop::fieldorder(field input, double alpha, double absthres)
         return abs(expression(op))-1.0;
 }
 
-expression mathop::getharmonic(int harmnum, expression input, int numfftharms)
+expression sl::getharmonic(int harmnum, expression input, int numfftharms)
 {
     if (harmnum <= 0)
     {
-        std::cout << "Error in 'mathop' namespace: in 'getharmonic' cannot have a negative or zero harmonic" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'getharmonic' cannot have a negative or zero harmonic" << std::endl;
         abort();
     }
     
     return moveharmonic({harmnum}, {1}, input, numfftharms);
 }
 
-expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> exprs)
+expression sl::makeharmonic(std::vector<int> harms, std::vector<expression> exprs)
 {
     if (harms.size() == 0)
     {
-        std::cout << "Error in 'mathop' namespace: in 'makeharmonic' expected at least one harmonic as argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'makeharmonic' expected at least one harmonic as argument" << std::endl;
         abort();
     }
     if (harms.size() != exprs.size())
     {
-        std::cout << "Error in 'mathop' namespace: in 'makeharmonic' the number of harmonics and expressions do not match" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'makeharmonic' the number of harmonics and expressions do not match" << std::endl;
         abort();
     }
     
@@ -406,17 +406,17 @@ expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> 
     {
         if (harms[i] <= 0)
         {
-            std::cout << "Error in 'mathop' namespace: in 'makeharmonic' cannot have a negative or zero harmonic" << std::endl;
+            std::cout << "Error in 'sl' namespace: in 'makeharmonic' cannot have a negative or zero harmonic" << std::endl;
             abort();
         }
         if (exprs[i].countrows() != m || exprs[i].countcolumns() != n)
         {
-            std::cout << "Error in 'mathop' namespace: in 'makeharmonic' all expressions should have the same dimension" << std::endl;
+            std::cout << "Error in 'sl' namespace: in 'makeharmonic' all expressions should have the same dimension" << std::endl;
             abort();
         }
         if (not(exprs[i].isharmonicone(alldisjregs)))
         {
-            std::cout << "Error in 'mathop' namespace: in 'makeharmonic' cannot have multiharmonic expressions as argument (only constant harmonic 1)" << std::endl;
+            std::cout << "Error in 'sl' namespace: in 'makeharmonic' cannot have multiharmonic expressions as argument (only constant harmonic 1)" << std::endl;
             abort();
         }
     }
@@ -440,23 +440,23 @@ expression mathop::makeharmonic(std::vector<int> harms, std::vector<expression> 
     return expression(m, n, outexprs);
 }
 
-expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> destharms, expression input, int numfftharms)
+expression sl::moveharmonic(std::vector<int> origharms, std::vector<int> destharms, expression input, int numfftharms)
 {
     if (origharms.size() == 0)
     {
-        std::cout << "Error in 'mathop' namespace: in 'moveharmonic' expected at least one harmonic as argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'moveharmonic' expected at least one harmonic as argument" << std::endl;
         abort();
     }
     if (origharms.size() != destharms.size())
     {
-        std::cout << "Error in 'mathop' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
         abort();
     }
     for (int i = 0; i < origharms.size(); i++)
     {
         if (origharms[i] <= 0 || destharms[i] <= 0)
         {
-            std::cout << "Error in 'mathop' namespace: in 'moveharmonic' cannot have a negative or zero harmonic" << std::endl;
+            std::cout << "Error in 'sl' namespace: in 'moveharmonic' cannot have a negative or zero harmonic" << std::endl;
             abort();
         }
     }
@@ -473,7 +473,7 @@ expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> des
             
             if (opin->isdofincluded() || opin->istfincluded())
             {
-                std::cout << "Error in 'mathop' namespace: in 'moveharmonic' expected an argument expression without dof or tf" << std::endl;
+                std::cout << "Error in 'sl' namespace: in 'moveharmonic' expected an argument expression without dof or tf" << std::endl;
                 abort();
             }
 
@@ -485,13 +485,13 @@ expression mathop::moveharmonic(std::vector<int> origharms, std::vector<int> des
     return expression(m,n,exprs);
 }
 
-std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(EorH.isharmonicone(alldisjregs)) || not(epsilonormu.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'mathop' namespace: cannot have a multiharmonic argument in the total force calculation" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot have a multiharmonic argument in the total force calculation" << std::endl;
         abort();
     }
     
@@ -500,7 +500,7 @@ std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, e
     int numcomps = universe::mymesh->getmeshdimension();
     if (numcomps == 1)
     {
-        std::cout << "Error in 'mathop' namespace: force calculation formula is undefined in 1D" << std::endl;
+        std::cout << "Error in 'sl' namespace: force calculation formula is undefined in 1D" << std::endl;
         abort();
     }
         
@@ -537,17 +537,17 @@ std::vector<double> mathop::gettotalforce(int physreg, expression* meshdeform, e
     return output;
 }
 
-std::vector<double> mathop::gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> sl::gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     return gettotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
-std::vector<double> mathop::gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> sl::gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     return gettotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
-std::vector<double> mathop::printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> sl::printtotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     std::vector<double> totforce = gettotalforce(physreg, meshdeform, EorH, epsilonormu, extraintegrationorder);
 
@@ -567,28 +567,28 @@ std::vector<double> mathop::printtotalforce(int physreg, expression* meshdeform,
     return totforce;
 }
 
-std::vector<double> mathop::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> sl::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     return printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
-std::vector<double> mathop::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
+std::vector<double> sl::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
     return printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
-void mathop::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
+void sl::setphysicalregionshift(int shiftamount) { universe::physregshift = shiftamount; }
 
-void mathop::writeshapefunctions(std::string filename, std::string sftypename, int elementtypenumber, int maxorder, bool allorientations)
+void sl::writeshapefunctions(std::string filename, std::string sftypename, int elementtypenumber, int maxorder, bool allorientations)
 {
     if (elementtypenumber == 7)
     {
-        std::cout << "Error in 'mathop' namespace: cannot write shape functions for pyramids (non-polynomial)" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot write shape functions for pyramids (non-polynomial)" << std::endl;
         abort();
     }
     if (elementtypenumber > 7)
     {
-        std::cout << "Error in 'mathop' namespace: element type number must be between 0 and 7" << std::endl;
+        std::cout << "Error in 'sl' namespace: element type number must be between 0 and 7" << std::endl;
         abort();
     }
     
@@ -657,14 +657,14 @@ void mathop::writeshapefunctions(std::string filename, std::string sftypename, i
     }    
 }
 
-expression mathop::t(void) { expression exp; return exp.time(); }
+expression sl::t(void) { expression exp; return exp.time(); }
 
-void mathop::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
+void sl::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
 {
     iointerface::grouptimesteps(filename, filestogroup, timevals);
 }
 
-void mathop::grouptimesteps(std::string filename, std::string fileprefix, int firstint, std::vector<double> timevals)
+void sl::grouptimesteps(std::string filename, std::string fileprefix, int firstint, std::vector<double> timevals)
 {
     int numsteps = timevals.size();
 
@@ -675,7 +675,7 @@ void mathop::grouptimesteps(std::string filename, std::string fileprefix, int fi
     iointerface::grouptimesteps(filename, filestogroup, timevals);
 }
 
-std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
+std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
 {
     std::shared_ptr<rawmesh> loadedmesh(new rawmesh());
     
@@ -690,7 +690,7 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
     int curvatureorder = loadedelems->getcurvatureorder();
     if (curvatureorder > 1)
     {
-        std::cout << "Error in 'mathop' namespace: loadshape does not accept curved meshes" << std::endl;
+        std::cout << "Error in 'sl' namespace: loadshape does not accept curved meshes" << std::endl;
         abort();
     }
     
@@ -766,49 +766,49 @@ std::vector<std::vector<shape>> mathop::loadshape(std::string meshfile)
     return output;
 }
 
-void mathop::settimederivative(vec dtx)
+void sl::settimederivative(vec dtx)
 {
     universe::xdtxdtdtx = {{},{dtx},{}};
 }
 
-void mathop::settimederivative(vec dtx, vec dtdtx)
+void sl::settimederivative(vec dtx, vec dtdtx)
 {
     universe::xdtxdtdtx = {{},{dtx},{dtdtx}};
 }
 
-expression mathop::dx(expression input) { return input.spacederivative(1); }
-expression mathop::dy(expression input) { return input.spacederivative(2); }
-expression mathop::dz(expression input) { return input.spacederivative(3); }
+expression sl::dx(expression input) { return input.spacederivative(1); }
+expression sl::dy(expression input) { return input.spacederivative(2); }
+expression sl::dz(expression input) { return input.spacederivative(3); }
 
-expression mathop::dt(expression input) { return input.timederivative(1); }
-expression mathop::dtdt(expression input) { return input.timederivative(2); }
-expression mathop::dtdtdt(expression input) { return input.timederivative(3); }
-expression mathop::dtdtdtdt(expression input) { return input.timederivative(4); }
+expression sl::dt(expression input) { return input.timederivative(1); }
+expression sl::dtdt(expression input) { return input.timederivative(2); }
+expression sl::dtdtdt(expression input) { return input.timederivative(3); }
+expression sl::dtdtdtdt(expression input) { return input.timederivative(4); }
 
-expression mathop::sin(expression input) { return input.sin(); }
-expression mathop::cos(expression input) { return input.cos(); }
-expression mathop::tan(expression input) { return input.tan(); }
-expression mathop::asin(expression input) { return input.asin(); }
-expression mathop::acos(expression input) { return input.acos(); }
-expression mathop::atan(expression input) { return input.atan(); }
-expression mathop::abs(expression input) { return input.abs(); }
-expression mathop::sqrt(expression input) { return pow(input, 0.5); }
-expression mathop::log10(expression input) { return input.log10(); }
-expression mathop::pow(expression base, expression exponent) { return base.pow(exponent); }
-expression mathop::exp(expression input) { return pow(2.7182818284590452353, input); }
-expression mathop::mod(expression input, double modval) { return input.mod(modval); }
+expression sl::sin(expression input) { return input.sin(); }
+expression sl::cos(expression input) { return input.cos(); }
+expression sl::tan(expression input) { return input.tan(); }
+expression sl::asin(expression input) { return input.asin(); }
+expression sl::acos(expression input) { return input.acos(); }
+expression sl::atan(expression input) { return input.atan(); }
+expression sl::abs(expression input) { return input.abs(); }
+expression sl::sqrt(expression input) { return pow(input, 0.5); }
+expression sl::log10(expression input) { return input.log10(); }
+expression sl::pow(expression base, expression exponent) { return base.pow(exponent); }
+expression sl::exp(expression input) { return pow(2.7182818284590452353, input); }
+expression sl::mod(expression input, double modval) { return input.mod(modval); }
 
-expression mathop::ifpositive(expression condexpr, expression trueexpr, expression falseexpr)
+expression sl::ifpositive(expression condexpr, expression trueexpr, expression falseexpr)
 {
     expression output(condexpr, trueexpr, falseexpr);
     return output;
 }
 
-expression mathop::andpositive(std::vector<expression> exprs)
+expression sl::andpositive(std::vector<expression> exprs)
 {
     if (exprs.size() == 0)
     {
-        std::cout << "Error in 'mathop' namespace: cannot call andpositive on an empty vector of expressions" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot call andpositive on an empty vector of expressions" << std::endl;
         abort();
     }
 
@@ -820,11 +820,11 @@ expression mathop::andpositive(std::vector<expression> exprs)
     return output;
 }
 
-expression mathop::orpositive(std::vector<expression> exprs)
+expression sl::orpositive(std::vector<expression> exprs)
 {
     if (exprs.size() == 0)
     {
-        std::cout << "Error in 'mathop' namespace: cannot call orpositive on an empty vector of expressions" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot call orpositive on an empty vector of expressions" << std::endl;
         abort();
     }
 
@@ -836,42 +836,42 @@ expression mathop::orpositive(std::vector<expression> exprs)
     return output;
 }
 
-expression mathop::max(expression a, expression b)
+expression sl::max(expression a, expression b)
 {
     a.reuseit(); b.reuseit();
     
     return ifpositive(a-b, a, b);
 }
 
-expression mathop::max(field a, field b)
+expression sl::max(field a, field b)
 {
     expression expra = a;
     expression exprb = b;
     return max(expra, exprb);
 }
 
-expression mathop::max(parameter a, parameter b)
+expression sl::max(parameter a, parameter b)
 {
     expression expra = a;
     expression exprb = b;
     return max(expra, exprb);
 }
 
-expression mathop::min(expression a, expression b)
+expression sl::min(expression a, expression b)
 {
     a.reuseit(); b.reuseit();
     
     return ifpositive(a-b, b, a);
 }
 
-expression mathop::min(field a, field b)
+expression sl::min(field a, field b)
 {
     expression expra = a;
     expression exprb = b;
     return min(expra, exprb);
 }
 
-expression mathop::min(parameter a, parameter b)
+expression sl::min(parameter a, parameter b)
 {
     expression expra = a;
     expression exprb = b;
@@ -879,10 +879,10 @@ expression mathop::min(parameter a, parameter b)
 }
 
 
-expression mathop::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
-expression mathop::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
+expression sl::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
+expression sl::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
 
-expression mathop::comp(int selectedcomp, expression input)
+expression sl::comp(int selectedcomp, expression input)
 {
     std::vector<expression> mycomp(input.countcolumns());
     for (int i = 0; i < input.countcolumns(); i++)
@@ -890,17 +890,17 @@ expression mathop::comp(int selectedcomp, expression input)
     return expression(1, input.countcolumns(), mycomp);
 }
 
-expression mathop::compx(expression input) { return comp(0,input); }
-expression mathop::compy(expression input) { return comp(1,input); }
-expression mathop::compz(expression input) { return comp(2,input); }
+expression sl::compx(expression input) { return comp(0,input); }
+expression sl::compy(expression input) { return comp(1,input); }
+expression sl::compz(expression input) { return comp(2,input); }
 
-expression mathop::entry(int row, int col, expression input) { return input.at(row,col); }
+expression sl::entry(int row, int col, expression input) { return input.at(row,col); }
 
-expression mathop::eye(int size)
+expression sl::eye(int size)
 {
     if (size < 0)
     {
-        std::cout << "Error in 'mathop' namespace: cannot create a " << size << "x" << size << " identity matrix" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot create a " << size << "x" << size << " identity matrix" << std::endl;
         abort();
     }
 
@@ -913,15 +913,15 @@ expression mathop::eye(int size)
     return output;
 }
 
-expression mathop::transpose(expression input) { return input.transpose(); }
-expression mathop::inverse(expression input) { return input.invert(); }
-expression mathop::determinant(expression input) { return input.determinant(); }
+expression sl::transpose(expression input) { return input.transpose(); }
+expression sl::inverse(expression input) { return input.invert(); }
+expression sl::determinant(expression input) { return input.determinant(); }
 
-expression mathop::grad(expression input)
+expression sl::grad(expression input)
 {
     if (input.countcolumns() != 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'mathop' namespace: can only take the gradient of a scalar or an up to length 3 column vector" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only take the gradient of a scalar or an up to length 3 column vector" << std::endl;
         abort();
     }
 
@@ -958,11 +958,11 @@ expression mathop::grad(expression input)
     return output;
 }
 
-expression mathop::div(expression input)
+expression sl::div(expression input)
 {
     if (input.countcolumns() != 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'mathop' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
         abort();
     }
 
@@ -994,7 +994,7 @@ expression mathop::div(expression input)
     abort(); // fix return warning
 }
 
-expression mathop::curl(expression input)
+expression sl::curl(expression input)
 {
     bool ishcurlfield = false;
     std::vector<std::pair<std::string,expression>> inrefcoord = input.getinrefcoord();
@@ -1006,7 +1006,7 @@ expression mathop::curl(expression input)
 
     if (input.countcolumns() > 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'mathop' namespace: can only take the curl of an up to length 3 column vector" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only take the curl of an up to length 3 column vector" << std::endl;
         abort();
     }
 
@@ -1054,11 +1054,11 @@ expression mathop::curl(expression input)
     abort(); // fix return warning
 }
 
-expression mathop::crossproduct(expression a, expression b)
+expression sl::crossproduct(expression a, expression b)
 {
     if (a.countcolumns() != 1 || b.countcolumns() != 1 || a.countrows() > 3 || b.countrows() > 3)
     {
-        std::cout << "Error in 'mathop' namespace: can only take the cross product of up to length 3 column vectors" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only take the cross product of up to length 3 column vectors" << std::endl;
         abort();
     }
 
@@ -1073,11 +1073,11 @@ expression mathop::crossproduct(expression a, expression b)
     return crossprodexpr;
 }
 
-expression mathop::doubledotproduct(expression a, expression b)
+expression sl::doubledotproduct(expression a, expression b)
 {
     if (a.countcolumns() != b.countcolumns() || a.countrows() != b.countrows())
     {
-        std::cout << "Error in 'mathop' namespace: dimension mismatch for double dot product" << std::endl;
+        std::cout << "Error in 'sl' namespace: dimension mismatch for double dot product" << std::endl;
         abort();
     }
 
@@ -1096,11 +1096,11 @@ expression mathop::doubledotproduct(expression a, expression b)
     return output;
 }
 
-expression mathop::trace(expression a)
+expression sl::trace(expression a)
 {
     if (a.countcolumns() != a.countrows())
     {
-        std::cout << "Error in 'mathop' namespace: can only get the trace of a square matrix" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only get the trace of a square matrix" << std::endl;
         abort();
     }
 
@@ -1116,7 +1116,7 @@ expression mathop::trace(expression a)
     return output;
 }
 
-std::vector<expression> mathop::rotation(double alphax, double alphay, double alphaz, std::string type)
+std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz, std::string type)
 {
     double pi = getpi();
     double ax = alphax*pi/180.0;
@@ -1202,34 +1202,34 @@ std::vector<expression> mathop::rotation(double alphax, double alphay, double al
         return std::vector<expression>{Kexpr, invKexpr};
     }
     
-    std::cout << "Error in 'mathop' namespace: rotation expected a type '' or 'voigt'" << std::endl;
+    std::cout << "Error in 'sl' namespace: rotation expected a type '' or 'voigt'" << std::endl;
     abort();
 }
 
-integration mathop::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
+integration sl::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     return integration(physreg, tointegrate, integrationorderdelta, blocknumber);
 }
 
-integration mathop::integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
+integration sl::integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     return integration(physreg, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
-integration mathop::integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta, int blocknumber)
+integration sl::integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     return integration(physreg, numcoefharms, tointegrate, integrationorderdelta, blocknumber);
 }
 
-integration mathop::integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
+integration sl::integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     return integration(physreg, numcoefharms, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
-expression mathop::dof(expression input, int physreg) { return input.dof(physreg); }
-expression mathop::tf(expression input, int physreg) { return input.tf(physreg); }
+expression sl::dof(expression input, int physreg) { return input.dof(physreg); }
+expression sl::tf(expression input, int physreg) { return input.tf(physreg); }
 
-expression mathop::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
+expression sl::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
     int m = expr.countrows();
     int n = expr.countcolumns();
@@ -1247,18 +1247,18 @@ expression mathop::athp(expression expr, std::shared_ptr<rawmesh> rm, std::share
     return expression(m, n, subexprs);
 }
 
-bool mathop::adapt(int verbosity)
+bool sl::adapt(int verbosity)
 {
     return universe::mymesh->adapthp(verbosity);
 }
 
-expression mathop::zienkiewiczzhu(expression input)
+expression sl::zienkiewiczzhu(expression input)
 {
     std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(input.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'mathop' namespace: in 'zienkiewiczzhu' cannot have a multiharmonic expression as argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'zienkiewiczzhu' cannot have a multiharmonic expression as argument" << std::endl;
         abort();
     }
 
@@ -1283,68 +1283,68 @@ expression mathop::zienkiewiczzhu(expression input)
     return norm(expression(m, n, zzexprs));
 }
 
-expression mathop::array1x1(expression term11)
+expression sl::array1x1(expression term11)
 {
     std::vector<expression> terms = {term11};
     return expression(1,1, terms);
 }
 
-expression mathop::array1x2(expression term11, expression term12)
+expression sl::array1x2(expression term11, expression term12)
 {
     return expression(1,2, {term11, term12});
 }
 
-expression mathop::array1x3(expression term11, expression term12, expression term13)
+expression sl::array1x3(expression term11, expression term12, expression term13)
 {
     return expression(1,3, {term11, term12, term13});
 }
 
-expression mathop::array2x1(expression term11, expression term21)
+expression sl::array2x1(expression term11, expression term21)
 {
     return expression(2,1, {term11, term21});
 }
 
-expression mathop::array2x2(expression term11, expression term12, expression term21, expression term22)
+expression sl::array2x2(expression term11, expression term12, expression term21, expression term22)
 {
     return expression(2,2, {term11, term12, term21, term22});
 }
 
-expression mathop::array2x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23)
+expression sl::array2x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23)
 {
     return expression(2,3, {term11, term12, term13, term21, term22, term23});
 }
 
-expression mathop::array3x1(expression term11, expression term21, expression term31)
+expression sl::array3x1(expression term11, expression term21, expression term31)
 {
     return expression(3,1, {term11, term21, term31});
 }
 
-expression mathop::array3x2(expression term11, expression term12, expression term21, expression term22, expression term31, expression term32)
+expression sl::array3x2(expression term11, expression term12, expression term21, expression term22, expression term31, expression term32)
 {
     return expression(3,2, {term11, term12, term21, term22, term31, term32});
 }
 
-expression mathop::array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33)
+expression sl::array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33)
 {
     return expression(3,3, {term11, term12, term13, term21, term22, term23, term31, term32, term33});
 }
 
-vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
+vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
     if (soltype != "lu")
     {
-        std::cout << "Error in 'mathop' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
         abort();
     }
     if (A.countrows() != b.size())
     {
-        std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
+        std::cout << "Error in 'sl' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
         abort();
     }
 
     if (A.getpointer() == NULL || b.getpointer() == NULL)
     {
-        std::cout << "Error in 'mathop' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
+        std::cout << "Error in 'sl' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
         abort();
     }
     
@@ -1389,23 +1389,23 @@ vec mathop::solve(mat A, vec b, std::string soltype, bool diagscaling)
     return sol;
 }
 
-std::vector<vec> mathop::solve(mat A, std::vector<vec> b, std::string soltype)
+std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
 {
     if (soltype != "lu")
     {
-        std::cout << "Error in 'mathop' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
         abort();
     }
     for (int i = 0; i < b.size(); i++)
     {
         if (A.countrows() != b[i].size())
         {
-            std::cout << "Error in 'mathop' namespace: multi-rhs direct solve of Ax = b failed (size of A and at least one rhs do not match)" << std::endl;
+            std::cout << "Error in 'sl' namespace: multi-rhs direct solve of Ax = b failed (size of A and at least one rhs do not match)" << std::endl;
             abort();
         }
         if (A.getpointer() == NULL || b[i].getpointer() == NULL)
         {
-            std::cout << "Error in 'mathop' namespace: multi-rhs direct solve of Ax = b failed (A or at least one rhs is undefined)" << std::endl;
+            std::cout << "Error in 'sl' namespace: multi-rhs direct solve of Ax = b failed (A or at least one rhs is undefined)" << std::endl;
             abort();
         }
     }
@@ -1457,7 +1457,7 @@ std::vector<vec> mathop::solve(mat A, std::vector<vec> b, std::string soltype)
     return outvecs;
 }
 
-densematrix mathop::solve(mat A, densematrix b, std::string soltype)
+densematrix sl::solve(mat A, densematrix b, std::string soltype)
 {
     int numrhs = b.countrows();
     int len = b.countcolumns();
@@ -1511,32 +1511,32 @@ int mykspmonitor(KSP ksp, PetscInt iter, PetscReal resnorm, void* unused)
     return 0;
 }
 
-void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype, std::string precondtype, int verbosity, bool diagscaling)
+void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype, std::string precondtype, int verbosity, bool diagscaling)
 {
     if (soltype != "gmres" && soltype != "bicgstab")
     {
-        std::cout << "Error in 'mathop' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
         abort();
     }
     if (precondtype != "ilu" && precondtype != "sor" && precondtype != "gamg")
     {
-        std::cout << "Error in 'mathop' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu', 'sor' or 'gamg')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu', 'sor' or 'gamg')" << std::endl;
         abort();
     }
     if (A.countrows() != b.size())
     {
-        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (size of A and b do not match)" << std::endl;
+        std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (size of A and b do not match)" << std::endl;
         abort();
     }
     if (A.countrows() != sol.size())
     {
-        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (size of A and x do not match)" << std::endl;
+        std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (size of A and x do not match)" << std::endl;
         abort();
     }
 
     if (A.getpointer() == NULL || b.getpointer() == NULL || sol.getpointer() == NULL)
     {
-        std::cout << "Error in 'mathop' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
+        std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
         abort();
     }
 
@@ -1589,12 +1589,12 @@ void mathop::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std:
     KSPDestroy(ksp);
 }
 
-void mathop::solve(formulation formul)
+void sl::solve(formulation formul)
 {
     // Make sure the problem is of the form Ax = b:
     if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
     {
-        std::cout << "Error in 'mathop' namespace: formulation to solve cannot have a damping/mass matrix (use a time resolution algorithm)" << std::endl;
+        std::cout << "Error in 'sl' namespace: formulation to solve cannot have a damping/mass matrix (use a time resolution algorithm)" << std::endl;
         abort();  
     }
     
@@ -1603,24 +1603,24 @@ void mathop::solve(formulation formul)
     // Generate:
     formul.generate();
     // Solve:
-    vec sol = mathop::solve(formul.A(), formul.b());
+    vec sol = sl::solve(formul.A(), formul.b());
 
     // Save to fields:
     setdata(sol);
 }
 
-void mathop::solve(std::vector<formulation> formuls)
+void sl::solve(std::vector<formulation> formuls)
 {
     for (int i = 0; i < formuls.size(); i++)
         solve(formuls[i]);
 }
 
 
-std::vector<double> mathop::linspace(double a, double b, int num)
+std::vector<double> sl::linspace(double a, double b, int num)
 {
     if (num < 0)
     {
-        std::cout << "Error in 'mathop' namespace: cannot call 'linspace' for " << num << " points" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot call 'linspace' for " << num << " points" << std::endl;
         abort();
     }
     if (num == 0)
@@ -1637,11 +1637,11 @@ std::vector<double> mathop::linspace(double a, double b, int num)
     return output;
 }
 
-std::vector<double> mathop::logspace(double a, double b, int num, double basis)
+std::vector<double> sl::logspace(double a, double b, int num, double basis)
 {
     if (num < 0)
     {
-        std::cout << "Error in 'mathop' namespace: cannot call 'logspace' for " << num << " points" << std::endl;
+        std::cout << "Error in 'sl' namespace: cannot call 'logspace' for " << num << " points" << std::endl;
         abort();
     }
     if (num == 0)
@@ -1658,7 +1658,7 @@ std::vector<double> mathop::logspace(double a, double b, int num, double basis)
     return output;
 }
 
-expression mathop::dbtoneper(expression toconvert)
+expression sl::dbtoneper(expression toconvert)
 {
     if (toconvert.iszero())
         return toconvert;
@@ -1666,7 +1666,7 @@ expression mathop::dbtoneper(expression toconvert)
     return ( 0.1151292546497023 * toconvert );
 }
 
-void mathop::setdata(vec invec)
+void sl::setdata(vec invec)
 {
     if (invec.getpointer() == NULL)
         return;
@@ -1681,17 +1681,17 @@ void mathop::setdata(vec invec)
 
 ////////// PREDEFINED OPERATORS
 
-expression mathop::strain(expression input)
+expression sl::strain(expression input)
 {
     if ((input.countrows() != 2 && input.countrows() != 3) || (input.countcolumns() != 1 && input.countrows() != input.countcolumns()))
     {
-        std::cout << "Error in 'mathop' namespace: can only compute the strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only compute the strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
         abort();
     }
 
     expression gradu = input;
     if (input.countcolumns() == 1)
-        gradu = mathop::grad(input);
+        gradu = sl::grad(input);
 
     if (input.countrows() == 2)
         return expression(3,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(1,0) + gradu.at(0,1)});
@@ -1701,17 +1701,17 @@ expression mathop::strain(expression input)
     abort(); // fix return warning
 }
 
-expression mathop::greenlagrangestrain(expression input)
+expression sl::greenlagrangestrain(expression input)
 {
     if ((input.countrows() != 2 && input.countrows() != 3) || (input.countcolumns() != 1 && input.countrows() != input.countcolumns()))
     {
-        std::cout << "Error in 'mathop' namespace: can only compute the green-lagrange strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
+        std::cout << "Error in 'sl' namespace: can only compute the green-lagrange strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
         abort();
     }
 
     expression gradu = input;
     if (input.countcolumns() == 1)
-        gradu = mathop::grad(input);
+        gradu = sl::grad(input);
 
     // This can be called since gradu is nonlinear in u and can thus not include a dof or tf:
     gradu.reuseit();
@@ -1748,11 +1748,11 @@ expression mathop::greenlagrangestrain(expression input)
     abort(); // fix return warning
 }
 
-expression mathop::vonmises(expression stress)
+expression sl::vonmises(expression stress)
 {
     if (stress.countcolumns() != 1 || stress.countrows() != 6)
     {
-        std::cout << "Error in 'mathop' namespace: expected the 3D stress tensor in Voigt notation (6 rows, 1 column)" << std::endl;
+        std::cout << "Error in 'sl' namespace: expected the 3D stress tensor in Voigt notation (6 rows, 1 column)" << std::endl;
         abort();
     }
 
@@ -1762,7 +1762,7 @@ expression mathop::vonmises(expression stress)
     return sqrt( 0.5*( pow(s11-s22,2)+pow(s22-s33,2)+pow(s33-s11,2) ) + 3.0*( pow(s12,2)+pow(s23,2)+pow(s13,2) ) );
 }
 
-expression mathop::predefinedmassconservation(expression dofv, expression tfp, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant)
+expression sl::predefinedmassconservation(expression dofv, expression tfp, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant)
 {
     if (isdensityconstant)
         return div(dofv)*tfp;
@@ -1773,14 +1773,14 @@ expression mathop::predefinedmassconservation(expression dofv, expression tfp, e
         return ( rho*div(dofv)*tfp + dofv*gradrho*tfp );
 }
 
-expression mathop::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho)
+expression sl::predefinedinertialforce(expression dofv, expression tfv, expression v, expression rho)
 {
     rho.reuseit(); v.reuseit();
 
     return ( -rho*( grad(v)*dofv + grad(dofv)*v - grad(v)*v )*tfv );
 }
 
-expression mathop::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant, bool isviscosityconstant)
+expression sl::predefinedviscousforce(expression dofv, expression tfv, expression mu, bool isdensityconstant, bool isviscosityconstant)
 {
     mu.reuseit();
 
@@ -1796,14 +1796,14 @@ expression mathop::predefinedviscousforce(expression dofv, expression tfv, expre
 
 ////////// PREDEFINED FORMULATIONS
 
-std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
+std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
-        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
+        std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
         abort();
     }
     
@@ -1813,7 +1813,7 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
         abort();
     }
     
@@ -1833,14 +1833,14 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     return output;
 }
 
-std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
+std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
 {       
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
-        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
+        std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
         abort();
     }
 
@@ -1850,31 +1850,31 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
         abort();
     }
     
     if (rotcent.size() != 3)
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' expected a vector of length 3 as fifth argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'continuitycondition' expected a vector of length 3 as fifth argument" << std::endl;
         abort();
     }
     
     if (factor != -1 && factor != 1)
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the factor must be -1 or 1" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'continuitycondition' the factor must be -1 or 1" << std::endl;
         abort();
     }
 
     if (angzmod < 0.0 || angzmod > 180.0)
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the angular modulo should be in range [0,180]" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'continuitycondition' the angular modulo should be in range [0,180]" << std::endl;
         abort();
     }
 
     if (rotangz < 0.0 || rotangz > angzmod)
     {
-        std::cout << "Error in 'mathop' namespace: in 'continuitycondition' the rotation angle should be in range [0,angzmod]" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'continuitycondition' the rotation angle should be in range [0,angzmod]" << std::endl;
         abort();
     }
     
@@ -1950,25 +1950,25 @@ std::vector<integration> mathop::continuitycondition(int gamma1, int gamma2, fie
     return output;
 }
 
-std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
+std::vector<integration> sl::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
-        std::cout << "Error in 'mathop' namespace: expected boundary regions for gamma1 and gamma2 in 'periodicitycondition'" << std::endl;
+        std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'periodicitycondition'" << std::endl;
         abort();
     }
     
     if (dat1.size() != 3)
     {
-        std::cout << "Error in 'mathop' namespace: in 'periodicitycondition' expected a vector of length 3 as fourth argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'periodicitycondition' expected a vector of length 3 as fourth argument" << std::endl;
         abort();
     }
     if (dat2.size() != 1 && dat2.size() != 3)
     {
-        std::cout << "Error in 'mathop' namespace: in 'periodicitycondition' expected a vector of length 1 or 3 as fifth argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: in 'periodicitycondition' expected a vector of length 1 or 3 as fifth argument" << std::endl;
         abort();
     }
 
@@ -2049,7 +2049,7 @@ std::vector<integration> mathop::periodicitycondition(int gamma1, int gamma2, fi
     return output;
 }
 
-expression mathop::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
+expression sl::predefinedelasticity(expression dofu, expression tfu, expression E, expression nu, std::string myoption)
 {
     // Elasticity matrix:
     expression H(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
@@ -2059,11 +2059,11 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
     return predefinedelasticity(dofu, tfu, H, myoption);
 }
 
-expression mathop::predefinedelasticity(expression dofu, expression tfu, expression H, std::string myoption)
+expression sl::predefinedelasticity(expression dofu, expression tfu, expression H, std::string myoption)
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
+        std::cout << "Error in 'sl' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
     if (dofu.countrows() == 2)
@@ -2111,7 +2111,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
             return -( H *strain(dofu) )*strain(tfu);
 
         // If the option is not valid:
-        std::cout << "Error in 'mathop' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
+        std::cout << "Error in 'sl' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
         std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
         abort();
     }
@@ -2119,7 +2119,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
     {
         if (myoption.length() > 0)
         {
-            std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
+            std::cout << "Error in 'sl' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
             abort();
         }
         return -( H*strain(dofu) ) * strain(tfu);
@@ -2128,7 +2128,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, express
     abort(); // fix return warning
 }
 
-expression mathop::predefinedelasticity(expression dofu, expression tfu, field u, expression E, expression nu, expression prestress, std::string myoption)
+expression sl::predefinedelasticity(expression dofu, expression tfu, field u, expression E, expression nu, expression prestress, std::string myoption)
 {
     // Elasticity matrix:
     expression H(6,6, {1-nu,nu,nu,0,0,0,  nu,1-nu,nu,0,0,0,  nu,nu,1-nu,0,0,0,  0,0,0,0.5*(1-2*nu),0,0,  0,0,0,0,0.5*(1-2*nu),0,  0,0,0,0,0,0.5*(1-2*nu)});
@@ -2138,18 +2138,18 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
     return predefinedelasticity(dofu, tfu, u, H, prestress, myoption);
 }
 
-expression mathop::predefinedelasticity(expression dofu, expression tfu, field u, expression H, expression prestress, std::string myoption)
+expression sl::predefinedelasticity(expression dofu, expression tfu, field u, expression H, expression prestress, std::string myoption)
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
+        std::cout << "Error in 'sl' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
         abort();
     }
     if (dofu.countrows() == 2)
     {
         if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 3))
         {
-            std::cout << "Error in 'mathop' namespace: expected a 3x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
+            std::cout << "Error in 'sl' namespace: expected a 3x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
             abort();
         }
 
@@ -2226,7 +2226,7 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
         }
 
         // If the option is not valid:
-        std::cout << "Error in 'mathop' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
+        std::cout << "Error in 'sl' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
         std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
         abort();
     }
@@ -2234,13 +2234,13 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
     {
         if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 6))
         {
-            std::cout << "Error in 'mathop' namespace: expected a 6x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
+            std::cout << "Error in 'sl' namespace: expected a 6x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
             abort();
         }
 
         if (myoption.length() > 0)
         {
-            std::cout << "Error in 'mathop' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
+            std::cout << "Error in 'sl' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
             abort();
         }
 
@@ -2278,11 +2278,11 @@ expression mathop::predefinedelasticity(expression dofu, expression tfu, field u
     abort(); // fix return warning
 }
 
-expression mathop::predefinedelectrostaticforce(expression tfu, expression E, expression epsilon)
+expression sl::predefinedelectrostaticforce(expression tfu, expression E, expression epsilon)
 {
     if (tfu.countcolumns() != 1)
     {
-        std::cout << "Error in 'mathop' namespace: the force formula expected a column vector expression as first argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: the force formula expected a column vector expression as first argument" << std::endl;
         abort();
     }
 
@@ -2293,7 +2293,7 @@ expression mathop::predefinedelectrostaticforce(expression tfu, expression E, ex
     return predefinedelectrostaticforce(spacederivatives, E, epsilon);
 }
 
-expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon)
+expression sl::predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon)
 {
     E.reuseit();
     epsilon.reuseit();
@@ -2307,7 +2307,7 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
 
     if (gradtfu.countcolumns() == 1)
     {
-        std::cout << "Error in 'mathop' namespace: the force formula is undefined for 1D displacements" << std::endl;
+        std::cout << "Error in 'sl' namespace: the force formula is undefined for 1D displacements" << std::endl;
         abort();
     }
 
@@ -2319,23 +2319,23 @@ expression mathop::predefinedelectrostaticforce(std::vector<expression> dxyztfu,
     abort(); // fix return warning
 }
 
-expression mathop::predefinedmagnetostaticforce(expression tfu, expression H, expression mu)
+expression sl::predefinedmagnetostaticforce(expression tfu, expression H, expression mu)
 {
     return predefinedelectrostaticforce(tfu, H, mu);
 }
 
-expression mathop::predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu)
+expression sl::predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu)
 {
     return predefinedelectrostaticforce(dxyztfu, H, mu);
 }
 
-expression mathop::predefinedacoustics(expression dofp, expression tfp, expression c, expression alpha)
+expression sl::predefinedacoustics(expression dofp, expression tfp, expression c, expression alpha)
 {
     c.reuseit(); alpha.reuseit();
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacoustics'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacoustics'" << std::endl;
         abort();
     }
 
@@ -2345,20 +2345,20 @@ expression mathop::predefinedacoustics(expression dofp, expression tfp, expressi
     // Only valid for harmonic problems in case of nonzero attenuation:
     if (universe::fundamentalfrequency == -1)
     {
-        std::cout << "Error in 'mathop' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        std::cout << "Error in 'sl' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
     }
 
     return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp -2.0*alpha/c*dt(dofp)*tfp -pow(alpha,2.0)*dofp*tfp );
 }
 
-expression mathop::predefinedacousticradiation(expression dofp, expression tfp, expression c, expression alpha)
+expression sl::predefinedacousticradiation(expression dofp, expression tfp, expression c, expression alpha)
 {
     c.reuseit(); alpha.reuseit();
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacousticradiation'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticradiation'" << std::endl;
         abort();
     }
 
@@ -2368,14 +2368,14 @@ expression mathop::predefinedacousticradiation(expression dofp, expression tfp, 
     // Only valid for harmonic problems in case of nonzero attenuation:
     if (universe::fundamentalfrequency == -1)
     {
-        std::cout << "Error in 'mathop' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        std::cout << "Error in 'sl' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
     }
 
     return ( -1.0/c*dt(dofp)*tfp -alpha*dofp*tfp );
 }
 
-expression mathop::predefinedacousticstructureinteraction(expression dofp, expression tfp, expression dofu, expression tfu, expression c, expression rho, expression n, expression alpha, double scaling)
+expression sl::predefinedacousticstructureinteraction(expression dofp, expression tfp, expression dofu, expression tfu, expression c, expression rho, expression n, expression alpha, double scaling)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
     
@@ -2385,7 +2385,7 @@ expression mathop::predefinedacousticstructureinteraction(expression dofp, expre
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || (dofu.countcolumns() != 1 || dofu.countrows() < problemdimension) || (tfu.countcolumns() != 1 || tfu.countrows() < problemdimension) || not(c.isscalar()) || not(rho.isscalar()) || (n.countcolumns() != 1 || n.countrows() < problemdimension) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedacousticstructureinteraction'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticstructureinteraction'" << std::endl;
         abort();
     }
 
@@ -2395,25 +2395,25 @@ expression mathop::predefinedacousticstructureinteraction(expression dofp, expre
     // Only valid for harmonic problems in case of nonzero attenuation:
     if (universe::fundamentalfrequency == -1)
     {
-        std::cout << "Error in 'mathop' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        std::cout << "Error in 'sl' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
     }
 
     return ( -dofp*tfu*n * scaling + rho*dtdt(dofu)*n*tfp * invscal +2.0*alpha*rho*c*dt(dofu)*n*tfp * invscal +rho*pow(alpha*c,2.0)*dofu*n*tfp * invscal );
 }
 
-expression mathop::predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
+expression sl::predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
     if (problemdimension < 2)
     {
-        std::cout << "Error in 'mathop' namespace: 'predefinedstokes' is only allowed on 2D and 3D geometries" << std::endl;
+        std::cout << "Error in 'sl' namespace: 'predefinedstokes' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
     if (dofv.countcolumns() != 1 || dofv.countrows() < problemdimension || tfv.countcolumns() != 1 || tfv.countrows() < problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstokes'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedstokes'" << std::endl;
         abort();
     }
 
@@ -2425,18 +2425,18 @@ expression mathop::predefinedstokes(expression dofv, expression tfv, expression 
     return ( output - grad(dofp)*tfv + predefinedviscousforce(dofv, tfv, mu, isdensityconstant, isviscosityconstant) );
 }
 
-expression mathop::predefinednavierstokes(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
+expression sl::predefinednavierstokes(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
     if (problemdimension < 2)
     {
-        std::cout << "Error in 'mathop' namespace: 'predefinednavierstokes' is only allowed on 2D and 3D geometries" << std::endl;
+        std::cout << "Error in 'sl' namespace: 'predefinednavierstokes' is only allowed on 2D and 3D geometries" << std::endl;
         abort();
     }
     if (dofv.countcolumns() != 1 || dofv.countrows() < problemdimension || tfv.countcolumns() != 1 || tfv.countrows() < problemdimension || v.countcolumns() != 1 || v.countrows() < problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
         abort();
     }
 
@@ -2449,7 +2449,7 @@ expression mathop::predefinednavierstokes(expression dofv, expression tfv, expre
 }
 
 
-expression mathop::predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression alpha, expression beta, expression gamma, bool isdivvzero)
+expression sl::predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression alpha, expression beta, expression gamma, bool isdivvzero)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
@@ -2457,7 +2457,7 @@ expression mathop::predefinedadvectiondiffusion(expression doff, expression tff,
 
     if (not(doff.isscalar()) || not(tff.isscalar()) || not(isvsizevalid) || alpha.countrows() != alpha.countcolumns() || not(beta.isscalar()) || not(gamma.isscalar()))
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedadvectiondiffusion'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedadvectiondiffusion'" << std::endl;
         abort();
     }
 
@@ -2476,12 +2476,12 @@ expression mathop::predefinedadvectiondiffusion(expression doff, expression tff,
     return output;
 }
 
-expression mathop::predefineddiffusion(expression doff, expression tff, expression alpha, expression beta)
+expression sl::predefineddiffusion(expression doff, expression tff, expression alpha, expression beta)
 {
     return predefinedadvectiondiffusion(doff, tff, 0.0, alpha, beta, 0.0, true);
 }
 
-expression mathop::predefinedstabilization(std::string stabtype, expression delta, expression f, expression v, expression diffusivity, expression residual)
+expression sl::predefinedstabilization(std::string stabtype, expression delta, expression f, expression v, expression diffusivity, expression residual)
 {
     v.reuseit(); diffusivity.reuseit();
     
@@ -2491,20 +2491,20 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     invnormv.reuseit();
     
     int problemdimension = universe::mymesh->getmeshdimension();
-    expression meshsize = pow(mathop::meshsize(2), 1.0/problemdimension );
+    expression meshsize = pow(sl::meshsize(2), 1.0/problemdimension );
      
     expression doff = dof(f);
     expression tff = tf(f);
     
     if (not(residual.isscalar()) || residual.getoperationinarray(0,0)->istfincluded())
     {
-        std::cout << "Error in 'mathop' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
+        std::cout << "Error in 'sl' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
         abort();
     }
      
     if (not(delta.isscalar()) || not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns())
     {
-        std::cout << "Error in 'mathop' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
         abort();
     }
      
@@ -2537,7 +2537,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
     {
         if (residual.getoperationinarray(0,0)->isdofincluded())
         {
-            std::cout << "Error in 'mathop' namespace: the residual cannot include a dof for cws in 'predefinedstabilization'" << std::endl;
+            std::cout << "Error in 'sl' namespace: the residual cannot include a dof for cws in 'predefinedstabilization'" << std::endl;
             abort();
         }
     
@@ -2583,7 +2583,7 @@ expression mathop::predefinedstabilization(std::string stabtype, expression delt
         return ( ifpositive(del,1.0,0.0) * output );
     }
 
-    std::cout << "Error in 'mathop' namespace: unknown stabilization method '" << stabtype << "' (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
+    std::cout << "Error in 'sl' namespace: unknown stabilization method '" << stabtype << "' (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
     abort();
 }
 

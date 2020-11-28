@@ -1,5 +1,5 @@
 #include "myalgorithm.h"
-#include "mathop.h"
+#include "sl.h"
 #include "universe.h"
 #include "disjointregions.h"
 #include "lagrangeformfunction.h"

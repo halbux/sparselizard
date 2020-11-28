@@ -4,7 +4,7 @@
 #include "sparselizard.h"
 
 
-using namespace mathop;
+using namespace sl;
 
 double hadapt1d(void)
 {
