@@ -181,7 +181,15 @@ void rawmesh::printcount(void)
     }
 }
 
-rawmesh::rawmesh(void) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions) {}
+rawmesh::rawmesh(void) : myelements(mynodes, myphysicalregions, mydisjointregions), myphysicalregions(mydisjointregions), myregiondefiner(mynodes, myelements, myphysicalregions)
+{
+    universe::addtorawmeshcounter(1);
+}
+
+rawmesh::~rawmesh(void)
+{
+    universe::addtorawmeshcounter(-1);
+}
 
 nodes* rawmesh::getnodes(void) {return &mynodes;}
 elements* rawmesh::getelements(void) {return &myelements;}

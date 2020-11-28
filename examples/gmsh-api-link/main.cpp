@@ -8,7 +8,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // EXAMPLE 1.
     // Load from file via GMSH API and solve the elasticity equations.
@@ -99,16 +99,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (compz(u).integrate(vol, u, 5) < -1.24776e-10 && compz(u).integrate(vol, u, 5) > -1.24780e-10);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

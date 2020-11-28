@@ -26,7 +26,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // Give names to the physical region numbers :
     int wavg1 = 1, wavg2 = 2, clad = 3, all = 4, bound = 5;
@@ -152,16 +152,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (neffcs[0] < 1.65780 && neffcs[0] > 1.65778);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

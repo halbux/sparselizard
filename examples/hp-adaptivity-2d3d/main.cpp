@@ -101,15 +101,9 @@ double adapthcurl(void)
 
 int main(void)
 {	
-    SlepcInitialize(0,{},0,0);
-
     double errorh1 = adapth1();
     double errorhcurl = adapthcurl();
     
     std::cout << (errorh1 < 3e-13 && errorhcurl < 2e-11);
-
-    SlepcFinalize();
-
-    return 0;
 }
 

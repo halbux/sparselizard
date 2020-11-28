@@ -5,7 +5,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions:
     int sur = 1, right = 2, boundary = 3;
@@ -56,16 +56,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (maxE < 0.138395 && maxE > 0.138393);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

@@ -17,7 +17,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'cmut2d.geo':
     int insulator = 1, pillars = 2, vacuumgap = 3, membrane = 4, fluid = 5, ground = 6, clamp = 6, electrode = 7, fluidboundary = 8;
@@ -224,16 +224,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (solup.norm() < 0.000252599 && solup.norm() > 0.000252595);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

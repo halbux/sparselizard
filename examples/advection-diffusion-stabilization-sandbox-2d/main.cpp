@@ -11,7 +11,7 @@ using namespace mathop;
 
 mesh createmesh(double a, int n);
 
-void sparselizard()
+int main(void)
 {	
     // Square surface and its four sides:
     int sur = 1, left = 2, right = 3, up = 4, down = 5;
@@ -122,7 +122,7 @@ mesh createmesh(double a, int n)
     // Give names to the physical region numbers:
     int sur = 1, left = 2, right = 3, up = 4, down = 5;
 
-    shape square("quadrangle", sur , {0,0,0, a,0,0, a,a,0, 0,a,0}, {n,n,n,n});
+    shape square("quadrangle", sur, {0,0,0, a,0,0, a,a,0, 0,a,0}, {n,n,n,n});
 
     shape line1 = square.getsons()[0];
     line1.setphysicalregion(down);
@@ -137,16 +137,5 @@ mesh createmesh(double a, int n)
     mesh mymesh({square,line1,line2,line3,line4});
 
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

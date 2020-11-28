@@ -23,7 +23,7 @@ using namespace mathop;
 //
 mesh createmesh(double thtube, double htube, double rintube, double linf, int nhtube, int ncircumtube, int nthtube, int nair, int prog);
 
-void sparselizard(void)
+int main(void)
 {	
     wallclock clk;
     
@@ -226,16 +226,5 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     mymesh.load({voltube, voltubeinside, wholevol});
     
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

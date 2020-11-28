@@ -74,6 +74,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void printcount(void);
 
         rawmesh(void);
+        ~rawmesh(void);
         
         nodes* getnodes(void);
         elements* getelements(void);

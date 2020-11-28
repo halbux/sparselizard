@@ -13,7 +13,7 @@ using namespace mathop;
 
 mesh createmesh(void);
 
-void sparselizard(void)
+int main(void)
 {	
     // Region number 
     // - 1 corresponds to the whole volume
@@ -185,16 +185,5 @@ mesh createmesh(void)
     // mymesh.write("meshed.msh");
 
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

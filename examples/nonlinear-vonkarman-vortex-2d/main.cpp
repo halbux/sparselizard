@@ -16,7 +16,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // Region numbers used in this simulation as defined in the .msh file:
     int fluid = 1, cylinder = 2, inlet = 3, outlet = 4;
@@ -66,16 +66,5 @@ void sparselizard(void)
         // Write field v with an order 2 interpolation to ParaView .vtu format:
         v.write(fluid, "v" + std::to_string(1000 + i) + ".vtu", 2);
     }
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

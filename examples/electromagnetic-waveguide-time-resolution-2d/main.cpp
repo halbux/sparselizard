@@ -8,7 +8,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'waveguide3D.geo':
     int left = 1, skin = 2, wholedomain = 3;
@@ -72,17 +72,6 @@ void sparselizard(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << (ga.gettimederivative()[0].norm() < 3.0665e+09 && ga.gettimederivative()[0].norm() > 3.0661e+09); 
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
+    std::cout << (ga.gettimederivative()[0].norm() < 3.0665e+09 && ga.gettimederivative()[0].norm() > 3.0661e+09);
 }
 

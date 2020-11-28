@@ -22,7 +22,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
 	// Give names to the region numbers defined in the mesh file:
 	int conductor = 1, shield = 2, air = 3, contour = 4;
@@ -84,16 +84,5 @@ void sparselizard(void)
 	
 	// Code validation line. Can be removed:
 	std::cout << (norm(a).max(wholedomain,4)[0] < 1.96437e-08 && norm(a).max(wholedomain,4)[0] > 1.96435e-08);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

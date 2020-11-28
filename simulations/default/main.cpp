@@ -3,7 +3,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'disk.geo':
     int vol = 1, sur = 2, top = 3;
@@ -30,7 +30,7 @@ void sparselizard(void)
     // The linear elasticity formulation is classical and thus predefined:
     elasticity += integral(vol, predefinedelasticity(dof(u), tf(u), E, nu));
     // Add a volumic force in the -z direction:
-    elasticity += integral(vol, array1x3(0,0,-10)*tf(u));
+    elasticity += integral(vol, array3x1(0,0,-10)*tf(u));
 
     elasticity.generate();
 
@@ -41,16 +41,5 @@ void sparselizard(void)
     // Write the deflection to ParaView .vtk format.
     // Write with an order 2 interpolation. Exaggerate the deflection by a factor 0.5e9.
     (0.5e9*u).write(vol, "u.vtk", 2);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

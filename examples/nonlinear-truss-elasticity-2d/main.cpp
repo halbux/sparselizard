@@ -8,7 +8,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'truss2d.geo':
     int solid = 1, clamp = 2, load = 3;
@@ -52,16 +52,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (umax < 0.0409512 && umax > 0.0409510);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

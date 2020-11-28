@@ -3,7 +3,6 @@
 // structures. Small-strain geometric nonlinearity is taken into account.
 // A monolithic fluid-structure coupling is used. A smooth mesh deformation is obtained
 // by solving a Laplace formulation. 
-// ALE can be used as an alternative to solve this FSI problem.
 //
 // A parabolic normal flow velocity is forced at the inlet and 
 // a zero pressure is imposed at the outlet.
@@ -32,7 +31,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'fsimicropillar.geo':
     int fluid = 1, solid = 2, inlet = 3, outlet = 4, sides = 5, clamp = 6;
@@ -124,16 +123,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (umax < 8.384e-06 && umax > 8.383e-06);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

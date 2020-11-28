@@ -27,7 +27,7 @@ using namespace mathop;
 
 mesh createmesh(double rmb, double depth, double thick, double BLth);
 
-void sparselizard(void)
+int main(void)
 {	
 
     wallclock clk;
@@ -225,7 +225,6 @@ void sparselizard(void)
     grouptimesteps("pch.pvd", "pch", 1, gena.gettimes());
     grouptimesteps("pout.pvd", "pout", 1, gena.gettimes());
     grouptimesteps("T.pvd", "T", 1, gena.gettimes());
-
 }
 
 // THE MESH BELOW IS FULLY STRUCTURED AND IS CREATED USING THE (BASIC) SPARSELIZARD GEOMETRY CREATION TOOL.
@@ -354,16 +353,5 @@ mesh createmesh(double rmb, double depth, double thick, double BLth)
 
 
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

@@ -109,8 +109,6 @@ double hadapt3d(void)
 
 int main(void)
 {	
-    SlepcInitialize(0,{},0,0);
-
     double relerror1d = hadapt1d();
     double relerror2d = hadapt2d();
     double relerror3d = hadapt3d();
@@ -119,9 +117,5 @@ int main(void)
 
     // Code validation line. Can be removed.
     std::cout << (relerror1d < 2e-15 && relerror2d < 4e-11 && relerror3d < 2e-12);
-
-    SlepcFinalize();
-
-    return 0;
 }
 

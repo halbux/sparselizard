@@ -158,8 +158,6 @@ double sparselizard(double alpha)
 
 int main(void)
 {	
-    SlepcInitialize(0,{},0,0);
-
     wallclock clk;
     
     double torque;
@@ -172,12 +170,8 @@ int main(void)
     }
 
     clk.print("Total run time:");
-
-    SlepcFinalize();
     
     // Code validation line. Can be removed:
     std::cout << (torque < 3.56278 && torque > 3.56274);
-
-    return 0;
 }
 

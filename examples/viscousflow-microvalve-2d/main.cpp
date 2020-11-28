@@ -13,7 +13,7 @@ using namespace mathop;
 
 mesh createmesh(void);
 
-void sparselizard(void)
+int main(void)
 {
     // Define the physical regions that will be used:
     int support = 1, fluid = 2, pillar = 3, membrane = 4, inlet = 7, outlet = 8;
@@ -112,16 +112,5 @@ mesh createmesh(void)
     mesh mymesh({q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,l1,l2});
     
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

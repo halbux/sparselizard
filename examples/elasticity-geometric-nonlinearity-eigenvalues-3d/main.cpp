@@ -13,7 +13,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'disk.geo':
     int botlayer = 1, toplayer = 2, sur = 3, top = 4;
@@ -125,16 +125,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (eig.geteigenvaluerealpart()[0] < 1.1453e+12 && eig.geteigenvaluerealpart()[0] > 1.1451e+12);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

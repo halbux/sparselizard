@@ -36,7 +36,7 @@ using namespace mathop;
 //
 mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, double thbotelec, double thmem, double thcav, double cov, double lpillar, double wavelength);
 
-void sparselizard(void)
+int main(void)
 {
     wallclock clk;
     
@@ -277,13 +277,3 @@ mesh createmesh(double r, double rfluid, double thtopelec, double thpiezo, doubl
     return mymesh;
 }
 
-int main(void)
-{
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
-}

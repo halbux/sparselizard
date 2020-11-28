@@ -8,7 +8,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'waveguide3D.geo':
     int left = 1, skin = 2, wholedomain = 3;
@@ -70,16 +70,5 @@ void sparselizard(void)
         // Write with an order 2 interpolation and with the name of your choice:
         E.write(wholedomain, "E"+std::to_string(ts+100)+".pos", 2); 
     }
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

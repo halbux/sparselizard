@@ -21,7 +21,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The physical region numbers as detailed above:
     int vol = 1, clamp = 2, faceincylinder = 3;
@@ -200,16 +200,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (abs(compz(u)).max(vol, 2)[0] < 4.24272e-12 && abs(compz(u)).max(vol, 2)[0] > 4.2427e-12);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

@@ -17,7 +17,7 @@ using namespace mathop;
 // First arguments give the geometry size, last arguments give the number of nodes for meshing.
 mesh createmesh(double length, double width, double thsi, double tracetilt, double ltrace, double wtrace, double rtrace, double thtrace, int numtraces, int nx, int ny, int nz, int nltrace, int nwtrace, int nthtrace);
 
-void sparselizard(void)
+int main(void)
 {	
     int silicon = 1, trace = 2, electrode = 3, ground = 4, clamp = 5;
     
@@ -170,16 +170,5 @@ mesh createmesh(double length, double width, double thsi, double tracetilt, doub
     mesh mymesh({si,clmp,trc,el,gr});
 
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

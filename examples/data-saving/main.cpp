@@ -61,13 +61,7 @@ void sparselizard(bool iswritemode)
 
 int main(void)
 {	
-    SlepcInitialize(0,{},0,0);
-
     sparselizard(true);
     sparselizard(false);
-    
-    SlepcFinalize();
-
-    return 0;
 }
 

@@ -13,7 +13,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
 	//Mesh import
 	mesh mymesh("natconv.msh");
@@ -159,16 +159,5 @@ void sparselizard(void)
 		
 	    adapt(1);
 	}
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

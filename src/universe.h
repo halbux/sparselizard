@@ -30,6 +30,9 @@ class universe
     
     public:
 
+        static int mynumrawmeshes;
+        static void addtorawmeshcounter(int val);
+        
         // Round-off noise level on the node coordinates:
         static double roundoffnoiselevel;
         

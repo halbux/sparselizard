@@ -7,7 +7,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'disk.geo':
     int vol = 1, sur = 2, top = 3;
@@ -84,16 +84,5 @@ void sparselizard(void)
     // Code validation line. Can be removed.
     double checkval = eig.geteigenvaluerealpart()[1]*myimageigenvectors[3].norm();
     std::cout << (checkval > -0.0029259 && checkval < -0.00292588);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

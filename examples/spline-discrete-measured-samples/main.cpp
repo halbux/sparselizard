@@ -10,7 +10,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'disk.geo':
     int vol = 1, sur = 2, top = 3;
@@ -66,16 +66,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (umax < 9.63876e-10 && umax > 9.63874e-10);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

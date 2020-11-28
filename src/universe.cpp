@@ -1,5 +1,27 @@
 #include "universe.h"
+#include "slepc.h"
 
+
+int universe::mynumrawmeshes = 0;
+
+void universe::addtorawmeshcounter(int val)
+{
+    if (mynumrawmeshes+val < 0)
+    {
+        std::cout << "Error in 'universe' object: unexpected negative value for rawmesh counter" << std::endl;
+        abort();
+    }
+
+    PetscBool ispetscinitialized;
+    PetscInitialized(&ispetscinitialized);
+    
+    if (mynumrawmeshes == 0 && val > 0 && ispetscinitialized == PETSC_FALSE)
+        SlepcInitialize(0,{},0,0);
+    if (mynumrawmeshes > 0 && mynumrawmeshes+val == 0 && ispetscinitialized == PETSC_TRUE)
+        SlepcFinalize();
+
+    mynumrawmeshes += val;
+}
 
 double universe::roundoffnoiselevel = 1e-12;
 

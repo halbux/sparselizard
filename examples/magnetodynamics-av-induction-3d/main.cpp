@@ -16,7 +16,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'inductionheating.geo':
     int coil = 1, tube = 2, air = 3, coilskin = 4, tubeskin = 5, vin = 6, vout = 7, domainboundary = 8;
@@ -100,16 +100,5 @@ void sparselizard(void)
     // Code validation line. Can be removed:
     double minj = norm(sigma*(-2*getpi()*50*a.harmonic(2) - grad(v.harmonic(3)))).min(tube,4)[0];
     std::cout << (minj < 216432 && minj > 216430);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

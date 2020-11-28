@@ -14,7 +14,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     
     // CHANGE THE INTERPOLATION ORDER HERE TO SEE THE IMPACT ON THE ERROR
@@ -66,16 +66,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (relativel2normoferror < 1e-5);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

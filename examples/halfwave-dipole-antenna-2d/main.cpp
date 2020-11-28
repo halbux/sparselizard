@@ -12,7 +12,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     wallclock clk;
     
@@ -90,16 +90,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (norm(crossproduct(Es,Ec)).max(wholedomain, 5)[0] < 0.00218416 && norm(crossproduct(Es,Ec)).max(wholedomain, 5)[0] > 0.00218413);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

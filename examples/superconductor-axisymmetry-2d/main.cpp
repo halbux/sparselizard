@@ -17,7 +17,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {   
     // The physical region numbers as defined in the mesh file:
     int tube = 1, air = 2, domainskin = 3;
@@ -121,16 +121,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed:
     std::cout << (bcenter[numsteps-1] < 0.03746 && bcenter[numsteps-1] > 0.03744);
-}
-
-int main(void)
-{   
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

@@ -7,7 +7,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     wallclock clk;
     
@@ -90,16 +90,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (C < 8.34113e-14 && C > 8.34111e-14);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-    
-    sparselizard();
-    
-    SlepcFinalize();
-    
-    return 0;
 }
 

@@ -24,7 +24,7 @@ using namespace mathop;
 //
 mesh createmesh(double r, double thmem, double thcav, double thins, double lpillar);
 
-void sparselizard(void)
+int main(void)
 {	    
     // Define the CMUT geometric dimensions [m]:
     double r = 20e-6, thmem = 0.5e-6, thcav = 0.5e-6, thins = 0.3e-6, lpillar = 10e-6;
@@ -274,16 +274,5 @@ mesh createmesh(double r, double thmem, double thcav, double thins, double lpill
     mesh mymesh({q01,q02,q11,q12,q21,q22,groundline,electrodeline});
     
     return mymesh;
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

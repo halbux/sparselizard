@@ -18,8 +18,6 @@
 #include "mat.h"
 #include "rawvec.h"
 #include "memory"
-#include <slepceps.h>
-#include <slepcpep.h>
 
 class eigenvalue
 {

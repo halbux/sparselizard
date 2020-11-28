@@ -13,7 +13,7 @@ using namespace mathop;
 
 void processmesh(void);
 
-void sparselizard(void)
+int main(void)
 {	
     // Name the regions for the inner and outer electrode, the clamp and the regions 'gamma' on which to apply the periodic condition:
     int electrodein = 1, electrodeout = 2, clamp = 3, gamma1 = 4, gamma2 = 5, cavity = 4007, solid = 4008, all = 4009;
@@ -127,16 +127,5 @@ void processmesh(void)
 
     // Write the processed mesh:
     mymesh3.write("cmutperiodic.msh", 0);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

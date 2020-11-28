@@ -1,4 +1,6 @@
 #include "eigenvalue.h"
+#include <slepceps.h>
+#include <slepcpep.h>
 
 
 void eigenvalue::errorifdirichletnotremoved(std::vector<mat> input)

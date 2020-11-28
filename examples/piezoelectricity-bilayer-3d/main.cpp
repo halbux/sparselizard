@@ -10,7 +10,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'bilayer.geo':
     int pztlayer = 1, siliconlayer = 2, electrode = 3, ground = 4, clamp = 6, freeside = 7, elecbox = 8, mecabox = 9;
@@ -94,16 +94,5 @@ void sparselizard(void)
     
     // Code validation line. Can be removed.
     std::cout << (umax < 1.7386e-07 && umax > 1.7384e-07);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 

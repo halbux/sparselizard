@@ -10,7 +10,7 @@
 
 using namespace mathop;
 
-void sparselizard(void)
+int main(void)
 {	
     // The domain regions as defined in 'halbacharray.geo':
     int magnet1 = 1, magnet2 = 2, magnet3 = 3, magnet4 = 4, magnet5 = 5, steel = 6, air = 7, zeropotential = 8;
@@ -107,16 +107,5 @@ void sparselizard(void)
 
     // Code validation line. Can be removed.
     std::cout << (magfieldnorm[0] < 64963.8 && magfieldnorm[0] > 64963.6 && totalforce[0] < -58.3914 && totalforce[0] > -58.3918);
-}
-
-int main(void)
-{	
-    SlepcInitialize(0,{},0,0);
-
-    sparselizard();
-
-    SlepcFinalize();
-
-    return 0;
 }
 
