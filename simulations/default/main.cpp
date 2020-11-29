@@ -32,12 +32,9 @@ int main(void)
     // Add a volumic force in the -z direction:
     elasticity += integral(vol, array3x1(0,0,-10)*tf(u));
 
-    elasticity.generate();
-
-    vec solu = solve(elasticity.A(), elasticity.b());
-
-    // Transfer the data from the solution vector to the u field:
-    u.setdata(vol, solu);
+    // Generate, solve and transfer the data to field u:
+    solve(elasticity);
+    
     // Write the deflection to ParaView .vtk format.
     // Write with an order 2 interpolation. Exaggerate the deflection by a factor 0.5e9.
     (0.5e9*u).write(vol, "u.vtk", 2);
