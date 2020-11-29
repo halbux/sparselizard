@@ -5,8 +5,10 @@ function(ConfigureMPI TARGET)
 FIND_PATH(MPI_INCLUDE_PATH
     NAMES mpi.h
     PATHS
-    /usr/local/include/
     /usr/include/
+    /usr/local/include/
+    /usr/include/openmpi-x86_64
+    /usr/include/mpich-x86_64
     )
 
 if(MPI_INCLUDE_PATH)
@@ -24,6 +26,7 @@ FIND_LIBRARY(MPI_LIBRARIES
     /usr/lib/x86_64-linux-gnu/
     /usr/lib64
     /usr/lib64/openmpi/lib
+    /usr/lib64/mpich/lib
     )
 
 if(MPI_LIBRARIES)
