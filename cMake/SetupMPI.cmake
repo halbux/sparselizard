@@ -1,3 +1,9 @@
+# Run the default example with MPICH using:
+#
+# module avail mpi
+# module load mpi/mpich-x86_64
+# mpirun -n 4 ./default
+
 function(ConfigureMPI TARGET)
 
 
