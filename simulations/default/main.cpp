@@ -32,7 +32,7 @@ int main(void)
     // Add a volumic force in the -z direction:
     elasticity += integral(vol, array3x1(0,0,-10)*tf(u));
 
-    // Generate, solve and transfer the data to field u:
+    // Generate, solve and transfer the solution to field u:
     solve(elasticity);
     
     // Write the deflection to ParaView .vtk format.
