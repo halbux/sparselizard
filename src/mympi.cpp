@@ -14,8 +14,8 @@ void mympi::errornompi(void)
 bool mympi::isavailable(void) { return false; }
 void mympi::initialize(void) { errornompi(); }
 void mympi::finalize(void) { errornompi(); }
-int mympi::getrank(void) { errornompi(); }
-int mympi::count(void) { errornompi(); }
+int mympi::getrank(void) { errornompi(); return -1; }
+int mympi::count(void) { errornompi(); return -1; }
 void mympi::barrier(void) { errornompi(); }
 void mympi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
 void mympi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
@@ -31,7 +31,7 @@ void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
 void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
 void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
 void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
-std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); }
+std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); return {}; }
 #endif
 
 
