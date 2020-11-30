@@ -8,7 +8,7 @@ void universe::addtorawmeshcounter(int val)
 {
     if (mynumrawmeshes+val < 0)
     {
-        std::cout << "Error in 'universe' object: unexpected negative value for rawmesh counter" << std::endl;
+        std::cout << "Error in 'universe' namespace: unexpected negative value for rawmesh counter" << std::endl;
         abort();
     }
 
@@ -38,7 +38,7 @@ double universe::getfundamentalfrequency(void)
         return fundamentalfrequency;
     else
     {
-        std::cout << "Error in 'universe' object: the fundamental frequency cannot be negative or 0 (make sure it was set)" << std::endl;
+        std::cout << "Error in 'universe' namespace: the fundamental frequency cannot be negative or 0 (make sure it was set)" << std::endl;
         abort();
     }
 }
