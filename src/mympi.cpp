@@ -31,7 +31,7 @@ void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
 void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
 void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
 void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
-void mympi::speedcheck(int messagesize)
+std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); }
 #endif
 
 
