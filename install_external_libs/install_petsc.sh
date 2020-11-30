@@ -58,7 +58,6 @@ fi
 echo '__________________________________________';
 echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
-make $PETSC_DIR $PETSC_ARCH test;    
 
 cd ..;
 
