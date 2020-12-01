@@ -74,6 +74,13 @@ int main(void)
 	
 
 	// Hp-adaptivity:
+	
+	/* 
+	// HP-adapt criterion based on Legendre expansion (RECOMMENDED)
+	expression criterion = fieldorder(T, 0.999, 1); // see fieldorder in documentation
+	expression errorindicator = ifpositive(criterion - 1.5, 1, 0); // order higher than 1 is checked with > 1.5
+	*/
+	
 	expression criterion = zienkiewiczzhu(grad(compx(v))) + zienkiewiczzhu(grad(compy(v)));
 	
 	double errtarget = 1.0;
