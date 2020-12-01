@@ -33,6 +33,9 @@ namespace mympi
     void broadcast(int broadcaster, std::vector<int>& data);
     void broadcast(int broadcaster, std::vector<double>& data);
 
+    // Returns on the gatherer a vector with an int value from all ranks:
+    std::vector<int> gather(int gatherer, int value);
+
     // Gather fixed size fragments in the gatherer:
     void gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered);
     void gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered);

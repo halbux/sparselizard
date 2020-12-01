@@ -14,8 +14,8 @@ void mympi::errornompi(void)
 bool mympi::isavailable(void) { return false; }
 void mympi::initialize(void) { errornompi(); }
 void mympi::finalize(void) { errornompi(); }
-int mympi::getrank(void) { errornompi(); return -1; }
-int mympi::count(void) { errornompi(); return -1; }
+int mympi::getrank(void) { errornompi(); abort(); }
+int mympi::count(void) { errornompi(); abort(); }
 void mympi::barrier(void) { errornompi(); }
 void mympi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
 void mympi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
@@ -23,6 +23,7 @@ void mympi::receive(int source, int tag, std::vector<int>& data) { errornompi();
 void mympi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
 void mympi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
 void mympi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
+std::vector<int> mympi::gather(int gatherer, int value) { errornompi(); abort(); }
 void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
 void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered) { errornompi(); }
 void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes) { errornompi(); }
@@ -31,7 +32,7 @@ void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
 void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
 void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
 void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
-std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); return {}; }
+std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); abort(); }
 #endif
 
 
@@ -101,6 +102,18 @@ void mympi::broadcast(int broadcaster, std::vector<int>& data)
 void mympi::broadcast(int broadcaster, std::vector<double>& data)
 {
     MPI_Bcast(&data[0], data.size(), MPI_DOUBLE, broadcaster, MPI_COMM_WORLD);
+}
+
+std::vector<int> mympi::gather(int gatherer, int value)
+{
+    std::vector<int> gathered = {};
+    
+    if (getrank() == gatherer)
+        gathered.resize(count());
+
+    MPI_Gather(&value, 1, MPI_INT, &gathered[0], 1, MPI_INT, gatherer, MPI_COMM_WORLD); 
+    
+    return gathered;
 }
 
 
