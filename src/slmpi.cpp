@@ -1,38 +1,38 @@
-#include "mympi.h"
+#include "slmpi.h"
 #include "myalgorithm.h"
 #include "wallclock.h"
 
 
-void mympi::errornompi(void)
+void slmpi::errornompi(void)
 {
-    std::cout << "Error in 'mympi' namespace: MPI is not available" << std::endl;
+    std::cout << "Error in 'slmpi' namespace: MPI is not available" << std::endl;
     abort();
 }
 
 
 #ifndef HAVE_MPI
-bool mympi::isavailable(void) { return false; }
-void mympi::initialize(void) { errornompi(); }
-void mympi::finalize(void) { errornompi(); }
-int mympi::getrank(void) { errornompi(); abort(); }
-int mympi::count(void) { errornompi(); abort(); }
-void mympi::barrier(void) { errornompi(); }
-void mympi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
-void mympi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
-void mympi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
-void mympi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
-void mympi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
-void mympi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
-std::vector<int> mympi::gather(int gatherer, int value) { errornompi(); abort(); }
-void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
-void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered) { errornompi(); }
-void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes) { errornompi(); }
-void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes) { errornompi(); }
-void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment) { errornompi(); }
-void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
-void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
-void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
-std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); abort(); }
+bool slmpi::isavailable(void) { return false; }
+void slmpi::initialize(void) { errornompi(); }
+void slmpi::finalize(void) { errornompi(); }
+int slmpi::getrank(void) { errornompi(); abort(); }
+int slmpi::count(void) { errornompi(); abort(); }
+void slmpi::barrier(void) { errornompi(); }
+void slmpi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
+void slmpi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
+void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
+void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
+void slmpi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
+void slmpi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
+std::vector<int> slmpi::gather(int gatherer, int value) { errornompi(); abort(); }
+void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
+void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered) { errornompi(); }
+void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes) { errornompi(); }
+void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes) { errornompi(); }
+void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment) { errornompi(); }
+void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
+void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
+void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
+std::vector<double> slmpi::ping(int messagesize, int verbosity) { errornompi(); abort(); }
 #endif
 
 
@@ -40,71 +40,71 @@ std::vector<double> mympi::ping(int messagesize, int verbosity) { errornompi(); 
 
 #include "mpi.h"
 
-bool mympi::isavailable(void) { return true; }
+bool slmpi::isavailable(void) { return true; }
 
-void mympi::initialize(void)
+void slmpi::initialize(void)
 {
     MPI_Init(NULL, NULL);
 }
 
-void mympi::finalize(void)
+void slmpi::finalize(void)
 {
     MPI_Finalize();
 }
 
-int mympi::getrank(void)
+int slmpi::getrank(void)
 {
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 return world_rank;
 }
 
-int mympi::count(void)
+int slmpi::count(void)
 {
     int world_size;
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     return world_size;
 }
 
-void mympi::barrier(void)
+void slmpi::barrier(void)
 {
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
 
-void mympi::send(int destination, int tag, std::vector<int>& data)
+void slmpi::send(int destination, int tag, std::vector<int>& data)
 {
     MPI_Send(&data[0], data.size(), MPI_INT, destination, tag, MPI_COMM_WORLD);
 }
 
-void mympi::send(int destination, int tag, std::vector<double>& data)
+void slmpi::send(int destination, int tag, std::vector<double>& data)
 {
     MPI_Send(&data[0], data.size(), MPI_DOUBLE, destination, tag, MPI_COMM_WORLD);
 }
 
 
-void mympi::receive(int source, int tag, std::vector<int>& data)
+void slmpi::receive(int source, int tag, std::vector<int>& data)
 {
     MPI_Recv(&data[0], data.size(), MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
-void mympi::receive(int source, int tag, std::vector<double>& data)
+void slmpi::receive(int source, int tag, std::vector<double>& data)
 {
     MPI_Recv(&data[0], data.size(), MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
 
-void mympi::broadcast(int broadcaster, std::vector<int>& data)
+void slmpi::broadcast(int broadcaster, std::vector<int>& data)
 {
     MPI_Bcast(&data[0], data.size(), MPI_INT, broadcaster, MPI_COMM_WORLD);
 }
 
-void mympi::broadcast(int broadcaster, std::vector<double>& data)
+void slmpi::broadcast(int broadcaster, std::vector<double>& data)
 {
     MPI_Bcast(&data[0], data.size(), MPI_DOUBLE, broadcaster, MPI_COMM_WORLD);
 }
 
-std::vector<int> mympi::gather(int gatherer, int value)
+std::vector<int> slmpi::gather(int gatherer, int value)
 {
     std::vector<int> gathered = {};
     
@@ -117,7 +117,7 @@ std::vector<int> mympi::gather(int gatherer, int value)
 }
 
 
-void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered)
+void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered)
 {
     if (getrank() == gatherer)
         gathered.resize(count()*fragment.size());
@@ -125,7 +125,7 @@ void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
     MPI_Gather(&fragment[0], fragment.size(), MPI_INT, &gathered[0], fragment.size(), MPI_INT, gatherer, MPI_COMM_WORLD); 
 }
 
-void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered)
+void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered)
 {
     if (getrank() == gatherer)
         gathered.resize(count()*fragment.size());
@@ -134,7 +134,7 @@ void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<doub
 }
 
 
-void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes)
+void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes)
 {
     int totlen = 0;
     std::vector<int> shifts(fragsizes.size());
@@ -149,7 +149,7 @@ void mympi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
     MPI_Gatherv(&fragment[0], fragment.size(), MPI_INT, &gathered[0], &fragsizes[0], &shifts[0], MPI_INT, gatherer, MPI_COMM_WORLD); 
 }
 
-void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes)
+void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes)
 {
     int totlen = 0;
     std::vector<int> shifts(fragsizes.size());
@@ -165,14 +165,14 @@ void mympi::gather(int gatherer, std::vector<double>& fragment, std::vector<doub
 }
 
 
-void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment)
+void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment)
 {
     fragment.resize(toscatter.size()/count());
         
     MPI_Scatter(&toscatter[0], fragment.size(), MPI_INT, &fragment[0], fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
 }
 
-void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment)
+void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment)
 {
     fragment.resize(toscatter.size()/count());
 
@@ -180,7 +180,7 @@ void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
 }
 
 
-void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes)
+void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes)
 {
     std::vector<int> shifts(fragsizes.size(), 0);
     for (int i = 1; i < fragsizes.size(); i++)
@@ -189,7 +189,7 @@ void mympi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
     MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_INT, &fragment[0], fragsizes.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
 }
 
-void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes)
+void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes)
 {
     std::vector<int> shifts(fragsizes.size(), 0);
     for (int i = 1; i < fragsizes.size(); i++)
@@ -199,7 +199,7 @@ void mympi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
 }
     
 
-std::vector<double> mympi::ping(int messagesize, int verbosity)
+std::vector<double> slmpi::ping(int messagesize, int verbosity)
 {
     std::vector<double> output(count(), 0);
     std::vector<double> datavec(messagesize);

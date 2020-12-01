@@ -3,13 +3,13 @@
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
-#ifndef MYMPI_H
-#define MYMPI_H
+#ifndef SLMPI_H
+#define SLMPI_H
 
 #include <iostream>
 #include <vector>
 
-namespace mympi
+namespace slmpi
 {
     bool isavailable(void);
     
