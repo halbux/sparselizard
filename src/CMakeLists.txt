@@ -39,8 +39,8 @@ ConfigurePETSC(sparselizard)
 ConfigureSLEPC(sparselizard)
 
 # Optional for std::thread
-#find_package(Threads)
-#target_link_libraries(sparselizard PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+# find_package(Threads)
+# target_link_libraries(sparselizard PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
 if(NOT (${BLAS_FOUND} AND ${METIS_FOUND} AND ${MUMPS_FOUND} AND ${PETSC_FOUND} AND ${SLEPC_FOUND}))
     message(FATAL_ERROR "\nAt least one required package (blas, metis, mumps, petsc, slepc) not found.")
