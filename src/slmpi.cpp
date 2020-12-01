@@ -1,5 +1,4 @@
 #include "slmpi.h"
-#include "myalgorithm.h"
 #include "wallclock.h"
 
 
