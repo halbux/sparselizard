@@ -118,6 +118,8 @@ std::vector<int> slmpi::gather(int gatherer, int value)
 
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered)
 {
+    gathered = {};
+    
     if (getrank() == gatherer)
         gathered.resize(count()*fragment.size());
 
@@ -126,15 +128,19 @@ void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
 
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered)
 {
+    gathered = {};
+    
     if (getrank() == gatherer)
         gathered.resize(count()*fragment.size());
 
-    MPI_Gather(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], fragment.size(), MPI_INT, gatherer, MPI_COMM_WORLD); 
+    MPI_Gather(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], fragment.size(), MPI_DOUBLE, gatherer, MPI_COMM_WORLD); 
 }
 
 
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes)
 {
+    gathered = {};
+    
     int totlen = 0;
     std::vector<int> shifts(fragsizes.size());
     for (int i = 0; i < fragsizes.size(); i++)
@@ -150,6 +156,8 @@ void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
 
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes)
 {
+    gathered = {};
+    
     int totlen = 0;
     std::vector<int> shifts(fragsizes.size());
     for (int i = 0; i < fragsizes.size(); i++)
@@ -209,14 +217,16 @@ std::vector<double> slmpi::ping(int messagesize, int verbosity)
 
     if (getrank() == 0)
     {
-        std::cout << "Send + receive time for " << messagesize << " doubles:" << std::endl;
+        if (verbosity > 0)
+            std::cout << "Send + receive time for " << messagesize << " doubles:" << std::endl;
         for (int i = 1; i < count(); i++)
         {
             wallclock clk;
             send(i, 0, datavec);
             receive(i, 0, datavec);
             output[i] = clk.toc();
-            clk.print("0->"+std::to_string(i)+"->0:");
+            if (verbosity > 0)
+                clk.print("0->"+std::to_string(i)+"->0:");
         }
         
         return output;
