@@ -55,7 +55,7 @@ int slmpi::getrank(void)
 {
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-return world_rank;
+    return world_rank;
 }
 
 int slmpi::count(void)
