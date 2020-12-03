@@ -20,6 +20,7 @@
 #include "densematrix.h"
 #include "intdensematrix.h"
 #include "spline.h"
+#include "slmpi.h"
 
 class sparselizard
 {
