@@ -29,7 +29,8 @@ namespace slmpi
     void receive(int source, int tag, std::vector<int>& data);
     void receive(int source, int tag, std::vector<double>& data);
     
-    // Broadcast from the broadcaster rank and receive in 'data' on all ranks:
+    // Broadcast from the broadcaster rank and receive in 'data' on all ranks.
+    // Data vector must be preallocated to the correct size:
     void broadcast(int broadcaster, std::vector<int>& data);
     void broadcast(int broadcaster, std::vector<double>& data);
 
@@ -43,16 +44,17 @@ namespace slmpi
     void gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes);
     void gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes);
     
-    // Scatter fixed size messages:
+    // Scatter fixed size messages.
+    // Fragment vectors must be preallocated to the correct size:
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment);
     // Scatter variable size messages from the scatterer (fragment size only needed on scatterer).
-    // Fragment vectors must be preallocated to the correct size.
+    // Fragment vectors must be preallocated to the correct size:
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes);
     
     // Send + receive time for 'messagesize' doubles. Timings in ns are returned on rank 0:
-    std::vector<double> ping(int messagesize = 1e6, int verbosity = 1);
+    std::vector<double> ping(int messagesize, int verbosity = 1);
 };
 
 #endif

@@ -174,15 +174,11 @@ void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<doub
 
 void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment)
 {
-    fragment.resize(toscatter.size()/count());
-        
     MPI_Scatter(&toscatter[0], fragment.size(), MPI_INT, &fragment[0], fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
 }
 
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment)
 {
-    fragment.resize(toscatter.size()/count());
-
     MPI_Scatter(&toscatter[0], fragment.size(), MPI_DOUBLE, &fragment[0], fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
 }
 
@@ -193,7 +189,7 @@ void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
     for (int i = 1; i < fragsizes.size(); i++)
         shifts[i] = shifts[i-1]+fragsizes[i-1];
 
-    MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_INT, &fragment[0], fragsizes.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
+    MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_INT, &fragment[0], fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
 }
 
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes)
@@ -202,13 +198,13 @@ void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
     for (int i = 1; i < fragsizes.size(); i++)
         shifts[i] = shifts[i-1]+fragsizes[i-1];
 
-    MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, &fragment[0], fragsizes.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
+    MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, &fragment[0], fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
 }
     
 
 std::vector<double> slmpi::ping(int messagesize, int verbosity)
 {
-    std::vector<double> output(count(), 0);
+    std::vector<double> output = {};
     std::vector<double> datavec(messagesize);
     for (int i = 0; i < messagesize; i++)
         datavec[i] = i;
@@ -217,8 +213,10 @@ std::vector<double> slmpi::ping(int messagesize, int verbosity)
 
     if (getrank() == 0)
     {
+        output = std::vector<double>(count(), 0);
+        
         if (verbosity > 0)
-            std::cout << "Send + receive time for " << messagesize << " doubles:" << std::endl;
+            std::cout << "Data round trip time (" << messagesize << " doubles):" << std::endl;
         for (int i = 1; i < count(); i++)
         {
             wallclock clk;
@@ -226,10 +224,8 @@ std::vector<double> slmpi::ping(int messagesize, int verbosity)
             receive(i, 0, datavec);
             output[i] = clk.toc();
             if (verbosity > 0)
-                clk.print("0->"+std::to_string(i)+"->0:");
+                clk.print("0 <> "+std::to_string(i)+":");
         }
-        
-        return output;
     }
     else
     {
@@ -237,7 +233,10 @@ std::vector<double> slmpi::ping(int messagesize, int verbosity)
         send(0, 0, datavec);
     }
     
-    return {};
+    // Timings should not be influenced by next computations:
+    barrier();
+    
+    return output;
 }
 
 #endif
