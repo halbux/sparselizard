@@ -233,7 +233,7 @@ std::vector<double> slmpi::ping(int messagesize, int verbosity)
         send(0, 0, datavec);
     }
     
-    // Timings should not be influenced by next computations:
+    // Timings should not be influenced by following computations:
     barrier();
     
     return output;
