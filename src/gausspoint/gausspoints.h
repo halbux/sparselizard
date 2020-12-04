@@ -26,7 +26,6 @@ class gausspoints
     private:
         
         int myelementtypenumber;
-        int myintegrationorder;
         
         std::vector<double> mycoordinates;
         std::vector<double> myweights;

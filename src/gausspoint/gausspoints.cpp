@@ -4,7 +4,6 @@
 gausspoints::gausspoints(int elementtypenumber, int integrationorder)
 {
     myelementtypenumber = elementtypenumber;
-    myintegrationorder = integrationorder;
     
     if (integrationorder < 0)
     {
