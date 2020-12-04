@@ -344,6 +344,22 @@ densematrix densematrix::returnproduct(double coef)
     return output;
 }
 
+densematrix densematrix::gettranspose(void)
+{
+    densematrix output(numcols, numrows);
+    
+    double* myvaluesptr = myvalues.get();
+    double* outputmyvaluesptr = output.myvalues.get();
+    
+    for (int i = 0; i < numrows; i++)
+    {
+        for (int j = 0; j < numcols; j++)
+            outputmyvaluesptr[j*numrows+i] = myvaluesptr[i*numcols+j];
+    }
+    
+    return output;
+}
+
 void densematrix::multiplyelementwise(densematrix B)
 {
     double* myvaluesptr = myvalues.get();

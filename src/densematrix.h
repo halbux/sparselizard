@@ -102,8 +102,10 @@ class densematrix
         // Return the product by 'coef' without modifying this object.
         densematrix returnproduct(double coef);
 
+        // Return the transpose without modifying this object.
+        densematrix gettranspose(void);
+
         // Elementwise operations below. 
-        // They do not accept matrix transposition.
         // Matrices must all have the same size.
         void multiplyelementwise(densematrix B);
         void multiplyelementwise(double val);
