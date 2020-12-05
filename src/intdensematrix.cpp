@@ -202,7 +202,7 @@ int* intdensematrix::getvalues(void)
     return myvalues.get();
 }
 
-intdensematrix intdensematrix::transpose(void)
+intdensematrix intdensematrix::gettranspose(void)
 {
     intdensematrix output(numcols, numrows);
 

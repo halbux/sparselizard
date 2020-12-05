@@ -69,8 +69,8 @@ class intdensematrix
  
         int* getvalues(void);
         
-        // Return the matrix transposed:
-        intdensematrix transpose(void);
+        // Get the transpose without modifying this object.
+        intdensematrix gettranspose(void);
 
         // A.duplicateallrowstogether(int n) for a matrix A of size pxq 
         // whose form is  [row1; row2; row3; ...] outputs a matrix of size 

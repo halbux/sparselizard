@@ -351,9 +351,9 @@ densematrix densematrix::gettranspose(void)
     double* myvaluesptr = myvalues.get();
     double* outputmyvaluesptr = output.myvalues.get();
     
-    for (int i = 0; i < numrows; i++)
+    for (long long int i = 0; i < numrows; i++)
     {
-        for (int j = 0; j < numcols; j++)
+        for (long long int j = 0; j < numcols; j++)
             outputmyvaluesptr[j*numrows+i] = myvaluesptr[i*numcols+j];
     }
     

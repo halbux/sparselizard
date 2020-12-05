@@ -269,7 +269,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         intdensematrix duplicatedtestfunadresses;
                         if (isdofinterpolate)
                         {
-                            duplicatedtestfunadresses = testfunadresses.transpose();
+                            duplicatedtestfunadresses = testfunadresses.gettranspose();
                             duplicatedtestfunadresses = duplicatedtestfunadresses.duplicatecolsonebyone(dofadresses.countcolumns());
                         }
                         else
