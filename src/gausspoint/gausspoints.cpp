@@ -51,6 +51,103 @@ gausspoints::gausspoints(int elementtypenumber, int integrationorder)
     }
 }
 
+gausspoints::gausspoints(int elementtypenumber, std::vector<double>& gpcoords)
+{
+    double roundoffnoise = 1e-12;
+    
+    myelementtypenumber = elementtypenumber;
+    
+    if (myelementtypenumber == 0)
+    {
+        gppoint::set(0, mycoordinates, myweights);
+        return;
+    }
+    
+    // Find the corresponding integration order or throw an error if none:
+    int integrationorder = 0;
+    while (true)
+    {
+        int numgps;
+        
+        switch (elementtypenumber)
+        {
+            // Line element:
+            case 1:
+                numgps = gpline::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gpline::set(integrationorder, mycoordinates, myweights);
+                break; 
+            // Triangle element:
+            case 2:
+                numgps = gptriangle::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gptriangle::set(integrationorder, mycoordinates, myweights);
+                break; 
+            // Quadrangle element:
+            case 3:
+                numgps = gpquadrangle::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gpquadrangle::set(integrationorder, mycoordinates, myweights);
+                break; 
+            // Tetrahedron element:
+            case 4:
+                numgps = gptetrahedron::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gptetrahedron::set(integrationorder, mycoordinates, myweights);
+                break; 
+            // Hexahedron element:
+            case 5:
+                numgps = gphexahedron::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gphexahedron::set(integrationorder, mycoordinates, myweights);
+                break; 
+            // Prism element:
+            case 6:
+                numgps = gpprism::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gpprism::set(integrationorder, mycoordinates, myweights);
+                break; 
+            // Pyramid element:
+            case 7:
+                numgps = gppyramid::count(integrationorder);
+                if (3*numgps == gpcoords.size())
+                    gppyramid::set(integrationorder, mycoordinates, myweights);
+                break; 
+            default:
+                std::cout << "Error in 'gausspoints' object: unknown element type number " << elementtypenumber << std::endl;
+                abort();
+        }
+        
+        if (numgps == -1)
+        {
+            std::cout << "Error in 'gausspoints' object: could not match gauss coordinates of element type number " << elementtypenumber << " to the requested coordinates" << std::endl;
+            for (int i = 0; i < gpcoords.size(); i++)
+                std::cout << gpcoords[i] << " ";
+            std::cout << std::endl;
+            abort();
+        }
+        
+        // Check if close enough to argument coordinates:
+        if (3*numgps == gpcoords.size())
+        {
+            bool iscloseenough = true;
+            for (int i = 0; i < gpcoords.size(); i++)
+            {
+                if (std::abs(gpcoords[i] - mycoordinates[i]) > roundoffnoise)
+                {
+                    iscloseenough = false;
+                    break;
+                }
+            }
+            
+            if (iscloseenough)
+                break;
+        }
+        
+        integrationorder++;
+    }
+}
+
 void gausspoints::print(void)
 {
     std::cout << std::endl << "ki coordinate | eta coordinate | phi coordinate | weight" << std::endl << std::endl;

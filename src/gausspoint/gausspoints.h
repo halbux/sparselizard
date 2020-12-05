@@ -33,6 +33,8 @@ class gausspoints
     public:
         
         gausspoints(int elementtypenumber, int integrationorder);
+        // Find based on the element type and the gauss points coordinates:
+        gausspoints(int elementtypenumber, std::vector<double>& gpcoords);
         
         // 'getcoordinates' returns a vector containing the reference 
         // element coordinates of the Gauss points in the format 
