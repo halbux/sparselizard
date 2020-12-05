@@ -223,7 +223,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                             
                             // Add the term to the stiffnesses:
                             if (stiffnesses[currentharm][currentdofharm].size() == 0)
-                                stiffnesses[currentharm][currentdofharm] = {currentcoeff[currentcoefharm][0].returnproduct(currentharmcoef)};
+                                stiffnesses[currentharm][currentdofharm] = {currentcoeff[currentcoefharm][0].getproduct(currentharmcoef)};
                             else
                                 stiffnesses[currentharm][currentdofharm][0].addproduct(currentharmcoef, currentcoeff[currentcoefharm][0]);
                         }

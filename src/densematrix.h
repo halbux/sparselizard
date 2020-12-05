@@ -99,10 +99,10 @@ class densematrix
         void addproduct(double coef, densematrix B);
         // Add A*B without changing A or B.
         void addproduct(densematrix A, densematrix B);
-        // Return the product by 'coef' without modifying this object.
-        densematrix returnproduct(double coef);
+        // Get the product by 'coef' without modifying this object.
+        densematrix getproduct(double coef);
 
-        // Return the transpose without modifying this object.
+        // Get the transpose without modifying this object.
         densematrix gettranspose(void);
 
         // Elementwise operations below. 

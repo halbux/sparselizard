@@ -84,7 +84,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
                         if (tempproduct[currentharm].size() == 1)
                             tempproduct[currentharm][0].addproduct(currentharmcoef, curprod);
                         else
-                            tempproduct[currentharm] = {curprod.returnproduct(currentharmcoef)};
+                            tempproduct[currentharm] = {curprod.getproduct(currentharmcoef)};
                     }
                 }
             }

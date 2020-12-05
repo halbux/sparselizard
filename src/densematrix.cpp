@@ -325,7 +325,7 @@ void densematrix::addproduct(densematrix A, densematrix B)
         myvaluesptr[i] += Amyvaluesptr[i]*Bmyvaluesptr[i];
 }
 
-densematrix densematrix::returnproduct(double coef)
+densematrix densematrix::getproduct(double coef)
 {
     densematrix output(numrows, numcols);
     double* myvaluesptr = myvalues.get();
