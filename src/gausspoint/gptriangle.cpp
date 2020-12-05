@@ -1,5 +1,14 @@
 #include "gptriangle.h"
 
+int gptriangle::count(int integrationorder)
+{
+    std::vector<int> nums = {1,1,3,4,6,7,12,13,16,19,25,27,33,37,42,48,52,61,70,73,79};
+    if (integrationorder >= 0 && integrationorder < nums.size())
+        return nums[integrationorder];
+    
+    return -1;
+}
+
 void gptriangle::set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights)
 {
 

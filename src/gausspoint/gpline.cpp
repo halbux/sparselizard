@@ -1,9 +1,17 @@
 #include "gpline.h"
 
+int gpline::count(int integrationorder)
+{
+    if (integrationorder >= 0 && integrationorder < 60)
+        return std::ceil(0.5*(integrationorder+1));
+    
+    return -1;
+}
+
 void gpline::set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights)
 {
     // Max exact integration order = 2 * number of Gauss points - 1:
-    int numberofgausspoints = ceil(0.5*(integrationorder+1));
+    int numberofgausspoints = std::ceil(0.5*(integrationorder+1));
     
     coordinates.resize(3*numberofgausspoints);
     weights.resize(numberofgausspoints);

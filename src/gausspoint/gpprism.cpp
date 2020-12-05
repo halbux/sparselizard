@@ -1,5 +1,15 @@
 #include "gpprism.h"
 
+int gpprism::count(int integrationorder)
+{
+    int numgplin = gpline::count(integrationorder);
+    int numgptri = gptriangle::count(integrationorder);
+    if (numgplin == -1 || numgptri == -1)
+        return -1;
+    else
+        return numgplin*numgptri;
+}
+
 void gpprism::set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights)
 {
     // General rule - based on the line and the triangle Gauss points:

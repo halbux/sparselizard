@@ -1,5 +1,14 @@
 #include "gptetrahedron.h"
 
+int gptetrahedron::count(int integrationorder)
+{
+    std::vector<int> nums = {1,1,4,5,11,14,24,31,43,53,126,126,210,210,330,330,495,495,715,715,1001,1001};
+    if (integrationorder >= 0 && integrationorder < nums.size())
+        return nums[integrationorder];
+    
+    return -1;
+}
+
 void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights)
 {
     

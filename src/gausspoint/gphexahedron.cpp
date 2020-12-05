@@ -1,5 +1,14 @@
 #include "gphexahedron.h"
 
+int gphexahedron::count(int integrationorder)
+{
+    int numgplin = gpline::count(integrationorder);
+    if (numgplin == -1)
+        return -1;
+    else
+        return numgplin*numgplin*numgplin;
+}
+
 void gphexahedron::set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights)
 {
     // General rule - based on the 1D Gauss points:
