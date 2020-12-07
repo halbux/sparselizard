@@ -59,6 +59,15 @@ gausspoints::gausspoints(int elementtypenumber, std::vector<double>& gpcoords)
     
     if (myelementtypenumber == 0)
     {
+        if (gpcoords.size() != 3)
+        {
+            std::cout << "Error in 'gausspoints' object: could not match gauss coordinates of element type number 0 to the requested coordinates" << std::endl;
+            for (int i = 0; i < gpcoords.size(); i++)
+                std::cout << gpcoords[i] << " ";
+            std::cout << std::endl;
+            abort();
+        }
+    
         gppoint::set(0, mycoordinates, myweights);
         return;
     }
