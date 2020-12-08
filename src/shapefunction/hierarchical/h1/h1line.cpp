@@ -131,8 +131,11 @@ hierarchicalformfunctioncontainer h1line::evalat(int maxorder)
                     val.set(i+2,1,edge,orientation,0,0,formfunc);
                 else
                 {
+                    if (orientation == 0)
+                    {
                     
-                    ffindexes[i+2]++;
+                        ffindexes[i+2]++;
+                    }
                 }
             }
         }

@@ -147,8 +147,11 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
                     val.set(i+2,1,edge,orientation,0,0,formfunc);
                 else
                 {
-                
-                    ffindexes[i+2]++;
+                    if (orientation == 0)
+                    {
+                    
+                        ffindexes[i+2]++;
+                    }
                 }
             }
         }
@@ -195,8 +198,11 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
                             val.set(order,2,face,orientation,ffindex,0,formfunc);
                         else
                         {
-                        
-                            ffindexes[order]++;
+                            if (orientation == 0)
+                            {
+                            
+                                ffindexes[order]++;
+                            }
                         }
 
                         ffindex = ffindex + 1;
