@@ -93,10 +93,13 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, in
         // Get the orientation of the current node/edge/face/volume. 
         // Orientation is non zero only for edges and faces.
         int orientation = 0;
-        if (i == 1)
-            orientation = edgesorientations[j];
-        if (i == 2)
-            orientation = facesorientations[j];
+        if (val[h][i][j].size() > 1) // e.g. not for h1d
+        {
+            if (i == 1)
+                orientation = edgesorientations[j];
+            if (i == 2)
+                orientation = facesorientations[j];
+        }
 
         valmat.setrow(ff, val[h][i][j][orientation][l][whichderivative][component]);
         
