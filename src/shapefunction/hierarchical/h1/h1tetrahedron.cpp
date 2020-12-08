@@ -96,6 +96,11 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
         {
             if (targetdim == -1)
                 val.set(1,0,node,0,0,0,lambda[node+1]);
+            else
+            {
+            
+                ffindexes[1]++;
+            }
         }
     }
     
@@ -120,6 +125,11 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
                 polynomial formfunc = Ls[i+2];
                 if (targetdim == -1)
                     val.set(i+2,1,edge,orientation,0,0,formfunc);
+                else
+                {
+                
+                    ffindexes[i+2]++;
+                }
             }
         }
     }
@@ -159,6 +169,11 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
                         polynomial formfunc = Ls[i+2]*lambda[f3]*ls[j];
                         if (targetdim == -1)
                             val.set(order,2,face,orientation,ffindex,0,formfunc);
+                        else
+                        {
+                        
+                            ffindexes[order]++;
+                        }
 
                         ffindex = ffindex + 1;
                     }
@@ -191,6 +206,11 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
                     polynomial formfunc = Ls[i+2]*lambda[3]*ls[j]*lambda[4]*l[k];
                     if (targetdim == -1)
                         val.set(order,3,0,0,ffindex,0,formfunc);
+                    else
+                    {
+                    
+                        ffindexes[order]++;
+                    }
 
                     ffindex = ffindex + 1;
                 }

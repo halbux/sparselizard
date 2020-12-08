@@ -116,6 +116,11 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
         {
             if (targetdim == -1)
                 val.set(1,0,node,0,0,0,lambda[node+1]);
+            else
+            {
+            
+                ffindexes[1]++;
+            }
         }
     }
     
@@ -140,6 +145,11 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
                 polynomial formfunc = L[i+2]*(lambda[e1]+lambda[e2]);
                 if (targetdim == -1)
                     val.set(i+2,1,edge,orientation,0,0,formfunc);
+                else
+                {
+                
+                    ffindexes[i+2]++;
+                }
             }
         }
     }
@@ -183,6 +193,11 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
                         polynomial formfunc = LxiF[i+2]*LetaF[j+2]*lambdaF;
                         if (targetdim == -1)
                             val.set(order,2,face,orientation,ffindex,0,formfunc);
+                        else
+                        {
+                        
+                            ffindexes[order]++;
+                        }
 
                         ffindex = ffindex + 1;
                     }
@@ -215,6 +230,11 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
                     polynomial formfunc = Ltwokiminusone[i+2]*Ltwoetaminusone[j+2]*Ltwophiminusone[k+2];
                     if (targetdim == -1)
                         val.set(order,3,0,0,ffindex,0,formfunc);
+                    else
+                    {
+                    
+                        ffindexes[order]++;
+                    }
 
                     ffindex = ffindex + 1;
                 }

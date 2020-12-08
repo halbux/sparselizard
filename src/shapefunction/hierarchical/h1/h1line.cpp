@@ -100,6 +100,11 @@ hierarchicalformfunctioncontainer h1line::evalat(int maxorder)
         {
             if (targetdim == -1)
                 val.set(1,0,node,0,0,0,lambda[node+1]);
+            else
+            {
+                
+                ffindexes[1]++;
+            }
         }
     }
     
@@ -124,6 +129,11 @@ hierarchicalformfunctioncontainer h1line::evalat(int maxorder)
                 polynomial formfunc = L[i+2]*(lambda[e1]+lambda[e2]);
                 if (targetdim == -1)
                     val.set(i+2,1,edge,orientation,0,0,formfunc);
+                else
+                {
+                    
+                    ffindexes[i+2]++;
+                }
             }
         }
     }
