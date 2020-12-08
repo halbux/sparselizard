@@ -243,7 +243,7 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                     if (i+j != order-3 && k != order-2)
                         continue;
 
-                    polynomial formfunc =  Ls[i+2]*lambda[3]*l[j]*L[k+2];
+                    polynomial formfunc = Ls[i+2]*lambda[3]*l[j]*L[k+2];
                     val.set(order,3,0,0,ffindex,0,formfunc);
 
                     ffindex = ffindex + 1;
