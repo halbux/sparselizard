@@ -96,7 +96,7 @@ hierarchicalformfunctioncontainer h1triangle::evalat(int maxorder)
                 val.set(1,0,node,0,0,0,lambda[node+1]);
             else
             {
-                val.set(1,0,node,0,0,0,lambda[node+1]);
+                val.set(1,2,0,0,ffindexes[1],0,lambda[node+1]);
                 ffindexes[1]++;
             }
         }
@@ -127,7 +127,7 @@ hierarchicalformfunctioncontainer h1triangle::evalat(int maxorder)
                 {
                     if (orientation == 0)
                     {
-                        val.set(i+2,1,edge,orientation,0,0,formfunc);
+                        val.set(i+2,2,0,orientation,ffindexes[i+2],0,formfunc);
                         ffindexes[i+2]++;
                     }
                 }
@@ -174,7 +174,7 @@ hierarchicalformfunctioncontainer h1triangle::evalat(int maxorder)
                         {
                             if (orientation == 0)
                             {
-                                val.set(order,2,face,orientation,ffindex,0,formfunc);
+                                val.set(order,2,0,orientation,ffindexes[order],0,formfunc);
                                 ffindexes[order]++;
                             }
                         }
