@@ -329,6 +329,10 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         std::cout << "Error in 'rawfield' object: first load mesh before defining a field that is not the x, y or z coordinate" << std::endl;
         abort();
     }
+    
+    // Translate to the actual type name:
+    if (fieldtypename == "h1d")
+        fieldtypename = "h1d"+std::to_string(universe::mymesh->getmeshdimension());
 
     // If the field type name ends with xy (or xyz) there are 2 (or 3) dof components.
     // 'xy' or 'xyz' can only be used on scalar form function type (e.g. not on hcurl).
