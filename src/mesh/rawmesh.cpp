@@ -730,20 +730,7 @@ void rawmesh::scale(int physreg, double x, double y, double z)
 
 int rawmesh::getmeshdimension(void)
 {
-    int maxelementdimension = -1;
-
-    // Iterate on all element types in 'myelements':
-    for (int elementtypenumber = 0; elementtypenumber <= 7; elementtypenumber++)
-    {
-        // If there is no element of that type we skip it:
-        if (myelements.count(elementtypenumber) == 0)
-            continue;
-        
-        element elementobject(elementtypenumber);
-        if (elementobject.getelementdimension() > maxelementdimension)
-            maxelementdimension = elementobject.getelementdimension();
-    }
-    return maxelementdimension;
+    return myelements.getdimension();
 }
 
 std::vector<int> rawmesh::getphysicalregionnumbers(int dim)
