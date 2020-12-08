@@ -100,6 +100,31 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         return std::shared_ptr<hierarchicalformfunction>(new oneconstant(elementtypenumber));
     }
     
+    if (formfunctiontypename.compare("h1d0") == 0 || formfunctiontypename.compare("h1d1") == 0 || formfunctiontypename.compare("h1d2") == 0 || formfunctiontypename.compare("h1d3") == 0)
+    {
+        int h1ddim = std::stoi(formfunctiontypename.substr(3,1));
+        
+        switch (elementtypenumber)
+        {
+            case 0:
+                return std::shared_ptr<hierarchicalformfunction>(new h1point(h1ddim));
+            case 1:
+                return std::shared_ptr<hierarchicalformfunction>(new h1line(h1ddim));
+            case 2:
+                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(h1ddim));
+            case 3:
+                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle(h1ddim));
+            case 4:
+                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(h1ddim));
+            case 5:
+                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron(h1ddim));
+            case 6:
+                return std::shared_ptr<hierarchicalformfunction>(new h1prism(h1ddim));
+            case 7:
+                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(h1ddim));
+        }
+    }
+    
     
     // If we arrive here it means the form function type name was incorrect:
     std::cout << "Error in 'selector' namespace: unknown form function type name '" << formfunctiontypename << "'" << std::endl;
