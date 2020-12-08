@@ -12,8 +12,12 @@
 class h1pyramid: public hierarchicalformfunction
 {
     private:
+    
+        int targetdim = -1;
 
     public:
+    
+        h1pyramid(int td) { targetdim = td; }; // -1 for h1
     
         // Get the number of form functions of order <= 'order':
         int count(int order);

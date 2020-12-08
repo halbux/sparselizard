@@ -16,8 +16,12 @@
 class h1prism: public hierarchicalformfunction
 {
     private:
+    
+        int targetdim = -1;
 
     public:
+    
+        h1prism(int td) { targetdim = td; }; // -1 for h1
 
         // Get the number of form functions of order <= 'order':
         int count(int order);
@@ -37,7 +41,7 @@ class h1prism: public hierarchicalformfunction
         // If 'isorientationdependent' is false then the assembly can
         // be carried out without taking care of the element orientation.
         // This provides an assembly speedup.
-        bool isorientationdependent(int order) { return (order > 2); };
+        bool isorientationdependent(int order) { return (targetdim == -1 && order > 2); };
 };
 
 #endif
