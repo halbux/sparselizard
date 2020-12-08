@@ -5,7 +5,7 @@ using namespace std;
 
 int h1prism::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 3)
         return 0;
     
     int countforline = (order+1);
@@ -16,6 +16,14 @@ int h1prism::count(int order)
 
 int h1prism::count(int order, int dim, int num)
 {
+    if (targetdim != -1)
+    {
+        if (targetdim == 3 && dim == 3)
+            return count(order);
+        else
+            return 0;
+    }
+    
     // The 'num' input argument is required here!
     
     if (order <= 0)
@@ -48,8 +56,12 @@ int h1prism::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1prism::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element prism("prism");
-    hierarchicalformfunctioncontainer val("h1", prism.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, prism.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = prism.getedgesdefinitionsbasedonnodes();                        
@@ -60,6 +72,9 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
     std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
     std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
     std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    
+    // Store the form function index in a given order:
+    std::vector<int> ffindexes(maxorder+1, 0);
 
 
     ////////// Define the 'lambda' and 'mu' polynomials used in Zaglmayr's thesis:
@@ -102,7 +117,13 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
         for (int node = 0; node < prism.countnodes(); node++)
         {
             polynomial formfunc = lambda[node+1]*mu[node+1];
-            val.set(1,0,node,0,0,0,formfunc);
+            if (targetdim == -1)
+                val.set(1,0,node,0,0,0,formfunc);
+            else
+            {
+                val.set(1,3,0,0,ffindexes[1],0,formfunc);
+                ffindexes[1]++;
+            }
         }
     }
     
@@ -131,7 +152,16 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                 else
                     formfunc = L[i+2]*(lambda[e1]+lambda[e2])*0.5; // A factor 0.5 was missing (lambda[e1] = lambda[e2] for horizontal edges)
                 
-                val.set(i+2,1,edge,orientation,0,0,formfunc);
+                if (targetdim == -1)
+                    val.set(i+2,1,edge,orientation,0,0,formfunc);
+                else
+                {
+                    if (orientation == 0)
+                    {
+                        val.set(i+2,3,0,orientation,ffindexes[i+2],0,formfunc);
+                        ffindexes[i+2]++;
+                    }
+                }
             }
         }
     }
@@ -168,7 +198,16 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                                 continue;
 
                             polynomial formfunc = Ls[i+2]*lambda[f3]*l[j]*mu[f1];
-                            val.set(order,2,face,orientation,ffindex,0,formfunc);
+                            if (targetdim == -1)
+                                val.set(order,2,face,orientation,ffindex,0,formfunc);
+                            else
+                            {
+                                if (orientation == 0)
+                                {
+                                    val.set(order,3,0,orientation,ffindexes[order],0,formfunc);
+                                    ffindexes[order]++;
+                                }
+                            }
 
                             ffindex = ffindex + 1;
                         }
@@ -212,7 +251,16 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                                 continue;
 
                             polynomial formfunc = Ls[i+2]*L[j+2];
-                            val.set(order,2,face,orientation,ffindex,0,formfunc);
+                            if (targetdim == -1)
+                                val.set(order,2,face,orientation,ffindex,0,formfunc);
+                            else
+                            {
+                                if (orientation == 0)
+                                {
+                                    val.set(order,3,0,orientation,ffindexes[order],0,formfunc);
+                                    ffindexes[order]++;
+                                }
+                            }
 
                             ffindex = ffindex + 1;
                         }
@@ -244,7 +292,13 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                         continue;
 
                     polynomial formfunc = Ls[i+2]*lambda[3]*l[j]*L[k+2];
-                    val.set(order,3,0,0,ffindex,0,formfunc);
+                    if (targetdim == -1)
+                        val.set(order,3,0,0,ffindex,0,formfunc);
+                    else
+                    {
+                        val.set(order,3,0,0,ffindexes[order],0,formfunc);
+                        ffindexes[order]++;
+                    }
 
                     ffindex = ffindex + 1;
                 }

@@ -5,7 +5,7 @@ using namespace std;
 
 int h1point::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 0)
         return 0;
     
     return 1;
@@ -13,6 +13,14 @@ int h1point::count(int order)
 
 int h1point::count(int order, int dim, int num)
 {
+    if (targetdim != -1)
+    {
+        if (targetdim == 0 && dim == 0)
+            return count(order);
+        else
+            return 0;
+    }
+    
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
     // however required for prisms and pyramids.
@@ -43,8 +51,12 @@ int h1point::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1point::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+
     element point("point");
-    hierarchicalformfunctioncontainer val("h1", point.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, point.gettypenumber());
 
     polynomial formfunc;
     formfunc.set({{{1.0}}});

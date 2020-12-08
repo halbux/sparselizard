@@ -8,21 +8,21 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         switch (elementtypenumber)
         {
             case 0:
-                return std::shared_ptr<hierarchicalformfunction>(new h1point);
+                return std::shared_ptr<hierarchicalformfunction>(new h1point(-1));
             case 1:
-                return std::shared_ptr<hierarchicalformfunction>(new h1line);
+                return std::shared_ptr<hierarchicalformfunction>(new h1line(-1));
             case 2:
-                return std::shared_ptr<hierarchicalformfunction>(new h1triangle);
+                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(-1));
             case 3:
-                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle);
+                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle(-1));
             case 4:
-                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron);
+                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(-1));
             case 5:
-                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron);
+                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron(-1));
             case 6:
-                return std::shared_ptr<hierarchicalformfunction>(new h1prism);
+                return std::shared_ptr<hierarchicalformfunction>(new h1prism(-1));
             case 7:
-                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
+                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(-1));
         }
     }
     
@@ -54,21 +54,21 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         switch (elementtypenumber)
         {
             case 0:
-                return std::shared_ptr<hierarchicalformfunction>(new h1point);
+                return std::shared_ptr<hierarchicalformfunction>(new h1point(-1));
             case 1:
-                return std::shared_ptr<hierarchicalformfunction>(new h1line);
+                return std::shared_ptr<hierarchicalformfunction>(new h1line(-1));
             case 2:
-                return std::shared_ptr<hierarchicalformfunction>(new h1triangle);
+                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(-1));
             case 3:
                 return std::shared_ptr<hierarchicalformfunction>(new q6);
             case 4:
-                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron);
+                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(-1));
             case 5:
-                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron);
+                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron(-1));
             case 6:
-                return std::shared_ptr<hierarchicalformfunction>(new h1prism);
+                return std::shared_ptr<hierarchicalformfunction>(new h1prism(-1));
             case 7:
-                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
+                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(-1));
         }
     }
     
@@ -77,27 +77,52 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         switch (elementtypenumber)
         {
             case 0:
-                return std::shared_ptr<hierarchicalformfunction>(new h1point);
+                return std::shared_ptr<hierarchicalformfunction>(new h1point(-1));
             case 1:
-                return std::shared_ptr<hierarchicalformfunction>(new h1line);
+                return std::shared_ptr<hierarchicalformfunction>(new h1line(-1));
             case 2:
-                return std::shared_ptr<hierarchicalformfunction>(new h1triangle);
+                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(-1));
             case 3:
-                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle);
+                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle(-1));
             case 4:
-                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron);
+                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(-1));
             case 5:
                 return std::shared_ptr<hierarchicalformfunction>(new h11);
             case 6:
-                return std::shared_ptr<hierarchicalformfunction>(new h1prism);
+                return std::shared_ptr<hierarchicalformfunction>(new h1prism(-1));
             case 7:
-                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid);
+                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(-1));
         }
     }
     
     if (formfunctiontypename.compare("one") == 0)
     {
         return std::shared_ptr<hierarchicalformfunction>(new oneconstant(elementtypenumber));
+    }
+    
+    if (formfunctiontypename.compare("h1d0") == 0 || formfunctiontypename.compare("h1d1") == 0 || formfunctiontypename.compare("h1d2") == 0 || formfunctiontypename.compare("h1d3") == 0)
+    {
+        int h1ddim = std::stoi(formfunctiontypename.substr(3,1));
+        
+        switch (elementtypenumber)
+        {
+            case 0:
+                return std::shared_ptr<hierarchicalformfunction>(new h1point(h1ddim));
+            case 1:
+                return std::shared_ptr<hierarchicalformfunction>(new h1line(h1ddim));
+            case 2:
+                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(h1ddim));
+            case 3:
+                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle(h1ddim));
+            case 4:
+                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(h1ddim));
+            case 5:
+                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron(h1ddim));
+            case 6:
+                return std::shared_ptr<hierarchicalformfunction>(new h1prism(h1ddim));
+            case 7:
+                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(h1ddim));
+        }
     }
     
     

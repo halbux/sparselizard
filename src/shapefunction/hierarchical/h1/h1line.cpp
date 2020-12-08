@@ -5,7 +5,7 @@ using namespace std;
 
 int h1line::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 1)
         return 0;
     
     return (order+1);
@@ -13,6 +13,14 @@ int h1line::count(int order)
 
 int h1line::count(int order, int dim, int num)
 {
+    if (targetdim != -1)
+    {
+        if (targetdim == 1 && dim == 1)
+            return count(order);
+        else
+            return 0;
+    }
+    
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
     // however required for prisms and pyramids.
@@ -43,8 +51,12 @@ int h1line::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1line::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element line("line");
-    hierarchicalformfunctioncontainer val("h1", line.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, line.gettypenumber());
 
     // Get the node list in every edge:
     std::vector<int> nodesinedges = line.getedgesdefinitionsbasedonnodes();                        
@@ -52,6 +64,9 @@ hierarchicalformfunctioncontainer h1line::evalat(int maxorder)
     // Get for every edge orientation the vector reordering the 
     // nodes to bring the edge to its reference orientation 0.
     std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
+    
+    // Store the form function index in a given order:
+    std::vector<int> ffindexes(maxorder+1, 0);
 
 
     ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
@@ -82,7 +97,15 @@ hierarchicalformfunctioncontainer h1line::evalat(int maxorder)
     {
         // Loop on all nodes:
         for (int node = 0; node < line.countnodes(); node++)
-            val.set(1,0,node,0,0,0,lambda[node+1]);
+        {
+            if (targetdim == -1)
+                val.set(1,0,node,0,0,0,lambda[node+1]);
+            else
+            {
+                val.set(1,1,0,0,ffindexes[1],0,lambda[node+1]);
+                ffindexes[1]++;
+            }
+        }
     }
     
     
@@ -104,7 +127,16 @@ hierarchicalformfunctioncontainer h1line::evalat(int maxorder)
             for (int i = 0; i <= maxorder-2; i++)
             {
                 polynomial formfunc = L[i+2]*(lambda[e1]+lambda[e2]);
-                val.set(i+2,1,edge,orientation,0,0,formfunc);
+                if (targetdim == -1)
+                    val.set(i+2,1,edge,orientation,0,0,formfunc);
+                else
+                {
+                    if (orientation == 0)
+                    {
+                        val.set(i+2,1,0,orientation,ffindexes[i+2],0,formfunc);
+                        ffindexes[i+2]++;
+                    }
+                }
             }
         }
     }

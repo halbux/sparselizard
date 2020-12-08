@@ -5,7 +5,7 @@ using namespace std;
 
 int h1tetrahedron::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 3)
         return 0;
     
     return 1.0/6.0*(order+1)*(order+2)*(order+3);
@@ -13,6 +13,14 @@ int h1tetrahedron::count(int order)
 
 int h1tetrahedron::count(int order, int dim, int num)
 {
+    if (targetdim != -1)
+    {
+        if (targetdim == 3 && dim == 3)
+            return count(order);
+        else
+            return 0;
+    }
+    
     // The 'num' input argument is not required here since all nodes, 
     // edges and faces have the same number of form functions. It is
     // however required for prisms and pyramids.
@@ -43,8 +51,12 @@ int h1tetrahedron::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element tetrahedron("tetrahedron");
-    hierarchicalformfunctioncontainer val("h1", tetrahedron.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, tetrahedron.gettypenumber());
     
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = tetrahedron.getedgesdefinitionsbasedonnodes();                        
@@ -54,6 +66,9 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
     // nodes to bring the edge/face to its reference orientation 0.
     std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
     std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
+    
+    // Store the form function index in a given order:
+    std::vector<int> ffindexes(maxorder+1, 0);
 
 
     ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
@@ -78,7 +93,15 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
     {
         // Loop on all nodes:
         for (int node = 0; node < tetrahedron.countnodes(); node++)
-            val.set(1,0,node,0,0,0,lambda[node+1]);
+        {
+            if (targetdim == -1)
+                val.set(1,0,node,0,0,0,lambda[node+1]);
+            else
+            {
+                val.set(1,3,0,0,ffindexes[1],0,lambda[node+1]);
+                ffindexes[1]++;
+            }
+        }
     }
     
     
@@ -100,7 +123,16 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
             for (int i = 0; i <= maxorder-2; i++)
             {
                 polynomial formfunc = Ls[i+2];
-                val.set(i+2,1,edge,orientation,0,0,formfunc);
+                if (targetdim == -1)
+                    val.set(i+2,1,edge,orientation,0,0,formfunc);
+                else
+                {
+                    if (orientation == 0)
+                    {
+                        val.set(i+2,3,0,orientation,ffindexes[i+2],0,formfunc);
+                        ffindexes[i+2]++;
+                    }
+                }
             }
         }
     }
@@ -138,7 +170,16 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
                             continue;
 
                         polynomial formfunc = Ls[i+2]*lambda[f3]*ls[j];
-                        val.set(order,2,face,orientation,ffindex,0,formfunc);
+                        if (targetdim == -1)
+                            val.set(order,2,face,orientation,ffindex,0,formfunc);
+                        else
+                        {
+                            if (orientation == 0)
+                            {
+                                val.set(order,3,0,orientation,ffindexes[order],0,formfunc);
+                                ffindexes[order]++;
+                            }
+                        }
 
                         ffindex = ffindex + 1;
                     }
@@ -169,7 +210,13 @@ hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder)
                         continue;
 
                     polynomial formfunc = Ls[i+2]*lambda[3]*ls[j]*lambda[4]*l[k];
-                    val.set(order,3,0,0,ffindex,0,formfunc);
+                    if (targetdim == -1)
+                        val.set(order,3,0,0,ffindex,0,formfunc);
+                    else
+                    {
+                        val.set(order,3,0,0,ffindexes[order],0,formfunc);
+                        ffindexes[order]++;
+                    }
 
                     ffindex = ffindex + 1;
                 }
