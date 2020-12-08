@@ -51,8 +51,12 @@ int h1quadrangle::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element quadrangle("quadrangle");
-    hierarchicalformfunctioncontainer val("h1", quadrangle.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, quadrangle.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = quadrangle.getedgesdefinitionsbasedonnodes();                        

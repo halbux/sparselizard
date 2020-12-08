@@ -56,8 +56,12 @@ int h1prism::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1prism::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element prism("prism");
-    hierarchicalformfunctioncontainer val("h1", prism.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, prism.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = prism.getedgesdefinitionsbasedonnodes();                        

@@ -51,8 +51,12 @@ int h1point::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1point::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+
     element point("point");
-    hierarchicalformfunctioncontainer val("h1", point.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, point.gettypenumber());
 
     polynomial formfunc;
     formfunc.set({{{1.0}}});

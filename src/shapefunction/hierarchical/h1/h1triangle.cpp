@@ -51,8 +51,12 @@ int h1triangle::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1triangle::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element triangle("triangle");
-    hierarchicalformfunctioncontainer val("h1", triangle.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, triangle.gettypenumber());
 
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = triangle.getedgesdefinitionsbasedonnodes();                        

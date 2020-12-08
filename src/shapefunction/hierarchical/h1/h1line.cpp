@@ -51,8 +51,12 @@ int h1line::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1line::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element line("line");
-    hierarchicalformfunctioncontainer val("h1", line.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, line.gettypenumber());
 
     // Get the node list in every edge:
     std::vector<int> nodesinedges = line.getedgesdefinitionsbasedonnodes();                        

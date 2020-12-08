@@ -51,8 +51,12 @@ int h1tetrahedron::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer h1tetrahedron::evalat(int maxorder) 
 {    
+    std::string type = "h1";
+    if (targetdim != -1)
+        type = "h1d"+std::to_string(targetdim);
+        
     element tetrahedron("tetrahedron");
-    hierarchicalformfunctioncontainer val("h1", tetrahedron.gettypenumber());
+    hierarchicalformfunctioncontainer val(type, tetrahedron.gettypenumber());
     
     // Get the node list in every edge and face:
     std::vector<int> nodesinedges = tetrahedron.getedgesdefinitionsbasedonnodes();                        
