@@ -16,6 +16,14 @@ int h1prism::count(int order)
 
 int h1prism::count(int order, int dim, int num)
 {
+    if (targetdim != -1)
+    {
+        if (targetdim == 3 && dim == 3)
+            return count(order);
+        else
+            return 0;
+    }
+    
     // The 'num' input argument is required here!
     
     if (order <= 0)
