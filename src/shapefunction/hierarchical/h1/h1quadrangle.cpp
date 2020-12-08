@@ -105,7 +105,8 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
         // Loop on all nodes:
         for (int node = 0; node < quadrangle.countnodes(); node++)
         {
-            val.set(1,0,node,0,0,0,lambda[node+1]);
+            if (targetdim == -1)
+                val.set(1,0,node,0,0,0,lambda[node+1]);
         }
     }
     
@@ -128,7 +129,8 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
             for (int i = 0; i <= maxorder-2; i++)
             {
                 polynomial formfunc = L[i+2]*(lambda[e1]+lambda[e2]);
-                val.set(i+2,1,edge,orientation,0,0,formfunc);
+                if (targetdim == -1)
+                    val.set(i+2,1,edge,orientation,0,0,formfunc);
             }
         }
     }
@@ -170,7 +172,8 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
                             continue;
 
                         polynomial formfunc = LxiF[i+2]*LetaF[j+2]*lambdaF;
-                        val.set(order,2,face,orientation,ffindex,0,formfunc);
+                        if (targetdim == -1)
+                            val.set(order,2,face,orientation,ffindex,0,formfunc);
 
                         ffindex = ffindex + 1;
                     }

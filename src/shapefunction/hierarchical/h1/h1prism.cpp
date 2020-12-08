@@ -117,7 +117,8 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
         for (int node = 0; node < prism.countnodes(); node++)
         {
             polynomial formfunc = lambda[node+1]*mu[node+1];
-            val.set(1,0,node,0,0,0,formfunc);
+            if (targetdim == -1)
+                val.set(1,0,node,0,0,0,formfunc);
         }
     }
     
@@ -146,7 +147,8 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                 else
                     formfunc = L[i+2]*(lambda[e1]+lambda[e2])*0.5; // A factor 0.5 was missing (lambda[e1] = lambda[e2] for horizontal edges)
                 
-                val.set(i+2,1,edge,orientation,0,0,formfunc);
+                if (targetdim == -1)
+                    val.set(i+2,1,edge,orientation,0,0,formfunc);
             }
         }
     }
@@ -183,7 +185,8 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                                 continue;
 
                             polynomial formfunc = Ls[i+2]*lambda[f3]*l[j]*mu[f1];
-                            val.set(order,2,face,orientation,ffindex,0,formfunc);
+                            if (targetdim == -1)
+                                val.set(order,2,face,orientation,ffindex,0,formfunc);
 
                             ffindex = ffindex + 1;
                         }
@@ -227,7 +230,8 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                                 continue;
 
                             polynomial formfunc = Ls[i+2]*L[j+2];
-                            val.set(order,2,face,orientation,ffindex,0,formfunc);
+                            if (targetdim == -1)
+                                val.set(order,2,face,orientation,ffindex,0,formfunc);
 
                             ffindex = ffindex + 1;
                         }
@@ -259,7 +263,8 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                         continue;
 
                     polynomial formfunc = Ls[i+2]*lambda[3]*l[j]*L[k+2];
-                    val.set(order,3,0,0,ffindex,0,formfunc);
+                    if (targetdim == -1)
+                        val.set(order,3,0,0,ffindex,0,formfunc);
 
                     ffindex = ffindex + 1;
                 }
