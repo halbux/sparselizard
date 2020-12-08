@@ -5,7 +5,7 @@ using namespace std;
 
 int h1prism::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 3)
         return 0;
     
     int countforline = (order+1);

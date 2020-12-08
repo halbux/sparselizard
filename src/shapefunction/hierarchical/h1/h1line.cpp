@@ -5,7 +5,7 @@ using namespace std;
 
 int h1line::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 1)
         return 0;
     
     return (order+1);

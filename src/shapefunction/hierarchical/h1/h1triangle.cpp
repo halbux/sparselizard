@@ -5,7 +5,7 @@ using namespace std;
 
 int h1triangle::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 2)
         return 0;
     
     return 0.5*(order+1)*(order+2);

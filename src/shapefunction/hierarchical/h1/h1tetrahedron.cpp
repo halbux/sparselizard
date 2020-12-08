@@ -5,7 +5,7 @@ using namespace std;
 
 int h1tetrahedron::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != -1 && targetdim != 3)
         return 0;
     
     return 1.0/6.0*(order+1)*(order+2)*(order+3);
