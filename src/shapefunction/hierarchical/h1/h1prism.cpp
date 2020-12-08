@@ -72,6 +72,9 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
     std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
     std::vector<std::vector<int>> reorderingtoreferencetriangularfaceorientation = orientation::getreorderingtoreferencetriangularfaceorientation();
     std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    
+    // Store the form function index in a given order:
+    std::vector<int> ffindexes(maxorder+1, 0);
 
 
     ////////// Define the 'lambda' and 'mu' polynomials used in Zaglmayr's thesis:

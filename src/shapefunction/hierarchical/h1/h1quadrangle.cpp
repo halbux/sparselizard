@@ -66,6 +66,9 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
     // nodes to bring the edge/face to its reference orientation 0.
     std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
     std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    
+    // Store the form function index in a given order:
+    std::vector<int> ffindexes(maxorder+1, 0);
 
 
     ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
@@ -101,7 +104,9 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
     {
         // Loop on all nodes:
         for (int node = 0; node < quadrangle.countnodes(); node++)
+        {
             val.set(1,0,node,0,0,0,lambda[node+1]);
+        }
     }
     
     

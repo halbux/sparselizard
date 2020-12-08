@@ -66,6 +66,9 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
     // nodes to bring the edge/face to its reference orientation 0.
     std::vector<std::vector<int>> reorderingtoreferenceedgeorientation = orientation::getreorderingtoreferenceedgeorientation();
     std::vector<std::vector<int>> reorderingtoreferencequadrangularfaceorientation = orientation::getreorderingtoreferencequadrangularfaceorientation();
+    
+    // Store the form function index in a given order:
+    std::vector<int> ffindexes(maxorder+1, 0);
 
 
     ////////// Define the 'lambda' and 'sigma' polynomials used in Zaglmayr's thesis:
