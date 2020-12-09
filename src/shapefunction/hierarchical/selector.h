@@ -29,9 +29,6 @@
 #include "hcurlprism.h"
 #include "hcurlpyramid.h"
 
-#include "q6.h"
-#include "h11.h"
-
 #include "oneconstant.h"
 
 

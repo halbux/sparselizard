@@ -49,52 +49,6 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         }
     }
     
-    if (formfunctiontypename.compare("q6") == 0)
-    {
-        switch (elementtypenumber)
-        {
-            case 0:
-                return std::shared_ptr<hierarchicalformfunction>(new h1point(-1));
-            case 1:
-                return std::shared_ptr<hierarchicalformfunction>(new h1line(-1));
-            case 2:
-                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(-1));
-            case 3:
-                return std::shared_ptr<hierarchicalformfunction>(new q6);
-            case 4:
-                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(-1));
-            case 5:
-                return std::shared_ptr<hierarchicalformfunction>(new h1hexahedron(-1));
-            case 6:
-                return std::shared_ptr<hierarchicalformfunction>(new h1prism(-1));
-            case 7:
-                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(-1));
-        }
-    }
-    
-    if (formfunctiontypename.compare("h11") == 0)
-    {
-        switch (elementtypenumber)
-        {
-            case 0:
-                return std::shared_ptr<hierarchicalformfunction>(new h1point(-1));
-            case 1:
-                return std::shared_ptr<hierarchicalformfunction>(new h1line(-1));
-            case 2:
-                return std::shared_ptr<hierarchicalformfunction>(new h1triangle(-1));
-            case 3:
-                return std::shared_ptr<hierarchicalformfunction>(new h1quadrangle(-1));
-            case 4:
-                return std::shared_ptr<hierarchicalformfunction>(new h1tetrahedron(-1));
-            case 5:
-                return std::shared_ptr<hierarchicalformfunction>(new h11);
-            case 6:
-                return std::shared_ptr<hierarchicalformfunction>(new h1prism(-1));
-            case 7:
-                return std::shared_ptr<hierarchicalformfunction>(new h1pyramid(-1));
-        }
-    }
-    
     if (formfunctiontypename.compare("one") == 0)
     {
         return std::shared_ptr<hierarchicalformfunction>(new oneconstant(elementtypenumber));
