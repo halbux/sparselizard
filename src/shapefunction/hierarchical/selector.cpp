@@ -3,7 +3,7 @@
 
 std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber, std::string formfunctiontypename)
 {
-    if (formfunctiontypename.compare("h1") == 0)
+    if (formfunctiontypename == "h1")
     {
         switch (elementtypenumber)
         {
@@ -26,7 +26,7 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         }
     }
     
-    if (formfunctiontypename.compare("hcurl") == 0)
+    if (formfunctiontypename == "hcurl")
     {
         switch (elementtypenumber)
         {
@@ -49,14 +49,14 @@ std::shared_ptr<hierarchicalformfunction> selector::select(int elementtypenumber
         }
     }
     
-    if (formfunctiontypename.compare("one0") == 0 || formfunctiontypename.compare("one1") == 0 || formfunctiontypename.compare("one2") == 0 || formfunctiontypename.compare("one3") == 0)
+    if (formfunctiontypename == "one0" || formfunctiontypename == "one1" || formfunctiontypename == "one2" || formfunctiontypename == "one3")
     {
         int onedim = std::stoi(formfunctiontypename.substr(3,1));
         
         return std::shared_ptr<hierarchicalformfunction>(new oneconstant(onedim, elementtypenumber));
     }
     
-    if (formfunctiontypename.compare("h1d0") == 0 || formfunctiontypename.compare("h1d1") == 0 || formfunctiontypename.compare("h1d2") == 0 || formfunctiontypename.compare("h1d3") == 0)
+    if (formfunctiontypename == "h1d0" || formfunctiontypename == "h1d1" || formfunctiontypename == "h1d2" || formfunctiontypename == "h1d3")
     {
         int h1ddim = std::stoi(formfunctiontypename.substr(3,1));
         
