@@ -22,7 +22,7 @@ class hierarchicalformfunction
     private:
     
         // List all form function type names (type numbers are defined by the name ordering):
-        std::vector<std::string> mytypenames = {"h1","hcurl","one","h1d0","h1d1","h1d2","h1d3"};
+        std::vector<std::string> mytypenames = {"h1","hcurl","one0","one1","one2","one3","h1d0","h1d1","h1d2","h1d3"};
 
     public:
 

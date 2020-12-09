@@ -331,6 +331,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     }
     
     // Translate to the actual type name:
+    if (fieldtypename == "one")
+        fieldtypename = "one"+std::to_string(universe::mymesh->getmeshdimension());
     if (fieldtypename == "h1d")
         fieldtypename = "h1d"+std::to_string(universe::mymesh->getmeshdimension());
 
@@ -641,7 +643,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
         myordertracker.push_back(std::make_pair(physreg, interpolorder));
         
-    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one0" || mytypename == "one1" || mytypename == "one2" || mytypename == "one3")
     {
         std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
         abort();
@@ -673,7 +675,7 @@ void rawfield::setorder(expression criterion, int loworder, int highorder)
 {
     synchronize();
     
-    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one0" || mytypename == "one1" || mytypename == "one2" || mytypename == "one3")
     {
         std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
         abort();
@@ -1402,7 +1404,7 @@ int rawfield::getinterpolationorder(int disjreg)
 { 
     synchronize();
     
-    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one")
+    if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one0" || mytypename == "one1" || mytypename == "one2" || mytypename == "one3")
         return 1;
         
     if (mysubfields.size() == 0)

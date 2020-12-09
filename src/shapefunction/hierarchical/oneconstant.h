@@ -8,18 +8,18 @@
 #define ONECONSTANT_H
 
 #include "hierarchicalformfunction.h"
-#include "universe.h"
 
 class oneconstant: public hierarchicalformfunction
 {
     private:
     
-        int myelementtypenumber;
+        int targetdim = -1;
+        int elementtypenumber = -1;
+        int elementdimension = -1;
 
     public:
     
-        // There is a single 'oneconstant' form function per element and it has a constant, scalar one value.
-        oneconstant(int elemtypenum) { myelementtypenumber = elemtypenum; };
+        oneconstant(int td, int et);
 
         // Get the number of form functions of order <= 'order':
         int count(int order);

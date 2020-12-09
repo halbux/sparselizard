@@ -1,40 +1,29 @@
 #include "oneconstant.h"
+#include "element.h"
 
 using namespace std;
 
 
+oneconstant::oneconstant(int td, int et)
+{
+    targetdim = td;
+    elementtypenumber = et;
+    element myelem(elementtypenumber);
+    elementdimension = myelem.getelementdimension();
+}
+
 int oneconstant::count(int order)
 {
-    if (order <= 0)
+    if (order <= 0 || targetdim != elementdimension)
         return 0;
-    
-    element myelement(myelementtypenumber);
-    int elemdim = myelement.getelementdimension();
-    
-    int problemdimension = universe::mymesh->getmeshdimension();
-    
-    if (elemdim == problemdimension)
-        return 1;
     else
-        return 0;
+        return 1;
 }
 
 int oneconstant::count(int order, int dim, int num)
 {
-    // The 'num' input argument is not required here since all nodes, 
-    // edges and faces have the same number of form functions. It is
-    // however required for prisms and pyramids.
-    
-    if (order <= 0)
-        return 0;
-    
-    element myelement(myelementtypenumber);
-    int elemdim = myelement.getelementdimension();
-    
-    int problemdimension = universe::mymesh->getmeshdimension();
-    
-    if (elemdim == problemdimension && dim == problemdimension)
-        return 1;
+    if (targetdim == elementdimension && dim == elementdimension)
+        return count(order);
     else
         return 0;
 }
@@ -43,23 +32,14 @@ int oneconstant::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer oneconstant::evalat(int maxorder) 
 {    
-    element myelement(myelementtypenumber);
-    int elemdim = myelement.getelementdimension();
-    
-    int problemdimension = universe::mymesh->getmeshdimension();
+    std::string type = "one"+std::to_string(targetdim);
 
-    hierarchicalformfunctioncontainer val("one", myelementtypenumber);
+    hierarchicalformfunctioncontainer val(type, elementtypenumber);
 
-    if (elemdim == problemdimension)
-    {
-        // Loop on all possible orientations. The value is the same.
-        for (int orientation = 0; orientation < orientation::countorientations(myelementtypenumber); orientation++)
-        {
-            polynomial formfunc;
-            formfunc.set({{{1.0}}});
-            val.set(1,problemdimension,0,orientation,0,0,formfunc);
-        }
-    }
+    polynomial formfunc;
+    formfunc.set({{{1.0}}});
+    val.set(1,elementdimension,0,0,0,0,formfunc);
     
     return val;
 }
+

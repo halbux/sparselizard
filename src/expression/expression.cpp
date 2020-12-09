@@ -1208,7 +1208,8 @@ bool expression::iszero(void)
 vec expression::atbarycenter(int physreg, field onefield)
 {
     // The field must be a "one" type:
-    if (onefield.getpointer()->gettypename() != "one")
+    std::string ft = onefield.getpointer()->gettypename();
+    if (ft != "one0" && ft != "one1" && ft != "one2" && ft != "one3")
     {
         std::cout << "Error in 'expression' object: atbarycenter requires a 'one' type field" << std::endl;
         abort();
