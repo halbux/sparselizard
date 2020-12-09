@@ -6,7 +6,6 @@ set(SRC_DIR_LIST
   ${CMAKE_CURRENT_SOURCE_DIR}/shapefunction/hierarchical
   ${CMAKE_CURRENT_SOURCE_DIR}/shapefunction/hierarchical/h1
   ${CMAKE_CURRENT_SOURCE_DIR}/shapefunction/hierarchical/hcurl
-  ${CMAKE_CURRENT_SOURCE_DIR}/shapefunction/hierarchical/meca
   ${CMAKE_CURRENT_SOURCE_DIR}/mesh
   ${CMAKE_CURRENT_SOURCE_DIR}/formulation
   ${CMAKE_CURRENT_SOURCE_DIR}/field
