@@ -112,7 +112,7 @@ void field::setorder(expression criterion, int loworder, int highorder)
     hierarchicalformfunction hff;
     if (loworder < hff.getminorder(tn))
     {
-        std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order 0 for shape function " << rawfieldptr->gettypename() << std::endl;
+        std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order 0 for shape function " << tn << std::endl;
         abort();   
     }
     if (highorder < loworder)
