@@ -29,6 +29,9 @@ class hierarchicalformfunction
         // Translate a form function type number to a type name and vice versa:
         int gettypenumber(std::string fftypename);
         std::string gettypename(int fftypenumber);
+        
+        // Get the minimum order allowed:
+        int getminorder(std::string fftypename);
 
         // Get the number of form functions of order <= 'order':
         virtual int count(int order) { abort(); }; // fix return warning

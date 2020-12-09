@@ -1512,11 +1512,8 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         myiterator.next();
     }    
     
-    int minorder = -1;
-    if (mytypename == "h1")
-        minorder = 1;
-    if (mytypename == "hcurl")
-        minorder = 0;
+    hierarchicalformfunction hff;
+    int minorder = hff.getminorder(mytypename);
 
     // Deduce the output:
     lowestorders.resize(numelems);

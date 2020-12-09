@@ -351,9 +351,9 @@ expression sl::fieldorder(field input, double alpha, double absthres)
 {
     std::shared_ptr<rawfield> rf = input.getpointer();
     
-    if (rf->gettypename() != "h1" && rf->gettypename() != "hcurl")
+    if (rf->gettypename() != "h1" && rf->gettypename() != "hcurl" && rf->gettypename() != "h1d0" && rf->gettypename() != "h1d1" && rf->gettypename() != "h1d2" && rf->gettypename() != "h1d3")
     {
-        std::cout << "Error in 'sl' namespace: field provided to 'fieldorder' must be of type 'h1' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
+        std::cout << "Error in 'sl' namespace: field provided to 'fieldorder' must be of type 'h1', 'h1d' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
         abort();
     }
     

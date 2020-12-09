@@ -32,3 +32,14 @@ std::string hierarchicalformfunction::gettypename(int fftypenumber)
 
     return mytypenames[fftypenumber];
 }
+
+int hierarchicalformfunction::getminorder(std::string fftypename)
+{
+    if (fftypename == "hcurl")
+        return 0;
+    if (fftypename == "h1" || fftypename == "q6" || fftypename == "h11" || fftypename == "one" || fftypename == "h1d0" || fftypename == "h1d1" || fftypename == "h1d2" || fftypename == "h1d3")
+        return 1;
+        
+    std::cout << "Error in 'hierarchicalformfunction' object: unknown type name '" << fftypename << "'" << std::endl;
+    abort();
+}
