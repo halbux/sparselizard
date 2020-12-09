@@ -329,12 +329,6 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         std::cout << "Error in 'rawfield' object: first load mesh before defining a field that is not the x, y or z coordinate" << std::endl;
         abort();
     }
-    
-    // Translate to the actual type name:
-    if (fieldtypename == "one")
-        fieldtypename = "one"+std::to_string(universe::mymesh->getmeshdimension());
-    if (fieldtypename == "h1d")
-        fieldtypename = "h1d"+std::to_string(universe::mymesh->getmeshdimension());
 
     // If the field type name ends with xy (or xyz) there are 2 (or 3) dof components.
     // 'xy' or 'xyz' can only be used on scalar form function type (e.g. not on hcurl).
@@ -348,6 +342,12 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     // Erase any trailing xy or xyz:
     if (numberofsubfields > 1)
         mytypename.erase(mytypename.size()-numberofsubfields,numberofsubfields);  
+        
+    // Translate to the actual type name:
+    if (mytypename == "one")
+        mytypename = "one"+std::to_string(universe::mymesh->getmeshdimension());
+    if (mytypename == "h1d")
+        mytypename = "h1d"+std::to_string(universe::mymesh->getmeshdimension());
 
     // Make sure the subfield type is scalar:
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(0, mytypename);
