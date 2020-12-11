@@ -174,6 +174,11 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set a zero value:
         void setvalue(int physreg);
         
+        // Selected elements can include multiple orientations and field orders.
+        // 'gpcoordsin' must correspond to Gauss coordinates for the selected element type.
+        // If reuse is allowed then all arguments must correspond to the reused data.
+        void setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values);
+        
         // Set/get value at nodes for 'h1' type fields:
         void setnodalvalues(intdensematrix nodenumbers, densematrix values);
         densematrix getnodalvalues(intdensematrix nodenumbers);

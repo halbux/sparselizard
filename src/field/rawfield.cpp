@@ -759,6 +759,148 @@ void rawfield::setvalue(int physreg)
     }
 }
 
+void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values)
+{
+    synchronize();
+    
+    if (mytypename != "h1d0" && mytypename != "h1d1" && mytypename != "h1d2" && mytypename != "h1d3")
+    {
+        std::cout << "Error in 'rawfield' object: expected a 'h1d' type field to set the value at given gauss points" << std::endl;
+        abort();
+    }
+
+    int numelems = elemselect.countinselection();
+    int elementtypenumber = elemselect.getelementtypenumber();
+    std::vector<int> elemnums = elemselect.getelementnumbers();
+    
+    // Needs to be monoharmonic without FFT (the field cannot store the time vals).
+    if (values.countrows() != numelems || 3*values.countcolumns() != gpcoordsin.size())
+    {
+        std::cout << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densematrix (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
+        abort();
+    }
+    
+    gausspoints gp(elementtypenumber, gpcoordsin);
+
+    int numgp = gp.count();
+    std::vector<double> gpcoords = gp.getcoordinates();
+    std::vector<double> gpweights = gp.getweights();
+    
+    // Manages reuse automatically:
+    std::shared_ptr<opdetjac> dj(new opdetjac);
+    densematrix detjac = dj->interpolate(elemselect, gpcoords, meshdeform)[1][0];
+    // The Jacobian determinant should be positive irrespective of the node numbering:
+    detjac.abs();
+
+
+    // Shape functions 'h1d' are not orientation dependent -> no orientation loop required.
+    // Their order can however be non-unique in the selected elements.
+
+    // Get all disjoint regions in the element selector:
+    std::vector<int> alldisjregs = elemselect.getdisjointregions();
+
+    // Group disj. regs. with same interpolation order (all have same element type number).
+    std::vector<int> interpolorders(alldisjregs.size());
+    for (int i = 0; i < alldisjregs.size(); i++)
+        interpolorders[i] = getinterpolationorder(alldisjregs[i]);
+    disjointregionselector mydisjregselector(alldisjregs, {interpolorders});
+    for (int i = 0; i < mydisjregselector.countgroups(); i++)
+    {
+        std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
+
+        elemselect.selectdisjointregions(mydisjregs);
+        
+        int numinselection = elemselect.countinselection();
+        if (numinselection == 0)
+            continue;
+            
+        int fforder = getinterpolationorder(mydisjregs[0]);
+        std::vector<int> elemindexes = elemselect.getelementindexes();
+        
+        densematrix dj = detjac.extractrows(elemindexes);
+        densematrix vl = values.extractrows(elemindexes);
+        
+
+        ///// Projection formulation -> integral(dofv * tfv - vl * tfv) = 0
+
+        vl.multiplyelementwise(dj);
+        vl.transpose();
+        
+        // 1. Evaluate dofv and tfv * gpweights:
+        
+        hierarchicalformfunctioncontainer ffval = *(universe::gethff(mytypename, elementtypenumber, fforder, gpcoords));
+        densematrix testfunctionvalue = ffval.tomatrix(0, fforder, 0, 0); // total orientation is always 0 for h1d type
+        densematrix doffunctionvalue = testfunctionvalue.copy();
+        
+        testfunctionvalue.multiplycolumns(gpweights);
+            
+        // 2. Compute the tf * dof product [tfrow1*dofrow1 tfrow1*dofrow2 ... tfrow2*dofrow1 ...]:
+        densematrix testfuntimesdof = doffunctionvalue.multiplyallrows(testfunctionvalue);
+        testfuntimesdof.transpose();
+
+        // 3. Create matrix A terms:
+        densematrix Avals = dj.multiply(testfuntimesdof);
+        
+        // 4. Create right handside vector b terms:
+        densematrix bvals = testfunctionvalue.multiply(vl); // will be already row-col sorted
+
+        // 5. Create A (block diagonal):
+        int numffs = testfunctionvalue.countrows();
+        int matsize = numinselection*numffs;
+        
+        intdensematrix csrrows(1, matsize+1, 0,numffs);
+        intdensematrix csrcols(numinselection, numffs*numffs);
+        int* captr = csrcols.getvalues();
+        
+        int index = 0;
+        for (int e = 0; e < numinselection; e++)
+        {
+            for (int t = 0; t < numffs; t++)
+            {
+                for (int d = 0; d < numffs; d++)
+                {
+                    captr[index] = e*numffs+d;
+                    index++;
+                }
+            }
+        }
+        
+        Mat bdmat;
+        MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, matsize, matsize, csrrows.getvalues(), csrcols.getvalues(), Avals.getvalues(), &bdmat);
+
+        MatAssemblyBegin(bdmat, MAT_FINAL_ASSEMBLY);
+        MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
+
+        intdensematrix blocksizes(numinselection,1, numffs);
+        densematrix blockvals(numinselection*numffs*numffs, 1);
+        MatInvertVariableBlockDiagonal(bdmat, numinselection, blocksizes.getvalues(), blockvals.getvalues());
+        
+        MatDestroy(&bdmat);
+        
+        // 6. Solve block-diagonal system:
+        densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, bvals.gettranspose());
+        double* prodptr = prod.getvalues();
+
+        // 7. Set coefs to coefmanager:
+        
+        elements* els = universe::mymesh->getelements();
+        disjointregions* drs = universe::mymesh->getdisjointregions();
+        for (int e = 0; e < numinselection; e++)
+        {
+            int curel = elemnums[elemindexes[e]];
+            int disjreg = els->getdisjointregion(elementtypenumber, curel);
+            int rb = drs->getrangebegin(disjreg);
+            int elemindexindr = curel-rb;
+
+            for (int ff = 0; ff < numffs; ff++)
+                mycoefmanager->setcoef(disjreg, ff, elemindexindr, prodptr[e*numffs+ff]);
+        }
+    }
+    
+    // Unselect the disjoint regions:
+    elemselect.selectdisjointregions({});
+}
+
 void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
 {
     synchronize();
