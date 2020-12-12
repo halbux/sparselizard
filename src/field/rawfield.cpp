@@ -839,10 +839,10 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         testfuntimesdof.transpose();
 
         // 3. Create matrix A terms:
-        densematrix Avals = dj.multiply(testfuntimesdof);
+        densematrix Avals = dj.multiply(testfuntimesdof); // will be already row-col sorted
         
         // 4. Create right handside vector b terms:
-        densematrix bvals = testfunctionvalue.multiply(vl); // will be already row-col sorted
+        densematrix bvals = testfunctionvalue.multiply(vl);
 
         // 5. Create A (block diagonal):
         int numffs = testfunctionvalue.countrows();
@@ -872,7 +872,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
 
         intdensematrix blocksizes(numinselection,1, numffs);
-        densematrix blockvals(numinselection*numffs*numffs, 1);
+        densematrix blockvals(numinselection*numffs, numffs);
         MatInvertVariableBlockDiagonal(bdmat, numinselection, blocksizes.getvalues(), blockvals.getvalues());
         
         MatDestroy(&bdmat);
