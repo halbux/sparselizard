@@ -304,6 +304,30 @@ expression::expression(int m, int n, std::vector<densematrix> customfct(std::vec
         (weakops[i].lock())->setfamily(weakops);
 }
 
+expression::expression(int m, int n, std::vector<densematrix> advancedcustomfct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields)
+{
+    mynumrows = m; mynumcols = n;
+
+    // Get all argument operations:
+    std::vector<std::shared_ptr<operation>> argops = {};
+    for (int i = 0; i < exprs.size(); i++)
+    {
+        for (int j = 0; j < exprs[i].myoperations.size(); j++)
+            argops.push_back(exprs[i].myoperations[j]);
+    }
+    
+    myoperations.resize(m*n);
+    std::vector<std::weak_ptr<opcustom>> weakops(m*n);
+    for (int i = 0; i < m*n; i++)
+    {
+        std::shared_ptr<opcustom> op(new opcustom(i, advancedcustomfct, argops, infields));
+        myoperations[i] = op;
+        weakops[i] = op;
+    }
+    for (int i = 0; i < m*n; i++)
+        (weakops[i].lock())->setfamily(weakops);
+}
+
 expression::expression(std::shared_ptr<operation> input)
 {
     mynumrows = 1; mynumcols = 1;

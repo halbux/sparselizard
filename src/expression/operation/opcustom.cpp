@@ -7,6 +7,14 @@ opcustom::opcustom(int outindex, std::vector<densematrix> fct(std::vector<densem
     myargs = args;
     myfunction = fct;
 }
+
+opcustom::opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<std::shared_ptr<operation>> args, std::vector<field> infields)
+{
+    myoutindex = outindex;
+    myargs = args;
+    myadvancedfunction = fct;
+    myfields = infields;
+}
         
 std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
@@ -32,7 +40,11 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
         fctargs[i] = argmat[1][0];
     }
     
-    std::vector<densematrix> output = myfunction(fctargs);
+    std::vector<densematrix> output;
+    if (myfunction != NULL)
+        output = myfunction(fctargs);
+    else
+        output = myadvancedfunction(fctargs, myfields, elemselect, evaluationcoordinates, meshdeform);
     
     // Make sure the user provided function returns something valid:
     if (output.size() != myfamily.size())
@@ -82,7 +94,11 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
     for (int i = 0; i < myargs.size(); i++)
         fctargs[i] = myargs[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
-    std::vector<densematrix> output = myfunction(fctargs);
+    std::vector<densematrix> output;
+    if (myfunction != NULL)
+        output = myfunction(fctargs);
+    else
+        output = myadvancedfunction(fctargs, myfields, elemselect, evaluationcoordinates, meshdeform);
     
     // Make sure the user provided function returns something valid:
     if (output.size() != myfamily.size())
@@ -126,7 +142,11 @@ std::shared_ptr<operation> opcustom::simplify(std::vector<int> disjregs)
 
 std::shared_ptr<operation> opcustom::copy(void)
 {
-    std::shared_ptr<opcustom> op(new opcustom(myoutindex, myfunction, myargs));
+    std::shared_ptr<opcustom> op;
+    if (myfunction != NULL)
+        op = std::shared_ptr<opcustom>(new opcustom(myoutindex, myfunction, myargs));
+    else
+        op = std::shared_ptr<opcustom>(new opcustom(myoutindex, myadvancedfunction, myargs, myfields));
     *op = *this;
     return op;
 }

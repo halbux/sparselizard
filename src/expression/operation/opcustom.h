@@ -19,13 +19,17 @@ class opcustom: public operation
         int myoutindex = -1;
         
         std::vector<std::shared_ptr<operation>> myargs = {};
+        std::vector<field> myfields = {}; // for advanced custom function
+        
         std::vector<std::weak_ptr<opcustom>> myfamily = {};
         
-        std::vector<densematrix> (*myfunction)(std::vector<densematrix>);
+        std::vector<densematrix> (*myfunction)(std::vector<densematrix>) = NULL;
+        std::vector<densematrix> (*myadvancedfunction)(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*) = NULL;
         
     public:
         
         opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>), std::vector<std::shared_ptr<operation>> args);
+        opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<std::shared_ptr<operation>> args, std::vector<field> infields);
         
         // Provide all related operations:
         void setfamily(std::vector<std::weak_ptr<opcustom>> ops) { myfamily = ops; };
