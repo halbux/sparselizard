@@ -1,6 +1,5 @@
 #include "sparselizard.h"
 
-
 using namespace sl;
 
 int main(void)
