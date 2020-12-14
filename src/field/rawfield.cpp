@@ -848,6 +848,9 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         int numffs = testfunctionvalue.countrows();
         int matsize = numinselection*numffs;
         
+        if (numffs == 0)
+            continue;
+        
         intdensematrix csrrows(1, matsize+1, 0,numffs);
         intdensematrix csrcols(numinselection, numffs*numffs);
         int* captr = csrcols.getvalues();
