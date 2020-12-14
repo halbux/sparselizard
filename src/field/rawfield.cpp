@@ -835,7 +835,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         testfunctionvalue.multiplycolumns(gpweights);
             
         // 2. Compute the tf * dof product [tfrow1*dofrow1 tfrow1*dofrow2 ... tfrow2*dofrow1 ...]:
-        densematrix testfuntimesdof = doffunctionvalue.multiplyallrows(testfunctionvalue);
+        densematrix testfuntimesdof = testfunctionvalue.multiplyallrows(doffunctionvalue);
         testfuntimesdof.transpose();
 
         // 3. Create matrix A terms:
