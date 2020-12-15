@@ -128,6 +128,13 @@ std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,st
     return output;
 }
 
+std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> universe::backup(void)
+{
+    auto output = std::make_tuple(computedjacobian, oppointers, oppointersfft, opcomputed, opcomputedfft);
+    
+    return output;
+}
+
 void universe::restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> input)
 {
     computedjacobian = std::get<0>(input);

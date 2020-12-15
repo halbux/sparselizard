@@ -42,7 +42,18 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
     
     std::vector<densematrix> output;
     if (myfunction != NULL)
+    {
+        bool wasreuseallowed = universe::isreuseallowed;
+        auto storage = universe::backup();
+        // Safe call to custom function:
+        universe::forbidreuse();
         output = myfunction(fctargs);
+        universe::forbidreuse();
+        
+        universe::restore(storage);
+        if (wasreuseallowed)
+            universe::allowreuse();
+    }
     else
         output = myadvancedfunction(fctargs, myfields, elemselect, evaluationcoordinates, meshdeform);
     
@@ -96,7 +107,18 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
     
     std::vector<densematrix> output;
     if (myfunction != NULL)
+    {
+        bool wasreuseallowed = universe::isreuseallowed;
+        auto storage = universe::backup();
+        // Safe call to custom function:
+        universe::forbidreuse();
         output = myfunction(fctargs);
+        universe::forbidreuse();
+        
+        universe::restore(storage);
+        if (wasreuseallowed)
+            universe::allowreuse();
+    }
     else
         output = myadvancedfunction(fctargs, myfields, elemselect, evaluationcoordinates, meshdeform);
     
