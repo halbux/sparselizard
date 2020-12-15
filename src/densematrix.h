@@ -15,6 +15,7 @@
 #include <vector>
 #include <cmath>
 #include <memory>
+#include "petscmat.h"
 #include "intdensematrix.h"
 
 class densematrix
@@ -104,6 +105,9 @@ class densematrix
 
         // Get the transpose without modifying this object.
         densematrix gettranspose(void);
+        
+        // Get the matrix inverse (must be square):
+        densematrix getinverse(void);
 
         // Elementwise operations below. 
         // Matrices must all have the same size.

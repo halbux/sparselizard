@@ -239,7 +239,7 @@ densematrix densematrix::multiply(densematrix B)
     
     if (numcolsA != numrowsB)
     {
-        std::cout << "Error on 'densematrix' object: trying to multiply a " << numrowsA << "x" << numcolsA << " matrix by a "  << numrowsB << "x" << numcolsB << std::endl;
+        std::cout << "Error in 'densematrix' object: trying to multiply a " << numrowsA << "x" << numcolsA << " matrix by a "  << numrowsB << "x" << numcolsB << std::endl;
         abort();
     }
     
@@ -358,6 +358,43 @@ densematrix densematrix::gettranspose(void)
     }
     
     return output;
+}
+
+densematrix densematrix::getinverse(void)
+{
+    int n = numrows;
+    if (numrows != numcols)
+    {
+        std::cout << "Error in 'densematrix' object: can only invert a square densematrix" << std::endl;
+        abort();
+    }
+    
+    if (n == 0)
+        return densematrix(0,0);
+
+    intdensematrix csrrows(1, n+1, 0,n);
+    intdensematrix csrcols(n,n);
+    int* captr = csrcols.getvalues();
+    for (int r = 0; r < n; r++)
+    {
+        for (int c = 0; c < n; c++)
+            captr[r*n+c] = c;
+    }
+        
+    Mat bdmat;
+    MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, n, n, csrrows.getvalues(), csrcols.getvalues(), myvalues.get(), &bdmat);
+
+    MatAssemblyBegin(bdmat, MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
+
+    intdensematrix blocksizes(1,1, n);
+    densematrix output(n,n);
+    MatInvertVariableBlockDiagonal(bdmat, 1, blocksizes.getvalues(), output.getvalues()); // output is column-major after the call
+
+    MatDestroy(&bdmat);
+
+    // Make row-major again:
+    return output.gettranspose();
 }
 
 void densematrix::multiplyelementwise(densematrix B)
