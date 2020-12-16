@@ -100,13 +100,13 @@ int main(void)
     // Define the weak magnetodynamic formulation:
     formulation magdyn;
     
-    // Magnetic equation (add an extra odd integration degree for convergence):
+    // Magnetic equation:
     magdyn += integral(wholedomain, 1/mu*( curl(dof(a)) + bsource ) * curl(tf(a)) );
-    magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*tf(a), +1 );
+    magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*tf(a) );
     magdyn += integral(tube, sigma*grad(dof(v))*tf(a) );
     // Electric equation:
     magdyn += integral(tube, sigma*grad(dof(v))*grad(tf(v)) );
-    magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*grad(tf(v)), +1 );
+    magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*grad(tf(v)) );
     
     
     // Start the implicit Euler time resolution with the field values and a zero time derivative:

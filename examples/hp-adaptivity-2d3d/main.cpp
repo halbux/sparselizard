@@ -65,7 +65,7 @@ double adapth1(void)
     
     std::cout << "Relative error for 'h1': " << erroru << " " << errorsol << " " << errorw << std::endl;
     
-    return erroru+errorsol+errorw;
+    return std::max(erroru, std::max(errorsol, errorw));
 }
 
 double adapthcurl(void)
@@ -82,9 +82,6 @@ double adapthcurl(void)
     expression toproject = array3x1(x*x*x, y*y*y, z*z*z);
     
     v.setvalue(vol, toproject, 1);
-    
-    // Increase the integration order during the h-adaptivity field value projection:
-    v.setupdateaccuracy(1);
     
     // H-adaptivity:
     mymesh.setadaptivity(x*y, 0, 1);
@@ -104,6 +101,6 @@ int main(void)
     double errorh1 = adapth1();
     double errorhcurl = adapthcurl();
     
-    std::cout << (errorh1 < 3e-13 && errorhcurl < 2e-11);
+    std::cout << (errorh1 < 1e-14 && errorhcurl < 1e-14);
 }
 

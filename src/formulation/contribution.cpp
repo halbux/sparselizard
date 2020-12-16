@@ -62,7 +62,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         
         // Get the interpolation order of the dof and tf fields:
         int tfinterpolationorder = tffield->getinterpolationorder(mydisjregs[0]);
-        int dofinterpolationorder = 0;
+        int dofinterpolationorder = tfinterpolationorder;
         if (doffield != NULL)
             dofinterpolationorder = doffield->getinterpolationorder(mydisjregs[0]);
         

@@ -83,8 +83,7 @@ int main(void)
     formulation magdyn;
     
     magdyn += integral(wholedomain, 1/mu*( curl(dof(a)) + bsource ) * curl(tf(a)) );
-    // Add an extra odd integration degree for convergence:
-    magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*tf(a), +1 );
+    magdyn += integral(tube, sigma*( dt(dof(a)) + dtasource )*tf(a) );
     
     
     // Start the implicit Euler time resolution with the field values and a zero time derivative:

@@ -223,6 +223,6 @@ int main(void)
     (scaling*p).write(fluid, "p.pos", 3, 50);
     
     // Code validation line. Can be removed.
-    std::cout << (solup.norm() < 0.000252599 && solup.norm() > 0.000252595);
+    std::cout << (solup.norm() < 0.000252605 && solup.norm() > 0.000252595);
 }
 

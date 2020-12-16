@@ -117,7 +117,7 @@ int main(void)
     std::cout << "Input current = " << I << " A at a peak deflection of " << norm(u).max(silicon,3)[0]*1e6 << " um" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (I < 6.10165e-07 && I > 6.10163e-07);
+    std::cout << (I < 6.10153e-07 && I > 6.10150e-07);
 }
 
 mesh createmesh(double length, double width, double thsi, double tracetilt, double ltrace, double wtrace, double rtrace, double thtrace, int numtraces, int nx, int ny, int nz, int nltrace, int nwtrace, int nthtrace)

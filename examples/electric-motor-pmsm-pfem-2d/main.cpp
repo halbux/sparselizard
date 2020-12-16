@@ -172,6 +172,6 @@ int main(void)
     clk.print("Total run time:");
     
     // Code validation line. Can be removed:
-    std::cout << (torque < 3.56278 && torque > 3.56274);
+    std::cout << (torque < 3.58648 && torque > 3.58644);
 }
 

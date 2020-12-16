@@ -47,6 +47,6 @@ int main(void)
     E.write(wholedomain, "E.pos", 2);
     
     // Code validation line. Can be removed.
-    std::cout << ((abs(E)*curl(E)).integrate(wholedomain, 5) < 6.9398e-07 && (abs(E)*curl(E)).integrate(wholedomain, 5) > 6.93978e-07);
+    std::cout << ((abs(E)*curl(E)).integrate(wholedomain, 5) < 6.8028e-07 && (abs(E)*curl(E)).integrate(wholedomain, 5) > 6.8025e-07);
 }
 
