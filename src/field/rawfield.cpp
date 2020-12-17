@@ -1724,6 +1724,46 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
     }
 }
 
+void rawfield::getaverage(int elementtypenumber, std::vector<int>& elementnumbers, int maxorder, std::vector<double>& averagevals)
+{
+    synchronize();
+
+    int numelems = elementnumbers.size();
+    averagevals = std::vector<double>(numelems, 0.0); // init all zero
+    element myelement(elementtypenumber);
+    
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    elements* els = universe::mymesh->getelements();
+    
+    // Create a form function iterator to iterate through the form functions of the element type.
+    hierarchicalformfunctioniterator myiterator(mytypename, elementtypenumber, maxorder);
+    double invnumffs = 1.0/myiterator.count();
+
+    for (int ff = 0; ff < myiterator.count(); ff++)
+    {
+        int associatedelementtype = myiterator.getassociatedelementtype();
+        int formfunctionindex = myiterator.getformfunctionindexinnodeedgefacevolume();
+        
+        int num = myiterator.getnodeedgefacevolumeindex();
+        // For quad subelements in prisms and pyramids:
+        if ((elementtypenumber == 6 || elementtypenumber == 7) && associatedelementtype == 3)
+            num -= myelement.counttriangularfaces(); 
+
+        for (int i = 0; i < numelems; i++)
+        {
+            int elem = elementnumbers[i];
+            int currentsubelem = els->getsubelement(associatedelementtype, elementtypenumber, elem, num);
+            int currentdisjointregion = els->getdisjointregion(associatedelementtype, currentsubelem);
+            int rb = drs->getrangebegin(currentdisjointregion);
+            
+            double curcoef = mycoefmanager->getcoef(currentdisjointregion, formfunctionindex, currentsubelem-rb);
+            
+            averagevals[i] += curcoef*invnumffs;
+        }
+        myiterator.next();
+    }
+}
+
 
 std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> rawfield::getallsons(void)
 {

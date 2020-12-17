@@ -240,6 +240,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Only valid for fields without subfields.
         void errornotsameinterpolationorder(int disjreg);
         
+        // Get the average of the coefficients for all shape functions up to a given order:
+        void getaverage(int elementtypenumber, std::vector<int>& elementnumbers, int maxorder, std::vector<double>& averagevals);
+        
 
         // Get a vector listing all subfields and every harmonic for every subfield 
         // as a pair of {subfieldnum,harmnum} and the rawfield pointer:
