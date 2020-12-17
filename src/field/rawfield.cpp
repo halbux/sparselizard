@@ -1626,6 +1626,14 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
     
     std::vector<double> weightsforeachorder(numelems*numorders, 0.0);
 
+    std::vector<double> averagevals = {};
+    if (mytypename == "h1" || mytypename == "h1d0" || mytypename == "h1d1" || mytypename == "h1d2" || mytypename == "h1d3")
+    {
+        getaverage(elementtypenumber, elementnumbers, 1, averagevals); // nodal shape functions are at order 1
+        for (int i = 0; i < numelems; i++)
+            weightsforeachorder[i*numorders+0] = std::abs(averagevals[i]);
+    }
+
     disjointregions* drs = universe::mymesh->getdisjointregions();
     elements* els = universe::mymesh->getelements();
     
@@ -1653,14 +1661,16 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
             int rb = drs->getrangebegin(currentdisjointregion);
             
             double curcoef = mycoefmanager->getcoef(currentdisjointregion, formfunctionindex, currentsubelem-rb);
+            if (formfunctionorder == 1 && averagevals.size() > 0)
+                curcoef -= averagevals[i];
             
             weightsforeachorder[i*numorders+formfunctionorder] += std::abs(curcoef);
         }
         myiterator.next();
     }    
     
-    hierarchicalformfunction hff;
-    int minorder = hff.getminorder(mytypename);
+    // Min order is artificially brought down to 0 for h1 type as well (see above):
+    int minorder = 0;
 
     // Deduce the output:
     lowestorders.resize(numelems);
