@@ -124,7 +124,7 @@ void field::setorder(expression criterion, int loworder, int highorder, double c
     rawfieldptr->setorder(criterion, loworder, highorder, critrange); 
 }
 
-void field::setorder(field targetfield, double targeterror, int loworder, int highorder, double absthres)
+void field::setorder(double targeterror, field targetfield, int loworder, int highorder, double absthres)
 {
     errorifpointerisnull();
     
