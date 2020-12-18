@@ -124,6 +124,33 @@ void field::setorder(expression criterion, int loworder, int highorder, double c
     rawfieldptr->setorder(criterion, loworder, highorder, critrange); 
 }
 
+void field::setorder(field targetfield, double targeterror, int loworder, int highorder, double absthres)
+{
+    errorifpointerisnull();
+    
+    std::shared_ptr<rawfield> rf = targetfield.getpointer();
+
+    if (rf->countsubfields() > 1)
+    {
+        std::cout << "Error in 'field' object: field provided for order adaptivity cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
+        std::cout << "You could instead provide the x subfield using yourfield.compx()" << std::endl;
+        abort();
+    }
+
+    // Target field order:
+    expression rfo = sl::fieldorder(targetfield, 1.0-targeterror, absthres);
+    rfo.reuseit();
+    // Actual field order:
+    expression afo = sl::fieldorder(targetfield);
+    afo.reuseit();
+    
+    expression crit = sl::ifpositive(rfo - afo+0.5, rfo+1.0, sl::ifpositive(afo - rfo-1.5, rfo+1.0, afo) );
+    
+    crit = sl::max(crit - loworder, 0) + 0.5;
+    
+    setorder(crit, loworder, highorder, highorder-loworder+1);
+}
+
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
