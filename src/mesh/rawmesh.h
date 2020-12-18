@@ -142,7 +142,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         
         // For h-adaptivity:
         bool adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosity);
-        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double critrange);
+        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double critrange); // critrange -1 for automatic choice
 
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
         void writewithdisjointregions(std::string);

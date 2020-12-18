@@ -69,7 +69,7 @@ class field
 
         // Set the interpolation order on a physical region.
         void setorder(int physreg, int interpolorder);
-        void setorder(expression criterion, int loworder, int highorder);
+        void setorder(expression criterion, int loworder, int highorder, double critrange = -1);
 
         // Set a value for the field on a given geometrical region.
         // Use the default order + 'extraintegrationdegree' to 

@@ -84,7 +84,7 @@ void field::setorder(int physreg, int interpolorder)
     rawfieldptr->setorder(physreg, interpolorder); 
 }
 
-void field::setorder(expression criterion, int loworder, int highorder)
+void field::setorder(expression criterion, int loworder, int highorder, double critrange)
 {
     errorifpointerisnull();
     
@@ -121,7 +121,7 @@ void field::setorder(expression criterion, int loworder, int highorder)
         abort();   
     }
 
-    rawfieldptr->setorder(criterion, loworder, highorder, -1); 
+    rawfieldptr->setorder(criterion, loworder, highorder, critrange); 
 }
 
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
