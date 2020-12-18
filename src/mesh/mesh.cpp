@@ -111,7 +111,7 @@ void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumspli
         abort();   
     }
     
-    rawmeshptr->setadaptivity(criterion, lownumsplits, highnumsplits);
+    rawmeshptr->setadaptivity(criterion, lownumsplits, highnumsplits, -1);
 }
 
 void mesh::split(int n)

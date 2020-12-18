@@ -874,7 +874,9 @@ bool rawmesh::adapthp(int verbosity)
         lownumsplits = std::get<1>(getoriginalmeshpointer()->myhadaptdata[0]);
         highnumsplits = std::get<2>(getoriginalmeshpointer()->myhadaptdata[0]);
         
-        double hcrange = hcritmat.maxabs();
+        double hcrange = std::get<3>(getoriginalmeshpointer()->myhadaptdata[0]);
+        if (hcrange == -1)
+            hcrange = hcritmat.maxabs();
         
         int numintervals = highnumsplits-lownumsplits+1;
         hthresholds = myalgorithm::getintervaltics(0.0, hcrange, numintervals);
@@ -889,7 +891,9 @@ bool rawmesh::adapthp(int verbosity)
         loworders[i] = std::get<2>(mypadaptdata[i]);
         highorders[i] = std::get<3>(mypadaptdata[i]);
         
-        double pcrange = pcritmats[i].maxabs();
+        double pcrange = std::get<4>(mypadaptdata[i]);
+        if (pcrange == -1)
+            pcrange = pcritmats[i].maxabs();
         
         int numintervals = highorders[i]-loworders[i]+1;
         pthresholds[i] = myalgorithm::getintervaltics(0.0, pcrange, numintervals);
@@ -1034,7 +1038,7 @@ void rawmesh::getattarget(std::vector<std::vector<int>>& values, std::shared_ptr
     }
 }
 
-void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, int loworder, int highorder)
+void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, int loworder, int highorder, double critrange)
 {
     int index = -1;
     for (int i = 0; i < mypadaptdata.size(); i++)
@@ -1050,15 +1054,15 @@ void rawmesh::add(std::shared_ptr<rawfield> inrawfield, expression criterion, in
     std::weak_ptr<rawfield> inweak = inrawfield;
 
     if (index != -1)
-        mypadaptdata[index] = std::make_tuple(inweak, criterion, loworder, highorder);
+        mypadaptdata[index] = std::make_tuple(inweak, criterion, loworder, highorder, critrange);
     else
-        mypadaptdata.push_back(std::make_tuple(inweak, criterion, loworder, highorder));
+        mypadaptdata.push_back(std::make_tuple(inweak, criterion, loworder, highorder, critrange));
 }
 
 void rawmesh::remove(rawfield* inrawfield)
 {
     // To delay criterion-field destruction to after 'mypadaptdata' has a valid state (after resize):
-    std::vector<std::tuple<std::weak_ptr<rawfield>, expression, int, int>> pad = mypadaptdata;
+    std::vector<std::tuple<std::weak_ptr<rawfield>, expression, int, int, double>> pad = mypadaptdata;
     
     // Remove the pointed field and all expired fields:
     int curindex = 0;
@@ -1536,11 +1540,11 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     return true;
 }
 
-void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)
+void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double critrange)
 {       
     criterion = sl::abs(criterion);
     
-    myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits)};   
+    myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits, critrange)};   
 }
 
 void rawmesh::writewithdisjointregions(std::string name)

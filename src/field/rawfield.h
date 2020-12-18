@@ -168,7 +168,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::string gettypename(bool familyonly = true);
 
         void setorder(int physreg, int interpolorder, bool iscalledbyuser = true);
-        void setorder(expression criterion, int loworder, int highorder);
+        void setorder(expression criterion, int loworder, int highorder, double critrange); // critrange -1 for automatic choice
         
         void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:
