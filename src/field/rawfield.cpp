@@ -1664,7 +1664,7 @@ void rawfield::getinterpolationorders(int fieldorder, double alpha, double absth
         // Lowest order if total weight is too small:
         if (totalweight <= std::abs(absthres))
         {
-            lowestorders[i] = 1+0; // min order is artificially brought down to 0 for h1 type as well (see above)
+            lowestorders[i] = 0; // min order is artificially brought down to 0 for h1 type as well (see above)
             continue;
         }
             
@@ -1673,16 +1673,13 @@ void rawfield::getinterpolationorders(int fieldorder, double alpha, double absth
         double accumulatedweight = 0.0;
         for (int o = 0; o < numorders; o++)
         {
-            lowestorders[i] = 1+o;
+            lowestorders[i] = o;
         
             accumulatedweight += weightsforeachorder[i*numorders+o];
 
             if (accumulatedweight >= weightthreshold)
                 break;
         }
-        
-        if (lowestorders[i] == 1+fieldorder)
-            lowestorders[i] = -lowestorders[i];
     }
 }
 

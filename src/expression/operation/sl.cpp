@@ -359,10 +359,7 @@ expression sl::fieldorder(field input, double alpha, double absthres)
     
     std::shared_ptr<opfieldorder> op(new opfieldorder(rf->getsons(), alpha, absthres));
 
-    if (alpha == -1.0)
-        return expression(op);
-    else
-        return abs(expression(op))-1.0;
+    return expression(op);
 }
 
 expression sl::getharmonic(int harmnum, expression input, int numfftharms)
