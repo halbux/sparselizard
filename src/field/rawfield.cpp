@@ -1669,9 +1669,7 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         myiterator.next();
     }    
     
-    // Min order is artificially brought down to 0 for h1 type as well (see above):
-    int minorder = 0;
-
+    
     // Deduce the output:
     lowestorders.resize(numelems);
     
@@ -1684,11 +1682,11 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         // Lowest order if total weight is too small:
         if (totalweight <= std::abs(absthres))
         {
-            lowestorders[i] = 1+minorder;
+            lowestorders[i] = 1+0; // min order is artificially brought down to 0 for h1 type as well (see above)
             continue;
         }
             
-        double weightthreshold = (1.0-1e-6)*std::abs(alpha)*totalweight; // noise margin
+        double weightthreshold = (1.0-1e-12)*std::abs(alpha)*totalweight; // noise margin
     
         double accumulatedweight = 0.0;
         for (int o = 0; o < numorders; o++)
@@ -1697,7 +1695,7 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         
             accumulatedweight += weightsforeachorder[i*numorders+o];
 
-            if (accumulatedweight > weightthreshold)
+            if (accumulatedweight >= weightthreshold)
                 break;
         }
         
