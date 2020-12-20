@@ -19,11 +19,11 @@ class opfieldorder: public operation
         double myalpha = -1.0;
         double mythreshold = 0.0;
         
-        std::shared_ptr<rawfield> myfield = NULL;
+        std::vector<std::shared_ptr<rawfield>> myfields = {};
         
     public:
         
-        opfieldorder(std::shared_ptr<rawfield> fieldin, double alpha = -1.0, double absthres = 0.0);
+        opfieldorder(std::vector<std::shared_ptr<rawfield>> fieldsin, double alpha = -1.0, double absthres = 0.0);
         
         std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);

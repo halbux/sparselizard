@@ -1510,6 +1510,34 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
     }
 }
 
+std::vector<std::shared_ptr<rawfield>> rawfield::getsons(void)
+{
+    // Do not sync this.
+
+    if (mysubfields.size() > 0)
+    {
+        std::vector<std::shared_ptr<rawfield>> output = {};
+        for (int i = 0; i < mysubfields.size(); i++)
+        {
+            std::vector<std::shared_ptr<rawfield>> curoutput = mysubfields[i][0]->getsons();
+            output.insert(output.end(), curoutput.begin(), curoutput.end());
+        }
+        return output;
+    }
+    if (myharmonics.size() > 0)
+    {
+        std::vector<std::shared_ptr<rawfield>> output = {};
+        for (int h = 0; h < myharmonics.size(); h++)
+        {
+            if (myharmonics[h].size() > 0)
+                output.push_back({myharmonics[h][0]});
+        }
+        return output;
+    }
+    
+    return {getpointer()};
+}
+
 bool rawfield::isconstrained(int disjreg)
 {
     synchronize();

@@ -217,6 +217,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::shared_ptr<rawfield> harmonic(int harmonicnumber);
         std::shared_ptr<rawfield> harmonic(const std::vector<int> harmonicnumbers);
         
+        // Get all included rawfields (subfields and harmonics in each subfield):
+        std::vector<std::shared_ptr<rawfield>> getsons(void);
+        
         // Only valid for fields without subfields.
         bool isconstrained(int disjreg);
         std::vector<std::shared_ptr<integration>> getconstraints(void);

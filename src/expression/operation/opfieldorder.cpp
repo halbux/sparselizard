@@ -1,9 +1,9 @@
 #include "opfieldorder.h"
 
 
-opfieldorder::opfieldorder(std::shared_ptr<rawfield> fieldin, double alpha, double absthres)
+opfieldorder::opfieldorder(std::vector<std::shared_ptr<rawfield>> fieldsin, double alpha, double absthres)
 {
-    myfield = fieldin;
+    myfields = fieldsin;
     myalpha = alpha;
     mythreshold = absthres;
 }
@@ -17,11 +17,21 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
+    // Make sure all fields have the same interpolation order:
+    for (int i = 1; i < myfields.size(); i++)
+    {
+        if (myfields[i]->getinterpolationorders() != myfields[0]->getinterpolationorders())
+        {
+            std::cout << "Error in 'opfieldorder' object: this object expects the same interpolation order for all subfields" << std::endl;
+            abort();
+        }
+    }
+    
     int numelems = elemselect.countinselection();
     int elementtypenumber = elemselect.getelementtypenumber();
     std::vector<int> elems = elemselect.getelementnumbers();
     std::vector<int> fieldorders;
-    int maxorder = myfield->getinterpolationorders(elementtypenumber, elems, fieldorders);
+    int maxorder = myfields[0]->getinterpolationorders(elementtypenumber, elems, fieldorders);
     
     if (myalpha != -1.0)
     {
@@ -38,11 +48,19 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
             for (int i = 0; i < numinorder; i++)
                 elemsinorder[i] = elems[splitorders[o][i]];
         
+            // Sum the weights of each field:
             std::vector<double> weightsforeachorder;
-            myfield->getweightsforeachorder(elementtypenumber, o, elemsinorder, weightsforeachorder);
+            myfields[0]->getweightsforeachorder(elementtypenumber, o, elemsinorder, weightsforeachorder);
+            for (int i = 1; i < myfields.size(); i++)
+            {
+                std::vector<double> curweightsforeachorder;
+                myfields[i]->getweightsforeachorder(elementtypenumber, o, elemsinorder, curweightsforeachorder);
+                for (int j = 0; j < weightsforeachorder.size(); j++)
+                    weightsforeachorder[j] += curweightsforeachorder[j];
+            }
             
             std::vector<int> lowestorders;
-            myfield->getinterpolationorders(o, myalpha, mythreshold, weightsforeachorder, lowestorders);
+            myfields[0]->getinterpolationorders(o, myalpha, mythreshold, weightsforeachorder, lowestorders);
 
             for (int i = 0; i < numinorder; i++)
                 fieldorders[splitorders[o][i]] = lowestorders[i];
@@ -85,7 +103,7 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
 
 std::shared_ptr<operation> opfieldorder::copy(void)
 {
-    std::shared_ptr<opfieldorder> op(new opfieldorder(myfield, myalpha, mythreshold));
+    std::shared_ptr<opfieldorder> op(new opfieldorder(myfields, myalpha, mythreshold));
     *op = *this;
     op->reuse = false;
     return op;
@@ -93,8 +111,6 @@ std::shared_ptr<operation> opfieldorder::copy(void)
 
 void opfieldorder::print(void)
 {
-    std::cout << "fieldorder(";
-    myfield->print();
-    std::cout << ")";
+    std::cout << "fieldorder";
 }
 

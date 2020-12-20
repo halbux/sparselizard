@@ -357,14 +357,7 @@ expression sl::fieldorder(field input, double alpha, double absthres)
         abort();
     }
     
-    if (rf->countsubfields() > 1)
-    {
-        std::cout << "Error in 'sl' namespace: field provided to 'fieldorder' cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
-        std::cout << "You could instead provide the x subfield using yourfield.compx()" << std::endl;
-        abort();
-    }
-    
-    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->harmonic(rf->getfirstharmonic()), alpha, absthres));
+    std::shared_ptr<opfieldorder> op(new opfieldorder(rf->getsons(), alpha, absthres));
 
     if (alpha == -1.0)
         return expression(op);
