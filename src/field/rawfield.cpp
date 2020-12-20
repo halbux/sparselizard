@@ -1617,14 +1617,55 @@ int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& el
     return maxorder;
 }
 
-void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, double alpha, double absthres, std::vector<int>& lowestorders)
+void rawfield::getinterpolationorders(int fieldorder, double alpha, double absthres, std::vector<double>& weightsforeachorder, std::vector<int>& lowestorders)
+{
+    synchronize();
+    
+    int numorders = 1+fieldorder;
+    int numelems = weightsforeachorder.size()/numorders;
+    
+    // Deduce the output:
+    lowestorders = std::vector<int>(numelems);
+    
+    for (int i = 0; i < numelems; i++)
+    {
+        double totalweight = 0.0;
+        for (int o = 0; o < numorders; o++)
+            totalweight += weightsforeachorder[i*numorders+o];
+            
+        // Lowest order if total weight is too small:
+        if (totalweight <= std::abs(absthres))
+        {
+            lowestorders[i] = 1+0; // min order is artificially brought down to 0 for h1 type as well (see above)
+            continue;
+        }
+            
+        double weightthreshold = (1.0-1e-12)*std::abs(alpha)*totalweight; // noise margin
+    
+        double accumulatedweight = 0.0;
+        for (int o = 0; o < numorders; o++)
+        {
+            lowestorders[i] = 1+o;
+        
+            accumulatedweight += weightsforeachorder[i*numorders+o];
+
+            if (accumulatedweight >= weightthreshold)
+                break;
+        }
+        
+        if (lowestorders[i] == 1+fieldorder)
+            lowestorders[i] = -lowestorders[i];
+    }
+}
+
+void rawfield::getweightsforeachorder(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, std::vector<double>& weightsforeachorder)
 {
     synchronize();
     
     int numelems = elementnumbers.size();
     int numorders = 1+fieldorder;
     
-    std::vector<double> weightsforeachorder(numelems*numorders, 0.0);
+    weightsforeachorder = std::vector<double>(numelems*numorders, 0.0);
 
     std::vector<double> averagevals = {};
     if (mytypename == "h1" || mytypename == "h1d0" || mytypename == "h1d1" || mytypename == "h1d2" || mytypename == "h1d3")
@@ -1668,40 +1709,6 @@ void rawfield::getinterpolationorders(int elementtypenumber, int fieldorder, std
         }
         myiterator.next();
     }    
-    
-    
-    // Deduce the output:
-    lowestorders.resize(numelems);
-    
-    for (int i = 0; i < numelems; i++)
-    {
-        double totalweight = 0.0;
-        for (int o = 0; o < numorders; o++)
-            totalweight += weightsforeachorder[i*numorders+o];
-            
-        // Lowest order if total weight is too small:
-        if (totalweight <= std::abs(absthres))
-        {
-            lowestorders[i] = 1+0; // min order is artificially brought down to 0 for h1 type as well (see above)
-            continue;
-        }
-            
-        double weightthreshold = (1.0-1e-12)*std::abs(alpha)*totalweight; // noise margin
-    
-        double accumulatedweight = 0.0;
-        for (int o = 0; o < numorders; o++)
-        {
-            lowestorders[i] = 1+o;
-        
-            accumulatedweight += weightsforeachorder[i*numorders+o];
-
-            if (accumulatedweight >= weightthreshold)
-                break;
-        }
-        
-        if (lowestorders[i] == 1+fieldorder)
-            lowestorders[i] = -lowestorders[i];
-    }
 }
 
 void rawfield::errornotsameinterpolationorder(int disjreg)

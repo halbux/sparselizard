@@ -234,7 +234,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         int getinterpolationorders(int elementtypenumber, std::vector<int>& elementnumbers, std::vector<int>& fieldorders);
         // This function returns 1 + the lowest order containing alpha % of the shape function coefficient weight.
         // If the lowest order equals the field order on the element and the weight is larger than absthres then the value is returned with a minus sign.
-        void getinterpolationorders(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, double alpha, double absthres, std::vector<int>& lowestorders);
+        void getinterpolationorders(int fieldorder, double alpha, double absthres, std::vector<double>& weightsforeachorder, std::vector<int>& lowestorders);
+        
+        // 'weightsforeachorder' has size numelems x fieldorder+1:
+        void getweightsforeachorder(int elementtypenumber, int fieldorder, std::vector<int>& elementnumbers, std::vector<double>& weightsforeachorder);
         
         // Give an error if all harmonics have not the same interpolation order.
         // Only valid for fields without subfields.

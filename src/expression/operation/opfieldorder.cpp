@@ -38,8 +38,11 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
             for (int i = 0; i < numinorder; i++)
                 elemsinorder[i] = elems[splitorders[o][i]];
         
+            std::vector<double> weightsforeachorder;
+            myfield->getweightsforeachorder(elementtypenumber, o, elemsinorder, weightsforeachorder);
+            
             std::vector<int> lowestorders;
-            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, mythreshold, lowestorders);
+            myfield->getinterpolationorders(o, myalpha, mythreshold, weightsforeachorder, lowestorders);
 
             for (int i = 0; i < numinorder; i++)
                 fieldorders[splitorders[o][i]] = lowestorders[i];
@@ -69,41 +72,8 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
 
-    int numelems = elemselect.countinselection();
-    int elementtypenumber = elemselect.getelementtypenumber();
-    std::vector<int> elems = elemselect.getelementnumbers();
-    std::vector<int> fieldorders;
-    int maxorder = myfield->getinterpolationorders(elementtypenumber, elems, fieldorders);
-    
-    if (myalpha != -1.0)
-    {
-        intdensematrix fo(numelems, 1, fieldorders);
-        std::vector<std::vector<int>> splitorders = fo.findalloccurences(maxorder);
-        
-        for (int o = 0; o <= maxorder; o++)
-        {
-            int numinorder = splitorders[o].size();
-            if (numinorder == 0)
-                continue;
-                
-            std::vector<int> elemsinorder(numinorder);
-            for (int i = 0; i < numinorder; i++)
-                elemsinorder[i] = elems[splitorders[o][i]];
-        
-            std::vector<int> lowestorders;
-            myfield->getinterpolationorders(elementtypenumber, o, elemsinorder, myalpha, mythreshold, lowestorders);
+    densematrix output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
 
-            for (int i = 0; i < numinorder; i++)
-                fieldorders[splitorders[o][i]] = lowestorders[i];
-        }
-    }
-    
-    densematrix output(numelems, 1);
-    double* outputvals = output.getvalues();
-    for (int i = 0; i < numelems; i++)
-        outputvals[i] = fieldorders[i];
-    
-    output = output.duplicatehorizontally(evaluationcoordinates.size()/3);
     output = output.flatten();
     output = output.duplicatevertically(numtimeevals);
 
