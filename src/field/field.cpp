@@ -84,7 +84,7 @@ void field::setorder(int physreg, int interpolorder)
     rawfieldptr->setorder(physreg, interpolorder); 
 }
 
-void field::setorder(expression criterion, int loworder, int highorder, double critrange)
+void field::setorder(expression criterion, int loworder, int highorder)
 {
     errorifpointerisnull();
     
@@ -121,25 +121,44 @@ void field::setorder(expression criterion, int loworder, int highorder, double c
         abort();   
     }
 
-    rawfieldptr->setorder(criterion, loworder, highorder, critrange); 
+    rawfieldptr->setorder(criterion, loworder, highorder, -1); 
 }
 
-void field::setorder(double targeterror, field targetfield, int loworder, int highorder, double absthres)
+void field::setorder(double targeterror, int loworder, int highorder, double absthres)
 {
     errorifpointerisnull();
 
-    // Target field order:
-    expression rfo = sl::fieldorder(targetfield, 1.0-targeterror, absthres);
+    std::string tn = rawfieldptr->gettypename();
+    
+    if (loworder < 0)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' cannot use negative minimum interpolation order " << loworder << std::endl;
+        abort();   
+    }
+    hierarchicalformfunction hff;
+    if (loworder < hff.getminorder(tn))
+    {
+        std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order " << loworder << " for shape function " << tn << std::endl;
+        abort();   
+    }
+    if (highorder < loworder)
+    {
+        std::cout << "Error in 'field' object: in 'setorder' the lowest order cannot be larger than the highest order" << std::endl;
+        abort();   
+    }
+    
+    // Recommended field order:
+    expression rfo = sl::fieldorder(field(getpointer()), 1.0-targeterror, absthres);
     rfo.reuseit();
     // Actual field order:
-    expression afo = sl::fieldorder(targetfield);
+    expression afo = sl::fieldorder(field(getpointer()));
     afo.reuseit();
     
     expression crit = sl::ifpositive(rfo - afo+0.5, rfo+1.0, sl::ifpositive(afo - rfo-1.5, rfo+1.0, afo) );
     
     crit = sl::max(crit - loworder, 0) + 0.5;
     
-    setorder(crit, loworder, highorder, highorder-loworder+1);
+    rawfieldptr->setorder(crit, loworder, highorder, highorder-loworder+1);
 }
 
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
