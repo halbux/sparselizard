@@ -127,15 +127,6 @@ void field::setorder(expression criterion, int loworder, int highorder, double c
 void field::setorder(double targeterror, field targetfield, int loworder, int highorder, double absthres)
 {
     errorifpointerisnull();
-    
-    std::shared_ptr<rawfield> rf = targetfield.getpointer();
-
-    if (rf->countsubfields() > 1)
-    {
-        std::cout << "Error in 'field' object: field provided for order adaptivity cannot have subfields (field of type '" << rf->gettypename(false) << "' provided has " << rf->countsubfields() << ")" << std::endl;
-        std::cout << "You could instead provide the x subfield using yourfield.compx()" << std::endl;
-        abort();
-    }
 
     // Target field order:
     expression rfo = sl::fieldorder(targetfield, 1.0-targeterror, absthres);
