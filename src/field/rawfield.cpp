@@ -1530,7 +1530,7 @@ std::vector<std::shared_ptr<rawfield>> rawfield::getsons(void)
         for (int h = 0; h < myharmonics.size(); h++)
         {
             if (myharmonics[h].size() > 0)
-                output.push_back({myharmonics[h][0]});
+                output.push_back(myharmonics[h][0]);
         }
         return output;
     }
