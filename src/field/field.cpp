@@ -147,14 +147,7 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
         abort();   
     }
     
-    // Recommended field order:
-    expression rfo = sl::fieldorder(field(getpointer()), 1.0-targeterror, absthres);
-    rfo.reuseit();
-    // Actual field order:
-    expression afo = sl::fieldorder(field(getpointer()));
-    afo.reuseit();
-    
-    expression crit = sl::ifpositive(rfo - afo+0.5, rfo+1.0, sl::ifpositive(afo - rfo-1.5, rfo+1.0, afo) );
+    expression crit = sl::fieldorder(field(getpointer()), 1.0-targeterror, absthres) + 1.0;
     
     crit = sl::max(crit - loworder, 0) + 0.5;
     
