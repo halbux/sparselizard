@@ -58,7 +58,7 @@ class mesh
         void write(std::string name, int verbosity = 1);     
         
         // H-adaptivity:
-        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double critrange = -1);
+        void setadaptivity(expression criterion, int lownumsplits, int highnumsplits);
         
         // Split each element in the mesh n times:
         void split(int n = 1);
