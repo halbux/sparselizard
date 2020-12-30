@@ -29,6 +29,10 @@ namespace slmpi
     void receive(int source, int tag, std::vector<int>& data);
     void receive(int source, int tag, std::vector<double>& data);
     
+    // Sum values from all ranks and distribute the result back to all ranks:
+    void sum(std::vector<int>& data);
+    void sum(std::vector<double>& data);
+    
     // Broadcast from the broadcaster rank and receive in 'data' on all ranks.
     // Data vector must be preallocated to the correct size:
     void broadcast(int broadcaster, std::vector<int>& data);

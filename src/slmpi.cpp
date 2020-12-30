@@ -93,6 +93,17 @@ void slmpi::receive(int source, int tag, std::vector<double>& data)
 }
 
 
+void slmpi::sum(std::vector<int>& data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, &data[0], data.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+}
+
+void slmpi::sum(std::vector<double>& data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, &data[0], data.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+}
+
+
 void slmpi::broadcast(int broadcaster, std::vector<int>& data)
 {
     MPI_Bcast(&data[0], data.size(), MPI_INT, broadcaster, MPI_COMM_WORLD);
