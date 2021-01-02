@@ -1120,3 +1120,20 @@ void myalgorithm::givensrotation(double a, double b, double& c, double& s)
     s = b * invr;
 }
 
+void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k)
+{
+    for (int i = 0; i < k-1; i++)
+    {
+        double temp = cs[i] * h[i] + sn[i] * h[i+1];
+        h[i+1] = -sn[i] * h[i] + cs[i] * h[i+1];
+        h[i] = temp;
+    }
+
+    // Update the next sin and cos values for the rotation:
+    givensrotation(h[k], h[k+1], cs[k], sn[k]);
+
+    // Eliminate h[k+1]:
+    h[k] = cs[k] * h[k] + sn[k] * h[k+1];
+    h[k+1] = 0.0;
+}
+
