@@ -3,6 +3,7 @@
 #include "universe.h"
 #include "disjointregions.h"
 #include "lagrangeformfunction.h"
+#include "slmpi.h"
 
 #if defined(__linux__)
 #include <parallel/algorithm>
@@ -1135,5 +1136,50 @@ void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::v
     // Eliminate h[k+1]:
     h[k] = cs[k] * h[k] + sn[k] * h[k+1];
     h[k+1] = 0.0;
+}
+
+std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k)
+{   
+    // One Krylov vector on each row:
+    int n = Q.countcolumns();
+    double* Qptr = Q.getvalues();
+    
+    // Krylov vector fragment on each rank:
+    densematrix q = mymatmult(Q.extractrows(k,k)); 
+    double* qptr = q.getvalues();
+    
+    // Standard Gramm-Schmidt orthogonalization:
+    densematrix h = Q.multiply(q);
+    std::vector<double> hvec;
+    h.getvalues(hvec);
+    
+    slmpi::sum(hvec); // reduce on all ranks
+    
+    h = densematrix(1, hvec.size(), hvec);
+    densematrix Qh = h.multiply(Q);
+    double* Qhptr = Qh.getvalues();
+    
+    // Subtract Qh and compute the norm of q:
+    double normqfrag = 0.0;
+    for (int i = 0; i < n; i++)
+    {
+        qptr[i] -= Qhptr[i];
+        normqfrag += qptr[i]*qptr[i];
+    }
+        
+    std::vector<double> temp = {normqfrag};
+    
+    slmpi::sum(temp); // reduce on all ranks
+    
+    double normq = std::sqrt(temp[0]);
+        
+    hvec.push_back(normq);
+
+    // Norm the Krylov vector and place it in Q:
+    double invnormq = 1.0/normq;
+    for (int i = 0; i < n; i++)
+        Qptr[k*n+i] = invnormq * qptr[i];
+    
+    return hvec;
 }
 

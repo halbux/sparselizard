@@ -17,6 +17,7 @@
 #include "polynomial.h"
 #include "polynomials.h"
 #include "coordinategroup.h"
+#include "densematrix.h"
 
 namespace myalgorithm
 {
@@ -167,6 +168,9 @@ namespace myalgorithm
     
     // Apply Givens rotation to h (the kth column of the Hessenberg matrix, h has length k+2):
     void applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k);
+    
+    // Q has one row per Krylov vector. Column k of the Hessenberg matrix is returned (length k+1):
+    std::vector<double> arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k);
     
 };
 
