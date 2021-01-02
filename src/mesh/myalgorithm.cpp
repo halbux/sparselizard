@@ -1122,7 +1122,7 @@ void myalgorithm::givensrotation(double a, double b, double& c, double& s)
 
 void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k)
 {
-    for (int i = 0; i < k-1; i++)
+    for (int i = 0; i < k; i++)
     {
         double temp = cs[i] * h[i] + sn[i] * h[i+1];
         h[i+1] = -sn[i] * h[i] + cs[i] * h[i+1];

@@ -165,7 +165,7 @@ namespace myalgorithm
     // Givens rotation:
     void givensrotation(double a, double b, double& c, double& s);
     
-    // Apply Givens rotation to kth Hessenberg matrix column h (of length k+2):
+    // Apply Givens rotation to h (the kth column of the Hessenberg matrix, h has length k+2):
     void applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k);
     
 };
