@@ -1113,3 +1113,10 @@ void myalgorithm::solvelowertriangular(int len, double* L, double* b, double* x)
     }
 }
 
+void myalgorithm::givensrotation(double a, double b, double& c, double& s)
+{
+    double invr = 1.0/std::sqrt(a*a + b*b);
+    c = a * invr;
+    s = b * invr;
+}
+
