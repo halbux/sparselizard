@@ -1098,3 +1098,18 @@ void myalgorithm::normvector(std::vector<double>& tonorm)
         tonorm[i] = invnrm * tonorm[i];
 }
 
+void myalgorithm::solvelowertriangular(int len, double* L, double* b, double* x)
+{
+    int index = 0;
+    for (int r = 0; r < len; r++)
+    {
+        double bv = 0.0;
+        for (int c = 0; c < r; c++)
+            bv += L[index+c] * x[c];
+            
+        x[r] = (b[r]-bv) / L[index+r];
+        
+        index += r+1;
+    }
+}
+

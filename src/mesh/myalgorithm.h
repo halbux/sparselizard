@@ -159,6 +159,9 @@ namespace myalgorithm
     // Norm a vector:
     void normvector(std::vector<double>& tonorm);
     
+    // Solve Lx = b where L is lower triangular in format {r0c0,r1c0,r1c1,r2c0,...,r(len-1)c(len-1)}:
+    void solvelowertriangular(int len, double* L, double* b, double* x);
+    
 };
 
 #endif
