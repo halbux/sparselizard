@@ -63,7 +63,7 @@ densematrix opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselect
     output.abs();
     output = output.multiply(weightsmat);
     output = output.duplicatehorizontally(evaluationcoordinates.size()/3);
-    output = output.flatten();
+    output = output.getflattened();
     output = output.duplicatevertically(numtimeevals);
 
     if (reuse && universe::isreuseallowed)

@@ -159,7 +159,7 @@ densematrix oporientation::multiharmonicinterpolate(int numtimeevals, elementsel
     
     densematrix output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
     
-    output = output.flatten();
+    output = output.getflattened();
     output = output.duplicatevertically(numtimeevals);
 
     if (reuse && universe::isreuseallowed)

@@ -1149,14 +1149,14 @@ std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), 
     double* qptr = q.getvalues();
     
     // Standard Gramm-Schmidt orthogonalization:
-    densematrix h = Q.multiply(q);
+    densematrix h = Q.getresized(k+1,n).multiply(q);
     std::vector<double> hvec;
     h.getvalues(hvec);
     
     slmpi::sum(hvec); // reduce on all ranks
     
     h = densematrix(1, hvec.size(), hvec);
-    densematrix Qh = h.multiply(Q);
+    densematrix Qh = h.multiply(Q.getresized(k+1,n));
     double* Qhptr = Qh.getvalues();
     
     // Subtract Qh and compute the norm of q:

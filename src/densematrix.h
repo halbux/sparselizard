@@ -62,7 +62,7 @@ class densematrix
         // Output the mxn resized matrix (this only changes 'numrows' and 'numcols'). Values are NOT copied!
         densematrix getresized(long long int m, long long int n);
         // Output the 1x(m*n) resized matrix:
-        densematrix flatten(void);
+        densematrix getflattened(void);
 
         // Insert a block in the matrix. Top left of block is at (row, col):
         void insert(long long int row, long long int col, densematrix toinsert);

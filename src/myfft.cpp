@@ -111,7 +111,7 @@ densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int 
                 for (int i = 0; i < numtimevals; i++)
                     valvec[i] = std::sin(currentfreq*phasestep*i);
             }            
-            output.add( sincoseval.multiply( input[harm][0].flatten() ) );
+            output.add( sincoseval.multiply( input[harm][0].getflattened() ) );
         }
     }
     return output;

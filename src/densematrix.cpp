@@ -102,7 +102,7 @@ densematrix densematrix::getresized(long long int m, long long int n)
     return out;
 }
 
-densematrix densematrix::flatten(void) 
+densematrix densematrix::getflattened(void) 
 { 
     return getresized(1, numrows*numcols);
 }
