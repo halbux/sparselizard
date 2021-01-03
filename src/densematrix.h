@@ -58,10 +58,10 @@ class densematrix
 
         // Set the values of a given row.
         void setrow(long long int rownumber, std::vector<double> rowvals);
-
-        // Output a flattened matrix, i.e. put all rows one after the other.
-        // In practice this only requires to change 'numrows' and 'numcols'.
-        // Values are NOT copied!
+        
+        // Output the mxn resized matrix (this only changes 'numrows' and 'numcols'). Values are NOT copied!
+        densematrix getresized(long long int m, long long int n);
+        // Output the 1x(m*n) resized matrix:
         densematrix flatten(void);
 
         // Insert a block in the matrix. Top left of block is at (row, col):

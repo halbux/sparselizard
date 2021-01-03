@@ -94,14 +94,18 @@ void densematrix::setrow(long long int rownumber, std::vector<double> rowvals)
         myvaluesptr[rownumber*numcols+i] = rowvals[i];
 }
 
-densematrix densematrix::flatten(void) 
-{ 
+densematrix densematrix::getresized(long long int m, long long int n)
+{
     densematrix out = *this; 
-    out.numcols = numrows*numcols; 
-    out.numrows = 1; 
-    return out; 
+    out.numrows = m;
+    out.numcols = n;
+    return out;
 }
 
+densematrix densematrix::flatten(void) 
+{ 
+    return getresized(1, numrows*numcols);
+}
 
 void densematrix::insert(long long int row, long long int col, densematrix toinsert)
 {
