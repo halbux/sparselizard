@@ -1145,8 +1145,14 @@ std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), 
     double* Qptr = Q.getvalues();
     
     // Krylov vector fragment on each rank:
-    densematrix q = mymatmult(Q.extractrows(k,k)); 
+    densematrix q = mymatmult(Q.extractrows(k,k).getresized(n,1));
     double* qptr = q.getvalues();
+    
+    if (q.countrows() != n || q.countcolumns() != 1)
+    {
+        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densematrix of wrong size on rank " << slmpi::getrank() << std::endl;
+        abort();
+    }
     
     // Standard Gramm-Schmidt orthogonalization:
     densematrix h = Q.getresized(k+1,n).multiply(q.getresized(n,1));
