@@ -3,6 +3,7 @@
 #include "rawline.h"
 #include "rawsurface.h"
 #include "rawvolume.h"
+#include "slmpi.h"
 
 
 int sl::getversion(void)
@@ -1603,6 +1604,107 @@ void sl::solve(std::vector<formulation> formuls)
 {
     for (int i = 0; i < formuls.size(); i++)
         solve(formuls[i]);
+}
+
+std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol)
+{   
+    if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
+    {
+        std::cout << "Error in 'sl' namespace: in function gmres expected a column vector of same size for b and x" << std::endl;
+        abort();
+    }
+
+    // Fragment size:
+    int n = b.count();
+    
+    // Initialize the 1D vectors:
+    std::vector<double> sn(maxits, 0.0);
+    std::vector<double> cs(maxits, 0.0);
+    std::vector<double> e1(maxits+1, 0.0);
+    e1[0] = 1.0;
+    std::vector<double> beta(maxits+1, 0.0);
+    std::vector<double> relresvec(maxits+1, 0.0);
+    
+    double* xptr = x.getvalues();
+    double* bptr = b.getvalues();
+
+    // Compute r = b - A * x and the initial relative residual:
+    double normb = 0.0; double normr = 0.0;
+    densematrix r = mymatmult(x);
+    double* rptr = r.getvalues();
+    
+    if (r.countrows() != n || r.countcolumns() != 1)
+    {
+        std::cout << "Error in 'sl' namespace: in function gmres the matrix product function call returned a densematrix of wrong size on rank " << slmpi::getrank() << std::endl;
+        abort();
+    }
+    
+    for (int i = 0; i < n; i++)
+    {
+        rptr[i] = bptr[i] - rptr[i];
+        normb += bptr[i]*bptr[i];
+        normr += rptr[i]*rptr[i];
+    }
+    
+    std::vector<double> norms = {normb, normr};
+    
+    slmpi::sum(norms); // reduce on all ranks
+    
+    normb = std::sqrt(norms[0]);
+    normr = std::sqrt(norms[1]);
+    beta[0] = normr*e1[0];
+    
+    relresvec[0] = normr/normb;
+        
+    // Holder for all Krylov vectors (one on each row):
+    densematrix Q(maxits+1, n);
+    double* Qptr = Q.getvalues();
+    
+    // First row is the normed residual:
+    double invnormr = 1.0/normr;
+    for (int i = 0; i < n; i++)
+        Qptr[i] = invnormr * rptr[i];
+        
+    // Hessenberg matrix (lower triangular {r0c0,r1c0,r1c1,r2c0,...}):
+    densematrix H(1, (1+maxits)*maxits/2 + 2, 0.0); // +2 because arnoldi returns length k+2
+    double* Hptr = H.getvalues();
+    
+    // GMRES iteration:
+    int k = 0;
+    for (k = 0; k < maxits; k++)
+    {
+        if (relresvec[k] <= relrestol)
+            break;
+            
+        // Run Arnoldi:
+        std::vector<double> h = myalgorithm::arnoldi(mymatmult, Q, k);
+        
+        // Write h to H (can exceed by 2 the actual Hessenberg matrix size):
+        for (int i = 0; i < h.size(); i++)
+            Hptr[(1+k)*k/2 + i] = h[i];
+
+        // Eliminate the last element in H ith vector and update the rotation matrix:
+        myalgorithm::applygivensrotation(Hptr+(1+k)*k/2, cs, sn, k);
+        
+        // Update the residual vector:
+        beta[k+1] = -sn[k] * beta[k];
+        beta[k] = cs[k] * beta[k];
+        
+        relresvec[k+1] = std::abs(beta[k+1]) / normb;
+    }
+
+    if (k > 0)
+    {
+        // Calculate the solution:
+        densematrix y(1,k);
+        myalgorithm::solvelowertriangular(k, Hptr, &beta[0], y.getvalues());
+        densematrix Qy = y.multiply(Q.getresized(k,n));
+        x.add(Qy);
+    }
+
+    relresvec.resize(k+1);
+    
+    return relresvec;
 }
 
 

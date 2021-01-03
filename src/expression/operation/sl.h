@@ -230,6 +230,10 @@ namespace sl
     void solve(formulation formul);
     void solve(std::vector<formulation> formuls);
     
+    // MPI based gmres with custom matrix free product (no restart). Initial guess and solution are in x.
+    // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
+    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol);
+    
     
     std::vector<double> linspace(double a, double b, int num);
     std::vector<double> logspace(double a, double b, int num, double basis = 10.0);
