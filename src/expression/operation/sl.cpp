@@ -1654,6 +1654,14 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     normr = std::sqrt(norms[1]);
     beta[0] = normr*e1[0];
     
+    // All zero solution in case b is all zero:
+    if (normb == 0)
+    {
+        for (int i = 0; i < n; i++)
+            xptr[i] = 0.0;
+        return {0.0};
+    }
+    
     relresvec[0] = normr/normb;
         
     // Holder for all Krylov vectors (one on each row):
