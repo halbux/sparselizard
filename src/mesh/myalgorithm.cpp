@@ -1105,7 +1105,7 @@ void myalgorithm::solveuppertriangular(int len, double* U, double* b, double* x)
     for (int i = 0; i < len; i++)
         x[i] = 0;
  
-    int index = (1+len)*len/2 - 1;
+    int index = ((1+len)*len)/2 - 1;
     
     for (int c = len-1; c >= 0; c--)
     {   
