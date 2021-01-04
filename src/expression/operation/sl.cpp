@@ -1665,7 +1665,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     for (int i = 0; i < n; i++)
         Qptr[i] = invnormr * rptr[i];
         
-    // Hessenberg matrix (lower triangular {r0c0,r1c0,r1c1,r2c0,...}):
+    // Hessenberg matrix (columnwise upper triangular {r0c0,r0c1,r1c1,r0c2,...}):
     densematrix H(1, (1+maxits)*maxits/2 + 2, 0.0); // +2 because arnoldi returns length k+2
     double* Hptr = H.getvalues();
     
@@ -1697,7 +1697,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     {
         // Calculate the solution:
         densematrix y(1,k);
-        myalgorithm::solvelowertriangular(k, Hptr, &beta[0], y.getvalues());
+        myalgorithm::solveuppertriangular(k, Hptr, &beta[0], y.getvalues());
         densematrix Qy = y.multiply(Q.getresized(k,n));
         x.add(Qy);
     }

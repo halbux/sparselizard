@@ -1099,18 +1099,26 @@ void myalgorithm::normvector(std::vector<double>& tonorm)
         tonorm[i] = invnrm * tonorm[i];
 }
 
-void myalgorithm::solvelowertriangular(int len, double* L, double* b, double* x)
+void myalgorithm::solveuppertriangular(int len, double* U, double* b, double* x)
 {
-    int index = 0;
-    for (int r = 0; r < len; r++)
-    {
-        double bv = 0.0;
-        for (int c = 0; c < r; c++)
-            bv += L[index+c] * x[c];
-            
-        x[r] = (b[r]-bv) / L[index+r];
+    // Init x to all zero:
+    for (int i = 0; i < len; i++)
+        x[i] = 0;
+ 
+    int index = (1+len)*len/2 - 1;
+    
+    for (int c = len-1; c >= 0; c--)
+    {   
+        x[c] = (b[c]-x[c]) / U[index];
         
-        index += r+1;
+        index--;
+        
+        for (int r = c-1; r >= 0; r--)
+        {
+            x[r] += U[index] * x[c];
+            
+            index--;
+        }
     }
 }
 
