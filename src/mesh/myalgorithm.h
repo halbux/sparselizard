@@ -160,7 +160,7 @@ namespace myalgorithm
     // Norm a vector:
     void normvector(std::vector<double>& tonorm);
     
-    // Solve Ux = b where U is columnwise upper triangular {r0c0,r0c1,r1c1,r0c2,...}:
+    // Solve Ux = b where U is column-major upper triangular {r0c0,r0c1,r1c1,r0c2,...}:
     void solveuppertriangular(int len, double* U, double* b, double* x);
 
     // Givens rotation:
