@@ -1171,7 +1171,7 @@ std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), 
     }
     
     // Standard Gramm-Schmidt orthogonalization:
-    densematrix h = Q.getresized(k+1,n).multiply(q.getresized(n,1));
+    densematrix h = Q.getresized(k+1,n).multiply(q);
     std::vector<double> hvec;
     h.getvalues(hvec);
     
