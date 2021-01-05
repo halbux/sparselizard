@@ -166,7 +166,7 @@ namespace myalgorithm
     // Givens rotation:
     void givensrotation(double a, double b, double& c, double& s);
     
-    // Apply Givens rotation to h (the kth column of the reduced upper Hessenberg matrix, h has length k+2 with 0 as last value):
+    // Apply Givens rotation to h (the kth column of the unreduced upper Hessenberg matrix, h must have length k+2):
     void applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k);
     
     // Q has one row per Krylov vector (at least k+2 rows must be preallocated).
