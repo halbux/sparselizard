@@ -1674,7 +1674,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
         Qptr[i] = invnormr * rptr[i];
         
     // Hessenberg matrix (columnwise upper triangular {r0c0,r0c1,r1c1,r0c2,...}):
-    densematrix H(1, ((1+maxits)*maxits)/2 + 2, 0.0); // +1 because arnoldi returns length k+2
+    densematrix H(1, ((1+maxits)*maxits)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
     double* Hptr = H.getvalues();
     
     // GMRES iteration:
