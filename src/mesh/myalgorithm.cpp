@@ -1124,17 +1124,10 @@ void myalgorithm::solveuppertriangular(int len, double* U, double* b, double* x)
 
 void myalgorithm::givensrotation(double a, double b, double& c, double& s)
 {
-    if (b != 0.0)
-    {
-        double invr = 1.0/std::sqrt(a*a + b*b);
-        c = std::abs(a) * invr;
-        s = std::copysign(invr, a) * b;
-    }
-    else
-    {
-        c = 1.0;
-        s = 0.0;
-    }
+    double invr = 1.0/std::sqrt(a*a + b*b);
+    
+    c = std::abs(a) * invr;
+    s = std::copysign(invr, a) * b;
 }
 
 void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k)
