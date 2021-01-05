@@ -166,11 +166,11 @@ namespace myalgorithm
     // Givens rotation:
     void givensrotation(double a, double b, double& c, double& s);
     
-    // Apply Givens rotation to h (the kth column of the Hessenberg matrix, h has length k+2):
+    // Apply Givens rotation to h (the kth column of the reduced upper Hessenberg matrix, h has length k+2 with 0 as last value):
     void applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k);
     
     // Q has one row per Krylov vector (at least k+2 rows must be preallocated).
-    // Column k of the Hessenberg matrix is returned (length k+2):
+    // Column k of the unreduced upper Hessenberg matrix is returned (length k+2):
     std::vector<double> arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k);
     
 };
