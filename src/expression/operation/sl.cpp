@@ -1689,7 +1689,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
         for (int i = 0; i < h.size(); i++)
             Hptr[((1+k)*k)/2 + i] = h[i];
 
-        // Eliminate the last element in H ith vector and update the rotation matrix:
+        // Eliminate the last element in the kth column of H and update the rotation matrix:
         myalgorithm::applygivensrotation(Hptr+((1+k)*k)/2, cs, sn, k);
         
         // Update the residual vector:
