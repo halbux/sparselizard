@@ -164,7 +164,7 @@ namespace myalgorithm
     void solveuppertriangular(int len, double* U, double* b, double* x);
 
     // Givens rotation:
-    void givensrotation(double a, double b, double& c, double& s);
+    void givensrotation(double a, double b, double& c, double& s, double& r);
     
     // Apply Givens rotation to h (the kth column of the unreduced upper Hessenberg matrix, h must have length k+2):
     void applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k);

@@ -1122,19 +1122,12 @@ void myalgorithm::solveuppertriangular(int len, double* U, double* b, double* x)
     }
 }
 
-void myalgorithm::givensrotation(double a, double b, double& c, double& s)
+void myalgorithm::givensrotation(double a, double b, double& c, double& s, double& r)
 {
-    if (a != 0)
-    {
-        double invr = 1.0/std::sqrt(a*a + b*b);   
-        c = std::abs(a) * invr;
-        s = std::copysign(invr, a) * b;
-    }
-    else
-    {
-        c = 0.0;
-        s = 1.0;
-    }
+    // As in www.netlib.org/eispack/comqr.f
+    r = std::sqrt(a*a + b*b);
+    c = a/r;
+    s = b/r;
 }
 
 void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k)
@@ -1147,10 +1140,11 @@ void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::v
     }
 
     // Update the next sin and cos values for the rotation:
-    givensrotation(h[k], h[k+1], cs[k], sn[k]);
+    double r;
+    givensrotation(h[k], h[k+1], cs[k], sn[k], r);
 
     // Eliminate h[k+1]:
-    h[k] = cs[k] * h[k] + sn[k] * h[k+1];
+    h[k] = r;
     h[k+1] = 0.0;
 }
 
