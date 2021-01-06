@@ -1620,8 +1620,6 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     // Initialize the 1D vectors:
     std::vector<double> sn(maxits, 0.0);
     std::vector<double> cs(maxits, 0.0);
-    std::vector<double> e1(maxits+1, 0.0);
-    e1[0] = 1.0;
     std::vector<double> beta(maxits+1, 0.0);
     std::vector<double> relresvec(maxits+1, 0.0);
     
@@ -1652,7 +1650,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     
     normb = std::sqrt(norms[0]);
     normr = std::sqrt(norms[1]);
-    beta[0] = normr*e1[0];
+    beta[0] = normr;
     
     // All zero solution in case b is all zero:
     if (normb == 0)
