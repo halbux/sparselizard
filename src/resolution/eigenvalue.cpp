@@ -54,7 +54,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         // Define the slepc eigensolver context:
         EPS eps;
         
-        EPSCreate( PETSC_COMM_WORLD, &eps );
+        EPSCreate( PETSC_COMM_SELF, &eps );
         
         // To be general we assume a non-hermitian problem:
         if (myB.getpointer() == NULL)
@@ -131,7 +131,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         // Define the slepc eigensolver context:
         PEP pep;
         
-        PEPCreate( PETSC_COMM_WORLD, &pep );
+        PEPCreate( PETSC_COMM_SELF, &pep );
         
         Mat* petscmats = new Mat[mymats.size()];
         for (int i = 0; i < mymats.size(); i++)

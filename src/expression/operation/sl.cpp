@@ -1354,7 +1354,7 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
     if (A.getpointer()->isludefined() == false)
     {
         PC pc;
-        KSPCreate(PETSC_COMM_WORLD, ksp);
+        KSPCreate(PETSC_COMM_SELF, ksp);
         KSPSetOperators(*ksp, Apetsc, Apetsc);
         // Perform a diagonal scaling for improved matrix conditionning.
         // This modifies the matrix A and right handside b!
@@ -1459,7 +1459,7 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
     PC pc;
     if (A.getpointer()->isludefined() == false)
     {
-        KSPCreate(PETSC_COMM_WORLD, ksp);
+        KSPCreate(PETSC_COMM_SELF, ksp);
         KSPSetOperators(*ksp, Apetsc, Apetsc);
         KSPSetFromOptions(*ksp);
 
@@ -1538,7 +1538,7 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
 
     KSP* ksp = A.getpointer()->getksp();
 
-    KSPCreate(PETSC_COMM_WORLD, ksp);
+    KSPCreate(PETSC_COMM_SELF, ksp);
     KSPSetOperators(*ksp, Apetsc, Apetsc);
     // Perform a diagonal scaling for improved matrix conditionning.
     // This modifies the matrix A and right handside b!
