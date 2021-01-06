@@ -1628,7 +1628,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
 
     // Compute r = b - A * x and the initial relative residual:
     double normb = 0.0; double normr = 0.0;
-    densematrix r = mymatmult(x);
+    densematrix r = mymatmult(x.copy());
     double* rptr = r.getvalues();
     
     if (r.countrows() != n || r.countcolumns() != 1)
