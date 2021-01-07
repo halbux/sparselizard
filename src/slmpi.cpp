@@ -11,17 +11,17 @@ void slmpi::errornompi(void)
 
 #ifndef HAVE_MPI
 bool slmpi::isavailable(void) { return false; }
-void slmpi::initialize(void) { errornompi(); }
-void slmpi::finalize(void) { errornompi(); }
-int slmpi::getrank(void) { errornompi(); abort(); }
-int slmpi::count(void) { errornompi(); abort(); }
-void slmpi::barrier(void) { errornompi(); }
+void slmpi::initialize(void) {}
+void slmpi::finalize(void) {}
+int slmpi::getrank(void) { return 0; }
+int slmpi::count(void) { return 1; }
+void slmpi::barrier(void) {}
 void slmpi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
-void slmpi::sum(std::vector<int>& data) { errornompi(); }
-void slmpi::sum(std::vector<double>& data) { errornompi(); }
+void slmpi::sum(std::vector<int>& data) {}
+void slmpi::sum(std::vector<double>& data) {}
 void slmpi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
 void slmpi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
 std::vector<int> slmpi::gather(int gatherer, int value) { errornompi(); abort(); }
