@@ -744,27 +744,27 @@ std::vector<int> rawmesh::getphysicalregionnumbers(int dim)
     return myphysicalregions.getallnumbers(dim);
 }
 
-void rawmesh::regionskin(int newphysreg, int physregtoskin)
+void rawmesh::selectskin(int newphysreg, int physregtoskin)
 {
     myregiondefiner.regionskin(newphysreg, physregtoskin);
 }
 
-void rawmesh::boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
+void rawmesh::selectbox(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
 {
-    myregiondefiner.boxselection(newphysreg, selecteddim, boxlimit, physregtobox);
+    myregiondefiner.regionbox(newphysreg, selecteddim, boxlimit, physregtobox);
 }
 
-void rawmesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
+void rawmesh::selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
 {
-    myregiondefiner.sphereselection(newphysreg, selecteddim, centercoords, radius, physregtosphere);
+    myregiondefiner.regionsphere(newphysreg, selecteddim, centercoords, radius, physregtosphere);
 }
 
-void rawmesh::layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
+void rawmesh::selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
 {
-    myregiondefiner.layerselection(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
+    myregiondefiner.regionlayer(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
 }
 
-void rawmesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
+void rawmesh::selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
 {
     myregiondefiner.regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
 }

@@ -219,9 +219,9 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     
     mesh mymesh;
     
-    mymesh.regionskin(tubeskin, tube);
-    mymesh.regionskin(domainskin, wholedomain);
-    mymesh.boxselection(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
+    mymesh.selectskin(tubeskin, tube);
+    mymesh.selectskin(domainskin, wholedomain);
+    mymesh.selectbox(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
     
     mymesh.load({voltube, voltubeinside, wholevol});
     

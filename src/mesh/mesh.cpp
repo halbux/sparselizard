@@ -190,34 +190,34 @@ std::vector<int> mesh::getphysicalregionnumbers(int dim)
     return rawmeshptr->getphysicalregionnumbers(dim);
 }
 
-void mesh::regionskin(int newphysreg, int physregtoskin)
+void mesh::selectskin(int newphysreg, int physregtoskin)
 {
     errorifloaded();
-    rawmeshptr->regionskin(newphysreg, physregtoskin);
+    rawmeshptr->selectskin(newphysreg, physregtoskin);
 }
 
-void mesh::boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
+void mesh::selectbox(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
 {
     errorifloaded();
-    rawmeshptr->boxselection(newphysreg, physregtobox, selecteddim, boxlimit);
+    rawmeshptr->selectbox(newphysreg, physregtobox, selecteddim, boxlimit);
 }
 
-void mesh::sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
+void mesh::selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
 {
     errorifloaded();
-    rawmeshptr->sphereselection(newphysreg, physregtosphere, selecteddim, centercoords, radius);
+    rawmeshptr->selectsphere(newphysreg, physregtosphere, selecteddim, centercoords, radius);
 }
 
-void mesh::layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
+void mesh::selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
 {
     errorifloaded();
-    rawmeshptr->layerselection(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
+    rawmeshptr->selectlayer(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
 }
 
-void mesh::regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
+void mesh::selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
 {
     errorifloaded();
-    rawmeshptr->regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
+    rawmeshptr->selectexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
 }
 
 void mesh::use(void)

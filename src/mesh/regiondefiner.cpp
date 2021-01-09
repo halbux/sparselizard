@@ -364,7 +364,7 @@ void regiondefiner::regionskin(int newphysreg, int physregtoskin)
     toskin.push_back(physregtoskin);
 }
 
-void regiondefiner::boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox)
+void regiondefiner::regionbox(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox)
 {
     int cur = tobox.size();
     std::vector<int> prio = {1,cur};
@@ -392,7 +392,7 @@ void regiondefiner::boxselection(int newphysreg, int selecteddim, std::vector<do
     boxlimits.push_back(boxlimit);
 }
 
-void regiondefiner::sphereselection(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere)
+void regiondefiner::regionsphere(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere)
 {
     int cur = tosphere.size();
     std::vector<int> prio = {2,cur};
@@ -431,7 +431,7 @@ void regiondefiner::regionexclusion(int newphysreg, int physregtoexcludefrom, st
     toexclude.push_back(physregstoexclude);
 }
 
-void regiondefiner::layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl)
+void regiondefiner::regionlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl)
 {
     int cur = tolayer.size();
     std::vector<int> prio = {4,cur};

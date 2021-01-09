@@ -32,7 +32,7 @@ int main(void)
     int wavg1 = 1, wavg2 = 2, clad = 3, all = 4, bound = 5;
 
     mesh mymesh;
-    mymesh.regionskin(bound, all);
+    mymesh.selectskin(bound, all);
     mymesh.load("optical_waveguide.msh");
     
     int waveguides = regionunion({wavg1, wavg2});

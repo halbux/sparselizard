@@ -92,10 +92,10 @@ class regiondefiner
         regiondefiner(nodes& inputnodes, elements& inputelems, physicalregions& inputphysregs);
 
         void regionskin(int newphysreg, int physregtoskin);
-        void boxselection(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
-        void sphereselection(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere);
+        void regionbox(int newphysreg, int selecteddim, std::vector<double> boxlimit, int physregtobox);
+        void regionsphere(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere);
         void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
-        void layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl);
+        void regionlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl);
 
         bool isanyregiondefined(void);
         bool isanycoordinatedependentregiondefined(void);

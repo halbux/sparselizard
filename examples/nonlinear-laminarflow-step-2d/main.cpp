@@ -130,8 +130,8 @@ mesh createmesh(double l1, double h1, double l2, double h2, int nl1, int nl2, in
     shape loutlet = shape("union", outlet, {qthick.getsons()[1],qthinright.getsons()[1]});
 
     mesh mymesh;
-    mymesh.regionskin(skin, fluid);
-    mymesh.regionexclusion(wall, skin, {inlet, outlet});
+    mymesh.selectskin(skin, fluid);
+    mymesh.selectexclusion(wall, skin, {inlet, outlet});
     mymesh.load({qthinleft,qthinright,qthick,linlet,loutlet});
 
     mymesh.write("pipestep.msh");

@@ -105,10 +105,10 @@ void processmesh(void)
 
     mesh mymesh2;
 
-    mymesh2.boxselection(elecc, 4001, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
-    mymesh2.boxselection(eleco, 4006, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
-    mymesh2.boxselection(clamp, all, 2, {-10,10,-10,10,-1e-10,1e-10});
-    mymesh2.boxselection(gamma1, all, 2, {-10,10,-1e-10,1e-10,-10,10});
+    mymesh2.selectbox(elecc, 4001, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
+    mymesh2.selectbox(eleco, 4006, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
+    mymesh2.selectbox(clamp, all, 2, {-10,10,-10,10,-1e-10,1e-10});
+    mymesh2.selectbox(gamma1, all, 2, {-10,10,-1e-10,1e-10,-10,10});
 
     mymesh2.load("cmutperiodic.msh", 0);
 
@@ -118,7 +118,7 @@ void processmesh(void)
 
     mesh mymesh3;
 
-    mymesh3.boxselection(gamma2, all, 2, {-10,10,-1e-10,1e-10,-10,10});
+    mymesh3.selectbox(gamma2, all, 2, {-10,10,-1e-10,1e-10,-10,10});
 
     mymesh3.load("cmutperiodic.msh", 0);
 

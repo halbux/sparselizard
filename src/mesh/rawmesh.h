@@ -123,11 +123,11 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::vector<int> getphysicalregionnumbers(int dim = -1);
         
         // Additional region selection tools. Will become effective only after loading the mesh. Can reuse previous selections!
-        void regionskin(int newphysreg, int physregtoskin);
-        void boxselection(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
-        void sphereselection(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
-        void layerselection(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers);
-        void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
+        void selectskin(int newphysreg, int physregtoskin);
+        void selectbox(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
+        void selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
+        void selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers);
+        void selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
         
 
         bool adapthp(int verbosity);
