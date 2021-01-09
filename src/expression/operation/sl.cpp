@@ -26,7 +26,7 @@ double sl::getpi(void)
     return 3.1415926535897932384;
 }
 
-int sl::regionunion(std::vector<int> physregs)
+int sl::selectunion(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
     universe::mymesh->getphysicalregions()->errornotsamedim(physregs);
@@ -35,7 +35,7 @@ int sl::regionunion(std::vector<int> physregs)
     return (universe::mymesh->getphysicalregions())->createunion(physregs, false);
 }
 
-int sl::regionintersection(std::vector<int> physregs)
+int sl::selectintersection(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
     
@@ -43,7 +43,7 @@ int sl::regionintersection(std::vector<int> physregs)
     return (universe::mymesh->getphysicalregions())->createintersection(physregs, false);
 }
 
-int sl::regionall(void)
+int sl::selectall(void)
 {
     universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunionofall(false);
     return (universe::mymesh->getphysicalregions())->createunionofall(false);

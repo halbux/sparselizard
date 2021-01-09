@@ -42,9 +42,9 @@ int main(void)
     mymesh.write("cmutaxisym.msh");
     
     // Define additional regions:
-    int contact = regionintersection({membrane, cavity});
-    int solid = regionunion({membrane, pillar, insulator});
-    int wholedomain = regionunion({solid,cavity});
+    int contact = selectintersection({membrane, cavity});
+    int solid = selectunion({membrane, pillar, insulator});
+    int wholedomain = selectunion({solid,cavity});
     
     // Nodal shape functions 'h1' for v (the electric potential) and 
     // u (membrane displacement). Three components are used for u.

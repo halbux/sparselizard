@@ -25,9 +25,9 @@ int main(void)
     mesh mymesh("inductionheating.msh");
     
     // Define extra regions for convenience:
-    int conductor = regionunion({coil,tube});
-    int wholedomain = regionunion({conductor,air});
-    domainboundary = regionunion({domainboundary,vin,vout});
+    int conductor = selectunion({coil,tube});
+    int wholedomain = selectunion({conductor,air});
+    domainboundary = selectunion({domainboundary,vin,vout});
     
     parameter mu, sigma;
     // Define the magnetic permeability mu [H/m] everywhere (the materials here are not magnetic):

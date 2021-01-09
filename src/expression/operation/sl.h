@@ -39,9 +39,9 @@ namespace sl
     double getpi(void);
 
     // Perform operations (union, intersection) on physical regions:
-    int regionunion(std::vector<int> physregs);
-    int regionintersection(std::vector<int> physregs);
-    int regionall(void);
+    int selectunion(std::vector<int> physregs);
+    int selectintersection(std::vector<int> physregs);
+    int selectall(void);
     
     // Check if a region is defined/empty/fully included in another region/touches another region:
     bool isregiondefined(int physreg);

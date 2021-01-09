@@ -43,8 +43,8 @@ double hadapt2d(void)
 
     mesh mymesh("2d.msh");
 
-    int sur = regionunion({s1,s2,s3,s4});
-    int lin = regionunion({l1,l2,l3,l4});
+    int sur = selectunion({s1,s2,s3,s4});
+    int lin = selectunion({l1,l2,l3,l4});
 
     field v("h1"), x("x"), y("y");
 

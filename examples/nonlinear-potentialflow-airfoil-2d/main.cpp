@@ -16,7 +16,7 @@ int main(void)
     mesh mymesh("airfoil2D.msh");
     
     // Define the whole outer boundary:
-    int gammaouter = regionunion({upstream, downstream});
+    int gammaouter = selectunion({upstream, downstream});
     
     // Define the velocity potential field 'phi' with standard nodal shape functions ("h1").
     // grad(phi) is the fluid velocity. Field x is the x coordinate field.

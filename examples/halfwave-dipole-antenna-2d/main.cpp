@@ -22,7 +22,7 @@ int main(void)
     mesh mymesh("dipoleantenna.msh");
     
     // Define the whole non-conducting region for convenience:
-    int wholedomain = regionunion({air, feed});
+    int wholedomain = selectunion({air, feed});
     
     // Edge shape functions 'hcurl' for the electric field E.
     // Because of the propagating EM waves the electric field has an 

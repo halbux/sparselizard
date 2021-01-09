@@ -19,8 +19,8 @@ int main(void)
     mesh mymesh("halbacharray.msh");
 
     // Define new physical regions for convenience:
-    int magnets = regionunion({magnet1, magnet2, magnet3, magnet4, magnet5});
-    int wholedomain = regionunion({magnets, steel, air});
+    int magnets = selectunion({magnet1, magnet2, magnet3, magnet4, magnet5});
+    int wholedomain = selectunion({magnets, steel, air});
 
     // Nodal shape functions 'h1' for the magnetic scalar potential 'phi'.
     field phi("h1");
@@ -97,7 +97,7 @@ int main(void)
 
     // Write 20 magnetic field lines starting on the top side of the magnet array:
     shape ln("line", -1, {-0.025,0.01,0, 0.025,0.01,0}, 20);
-    (-grad(phi)).streamline(regionunion({air, steel}), "magneticfieldline.pos", ln.getcoords(), 0.01/5);
+    (-grad(phi)).streamline(selectunion({air, steel}), "magneticfieldline.pos", ln.getcoords(), 0.01/5);
 
 
     // Calculate and print the total force on the steel disk:

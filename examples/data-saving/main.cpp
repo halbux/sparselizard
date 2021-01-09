@@ -20,7 +20,7 @@ void sparselizard(bool iswritemode)
         shape l2 = t2.getsons()[0];
         l2.setphysicalregion(right);
         mesh mymesh({t1,t2,l1,l2});
-        int all = regionunion({surleft,surright});
+        int all = selectunion({surleft,surright});
 
         field u("h1xy", {2,3}), x("x"), y("y");
         

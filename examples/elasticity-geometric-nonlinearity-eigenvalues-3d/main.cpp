@@ -22,7 +22,7 @@ int main(void)
     mesh mymesh("disk.msh");
     
     // Define the whole domain for convenience:
-    int vol = regionunion({botlayer, toplayer});
+    int vol = selectunion({botlayer, toplayer});
     
     // Nodal shape functions 'h1' with 3 components.
     // Field u is the membrane deflection.

@@ -18,7 +18,7 @@ int main(void)
     mesh mymesh("rc.msh");
     
     // Define the whole domain for convenience:
-    int wholedomain = regionunion({conductor, dielectric});
+    int wholedomain = selectunion({conductor, dielectric});
     
     // Nodal shape functions 'h1' for the electric potential field.
     // Harmonics 2 and 3 are respectively the in-phase and quadrature 

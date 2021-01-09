@@ -24,8 +24,8 @@ int main(void)
     mesh mymesh("cmutperiodic.msh");
 
     // The periodic condition is only applied to the solid region:
-    gamma1 = regionintersection({gamma1, solid});
-    gamma2 = regionintersection({gamma2, solid});
+    gamma1 = selectintersection({gamma1, solid});
+    gamma2 = selectintersection({gamma2, solid});
 
 
     wallclock clk;
@@ -93,9 +93,9 @@ void processmesh(void)
 
     mymesh1.load("cmutperiodic.nas", 0);
 
-    int vac = regionunion({4001,4005});
-    int solid = regionunion({4002,4003,4004,4006});
-    int all = regionunion({vac,solid});
+    int vac = selectunion({4001,4005});
+    int solid = selectunion({4002,4003,4004,4006});
+    int all = selectunion({vac,solid});
 
     // Rotate the mesh to easily select the bottom side for the periodic condition:
     mymesh1.rotate(0,0,30);

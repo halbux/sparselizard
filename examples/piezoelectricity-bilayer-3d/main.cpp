@@ -17,7 +17,7 @@ int main(void)
     
     mesh mymesh("bilayer.msh");
     
-    int wholedomain = regionunion({pztlayer, siliconlayer});
+    int wholedomain = selectunion({pztlayer, siliconlayer});
     
     // Harmonic analysis. Set the fundamental frequency [Hz]:
     setfundamentalfrequency(1e4);

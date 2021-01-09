@@ -24,12 +24,12 @@ int main(void)
 	// The domain regions as defined in 'hand_geom.geo':
     int fluid = 1, disk = 2, inlet = 3, outlet = 4, sides = 5;
 	
-	int all = regionunion({fluid, disk});
-	int diskskin = regionintersection({fluid, disk});
+	int all = selectunion({fluid, disk});
+	int diskskin = selectintersection({fluid, disk});
 	
-	int zflux = regionunion({sides, outlet});
-	int noslip = regionunion({sides, diskskin});
-	int fluidskin = regionunion({sides, diskskin, inlet, outlet});
+	int zflux = selectunion({sides, outlet});
+	int noslip = selectunion({sides, diskskin});
+	int fluidskin = selectunion({sides, diskskin, inlet, outlet});
 
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components in 2D.
     // Field p and T are the relative pressure andtemperature respectively. 

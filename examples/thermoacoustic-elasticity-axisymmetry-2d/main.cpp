@@ -49,9 +49,9 @@ int main(void)
     // Write the mesh for display:
     mymesh.write("geometry.msh");
     // Define additional regions:
-    int fluid = regionunion({cavity,outair});
-    int mechacoucoupl = regionintersection({fluid,membrane});
-    int slip = regionunion({botcoupl,wall});
+    int fluid = selectunion({cavity,outair});
+    int mechacoucoupl = selectintersection({fluid,membrane});
+    int slip = selectunion({botcoupl,wall});
 
 
     //Unknown fields defintion
@@ -170,7 +170,7 @@ int main(void)
     //no slip on the wall
     v.setconstraint(wall);
     //isothermal on the interfaces
-    T.setconstraint(regionunion({botcoupl,wall}));
+    T.setconstraint(selectunion({botcoupl,wall}));
     //symmetry (axial case : for pure 2D, not in axisym)
     //v.compx().setconstraint(axis);
     //u.compx().setconstraint(axis);

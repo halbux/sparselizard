@@ -27,13 +27,13 @@ double sparselizard(double alpha)
     mesh mymesh(false, {"rotor.msh", "stator.msh"}, 0);
 
     // Define new physical regions for convenience:
-    int rotor = regionunion({rotmagmat, magnet, magnetgap, gaprot});
-    int windings = regionunion({winda, windb, windc});
-    int stator = regionunion({gapstat, windslot, statmagmat, windings});
-    int nonmag = regionunion({magnet, magnetgap, gaprot, gapstat, windslot, windings});
-    int gamma1 = regionunion({gamma1rot,gamma1stat});
-    int gamma2 = regionunion({gamma2rot,gamma2stat});
-    int all = regionunion({rotor,stator});
+    int rotor = selectunion({rotmagmat, magnet, magnetgap, gaprot});
+    int windings = selectunion({winda, windb, windc});
+    int stator = selectunion({gapstat, windslot, statmagmat, windings});
+    int nonmag = selectunion({magnet, magnetgap, gaprot, gapstat, windslot, windings});
+    int gamma1 = selectunion({gamma1rot,gamma1stat});
+    int gamma2 = selectunion({gamma2rot,gamma2stat});
+    int all = selectunion({rotor,stator});
     
     mymesh.rotate(rotor, 0,0,alpha);
 

@@ -35,10 +35,10 @@ int main(void)
     mymesh.selectskin(bound, all);
     mymesh.load("optical_waveguide.msh");
     
-    int waveguides = regionunion({wavg1, wavg2});
+    int waveguides = selectunion({wavg1, wavg2});
     
     // Waveguide boundary plotting:
-    expression(1).write(regionintersection({waveguides, clad}), "skin.vtu");
+    expression(1).write(selectintersection({waveguides, clad}), "skin.vtu");
 
     wallclock clk;
 
@@ -133,7 +133,7 @@ int main(void)
             double neffc = btc/k0;
             // We need to write separately on the clad and waveguide regions to visualize the discontinuity:
             Etotal.write(clad, "Eclad_"+ std::to_string(index) +".vtu", 2);
-            Etotal.write(regionunion({wavg1,wavg2}), "Ewav_"+ std::to_string(index) +".vtu", 2);
+            Etotal.write(selectunion({wavg1,wavg2}), "Ewav_"+ std::to_string(index) +".vtu", 2);
             // Display mode information:
             std::cout << "Mode " << index << ": beta = " << btc << " rad/m, neff = " << neffc << std::endl;
 

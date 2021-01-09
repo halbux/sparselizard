@@ -31,7 +31,7 @@ int main(void)
 	mesh mymesh("magmesh.msh");
 
 	// Define the whole volume region for convenience:
-	int wholedomain = regionunion({conductor,shield,air});
+	int wholedomain = selectunion({conductor,shield,air});
 
 	// Define the magnetic permeability mu [H/m] in the air, conductor (aluminium) and magnetic shield (steel):
 	double mu0 = 4*getpi()*1e-7;

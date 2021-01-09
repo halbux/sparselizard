@@ -40,7 +40,7 @@ int main(void)
     mesh mymesh("fsimicropillar.msh");
 
     // Define the fluid-structure interface:
-    int fsinterface = regionintersection({fluid, solid});
+    int fsinterface = selectintersection({fluid, solid});
 
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components in 2D.
     // Field p is the relative pressure. Field u is the mechanical deflection. Field umesh stores
@@ -71,7 +71,7 @@ int main(void)
 
     // Mesh deformation field umesh is forced to 0 on the fluid boundary, 
     // to u on the solid and smoothed with a Laplace formulation in the fluid.
-    umesh.setconstraint(regionunion({inlet,outlet,sides})); umesh.setconstraint(solid, u);
+    umesh.setconstraint(selectunion({inlet,outlet,sides})); umesh.setconstraint(solid, u);
 
     // Classical Laplace formulation for each component:
     formulation laplacian;

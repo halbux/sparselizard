@@ -26,11 +26,11 @@ int main(void)
     mesh mymesh("cmut2d.msh");
     
     // Define the region for the mechanical problem:
-    int solid = regionunion({insulator, pillars, membrane});
+    int solid = selectunion({insulator, pillars, membrane});
     // Define the region for the electric problem:
-    int electricdomain = regionunion({insulator, pillars, membrane, vacuumgap});
+    int electricdomain = selectunion({insulator, pillars, membrane, vacuumgap});
     // Define the membrane top line:
-    int membranetop = regionintersection({membrane, fluid});
+    int membranetop = selectintersection({membrane, fluid});
     
     // Nodal shape functions 'h1' for the electric potential field v, acoustic pressure
     // field p and membrane deflection u (u has components x and y).

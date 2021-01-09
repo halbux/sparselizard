@@ -27,7 +27,7 @@ int main(void)
     mesh mymesh("tubeinair.msh");
     
     // Define the whole domain for convenience:
-    int wholedomain = regionunion({tube, air});
+    int wholedomain = selectunion({tube, air});
     
     // Magnetic permeability of the air:
     double mu = 4.0*getpi()*1e-7;
