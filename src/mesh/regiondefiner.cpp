@@ -347,6 +347,31 @@ void regiondefiner::definelayerregion(int regnum)
     newphysreg->removeduplicatedelements();
 }
 
+void regiondefiner::defineanynoderegion(int regnum)
+{
+    myphysicalregions->errorundefined({toanynode[regnum]});
+        
+    physicalregion* newphysreg = myphysicalregions->get(anynoded[regnum]);
+    physicalregion* origphysreg = myphysicalregions->get(toanynode[regnum]);
+    
+    std::vector<std::vector<int>>* elemsinor = origphysreg->getelementlist();
+    
+    // Loop on all element types:
+    for (int i = 0; i <= 7; i++)
+    {
+        std::vector<int>* curelemtype = &(elemsinor->at(i));
+        
+        if (curelemtype->size() > 0)
+        {
+            int selnode = myelements->getsubelement(0, i, curelemtype->at(0), 0);
+            newphysreg->addelement(0, selnode);
+         
+            break;   
+        }
+    }
+    newphysreg->removeduplicatedelements();
+}
+
 regiondefiner::regiondefiner(nodes& inputnodes, elements& inputelems, physicalregions& inputphysregs)
 {
     mynodes = &inputnodes;
@@ -449,6 +474,16 @@ void regiondefiner::regionlayer(int newphysreg, int physregtoselectfrom, int phy
     numlayers.push_back(nl);
 }
 
+void regiondefiner::regionanynode(int newphysreg, int physregtoselectfrom)
+{
+    int cur = toanynode.size();
+    std::vector<int> prio = {5,cur};
+    mypriority.push_back(prio);
+    
+    anynoded.push_back(newphysreg);
+    toanynode.push_back(physregtoselectfrom);
+}
+
 bool regiondefiner::isanyregiondefined(void)
 {
     return (mypriority.size() > 0);
@@ -480,6 +515,8 @@ void regiondefiner::defineregions(void)
             defineexclusionregion(mypriority[i][1]);
         if (mypriority[i][0] == 4)
             definelayerregion(mypriority[i][1]);
+        if (mypriority[i][0] == 5)
+            defineanynoderegion(mypriority[i][1]);
     }
 }
 

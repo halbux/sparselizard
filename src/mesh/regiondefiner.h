@@ -79,12 +79,20 @@ class regiondefiner
         // List of number of layers to select:
         std::vector<int> numlayers = {}; 
         
+        // ANY NODE SELECTION (operation type 5)
+        //
+        // List of new node regions:
+        std::vector<int> anynoded = {};
+        // List of physical regions from which any node is requested:
+        std::vector<int> toanynode = {};
+        
 
         void defineskinregion(int regnum);
         void defineboxregion(int regnum);
         void definesphereregion(int regnum);
         void defineexclusionregion(int regnum);
         void definelayerregion(int regnum);
+        void defineanynoderegion(int regnum);
 
     public:
 
@@ -96,6 +104,7 @@ class regiondefiner
         void regionsphere(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius, int physregtosphere);
         void regionexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
         void regionlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int nl);
+        void regionanynode(int newphysreg, int physregtoselectfrom);
 
         bool isanyregiondefined(void);
         bool isanycoordinatedependentregiondefined(void);

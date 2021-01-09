@@ -220,6 +220,12 @@ void mesh::selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector
     rawmeshptr->selectexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
 }
 
+void mesh::selectanynode(int newphysreg, int physregtoselectfrom)
+{
+    errorifloaded();
+    rawmeshptr->selectanynode(newphysreg, physregtoselectfrom);
+}
+
 void mesh::use(void)
 {
     errorifnotloaded();

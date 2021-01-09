@@ -88,6 +88,7 @@ class mesh
         void selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
         void selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers);
         void selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
+        void selectanynode(int newphysreg, int physregtoselectfrom);
         
         // Set this mesh as the one to use:
         void use(void);

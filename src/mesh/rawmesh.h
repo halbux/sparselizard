@@ -128,6 +128,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
         void selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers);
         void selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
+        void selectanynode(int newphysreg, int physregtoselectfrom);
         
 
         bool adapthp(int verbosity);

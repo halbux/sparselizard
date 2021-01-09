@@ -769,6 +769,11 @@ void rawmesh::selectexclusion(int newphysreg, int physregtoexcludefrom, std::vec
     myregiondefiner.regionexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
 }
 
+void rawmesh::selectanynode(int newphysreg, int physregtoselectfrom)
+{
+    myregiondefiner.regionanynode(newphysreg, physregtoselectfrom);
+}
+
 
 bool rawmesh::adapthp(int verbosity)
 {
