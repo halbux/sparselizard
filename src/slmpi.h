@@ -23,13 +23,19 @@ namespace slmpi
     
     void barrier(void);
 
+    void send(int destination, int tag, int len, int* data);
+    void send(int destination, int tag, int len, double* data);
     void send(int destination, int tag, std::vector<int>& data);
     void send(int destination, int tag, std::vector<double>& data);
     // Data vector must be preallocated to the correct size:
+    void receive(int source, int tag, int len, int* data);
+    void receive(int source, int tag, int len, double* data);
     void receive(int source, int tag, std::vector<int>& data);
     void receive(int source, int tag, std::vector<double>& data);
     
     // Sum values from all ranks and distribute the result back to all ranks:
+    void sum(int len, int* data);
+    void sum(int len, double* data);
     void sum(std::vector<int>& data);
     void sum(std::vector<double>& data);
     
@@ -37,9 +43,6 @@ namespace slmpi
     // Data vector must be preallocated to the correct size:
     void broadcast(int broadcaster, std::vector<int>& data);
     void broadcast(int broadcaster, std::vector<double>& data);
-
-    // Returns on the gatherer a vector with an int value from all ranks:
-    std::vector<int> gather(int gatherer, int value);
 
     // Gather fixed size fragments in the gatherer:
     void gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered);

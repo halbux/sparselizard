@@ -16,15 +16,20 @@ void slmpi::finalize(void) {}
 int slmpi::getrank(void) { return 0; }
 int slmpi::count(void) { return 1; }
 void slmpi::barrier(void) {}
+void slmpi::send(int destination, int tag, int len, int* data) { errornompi(); }
+void slmpi::send(int destination, int tag, int len, double* data) { errornompi(); }
 void slmpi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
+void slmpi::receive(int source, int tag, int len, int* data) { errornompi(); }
+void slmpi::receive(int source, int tag, int len, double* data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
+void slmpi::sum(int len, int* data) {}
+void slmpi::sum(int len, double* data) {}
 void slmpi::sum(std::vector<int>& data) {}
 void slmpi::sum(std::vector<double>& data) {}
 void slmpi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
 void slmpi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
-std::vector<int> slmpi::gather(int gatherer, int value) { errornompi(); abort(); }
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered) { errornompi(); }
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes) { errornompi(); }
@@ -73,6 +78,16 @@ void slmpi::barrier(void)
 }
 
 
+void slmpi::send(int destination, int tag, int len, int* data)
+{
+    MPI_Send(data, len, MPI_INT, destination, tag, MPI_COMM_WORLD);
+}
+
+void slmpi::send(int destination, int tag, int len, double* data)
+{
+    MPI_Send(data, len, MPI_DOUBLE, destination, tag, MPI_COMM_WORLD);
+}
+
 void slmpi::send(int destination, int tag, std::vector<int>& data)
 {
     MPI_Send(&data[0], data.size(), MPI_INT, destination, tag, MPI_COMM_WORLD);
@@ -84,6 +99,16 @@ void slmpi::send(int destination, int tag, std::vector<double>& data)
 }
 
 
+void slmpi::receive(int source, int tag, int len, int* data)
+{
+    MPI_Recv(data, len, MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+}
+
+void slmpi::receive(int source, int tag, int len, double* data)
+{
+    MPI_Recv(data, len, MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+}
+
 void slmpi::receive(int source, int tag, std::vector<int>& data)
 {
     MPI_Recv(&data[0], data.size(), MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -94,6 +119,16 @@ void slmpi::receive(int source, int tag, std::vector<double>& data)
     MPI_Recv(&data[0], data.size(), MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
+
+void slmpi::sum(int len, int* data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data, len, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+}
+
+void slmpi::sum(int len, double* data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data, len, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+}
 
 void slmpi::sum(std::vector<int>& data)
 {
@@ -114,18 +149,6 @@ void slmpi::broadcast(int broadcaster, std::vector<int>& data)
 void slmpi::broadcast(int broadcaster, std::vector<double>& data)
 {
     MPI_Bcast(&data[0], data.size(), MPI_DOUBLE, broadcaster, MPI_COMM_WORLD);
-}
-
-std::vector<int> slmpi::gather(int gatherer, int value)
-{
-    std::vector<int> gathered = {};
-    
-    if (getrank() == gatherer)
-        gathered.resize(count());
-
-    MPI_Gather(&value, 1, MPI_INT, &gathered[0], 1, MPI_INT, gatherer, MPI_COMM_WORLD); 
-    
-    return gathered;
 }
 
 
