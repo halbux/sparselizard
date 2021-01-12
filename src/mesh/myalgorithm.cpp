@@ -1166,12 +1166,10 @@ std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), 
     
     // Standard Gramm-Schmidt orthogonalization:
     densematrix h = Q.getresized(k+1,n).multiply(q);
-    std::vector<double> hvec;
-    h.getvalues(hvec);
+    h = h.getresized(1,k+1);
     
-    slmpi::sum(hvec); // reduce on all ranks
+    slmpi::sum(k+1, h.getvalues()); // reduce on all ranks
     
-    h = densematrix(1, k+1, hvec);
     densematrix Qh = h.multiply(Q.getresized(k+1,n));
     double* Qhptr = Qh.getvalues();
     
@@ -1183,18 +1181,18 @@ std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), 
         normqfrag += qptr[i]*qptr[i];
     }
         
-    std::vector<double> temp = {normqfrag};
+    slmpi::sum(1, &normqfrag); // reduce on all ranks
     
-    slmpi::sum(temp); // reduce on all ranks
-    
-    double normq = std::sqrt(temp[0]);
-        
-    hvec.push_back(normq);
+    double normq = std::sqrt(normqfrag);
 
     // Norm the Krylov vector and place it in Q:
     double invnormq = 1.0/normq;
     for (int i = 0; i < n; i++)
         Qptr[(k+1)*n+i] = invnormq * qptr[i];
+    
+    std::vector<double> hvec;
+    h.getvalues(hvec);
+    hvec.push_back(normq);
     
     return hvec;
 }
