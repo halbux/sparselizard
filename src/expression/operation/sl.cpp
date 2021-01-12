@@ -1606,7 +1606,7 @@ void sl::solve(std::vector<formulation> formuls)
         solve(formuls[i]);
 }
 
-std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol)
+std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity)
 {   
     if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
     {
@@ -1679,6 +1679,9 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     int k = 0;
     for (k = 0; k < maxits; k++)
     {
+        if (verbosity > 0)
+            std::cout << "gmres @" << k << " -> " << relresvec[k] << std::endl;
+            
         if (relresvec[k] <= relrestol)
             break;
             
