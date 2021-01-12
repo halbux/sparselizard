@@ -1197,3 +1197,23 @@ std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), 
     return hvec;
 }
 
+int myalgorithm::squeeze(std::vector<int>& nums, int maxval, std::vector<int>& renumbering)
+{
+    std::vector<bool> isactive(maxval+1, false);
+    for (int i = 0; i < nums.size(); i++)
+        isactive[nums[i]] = true;
+
+    int index = 0;
+    renumbering = std::vector<int>(maxval+1, -1);
+    for (int i = 0; i < maxval+1; i++)
+    {
+        if (isactive[i])
+        {
+            renumbering[i] = index;
+            index++;
+        }
+    }
+
+    return index;
+}
+

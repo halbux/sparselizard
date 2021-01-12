@@ -173,6 +173,10 @@ namespace myalgorithm
     // Column k of the unreduced upper Hessenberg matrix is returned (length k+2):
     std::vector<double> arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k);
     
+    // Create a vector to renumber integer values with gaps to values without gap.
+    // Integers must all be positive or zero. The number of unique integers is returned.
+    int squeeze(std::vector<int>& nums, int maxval, std::vector<int>& renumbering);
+    
 };
 
 #endif
