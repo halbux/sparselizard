@@ -120,6 +120,9 @@ namespace myalgorithm
     std::vector<bool> inttobinary(int numbits, int num);
     int binarytoint(std::vector<bool> num);
     
+    // Return the exact conversion from integer to double (throw an error if not possible):
+    double exactinttodouble(long long int num);
+    
     // Output a unique number for each combination of number inequalities (no equality allowed).
     // The output is a number ranging from 0 to numbers.size()! - 1.
     int identifyrelations(std::vector<int> numbers);
