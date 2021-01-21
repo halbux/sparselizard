@@ -13,6 +13,7 @@ FIND_PATH(MPI_INCLUDE_PATH
     PATHS
     /usr/include/mpich-x86_64
     /usr/include/openmpi-x86_64
+    NO_DEFAULT_PATH
     )
 
 if(MPI_INCLUDE_PATH)
@@ -28,6 +29,7 @@ FIND_LIBRARY(MPI_LIBRARIES
     PATHS
     /usr/lib64/mpich/lib
     /usr/lib64/openmpi/lib
+    NO_DEFAULT_PATH
     )
 
 if(MPI_LIBRARIES)

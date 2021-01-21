@@ -6,6 +6,7 @@ FIND_PATH(PETSC_INCLUDE_PATH
     NAMES petsc.h
     PATHS
     "${PETSC_PATH}/include"
+    NO_DEFAULT_PATH
     )
 
 if(PETSC_INCLUDE_PATH)
@@ -20,6 +21,7 @@ FIND_PATH(PETSCCONF_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
+    NO_DEFAULT_PATH
     )
 
 if(PETSCCONF_INCLUDE_PATH)
@@ -36,6 +38,7 @@ FIND_LIBRARY(PETSC_LIBRARIES
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
+    NO_DEFAULT_PATH
     )
 
 if(PETSC_LIBRARIES)

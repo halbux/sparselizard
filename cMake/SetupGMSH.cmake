@@ -6,6 +6,7 @@ FIND_PATH(GMSH_INCLUDE_PATH
     NAMES gmsh.h
     PATHS
     "${GMSH_PATH}/include"
+    NO_DEFAULT_PATH
     )
 
 if(GMSH_INCLUDE_PATH)
@@ -20,6 +21,7 @@ FIND_LIBRARY(GMSH_LIBRARIES
     NAMES gmsh
     PATHS
     "${GMSH_PATH}/lib"
+    NO_DEFAULT_PATH
     )
 
 if(GMSH_LIBRARIES)

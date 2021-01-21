@@ -8,6 +8,7 @@ FIND_PATH(SLEPC_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
+    NO_DEFAULT_PATH
     )
 
 if(SLEPC_INCLUDE_PATH)
@@ -24,6 +25,7 @@ FIND_LIBRARY(SLEPC_LIBRARIES
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
+    NO_DEFAULT_PATH
     )
 
 if(SLEPC_LIBRARIES)
