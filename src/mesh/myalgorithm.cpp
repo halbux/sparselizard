@@ -1289,3 +1289,39 @@ int myalgorithm::findcoordinates(std::vector<double>& targetcoords, std::vector<
     return numfound;
 }
 
+void myalgorithm::selectcoordinates(std::vector<bool>& selection, std::vector<double>& coords, double* selectedcoords)
+{
+    int index = 0;
+    for (int i = 0; i < selection.size(); i++)
+    {
+        if (selection[i])
+        {
+            selectedcoords[3*index+0] = coords[3*i+0];
+            selectedcoords[3*index+1] = coords[3*i+1];
+            selectedcoords[3*index+2] = coords[3*i+2];
+            
+            index++;
+        }
+    }
+}
+
+void myalgorithm::pickcandidates(int numbertopick, std::vector<double>& candidatecoordinates, std::vector<double>& picked)
+{
+    picked = {};
+    
+    if (numbertopick <= 0 || candidatecoordinates.size() == 0)
+        return;
+
+    picked = std::vector<double>(3*numbertopick);
+
+    // Guarantee to stay inside candidate coordinate vector:
+    int spacing = std::floor( (candidatecoordinates.size()/3-1) / numbertopick);
+
+    for (int i = 0; i < numbertopick; i++)
+    {
+        picked[3*i+0] = candidatecoordinates[3*i*spacing+0];
+        picked[3*i+1] = candidatecoordinates[3*i*spacing+1];
+        picked[3*i+2] = candidatecoordinates[3*i*spacing+2];
+    }
+}
+
