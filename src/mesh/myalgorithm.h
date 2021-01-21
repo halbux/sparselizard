@@ -180,6 +180,9 @@ namespace myalgorithm
     // Integers must all be positive or zero. The number of unique integers is returned.
     int squeeze(std::vector<int>& nums, int maxval, std::vector<int>& renumbering);
     
+    // Set 'numtrue' to -1 if the number of true entries is not known:
+    void find(std::vector<bool>& invec, int numtrue, std::vector<int>& trueindexes);
+    
 };
 
 #endif

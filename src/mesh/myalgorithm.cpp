@@ -1229,3 +1229,28 @@ int myalgorithm::squeeze(std::vector<int>& nums, int maxval, std::vector<int>& r
     return index;
 }
 
+void myalgorithm::find(std::vector<bool>& invec, int numtrue, std::vector<int>& trueindexes)
+{
+    if (numtrue == -1)
+    {
+        numtrue = 0;
+        for (int i = 0; i < invec.size(); i++)
+        {
+            if (invec[i])
+                numtrue++;
+        }
+    }
+    
+    trueindexes = std::vector<int>(numtrue);
+    
+    int ind = 0;
+    for (int i = 0; i < invec.size(); i++)
+    {
+        if (invec[i])
+        {
+            trueindexes[ind] = i;
+            ind++;
+        }
+    }
+}
+
