@@ -1254,3 +1254,38 @@ void myalgorithm::find(std::vector<bool>& invec, int numtrue, std::vector<int>& 
     }
 }
 
+int myalgorithm::findcoordinates(std::vector<double>& targetcoords, std::vector<double>& tofindintarget, std::vector<int>& posfound)
+{
+    int nct = targetcoords.size()/3;
+    int ncf = tofindintarget.size()/3;
+
+    // Place all in one vector:
+    std::vector<double> allcoords(targetcoords.size()+tofindintarget.size());
+    for (int i = 0; i < targetcoords.size(); i++)
+        allcoords[i] = targetcoords[i];
+    for (int i = 0; i < tofindintarget.size(); i++)
+        allcoords[targetcoords.size()+i] = tofindintarget[i];
+
+    std::vector<int> renumberingvector;
+    myalgorithm::removeduplicates(allcoords, renumberingvector);
+
+    // This is needed for general renumbering vectors (also allows duplicates in the target):
+    std::vector<int> targetpositions(nct+ncf, -1);
+    for (int i = 0; i < nct; i++)
+        targetpositions[renumberingvector[i]] = i;
+
+    int numfound = 0;
+    posfound = std::vector<int>(ncf, -1);
+    for (int i = 0; i < ncf; i++)
+    {
+        int renumed = renumberingvector[nct+i];
+        if (targetpositions[renumed] != -1)
+        {
+            posfound[i] = targetpositions[renumed];
+            numfound++;
+        }
+    }
+
+    return numfound;
+}
+

@@ -183,6 +183,10 @@ namespace myalgorithm
     // Set 'numtrue' to -1 if the number of true entries is not known:
     void find(std::vector<bool>& invec, int numtrue, std::vector<int>& trueindexes);
     
+    // For each coordinate to find this gives the index of the coordinate matched in the target (-1 if not found in the target).
+    // The number of matches is returned. It is allowed to have duplicate coordinates in the target.
+    int findcoordinates(std::vector<double>& targetcoords, std::vector<double>& tofindintarget, std::vector<int>& posfound);
+    
 };
 
 #endif
