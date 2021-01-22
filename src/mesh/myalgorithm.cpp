@@ -1325,3 +1325,60 @@ void myalgorithm::pickcandidates(int numbertopick, std::vector<double>& candidat
     }
 }
 
+void myalgorithm::split(std::vector< std::vector<std::vector<double>> >& data, std::vector<double>& dataa, std::vector<double>& datab, std::vector<std::vector<int>>& sizesa, std::vector<std::vector<int>>& sizesb)
+{
+    int sizea = 0;
+    int sizeb = 0;
+
+    sizesa.resize(data.size());
+    sizesb.resize(data.size());
+
+    for (int i = 0; i < data.size(); i++)
+    {
+        sizesa[i] = std::vector<int>(data[i].size(), 0);
+        sizesb[i] = std::vector<int>(data[i].size(), 0);
+
+        for (int j = 0; j < data[i].size(); j++)
+        {
+            if (data[i][j].size() >= 2)
+            {
+                int csa = (int)data[i][j][0];
+                int csb = (int)data[i][j][1];
+
+                sizesa[i][j] = csa;
+                sizesb[i][j] = csb;
+
+                sizea += csa;
+                sizeb += csb;
+            }
+        }
+    }
+
+    dataa = std::vector<double>(sizea);
+    datab = std::vector<double>(sizeb);
+
+    int indexa = 0;
+    int indexb = 0;
+
+    for (int i = 0; i < data.size(); i++)
+    {
+        for (int j = 0; j < data[i].size(); j++)
+        {
+            if (data[i][j].size() >= 2)
+            {
+                int csa = (int)data[i][j][0];
+                int csb = (int)data[i][j][1];
+
+                for (int k = 0; k < csa; k++)
+                    dataa[indexa+k] = data[i][j][2+k];
+
+                for (int k = 0; k < csb; k++)
+                    datab[indexb+k] = data[i][j][2+csa + k];
+
+                indexa += csa;
+                indexb += csb;
+            }
+        }
+    }
+}
+

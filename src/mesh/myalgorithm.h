@@ -193,6 +193,12 @@ namespace myalgorithm
     // From the candidates vector pick a set of coordinates that have rather equally spaced (possibly NOT UNIQUE) indexes:
     void pickcandidates(int numbertopick, std::vector<double>& candidatecoordinates, std::vector<double>& picked);
     
+    // 'data[i][j]' is a vector that can either have size 0 or a size larger or equal to 2. In the latter case the vector
+    // is the result of the concatenation of two vectors a and b and has format {lengtha, lengthb, ... valuesa ..., ... valuesb ...}.
+    // This function extracts the sizes of each a/b vector into 'sizesa'/'sizesb' and concatenates 
+    // all valuesa/valuesb vectors together into the output 'dataa'/'datab'.
+    void split(std::vector< std::vector<std::vector<double>> >& data, std::vector<double>& dataa, std::vector<double>& datab, std::vector<std::vector<int>>& sizesa, std::vector<std::vector<int>>& sizesb);
+    
 };
 
 #endif
