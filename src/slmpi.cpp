@@ -277,3 +277,71 @@ std::vector<double> slmpi::ping(int messagesize, int verbosity)
 
 #endif
 
+
+
+// The functions below do not call MPI themselves and therefore do not need to be in the mpi available check:
+
+std::vector<int> slmpi::broadcastgathered(std::vector<int> valuestoinclude, std::vector<int>& fragment, std::vector<int>& data)
+{
+    int numranks = count();
+
+    int il = valuestoinclude.size();
+    int fl = fragment.size();
+    int tl = il+fl;
+
+    std::vector<int> tosend(tl);
+    for (int i = 0; i < il; i++)
+        tosend[i] = valuestoinclude[i];
+    for (int i = 0; i < fl; i++)
+        tosend[il+i] = fragment[i];
+
+    gather(0, tosend, data);
+    data.resize(numranks*tl); // only rank 0 has correct data size
+    broadcast(0, data);
+
+    std::vector<int> output(numranks*il);
+    
+    for (int r = 0; r < numranks; r++)
+    {
+        for (int i = 0; i < il; i++)
+            output[r*il+i] = data[r*tl + i];
+        for (int i = 0; i < fl; i++)
+            data[r*fl+i] = data[r*tl + il+i];
+    }
+    data.resize(numranks*fl);
+
+    return output;
+}
+
+std::vector<double> slmpi::broadcastgathered(std::vector<double> valuestoinclude, std::vector<double>& fragment, std::vector<double>& data)
+{
+    int numranks = count();
+
+    int il = valuestoinclude.size();
+    int fl = fragment.size();
+    int tl = il+fl;
+
+    std::vector<double> tosend(tl);
+    for (int i = 0; i < il; i++)
+        tosend[i] = valuestoinclude[i];
+    for (int i = 0; i < fl; i++)
+        tosend[il+i] = fragment[i];
+
+    gather(0, tosend, data);
+    data.resize(numranks*tl); // only rank 0 has correct data size
+    broadcast(0, data);
+
+    std::vector<double> output(numranks*il);
+    
+    for (int r = 0; r < numranks; r++)
+    {
+        for (int i = 0; i < il; i++)
+            output[r*il+i] = data[r*tl + i];
+        for (int i = 0; i < fl; i++)
+            data[r*fl+i] = data[r*tl + il+i];
+    }
+    data.resize(numranks*fl);
+
+    return output;
+}
+

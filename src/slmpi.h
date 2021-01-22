@@ -62,6 +62,11 @@ namespace slmpi
     
     // Send + receive time for 'messagesize' doubles. Timings in ns are returned on rank 0:
     std::vector<double> ping(int messagesize, int verbosity = 1);
+    
+    // Upon return 'data' contains the fragments from all ranks and the returned vector contains 'valuestoinclude' from all ranks.
+    // Only one gather and one broadcast call is done. The fragment size and number of values to include must be identical on each rank. 
+    std::vector<int> broadcastgathered(std::vector<int> valuestoinclude, std::vector<int>& fragment, std::vector<int>& data);
+    std::vector<double> broadcastgathered(std::vector<double> valuestoinclude, std::vector<double>& fragment, std::vector<double>& data);
 };
 
 #endif
