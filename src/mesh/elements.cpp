@@ -147,6 +147,36 @@ std::vector<bool> elements::isflipped(int subelementtypenumber, std::vector<int>
     return output;
 }
 
+int elements::istypeinelementlist(int elementtypenumber, std::vector<std::vector<int>>* elementlist, std::vector<bool>& isinelementlist)
+{
+    isinelementlist = std::vector<bool>(count(elementtypenumber), false);
+
+    int numinlist = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        element el(i);
+        int ns = el.counttype(elementtypenumber);
+        if (ns == 0)
+            continue;
+
+        for (int j = 0; j < elementlist->at(i).size(); j++)
+        {
+            int curelem = elementlist->at(i)[j];
+            for (int k = 0; k < ns; k++)
+            {
+                int cursub = getsubelement(elementtypenumber,i,curelem,k);
+                if (isinelementlist[cursub] == false)
+                {
+                    isinelementlist[cursub] = true;
+                    numinlist++;
+                }
+            }
+        }
+    }
+
+    return numinlist;
+}
+
 
 int elements::count(int elementtypenumber)
 {
@@ -519,6 +549,55 @@ std::vector<double>* elements::getboxdimensions(int elementtypenumber)
     }
     
     return &(boxdimensions[elementtypenumber]);
+}
+
+void elements::getbarycenters(std::vector<std::vector<int>>* elementlist, std::vector<double>& barycenters)
+{
+    int numelems = 0;
+    for (int i = 0; i < elementlist->size(); i++)
+        numelems += elementlist->at(i).size();
+
+    barycenters = std::vector<double>(3*numelems);
+
+    int index = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        if (elementlist->at(i).size() == 0)
+            continue;
+
+        double* bcs = &(getbarycenters(i)->at(0));
+        for (int j = 0; j < elementlist->at(i).size(); j++)
+        {
+            int elem = elementlist->at(i)[j];
+
+            barycenters[3*index+0] = bcs[3*elem+0];
+            barycenters[3*index+1] = bcs[3*elem+1];
+            barycenters[3*index+2] = bcs[3*elem+2];
+
+            index++;
+        }
+    }
+}
+
+void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, std::vector<double>& barycenters)
+{
+    int numelems = elementlist.size();
+    
+    barycenters = std::vector<double>(3*numelems);
+    
+    if (numelems == 0)
+        return;
+    
+    double* bcs = &(getbarycenters(elementtypenumber)->at(0));
+
+    for (int i = 0; i < numelems; i++)
+    {
+        int elem = elementlist[i];
+
+        barycenters[3*i+0] = bcs[3*elem+0];
+        barycenters[3*i+1] = bcs[3*elem+1];
+        barycenters[3*i+2] = bcs[3*elem+2];
+    }
 }
 
 std::vector<double> elements::getnormal(int elementtypenumber, int elementnumber)

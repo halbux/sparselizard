@@ -114,6 +114,10 @@ class elements
         // Check if a subelement has the same orientation as in its parent element:
         std::vector<bool> isflipped(int subelementtypenumber, std::vector<int>& subelementnumbers, int elementtypenumber, std::vector<int>& elementnumbers);
         
+        // 'isinelementlist[i]' is true if the ith element of type 'elementtypenumber' is a (sub-)element of the element list.
+        // The number of true entries in 'isinelementlist' is returned. Curvature nodes are NOT considered.
+        int istypeinelementlist(int elementtypenumber, std::vector<std::vector<int>>* elementlist, std::vector<bool>& isinelementlist);
+        
         // Return the number of elements of a given type:
         int count(int elementtypenumber);
         // Return the number of elements of a given dimension:
@@ -152,6 +156,11 @@ class elements
         // Get a pointer to the boxdimensions[elementtypenumber] vector.
         // The 'boxdimensions' container is populated for the element type if empty. 
         std::vector<double>* getboxdimensions(int elementtypenumber);
+        
+        // Get the barycenter of all elements in the flattened element list:
+        void getbarycenters(std::vector<std::vector<int>>* elementlist, std::vector<double>& barycenters);
+        // Get the barycenter of all requested elements:
+        void getbarycenters(int elementtypenumber, std::vector<int>& elementlist, std::vector<double>& barycenters);
         
         // Get the normal (not normed) to a straight face element:
         std::vector<double> getnormal(int elementtypenumber, int elementnumber);
