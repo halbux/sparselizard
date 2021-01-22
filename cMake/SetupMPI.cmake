@@ -11,15 +11,14 @@ function(ConfigureMPI TARGET)
 FIND_PATH(MPI_INCLUDE_PATH
     NAMES mpi.h
     PATHS
-    /usr/include/mpich-x86_64
-    /usr/include/openmpi-x86_64
+    "${MPI_PATH}/include"
     NO_DEFAULT_PATH
     )
 
 if(MPI_INCLUDE_PATH)
     message(STATUS "MPI headers found at " ${MPI_INCLUDE_PATH})
 else()
-    message(STATUS "MPI HEADERS NOT FOUND")
+    message(STATUS "MPI HEADERS NOT FOUND (OPTIONAL)")
 endif()
 
 
@@ -27,15 +26,14 @@ endif()
 FIND_LIBRARY(MPI_LIBRARIES
     NAMES mpi
     PATHS
-    /usr/lib64/mpich/lib
-    /usr/lib64/openmpi/lib
+    "${MPI_PATH}/lib"
     NO_DEFAULT_PATH
     )
 
 if(MPI_LIBRARIES)
     message(STATUS "MPI library found at " ${MPI_LIBRARIES})
 else()
-    message(STATUS "MPI LIBRARY NOT FOUND")
+    message(STATUS "MPI LIBRARY NOT FOUND (OPTIONAL)")
 endif()
 
 

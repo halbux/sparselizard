@@ -12,7 +12,7 @@ FIND_PATH(GMSH_INCLUDE_PATH
 if(GMSH_INCLUDE_PATH)
     message(STATUS "Gmsh headers found at " ${GMSH_INCLUDE_PATH})
 else()
-    message(STATUS "GMSH HEADERS NOT FOUND")
+    message(STATUS "GMSH HEADERS NOT FOUND (OPTIONAL)")
 endif()
 
 
@@ -27,7 +27,7 @@ FIND_LIBRARY(GMSH_LIBRARIES
 if(GMSH_LIBRARIES)
     message(STATUS "Gmsh library found at " ${GMSH_LIBRARIES})
 else()
-    message(STATUS "GMSH LIBRARY NOT FOUND")
+    message(STATUS "GMSH LIBRARY NOT FOUND (OPTIONAL)")
 endif()
 
 
