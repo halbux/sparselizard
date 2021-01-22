@@ -1,0 +1,666 @@
+#include "dtracker.h"
+#include "nodes.h"
+#include "elements.h"
+#include "physicalregions.h"
+
+
+dtracker::dtracker(std::shared_ptr<rawmesh> rm)
+{
+    if (rm == NULL)
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide a NULL rawmesh pointer" << std::endl;
+        abort();
+    }
+    
+    myrawmesh = rm;
+}
+
+std::shared_ptr<rawmesh> dtracker::getrawmesh(void)
+{
+    if (myrawmesh.expired() == false)
+        return myrawmesh.lock();
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot get 'rawmesh' object (weak pointer is expired)" << std::endl;
+        abort();
+    }
+}
+
+std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vector<double>& interfaceelembarys, std::vector<int>& neighboursfound)
+{ 
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    neighboursfound = {};
+    
+    int numelementsininterface = interfaceelembarys.size()/3;
+    
+    std::vector<double> trialbarys(3*numtrialelements, 0.0); // must have this size in any case
+    if (numelementsininterface > 0)
+        myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique! MAKE SURE
+    
+    std::vector<double> alltrialbarys;
+    std::vector<double> allisalive = slmpi::broadcastgathered({myalgorithm::exactinttodouble(std::min(numelementsininterface,1))}, trialbarys, alltrialbarys);
+    
+    // Return empty if no rank has elements in the interface:
+    bool isanyalive = false;
+    for (int i = 0; i < numranks; i++)
+        isanyalive = isanyalive || (allisalive[i] == 1.0);
+    if (not(isanyalive))
+        return {};
+
+    // Find trial elements coordinates on the interface:  
+    std::vector<int> isfound(numranks, -1);
+    if (numelementsininterface > 0)
+        myalgorithm::findcoordinates(interfaceelembarys, alltrialbarys, isfound);
+        
+    // Deduce which are neighbours. To avoid additional MPI length exchange steps the number of neighbours is limited.
+    std::vector<int> neighbourlist(numtrialelements, -1);
+    if (numelementsininterface > 0)
+    {
+        int index = 0;
+        std::vector<bool> isneighbour(numranks, false); // to have unique neighbours
+        for (int r = 0; r < numranks; r++)
+        {
+            if (r == rank || allisalive[r] == 0.0)
+                continue;
+        
+            for (int i = 0; i < numtrialelements; i++)
+            {
+                if (index < numtrialelements && isneighbour[r] == false && isfound[r*numtrialelements+i] != -1)
+                {
+                    isneighbour[r] = true;
+                    neighbourlist[index] = r;
+                    index++;
+                }
+            }
+        }
+    }
+    
+    std::vector<int> allneighbourlist;
+    std::vector<int> allnumelementsininterface = slmpi::broadcastgathered({(int)numelementsininterface}, neighbourlist, allneighbourlist);
+    
+    // Deduce the neighbours for the current rank:
+    std::vector<bool> isneighbour(numranks, false);
+    if (numelementsininterface > 0)
+    {
+        for (int r = 0; r < numranks; r++)
+        {
+            for (int i = 0; i < numtrialelements; i++)
+            {
+                int cur = allneighbourlist[r*numtrialelements + i];
+                if (cur < 0)
+                    continue;
+            
+                // Neighbour relations are symmetric:
+                if (rank == r)
+                    isneighbour[cur] = true;
+                else
+                {
+                    if (rank == cur && isneighbour[r] == false)
+                        isneighbour[r] = true;
+                }
+            }
+        }
+    
+        for (int r = 0; r < numranks; r++)
+        {
+             if (isneighbour[r])
+                neighboursfound.push_back(r); // push_back here is ok (low number of neighbours)
+        }
+    }
+    
+    return allnumelementsininterface;
+}
+
+void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<double>& interfaceelembarys, std::vector<int>& allnumelementsininterface, std::vector<int>& inneighbour)
+{
+    int rank = slmpi::getrank();
+    
+    int numelementsininterface = interfaceelembarys.size()/3;
+    
+    inneighbour = std::vector<int>(numelementsininterface, -1);
+    
+    int numneighbours = neighbours.size();
+    if (numneighbours == 0)
+        return;
+    
+    // Place in one vector all received candidate coordinates:
+    int totnumcand = 0;
+    for (int n = 0; n < numneighbours; n++)
+        totnumcand += allnumelementsininterface[neighbours[n]];
+        
+    std::vector<double> candidatebarys(3*totnumcand);
+    
+    // First send all coordinates to all neighbours:
+    for (int n = 0; n < numneighbours; n++)
+        slmpi::send(neighbours[n], 0, 3*numelementsininterface, &interfaceelembarys[0]);
+        
+    // Then receive from all neighbours:
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = 3*allnumelementsininterface[neighbours[n]];
+        slmpi::receive(neighbours[n], 0, len, &candidatebarys[pos]);
+        pos += len;
+    }
+
+    // Find matches:
+    std::vector<int> posfound;
+    myalgorithm::findcoordinates(interfaceelembarys, candidatebarys, posfound);
+    
+    pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = allnumelementsininterface[neighbours[n]];
+        for (int i = 0; i < len; i++)
+        {
+            int pf = posfound[pos+i];
+            if (pf != -1)
+                inneighbour[pf] = neighbours[n];
+        }
+        pos += len;
+    }
+}
+
+bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std::vector<int>& interfaceedgelist, std::vector<std::vector<bool>>& isnodeinneighbours, std::vector<std::vector<bool>>& isedgeinneighbours)
+{
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    int numnodes = nds->count();
+    int numedges = els->count(1);
+    
+    std::vector<int> neighbours = {};
+    for (int i = 0; i < numranks; i++)
+    {
+        if (isnodeinneighbours[i].size() > 0)
+            neighbours.push_back(i);
+    }
+    int numneighbours = neighbours.size();
+    
+    std::vector<double>* ncs = nds->getcoordinates();
+    std::vector<double>* linebarys = els->getbarycenters(1);
+
+    
+    // For each neighbour pair make a container that stores all nodes/lines in the interface intersection:
+    std::vector<int> numnodesinneighbourpair(numneighbours*numneighbours, 0);
+    std::vector<int> numedgesinneighbourpair(numneighbours*numneighbours, 0); // neighbour relations are symmetric (only half used but allows direct access)
+    
+    std::vector<std::vector<bool>> nodesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
+    std::vector<std::vector<bool>> linesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
+    
+    // Treat neighbour pair (m,n):
+    for (int n = 0; n < numneighbours; n++)
+    {
+        // Start at n+1 because neighbour relations are symmetric (counted twice otherwise) and not to itself:
+        for (int m = n+1; m < numneighbours; m++)
+        {
+            for (int i = 0; i < numnodes; i++)
+            {
+                if (isnodeinneighbours[neighbours[n]][i] && isnodeinneighbours[neighbours[m]][i])
+                {
+                    if (nodesinneighbourpair[n*numneighbours+m].size() == 0)
+                        nodesinneighbourpair[n*numneighbours+m] = std::vector<bool>(numnodes, false);
+                
+                    numnodesinneighbourpair[n*numneighbours+m]++;
+                    nodesinneighbourpair[n*numneighbours+m][i] = true;
+                }
+            }
+            for (int i = 0; i < numedges; i++)
+            {
+                if (isedgeinneighbours[neighbours[n]][i] && isedgeinneighbours[neighbours[m]][i])
+                {
+                    if (linesinneighbourpair[n*numneighbours+m].size() == 0)
+                        linesinneighbourpair[n*numneighbours+m] = std::vector<bool>(numedges, false);
+                
+                    numedgesinneighbourpair[n*numneighbours+m]++;
+                    linesinneighbourpair[n*numneighbours+m][i] = true;
+                }
+            }
+        }
+    }
+    
+    // Package line and node barycenters to both neighbours in each neighbour pair:
+    std::vector<std::vector<double>> packaged(numneighbours*numneighbours, std::vector<double>(0));
+    for (int i = 0; i < numneighbours*numneighbours; i++)
+    {
+        int totnumtosend = numnodesinneighbourpair[i] + numedgesinneighbourpair[i];
+        int index = 0;
+        packaged[i] = std::vector<double>(3*totnumtosend+2);
+        packaged[i][0] = 3*myalgorithm::exactinttodouble(numnodesinneighbourpair[i]);
+        packaged[i][1] = 3*myalgorithm::exactinttodouble(numedgesinneighbourpair[i]);
+        
+        myalgorithm::selectcoordinates(nodesinneighbourpair[i], *ncs, &(packaged[i][2]));
+        myalgorithm::selectcoordinates(linesinneighbourpair[i], *linebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
+    }
+    
+    std::vector<std::vector<double>> dataforeachneighbour;
+    myalgorithm::pack(neighbours, packaged, dataforeachneighbour);
+    
+    // Send all:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int datasize = dataforeachneighbour[n].size();
+        slmpi::send(neighbours[n], 0, 1, &datasize);
+        slmpi::send(neighbours[n], 1, dataforeachneighbour[n]);
+    }
+    // Receive all:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int datasize;
+        slmpi::receive(neighbours[n], 0, 1, &datasize);
+        dataforeachneighbour[n].resize(datasize);
+        slmpi::receive(neighbours[n], 1, dataforeachneighbour[n]);
+    }
+    
+    // Unpack:
+    std::vector< std::vector<std::vector<double>> > unpackedcoords(numneighbours);
+    std::vector<std::vector<int>> candidateneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        candidateneighbours[n] = myalgorithm::unpack(dataforeachneighbour[n], unpackedcoords[n]);
+    
+    std::vector<double> allreceivednodecoords, allreceivededgecoords;
+    std::vector<std::vector<int>> numnodesingroup, numedgesingroup;
+    myalgorithm::split(unpackedcoords, allreceivednodecoords, allreceivededgecoords, numnodesingroup, numedgesingroup);
+    
+    std::vector<double> interfacenodesbarys;
+    els->getbarycenters(0, interfacenodelist, interfacenodesbarys);
+    std::vector<double> interfaceedgesbarys;
+    els->getbarycenters(1, interfaceedgelist, interfaceedgesbarys);
+    
+    std::vector<int> posnodefound;
+    myalgorithm::findcoordinates(interfacenodesbarys, allreceivednodecoords, posnodefound);
+    std::vector<int> posedgefound;
+    myalgorithm::findcoordinates(interfaceedgesbarys, allreceivededgecoords, posedgefound);
+
+    // Update 'isnodeinneighbours' and 'isedgeinneighbours':
+    int nodeindex = 0;
+    int edgeindex = 0;
+    
+    int isanynewadded = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int i = 0; i < unpackedcoords[n].size(); i++)
+        {
+            if (unpackedcoords[n][i].size() == 0)
+                continue;
+                
+            int nn = numnodesingroup[n][i]/3;
+            int ne = numedgesingroup[n][i]/3;
+            
+            int curcanneighour = candidateneighbours[n][i];
+            
+            if (isnodeinneighbours[curcanneighour].size() == 0)
+                isnodeinneighbours[curcanneighour] = std::vector<bool>(numnodes, false);
+            if (isedgeinneighbours[curcanneighour].size() == 0)
+                isedgeinneighbours[curcanneighour] = std::vector<bool>(numedges, false);
+
+            for (int k = 0; k < nn; k++)
+            {
+                int nodetoadd = interfacenodelist[posnodefound[nodeindex+k]];
+                if (isnodeinneighbours[curcanneighour][nodetoadd] == false)
+                {
+                    isnodeinneighbours[curcanneighour][nodetoadd] = true;
+                    isanynewadded = 1;
+                }
+            }
+            for (int k = 0; k < ne; k++)
+            {
+                int edgetoadd = interfaceedgelist[posedgefound[edgeindex+k]];
+      
+                if (isedgeinneighbours[curcanneighour][edgetoadd] == false)
+                {
+                    isedgeinneighbours[curcanneighour][edgetoadd] = true;
+                    isanynewadded = 1;
+                }
+            }
+        
+            nodeindex += nn;
+            edgeindex += ne;
+        }
+    }
+
+    // Status must be checked on all ranks to decide:
+    slmpi::sum(1, &isanynewadded);
+    
+    return (isanynewadded != 0);
+}
+
+void dtracker::setconnectivity(std::vector<int> neighbours, std::vector<int> nooverlapinterfaces)
+{
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+
+    if (neighbours.size() != nooverlapinterfaces.size())
+    {
+        std::cout << "Error in 'dtracker' object: expected a number of no-overlap interface regions equal to the number of neighbours" << std::endl;
+        abort();
+    }
+    getrawmesh()->getphysicalregions()->errorundefined(nooverlapinterfaces);
+
+    // Make sure there is no duplicate and not the rank itself:
+    int numneighbours = 0;
+    myisneighbour = std::vector<bool>(numranks, false);
+    mynooverlapinterfaces = std::vector<int>(numranks, -1);
+    for (int i = 0; i < neighbours.size(); i++)
+    {
+        int n = neighbours[i];
+        if (myisneighbour[n] == false && n != rank)
+        {
+            myisneighbour[n] = true;
+            mynooverlapinterfaces[n] = nooverlapinterfaces[i];
+            
+            numneighbours++;
+        }
+        else
+        {
+            std::cout << "Error in 'dtracker' object: neighbours provided must be unique and cannot include the domain rank itself" << std::endl;
+            abort();
+        }
+    }
+    
+    myneighbours = std::vector<int>(numneighbours);
+    
+    int index = 0;
+    for (int i = 0; i < numranks; i++)
+    {
+        if (myisneighbour[i])
+        {
+            myneighbours[index] = i;
+            index++;
+        }
+    }
+}
+
+void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements, int verbosity)
+{        
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    std::vector<std::vector<int>> interfaceelems = *(prs->get(nooverlapinterface)->getelementlist());
+
+    std::vector<bool> isnodeininterface, isedgeininterface;
+    int numnodesininterface = els->istypeinelementlist(0, &interfaceelems, isnodeininterface);
+    int numedgesininterface = els->istypeinelementlist(1, &interfaceelems, isedgeininterface);
+    std::vector<int> interfacenodelist, interfaceedgelist;
+    myalgorithm::find(isnodeininterface, numnodesininterface, interfacenodelist);
+    myalgorithm::find(isedgeininterface, numedgesininterface, interfaceedgelist);
+
+    std::vector<physicalregion*> physregsvec(numranks, NULL);
+
+    std::vector<int> allnei = {};
+
+    int numits = 0;
+    while (true)
+    {   
+        // MAKE SURE ALL WORKS WITH NO ELEMENT IN INTERFACE (FOR A NON CONNECTED DOMAIN!)
+        // ALSO TRY WITH HEX TET AND QUAD TRI MIX
+
+
+        std::vector<double> elembarys;
+        els->getbarycenters(&interfaceelems, elembarys);
+        
+        std::vector<int> neighboursfound;
+        std::vector<int> allnumelementsininterface = discoversomeneighbours(std::max(1,numtrialelements), elembarys, neighboursfound);
+
+        int numneighboursfound = neighboursfound.size();
+        
+        if (allnumelementsininterface.size() == 0)
+            break;
+            
+        if (allnumelementsininterface == allnei)
+        {
+            std::cout << "Error in 'dtracker' object: connectivity discovery algorithm failed because some interface elements could not be found on any other domain" << std::endl;
+            abort();
+        }
+        allnei = allnumelementsininterface;
+        
+        // Discover the cell-1 dimension interfaces:
+        std::vector<int> inneighbour;
+        discoverinterfaces(neighboursfound, elembarys, allnumelementsininterface, inneighbour);
+        
+        // Add the matched elements to their physical region and remove them from the list:
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            int numelemstokeep = 0;
+            for (int j = 0; j < interfaceelems[i].size(); j++)
+            {
+                int elem = interfaceelems[i][j];
+                int curneighbour = inneighbour[index];
+                
+                if (curneighbour != -1)
+                {
+                    if (physregsvec[curneighbour] == NULL)
+                        physregsvec[curneighbour] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                        
+                    physregsvec[curneighbour]->addelement(i, elem);
+                }
+                else
+                {
+                    interfaceelems[i][numelemstokeep] = elem;
+                    numelemstokeep++;
+                }
+                index++; 
+            }
+            interfaceelems[i].resize(numelemstokeep);
+        }
+
+        numits++;
+    }
+    
+    
+    // Discover the neighbours touching with lower dimension interfaces (none in 1D, only nodes in 2D, nodes and edges in 3D): /// CHECK THAT IT WORKS IN 2D AND 1D!
+    
+    // One entry per rank (any rank is a neighbour candidate):
+    std::vector<std::vector<bool>> isnodeinneighbours(numranks, std::vector<bool>(0));
+    std::vector<std::vector<bool>> isedgeinneighbours(numranks, std::vector<bool>(0));
+    for (int r = 0; r < numranks; r++)
+    {
+        if (physregsvec[r] != NULL)
+        {
+            els->istypeinelementlist(0, physregsvec[r]->getelementlist(), isnodeinneighbours[r]);
+            els->istypeinelementlist(1, physregsvec[r]->getelementlist(), isedgeinneighbours[r]);
+        }
+    }
+    
+    int numcrossits = 0;
+    while (true)
+    {
+        std::vector<std::vector<bool>> wasnodeinneighbours = isnodeinneighbours;
+        std::vector<std::vector<bool>> wasedgeinneighbours = isedgeinneighbours;
+
+        bool isanyfound = discovercrossinterfaces(interfacenodelist, interfaceedgelist, isnodeinneighbours, isedgeinneighbours);
+
+        if (isanyfound == false)
+            break;
+
+        // First add the newly discovered edges:
+        int numnodes = nds->count();
+        int numedges = els->count(1);
+        for (int r = 0; r < numranks; r++)
+        {
+            if (r == rank || isnodeinneighbours.size() == 0 && isedgeinneighbours.size() == 0)
+                continue;
+            
+            // Nodes and edges might be added:
+            if (wasnodeinneighbours[r].size() == 0)
+                wasnodeinneighbours[r] = std::vector<bool>(numnodes, false);
+            if (wasedgeinneighbours[r].size() == 0)
+                wasedgeinneighbours[r] = std::vector<bool>(numedges, false);
+                
+            for (int i = 0; i < isedgeinneighbours[r].size(); i++)
+            {
+                // A new edge must be added to the neighbour interface:
+                if (isedgeinneighbours[r][i] == true && wasedgeinneighbours[r][i] == false)
+                {
+                    int nodea = els->getsubelement(0, 1, i, 0);
+                    int nodeb = els->getsubelement(0, 1, i, 1);
+                    
+                    isnodeinneighbours[r][nodea] = true;
+                    isnodeinneighbours[r][nodeb] = true;
+                    // The node should not be added to the interface region since it is part of an added edge:
+                    wasnodeinneighbours[r][nodea] = true;
+                    wasnodeinneighbours[r][nodeb] = true;
+                    
+                    // Add the edge to the physical region:
+                    if (physregsvec[r] == NULL)
+                        physregsvec[r] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                        
+                    int prdim = physregsvec[r]->getelementdimension();
+                    if (prdim < 0 || prdim == 1)
+                        physregsvec[r]->addelement(1, i);
+                    else
+                    {
+                        std::cout << "Error in 'dtracker' object: interface between domains on rank " << rank << " and " << r << " has " << prdim << "D and 1D contacts" << std::endl;
+                        std::cout << "This is not supported because a physical region can only contain elements of the same dimension" << std::endl;
+                        std::cout << "Try another mesh partitionning" << std::endl;
+                        abort();
+                    }
+                }
+            }
+
+            for (int i = 0; i < isnodeinneighbours[r].size(); i++)
+            {
+                // A new node must be added to the neighbour interface:
+                if (isnodeinneighbours[r][i] == true && wasnodeinneighbours[r][i] == false)
+                {
+                    // Add the node to the physical region:
+                    if (physregsvec[r] == NULL)
+                        physregsvec[r] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                        
+                    int prdim = physregsvec[r]->getelementdimension();
+                    if (prdim < 0 || prdim == 0)
+                        physregsvec[r]->addelement(0, i);
+                    else
+                    {
+                        std::cout << "Error in 'dtracker' object: interface between domains on rank " << rank << " and " << r << " has " << prdim << "D and 0D contacts" << std::endl;
+                        std::cout << "This is not supported because a physical region can only contain elements of the same dimension" << std::endl;
+                        std::cout << "Try another mesh partitionning" << std::endl;
+                        abort();
+                    }
+                }
+            }
+        }
+        
+        numcrossits++;
+    }
+    
+    // Create connectivity containers:
+    myneighbours = {};
+    myisneighbour = std::vector<bool>(numranks, false);
+    mynooverlapinterfaces = std::vector<int>(numranks, -1);
+    for (int r = 0; r < numranks; r++)
+    {
+        if (physregsvec[r] != NULL)
+        {
+            myneighbours.push_back(r);
+            myisneighbour[r] = true;
+            mynooverlapinterfaces[r] = physregsvec[r]->getnumber();
+        }
+    }
+    
+    if (verbosity > 0)
+        std::cout << "Found all neighbour domains with " << numits << " set" << myalgorithm::getplurals(numits) << " of " << numtrialelements << " trial element" << myalgorithm::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << myalgorithm::getplurals(numcrossits) << std::endl;
+}
+
+
+
+int dtracker::countneighbours(void)
+{
+    return myneighbours.size();
+}
+
+int dtracker::getneighbour(int neighbourindex)
+{
+    if (neighbourindex < myneighbours.size())
+        return myneighbours[neighbourindex];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: asked for a neighbour at an index larger than the number of neighbours" << std::endl;
+        abort();
+    }
+}
+
+bool dtracker::isneighbour(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myisneighbour.size())
+        return myisneighbour[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: asked if rank " << neighbour << " is a neighbour of rank " << slmpi::getrank() << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
+        abort();
+    }
+}
+
+int dtracker::getnooverlapinterface(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myisneighbour.size())
+        return mynooverlapinterfaces[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: requested on rank " << slmpi::getrank() << " the no-overlap interface to neighbour rank " << neighbour << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
+        abort();
+    }
+}
+
+void dtracker::print(void)
+{
+    std::vector<int> lens = {(int)myneighbours.size()};
+    std::vector<int> alllens;
+    slmpi::gather(0, lens, alllens);
+    std::vector<int> allneighbours;
+    slmpi::gather(0, myneighbours, allneighbours, alllens);
+
+    if (slmpi::getrank() == 0)
+    {
+        int index = 0;
+        for (int r = 0; r < slmpi::count(); r++)
+        {
+            std::cout << "Rank " << r << " has " << alllens[r] << " neighbours";
+            for (int n = 0; n < alllens[r]; n++)
+                std::cout << " " << allneighbours[index+n];
+            std::cout << std::endl;
+                
+            index += alllens[r];
+        }
+    }
+}
+
+void dtracker::writeinterfaces(std::string filename)
+{
+    if (filename.size() >= 5)
+    {
+        // Get the extension:
+        std::string fileext = filename.substr(filename.size()-4,4);
+        // Get the file name without the extension:
+        std::string noext = filename.substr(0, filename.size()-4);
+
+        int rank = slmpi::getrank();
+        
+        for (int r = 0; r < myisneighbour.size(); r++)
+        {
+            if (myisneighbour[r])
+            {
+                std::string cfn = noext + "d" + std::to_string(rank) + "n" + std::to_string(r) + fileext;
+                expression(rank).write(mynooverlapinterfaces[r], cfn, 1);
+            }
+        }
+
+        return;
+    }
+    
+    std::cout << "Error in 'dtracker' object: cannot write to file '" << filename << "'." << std::endl;
+    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
+    abort();
+}
+
