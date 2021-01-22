@@ -1382,3 +1382,98 @@ void myalgorithm::split(std::vector< std::vector<std::vector<double>> >& data, s
     }
 }
 
+void myalgorithm::pack(std::vector<int> tags, std::vector<std::vector<double>>& topack, std::vector<std::vector<double>>& packed)
+{
+    int numtags = tags.size();
+
+    // Get the packed sizes:
+    std::vector<int> packedsizes(numtags, 0);
+    for (int i = 0; i < numtags; i++)
+    {
+        for (int j = i+1; j < numtags; j++)
+        {
+            int ci = i*numtags+j;
+            int cs = topack[ci].size();
+         
+            if (cs == 0)
+                continue;
+                
+            packedsizes[i] += 2 + cs;
+            packedsizes[j] += 2 + cs;
+        }
+    }
+
+    // Preallocate:
+    packed = std::vector<std::vector<double>>(numtags, std::vector<double>(0));
+    for (int i = 0; i < numtags; i++)
+        packed[i] = std::vector<double>(packedsizes[i]);
+
+    // Populate:
+    std::vector<int> indexes(numtags, 0);
+  
+    for (int i = 0; i < numtags; i++)
+    {
+        for (int j = i+1; j < numtags; j++)
+        {
+            int ci = i*numtags+j;
+            int cs = topack[ci].size();
+            
+            if (cs == 0)
+                continue;
+
+            packed[i][indexes[i]+0] = exactinttodouble(tags[j]);
+            packed[i][indexes[i]+1] = exactinttodouble(cs);
+
+            packed[j][indexes[j]+0] = exactinttodouble(tags[i]);
+            packed[j][indexes[j]+1] = exactinttodouble(cs);
+
+            for (int k = 0; k < cs; k++)
+            {
+                double val = topack[ci][k];
+                packed[i][indexes[i]+2+k] = val;
+                packed[j][indexes[j]+2+k] = val;
+            }
+
+            indexes[i] += 2+cs;
+            indexes[j] += 2+cs;
+        }
+    }
+}
+
+std::vector<int> myalgorithm::unpack(std::vector<double>& packed, std::vector<std::vector<double>>& unpacked)
+{
+    // Get the number of datasets:
+    int numdatasets = 0;
+    
+    int index = 0;
+    while (index < packed.size())
+    {
+        index += 2 + (int)packed[index+1];
+        numdatasets++;
+    }
+
+    std::vector<int> output(numdatasets);
+    unpacked = std::vector<std::vector<double>>(numdatasets, std::vector<double>(0));
+
+    index = 0;
+    int cds = 0;
+    while (index < packed.size())
+    {
+        output[cds] = (int)packed[index];
+        int len = (int)packed[index+1];
+        
+        index += 2;
+        
+        unpacked[cds] = std::vector<double>(len);
+        double* data = &(unpacked[cds][0]);
+        
+        for (int i = 0; i < len; i++)
+            data[i] = packed[index+i];
+
+        index += len;
+        cds++;
+    }
+
+    return output;
+}
+

@@ -199,6 +199,19 @@ namespace myalgorithm
     // all valuesa/valuesb vectors together into the output 'dataa'/'datab'.
     void split(std::vector< std::vector<std::vector<double>> >& data, std::vector<double>& dataa, std::vector<double>& datab, std::vector<std::vector<int>>& sizesa, std::vector<std::vector<int>>& sizesb);
     
+    // This function creates 'packed' of size numtags where 'packed[k]' holds all data associated to the kth tag.
+    // 'topack' has size numtags^2 and 'topack[i*numtags+j]' (only j >= i+1 is considered, empty vectors are skipped)
+    // holds data of tag 'tags[j]' associated to the ith tag and data of tag 'tags[i]' associated to the jth tag.
+    // 'packed[k]' is the concatenation of all data from 'topack' associated to the kth tag. It has format
+    // {tag0, length0, ... data0 ..., tag1, length1, ... data1 ..., ...}.
+    void pack(std::vector<int> tags, std::vector<std::vector<double>>& topack, std::vector<std::vector<double>>& packed);
+    
+    // Unpack 'packed' of format {tag0, length0, ... data0 ..., tag1, length1, ... data1 ..., ...} into 'unpack'.
+    // 'unpacked' has a size equal to the number of tags (possibly not unique) found in 'packed'.
+    // 'unpacked[i]' holds the ith dataset (of tag 'output[i]') found in 'packed'.
+    // All tags found are returned in the order of appearance. They might not be unique.  
+    std::vector<int> unpack(std::vector<double>& packed, std::vector<std::vector<double>>& unpacked);
+    
 };
 
 #endif
