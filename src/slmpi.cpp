@@ -125,6 +125,9 @@ void slmpi::receive(int source, int tag, std::vector<double>& data)
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers)
 {
     int numtargets = targetranks.size();
+    
+    if (numtargets == 0)
+        return;
 
     int totbytelen = 0;
     for (int i = 0; i < numtargets; i++)
@@ -146,6 +149,9 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, st
 {
     int numtargets = targetranks.size();
 
+    if (numtargets == 0)
+        return;
+        
     int totbytelen = 0;
     for (int i = 0; i < numtargets; i++)
         totbytelen += sendlens[i]*sizeof(double) + MPI_BSEND_OVERHEAD;
