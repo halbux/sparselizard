@@ -29,7 +29,9 @@
 #include "ptracker.h"
 #include "htracker.h"
 #include "rawfield.h"
+#include "dtracker.h"
 
+class dtracker;
 class htracker;
 class nodes;
 class elements;
@@ -49,6 +51,9 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         regiondefiner myregiondefiner;
         
         int mynumber = 0;
+        
+        // For domain decomposition:
+        std::shared_ptr<dtracker> mydtracker = NULL;
         
         // For p-adaptivity:
         std::shared_ptr<ptracker> myptracker = NULL;
@@ -80,6 +85,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         elements* getelements(void);
         physicalregions* getphysicalregions(void);
         disjointregions* getdisjointregions(void);
+        std::shared_ptr<dtracker> getdtracker(void);
         std::shared_ptr<ptracker> getptracker(void);
         std::shared_ptr<htracker> gethtracker(void);
         int getmeshnumber(void) { return mynumber; };
