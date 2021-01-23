@@ -274,10 +274,17 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     els->getbarycenters(1, interfaceedgelist, interfaceedgesbarys);
     
     std::vector<int> posnodefound;
-    myalgorithm::findcoordinates(interfacenodesbarys, allreceivednodecoords, posnodefound);
+    int nnf = myalgorithm::findcoordinates(interfacenodesbarys, allreceivednodecoords, posnodefound);
     std::vector<int> posedgefound;
-    myalgorithm::findcoordinates(interfaceedgesbarys, allreceivededgecoords, posedgefound);
+    int nef = myalgorithm::findcoordinates(interfaceedgesbarys, allreceivededgecoords, posedgefound);
 
+    // All nodes and edges must have been found or something went wrong:
+    if (nnf != posnodefound.size() || nef != posedgefound.size())
+    {
+        std::cout << "Error in 'dtracker' object: algorithm to detect cross-interfaces did not succeed (at least one node or edge barycenter was not matched on a target neighbour)" << std::endl;
+        abort();
+    }
+    
     // Update 'isnodeinneighbours' and 'isedgeinneighbours':
     int nodeindex = 0;
     int edgeindex = 0;
