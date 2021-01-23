@@ -132,18 +132,23 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
         
     std::vector<double> candidatebarys(3*totnumcand);
     
-    // First send all coordinates to all neighbours:
-    for (int n = 0; n < numneighbours; n++)
-        slmpi::send(neighbours[n], 0, 3*numelementsininterface, &interfaceelembarys[0]);
-        
-    // Then receive from all neighbours:
+    
+    // Exchange all interface barycenter coordinates with every neighbour:
+    std::vector<int> sendlens(numneighbours, 3*numelementsininterface);
+    std::vector<double*> sendbuffers(numneighbours, &interfaceelembarys[0]);
+    std::vector<int> receivelens(numneighbours);
+    std::vector<double*> receivebuffers(numneighbours);
+    
     int pos = 0;
     for (int n = 0; n < numneighbours; n++)
     {
         int len = 3*allnumelementsininterface[neighbours[n]];
-        slmpi::receive(neighbours[n], 0, len, &candidatebarys[pos]);
+        receivelens[n] = len;
+        receivebuffers[n] = &candidatebarys[pos];
         pos += len;
     }
+    slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
+    
 
     // Find matches:
     std::vector<int> posfound;
@@ -242,27 +247,36 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     std::vector<std::vector<double>> dataforeachneighbour;
     myalgorithm::pack(neighbours, packaged, dataforeachneighbour);
     
-    // Send all:
+    
+    // Exchange all interface barycenter coordinates with every neighbour:
+    std::vector<int> sendlens(numneighbours);
+    std::vector<double*> sendbuffers(numneighbours);
+    std::vector<int> receivelens(numneighbours);
+    std::vector<double*> receivebuffers(numneighbours);
+    
+    std::vector<std::vector<double>> datafromeachneighbour(numneighbours, std::vector<double>(0));
+    
     for (int n = 0; n < numneighbours; n++)
     {
         int datasize = dataforeachneighbour[n].size();
-        slmpi::send(neighbours[n], 0, 1, &datasize);
-        slmpi::send(neighbours[n], 1, dataforeachneighbour[n]);
+        sendlens[n] = datasize;
+        sendbuffers[n] = &(dataforeachneighbour[n][0]);
     }
-    // Receive all:
+    slmpi::exchange(neighbours, sendlens, receivelens);
+    
     for (int n = 0; n < numneighbours; n++)
     {
-        int datasize;
-        slmpi::receive(neighbours[n], 0, 1, &datasize);
-        dataforeachneighbour[n].resize(datasize);
-        slmpi::receive(neighbours[n], 1, dataforeachneighbour[n]);
+        datafromeachneighbour[n].resize(receivelens[n]);
+        receivebuffers[n] = &(datafromeachneighbour[n][0]);
     }
+    slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
+    
     
     // Unpack:
     std::vector< std::vector<std::vector<double>> > unpackedcoords(numneighbours);
     std::vector<std::vector<int>> candidateneighbours(numneighbours);
     for (int n = 0; n < numneighbours; n++)
-        candidateneighbours[n] = myalgorithm::unpack(dataforeachneighbour[n], unpackedcoords[n]);
+        candidateneighbours[n] = myalgorithm::unpack(datafromeachneighbour[n], unpackedcoords[n]);
     
     std::vector<double> allreceivednodecoords, allreceivededgecoords;
     std::vector<std::vector<int>> numnodesingroup, numedgesingroup;
