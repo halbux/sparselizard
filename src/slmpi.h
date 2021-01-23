@@ -34,6 +34,8 @@ namespace slmpi
     void receive(int source, int tag, std::vector<double>& data);
     
     // Send data to all target ranks then receive data back from them:
+    void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues);
+    void exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues);
     void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers);
     void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers);
     
