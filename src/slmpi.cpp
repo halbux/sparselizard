@@ -139,10 +139,10 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues,
     MPI_Buffer_attach(&sendbuffer[0], totbytelen);
      
     for (int i = 0; i < numtargets; i++)
-        MPI_Bsend(sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD);
+        MPI_Bsend(&sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD);
      
     for (int i = 0; i < numtargets; i++)
-        MPI_Recv(receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
      
     MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
 }
@@ -162,10 +162,10 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalu
     MPI_Buffer_attach(&sendbuffer[0], totbytelen);
      
     for (int i = 0; i < numtargets; i++)
-        MPI_Bsend(sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD);
+        MPI_Bsend(&sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD);
      
     for (int i = 0; i < numtargets; i++)
-        MPI_Recv(receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
      
     MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
 }
