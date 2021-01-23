@@ -24,6 +24,8 @@ void slmpi::receive(int source, int tag, int len, int* data) { errornompi(); }
 void slmpi::receive(int source, int tag, int len, double* data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
 void slmpi::sum(int len, int* data) {}
 void slmpi::sum(int len, double* data) {}
 void slmpi::sum(std::vector<int>& data) {}
@@ -117,6 +119,47 @@ void slmpi::receive(int source, int tag, std::vector<int>& data)
 void slmpi::receive(int source, int tag, std::vector<double>& data)
 {
     MPI_Recv(&data[0], data.size(), MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+}
+
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers)
+{
+    int numtargets = targetranks.size();
+
+    int totbytelen = 0;
+    for (int i = 0; i < numtargets; i++)
+        totbytelen += sendlens[i]*sizeof(int) + MPI_BSEND_OVERHEAD;
+
+    std::vector<char> sendbuffer(totbytelen); // a char is one byte long
+    MPI_Buffer_attach(&sendbuffer[0], totbytelen);
+     
+    for (int i = 0; i < numtargets; i++)
+        MPI_Bsend(sendbuffers[i], sendlens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD);
+     
+    for (int i = 0; i < numtargets; i++)
+        MPI_Recv(receivebuffers[i], receivelens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+     
+    MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
+}
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers)
+{
+    int numtargets = targetranks.size();
+
+    int totbytelen = 0;
+    for (int i = 0; i < numtargets; i++)
+        totbytelen += sendlens[i]*sizeof(double) + MPI_BSEND_OVERHEAD;
+
+    std::vector<char> sendbuffer(totbytelen); // a char is one byte long
+    MPI_Buffer_attach(&sendbuffer[0], totbytelen);
+     
+    for (int i = 0; i < numtargets; i++)
+        MPI_Bsend(sendbuffers[i], sendlens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD);
+     
+    for (int i = 0; i < numtargets; i++)
+        MPI_Recv(receivebuffers[i], receivelens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+     
+    MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
 }
 
 
