@@ -127,70 +127,58 @@ void slmpi::receive(int source, int tag, std::vector<double>& data)
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues)
 {
     int numtargets = targetranks.size();
-    
-    receivevalues = std::vector<int>(numtargets);
-    
+
     if (numtargets == 0)
         return;
 
-    int totbytelen = numtargets*sizeof(int) + MPI_BSEND_OVERHEAD;
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
 
-    std::vector<char> sendbuffer(totbytelen); // a char is one byte long
-    MPI_Buffer_attach(&sendbuffer[0], totbytelen);
-     
     for (int i = 0; i < numtargets; i++)
-        MPI_Bsend(&sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD);
-     
+        MPI_Isend(&sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
     for (int i = 0; i < numtargets; i++)
-        MPI_Recv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-     
-    MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
+        MPI_Irecv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
 
 void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues)
 {
     int numtargets = targetranks.size();
-    
-    receivevalues = std::vector<double>(numtargets);
-    
+
     if (numtargets == 0)
         return;
 
-    int totbytelen = numtargets*sizeof(double) + MPI_BSEND_OVERHEAD;
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
 
-    std::vector<char> sendbuffer(totbytelen); // a char is one byte long
-    MPI_Buffer_attach(&sendbuffer[0], totbytelen);
-     
     for (int i = 0; i < numtargets; i++)
-        MPI_Bsend(&sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD);
-     
+        MPI_Isend(&sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
     for (int i = 0; i < numtargets; i++)
-        MPI_Recv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-     
-    MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
+        MPI_Irecv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
     
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers)
 {
     int numtargets = targetranks.size();
-    
+
     if (numtargets == 0)
         return;
 
-    int totbytelen = 0;
-    for (int i = 0; i < numtargets; i++)
-        totbytelen += sendlens[i]*sizeof(int) + MPI_BSEND_OVERHEAD;
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
 
-    std::vector<char> sendbuffer(totbytelen); // a char is one byte long
-    MPI_Buffer_attach(&sendbuffer[0], totbytelen);
-     
     for (int i = 0; i < numtargets; i++)
-        MPI_Bsend(sendbuffers[i], sendlens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD);
-     
+        MPI_Isend(sendbuffers[i], sendlens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
     for (int i = 0; i < numtargets; i++)
-        MPI_Recv(receivebuffers[i], receivelens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-     
-    MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
+        MPI_Irecv(receivebuffers[i], receivelens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
 
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers)
@@ -199,21 +187,17 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, st
 
     if (numtargets == 0)
         return;
-        
-    int totbytelen = 0;
-    for (int i = 0; i < numtargets; i++)
-        totbytelen += sendlens[i]*sizeof(double) + MPI_BSEND_OVERHEAD;
 
-    std::vector<char> sendbuffer(totbytelen); // a char is one byte long
-    MPI_Buffer_attach(&sendbuffer[0], totbytelen);
-     
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
+
     for (int i = 0; i < numtargets; i++)
-        MPI_Bsend(sendbuffers[i], sendlens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD);
-     
+        MPI_Isend(sendbuffers[i], sendlens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
     for (int i = 0; i < numtargets; i++)
-        MPI_Recv(receivebuffers[i], receivelens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-     
-    MPI_Buffer_detach(&sendbuffer[0], &totbytelen);
+        MPI_Irecv(receivebuffers[i], receivelens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
 
 
