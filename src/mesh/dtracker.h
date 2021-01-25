@@ -24,9 +24,10 @@ class dtracker
 
         // Neighbours (without this rank and without duplicates, sorted):
         std::vector<int> myneighbours = {};
-        // Direct access:
+        // Direct access (length is numranks):
         std::vector<bool> myisneighbour = {};
-        // No overlap interfaces:
+        // No-overlap interfaces (length is 3*numranks, -1 if none).
+        // Entry 3*r+i is the interface of i-dimensional elements with rank r:
         std::vector<int> mynooverlapinterfaces = {};
 
 
@@ -48,7 +49,8 @@ class dtracker
 
         std::shared_ptr<rawmesh> getrawmesh(void);
         
-        // Set manually or discover automatically the no-overlap connectivity of this rank:
+        // Set manually or discover automatically the no-overlap connectivity of this rank.
+        // 'nooverlapinterfaces[3*i+j]' is the interface of j-dimensional elements with the ith neighbour.
         void setconnectivity(std::vector<int> neighbours, std::vector<int> nooverlapinterfaces);
         void discoverconnectivity(int nooverlapinterface, int numtrialelements = 10, int verbosity = 0);
 
@@ -56,7 +58,8 @@ class dtracker
         int getneighbour(int neighbourindex);
 
         bool isneighbour(int neighbour);
-        int getnooverlapinterface(int neighbour);
+        // Return -1 if not defined:
+        int getnooverlapinterface(int neighbour, int elementdimension);
 
         // Print connectivity information:
         void print(void);

@@ -375,14 +375,16 @@ void dtracker::setconnectivity(std::vector<int> neighbours, std::vector<int> noo
     // Make sure there is no duplicate and not the rank itself:
     int numneighbours = 0;
     myisneighbour = std::vector<bool>(numranks, false);
-    mynooverlapinterfaces = std::vector<int>(numranks, -1);
+    mynooverlapinterfaces = std::vector<int>(3*numranks, -1);
     for (int i = 0; i < neighbours.size(); i++)
     {
         int n = neighbours[i];
         if (myisneighbour[n] == false && n != rank)
         {
             myisneighbour[n] = true;
-            mynooverlapinterfaces[n] = nooverlapinterfaces[i];
+            mynooverlapinterfaces[3*n+0] = nooverlapinterfaces[3*i+0];
+            mynooverlapinterfaces[3*n+1] = nooverlapinterfaces[3*i+1];
+            mynooverlapinterfaces[3*n+2] = nooverlapinterfaces[3*i+2];
             
             numneighbours++;
         }
@@ -415,6 +417,8 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
+    int meshdim = getrawmesh()->getmeshdimension();
+    
     std::vector<std::vector<int>> interfaceelems = *(prs->get(nooverlapinterface)->getelementlist());
 
     std::vector<bool> isnodeininterface, isedgeininterface;
@@ -424,7 +428,7 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     myalgorithm::find(isnodeininterface, numnodesininterface, interfacenodelist);
     myalgorithm::find(isedgeininterface, numedgesininterface, interfaceedgelist);
 
-    std::vector<physicalregion*> physregsvec(numranks, NULL);
+    std::vector<physicalregion*> physregsvec(3*numranks, NULL);
 
     std::vector<int> allnei = {};
 
@@ -469,10 +473,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
                 
                 if (curneighbour != -1)
                 {
-                    if (physregsvec[curneighbour] == NULL)
-                        physregsvec[curneighbour] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                    if (physregsvec[3*curneighbour+(meshdim-1)] == NULL)
+                        physregsvec[3*curneighbour+(meshdim-1)] = prs->get(prs->getmaxphysicalregionnumber()+1);
                         
-                    physregsvec[curneighbour]->addelement(i, elem);
+                    physregsvec[3*curneighbour+(meshdim-1)]->addelement(i, elem);
                 }
                 else
                 {
@@ -495,10 +499,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     std::vector<std::vector<bool>> isedgeinneighbours(numranks, std::vector<bool>(0));
     for (int r = 0; r < numranks; r++)
     {
-        if (physregsvec[r] != NULL)
+        if (physregsvec[3*r+(meshdim-1)] != NULL)
         {
-            els->istypeinelementlist(0, physregsvec[r]->getelementlist(), isnodeinneighbours[r]);
-            els->istypeinelementlist(1, physregsvec[r]->getelementlist(), isedgeinneighbours[r]);
+            els->istypeinelementlist(0, physregsvec[3*r+(meshdim-1)]->getelementlist(), isnodeinneighbours[r]);
+            els->istypeinelementlist(1, physregsvec[3*r+(meshdim-1)]->getelementlist(), isedgeinneighbours[r]);
         }
     }
     
@@ -542,19 +546,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
                     wasnodeinneighbours[r][nodeb] = true;
                     
                     // Add the edge to the physical region:
-                    if (physregsvec[r] == NULL)
-                        physregsvec[r] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                    if (physregsvec[3*r+1] == NULL)
+                        physregsvec[3*r+1] = prs->get(prs->getmaxphysicalregionnumber()+1);
                         
-                    int prdim = physregsvec[r]->getelementdimension();
-                    if (prdim < 0 || prdim == 1)
-                        physregsvec[r]->addelement(1, i);
-                    else
-                    {
-                        std::cout << "Error in 'dtracker' object: interface between domains on rank " << rank << " and " << r << " has " << prdim << "D and 1D contacts" << std::endl;
-                        std::cout << "This is not supported because a physical region can only contain elements of the same dimension" << std::endl;
-                        std::cout << "Try another mesh partitionning" << std::endl;
-                        abort();
-                    }
+                    physregsvec[3*r+1]->addelement(1, i);
                 }
             }
 
@@ -564,19 +559,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
                 if (isnodeinneighbours[r][i] == true && wasnodeinneighbours[r][i] == false)
                 {
                     // Add the node to the physical region:
-                    if (physregsvec[r] == NULL)
-                        physregsvec[r] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                    if (physregsvec[3*r+0] == NULL)
+                        physregsvec[3*r+0] = prs->get(prs->getmaxphysicalregionnumber()+1);
                         
-                    int prdim = physregsvec[r]->getelementdimension();
-                    if (prdim < 0 || prdim == 0)
-                        physregsvec[r]->addelement(0, i);
-                    else
-                    {
-                        std::cout << "Error in 'dtracker' object: interface between domains on rank " << rank << " and " << r << " has " << prdim << "D and 0D contacts" << std::endl;
-                        std::cout << "This is not supported because a physical region can only contain elements of the same dimension" << std::endl;
-                        std::cout << "Try another mesh partitionning" << std::endl;
-                        abort();
-                    }
+                    physregsvec[3*r+0]->addelement(0, i);
                 }
             }
         }
@@ -587,14 +573,18 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     // Create connectivity containers:
     myneighbours = {};
     myisneighbour = std::vector<bool>(numranks, false);
-    mynooverlapinterfaces = std::vector<int>(numranks, -1);
+    mynooverlapinterfaces = std::vector<int>(3*numranks, -1);
     for (int r = 0; r < numranks; r++)
     {
-        if (physregsvec[r] != NULL)
+        if (physregsvec[3*r+0] != NULL || physregsvec[3*r+1] != NULL || physregsvec[3*r+2] != NULL)
         {
             myneighbours.push_back(r);
             myisneighbour[r] = true;
-            mynooverlapinterfaces[r] = physregsvec[r]->getnumber();
+            for (int dim = 0; dim < 3; dim++)
+            {
+                if (physregsvec[3*r+dim] != NULL)
+                    mynooverlapinterfaces[3*r+dim] = physregsvec[3*r+dim]->getnumber();
+            }
         }
     }
     
@@ -631,10 +621,10 @@ bool dtracker::isneighbour(int neighbour)
     }
 }
 
-int dtracker::getnooverlapinterface(int neighbour)
+int dtracker::getnooverlapinterface(int neighbour, int elementdimension)
 {
     if (neighbour >= 0 && neighbour < myisneighbour.size())
-        return mynooverlapinterfaces[neighbour];
+        return mynooverlapinterfaces[3*neighbour+elementdimension];
     else
     {
         std::cout << "Error in 'dtracker' object: requested on rank " << slmpi::getrank() << " the no-overlap interface to neighbour rank " << neighbour << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
@@ -680,8 +670,12 @@ void dtracker::writeinterfaces(std::string filename)
         {
             if (myisneighbour[r])
             {
-                std::string cfn = noext + "d" + std::to_string(rank) + "n" + std::to_string(r) + fileext;
-                expression(rank).write(mynooverlapinterfaces[r], cfn, 1);
+                std::string cfn = noext + "dom" + std::to_string(rank) + "nei" + std::to_string(r);
+                for (int dim = 0; dim < 3; dim++)
+                {
+                    if (mynooverlapinterfaces[3*r+dim] != -1)
+                        expression(rank).write(mynooverlapinterfaces[3*r+dim], cfn + "dim" + std::to_string(dim) + fileext, 1);
+                }
             }
         }
 
