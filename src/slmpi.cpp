@@ -38,6 +38,10 @@ void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered) { errornompi(); }
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes) { errornompi(); }
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes) { errornompi(); }
+void slmpi::allgather(std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
+void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gathered) { errornompi(); }
+void slmpi::allgather(std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes) { errornompi(); }
+void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes) { errornompi(); }
 void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment) { errornompi(); }
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
 void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
@@ -288,6 +292,44 @@ void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<doub
     MPI_Gatherv(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, gatherer, MPI_COMM_WORLD); 
 }
 
+
+void slmpi::allgather(std::vector<int>& fragment, std::vector<int>& gathered)
+{
+    gathered.resize(count()*fragment.size());
+
+    MPI_Allgather(&fragment[0], fragment.size(), MPI_INT, &gathered[0], fragment.size(), MPI_INT, MPI_COMM_WORLD);
+}
+
+void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gathered)
+{
+    gathered.resize(count()*fragment.size());
+
+    MPI_Allgather(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], fragment.size(), MPI_DOUBLE, MPI_COMM_WORLD);
+}
+
+
+void slmpi::allgather(std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes)
+{
+    std::vector<int> shifts(fragsizes.size(), 0);
+    for (int i = 1; i < fragsizes.size(); i++)
+        shifts[i] = shifts[i-1]+fragsizes[i-1];
+        
+    gathered.resize(shifts[fragsizes.size()-1]+fragsizes[fragsizes.size()-1]);
+
+    MPI_Allgatherv(&fragment[0], fragment.size(), MPI_INT, &gathered[0], &fragsizes[0], &shifts[0], MPI_INT, MPI_COMM_WORLD);
+}
+
+void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes)
+{
+    std::vector<int> shifts(fragsizes.size(), 0);
+    for (int i = 1; i < fragsizes.size(); i++)
+        shifts[i] = shifts[i-1]+fragsizes[i-1];
+        
+    gathered.resize(shifts[fragsizes.size()-1]+fragsizes[fragsizes.size()-1]);
+
+    MPI_Allgatherv(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, MPI_COMM_WORLD);
+}
+    
 
 void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment)
 {

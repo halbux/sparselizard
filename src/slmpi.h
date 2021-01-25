@@ -53,15 +53,22 @@ namespace slmpi
     // Gather fixed size fragments in the gatherer:
     void gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered);
     void gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered);
-    // Gather variable size messages to the gatherer (fragment size only needed on gatherer):
+    // Gather variable size messages to the gatherer (fragment sizes only needed on gatherer):
     void gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes);
     void gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes);
+    
+    // Gather fixed size fragments from all ranks in all ranks:
+    void allgather(std::vector<int>& fragment, std::vector<int>& gathered);
+    void allgather(std::vector<double>& fragment, std::vector<double>& gathered);
+    // Gather variable size messages from all ranks in all ranks (fragment sizes needed on all ranks):
+    void allgather(std::vector<int>& fragment, std::vector<int>& gathered, std::vector<int>& fragsizes);
+    void allgather(std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes);
     
     // Scatter fixed size messages.
     // Fragment vectors must be preallocated to the correct size:
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment);
-    // Scatter variable size messages from the scatterer (fragment size only needed on scatterer).
+    // Scatter variable size messages from the scatterer (fragment sizes only needed on scatterer).
     // Fragment vectors must be preallocated to the correct size:
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes);
