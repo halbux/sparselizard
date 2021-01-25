@@ -212,6 +212,10 @@ namespace myalgorithm
     // All tags found are returned in the order of appearance. They might not be unique.  
     std::vector<int> unpack(std::vector<double>& packed, std::vector<std::vector<double>>& unpacked);
     
+    // Return all values at data[i*period+shift] and remove them from 'data' (length of 'data' should be a multiple of the period):
+    std::vector<int> extract(std::vector<int>& data, int period, int shift);
+    std::vector<double> extract(std::vector<double>& data, int period, int shift);
+    
 };
 
 #endif

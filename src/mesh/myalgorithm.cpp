@@ -1477,3 +1477,53 @@ std::vector<int> myalgorithm::unpack(std::vector<double>& packed, std::vector<st
     return output;
 }
 
+std::vector<int> myalgorithm::extract(std::vector<int>& data, int period, int shift)
+{
+    int numperiods = data.size()/period;
+    
+    std::vector<int> output(numperiods);
+    
+    int index = 0;
+    for (int i = 0; i < numperiods; i++)
+    {
+        for (int j = 0; j < period; j++)
+        {
+            if (j == shift)
+                output[i] = data[i*period+j];
+            else
+            {
+                data[index] = data[i*period+j];
+                index++;
+            }
+        }
+    }
+    data.resize(index);
+
+    return output;
+}
+
+std::vector<double> myalgorithm::extract(std::vector<double>& data, int period, int shift)
+{
+    int numperiods = data.size()/period;
+    
+    std::vector<double> output(numperiods);
+    
+    int index = 0;
+    for (int i = 0; i < numperiods; i++)
+    {
+        for (int j = 0; j < period; j++)
+        {
+            if (j == shift)
+                output[i] = data[i*period+j];
+            else
+            {
+                data[index] = data[i*period+j];
+                index++;
+            }
+        }
+    }
+    data.resize(index);
+
+    return output;
+}
+
