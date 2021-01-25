@@ -67,11 +67,13 @@ namespace slmpi
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes);
     
-    // Send data to all target ranks and receive data back from them:
-    void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues); // send a single value to each target
+    // Exchange a single value with each target:
+    void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues);
     void exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues);
-    void exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer, std::vector<int> receivelens, std::vector<int*> receivebuffers); // send same message to each target
+    // Exchange a message with each target (same message sent to each target):
+    void exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer, std::vector<int> receivelens, std::vector<int*> receivebuffers);
     void exchange(std::vector<int> targetranks, int sendlen, double* sendbuffer, std::vector<int> receivelens, std::vector<double*> receivebuffers);
+    // Exchange a message with each target:
     void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers);
     void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers);
     
