@@ -144,8 +144,6 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
     
     
     // Exchange all interface barycenter coordinates with every neighbour:
-    std::vector<int> sendlens(numneighbours, 3*numelementsininterface);
-    std::vector<double*> sendbuffers(numneighbours, &interfaceelembarys[0]);
     std::vector<int> receivelens(numneighbours);
     std::vector<double*> receivebuffers(numneighbours);
     
@@ -157,7 +155,7 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
         receivebuffers[n] = &candidatebarys[pos];
         pos += len;
     }
-    slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
+    slmpi::exchange(neighbours, 3*numelementsininterface, &interfaceelembarys[0], receivelens, receivebuffers);
     
 
     // Find matches:
