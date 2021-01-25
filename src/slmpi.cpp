@@ -300,6 +300,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues,
     for (int i = 0; i < numtargets; i++)
         MPI_Irecv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
 
+    MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
 
@@ -319,6 +320,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalu
     for (int i = 0; i < numtargets; i++)
         MPI_Irecv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
 
+    MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
     
@@ -338,6 +340,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, st
     for (int i = 0; i < numtargets; i++)
         MPI_Irecv(receivebuffers[i], receivelens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
 
+    MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
 
@@ -357,6 +360,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, st
     for (int i = 0; i < numtargets; i++)
         MPI_Irecv(receivebuffers[i], receivelens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
 
+    MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
     
