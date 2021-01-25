@@ -33,12 +33,6 @@ namespace slmpi
     void receive(int source, int tag, std::vector<int>& data);
     void receive(int source, int tag, std::vector<double>& data);
     
-    // Send data to all target ranks and receive data back from them:
-    void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues);
-    void exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues);
-    void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers);
-    void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers);
-    
     // Sum values from all ranks and distribute the result back to all ranks:
     void sum(int len, int* data);
     void sum(int len, double* data);
@@ -72,6 +66,12 @@ namespace slmpi
     // Fragment vectors must be preallocated to the correct size:
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes);
+    
+    // Send data to all target ranks and receive data back from them:
+    void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues);
+    void exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues);
+    void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers);
+    void exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers);
     
     // Send + receive time for 'messagesize' doubles. Timings in ns are returned on rank 0:
     std::vector<double> ping(int messagesize, int verbosity = 1);

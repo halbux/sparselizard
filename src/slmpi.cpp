@@ -24,10 +24,6 @@ void slmpi::receive(int source, int tag, int len, int* data) { errornompi(); }
 void slmpi::receive(int source, int tag, int len, double* data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
-void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues) { errornompi(); }
-void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues) { errornompi(); }
-void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
-void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
 void slmpi::sum(int len, int* data) {}
 void slmpi::sum(int len, double* data) {}
 void slmpi::sum(std::vector<int>& data) {}
@@ -46,6 +42,10 @@ void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment) { errornompi(); }
 void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes) { errornompi(); }
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
 std::vector<double> slmpi::ping(int messagesize, int verbosity) { errornompi(); abort(); }
 #endif
 
@@ -125,83 +125,6 @@ void slmpi::receive(int source, int tag, std::vector<int>& data)
 void slmpi::receive(int source, int tag, std::vector<double>& data)
 {
     MPI_Recv(&data[0], data.size(), MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-}
-
-
-void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues)
-{
-    int numtargets = targetranks.size();
-
-    if (numtargets == 0)
-        return;
-
-    std::vector<MPI_Request> sendrequests(numtargets);
-    std::vector<MPI_Request> receiverequests(numtargets);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Isend(&sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Irecv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
-
-    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
-}
-
-void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues)
-{
-    int numtargets = targetranks.size();
-
-    if (numtargets == 0)
-        return;
-
-    std::vector<MPI_Request> sendrequests(numtargets);
-    std::vector<MPI_Request> receiverequests(numtargets);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Isend(&sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Irecv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
-
-    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
-}
-    
-void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers)
-{
-    int numtargets = targetranks.size();
-
-    if (numtargets == 0)
-        return;
-
-    std::vector<MPI_Request> sendrequests(numtargets);
-    std::vector<MPI_Request> receiverequests(numtargets);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Isend(sendbuffers[i], sendlens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Irecv(receivebuffers[i], receivelens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
-
-    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
-}
-
-void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers)
-{
-    int numtargets = targetranks.size();
-
-    if (numtargets == 0)
-        return;
-
-    std::vector<MPI_Request> sendrequests(numtargets);
-    std::vector<MPI_Request> receiverequests(numtargets);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Isend(sendbuffers[i], sendlens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
-
-    for (int i = 0; i < numtargets; i++)
-        MPI_Irecv(receivebuffers[i], receivelens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
-
-    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
 
 
@@ -358,6 +281,83 @@ void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
         shifts[i] = shifts[i-1]+fragsizes[i-1];
 
     MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, &fragment[0], fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
+}
+
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Isend(&sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Irecv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
+}
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Isend(&sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Irecv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
+}
+    
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Isend(sendbuffers[i], sendlens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Irecv(receivebuffers[i], receivelens[i], MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
+}
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<MPI_Request> sendrequests(numtargets);
+    std::vector<MPI_Request> receiverequests(numtargets);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Isend(sendbuffers[i], sendlens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+
+    for (int i = 0; i < numtargets; i++)
+        MPI_Irecv(receivebuffers[i], receivelens[i], MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+
+    MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
 }
     
 
