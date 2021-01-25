@@ -39,8 +39,13 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     if (numelementsininterface > 0)
         myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique! MAKE SURE
     
+    // Push this in the mpi call:
+    trialbarys.push_back(myalgorithm::exactinttodouble(std::min(numelementsininterface,1)));
+    
     std::vector<double> alltrialbarys;
-    std::vector<double> allisalive = slmpi::broadcastgathered({myalgorithm::exactinttodouble(std::min(numelementsininterface,1))}, trialbarys, alltrialbarys);
+    slmpi::allgather(trialbarys, alltrialbarys);
+    
+    std::vector<double> allisalive = myalgorithm::extract(alltrialbarys, 3*numtrialelements+1, 3*numtrialelements);
     
     // Return empty if no rank has elements in the interface:
     bool isanyalive = false;
@@ -77,8 +82,13 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
         }
     }
     
+    // Push this in the mpi call:
+    neighbourlist.push_back(numelementsininterface);
+    
     std::vector<int> allneighbourlist;
-    std::vector<int> allnumelementsininterface = slmpi::broadcastgathered({(int)numelementsininterface}, neighbourlist, allneighbourlist);
+    slmpi::allgather(neighbourlist, allneighbourlist);
+    
+    std::vector<int> allnumelementsininterface = myalgorithm::extract(allneighbourlist, numtrialelements+1, numtrialelements);
     
     // Deduce the neighbours for the current rank:
     std::vector<bool> isneighbour(numranks, false);
