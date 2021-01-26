@@ -819,12 +819,12 @@ int myalgorithm::binarytoint(std::vector<bool> num)
 
 double myalgorithm::exactinttodouble(long long int num)
 {
-    // All integers of absolute value <= 2^53 can be exactly represented in IEEE double format:
-    if (std::abs(num) <= 9007199254740992)
+    // All integers of absolute value < 2^53 can be exactly represented in IEEE double format:
+    if (std::abs(num) < 9007199254740992)
         return (double)num;
     else
     {
-        std::cout << "Error in 'myalgorithm' namespace: integer " << num << " cannot be exactly represented in double format" << std::endl;
+        std::cout << "Error in 'myalgorithm' namespace: integer " << num << " is too large to be exactly represented in double format" << std::endl;
         abort();
     }
 }
