@@ -1309,19 +1309,25 @@ void myalgorithm::pickcandidates(int numbertopick, std::vector<double>& candidat
 {
     picked = {};
     
-    if (numbertopick <= 0 || candidatecoordinates.size() == 0)
+    int numcandidates = candidatecoordinates.size()/3;
+    
+    if (numbertopick <= 0 || numcandidates == 0)
         return;
 
     picked = std::vector<double>(3*numbertopick);
 
-    // Guarantee to stay inside candidate coordinate vector:
-    int spacing = std::floor( (candidatecoordinates.size()/3-1) / numbertopick);
+    // Pick should include all candidates if the number to pick is larger than the number of candidates: 
+    int spacing = std::ceil((double)numcandidates/(double)numbertopick);
 
     for (int i = 0; i < numbertopick; i++)
     {
-        picked[3*i+0] = candidatecoordinates[3*i*spacing+0];
-        picked[3*i+1] = candidatecoordinates[3*i*spacing+1];
-        picked[3*i+2] = candidatecoordinates[3*i*spacing+2];
+        int p = i*spacing;
+        if (p >= numcandidates)
+            p = numcandidates-1;
+    
+        picked[3*i+0] = candidatecoordinates[3*p+0];
+        picked[3*i+1] = candidatecoordinates[3*p+1];
+        picked[3*i+2] = candidatecoordinates[3*p+2];
     }
 }
 
