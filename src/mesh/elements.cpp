@@ -554,7 +554,7 @@ std::vector<double>* elements::getboxdimensions(int elementtypenumber)
 void elements::getbarycenters(std::vector<std::vector<int>>* elementlist, std::vector<double>& barycenters)
 {
     int numelems = 0;
-    for (int i = 0; i < elementlist->size(); i++)
+    for (int i = 0; i < 8; i++)
         numelems += elementlist->at(i).size();
 
     barycenters = std::vector<double>(3*numelems);
