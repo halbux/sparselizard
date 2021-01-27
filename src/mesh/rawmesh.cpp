@@ -1662,9 +1662,13 @@ void rawmesh::errorondisconnecteddisjointregion(void)
         }
         if (isinmaxdim == false)
         {
+            // Write problematic elements to file:
+            myelements.write("problematicelements.pos", mydisjointregions.getelementtypenumber(d), myalgorithm::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d)));
+            
             std::vector<std::string> typnm = {"node", "line", "face", "volume"};
-            std::cout << "Error in 'mesh' object: found a " << typnm[drdim] << " not connected to any " << typnm[dim] << std::endl;
+            std::cout << "Error in 'mesh' object: found at least one " << typnm[drdim] << " not connected to any " << typnm[dim] << std::endl;
             std::cout << "Remove it or increase the roundoff noise threshold to merge it" << std::endl;
+            std::cout << "The problematic elements found have been written to 'problematicelements.pos'" << std::endl;
             abort();
         }
     }
