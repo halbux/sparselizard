@@ -289,6 +289,8 @@ void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues)
 {
     int numtargets = targetranks.size();
+    
+    receivevalues = std::vector<int>(numtargets);
 
     if (numtargets == 0)
         return;
@@ -310,6 +312,8 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalu
 {
     int numtargets = targetranks.size();
 
+    receivevalues = std::vector<double>(numtargets);
+    
     if (numtargets == 0)
         return;
 
