@@ -21,7 +21,7 @@ std::shared_ptr<rawmesh> dtracker::getrawmesh(void)
         return myrawmesh.lock();
     else
     {
-        std::cout << "Error in 'dtracker' object: cannot get 'rawmesh' object (weak pointer is expired)" << std::endl;
+        std::cout << "Error in 'dtracker' object: cannot get rawmesh object (weak pointer is expired)" << std::endl;
         abort();
     }
 }
