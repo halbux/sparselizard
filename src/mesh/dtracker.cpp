@@ -626,7 +626,7 @@ std::vector<int> dtracker::getneighbours(void)
 
 int dtracker::getneighbour(int neighbourindex)
 {
-    if (neighbourindex < myneighbours.size())
+    if (neighbourindex >= 0 && neighbourindex < myneighbours.size())
         return myneighbours[neighbourindex];
     else
     {
