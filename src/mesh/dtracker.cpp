@@ -382,7 +382,7 @@ void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& n
     for (int i = 0; i < neighbours.size(); i++)
     {
         int n = neighbours[i];
-        if (myisneighbour[n] == false && n != rank)
+        if (n >= 0 && n < numranks && myisneighbour[n] == false && n != rank)
         {
             myisneighbour[n] = true;
             
@@ -414,7 +414,7 @@ void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& n
         }
         else
         {
-            std::cout << "Error in 'dtracker' object: neighbours provided must be unique and cannot include the domain rank itself" << std::endl;
+            std::cout << "Error in 'dtracker' object: neighbours provided must be unique numbers between 0 and " << numranks << " and cannot include the domain rank itself" << std::endl;
             abort();
         }
     }
