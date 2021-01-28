@@ -406,7 +406,7 @@ void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& n
                         abort();
                     }
                     
-                    mynooverlapinterfaces[3*n+d] = nooverlapinterfaces[3*i+d];
+                    mynooverlapinterfaces[3*n+d] = ci;
                 }
             }
             
