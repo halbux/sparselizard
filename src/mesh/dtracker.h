@@ -33,7 +33,7 @@ class dtracker
 
         // Discover up to 'numtrialelements' neighbours that share cell-1 dimension elements with this rank.
         // The barycenter of all elements shared with the neighbours to discover must be provided as argument.
-        // The number of interface elements on all ranks is returned (if all zero an empty vector is returned).
+        // The number of barycenters provided on all ranks is returned (if all zero an empty vector is returned).
         std::vector<int> discoversomeneighbours(int numtrialelements, std::vector<double>& interfaceelembarys, std::vector<int>& neighboursfound);
 
         // Upon return 'inneighbours[i]' is the number of the neighbour touching the ith interface element (-1 if no neighbour touching).
