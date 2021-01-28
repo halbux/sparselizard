@@ -37,7 +37,7 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     
     std::vector<double> trialbarys(3*numtrialelements, 0.0); // must have this size in any case
     if (numelementsininterface > 0)
-        myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique! MAKE SURE
+        myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique!
     
     // Push this in the mpi call:
     trialbarys.push_back(myalgorithm::exactinttodouble(std::min(numelementsininterface,1)));
@@ -360,17 +360,20 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     return (isanynewadded != 0);
 }
 
-void dtracker::setconnectivity(std::vector<int> neighbours, std::vector<int> nooverlapinterfaces)
+void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& nooverlapinterfaces)
 {
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
     int rank = slmpi::getrank();
     int numranks = slmpi::count();
+    
+    int meshdim = getrawmesh()->getmeshdimension();
 
-    if (neighbours.size() != nooverlapinterfaces.size())
+    if (3*neighbours.size() != nooverlapinterfaces.size())
     {
-        std::cout << "Error in 'dtracker' object: expected a number of no-overlap interface regions equal to the number of neighbours" << std::endl;
+        std::cout << "Error in 'dtracker' object: expected a number of no-overlap interface regions equal to 3 x number of neighbours (one region per interface element dimension, -1 if none)" << std::endl;
         abort();
     }
-    getrawmesh()->getphysicalregions()->errorundefined(nooverlapinterfaces);
 
     // Make sure there is no duplicate and not the rank itself:
     int numneighbours = 0;
@@ -382,9 +385,30 @@ void dtracker::setconnectivity(std::vector<int> neighbours, std::vector<int> noo
         if (myisneighbour[n] == false && n != rank)
         {
             myisneighbour[n] = true;
-            mynooverlapinterfaces[3*n+0] = nooverlapinterfaces[3*i+0];
-            mynooverlapinterfaces[3*n+1] = nooverlapinterfaces[3*i+1];
-            mynooverlapinterfaces[3*n+2] = nooverlapinterfaces[3*i+2];
+            
+            for (int d = 0; d < 3; d++)
+            {
+                int ci = nooverlapinterfaces[3*i+d];
+                
+                if (ci >= 0)
+                {
+                    prs->errorundefined({ci});
+                    int elemdim = prs->get(ci)->getelementdimension();
+                    
+                    if (elemdim >= meshdim)
+                    {
+                        std::cout << "Error in 'dtracker' object: provided an interface physical region with " << elemdim << "D elements (this is not an interface)" << std::endl;
+                        abort();
+                    }
+                    if (elemdim != d)
+                    {
+                        std::cout << "Error in 'dtracker' object: expected a physical region with " << d << "D elements at index 3*" << i << "+" << d << std::endl;
+                        abort();
+                    }
+                    
+                    mynooverlapinterfaces[3*n+d] = nooverlapinterfaces[3*i+d];
+                }
+            }
             
             numneighbours++;
         }
@@ -435,10 +459,6 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     int numits = 0;
     while (true)
     {   
-        // MAKE SURE ALL WORKS WITH NO ELEMENT IN INTERFACE (FOR A NON CONNECTED DOMAIN!)
-        // ALSO TRY WITH HEX TET AND QUAD TRI MIX
-
-
         std::vector<double> elembarys;
         els->getbarycenters(&interfaceelems, elembarys);
         
@@ -492,7 +512,7 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     }
     
     
-    // Discover the neighbours touching with lower dimension interfaces (none in 1D, only nodes in 2D, nodes and edges in 3D): /// CHECK THAT IT WORKS IN 2D AND 1D!
+    // Discover the neighbours touching with lower dimension interfaces (none in 1D, only nodes in 2D, nodes and edges in 3D):
     
     // One entry per rank (any rank is a neighbour candidate):
     std::vector<std::vector<bool>> isnodeinneighbours(numranks, std::vector<bool>(0));
@@ -599,6 +619,11 @@ int dtracker::countneighbours(void)
     return myneighbours.size();
 }
 
+std::vector<int> dtracker::getneighbours(void)
+{
+    return myneighbours;
+}
+
 int dtracker::getneighbour(int neighbourindex)
 {
     if (neighbourindex < myneighbours.size())
@@ -623,11 +648,11 @@ bool dtracker::isneighbour(int neighbour)
 
 int dtracker::getnooverlapinterface(int neighbour, int elementdimension)
 {
-    if (neighbour >= 0 && neighbour < myisneighbour.size())
+    if (neighbour >= 0 && neighbour < myisneighbour.size() && elementdimension >= 0 && elementdimension < 3)
         return mynooverlapinterfaces[3*neighbour+elementdimension];
     else
     {
-        std::cout << "Error in 'dtracker' object: requested on rank " << slmpi::getrank() << " the no-overlap interface to neighbour rank " << neighbour << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
+        std::cout << "Error in 'dtracker' object: requested on rank " << slmpi::getrank() << " the " << elementdimension << "D no-overlap interface to neighbour rank " << neighbour << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
         abort();
     }
 }
@@ -643,7 +668,7 @@ void dtracker::print(void)
     if (slmpi::getrank() == 0)
     {
         int index = 0;
-        for (int r = 0; r < slmpi::count(); r++)
+        for (int r = 0; r < myisneighbour.size(); r++)
         {
             std::cout << "Rank " << r << " has " << alllens[r] << " neighbours";
             for (int n = 0; n < alllens[r]; n++)

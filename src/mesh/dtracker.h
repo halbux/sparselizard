@@ -51,10 +51,11 @@ class dtracker
         
         // Set manually or discover automatically the no-overlap connectivity of this rank.
         // 'nooverlapinterfaces[3*i+j]' is the interface of j-dimensional elements with the ith neighbour (-1 if none).
-        void setconnectivity(std::vector<int> neighbours, std::vector<int> nooverlapinterfaces);
+        void setconnectivity(std::vector<int>& neighbours, std::vector<int>& nooverlapinterfaces);
         void discoverconnectivity(int nooverlapinterface, int numtrialelements = 10, int verbosity = 0);
 
         int countneighbours(void);
+        std::vector<int> getneighbours(void);
         int getneighbour(int neighbourindex);
 
         bool isneighbour(int neighbour);
