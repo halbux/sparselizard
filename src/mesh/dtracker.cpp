@@ -142,8 +142,6 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
 
 void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<double>& interfaceelembarys, std::vector<int>& allnumelementsininterface, std::vector<int>& inneighbour)
 {
-    int rank = slmpi::getrank();
-    
     int numelementsininterface = interfaceelembarys.size()/3;
     
     inneighbour = std::vector<int>(numelementsininterface, -1);
