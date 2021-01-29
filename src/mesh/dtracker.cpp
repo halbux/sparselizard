@@ -53,14 +53,16 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     {
         if (r != rank && allisalive[r] == 1.0)
         {
-            alltrialbarys[3*numalive+0] = alltrialbarys[3*r+0];
-            alltrialbarys[3*numalive+1] = alltrialbarys[3*r+1];
-            alltrialbarys[3*numalive+2] = alltrialbarys[3*r+2];
-            
+            for (int i = 0; i < numtrialelements; i++)
+            {
+                alltrialbarys[3*numalive*numtrialelements+3*i+0] = alltrialbarys[3*r*numtrialelements+3*i+0];
+                alltrialbarys[3*numalive*numtrialelements+3*i+1] = alltrialbarys[3*r*numtrialelements+3*i+1];
+                alltrialbarys[3*numalive*numtrialelements+3*i+2] = alltrialbarys[3*r*numtrialelements+3*i+2];
+            }
             numalive++;
         }
     }
-    alltrialbarys.resize(3*numalive);
+    alltrialbarys.resize(3*numalive*numtrialelements);
     numalive += (int)allisalive[rank];
     
     // Return empty if no rank has elements in the interface:
