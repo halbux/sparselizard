@@ -74,7 +74,7 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     if (numelementsininterface > 0)
         myalgorithm::findcoordinates(interfaceelembarys, alltrialbarys, isfound);
         
-    // Deduce which are neighbours. To avoid additional MPI length exchange steps the number of neighbours is limited.
+    // Deduce which are neighbours. To avoid additional mpi length exchange steps the number of neighbours is limited.
     std::vector<int> neighbourlist(numtrialelements, -1);
     if (numelementsininterface > 0)
     {
