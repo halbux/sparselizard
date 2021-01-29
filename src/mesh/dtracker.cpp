@@ -35,9 +35,9 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     
     int numelementsininterface = interfaceelembarys.size()/3;
     
-    std::vector<double> trialbarys(3*numtrialelements, 0.0); // must have this size in any case
+    std::vector<double> trialbarys(3*numtrialelements, 0.0); // must have this size in any case, barycenters for not alive ranks will be removed below
     if (numelementsininterface > 0)
-        myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique!
+        myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique
     
     // Push this in the mpi call:
     trialbarys.push_back(myalgorithm::exactinttodouble(std::min(numelementsininterface,1)));
@@ -47,15 +47,28 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     
     std::vector<double> allisalive = myalgorithm::extract(alltrialbarys, 3*numtrialelements+1, 3*numtrialelements);
     
+    // Remove the barycenters of this rank and ranks that are no alive anymore (to avoid removing duplicates with arbitrary all 0 coordinates):
+    int numalive = 0;
+    for (int r = 0; r < numranks; r++)
+    {
+        if (r != rank && allisalive[r] == 1.0)
+        {
+            alltrialbarys[3*numalive+0] = alltrialbarys[3*r+0];
+            alltrialbarys[3*numalive+1] = alltrialbarys[3*r+1];
+            alltrialbarys[3*numalive+2] = alltrialbarys[3*r+2];
+            
+            numalive++;
+        }
+    }
+    alltrialbarys.resize(3*numalive);
+    numalive += (int)allisalive[rank];
+    
     // Return empty if no rank has elements in the interface:
-    bool isanyalive = false;
-    for (int i = 0; i < numranks; i++)
-        isanyalive = isanyalive || (allisalive[i] == 1.0);
-    if (not(isanyalive))
+    if (numalive == 0)
         return {};
 
     // Find trial elements coordinates on the interface:  
-    std::vector<int> isfound(numranks, -1);
+    std::vector<int> isfound;
     if (numelementsininterface > 0)
         myalgorithm::findcoordinates(interfaceelembarys, alltrialbarys, isfound);
         
@@ -63,21 +76,23 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     std::vector<int> neighbourlist(numtrialelements, -1);
     if (numelementsininterface > 0)
     {
-        int index = 0;
-        std::vector<bool> isneighbour(numranks, false); // to have unique neighbours
+        int index = 0, rindex = 0; // rindex to take into account the ranks with removed barycenters
+        std::vector<bool> isalreadythere(numranks, false);
         for (int r = 0; r < numranks; r++)
         {
-            if (r == rank || allisalive[r] == 0.0)
-                continue;
-        
-            for (int i = 0; i < numtrialelements; i++)
+            if (r != rank && allisalive[r] == 1.0)
             {
-                if (index < numtrialelements && isneighbour[r] == false && isfound[r*numtrialelements+i] != -1)
+                for (int i = 0; i < numtrialelements; i++)
                 {
-                    isneighbour[r] = true;
-                    neighbourlist[index] = r;
-                    index++;
+                    if (index < numtrialelements && isalreadythere[r] == false && isfound[rindex*numtrialelements+i] != -1)
+                    {
+                        isalreadythere[r] = true;
+                        neighbourlist[index] = r;
+                        index++;
+                    }
                 }
+
+                rindex++;
             }
         }
     }
@@ -107,7 +122,7 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
                     isneighbour[cur] = true;
                 else
                 {
-                    if (rank == cur && isneighbour[r] == false)
+                    if (rank == cur)
                         isneighbour[r] = true;
                 }
             }
