@@ -108,9 +108,9 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     std::vector<int> allnumelementsininterface = myalgorithm::extract(allneighbourlist, numtrialelements+1, numtrialelements);
     
     // Deduce the neighbours for the current rank:
-    std::vector<bool> isneighbour(numranks, false);
     if (numelementsininterface > 0)
     {
+        std::vector<bool> isneighbour(numranks, false);
         for (int r = 0; r < numranks; r++)
         {
             for (int i = 0; i < numtrialelements; i++)
