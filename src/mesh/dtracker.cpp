@@ -157,7 +157,6 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
         
     std::vector<double> candidatebarys(3*totnumcand);
     
-    
     // Exchange all interface barycenter coordinates with every neighbour:
     std::vector<int> receivelens(numneighbours);
     std::vector<double*> receivebuffers(numneighbours);
