@@ -171,7 +171,6 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
     }
     slmpi::exchange(neighbours, 3*numelementsininterface, &interfaceelembarys[0], receivelens, receivebuffers);
     
-
     // Find matches:
     std::vector<int> posfound;
     myalgorithm::findcoordinates(interfaceelembarys, candidatebarys, posfound);
