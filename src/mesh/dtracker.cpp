@@ -193,9 +193,7 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
 {
     nodes* nds = getrawmesh()->getnodes();
     elements* els = getrawmesh()->getelements();
-    physicalregions* prs = getrawmesh()->getphysicalregions();
 
-    int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
     int numnodes = nds->count();
@@ -213,9 +211,10 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     std::vector<double>* linebarys = els->getbarycenters(1);
 
     
-    // For each neighbour pair make a container that stores all nodes/lines in the interface intersection:
+    // For each neighbour pair make a container that stores all nodes/lines in the interface intersection.
+    // Neighbour relations are symmetric thus only indexes i*numneighbours+j with j >= i+1 are considered.
     std::vector<int> numnodesinneighbourpair(numneighbours*numneighbours, 0);
-    std::vector<int> numedgesinneighbourpair(numneighbours*numneighbours, 0); // neighbour relations are symmetric (only half used but allows direct access)
+    std::vector<int> numedgesinneighbourpair(numneighbours*numneighbours, 0);
     
     std::vector<std::vector<bool>> nodesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
     std::vector<std::vector<bool>> linesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
@@ -256,7 +255,7 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     for (int i = 0; i < numneighbours*numneighbours; i++)
     {
         int totnumtosend = numnodesinneighbourpair[i] + numedgesinneighbourpair[i];
-        int index = 0;
+        
         packaged[i] = std::vector<double>(3*totnumtosend+2);
         packaged[i][0] = 3*myalgorithm::exactinttodouble(numnodesinneighbourpair[i]);
         packaged[i][1] = 3*myalgorithm::exactinttodouble(numedgesinneighbourpair[i]);
