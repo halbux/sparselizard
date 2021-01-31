@@ -30,7 +30,6 @@ class dtracker
         // Entry 3*r+i is the interface of i-dimensional elements with rank r:
         std::vector<int> mynooverlapinterfaces = {};
 
-
         // Discover up to 'numtrialelements' neighbours that share cell-1 dimension elements with this rank.
         // The barycenter of all elements shared with the neighbours to discover must be provided as argument.
         // The number of barycenters provided on all ranks is returned (if all zero an empty vector is returned).
