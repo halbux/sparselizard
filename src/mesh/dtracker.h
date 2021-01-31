@@ -39,7 +39,7 @@ class dtracker
         // The neighbours provided must be unique. The number of interface elements for each rank must be provided in 'allnumelementsininterface'.
         void discoverinterfaces(std::vector<int> neighbours, std::vector<double>& interfaceelembarys, std::vector<int>& allnumelementsininterface, std::vector<int>& inneighbour);
 
-        // Find new interfaces and populate the output accordingly. Return false if no more interface can be found on any rank.
+        // Find new interfaces and populate the output accordingly. Return false if no more interfaces can be found on any rank.
         bool discovercrossinterfaces(std::vector<int>& interfacenodelist, std::vector<int>& interfaceedgelist, std::vector<std::vector<bool>>& isnodeinneighbours, std::vector<std::vector<bool>>& isedgeinneighbours);
 
     public:
