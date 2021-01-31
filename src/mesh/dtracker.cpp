@@ -299,8 +299,8 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         candidateneighbours[n] = myalgorithm::unpack(datafromeachneighbour[n], unpackedcoords[n]);
     
     std::vector<double> allreceivednodecoords, allreceivededgecoords;
-    std::vector<std::vector<int>> numnodesingroup, numedgesingroup;
-    myalgorithm::split(unpackedcoords, allreceivednodecoords, allreceivededgecoords, numnodesingroup, numedgesingroup);
+    std::vector<std::vector<int>> lennodedataingroup, lenedgedataingroup;
+    myalgorithm::split(unpackedcoords, allreceivednodecoords, allreceivededgecoords, lennodedataingroup, lenedgedataingroup);
     
     std::vector<double> interfacenodesbarys;
     els->getbarycenters(0, interfacenodelist, interfacenodesbarys);
@@ -328,11 +328,8 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     {
         for (int i = 0; i < unpackedcoords[n].size(); i++)
         {
-            if (unpackedcoords[n][i].size() == 0)
-                continue;
-                
-            int nn = numnodesingroup[n][i]/3;
-            int ne = numedgesingroup[n][i]/3;
+            int nn = lennodedataingroup[n][i]/3;
+            int ne = lenedgedataingroup[n][i]/3;
             
             int curcanneighour = candidateneighbours[n][i];
             
