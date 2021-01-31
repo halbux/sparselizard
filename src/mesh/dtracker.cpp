@@ -208,16 +208,15 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     int numneighbours = neighbours.size();
     
     std::vector<double>* ncs = nds->getcoordinates();
-    std::vector<double>* linebarys = els->getbarycenters(1);
-
+    std::vector<double>* edgebarys = els->getbarycenters(1);
     
-    // For each neighbour pair make a container that stores all nodes/lines in the interface intersection.
+    // For each neighbour pair make a container that stores all nodes/edges in the interface intersection.
     // Neighbour relations are symmetric thus only indexes i*numneighbours+j with j >= i+1 are considered.
     std::vector<int> numnodesinneighbourpair(numneighbours*numneighbours, 0);
     std::vector<int> numedgesinneighbourpair(numneighbours*numneighbours, 0);
     
     std::vector<std::vector<bool>> nodesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
-    std::vector<std::vector<bool>> linesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
+    std::vector<std::vector<bool>> edgesinneighbourpair(numneighbours*numneighbours, std::vector<bool>(0));
     
     // Treat neighbour pair (m,n):
     for (int n = 0; n < numneighbours; n++)
@@ -240,17 +239,17 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
             {
                 if (isedgeinneighbours[neighbours[n]][i] && isedgeinneighbours[neighbours[m]][i])
                 {
-                    if (linesinneighbourpair[n*numneighbours+m].size() == 0)
-                        linesinneighbourpair[n*numneighbours+m] = std::vector<bool>(numedges, false);
+                    if (edgesinneighbourpair[n*numneighbours+m].size() == 0)
+                        edgesinneighbourpair[n*numneighbours+m] = std::vector<bool>(numedges, false);
                 
                     numedgesinneighbourpair[n*numneighbours+m]++;
-                    linesinneighbourpair[n*numneighbours+m][i] = true;
+                    edgesinneighbourpair[n*numneighbours+m][i] = true;
                 }
             }
         }
     }
     
-    // Package line and node barycenters to both neighbours in each neighbour pair:
+    // Package edge and node barycenters to both neighbours in each neighbour pair:
     std::vector<std::vector<double>> packaged(numneighbours*numneighbours, std::vector<double>(0));
     for (int i = 0; i < numneighbours*numneighbours; i++)
     {
@@ -261,12 +260,11 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         packaged[i][1] = 3*myalgorithm::exactinttodouble(numedgesinneighbourpair[i]);
         
         myalgorithm::selectcoordinates(nodesinneighbourpair[i], *ncs, &(packaged[i][2]));
-        myalgorithm::selectcoordinates(linesinneighbourpair[i], *linebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
+        myalgorithm::selectcoordinates(edgesinneighbourpair[i], *edgebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
     }
     
     std::vector<std::vector<double>> dataforeachneighbour;
     myalgorithm::pack(neighbours, packaged, dataforeachneighbour);
-    
     
     // Exchange all interface barycenter coordinates with every neighbour:
     std::vector<int> sendlens(numneighbours);
@@ -290,7 +288,6 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         receivebuffers[n] = &(datafromeachneighbour[n][0]);
     }
     slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
-    
     
     // Unpack:
     std::vector< std::vector<std::vector<double>> > unpackedcoords(numneighbours);
