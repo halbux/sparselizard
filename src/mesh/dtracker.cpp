@@ -202,7 +202,7 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     std::vector<int> neighbours = {};
     for (int i = 0; i < numranks; i++)
     {
-        if (isnodeinneighbours[i].size() > 0)
+        if (isnodeinneighbours[i].size() > 0 || isedgeinneighbours[i].size() > 0)
             neighbours.push_back(i);
     }
     int numneighbours = neighbours.size();
