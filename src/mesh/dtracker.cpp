@@ -249,7 +249,7 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         }
     }
     
-    // Package edge and node barycenters to both neighbours in each neighbour pair:
+    // Package edge and node barycenters for both neighbours in each neighbour pair:
     std::vector<std::vector<double>> packaged(numneighbours*numneighbours, std::vector<double>(0));
     for (int i = 0; i < numneighbours*numneighbours; i++)
     {
