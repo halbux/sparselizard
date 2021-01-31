@@ -249,18 +249,21 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         }
     }
     
-    // Package edge and node barycenters for both neighbours in each neighbour pair:
+    // Package node and edge barycenters for both neighbours in each neighbour pair:
     std::vector<std::vector<double>> packaged(numneighbours*numneighbours, std::vector<double>(0));
     for (int i = 0; i < numneighbours*numneighbours; i++)
     {
         int totnumtosend = numnodesinneighbourpair[i] + numedgesinneighbourpair[i];
         
-        packaged[i] = std::vector<double>(3*totnumtosend+2);
-        packaged[i][0] = 3*myalgorithm::exactinttodouble(numnodesinneighbourpair[i]);
-        packaged[i][1] = 3*myalgorithm::exactinttodouble(numedgesinneighbourpair[i]);
-        
-        myalgorithm::selectcoordinates(nodesinneighbourpair[i], *ncs, &(packaged[i][2]));
-        myalgorithm::selectcoordinates(edgesinneighbourpair[i], *edgebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
+        if (totnumtosend > 0)
+        {
+            packaged[i] = std::vector<double>(3*totnumtosend+2);
+            packaged[i][0] = 3*myalgorithm::exactinttodouble(numnodesinneighbourpair[i]);
+            packaged[i][1] = 3*myalgorithm::exactinttodouble(numedgesinneighbourpair[i]);
+            
+            myalgorithm::selectcoordinates(nodesinneighbourpair[i], *ncs, &(packaged[i][2]));
+            myalgorithm::selectcoordinates(edgesinneighbourpair[i], *edgebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
+        }
     }
     
     std::vector<std::vector<double>> dataforeachneighbour;
