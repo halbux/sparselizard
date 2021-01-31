@@ -203,7 +203,15 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     for (int i = 0; i < numranks; i++)
     {
         if (isnodeinneighbours[i].size() > 0 || isedgeinneighbours[i].size() > 0)
+        {
+            // Make sure both are defined together:
+            if (isnodeinneighbours[i].size() == 0)
+                isnodeinneighbours[i] = std::vector<bool>(numnodes, false);
+            if (isedgeinneighbours[i].size() == 0)
+                isedgeinneighbours[i] = std::vector<bool>(numedges, false);
+        
             neighbours.push_back(i);
+        }
     }
     int numneighbours = neighbours.size();
     
@@ -330,6 +338,9 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         {
             int nn = lennodedataingroup[n][i]/3;
             int ne = lenedgedataingroup[n][i]/3;
+            
+            if (nn == 0 && ne == 0)
+                continue;
             
             int curcanneighour = candidateneighbours[n][i];
             
