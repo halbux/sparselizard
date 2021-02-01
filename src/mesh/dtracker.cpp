@@ -458,10 +458,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     elements* els = getrawmesh()->getelements();
     physicalregions* prs = getrawmesh()->getphysicalregions();
 
-    int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
     int meshdim = getrawmesh()->getmeshdimension();
+    numtrialelements = std::max(1,numtrialelements);
     
     std::vector<std::vector<int>> interfaceelems = *(prs->get(nooverlapinterface)->getelementlist());
 
@@ -483,7 +483,7 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
         els->getbarycenters(&interfaceelems, elembarys);
         
         std::vector<int> neighboursfound;
-        std::vector<int> allnumelementsininterface = discoversomeneighbours(std::max(1,numtrialelements), elembarys, neighboursfound);
+        std::vector<int> allnumelementsininterface = discoversomeneighbours(numtrialelements, elembarys, neighboursfound);
 
         int numneighboursfound = neighboursfound.size();
         
