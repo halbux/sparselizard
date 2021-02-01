@@ -454,7 +454,6 @@ void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& n
 
 void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements, int verbosity)
 {        
-    nodes* nds = getrawmesh()->getnodes();
     elements* els = getrawmesh()->getelements();
     physicalregions* prs = getrawmesh()->getphysicalregions();
 
@@ -558,8 +557,6 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     }
 
     // Add first the edges then the nodes that are not in the edges:
-    int numnodes = nds->count();
-    int numedges = els->count(1);
     for (int r = 0; r < numranks; r++)
     {
         for (int i = 0; i < isedgeinneighbours[r].size(); i++)
