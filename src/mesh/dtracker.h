@@ -52,8 +52,8 @@ class dtracker
         // 'nooverlapinterfaces[3*i+j]' is the interface of j-dimensional elements with the ith neighbour (-1 if none).
         void setconnectivity(std::vector<int>& neighbours, std::vector<int>& nooverlapinterfaces);
         // Discover automatically the no-overlap connectivity of this rank.
-        // This works for any geometry whose global skin region does not intersect itself. Region 'nooverlapinterface'
-        // must include all elements of dimension cell-1 which touch the neighbour domains.
+        // This works for any geometry whose global skin region does not intersect itself.
+        // Region 'nooverlapinterface' must include all elements of dimension cell-1 which touch the neighbour domains.
         void discoverconnectivity(int nooverlapinterface, int numtrialelements = 10, int verbosity = 0);
 
         int countneighbours(void);
