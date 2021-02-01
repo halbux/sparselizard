@@ -485,8 +485,6 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
         std::vector<int> neighboursfound;
         std::vector<int> allnumelementsininterface = discoversomeneighbours(numtrialelements, elembarys, neighboursfound);
 
-        int numneighboursfound = neighboursfound.size();
-        
         if (allnumelementsininterface.size() == 0)
             break;
             
