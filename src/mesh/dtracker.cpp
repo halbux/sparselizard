@@ -546,68 +546,52 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
         }
     }
     
+    std::vector<std::vector<bool>> wasnodeinneighbours = isnodeinneighbours;
+    std::vector<std::vector<bool>> wasedgeinneighbours = isedgeinneighbours;
+        
+    // Discover all cross-interfaces:
     int numcrossits = 0;
     while (true)
     {
-        std::vector<std::vector<bool>> wasnodeinneighbours = isnodeinneighbours;
-        std::vector<std::vector<bool>> wasedgeinneighbours = isedgeinneighbours;
-
         bool isanyfound = discovercrossinterfaces(interfacenodelist, interfaceedgelist, isnodeinneighbours, isedgeinneighbours);
-
         if (isanyfound == false)
             break;
+        numcrossits++;
+    }
 
-        // First add the newly discovered edges:
-        int numnodes = nds->count();
-        int numedges = els->count(1);
-        for (int r = 0; r < numranks; r++)
+    // Add first the edges then the nodes that are not in the edges:
+    int numnodes = nds->count();
+    int numedges = els->count(1);
+    for (int r = 0; r < numranks; r++)
+    {
+        for (int i = 0; i < isedgeinneighbours[r].size(); i++)
         {
-            if (r == rank || isnodeinneighbours.size() == 0 && isedgeinneighbours.size() == 0)
-                continue;
-            
-            // Nodes and edges might be added:
-            if (wasnodeinneighbours[r].size() == 0)
-                wasnodeinneighbours[r] = std::vector<bool>(numnodes, false);
-            if (wasedgeinneighbours[r].size() == 0)
-                wasedgeinneighbours[r] = std::vector<bool>(numedges, false);
+            if (isedgeinneighbours[r][i] == true && (wasedgeinneighbours[r].size() == 0 || wasedgeinneighbours[r][i] == false))
+            {
+                int nodea = els->getsubelement(0, 1, i, 0);
+                int nodeb = els->getsubelement(0, 1, i, 1);
                 
-            for (int i = 0; i < isedgeinneighbours[r].size(); i++)
-            {
-                // A new edge must be added to the neighbour interface:
-                if (isedgeinneighbours[r][i] == true && wasedgeinneighbours[r][i] == false)
-                {
-                    int nodea = els->getsubelement(0, 1, i, 0);
-                    int nodeb = els->getsubelement(0, 1, i, 1);
+                // The nodes should not be added to the interface region since they are part of an added edge:
+                isnodeinneighbours[r][nodea] = false;
+                isnodeinneighbours[r][nodeb] = false;
+                
+                if (physregsvec[3*r+1] == NULL)
+                    physregsvec[3*r+1] = prs->get(prs->getmaxphysicalregionnumber()+1);
                     
-                    isnodeinneighbours[r][nodea] = true;
-                    isnodeinneighbours[r][nodeb] = true;
-                    // The node should not be added to the interface region since it is part of an added edge:
-                    wasnodeinneighbours[r][nodea] = true;
-                    wasnodeinneighbours[r][nodeb] = true;
-                    
-                    // Add the edge to the physical region:
-                    if (physregsvec[3*r+1] == NULL)
-                        physregsvec[3*r+1] = prs->get(prs->getmaxphysicalregionnumber()+1);
-                        
-                    physregsvec[3*r+1]->addelement(1, i);
-                }
-            }
-
-            for (int i = 0; i < isnodeinneighbours[r].size(); i++)
-            {
-                // A new node must be added to the neighbour interface:
-                if (isnodeinneighbours[r][i] == true && wasnodeinneighbours[r][i] == false)
-                {
-                    // Add the node to the physical region:
-                    if (physregsvec[3*r+0] == NULL)
-                        physregsvec[3*r+0] = prs->get(prs->getmaxphysicalregionnumber()+1);
-                        
-                    physregsvec[3*r+0]->addelement(0, i);
-                }
+                physregsvec[3*r+1]->addelement(1, i);
             }
         }
-        
-        numcrossits++;
+
+        for (int i = 0; i < isnodeinneighbours[r].size(); i++)
+        {
+            if (isnodeinneighbours[r][i] == true && (wasnodeinneighbours[r].size() == 0 || wasnodeinneighbours[r][i] == false))
+            {
+                if (physregsvec[3*r+0] == NULL)
+                    physregsvec[3*r+0] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                    
+                physregsvec[3*r+0]->addelement(0, i);
+            }
+        }
     }
     
     // Create connectivity containers:
