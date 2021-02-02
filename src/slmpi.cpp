@@ -289,20 +289,22 @@ void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues)
 {
     int numtargets = targetranks.size();
-    
-    receivevalues = std::vector<int>(numtargets);
-
+ 
+    receivevalues = {};
     if (numtargets == 0)
         return;
+    
+    int numvalues = sendvalues.size()/numtargets;
+    receivevalues = std::vector<int>(numtargets*numvalues);
 
     std::vector<MPI_Request> sendrequests(numtargets);
     std::vector<MPI_Request> receiverequests(numtargets);
 
     for (int i = 0; i < numtargets; i++)
-        MPI_Isend(&sendvalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+        MPI_Isend(&sendvalues[numvalues*i], numvalues, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
 
     for (int i = 0; i < numtargets; i++)
-        MPI_Irecv(&receivevalues[i], 1, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+        MPI_Irecv(&receivevalues[numvalues*i], numvalues, MPI_INT, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
 
     MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
@@ -311,20 +313,22 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues,
 void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues)
 {
     int numtargets = targetranks.size();
-
-    receivevalues = std::vector<double>(numtargets);
-    
+ 
+    receivevalues = {};
     if (numtargets == 0)
         return;
+    
+    int numvalues = sendvalues.size()/numtargets;
+    receivevalues = std::vector<double>(numtargets*numvalues);
 
     std::vector<MPI_Request> sendrequests(numtargets);
     std::vector<MPI_Request> receiverequests(numtargets);
 
     for (int i = 0; i < numtargets; i++)
-        MPI_Isend(&sendvalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
+        MPI_Isend(&sendvalues[numvalues*i], numvalues, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &sendrequests[i]);
 
     for (int i = 0; i < numtargets; i++)
-        MPI_Irecv(&receivevalues[i], 1, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
+        MPI_Irecv(&receivevalues[numvalues*i], numvalues, MPI_DOUBLE, targetranks[i], 0, MPI_COMM_WORLD, &receiverequests[i]);
 
     MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);

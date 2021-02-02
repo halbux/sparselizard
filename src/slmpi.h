@@ -67,7 +67,7 @@ namespace slmpi
     void scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment, std::vector<int>& fragsizes);
     void scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes);
     
-    // Exchange a single value with each unique target:
+    // Exchange a fixed number of values with each unique target:
     void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues);
     void exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues);
     // Exchange a message with each unique target (same message sent to each target):
