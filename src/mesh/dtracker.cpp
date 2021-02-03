@@ -457,6 +457,7 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     elements* els = getrawmesh()->getelements();
     physicalregions* prs = getrawmesh()->getphysicalregions();
 
+    int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
     int meshdim = getrawmesh()->getmeshdimension();
@@ -597,6 +598,12 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     {
         if (physregsvec[3*r+0] != NULL || physregsvec[3*r+1] != NULL || physregsvec[3*r+2] != NULL)
         {
+            if (r == rank)
+            {
+                std::cout << "Error in 'dtracker' object: rank " << r << " is a neighbour of itself (this is unexpected)" << std::endl;
+                abort();
+            }
+        
             myneighbours.push_back(r);
             myisneighbour[r] = true;
             for (int dim = 0; dim < 3; dim++)
