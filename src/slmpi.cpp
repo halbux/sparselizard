@@ -100,12 +100,12 @@ void slmpi::send(int destination, int tag, int len, double* data)
 
 void slmpi::send(int destination, int tag, std::vector<int>& data)
 {
-    MPI_Send(&data[0], data.size(), MPI_INT, destination, tag, MPI_COMM_WORLD);
+    MPI_Send(data.data(), data.size(), MPI_INT, destination, tag, MPI_COMM_WORLD);
 }
 
 void slmpi::send(int destination, int tag, std::vector<double>& data)
 {
-    MPI_Send(&data[0], data.size(), MPI_DOUBLE, destination, tag, MPI_COMM_WORLD);
+    MPI_Send(data.data(), data.size(), MPI_DOUBLE, destination, tag, MPI_COMM_WORLD);
 }
 
 
@@ -121,12 +121,12 @@ void slmpi::receive(int source, int tag, int len, double* data)
 
 void slmpi::receive(int source, int tag, std::vector<int>& data)
 {
-    MPI_Recv(&data[0], data.size(), MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(data.data(), data.size(), MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
 void slmpi::receive(int source, int tag, std::vector<double>& data)
 {
-    MPI_Recv(&data[0], data.size(), MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(data.data(), data.size(), MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
 
@@ -142,23 +142,23 @@ void slmpi::sum(int len, double* data)
 
 void slmpi::sum(std::vector<int>& data)
 {
-    MPI_Allreduce(MPI_IN_PLACE, &data[0], data.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 }
 
 void slmpi::sum(std::vector<double>& data)
 {
-    MPI_Allreduce(MPI_IN_PLACE, &data[0], data.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 }
 
 
 void slmpi::broadcast(int broadcaster, std::vector<int>& data)
 {
-    MPI_Bcast(&data[0], data.size(), MPI_INT, broadcaster, MPI_COMM_WORLD);
+    MPI_Bcast(data.data(), data.size(), MPI_INT, broadcaster, MPI_COMM_WORLD);
 }
 
 void slmpi::broadcast(int broadcaster, std::vector<double>& data)
 {
-    MPI_Bcast(&data[0], data.size(), MPI_DOUBLE, broadcaster, MPI_COMM_WORLD);
+    MPI_Bcast(data.data(), data.size(), MPI_DOUBLE, broadcaster, MPI_COMM_WORLD);
 }
 
 
@@ -169,7 +169,7 @@ void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
     if (getrank() == gatherer)
         gathered.resize(count()*fragment.size());
 
-    MPI_Gather(&fragment[0], fragment.size(), MPI_INT, &gathered[0], fragment.size(), MPI_INT, gatherer, MPI_COMM_WORLD); 
+    MPI_Gather(fragment.data(), fragment.size(), MPI_INT, gathered.data(), fragment.size(), MPI_INT, gatherer, MPI_COMM_WORLD); 
 }
 
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered)
@@ -179,7 +179,7 @@ void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<doub
     if (getrank() == gatherer)
         gathered.resize(count()*fragment.size());
 
-    MPI_Gather(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], fragment.size(), MPI_DOUBLE, gatherer, MPI_COMM_WORLD); 
+    MPI_Gather(fragment.data(), fragment.size(), MPI_DOUBLE, gathered.data(), fragment.size(), MPI_DOUBLE, gatherer, MPI_COMM_WORLD); 
 }
 
 
@@ -197,7 +197,7 @@ void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& g
     if (getrank() == gatherer)
         gathered.resize(totlen);
 
-    MPI_Gatherv(&fragment[0], fragment.size(), MPI_INT, &gathered[0], &fragsizes[0], &shifts[0], MPI_INT, gatherer, MPI_COMM_WORLD); 
+    MPI_Gatherv(fragment.data(), fragment.size(), MPI_INT, gathered.data(), fragsizes.data(), shifts.data(), MPI_INT, gatherer, MPI_COMM_WORLD); 
 }
 
 void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes)
@@ -214,7 +214,7 @@ void slmpi::gather(int gatherer, std::vector<double>& fragment, std::vector<doub
     if (getrank() == gatherer)
         gathered.resize(totlen);
 
-    MPI_Gatherv(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, gatherer, MPI_COMM_WORLD); 
+    MPI_Gatherv(fragment.data(), fragment.size(), MPI_DOUBLE, gathered.data(), fragsizes.data(), shifts.data(), MPI_DOUBLE, gatherer, MPI_COMM_WORLD); 
 }
 
 
@@ -222,14 +222,14 @@ void slmpi::allgather(std::vector<int>& fragment, std::vector<int>& gathered)
 {
     gathered.resize(count()*fragment.size());
 
-    MPI_Allgather(&fragment[0], fragment.size(), MPI_INT, &gathered[0], fragment.size(), MPI_INT, MPI_COMM_WORLD);
+    MPI_Allgather(fragment.data(), fragment.size(), MPI_INT, gathered.data(), fragment.size(), MPI_INT, MPI_COMM_WORLD);
 }
 
 void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gathered)
 {
     gathered.resize(count()*fragment.size());
 
-    MPI_Allgather(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], fragment.size(), MPI_DOUBLE, MPI_COMM_WORLD);
+    MPI_Allgather(fragment.data(), fragment.size(), MPI_DOUBLE, gathered.data(), fragment.size(), MPI_DOUBLE, MPI_COMM_WORLD);
 }
 
 
@@ -241,7 +241,7 @@ void slmpi::allgather(std::vector<int>& fragment, std::vector<int>& gathered, st
         
     gathered.resize(shifts[fragsizes.size()-1]+fragsizes[fragsizes.size()-1]);
 
-    MPI_Allgatherv(&fragment[0], fragment.size(), MPI_INT, &gathered[0], &fragsizes[0], &shifts[0], MPI_INT, MPI_COMM_WORLD);
+    MPI_Allgatherv(fragment.data(), fragment.size(), MPI_INT, gathered.data(), fragsizes.data(), shifts.data(), MPI_INT, MPI_COMM_WORLD);
 }
 
 void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gathered, std::vector<int>& fragsizes)
@@ -252,18 +252,18 @@ void slmpi::allgather(std::vector<double>& fragment, std::vector<double>& gather
         
     gathered.resize(shifts[fragsizes.size()-1]+fragsizes[fragsizes.size()-1]);
 
-    MPI_Allgatherv(&fragment[0], fragment.size(), MPI_DOUBLE, &gathered[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, MPI_COMM_WORLD);
+    MPI_Allgatherv(fragment.data(), fragment.size(), MPI_DOUBLE, gathered.data(), fragsizes.data(), shifts.data(), MPI_DOUBLE, MPI_COMM_WORLD);
 }
     
 
 void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>& fragment)
 {
-    MPI_Scatter(&toscatter[0], fragment.size(), MPI_INT, &fragment[0], fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
+    MPI_Scatter(toscatter.data(), fragment.size(), MPI_INT, fragment.data(), fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
 }
 
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment)
 {
-    MPI_Scatter(&toscatter[0], fragment.size(), MPI_DOUBLE, &fragment[0], fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
+    MPI_Scatter(toscatter.data(), fragment.size(), MPI_DOUBLE, fragment.data(), fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
 }
 
 
@@ -273,7 +273,7 @@ void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
     for (int i = 1; i < fragsizes.size(); i++)
         shifts[i] = shifts[i-1]+fragsizes[i-1];
 
-    MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_INT, &fragment[0], fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
+    MPI_Scatterv(toscatter.data(), fragsizes.data(), shifts.data(), MPI_INT, fragment.data(), fragment.size(), MPI_INT, scatterer, MPI_COMM_WORLD); 
 }
 
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes)
@@ -282,7 +282,7 @@ void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<d
     for (int i = 1; i < fragsizes.size(); i++)
         shifts[i] = shifts[i-1]+fragsizes[i-1];
 
-    MPI_Scatterv(&toscatter[0], &fragsizes[0], &shifts[0], MPI_DOUBLE, &fragment[0], fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
+    MPI_Scatterv(toscatter.data(), fragsizes.data(), shifts.data(), MPI_DOUBLE, fragment.data(), fragment.size(), MPI_DOUBLE, scatterer, MPI_COMM_WORLD); 
 }
 
 
@@ -291,7 +291,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues,
     int numtargets = targetranks.size();
  
     receivevalues = {};
-    if (numtargets == 0)
+    if (numtargets == 0 || sendvalues.size() == 0)
         return;
     
     int numvalues = sendvalues.size()/numtargets;
@@ -315,7 +315,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalu
     int numtargets = targetranks.size();
  
     receivevalues = {};
-    if (numtargets == 0)
+    if (numtargets == 0 || sendvalues.size() == 0)
         return;
     
     int numvalues = sendvalues.size()/numtargets;
@@ -346,7 +346,7 @@ void slmpi::exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer,
     std::vector<std::vector<int>> duplicatedsenddata(numtargets, std::vector<int>(sendlen));
     for (int i = 0; i < numtargets; i++)
     {
-        sendbuffers[i] = &(duplicatedsenddata[i][0]);
+        sendbuffers[i] = duplicatedsenddata[i].data();
         for (int j = 0; j < sendlen; j++)
             duplicatedsenddata[i][j] = sendbuffer[j];
     }
@@ -366,7 +366,7 @@ void slmpi::exchange(std::vector<int> targetranks, int sendlen, double* sendbuff
     std::vector<std::vector<double>> duplicatedsenddata(numtargets, std::vector<double>(sendlen));
     for (int i = 0; i < numtargets; i++)
     {
-        sendbuffers[i] = &(duplicatedsenddata[i][0]);
+        sendbuffers[i] = duplicatedsenddata[i].data();
         for (int j = 0; j < sendlen; j++)
             duplicatedsenddata[i][j] = sendbuffer[j];
     }

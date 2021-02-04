@@ -169,7 +169,7 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
         receivebuffers[n] = &candidatebarys[pos];
         pos += len;
     }
-    slmpi::exchange(neighbours, 3*numelementsininterface, &interfaceelembarys[0], receivelens, receivebuffers);
+    slmpi::exchange(neighbours, 3*numelementsininterface, interfaceelembarys.data(), receivelens, receivebuffers);
     
     // Find matches:
     std::vector<int> posfound;
@@ -289,14 +289,14 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     {
         int datasize = dataforeachneighbour[n].size();
         sendlens[n] = datasize;
-        sendbuffers[n] = &(dataforeachneighbour[n][0]);
+        sendbuffers[n] = dataforeachneighbour[n].data();
     }
     slmpi::exchange(neighbours, sendlens, receivelens);
     
     for (int n = 0; n < numneighbours; n++)
     {
         datafromeachneighbour[n].resize(receivelens[n]);
-        receivebuffers[n] = &(datafromeachneighbour[n][0]);
+        receivebuffers[n] = datafromeachneighbour[n].data();
     }
     slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
     

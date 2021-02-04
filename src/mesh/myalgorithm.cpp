@@ -1471,7 +1471,7 @@ std::vector<int> myalgorithm::unpack(std::vector<double>& packed, std::vector<st
         index += 2;
         
         unpacked[cds] = std::vector<double>(len);
-        double* data = &(unpacked[cds][0]);
+        double* data = unpacked[cds].data();
         
         for (int i = 0; i < len; i++)
             data[i] = packed[index+i];
