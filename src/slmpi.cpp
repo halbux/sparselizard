@@ -46,6 +46,8 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues,
 void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, int sendlen, double* sendbuffer, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<int>>& sends, std::vector<std::vector<int>>& receives) { errornompi(); }
+void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<double>>& sends, std::vector<std::vector<double>>& receives) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
 std::vector<double> slmpi::ping(int messagesize, int verbosity) { errornompi(); abort(); }
@@ -372,6 +374,50 @@ void slmpi::exchange(std::vector<int> targetranks, int sendlen, double* sendbuff
     }
     
     exchange(targetranks, sendlens, sendbuffers, receivelens, receivebuffers);
+}
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<int>>& sends, std::vector<std::vector<int>>& receives)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<int> sendlens(numtargets), reclens(numtargets);
+    std::vector<int*> sendbuffers(numtargets), recbuffers(numtargets);
+    
+    for (int i = 0; i < numtargets; i++)
+    {
+        sendlens[i] = sends[i].size();
+        reclens[i] = receives[i].size();
+        
+        sendbuffers[i] = sends[i].data();
+        recbuffers[i] = receives[i].data();
+    }
+
+    exchange(targetranks, sendlens, sendbuffers, reclens, recbuffers);
+}
+
+void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<double>>& sends, std::vector<std::vector<double>>& receives)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<int> sendlens(numtargets), reclens(numtargets);
+    std::vector<double*> sendbuffers(numtargets), recbuffers(numtargets);
+    
+    for (int i = 0; i < numtargets; i++)
+    {
+        sendlens[i] = sends[i].size();
+        reclens[i] = receives[i].size();
+        
+        sendbuffers[i] = sends[i].data();
+        recbuffers[i] = receives[i].data();
+    }
+
+    exchange(targetranks, sendlens, sendbuffers, reclens, recbuffers);
 }
     
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers)
