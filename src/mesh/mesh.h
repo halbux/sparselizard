@@ -84,11 +84,17 @@ class mesh
         
         // Additional region selection tools. Will become effective only after loading the mesh. Can reuse previous selections!
         void selectskin(int newphysreg, int physregtoskin);
+        void selectskin(int newphysreg);
         void selectbox(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit);
+        void selectbox(int newphysreg, int selecteddim, std::vector<double> boxlimit);
         void selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius);
+        void selectsphere(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius);
         void selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers);
+        void selectlayer(int newphysreg, int physregtostartgrowth, int numlayers);
         void selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude);
+        void selectexclusion(int newphysreg, std::vector<int> physregstoexclude);
         void selectanynode(int newphysreg, int physregtoselectfrom);
+        void selectanynode(int newphysreg);
         
         // Set this mesh as the one to use:
         void use(void);

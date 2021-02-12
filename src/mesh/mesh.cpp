@@ -192,38 +192,110 @@ std::vector<int> mesh::getphysicalregionnumbers(int dim)
 
 void mesh::selectskin(int newphysreg, int physregtoskin)
 {
+    if (physregtoskin < 0)
+    {
+        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
+        abort();
+    }
+
     errorifloaded();
     rawmeshptr->selectskin(newphysreg, physregtoskin);
 }
 
+void mesh::selectskin(int newphysreg)
+{
+    errorifloaded();
+    rawmeshptr->selectskin(newphysreg, -1);
+}
+
 void mesh::selectbox(int newphysreg, int physregtobox, int selecteddim, std::vector<double> boxlimit)
 {
+    if (physregtobox < 0)
+    {
+        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
+        abort();
+    }
+    
     errorifloaded();
     rawmeshptr->selectbox(newphysreg, physregtobox, selecteddim, boxlimit);
 }
 
+void mesh::selectbox(int newphysreg, int selecteddim, std::vector<double> boxlimit)
+{
+    errorifloaded();
+    rawmeshptr->selectbox(newphysreg, -1, selecteddim, boxlimit);
+}
+
 void mesh::selectsphere(int newphysreg, int physregtosphere, int selecteddim, std::vector<double> centercoords, double radius)
 {
+    if (physregtosphere < 0)
+    {
+        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
+        abort();
+    }
+    
     errorifloaded();
     rawmeshptr->selectsphere(newphysreg, physregtosphere, selecteddim, centercoords, radius);
 }
 
+void mesh::selectsphere(int newphysreg, int selecteddim, std::vector<double> centercoords, double radius)
+{
+    errorifloaded();
+    rawmeshptr->selectsphere(newphysreg, -1, selecteddim, centercoords, radius);
+}
+
 void mesh::selectlayer(int newphysreg, int physregtoselectfrom, int physregtostartgrowth, int numlayers)
 {
+    if (physregtoselectfrom < 0)
+    {
+        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
+        abort();
+    }
+    
     errorifloaded();
     rawmeshptr->selectlayer(newphysreg, physregtoselectfrom, physregtostartgrowth, numlayers);
 }
 
+void mesh::selectlayer(int newphysreg, int physregtostartgrowth, int numlayers)
+{
+    errorifloaded();
+    rawmeshptr->selectlayer(newphysreg, -1, physregtostartgrowth, numlayers);
+}
+
 void mesh::selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector<int> physregstoexclude)
 {
+    if (physregtoexcludefrom < 0)
+    {
+        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
+        abort();
+    }
+    
     errorifloaded();
     rawmeshptr->selectexclusion(newphysreg, physregtoexcludefrom, physregstoexclude);
 }
 
-void mesh::selectanynode(int newphysreg, int physregtoselectfrom)
+void mesh::selectexclusion(int newphysreg, std::vector<int> physregstoexclude)
 {
     errorifloaded();
+    rawmeshptr->selectexclusion(newphysreg, -1, physregstoexclude);
+}
+
+void mesh::selectanynode(int newphysreg, int physregtoselectfrom)
+{
+    if (physregtoselectfrom < 0)
+    {
+        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
+        abort();
+    }
+    
+    errorifloaded();
     rawmeshptr->selectanynode(newphysreg, physregtoselectfrom);
+}
+
+void mesh::selectanynode(int newphysreg)
+{
+    errorifloaded();
+    rawmeshptr->selectanynode(newphysreg, -1);
 }
 
 void mesh::use(void)
