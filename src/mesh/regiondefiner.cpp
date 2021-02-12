@@ -3,7 +3,9 @@
 
 void regiondefiner::defineskinregion(int regnum)
 {
-    if (toskin[regnum] != -1)
+    bool isnotall = (toskin[regnum] != -1);
+
+    if (isnotall)
         myphysicalregions->errorundefined({toskin[regnum]});
 
     physicalregion* newphysreg = myphysicalregions->get(skins[regnum]);
@@ -35,6 +37,7 @@ void regiondefiner::defineskinregion(int regnum)
         for (int elemtype = 0; elemtype <= 7; elemtype++)
         {
             int numelems = curelems->at(elemtype).size();
+            
             if (numelems == 0)
                 continue;
 
@@ -66,7 +69,9 @@ void regiondefiner::defineskinregion(int regnum)
 
 void regiondefiner::defineboxregion(int regnum)
 {
-    if (tobox[regnum] != -1)
+    bool isnotall = (tobox[regnum] != -1);
+    
+    if (isnotall)
         myphysicalregions->errorundefined({tobox[regnum]});
 
     std::vector<double>* nodecoords = mynodes->getcoordinates();
@@ -81,7 +86,9 @@ void regiondefiner::defineboxregion(int regnum)
     // Loop on all element types:
     for (int elemtype = 0; elemtype <= 7; elemtype++)
     {
-        if (curelems->at(elemtype).size() == 0)
+        int numelems = curelems->at(elemtype).size();
+        
+        if (numelems == 0)
             continue;
 
         element myelement(elemtype);
@@ -98,7 +105,7 @@ void regiondefiner::defineboxregion(int regnum)
                 continue;
 
             // Loop on all elements:
-            for (int elem = 0; elem < curelems->at(elemtype).size(); elem++)
+            for (int elem = 0; elem < numelems; elem++)
             {
                 int curelem = curelems->at(elemtype)[elem];
 
@@ -133,7 +140,9 @@ void regiondefiner::defineboxregion(int regnum)
 
 void regiondefiner::definesphereregion(int regnum)
 {
-    if (tosphere[regnum] != -1)
+    bool isnotall = (tosphere[regnum] != -1);
+    
+    if (isnotall)
         myphysicalregions->errorundefined({tosphere[regnum]});
 
     std::vector<double>* nodecoords = mynodes->getcoordinates();
@@ -149,7 +158,9 @@ void regiondefiner::definesphereregion(int regnum)
     // Loop on all element types:
     for (int elemtype = 0; elemtype <= 7; elemtype++)
     {
-        if (curelems->at(elemtype).size() == 0)
+        int numelems = curelems->at(elemtype).size();
+        
+        if (numelems == 0)
             continue;
 
         element myelement(elemtype);
@@ -166,7 +177,7 @@ void regiondefiner::definesphereregion(int regnum)
                 continue;
 
             // Loop on all elements:
-            for (int elem = 0; elem < curelems->at(elemtype).size(); elem++)
+            for (int elem = 0; elem < numelems; elem++)
             {
                 int curelem = curelems->at(elemtype)[elem];
 
@@ -201,7 +212,9 @@ void regiondefiner::definesphereregion(int regnum)
 
 void regiondefiner::defineexclusionregion(int regnum)
 {
-    if (toexcludefrom[regnum] != -1)
+    bool isnotall = (toexcludefrom[regnum] != -1);
+    
+    if (isnotall)
         myphysicalregions->errorundefined({toexcludefrom[regnum]});
     myphysicalregions->errorundefined(toexclude[regnum]);
         
@@ -225,14 +238,18 @@ void regiondefiner::defineexclusionregion(int regnum)
     // Loop on all element types:
     for (int i = 0; i <= 7; i++)
     {
-        if (curelems->at(i).size() == 0)
+        int numelems = curelems->at(i).size();
+        
+        if (numelems == 0)
             continue;
 
         int numelemsintype = myelements->count(i);
         std::vector<bool> inexcluded(numelemsintype, false);
         // First add all elements from which to exclude:
-        for (int e = 0; e < curelems->at(i).size(); e++)
+        for (int e = 0; e < numelems; e++)
+        {
             inexcluded[curelems->at(i)[e]] = true;
+        }
 
         // Now remove the elements to exclude:
         for (int j = 0; j < toexclude[regnum].size(); j++)
@@ -256,7 +273,9 @@ void regiondefiner::defineexclusionregion(int regnum)
 
 void regiondefiner::definelayerregion(int regnum)
 {
-    if (tolayer[regnum] != -1)
+    bool isnotall = (tolayer[regnum] != -1);
+    
+    if (isnotall)
         myphysicalregions->errorundefined({tolayer[regnum]});
     myphysicalregions->errorundefined({growthstart[regnum]});
         
@@ -273,6 +292,7 @@ void regiondefiner::definelayerregion(int regnum)
     for (int i = 0; i <= 7; i++)
     {
         int numelems = elemsingr->at(i).size();
+        
         if (numelems == 0)
             continue;
             
@@ -302,6 +322,7 @@ void regiondefiner::definelayerregion(int regnum)
         for (int i = 0; i <= 7; i++)
         {
             int numelems = curelems->at(i).size();
+            
             if (numelems == 0)
                 continue;
 
@@ -342,7 +363,9 @@ void regiondefiner::definelayerregion(int regnum)
 
 void regiondefiner::defineanynoderegion(int regnum)
 {
-    if (toanynode[regnum] != -1)
+    bool isnotall = (toanynode[regnum] != -1);
+    
+    if (isnotall)
         myphysicalregions->errorundefined({toanynode[regnum]});
         
     physicalregion* newphysreg = myphysicalregions->get(anynoded[regnum]);
@@ -353,9 +376,13 @@ void regiondefiner::defineanynoderegion(int regnum)
     // Loop on all element types:
     for (int i = 0; i <= 7; i++)
     {
-        if (elemsinor->at(i).size() > 0)
+        int numelems = elemsinor->at(i).size();
+        
+        if (numelems > 0)
         {
-            int selnode = myelements->getsubelement(0, i, elemsinor->at(i)[0], 0);
+            int firstelem = elemsinor->at(i)[0];
+        
+            int selnode = myelements->getsubelement(0, i, firstelem, 0);
             newphysreg->addelement(0, selnode);
          
             break;   
