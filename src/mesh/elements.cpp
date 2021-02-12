@@ -1069,6 +1069,61 @@ void elements::explode(void)
     }
 }
 
+void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<int>>* mustbeinelementlist)
+{
+    int highestdim = -1;
+    for (int i = 0; i < 8; i++)
+    {
+        element el(i);
+        int eldim = el.getelementdimension();
+        if (elementlist->at(i).size() > 0 && eldim > highestdim)
+            highestdim = eldim;
+    }
+
+    int numsubs = count(subtype);
+    
+    // To treat only once each subelement:
+    std::vector<bool> iselemdone(numsubs, false);
+
+    // Preallocate to max possible size:
+    sublist.resize(numsubs);
+
+    std::vector<bool> issuballowed;
+    if (mustbeinelementlist != NULL)
+        istypeinelementlist(subtype, mustbeinelementlist, issuballowed);
+
+    int index = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        int numelems = elementlist->at(i).size();
+    
+        element el(i);
+        int ns = el.counttype(subtype); // no curvature nodes
+        
+        if (numelems == 0 || ns == 0 || el.getelementdimension() != highestdim)
+            continue;
+
+        for (int j = 0; j < numelems; j++)
+        {
+            int elem = elementlist->at(i)[j];
+            for (int k = 0; k < ns; k++)
+            {
+                int cursub = getsubelement(subtype,i,elem,k);
+
+                if (iselemdone[cursub] == false && (mustbeinelementlist == NULL || issuballowed[cursub]))
+                {
+                    sublist[index] = cursub;
+                    iselemdone[cursub] = true;
+
+                    index++;
+                }
+            }
+        }
+    }
+
+    sublist.resize(index);
+}
+
 void elements::definedisjointregions(void)
 {
     

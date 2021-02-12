@@ -198,7 +198,14 @@ class elements
         // elements created are lines (the edges) and triangles/quadrangles 
         // (the faces) that are part of the original elements. This function 
         // creates duplicated elements that have to be uniqued afterwards.
-        void explode(void);                    
+        void explode(void);
+        
+        // Follow the elements of highest dimension in 'elementlist' in the order provided.
+        // For each element follow the subelements of type 'subtype' in the element-subs order.
+        // Each subelement is passed only once. If the last argument is provided then only the
+        // subelements that are also subelements of that argument element list are returned.
+        // Curvature nodes are NOT returned.
+        void follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<int>>* mustbeinelementlist = NULL);         
         
         
         // To call only after all renumbering and reordering steps:
