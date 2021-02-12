@@ -189,6 +189,16 @@ int elements::count(int elementtypenumber)
     return subelementsinelements[elementtypenumber][0].size()/numberofsubelementsineveryelement[elementtypenumber][0];
 }
 
+int elements::countcells(int elementtypenumber)
+{
+    int dim = getdimension();
+    
+    if (dim == 0 && elementtypenumber != 0 || dim == 1 && elementtypenumber != 1 || dim == 2 && elementtypenumber != 2 && elementtypenumber != 3 || dim == 3 && elementtypenumber < 4)
+        return 0;
+    
+    return count(elementtypenumber);
+}
+
 int elements::countindim(int dim)
 {
     int output = 0;

@@ -9,9 +9,16 @@ void regiondefiner::defineskinregion(int regnum)
         myphysicalregions->errorundefined({toskin[regnum]});
 
     physicalregion* newphysreg = myphysicalregions->get(skins[regnum]);
-    physicalregion* curphysreg = myphysicalregions->get(toskin[regnum]);
+    physicalregion* curphysreg;
+    if (isnotall)
+        curphysreg = myphysicalregions->get(toskin[regnum]);
 
-    int physregdim = curphysreg->getelementdimension();
+    int physregdim;
+    if (isnotall)
+        physregdim = curphysreg->getelementdimension();
+    else
+        physregdim = myelements->getdimension();
+        
     if (physregdim == 0)
     {
         std::cout << "Error in 'regiondefiner' object: cannot get the skin of point elements" << std::endl;
@@ -21,7 +28,9 @@ void regiondefiner::defineskinregion(int regnum)
     // The skin has a one lower dimension:
     int skindim = physregdim-1;
 
-    std::vector<std::vector<int>>* curelems = curphysreg->getelementlist();
+    std::vector<std::vector<int>>* curelems;
+    if (isnotall)
+        curelems = curphysreg->getelementlist();
 
     // Loop on all skin element types:
     for (int skinelemtype = 0; skinelemtype <= 7; skinelemtype++)
@@ -36,7 +45,11 @@ void regiondefiner::defineskinregion(int regnum)
         // Loop on all element types in the physical region:
         for (int elemtype = 0; elemtype <= 7; elemtype++)
         {
-            int numelems = curelems->at(elemtype).size();
+            int numelems;
+            if (isnotall)
+                numelems = curelems->at(elemtype).size();
+            else
+                numelems = myelements->countcells(elemtype);
             
             if (numelems == 0)
                 continue;
@@ -50,7 +63,11 @@ void regiondefiner::defineskinregion(int regnum)
             // Loop on all elements:
             for (int elem = 0; elem < numelems; elem++)
             {
-                int curelem = curelems->at(elemtype)[elem];
+                int curelem;
+                if (isnotall)
+                    curelem = curelems->at(elemtype)[elem];
+                else
+                    curelem = elem;
 
                 for (int subelem = 0; subelem < numsubtypeelems; subelem++)
                     numoccurences[myelements->getsubelement(skinelemtype, elemtype, curelem, subelem)]++;
@@ -79,14 +96,22 @@ void regiondefiner::defineboxregion(int regnum)
     std::vector<double> boxlimit = boxlimits[regnum];
 
     physicalregion* newphysreg = myphysicalregions->get(boxed[regnum]);
-    physicalregion* curphysreg = myphysicalregions->get(tobox[regnum]);
+    physicalregion* curphysreg;
+    if (isnotall)
+        curphysreg = myphysicalregions->get(tobox[regnum]);
 
-    std::vector<std::vector<int>>* curelems = curphysreg->getelementlist();
+    std::vector<std::vector<int>>* curelems;
+    if (isnotall)
+        curelems = curphysreg->getelementlist();
 
     // Loop on all element types:
     for (int elemtype = 0; elemtype <= 7; elemtype++)
     {
-        int numelems = curelems->at(elemtype).size();
+        int numelems;
+        if (isnotall)
+            numelems = curelems->at(elemtype).size();
+        else
+            numelems = myelements->countcells(elemtype);
         
         if (numelems == 0)
             continue;
@@ -107,7 +132,11 @@ void regiondefiner::defineboxregion(int regnum)
             // Loop on all elements:
             for (int elem = 0; elem < numelems; elem++)
             {
-                int curelem = curelems->at(elemtype)[elem];
+                int curelem;
+                if (isnotall)
+                    curelem = curelems->at(elemtype)[elem];
+                else
+                    curelem = elem;
 
                 for (int subelem = 0; subelem < numsubtypeelems; subelem++)
                 {
@@ -151,14 +180,22 @@ void regiondefiner::definesphereregion(int regnum)
     double sphereradius = sphereradii[regnum];
 
     physicalregion* newphysreg = myphysicalregions->get(sphered[regnum]);
-    physicalregion* curphysreg = myphysicalregions->get(tosphere[regnum]);
+    physicalregion* curphysreg;
+    if (isnotall)
+        curphysreg = myphysicalregions->get(tosphere[regnum]);
 
-    std::vector<std::vector<int>>* curelems = curphysreg->getelementlist();
+    std::vector<std::vector<int>>* curelems;
+    if (isnotall)
+        curelems = curphysreg->getelementlist();
 
     // Loop on all element types:
     for (int elemtype = 0; elemtype <= 7; elemtype++)
     {
-        int numelems = curelems->at(elemtype).size();
+        int numelems;
+        if (isnotall)
+            numelems = curelems->at(elemtype).size();
+        else
+            numelems = myelements->countcells(elemtype);
         
         if (numelems == 0)
             continue;
@@ -179,7 +216,11 @@ void regiondefiner::definesphereregion(int regnum)
             // Loop on all elements:
             for (int elem = 0; elem < numelems; elem++)
             {
-                int curelem = curelems->at(elemtype)[elem];
+                int curelem;
+                if (isnotall)
+                    curelem = curelems->at(elemtype)[elem];
+                else
+                    curelem = elem;
 
                 for (int subelem = 0; subelem < numsubtypeelems; subelem++)
                 {
@@ -219,7 +260,12 @@ void regiondefiner::defineexclusionregion(int regnum)
     myphysicalregions->errorundefined(toexclude[regnum]);
         
     // Make sure the regions are of same dimension:
-    int physregdim = myphysicalregions->get(toexcludefrom[regnum])->getelementdimension();
+    int physregdim;
+    if (isnotall)
+        physregdim = myphysicalregions->get(toexcludefrom[regnum])->getelementdimension();
+    else
+        physregdim = myelements->getdimension();
+    
     for (int i = 0; i < toexclude[regnum].size(); i++)
     {
         int curdim = myphysicalregions->get(toexclude[regnum][i])->getelementdimension();
@@ -231,14 +277,22 @@ void regiondefiner::defineexclusionregion(int regnum)
     }
     
     physicalregion* newphysreg = myphysicalregions->get(excluded[regnum]);
-    physicalregion* curphysreg = myphysicalregions->get(toexcludefrom[regnum]);
+    physicalregion* curphysreg;
+    if (isnotall)
+        curphysreg = myphysicalregions->get(toexcludefrom[regnum]);
     
-    std::vector<std::vector<int>>* curelems = curphysreg->getelementlist();
+    std::vector<std::vector<int>>* curelems;
+    if (isnotall)
+        curelems = curphysreg->getelementlist();
 
     // Loop on all element types:
     for (int i = 0; i <= 7; i++)
     {
-        int numelems = curelems->at(i).size();
+        int numelems;
+        if (isnotall)
+            numelems = curelems->at(i).size();
+        else
+            numelems = myelements->countcells(i);
         
         if (numelems == 0)
             continue;
@@ -248,7 +302,10 @@ void regiondefiner::defineexclusionregion(int regnum)
         // First add all elements from which to exclude:
         for (int e = 0; e < numelems; e++)
         {
-            inexcluded[curelems->at(i)[e]] = true;
+            if (isnotall)
+                inexcluded[curelems->at(i)[e]] = true;
+            else
+                inexcluded[e] = true;
         }
 
         // Now remove the elements to exclude:
@@ -280,7 +337,9 @@ void regiondefiner::definelayerregion(int regnum)
     myphysicalregions->errorundefined({growthstart[regnum]});
         
     physicalregion* newphysreg = myphysicalregions->get(layered[regnum]);
-    physicalregion* origphysreg = myphysicalregions->get(tolayer[regnum]);
+    physicalregion* origphysreg;
+    if (isnotall)
+        origphysreg = myphysicalregions->get(tolayer[regnum]);
     physicalregion* growthphysreg = myphysicalregions->get(growthstart[regnum]);
     
     int nl = numlayers[regnum];
@@ -311,7 +370,9 @@ void regiondefiner::definelayerregion(int regnum)
     for (int i = 0; i <= 7; i++)
         inlayer[i] = std::vector<bool>(myelements->count(i), false);
 
-    std::vector<std::vector<int>>* curelems = origphysreg->getelementlist();
+    std::vector<std::vector<int>>* curelems;
+    if (isnotall)
+        curelems = origphysreg->getelementlist();
     
     for (int l = 0; l < nl; l++)
     {
@@ -321,7 +382,11 @@ void regiondefiner::definelayerregion(int regnum)
         // Find all elements in the current layer (must be touching the growth region with at least one node):
         for (int i = 0; i <= 7; i++)
         {
-            int numelems = curelems->at(i).size();
+            int numelems;
+            if (isnotall)
+                numelems = curelems->at(i).size();
+            else
+                numelems = myelements->countcells(i);
             
             if (numelems == 0)
                 continue;
@@ -331,7 +396,12 @@ void regiondefiner::definelayerregion(int regnum)
 
             for (int j = 0; j < numelems; j++)
             {
-                int curelem = curelems->at(i)[j];
+                int curelem;
+                if (isnotall)
+                    curelem = curelems->at(i)[j];
+                else
+                    curelem = j;
+                    
                 if (inlayer[i][curelem])
                     continue;
                     
@@ -369,18 +439,30 @@ void regiondefiner::defineanynoderegion(int regnum)
         myphysicalregions->errorundefined({toanynode[regnum]});
         
     physicalregion* newphysreg = myphysicalregions->get(anynoded[regnum]);
-    physicalregion* origphysreg = myphysicalregions->get(toanynode[regnum]);
+    physicalregion* origphysreg;
+    if (isnotall)
+        origphysreg = myphysicalregions->get(toanynode[regnum]);
     
-    std::vector<std::vector<int>>* elemsinor = origphysreg->getelementlist();
+    std::vector<std::vector<int>>* elemsinor;
+    if (isnotall)
+        elemsinor = origphysreg->getelementlist();
     
     // Loop on all element types:
     for (int i = 0; i <= 7; i++)
     {
-        int numelems = elemsinor->at(i).size();
+        int numelems;
+        if (isnotall)
+            numelems = elemsinor->at(i).size();
+        else
+            numelems = myelements->countcells(i);
         
         if (numelems > 0)
         {
-            int firstelem = elemsinor->at(i)[0];
+            int firstelem;
+            if (isnotall)
+                firstelem = elemsinor->at(i)[0];
+            else
+                firstelem = 0;
         
             int selnode = myelements->getsubelement(0, i, firstelem, 0);
             newphysreg->addelement(0, selnode);

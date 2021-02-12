@@ -120,6 +120,8 @@ class elements
         
         // Return the number of elements of a given type:
         int count(int elementtypenumber);
+        // Same as above but returns 0 if the element type is not a cell:
+        int countcells(int elementtypenumber);
         // Return the number of elements of a given dimension:
         int countindim(int dim);
         // Count in each type:
