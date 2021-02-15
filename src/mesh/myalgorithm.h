@@ -216,6 +216,9 @@ namespace myalgorithm
     std::vector<int> extract(std::vector<int>& data, int period, int shift);
     std::vector<double> extract(std::vector<double>& data, int period, int shift);
     
+    // Return the ceiled division a/b:
+    int ceildiv(int a, int b);
+    
 };
 
 #endif

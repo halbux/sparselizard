@@ -1533,3 +1533,12 @@ std::vector<double> myalgorithm::extract(std::vector<double>& data, int period, 
     return output;
 }
 
+int myalgorithm::ceildiv(int a, int b)
+{
+    int r = a%b;
+    if (r == 0)
+        return a/b;
+    else
+        return (a-r)/b+1;
+}
+
