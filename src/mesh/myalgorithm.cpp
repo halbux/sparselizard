@@ -1542,3 +1542,56 @@ int myalgorithm::ceildiv(int a, int b)
         return (a-r)/b+1;
 }
 
+void myalgorithm::pack(std::vector<bool>& topack, std::vector<int>& packed)
+{   
+    int numbitsinint = 8 * sizeof(int); // to be os independent
+    numbitsinint--; // sign bit is not used to avoid issues on 0 int value
+ 
+    int numbits = topack.size();
+    int numints = ceildiv(numbits, numbitsinint);
+    
+    packed = std::vector<int>(numints);
+    
+    std::vector<int> powersof2(numbitsinint, 1);
+    for (int i = 1; i < numbitsinint; i++)
+        powersof2[i] = 2*powersof2[i-1];
+    
+    for (int i = 0; i < numints; i++)
+    {
+        int val = 0;
+        for (int b = 0; b < std::min(numbitsinint, numbits-i*numbitsinint); b++)
+        {
+            if (topack[i*numbitsinint+b])
+                val += powersof2[b];
+        }
+        packed[i] = val;
+    }
+}
+
+void myalgorithm::unpack(int orignumbools, std::vector<int>& packed, std::vector<bool>& unpacked)
+{
+    unpacked = std::vector<bool>(orignumbools, false);
+
+    int numbitsinint = 8 * sizeof(int); // to be os independent
+    numbitsinint--; // sign bit is not used to avoid issues on 0 int value
+ 
+    int numints = packed.size();
+ 
+    for (int i = 0; i < numints; i++)
+    {
+        int val = packed[i];
+        for (int b = 0; b < numbitsinint; b++)
+        {
+            if (val > 0)
+            {
+                if (val%2 == 1)
+                {
+                    unpacked[i*numbitsinint+b] = true;
+                    val--;
+                }
+                val = val/2;
+            }
+        }
+    }
+}
+

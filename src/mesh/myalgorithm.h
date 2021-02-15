@@ -219,6 +219,11 @@ namespace myalgorithm
     // Return the ceiled division a/b:
     int ceildiv(int a, int b);
     
+    // Pack a vector of booleans (works for an arbitrary sizeof(int) bytes):
+    void pack(std::vector<bool>& topack, std::vector<int>& packed);
+    // Unpack the vector of booleans (was of length 'orignumbools' before being packed):
+    void unpack(int orignumbools, std::vector<int>& packed, std::vector<bool>& unpacked);
+    
 };
 
 #endif
