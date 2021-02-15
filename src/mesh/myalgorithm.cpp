@@ -1317,7 +1317,7 @@ void myalgorithm::pickcandidates(int numbertopick, std::vector<double>& candidat
     picked = std::vector<double>(3*numbertopick);
 
     // Pick should include all candidates if the number to pick is larger than the number of candidates: 
-    int spacing = std::ceil((double)numcandidates/(double)numbertopick);
+    int spacing = ceildiv(numcandidates, numbertopick);
 
     for (int i = 0; i < numbertopick; i++)
     {
