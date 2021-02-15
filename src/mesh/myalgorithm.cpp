@@ -1595,3 +1595,33 @@ void myalgorithm::unpack(int orignumbools, std::vector<int>& packed, std::vector
     }
 }
 
+void myalgorithm::split(std::vector<int>& vals, int val, std::vector<int>& lowervals, std::vector<int>& highervals)
+{
+    int nl = 0, nh = 0;
+    for (int i = 0; i < vals.size(); i++)
+    {
+        if (vals[i] < val)
+            nl++;
+        else
+            nh++;
+    }
+    
+    lowervals = std::vector<int>(nl);
+    highervals = std::vector<int>(nh);
+    
+    int il = 0, ih = 0;
+    for (int i = 0; i < vals.size(); i++)
+    {
+        if (vals[i] < val)
+        {
+            lowervals[il] = vals[i];
+            il++;
+        }
+        else
+        {
+            highervals[ih] = vals[i];
+            ih++;
+        }
+    }
+}
+

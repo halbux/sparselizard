@@ -224,6 +224,9 @@ namespace myalgorithm
     // Unpack the vector of booleans (was of length 'orignumbools' before being packed):
     void unpack(int orignumbools, std::vector<int>& packed, std::vector<bool>& unpacked);
     
+    // Split values < val and >= val while keeping the ordering:
+    void split(std::vector<int>& vals, int val, std::vector<int>& lowervals, std::vector<int>& highervals);
+    
 };
 
 #endif
