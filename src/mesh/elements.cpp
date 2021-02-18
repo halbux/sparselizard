@@ -745,9 +745,11 @@ void elements::printtotalorientations(void)
     std::cout << std::endl;
 }
 
-void elements::write(std::string filename, int elementtypenumber, std::vector<int> elementnumbers)
+void elements::write(std::string filename, int elementtypenumber, std::vector<int> elementnumbers, std::vector<int> elementvalues)
 {
     int numelems = elementnumbers.size();
+    if (numelems == 0)
+        return;
     
     element myelem(elementtypenumber, mycurvatureorder);
     int ncn = myelem.countcurvednodes();
@@ -774,7 +776,7 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
             xptr[e*ncn+n] = xc[n];
             yptr[e*ncn+n] = yc[n];
             zptr[e*ncn+n] = zc[n];
-            vptr[e*ncn+n] = elementnumbers[e];
+            vptr[e*ncn+n] = elementvalues[e];
         }
     }
     

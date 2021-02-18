@@ -176,7 +176,7 @@ class elements
         void printsubelements(void);
         void printtotalorientations(void);
         // Visualize elements for debug:
-        void write(std::string filename, int elementtypenumber, std::vector<int> elementnumbers);
+        void write(std::string filename, int elementtypenumber, std::vector<int> elementnumbers, std::vector<int> elementvalues);
         
         // 'computebarycenters' computes the barycenter coordinates of all 
         // elements of type 'elementtypenumber'. The output vector has format 

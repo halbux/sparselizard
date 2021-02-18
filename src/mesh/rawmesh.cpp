@@ -1663,7 +1663,8 @@ void rawmesh::errorondisconnecteddisjointregion(void)
         if (isinmaxdim == false)
         {
             // Write problematic elements to file:
-            myelements.write("info_not_connected.pos", mydisjointregions.getelementtypenumber(d), myalgorithm::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d)));
+            std::vector<int> problematicelements = myalgorithm::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d));
+            myelements.write("info_not_connected.pos", mydisjointregions.getelementtypenumber(d), problematicelements, problematicelements);
             
             std::vector<std::string> typnm = {"node", "line", "face", "volume"};
             std::cout << "Error in 'mesh' object: found at least one " << typnm[drdim] << " not connected to any " << typnm[dim] << std::endl;
