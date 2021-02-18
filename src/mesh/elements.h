@@ -236,6 +236,12 @@ class elements
         // (sub)element to merge must be provided (can include duplicates).
         // The 'nodes' object known to this object is modified.
         void merge(elements* elstomerge, std::vector<std::vector<int>>& renumbering, std::vector<int>& numduplicates);
+        
+        // Merge with this object. New elements are appended. Duplicates in 'elstomerge' are
+        // removed. Duplicates in the intersection region between 'elstomerge' and this object
+        // are also removed. THIS OBJECT CAN NOT HAVE DUPLICATES on the intersection region.
+        // CELL DUPLICATES ARE NOT REMOVED. The 'nodes' object known to this object is modified.
+        void merge(int intersectionphysreg, elements* elstomerge);
 };
 
 #endif
