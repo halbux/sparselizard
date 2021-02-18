@@ -1375,3 +1375,58 @@ void elements::toptracker(std::shared_ptr<ptracker> originpt, std::shared_ptr<pt
     targetpt->getindisjointregions(indisjointregion);
 }
 
+void elements::merge(elements* elstomerge, std::vector<std::vector<int>>& renumbering, std::vector<int>& numduplicates)
+{
+    std::vector<int> numineachtype = count(); // curvature nodes are included
+    
+    // Merge the nodes:
+    int numnodestomerge = elstomerge->count(0);
+    mynodes->setnumber(numineachtype[0] + numnodestomerge - numduplicates[0]);
+    
+    double* ncs = mynodes->getcoordinates()->data();
+    double* ncstomerge = elstomerge->mynodes->getcoordinates()->data();
+
+    for (int i = 0; i < numnodestomerge; i++)
+    {
+        int renum = renumbering[0][i];
+        
+        // If the node is already there:
+        if (renum < numineachtype[0])
+            continue;
+            
+        ncs[3*renum+0] = ncstomerge[3*i+0];
+        ncs[3*renum+1] = ncstomerge[3*i+1];
+        ncs[3*renum+2] = ncstomerge[3*i+2];
+    }
+    
+    // Merge the other elements:
+    for (int i = 1; i < 8; i++)
+    {
+        int ne = elstomerge->count(i);
+        int nd = numduplicates[i];
+    
+        // Subelement numbers are below 4:
+        for (int j = 0; j < 4; j++)
+        {
+            int ns = numberofsubelementsineveryelement[i][j];
+            
+            if (i == j || ns == 0)
+                continue;
+        
+            subelementsinelements[i][j].resize(subelementsinelements[i][j].size() + (ne-nd)*ns);
+         
+            for (int k = 0; k < ne; k++)
+            {
+                int renum = renumbering[i][k];
+                
+                // If the element is already there:
+                if (renum < numineachtype[i])
+                    continue;
+                    
+                for (int s = 0; s < ns; s++)
+                    subelementsinelements[i][j][renum*ns+s] = renumbering[j][elstomerge->subelementsinelements[i][j][k*ns+s]];
+            }
+        }
+    }
+}
+

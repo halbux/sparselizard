@@ -230,6 +230,11 @@ class elements
         
         // Bring this object in the state corresponding to the target ptracker:
         void toptracker(std::shared_ptr<ptracker> originpt, std::shared_ptr<ptracker> targetpt);
+        
+        // Merge with this object. The renumbering into the merged object of each
+        // (sub)element to merge must be provided (can include duplicates).
+        // The 'nodes' object known to this object is modified.
+        void merge(elements* elstomerge, std::vector<std::vector<int>>& renumbering, std::vector<int>& numduplicates);
 };
 
 #endif
