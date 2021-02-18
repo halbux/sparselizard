@@ -236,6 +236,8 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     dtx = dtxnext;
     mytimes.push_back(universe::currenttimestep);
     
+    std::cout << std::endl;
+    
     return nlit;
 }
 
