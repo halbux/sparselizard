@@ -163,6 +163,7 @@ class elements
         void getbarycenters(std::vector<std::vector<int>>* elementlist, std::vector<double>& barycenters);
         // Get the barycenter of all requested elements:
         void getbarycenters(int elementtypenumber, std::vector<int>& elementlist, std::vector<double>& barycenters);
+        void getbarycenters(int elementtypenumber, std::vector<int>& elementlist, double* barycenters);
         
         // Get the normal (not normed) to a straight face element:
         std::vector<double> getnormal(int elementtypenumber, int elementnumber);

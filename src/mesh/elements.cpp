@@ -602,9 +602,13 @@ void elements::getbarycenters(std::vector<std::vector<int>>* elementlist, std::v
 
 void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, std::vector<double>& barycenters)
 {
+    barycenters = std::vector<double>(3*elementlist.size());
+    getbarycenters(elementtypenumber, elementlist, barycenters.data());
+}
+
+void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, double* barycenters)
+{
     int numelems = elementlist.size();
-    
-    barycenters = std::vector<double>(3*numelems);
     
     if (numelems == 0)
         return;
