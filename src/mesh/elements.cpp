@@ -147,34 +147,45 @@ std::vector<bool> elements::isflipped(int subelementtypenumber, std::vector<int>
     return output;
 }
 
-int elements::istypeinelementlist(int elementtypenumber, std::vector<std::vector<int>>* elementlist, std::vector<bool>& isinelementlist)
+int elements::istypeinelementlists(int elementtypenumber, std::vector<std::vector<std::vector<int>>*> elementlists, std::vector<bool>& isinelementlists, bool considercurvaturenodes)
 {
-    isinelementlist = std::vector<bool>(count(elementtypenumber), false);
+    isinelementlists = std::vector<bool>(count(elementtypenumber), false);
 
-    int numinlist = 0;
+    int numinlists = 0;
     for (int i = 0; i < 8; i++)
     {
-        element el(i);
-        int ns = el.counttype(elementtypenumber);
+        element el(i, mycurvatureorder);
+        int ns;
+        if (elementtypenumber == 0 && considercurvaturenodes)
+            ns = el.countcurvednodes();
+        else
+            ns = el.counttype(elementtypenumber);
+            
         if (ns == 0)
             continue;
 
-        for (int j = 0; j < elementlist->at(i).size(); j++)
+        for (int l = 0; l < elementlists.size(); l++)
         {
-            int curelem = elementlist->at(i)[j];
-            for (int k = 0; k < ns; k++)
+            if (elementlists[l] != NULL)
             {
-                int cursub = getsubelement(elementtypenumber,i,curelem,k);
-                if (isinelementlist[cursub] == false)
+                for (int j = 0; j < elementlists[l]->at(i).size(); j++)
                 {
-                    isinelementlist[cursub] = true;
-                    numinlist++;
+                    int curelem = elementlists[l]->at(i)[j];
+                    for (int k = 0; k < ns; k++)
+                    {
+                        int cursub = getsubelement(elementtypenumber,i,curelem,k);
+                        if (isinelementlists[cursub] == false)
+                        {
+                            isinelementlists[cursub] = true;
+                            numinlists++;
+                        }
+                    }
                 }
             }
         }
     }
 
-    return numinlist;
+    return numinlists;
 }
 
 
@@ -1090,7 +1101,7 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
 
     std::vector<bool> issuballowed;
     if (mustbeinelementlist != NULL)
-        istypeinelementlist(subtype, mustbeinelementlist, issuballowed);
+        istypeinelementlists(subtype, {mustbeinelementlist}, issuballowed, false);
 
     int index = 0;
     for (int i = 0; i < 8; i++)

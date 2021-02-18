@@ -469,8 +469,8 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     std::vector<std::vector<int>> interfaceelems = *(prs->get(nooverlapinterface)->getelementlist());
 
     std::vector<bool> isnodeininterface, isedgeininterface;
-    int numnodesininterface = els->istypeinelementlist(0, &interfaceelems, isnodeininterface);
-    int numedgesininterface = els->istypeinelementlist(1, &interfaceelems, isedgeininterface);
+    int numnodesininterface = els->istypeinelementlists(0, {&interfaceelems}, isnodeininterface, false);
+    int numedgesininterface = els->istypeinelementlists(1, {&interfaceelems}, isedgeininterface, false);
     std::vector<int> interfacenodelist, interfaceedgelist;
     myalgorithm::find(isnodeininterface, numnodesininterface, interfacenodelist);
     myalgorithm::find(isedgeininterface, numedgesininterface, interfaceedgelist);
@@ -542,8 +542,8 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     {
         if (physregsvec[3*r+(meshdim-1)] != NULL)
         {
-            els->istypeinelementlist(0, physregsvec[3*r+(meshdim-1)]->getelementlist(), isnodeinneighbours[r]);
-            els->istypeinelementlist(1, physregsvec[3*r+(meshdim-1)]->getelementlist(), isedgeinneighbours[r]);
+            els->istypeinelementlists(0, {physregsvec[3*r+(meshdim-1)]->getelementlist()}, isnodeinneighbours[r], false);
+            els->istypeinelementlists(1, {physregsvec[3*r+(meshdim-1)]->getelementlist()}, isedgeinneighbours[r], false);
         }
     }
     

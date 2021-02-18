@@ -114,9 +114,9 @@ class elements
         // Check if a subelement has the same orientation as in its parent element:
         std::vector<bool> isflipped(int subelementtypenumber, std::vector<int>& subelementnumbers, int elementtypenumber, std::vector<int>& elementnumbers);
         
-        // 'isinelementlist[i]' is true if the ith element of type 'elementtypenumber' is a (sub-)element of the element list.
-        // The number of true entries in 'isinelementlist' is returned. Curvature nodes are NOT considered.
-        int istypeinelementlist(int elementtypenumber, std::vector<std::vector<int>>* elementlist, std::vector<bool>& isinelementlist);
+        // 'isinelementlists[i]' is true if the ith element of type 'elementtypenumber' is a (sub-)element of any element list provided.
+        // The number of true entries in 'isinelementlists' is returned. NULL element list pointers are ignored.
+        int istypeinelementlists(int elementtypenumber, std::vector<std::vector<std::vector<int>>*> elementlists, std::vector<bool>& isinelementlists, bool considercurvaturenodes);
         
         // Return the number of elements of a given type:
         int count(int elementtypenumber);
