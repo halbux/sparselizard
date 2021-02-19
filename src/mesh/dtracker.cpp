@@ -26,6 +26,17 @@ std::shared_ptr<rawmesh> dtracker::getrawmesh(void)
     }
 }
 
+bool dtracker::isoverlap(void)
+{
+    if (mynumoverlaplayers >= 0)
+        return (mynumoverlaplayers > 0);
+    else
+    {
+        std::cout << "Error in 'dtracker' object: number of overlap layers has not been defined (use 0 for no-overlap)" << std::endl;
+        abort();
+    }
+}
+
 std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vector<double>& interfaceelembarys, std::vector<int>& neighboursfound)
 { 
     int rank = slmpi::getrank();
@@ -383,6 +394,165 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     return (isanynewadded != 0);
 }
 
+void dtracker::mapnooverlapinterfaces(void)
+{
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    int rank = slmpi::getrank();
+    
+    int numneighbours = myneighbours.size();
+    
+    int numinterfacetype = els->countinterfaceelementtypes();
+    
+    // Create a container listing all subelements in each no-overlap interface:
+    std::vector<int> numsubsoneachneighbour(numneighbours, 0);
+    std::vector<std::vector<std::vector<int>>> subsininterfaces(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        for (int i = 0; i < numinterfacetype; i++)
+        {   
+            std::vector<std::vector<std::vector<int>>*> interfaceelems(3, NULL);
+            for (int j = 0; j < 3; j++)
+            {
+                int cr = mynooverlapinterfaces[3*cn+j];
+                if (cr > 0)
+                    interfaceelems[j] = prs->get(cr)->getelementlist();
+            }
+            std::vector<bool> isininterface;
+            int numininterface = els->istypeinelementlists(i, interfaceelems, isininterface, false); // no curvature nodes
+            myalgorithm::find(isininterface, numininterface, subsininterfaces[n][i]);
+            
+            numsubsoneachneighbour[n] += numininterface;
+        }
+    }
+    
+    // Split neighbours into lower ranks and higher ranks (neighbours are sorted ascendingly):
+    std::vector<int> lowerranks, higherranks;
+    myalgorithm::split(myneighbours, rank, lowerranks, higherranks);
+    
+    // Prepare all barycenters to send to the higher ranks:
+    std::vector<std::vector<double>> barysforeachneighbour(numneighbours, std::vector<double>(0));
+    for (int n = lowerranks.size(); n < numneighbours; n++)
+    {
+        barysforeachneighbour[n] = std::vector<double>(3*numsubsoneachneighbour[n]);
+        
+        if (numsubsoneachneighbour[n] > 0)
+        {
+            int pos = 0;
+            for (int i = 0; i < numinterfacetype; i++)
+            {
+                els->getbarycenters(i, subsininterfaces[n][i], &barysforeachneighbour[n][pos]);
+                pos += 3*subsininterfaces[n][i].size();
+            }
+        }
+    }
+    std::vector<std::vector<double>> barysfromeachneighbour(numneighbours, std::vector<double>(0));
+    for (int n = 0; n < lowerranks.size(); n++)
+        barysfromeachneighbour[n].resize(3*numsubsoneachneighbour[n]);
+    
+    slmpi::exchange(myneighbours, barysforeachneighbour, barysfromeachneighbour);
+    
+    // Treat all barycenters sent by the lower ranks:
+    std::vector<std::vector<std::vector<int>>> posfounds(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
+    for (int n = 0; n < lowerranks.size(); n++)
+    {
+        int pos = 0;
+        for (int i = 0; i < numinterfacetype; i++)
+        {
+            int num = subsininterfaces[n][i].size();
+            std::vector<double> recbarys(3*num);
+            for (int j = 0; j < 3*num; j++)
+                recbarys[j] = barysfromeachneighbour[n][pos+j];
+            
+            pos += 3*num;
+            
+            std::vector<double> targetbarys;
+            els->getbarycenters(i, subsininterfaces[n][i], targetbarys);
+            
+            int numfound = myalgorithm::findcoordinates(targetbarys, recbarys, posfounds[n][i]);
+            if (numfound != num)
+            {
+                std::cout << "Error in 'dtracker' object: no-overlap mapping failed because some interface elements could not be matched" << std::endl;
+                abort();
+            }
+        }
+    }
+    
+    // Exchange the subs numbers for mapping:
+    std::vector<std::vector<int>> elemnumbersforeachneighbour(numneighbours), elemnumbersfromeachneighbour(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        // Also include the number of interface elements of each type (needed to preallocate the map):
+        elemnumbersforeachneighbour[n].resize(numsubsoneachneighbour[n] + numinterfacetype);
+        elemnumbersfromeachneighbour[n].resize(numsubsoneachneighbour[n] + numinterfacetype);
+    
+        int pos = 0;
+        for (int i = 0; i < numinterfacetype; i++)
+        {
+            int num = subsininterfaces[n][i].size();
+            
+            // Lower rank neighbour:
+            if (n < lowerranks.size())
+            {
+                for (int j = 0; j < num; j++)
+                    elemnumbersforeachneighbour[n][pos+j] = subsininterfaces[n][i][posfounds[n][i][j]];
+            }
+            else
+            {
+                for (int j = 0; j < num; j++)
+                    elemnumbersforeachneighbour[n][pos+j] = subsininterfaces[n][i][j];
+            }
+            pos += num;
+        }
+        for (int i = 0; i < numinterfacetype; i++)
+            elemnumbersforeachneighbour[n][pos+i] = els->count(i);
+    }
+    
+    slmpi::exchange(myneighbours, elemnumbersforeachneighbour, elemnumbersfromeachneighbour);
+    
+    // Create and populate the map:
+    mymaptothisdomain = std::vector<std::vector<std::vector<int>>>(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
+    
+    for (int n = 0; n < numneighbours; n++)
+    {
+        // Preallocate the map:
+        for (int i = 0; i < numinterfacetype; i++)
+            mymaptothisdomain[n][i] = std::vector<int>(elemnumbersfromeachneighbour[n][elemnumbersfromeachneighbour[n].size()-numinterfacetype+i], -1);
+    
+        int pos = 0;
+        for (int i = 0; i < numinterfacetype; i++)
+        {
+            int num = subsininterfaces[n][i].size();
+            
+            // Lower rank neighbour:
+            if (n < lowerranks.size())
+            {
+                for (int j = 0; j < num; j++)
+                {
+                    int recnum = elemnumbersfromeachneighbour[n][pos+j];
+                    mymaptothisdomain[n][i][recnum] = subsininterfaces[n][i][posfounds[n][i][j]];
+                }
+            }
+            else
+            {
+                for (int j = 0; j < num; j++)
+                {
+                    int recnum = elemnumbersfromeachneighbour[n][pos+j];
+                    mymaptothisdomain[n][i][recnum] = subsininterfaces[n][i][j];
+                }
+            }
+            pos += num;
+        }
+    }
+}
+
+void dtracker::mapoverlapinterfaces(void)
+{
+
+}
+
 void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& nooverlapinterfaces)
 {
     physicalregions* prs = getrawmesh()->getphysicalregions();
@@ -621,6 +791,13 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
         std::cout << "Found all neighbour domains with " << numits << " set" << myalgorithm::getplurals(numits) << " of " << numtrialelements << " trial element" << myalgorithm::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << myalgorithm::getplurals(numcrossits) << std::endl;
 }
 
+void dtracker::mapinterfaces(void)
+{
+    if (isoverlap())
+        mapoverlapinterfaces();
+    else
+        mapnooverlapinterfaces();
+}
 
 
 int dtracker::countneighbours(void)

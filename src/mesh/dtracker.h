@@ -19,16 +19,25 @@ class dtracker
 {
 
     private:
+    
+        // Number of overlap layers (0 for no-overlap):
+        int mynumoverlaplayers = -1;
 
         std::weak_ptr<rawmesh> myrawmesh;
 
-        // Neighbours (without this rank and without duplicates, sorted):
+        // Neighbours (without this rank and without duplicates, sorted ascendingly):
         std::vector<int> myneighbours = {};
         // Direct access (length is numranks):
         std::vector<bool> myisneighbour = {};
         // No-overlap interfaces (length is 3*numranks, -1 if none).
         // Entry 3*r+i is the interface of i-dimensional elements with rank r:
         std::vector<int> mynooverlapinterfaces = {};
+        
+        // Map entry [n][type][i] gives the element number of type 'type' in this domain that corresponds to the
+        // ith element of that type in the nth neighbour domain. Only elements in the outer-overlap/no-overlap
+        // interfaces can be mapped. Curvature nodes cannot be mapped. The map has value -1 by default.
+        std::vector<std::vector<std::vector<int>>> mymaptothisdomain = {};
+        
 
         // Discover up to 'numtrialelements' neighbours that share cell-1 dimension elements with this rank.
         // The barycenter of all elements shared with the neighbours to discover must be provided as argument.
@@ -42,11 +51,17 @@ class dtracker
         // Find new interfaces and populate the output accordingly. Return false if no more interfaces can be found on any rank.
         bool discovercrossinterfaces(std::vector<int>& interfacenodelist, std::vector<int>& interfaceedgelist, std::vector<std::vector<bool>>& isnodeinneighbours, std::vector<std::vector<bool>>& isedgeinneighbours);
 
+        // Map the outer-overlap/no-overlap interfaces:
+        void mapnooverlapinterfaces(void);
+        void mapoverlapinterfaces(void);
+
     public:
 
         dtracker(std::shared_ptr<rawmesh> rm);
 
         std::shared_ptr<rawmesh> getrawmesh(void);
+        
+        bool isoverlap(void);
         
         // Set manually the no-overlap connectivity of this rank.
         // 'nooverlapinterfaces[3*i+j]' is the interface of j-dimensional elements with the ith neighbour (-1 if none).
@@ -56,6 +71,9 @@ class dtracker
         // Region 'nooverlapinterface' must include all elements of dimension cell-1 which touch the neighbour domains.
         void discoverconnectivity(int nooverlapinterface, int numtrialelements = 10, int verbosity = 0);
 
+        // Map the outer-overlap/no-overlap interfaces:
+        void mapinterfaces(void);
+        
         int countneighbours(void);
         std::vector<int> getneighbours(void);
         int getneighbour(int neighbourindex);
