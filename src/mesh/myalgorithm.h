@@ -227,6 +227,9 @@ namespace myalgorithm
     // Split values < val and >= val while keeping the ordering:
     void split(std::vector<int>& vals, int val, std::vector<int>& lowervals, std::vector<int>& highervals);
     
+    // Count the number of true entries:
+    int counttrue(std::vector<bool>& tocount);
+    
 };
 
 #endif

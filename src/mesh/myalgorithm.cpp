@@ -1625,3 +1625,14 @@ void myalgorithm::split(std::vector<int>& vals, int val, std::vector<int>& lower
     }
 }
 
+int myalgorithm::counttrue(std::vector<bool>& tocount)
+{
+    int cnt = 0;
+    for (int i = 0; i < tocount.size(); i++)
+    {
+        if (tocount[i])
+            cnt++;
+    }
+    return cnt;
+}
+
