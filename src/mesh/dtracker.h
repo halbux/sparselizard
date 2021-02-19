@@ -57,6 +57,10 @@ class dtracker
         // Map the outer-overlap/no-overlap interfaces:
         void mapnooverlapinterfaces(void);
         void mapoverlapinterfaces(void);
+        
+        // Create the global node numbers for every domain node:
+        void createglobalnodenumbersnooverlap(void);
+        void createglobalnodenumbersoverlap(void);
 
     public:
 
