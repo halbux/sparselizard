@@ -38,6 +38,9 @@ class dtracker
         // interfaces can be mapped. Curvature nodes cannot be mapped. The map has value -1 by default.
         std::vector<std::vector<std::vector<int>>> mymaptothisdomain = {};
         
+        // Global node numbers for every domain node (unrelated to the local node numbers, -1 for curvature nodes):
+        std::vector<long long int> myglobalnodenumbers = {};
+        
 
         // Discover up to 'numtrialelements' neighbours that share cell-1 dimension elements with this rank.
         // The barycenter of all elements shared with the neighbours to discover must be provided as argument.
@@ -74,6 +77,9 @@ class dtracker
         // Map the outer-overlap/no-overlap interfaces:
         void mapinterfaces(void);
         
+        // Create the global node numbers for every domain node:
+        void createglobalnodenumbers(void);
+        
         int countneighbours(void);
         std::vector<int> getneighbours(void);
         int getneighbour(int neighbourindex);
@@ -81,6 +87,11 @@ class dtracker
         bool isneighbour(int neighbour);
         // Return -1 if not defined:
         int getnooverlapinterface(int neighbour, int elementdimension);
+
+        std::vector<std::vector<std::vector<int>>>* getmap(void);
+        
+        long long int* getglobalnodenumbers(void);
+        void writeglobalnodenumbers(std::string filename);
 
         // Print connectivity information:
         void print(void);

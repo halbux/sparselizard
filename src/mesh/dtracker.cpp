@@ -799,6 +799,11 @@ void dtracker::mapinterfaces(void)
         mapnooverlapinterfaces();
 }
 
+void dtracker::createglobalnodenumbers(void)
+{
+
+}
+
 
 int dtracker::countneighbours(void)
 {
@@ -841,6 +846,31 @@ int dtracker::getnooverlapinterface(int neighbour, int elementdimension)
         std::cout << "Error in 'dtracker' object: requested on rank " << slmpi::getrank() << " the " << elementdimension << "D no-overlap interface to neighbour rank " << neighbour << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
         abort();
     }
+}
+
+std::vector<std::vector<std::vector<int>>>* dtracker::getmap(void)
+{
+    return &mymaptothisdomain;
+}
+
+long long int* dtracker::getglobalnodenumbers(void)
+{
+    return myglobalnodenumbers.data();
+}
+
+void dtracker::writeglobalnodenumbers(std::string filename)
+{
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+
+    int numnodes = nds->count();
+
+    // Convert to int:
+    std::vector<int> nodenums(numnodes);
+    for (int i = 0; i < numnodes; i++)
+        nodenums[i] = myglobalnodenumbers[i];
+
+    els->write(filename, 0, myalgorithm::getequallyspaced(0, 1, numnodes), nodenums);
 }
 
 void dtracker::print(void)
