@@ -660,6 +660,12 @@ int elements::getdimension(void)
     return elem.getelementdimension();
 }
 
+int elements::countinterfaceelementtypes(void)
+{
+    std::vector<int> countfordim = {-1,1,2,4};
+    return countfordim[getdimension()];
+}
+
 void elements::printnumber(void)
 {
     std::cout << std::endl;

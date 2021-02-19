@@ -171,6 +171,9 @@ class elements
         // Get the highest element dimension available:
         int getdimension(void);
         
+        // Count the number of interface element types (1/2/4 for a 1D/2D/3D mesh):
+        int countinterfaceelementtypes(void);
+        
         // Print elements data for debug:
         void printnumber(void);
         void printsubelements(void);
