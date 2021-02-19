@@ -1092,7 +1092,7 @@ void elements::explode(void)
     }
 }
 
-void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<int>>* mustbeinelementlist)
+void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<std::vector<int>>*> mustbeinelementlists)
 {
     int highestdim = -1;
     for (int i = 0; i < 8; i++)
@@ -1111,9 +1111,9 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
     // Preallocate to max possible size:
     sublist.resize(numsubs);
 
-    std::vector<bool> issuballowed;
-    if (mustbeinelementlist != NULL)
-        istypeinelementlists(subtype, {mustbeinelementlist}, issuballowed, false);
+    std::vector<bool> issuballowed = {};
+    if (mustbeinelementlists.size() == 0)
+        istypeinelementlists(subtype, mustbeinelementlists, issuballowed, false);
 
     int index = 0;
     for (int i = 0; i < 8; i++)
@@ -1133,7 +1133,7 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
             {
                 int cursub = getsubelement(subtype,i,elem,k);
 
-                if (iselemdone[cursub] == false && (mustbeinelementlist == NULL || issuballowed[cursub]))
+                if (iselemdone[cursub] == false && (mustbeinelementlists.size() == 0 || issuballowed[cursub]))
                 {
                     sublist[index] = cursub;
                     iselemdone[cursub] = true;
