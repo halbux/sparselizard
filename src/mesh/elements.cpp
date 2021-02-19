@@ -1112,7 +1112,7 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
     sublist.resize(numsubs);
 
     std::vector<bool> issuballowed = {};
-    if (mustbeinelementlists.size() == 0)
+    if (mustbeinelementlists.size() > 0)
         istypeinelementlists(subtype, mustbeinelementlists, issuballowed, false);
 
     int index = 0;
