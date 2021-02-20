@@ -550,7 +550,70 @@ void dtracker::mapnooverlapinterfaces(void)
 
 void dtracker::mapoverlapinterfaces(void)
 {
-
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    int numneighbours = myneighbours.size();
+    
+    int numinterfacetype = els->countinterfaceelementtypes();
+    
+    // Cells are guaranteed to be listed in the same order in the inner overlap region of this domain and in the outer
+    // overlap region of each neighbour even if they have been renumbered during the disjoint region range definition.
+    std::vector<std::vector<int>> sublistforneighbours(numneighbours), sublistfromneighbours(numneighbours);
+    std::vector<std::vector<std::vector<int>>> sublistouteroverlapinterface(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        
+        // Get the sublist on the inner overlap interface:
+        std::vector<std::vector<int>> sublists(numinterfacetype, std::vector<int>(0));
+        for (int i = 0; i < numinterfacetype; i++)
+        {
+            std::vector<std::vector<int>>* inneroverlapinterfaceelems = prs->get(myinneroverlapinterfaces[cn])->getelementlist();
+            std::vector<std::vector<int>>* inneroverlapelems = prs->get(myinneroverlaps[cn])->getelementlist();
+        
+            els->follow(inneroverlapelems, i, sublists[i], {inneroverlapinterfaceelems});
+        }
+        sublistforneighbours[n] = myalgorithm::concatenate(sublists);
+        sublistforneighbours[n].resize(sublistforneighbours[n].size() + numinterfacetype);
+        for (int i = 0; i < numinterfacetype; i++)
+            sublistforneighbours[n][sublistforneighbours[n].size()-numinterfacetype+i] = els->count(i);
+        
+        // Preallocate the receive buffer based on the outer overlap interface:
+        int totlen = 0;
+        for (int i = 0; i < numinterfacetype; i++)
+        {
+            std::vector<std::vector<int>>* outeroverlapinterfaceelems = prs->get(myouteroverlapinterfaces[cn])->getelementlist();
+            std::vector<std::vector<int>>* outeroverlapelems = prs->get(myouteroverlaps[cn])->getelementlist();
+        
+            els->follow(outeroverlapelems, i, sublistouteroverlapinterface[n][i], {outeroverlapinterfaceelems});
+            
+            totlen += sublistouteroverlapinterface[n][i].size();
+        }
+        sublistfromneighbours[n].resize(totlen + numinterfacetype);
+    }
+    
+    slmpi::exchange(myneighbours, sublistforneighbours, sublistfromneighbours);
+    
+    mymaptothisdomain = std::vector<std::vector<std::vector<int>>>(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
+    
+    // Receive the inner overlap interface of each neighbour on the outer overlap interface of this domain:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        // Preallocate the map:
+        for (int i = 0; i < numinterfacetype; i++)
+            mymaptothisdomain[n][i] = std::vector<int>(sublistfromneighbours[n][sublistfromneighbours[n].size()-numinterfacetype+i], -1);
+            
+        int pos = 0;
+        for (int i = 0; i < numinterfacetype; i++)
+        {
+            int numsubs = sublistouteroverlapinterface[n][i].size();
+            for (int j = 0; j < numsubs; j++)
+                mymaptothisdomain[n][i][sublistfromneighbours[n][pos+j]] = sublistouteroverlapinterface[n][i][j];
+        
+            pos += numsubs;
+        }
+    }
 }
 
 void dtracker::createglobalnodenumbersnooverlap(void)
