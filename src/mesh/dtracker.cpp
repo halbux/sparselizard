@@ -986,6 +986,72 @@ int dtracker::getnooverlapinterface(int neighbour, int elementdimension)
     }
 }
 
+int dtracker::getinneroverlapinterface(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myinneroverlapinterfaces.size())
+        return myinneroverlapinterfaces[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap interface region" << std::endl;
+        abort();
+    }
+}
+
+int dtracker::getouteroverlapinterface(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myouteroverlapinterfaces.size())
+        return myouteroverlapinterfaces[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested outer overlap interface region" << std::endl;
+        abort();
+    }
+}
+
+int dtracker::getinneroverlap(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myinneroverlaps.size())
+        return myinneroverlaps[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap region" << std::endl;
+        abort();
+    }
+}
+
+int dtracker::getouteroverlap(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myouteroverlaps.size())
+        return myouteroverlaps[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested outer overlap region" << std::endl;
+        abort();
+    }
+}
+
+int dtracker::getinneroverlapskin(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myinneroverlapskins.size())
+        return myinneroverlapskins[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap skin region" << std::endl;
+        abort();
+    }
+}
+
+int dtracker::getouteroverlapskin(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myouteroverlapskins.size())
+        return myouteroverlapskins[neighbour];
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested outer overlap skin region" << std::endl;
+        abort();
+    }
+}
+
 std::vector<std::vector<std::vector<int>>>* dtracker::getmap(void)
 {
     return &mymaptothisdomain;
