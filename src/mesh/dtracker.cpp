@@ -630,10 +630,6 @@ void dtracker::createglobalnodenumbersnooverlap(void)
     int numnodes = nds->count();
     int curvatureorder = els->getcurvatureorder();
     
-    // Split neighbours into lower ranks and higher ranks (neighbours are sorted ascendingly):
-    std::vector<int> lowerranks, higherranks;
-    myalgorithm::split(myneighbours, rank, lowerranks, higherranks);
-    
     // Curvature nodes have a -1 global numbering:
     std::vector<bool> isitacornernode = els->iscornernode();
     int numcornernodes = myalgorithm::counttrue(isitacornernode);
@@ -641,8 +637,8 @@ void dtracker::createglobalnodenumbersnooverlap(void)
     // Number of own nodes (nodes shared with lower ranks are not own nodes):
     int numownnodes = numcornernodes;
     
-    // Lowest rank for each node on the no-overlap interfaces:
-    std::vector<int> lowestrankfornoinode(numnodes, rank);
+    // Owner rank for each node:
+    std::vector<int> nodeownerrank(numnodes, rank);
     std::vector<std::vector<int>> nodesinnoi(numneighbours, std::vector<int>(0));
     for (int n = 0; n < numneighbours; n++)
     {
@@ -663,9 +659,9 @@ void dtracker::createglobalnodenumbersnooverlap(void)
         for (int i = 0; i < numinellist; i++)
         {
             int curnode = nodesinnoi[n][i];
-            if (cn < lowestrankfornoinode[curnode])
+            if (cn < nodeownerrank[curnode])
             {
-                lowestrankfornoinode[curnode] = cn;
+                nodeownerrank[curnode] = cn;
                 numownnodes--;
             }
         }
@@ -685,17 +681,18 @@ void dtracker::createglobalnodenumbersnooverlap(void)
     myglobalnodenumbers = std::vector<long long int>(numnodes, -1);
     
     // Make the global node numbers correct for the own nodes:
+
     long long int ownnodenumber = offsetforeachrank[rank];
     for (int i = 0; i < numnodes; i++)
     {
-        if (isitacornernode[i] && lowestrankfornoinode[i] == rank)
+        if (isitacornernode[i] && nodeownerrank[i] == rank)
         {
             myglobalnodenumbers[i] = ownnodenumber;
             ownnodenumber++;
         }
     }
     
-    // Make the node numbers correct for the remaining nodes:
+    // Make the global node numbers correct for the remaining nodes:
     
     std::vector<std::vector<int>> globalnodenumbersforeachneighbour(numneighbours, std::vector<int>(0));
     std::vector<std::vector<int>> globalnodenumbersfromeachneighbour(numneighbours, std::vector<int>(0));
@@ -709,7 +706,7 @@ void dtracker::createglobalnodenumbersnooverlap(void)
         int numtosend = 0;
         for (int i = 0; i < nodesinnoi[n].size(); i++)
         {
-            if (lowestrankfornoinode[nodesinnoi[n][i]] == rank)
+            if (nodeownerrank[nodesinnoi[n][i]] == rank)
                 numtosend++;
         }
         
@@ -717,7 +714,7 @@ void dtracker::createglobalnodenumbersnooverlap(void)
         int ni = 0;
         for (int i = 0; i < nodesinnoi[n].size(); i++)
         {
-            if (lowestrankfornoinode[nodesinnoi[n][i]] == rank)
+            if (nodeownerrank[nodesinnoi[n][i]] == rank)
             {
                 int curnode = nodesinnoi[n][i];
                 globalnodenumbersforeachneighbour[n][2*ni+0] = curnode;
@@ -730,7 +727,7 @@ void dtracker::createglobalnodenumbersnooverlap(void)
         int numtoreceive = 0;
         for (int i = 0; i < nodesinnoi[n].size(); i++)
         {
-            if (lowestrankfornoinode[nodesinnoi[n][i]] == cn)
+            if (nodeownerrank[nodesinnoi[n][i]] == cn)
                 numtoreceive++;
         }
         globalnodenumbersfromeachneighbour[n].resize(2*numtoreceive);
@@ -748,7 +745,183 @@ void dtracker::createglobalnodenumbersnooverlap(void)
 
 void dtracker::createglobalnodenumbersoverlap(void)
 {
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    int numneighbours = myneighbours.size();
+    
+    int numnodes = nds->count();
+    int curvatureorder = els->getcurvatureorder();
+    
+    // Split neighbours into lower ranks and higher ranks (neighbours are sorted ascendingly):
+    std::vector<int> lowerranks, higherranks;
+    myalgorithm::split(myneighbours, rank, lowerranks, higherranks);
+    
+    // Curvature nodes have a -1 global numbering:
+    std::vector<bool> isitacornernode = els->iscornernode();
+    int numcornernodes = myalgorithm::counttrue(isitacornernode);
+    
+    // Number of own nodes (nodes shared with lower ranks are not own nodes):
+    int numownnodes = numcornernodes;
+    
+    // Owner rank for each node:
+    std::vector<int> nodeownerrank(numnodes, rank);
+    
+    // Nodes in the no-overlap interfaces, inner overlaps and outer overlaps:
+    std::vector<std::vector<int>> nodesinnoiseenfromio(numneighbours, std::vector<int>(0));
+    std::vector<std::vector<int>> nodesinnoiseenfromoo(numneighbours, std::vector<int>(0));
+    std::vector<std::vector<int>> nodesinio(numneighbours, std::vector<int>(0));
+    std::vector<std::vector<int>> nodesinoo(numneighbours, std::vector<int>(0));
 
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        
+        std::vector<std::vector<std::vector<int>>*> noielems(3, NULL);
+        for (int d = 0; d < 3; d++)
+        {
+            int cr = mynooverlapinterfaces[3*cn+d];
+            if (cr >= 0)
+                noielems[d] = prs->get(cr)->getelementlist();
+        }
+
+        std::vector<std::vector<int>>* ioelems = prs->get(myinneroverlaps[cn])->getelementlist();
+        std::vector<std::vector<int>>* ooelems = prs->get(myouteroverlaps[cn])->getelementlist();
+        
+        els->follow(ioelems, 0, nodesinnoiseenfromio[n], noielems);
+        els->follow(ooelems, 0, nodesinnoiseenfromoo[n], noielems);
+        els->follow(ioelems, 0, nodesinio[n]);
+        els->follow(ooelems, 0, nodesinoo[n]);
+    }
+    
+    // Give away the ownership of the outer overlaps:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int i = 0; i < nodesinoo[n].size(); i++)
+        {
+            int curnode = nodesinoo[n][i];
+            if (nodeownerrank[curnode] == rank)
+            {
+                nodeownerrank[curnode] = -1;
+                numownnodes--;
+            }
+        }
+    }
+    
+    // Take back the ownership of the no-overlap interfaces:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int i = 0; i < nodesinnoiseenfromio[n].size(); i++)
+        {
+            int curnode = nodesinnoiseenfromio[n][i];
+            if (nodeownerrank[curnode] != rank)
+            {
+                nodeownerrank[curnode] = rank;
+                numownnodes++;
+            }
+        }
+    }
+    
+    // Give the ownership of the no-overlap interface nodes to the lowest touching rank:
+    for (int n = 0; n < lowerranks.size(); n++)
+    {
+        int cn = myneighbours[n];
+        for (int i = 0; i < nodesinnoiseenfromio[n].size(); i++)
+        {
+            int curnode = nodesinnoiseenfromio[n][i];
+            if (cn < nodeownerrank[curnode])
+            {
+                nodeownerrank[curnode] = cn;
+                numownnodes--;
+            }
+        }
+    }
+    
+    // Share with all ranks the number of own nodes:
+    std::vector<int> numownnodesinthisrank = {numownnodes};
+    std::vector<int> mynumownnodesinall;
+    slmpi::allgather(numownnodesinthisrank, mynumownnodesinall);
+    
+    // Get the global number of the first own node:
+    std::vector<long long int> offsetforeachrank(numranks, 0);
+    for (int i = 1; i < numranks; i++)
+        offsetforeachrank[i] = offsetforeachrank[i-1] + mynumownnodesinall[i-1];
+    
+    // Preallocate the global node numbers with a -1 default value:
+    myglobalnodenumbers = std::vector<long long int>(numnodes, -1);
+    
+    // Make the global node numbers correct for the own nodes:
+
+    long long int ownnodenumber = offsetforeachrank[rank];
+    for (int i = 0; i < numnodes; i++)
+    {
+        if (isitacornernode[i] && nodeownerrank[i] == rank)
+        {
+            myglobalnodenumbers[i] = ownnodenumber;
+            ownnodenumber++;
+        }
+    }
+
+    // Make the global node numbers correct for the no-overlap interfaces:
+
+    // Transfer the own nodes to the higher rank neighbours:
+    std::vector<std::vector<int>> globalnoinodesforneighbours(numneighbours, std::vector<int>(0));
+    std::vector<std::vector<int>> globalnoinodesfromneighbours(numneighbours, std::vector<int>(0));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int numnoinodes = nodesinnoiseenfromio[n].size();
+        if (n < lowerranks.size())
+            globalnoinodesfromneighbours[n].resize(numnoinodes);
+        else
+        {
+            globalnoinodesforneighbours[n].resize(numnoinodes);
+            // Not owned nodes will send a -1 global number:
+            for (int i = 0; i < numnoinodes; i++)
+                globalnoinodesforneighbours[n][i] = myglobalnodenumbers[nodesinnoiseenfromio[n][i]]-offsetforeachrank[rank]; // referenced to offset
+        }
+    }
+    
+    slmpi::exchange(myneighbours, globalnoinodesforneighbours, globalnoinodesfromneighbours);
+    
+    for (int n = 0; n < lowerranks.size(); n++)
+    {
+        int cn = myneighbours[n];
+        int numnoinodes = nodesinnoiseenfromoo[n].size();
+        
+        for (int i = 0; i < numnoinodes; i++)
+        {
+            int gnn = globalnoinodesfromneighbours[n][i];
+            if (gnn >= 0)
+                myglobalnodenumbers[nodesinnoiseenfromoo[n][i]] = gnn+offsetforeachrank[cn];
+        }
+    }
+    
+    // Make the global node numbers correct for the outer overlaps:
+
+    // Transfer the inner overlap nodes of this domain to the outer overlap nodes of every neighbour:
+    std::vector<std::vector<int>> globalnodesforneighbours(numneighbours, std::vector<int>(0));
+    std::vector<std::vector<int>> globalnodesfromneighbours(numneighbours, std::vector<int>(0));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        globalnodesforneighbours[n].resize(nodesinio[n].size());
+        for (int i = 0; i < nodesinio[n].size(); i++)
+            globalnodesforneighbours[n][i] = myglobalnodenumbers[nodesinio[n][i]]-offsetforeachrank[rank]; // referenced to offset
+    
+        globalnodesfromneighbours[n].resize(nodesinoo[n].size());
+    }
+    
+    slmpi::exchange(myneighbours, globalnodesforneighbours, globalnodesfromneighbours);
+    
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        for (int i = 0; i < nodesinoo[n].size(); i++)
+            myglobalnodenumbers[nodesinoo[n][i]] = globalnodesfromneighbours[n][i]+offsetforeachrank[cn];
+    }
 }
 
 void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& nooverlapinterfaces)
