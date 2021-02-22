@@ -438,6 +438,202 @@ void dtracker::defineinneroverlaps(void)
     }
 }
 
+void dtracker::exchangeoverlaps(void)
+{
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+
+    int numranks = slmpi::count();
+    
+    double* ncs = nds->getcoordinates()->data();
+    int curvatureorder = els->getcurvatureorder();
+
+    int numneighbours = myneighbours.size();
+
+    std::vector<int> numelemsnooverlap = els->count();
+    
+    // Node numbers and node coordinates for all cells in the inner overlaps:
+    std::vector<std::vector<int>> nodenumsforeachneighbour(numneighbours);
+    std::vector<std::vector<double>> coordsforeachneighbour(numneighbours);
+        
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        
+        std::vector<std::vector<int>>* inneroverlapcells = prs->get(myinneroverlaps[cn])->getelementlist();
+        
+        int prealloc = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            element el(i, curvatureorder);
+            prealloc += inneroverlapcells->at(i).size() * el.countcurvednodes();
+        }
+        nodenumsforeachneighbour[n] = std::vector<int>(prealloc);
+        
+        // Get the nodes in each cell:
+        int ni = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            element el(i, curvatureorder);
+            int ncn = el.countcurvednodes();
+            
+            for (int j = 0; j < inneroverlapcells->at(i).size(); j++)
+            {
+                int elem = inneroverlapcells->at(i)[j];
+                for (int k = 0; k < ncn; k++)
+                    nodenumsforeachneighbour[n][ni+k] = els->getsubelement(0, i, elem, k);
+                ni += ncn;
+            }
+        }
+        
+        // Get the renumbering to make the node numbers consecutive:
+        std::vector<int> renumvec;
+        int numuniques = myalgorithm::squeeze(nodenumsforeachneighbour[n], nds->count(), renumvec);
+        
+        // Make the nodes consecutive and gather all coordinates to send:
+        coordsforeachneighbour[n] = std::vector<double>(3*numuniques);
+        for (int i = 0; i < prealloc; i++)
+        {
+            int curnode = nodenumsforeachneighbour[n][i];
+            int renumbered = renumvec[curnode];
+            
+            nodenumsforeachneighbour[n][i] = renumbered;
+            coordsforeachneighbour[n][3*renumbered+0] = ncs[3*curnode+0];
+            coordsforeachneighbour[n][3*renumbered+1] = ncs[3*curnode+1];
+            coordsforeachneighbour[n][3*renumbered+2] = ncs[3*curnode+2];
+        }
+    }
+            
+    // Exchange the node numbers and coordinates with each neighbour:
+    std::vector<int> sendlens(11*numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        sendlens[11*n+0] = nodenumsforeachneighbour[n].size();
+        sendlens[11*n+1] = coordsforeachneighbour[n].size();
+        // Send the number of inner overlap cells of each type as well as the curvature order:
+        std::vector<std::vector<int>>* inneroverlapcells = prs->get(myinneroverlaps[myneighbours[n]])->getelementlist();
+        for (int i = 0; i < 8; i++)
+            sendlens[11*n+2+i] = inneroverlapcells->at(i).size();
+        sendlens[11*n+10] = curvatureorder;
+    }
+    std::vector<int> reclens;
+    slmpi::exchange(myneighbours, sendlens, reclens);
+
+    std::vector<std::vector<int>> nodenumsfromeachneighbour(numneighbours);
+    std::vector<std::vector<double>> coordsfromeachneighbour(numneighbours);
+    
+    for (int n = 0; n < numneighbours; n++)
+    {
+        nodenumsfromeachneighbour[n].resize(reclens[11*n+0]);
+        coordsfromeachneighbour[n].resize(reclens[11*n+1]);
+    }
+
+    slmpi::exchange(myneighbours, nodenumsforeachneighbour, nodenumsfromeachneighbour);
+    slmpi::exchange(myneighbours, coordsforeachneighbour, coordsfromeachneighbour); 
+
+    // Make sure the curvature order is identical on all neighbours:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        if (reclens[11*n+10] != curvatureorder)
+        {
+            std::cout << "Error in 'dtracker' object: expected the same curvature order on all mesh parts" << std::endl;
+            abort();
+        }
+    }
+
+    // Populate the temporary 'nodes' object:
+    nodes tmpnds;
+    
+    int totnumrecnodes = 0;
+    for (int n = 0; n < numneighbours; n++)
+        totnumrecnodes += coordsfromeachneighbour[n].size()/3;
+    
+    tmpnds.setnumber(totnumrecnodes);
+    double* tmpncs = tmpnds.getcoordinates()->data();
+    
+    int cindex = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int i = 0; i < coordsfromeachneighbour[n].size(); i++)
+            tmpncs[cindex+i] = coordsfromeachneighbour[n][i];
+        cindex += coordsfromeachneighbour[n].size();
+    }
+    
+    // Populate the temporary 'elements' object:
+    disjointregions tmpdrs;
+    physicalregions tmpprs(tmpdrs);
+    elements tmpels(tmpnds, tmpprs, tmpdrs);
+    
+    int nodeshift = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int ni = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            element el(i, curvatureorder);
+            int ncn = el.countcurvednodes();
+            std::vector<int> nodelist(ncn);
+            
+            int numelemsintype = reclens[11*n+2+i];
+            for (int j = 0; j < numelemsintype; j++)
+            {
+                for (int k = 0; k < ncn; k++)
+                    nodelist[k] = nodenumsfromeachneighbour[n][ni+k] + nodeshift;
+                ni += ncn;
+                
+                tmpels.add(i, curvatureorder, nodelist);
+            }
+        }
+        nodeshift += coordsfromeachneighbour[n].size()/3;
+    }
+    tmpels.explode();
+    
+    // Merge while removing the duplicates:
+    std::vector<int> nooverlapregs = {};
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        for (int dim = 0; dim < 3; dim++)
+        {
+            int cr = mynooverlapinterfaces[3*cn+dim];
+            if (cr >= 0)
+                nooverlapregs.push_back(cr);
+        }
+    }
+    els->merge(nooverlapregs, &tmpels);
+    
+    // Define the outer overlap regions and their skins:
+    myouteroverlaps = std::vector<int>(numranks, -1);
+    myouteroverlapskins = std::vector<int>(numranks, -1);
+
+    std::vector<int> offsets = numelemsnooverlap;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        int firstnewpr = prs->getmaxphysicalregionnumber()+1;
+        myouteroverlaps[cn] = firstnewpr;
+        myouteroverlapskins[cn] = firstnewpr+1;
+
+        physicalregion* oopr = prs->get(firstnewpr);
+
+        for (int i = 0; i < 8; i++)
+        {
+            int numelemsintype = reclens[11*n+2+i];
+
+            for (int j = 0; j < numelemsintype; j++)
+                oopr->addelement(i, offsets[i]+j); // outer overlap cells have been appended to 'els'
+
+            offsets[i] += numelemsintype;
+        }
+
+        regiondefiner regdef(*nds, *els, *prs);
+        regdef.regionskin(myouteroverlapskins[cn], myouteroverlaps[cn]);
+        regdef.defineregions();
+    }
+}
+
 void dtracker::mapnooverlapinterfaces(void)
 {
     elements* els = getrawmesh()->getelements();

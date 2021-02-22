@@ -68,6 +68,8 @@ class dtracker
 
         // Define the inner overlaps and their skins:
         void defineinneroverlaps(void);
+        // Define the outer overlaps and their skins:
+        void exchangeoverlaps(void);
 
         // Map the outer-overlap/no-overlap interfaces:
         void mapnooverlapinterfaces(void);
