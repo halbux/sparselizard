@@ -244,7 +244,7 @@ class elements
         // removed. Duplicates in the intersection region between 'elstomerge' and this object
         // are also removed. THIS OBJECT CAN NOT HAVE DUPLICATES on the intersection region.
         // CELL DUPLICATES ARE NOT REMOVED. The 'nodes' object known to this object is modified.
-        void merge(int intersectionphysreg, elements* elstomerge);
+        void merge(std::vector<int> intersectionphysregs, elements* elstomerge);
 };
 
 #endif

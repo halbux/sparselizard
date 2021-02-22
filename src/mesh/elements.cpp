@@ -1453,11 +1453,12 @@ void elements::merge(elements* elstomerge, std::vector<std::vector<int>>& renumb
     }
 }
 
-void elements::merge(int intersectionphysreg, elements* elstomerge)
+void elements::merge(std::vector<int> intersectionphysregs, elements* elstomerge)
 {
     int meshdim = getdimension();
-    int prdim = myphysicalregions->get(intersectionphysreg)->getelementdimension(); // can be celldim-1 or lower dim
-    std::vector<std::vector<int>>* elementlist = myphysicalregions->get(intersectionphysreg)->getelementlist();
+    std::vector<std::vector<std::vector<int>>*> elementlists(intersectionphysregs.size());
+    for (int i = 0; i < intersectionphysregs.size(); i++)
+        elementlists[i] = myphysicalregions->get(intersectionphysregs[i])->getelementlist();
 
     std::vector<int> numineachtype = count(); // curvature nodes are included
     std::vector<int> numduplicates(8, 0);
@@ -1481,7 +1482,7 @@ void elements::merge(int intersectionphysreg, elements* elstomerge)
 
         // Get the barycenters in this object for the current element type:
         std::vector<bool> isinelementlist;
-        int cnt = istypeinelementlists(i, {elementlist}, isinelementlist, true);
+        int cnt = istypeinelementlists(i, elementlists, isinelementlist, true);
         std::vector<int> targetelemnums;
         myalgorithm::find(isinelementlist, cnt, targetelemnums);
         
