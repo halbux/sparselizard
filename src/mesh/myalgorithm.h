@@ -230,6 +230,10 @@ namespace myalgorithm
     // Count the number of true entries:
     int counttrue(std::vector<bool>& tocount);
     
+    // For a vector of positive or zero values compress consecutive zero values:
+    void compresszeros(std::vector<int>& tocompress);
+    void decompresszeros(std::vector<int>& todecompress);
+    
 };
 
 #endif

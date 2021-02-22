@@ -1636,3 +1636,54 @@ int myalgorithm::counttrue(std::vector<bool>& tocount)
     return cnt;
 }
 
+void myalgorithm::compresszeros(std::vector<int>& tocompress)
+{
+    int len = tocompress.size();
+    
+    int i = 0, ci = 0;
+    while (i < len)
+    {
+        if (tocompress[i] > 0)
+        {
+            tocompress[ci] = tocompress[i];
+            i++; ci++;
+        }
+        else
+        {
+            int cntconsec = 0;
+            while (i < len && tocompress[i] == 0)
+            {
+                cntconsec++;
+                i++;
+            }
+            tocompress[ci] = -cntconsec;
+            ci++;
+        }
+    }
+    
+    tocompress.resize(ci+1);
+    tocompress[ci] = len;
+}
+
+void myalgorithm::decompresszeros(std::vector<int>& todecompress)
+{
+    std::vector<int> tdc = todecompress;
+    
+    int len = todecompress.size();
+    int dlen = todecompress[len-1];
+
+    todecompress = std::vector<int>(dlen, 0);
+
+    int di = 0;
+    for (int i = 0; i < len; i++)
+    {
+        if (tdc[i] > 0) // there are no 0 values in the compressed vector
+        {
+            todecompress[di] = tdc[i];
+            di++;
+        }
+        else
+            di += std::abs(tdc[i]);
+    }
+}
+
