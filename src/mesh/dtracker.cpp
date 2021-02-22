@@ -4,15 +4,24 @@
 #include "physicalregions.h"
 
 
-dtracker::dtracker(std::shared_ptr<rawmesh> rm)
+dtracker::dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numoverlaplayers)
 {
     if (rm == NULL)
     {
         std::cout << "Error in 'dtracker' object: cannot provide a NULL rawmesh pointer" << std::endl;
         abort();
     }
-    
+    if (numoverlaplayers < 0)
+    {
+        std::cout << "Error in 'dtracker' object: cannot have a negative number of overlap layers" << std::endl;
+        abort();
+    }
+
     myrawmesh = rm;
+    getrawmesh()->getphysicalregions()->errorundefined({globalgeometryskin});
+
+    myglobalgeometryskin = globalgeometryskin;
+    mynumoverlaplayers = numoverlaplayers;
 }
 
 std::shared_ptr<rawmesh> dtracker::getrawmesh(void)
@@ -392,6 +401,41 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     slmpi::sum(1, &isanynewadded);
     
     return (isanynewadded != 0);
+}
+
+void dtracker::defineinneroverlaps(void)
+{
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+
+    int numranks = slmpi::count();
+
+    myinneroverlaps = std::vector<int>(numranks, -1);
+    myinneroverlapskins = std::vector<int>(numranks, -1);
+
+    for (int n = 0; n < myneighbours.size(); n++)
+    {
+        regiondefiner regdef(*nds, *els, *prs);
+
+        int cn = myneighbours[n];
+        int firstnewpr = prs->getmaxphysicalregionnumber()+1;
+
+        myinneroverlaps[cn] = firstnewpr;
+        myinneroverlapskins[cn] = firstnewpr+1;
+
+        for (int dim = 0; dim < 3; dim++)
+        {
+            int ci = mynooverlapinterfaces[3*cn+dim];
+            if (ci >= 0)
+                regdef.regionlayer(myinneroverlaps[cn], -1, ci, mynumoverlaplayers);
+        }
+
+        regdef.regionskin(myinneroverlapskins[cn], myinneroverlaps[cn]);
+
+        // Duplicated cells in the inner overlap are automatically removed:
+        regdef.defineregions();
+    }
 }
 
 void dtracker::mapnooverlapinterfaces(void)
@@ -1160,6 +1204,14 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     
     if (verbosity > 0)
         std::cout << "Found all neighbour domains with " << numits << " set" << myalgorithm::getplurals(numits) << " of " << numtrialelements << " trial element" << myalgorithm::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << myalgorithm::getplurals(numcrossits) << std::endl;
+}
+
+void dtracker::overlap(void)
+{
+    if (isoverlap())
+    {   
+        defineinneroverlaps();
+    }
 }
 
 void dtracker::mapinterfaces(void)

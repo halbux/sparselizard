@@ -20,6 +20,9 @@ class dtracker
 
     private:
     
+        // Skin of the global geometry:
+        int myglobalgeometryskin = -1;
+        
         // Number of overlap layers (0 for no-overlap):
         int mynumoverlaplayers = -1;
 
@@ -63,6 +66,9 @@ class dtracker
         // Find new interfaces and populate the output accordingly. Return false if no more interfaces can be found on any rank.
         bool discovercrossinterfaces(std::vector<int>& interfacenodelist, std::vector<int>& interfaceedgelist, std::vector<std::vector<bool>>& isnodeinneighbours, std::vector<std::vector<bool>>& isedgeinneighbours);
 
+        // Define the inner overlaps and their skins:
+        void defineinneroverlaps(void);
+
         // Map the outer-overlap/no-overlap interfaces:
         void mapnooverlapinterfaces(void);
         void mapoverlapinterfaces(void);
@@ -73,7 +79,7 @@ class dtracker
 
     public:
 
-        dtracker(std::shared_ptr<rawmesh> rm);
+        dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numoverlaplayers);
 
         std::shared_ptr<rawmesh> getrawmesh(void);
         
@@ -87,6 +93,9 @@ class dtracker
         // Region 'nooverlapinterface' must include all elements of dimension cell-1 which touch the neighbour domains.
         void discoverconnectivity(int nooverlapinterface, int numtrialelements = 10, int verbosity = 0);
 
+        // Exchange the overlaps (and the physical regions included) with the neighbours and define the overlap interfaces:
+        void overlap(void);
+    
         // Map the outer-overlap/no-overlap interfaces:
         void mapinterfaces(void);
         
