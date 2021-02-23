@@ -783,22 +783,27 @@ void dtracker::defineouteroverlapinterfaces(void)
     int skintype = meshdim-1; // this does not provide the quad element in a 3D mesh
 
     int firstnewpr = prs->getmaxphysicalregionnumber()+1;
+    int candidatesregion = firstnewpr+numneighbours+1;
     
     regiondefiner regdef(*nds, *els, *prs);
 
     regdef.regionskin(firstnewpr+numneighbours, -1);
-    regdef.regionexclusion(firstnewpr+numneighbours+1, firstnewpr+numneighbours, {myglobalgeometryskin});
+    // This domain might not be in contact with the global geometry skin:
+    if (prs->getindex(myglobalgeometryskin) != -1)
+        regdef.regionexclusion(candidatesregion, firstnewpr+numneighbours, {myglobalgeometryskin});
+    else
+        candidatesregion = firstnewpr+numneighbours;
 
     regdef.defineregions();
 
-    std::vector<std::vector<int>>* candidateelementlist = prs->get(firstnewpr+numneighbours+1)->getelementlist();
+    std::vector<std::vector<int>>* candidateelementlist = prs->get(candidatesregion)->getelementlist();
     std::vector<bool> iscandidate = {}, iscandidateq = {};
     els->istypeinelementlists(skintype, {candidateelementlist}, iscandidate, false);
     if (meshdim == 3)
         els->istypeinelementlists(3, {candidateelementlist}, iscandidateq, false);
     
     // Remove the construction regions:
-    prs->remove({firstnewpr+numneighbours, firstnewpr+numneighbours+1}, false);
+    prs->remove({firstnewpr+numneighbours, candidatesregion}, false);
     
     // Create the outer overlap interfaces as the intersection between the above created region and each outer overlap skin:
     for (int n = 0; n < numneighbours; n++)
