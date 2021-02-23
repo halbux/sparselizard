@@ -18,7 +18,6 @@ dtracker::dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numo
     }
 
     myrawmesh = rm;
-    getrawmesh()->getphysicalregions()->errorundefined({globalgeometryskin});
 
     myglobalgeometryskin = globalgeometryskin;
     mynumoverlaplayers = numoverlaplayers;
