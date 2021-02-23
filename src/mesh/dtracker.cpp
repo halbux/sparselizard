@@ -1244,6 +1244,11 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
+    // Avoid any conflict between DDM-created regions and the other regions:
+    std::vector<int> lastpr = {prs->getmaxphysicalregionnumber()};
+    slmpi::max(lastpr);
+    int firstnewpr = lastpr[0]+1;
+    
     int meshdim = getrawmesh()->getmeshdimension();
     numtrialelements = std::max(1,numtrialelements);
     
@@ -1296,7 +1301,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
                 if (curneighbour != -1)
                 {
                     if (physregsvec[3*curneighbour+(meshdim-1)] == NULL)
-                        physregsvec[3*curneighbour+(meshdim-1)] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                    {
+                        physregsvec[3*curneighbour+(meshdim-1)] = prs->get(firstnewpr);
+                        firstnewpr++;   
+                    }
                         
                     physregsvec[3*curneighbour+(meshdim-1)]->addelement(i, elem);
                 }
@@ -1356,7 +1364,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
                 isnodeinneighbours[r][nodeb] = false;
                 
                 if (physregsvec[3*r+1] == NULL)
-                    physregsvec[3*r+1] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                {
+                    physregsvec[3*r+1] = prs->get(firstnewpr);
+                    firstnewpr++;   
+                }
                     
                 physregsvec[3*r+1]->addelement(1, i);
             }
@@ -1367,7 +1378,10 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
             if (isnodeinneighbours[r][i] == true && (wasnodeinneighbours[r].size() == 0 || wasnodeinneighbours[r][i] == false))
             {
                 if (physregsvec[3*r+0] == NULL)
-                    physregsvec[3*r+0] = prs->get(prs->getmaxphysicalregionnumber()+1);
+                {
+                    physregsvec[3*r+0] = prs->get(firstnewpr);
+                    firstnewpr++;
+                }
                     
                 physregsvec[3*r+0]->addelement(0, i);
             }

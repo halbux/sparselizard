@@ -16,12 +16,8 @@ void slmpi::finalize(void) {}
 int slmpi::getrank(void) { return 0; }
 int slmpi::count(void) { return 1; }
 void slmpi::barrier(void) {}
-void slmpi::send(int destination, int tag, int len, int* data) { errornompi(); }
-void slmpi::send(int destination, int tag, int len, double* data) { errornompi(); }
 void slmpi::send(int destination, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::send(int destination, int tag, std::vector<double>& data) { errornompi(); }
-void slmpi::receive(int source, int tag, int len, int* data) { errornompi(); }
-void slmpi::receive(int source, int tag, int len, double* data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
 void slmpi::sum(int len, int* data) {}
@@ -90,16 +86,6 @@ void slmpi::barrier(void)
 }
 
 
-void slmpi::send(int destination, int tag, int len, int* data)
-{
-    MPI_Send(data, len, MPI_INT, destination, tag, MPI_COMM_WORLD);
-}
-
-void slmpi::send(int destination, int tag, int len, double* data)
-{
-    MPI_Send(data, len, MPI_DOUBLE, destination, tag, MPI_COMM_WORLD);
-}
-
 void slmpi::send(int destination, int tag, std::vector<int>& data)
 {
     MPI_Send(data.data(), data.size(), MPI_INT, destination, tag, MPI_COMM_WORLD);
@@ -110,16 +96,6 @@ void slmpi::send(int destination, int tag, std::vector<double>& data)
     MPI_Send(data.data(), data.size(), MPI_DOUBLE, destination, tag, MPI_COMM_WORLD);
 }
 
-
-void slmpi::receive(int source, int tag, int len, int* data)
-{
-    MPI_Recv(data, len, MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-}
-
-void slmpi::receive(int source, int tag, int len, double* data)
-{
-    MPI_Recv(data, len, MPI_DOUBLE, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-}
 
 void slmpi::receive(int source, int tag, std::vector<int>& data)
 {
@@ -150,6 +126,17 @@ void slmpi::sum(std::vector<int>& data)
 void slmpi::sum(std::vector<double>& data)
 {
     MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+}
+
+
+void slmpi::max(std::vector<int>& data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+}
+
+void slmpi::max(std::vector<double>& data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 }
 
 

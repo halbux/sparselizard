@@ -23,13 +23,9 @@ namespace slmpi
     
     void barrier(void);
 
-    void send(int destination, int tag, int len, int* data);
-    void send(int destination, int tag, int len, double* data);
     void send(int destination, int tag, std::vector<int>& data);
     void send(int destination, int tag, std::vector<double>& data);
     // Data vector must be preallocated to the correct size:
-    void receive(int source, int tag, int len, int* data);
-    void receive(int source, int tag, int len, double* data);
     void receive(int source, int tag, std::vector<int>& data);
     void receive(int source, int tag, std::vector<double>& data);
     
@@ -38,6 +34,10 @@ namespace slmpi
     void sum(int len, double* data);
     void sum(std::vector<int>& data);
     void sum(std::vector<double>& data);
+    
+    // Take the max of the values from all ranks and distribute the result back to all ranks:
+    void max(std::vector<int>& data);
+    void max(std::vector<double>& data);
     
     // Broadcast from the broadcaster rank and receive in 'data' on all ranks.
     // Data vector must be preallocated to the correct size:
