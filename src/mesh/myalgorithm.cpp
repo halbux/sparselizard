@@ -1542,6 +1542,14 @@ int myalgorithm::ceildiv(int a, int b)
         return (a-r)/b+1;
 }
 
+int myalgorithm::getpackedsize(int numbits)
+{
+    int numbitsinint = 8 * sizeof(int); // to be os independent
+    numbitsinint--; // sign bit is not used to avoid issues on 0 int value
+    
+    return ceildiv(numbits, numbitsinint);
+}
+
 void myalgorithm::pack(std::vector<bool>& topack, std::vector<int>& packed)
 {   
     int numbitsinint = 8 * sizeof(int); // to be os independent
