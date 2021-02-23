@@ -24,6 +24,8 @@ void slmpi::sum(int len, int* data) {}
 void slmpi::sum(int len, double* data) {}
 void slmpi::sum(std::vector<int>& data) {}
 void slmpi::sum(std::vector<double>& data) {}
+void slmpi::max(std::vector<int>& data) {}
+void slmpi::max(std::vector<double>& data) {}
 void slmpi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
 void slmpi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
