@@ -762,6 +762,73 @@ void dtracker::exchangephysicalregions(void)
     }
 }
 
+void dtracker::defineouteroverlapinterfaces(void)
+{
+    // The outer overlap interface with a neighbour is the intersection of:
+    //
+    // - the skin of the overlapped domain minus the global geometry skin
+    // - the outer overlap skin
+
+    nodes* nds = getrawmesh()->getnodes();
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+
+    int numranks = slmpi::count();
+
+    int numneighbours = myneighbours.size();
+
+    myouteroverlapinterfaces = std::vector<int>(numranks, -1);
+    
+    int meshdim = getrawmesh()->getmeshdimension();
+    int skintype = meshdim-1; // this does not provide the quad element in a 3D mesh
+
+    int firstnewpr = prs->getmaxphysicalregionnumber()+1;
+    
+    regiondefiner regdef(*nds, *els, *prs);
+
+    regdef.regionskin(firstnewpr+numneighbours, -1);
+    regdef.regionexclusion(firstnewpr+numneighbours+1, firstnewpr+numneighbours, {myglobalgeometryskin});
+
+    regdef.defineregions();
+
+    std::vector<std::vector<int>>* candidateelementlist = prs->get(firstnewpr+numneighbours+1)->getelementlist();
+    std::vector<bool> iscandidate = {}, iscandidateq = {};
+    els->istypeinelementlists(skintype, {candidateelementlist}, iscandidate, false);
+    if (meshdim == 3)
+        els->istypeinelementlists(3, {candidateelementlist}, iscandidateq, false);
+    
+    // Remove the construction regions:
+    prs->remove({firstnewpr+numneighbours, firstnewpr+numneighbours+1}, false);
+    
+    // Create the outer overlap interfaces as the intersection between the above created region and each outer overlap skin:
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        
+        myouteroverlapinterfaces[cn] = firstnewpr+n;
+        physicalregion* curpr = prs->get(myouteroverlapinterfaces[cn]);
+    
+        std::vector<std::vector<int>>* outeroverlapskin = prs->get(myouteroverlapskins[cn])->getelementlist();
+        
+        std::vector<bool> isinoo = {}, isinooq = {};
+        els->istypeinelementlists(skintype, {outeroverlapskin}, isinoo, false);
+        if (meshdim == 3)
+            els->istypeinelementlists(3, {outeroverlapskin}, isinooq, false);
+    
+        // Add the intersection elements:
+        for (int i = 0; i < isinoo.size(); i++)
+        {
+            if (iscandidate[i] && isinoo[i])
+                curpr->addelement(skintype, i);
+        }
+        for (int i = 0; i < isinooq.size(); i++)
+        {
+            if (iscandidateq[i] && isinooq[i])
+                curpr->addelement(3, i);
+        }
+    }
+}
+
 void dtracker::mapnooverlapinterfaces(void)
 {
     elements* els = getrawmesh()->getelements();
@@ -1551,6 +1618,7 @@ void dtracker::overlap(void)
         defineinneroverlaps();
         exchangeoverlaps();
         exchangephysicalregions();
+        defineouteroverlapinterfaces();
     }
 }
 
