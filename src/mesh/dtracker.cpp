@@ -634,6 +634,134 @@ void dtracker::exchangeoverlaps(void)
     }
 }
 
+void dtracker::exchangephysicalregions(void)
+{
+    elements* els = getrawmesh()->getelements();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+
+    int rank = slmpi::getrank();
+    
+    int numneighbours = myneighbours.size();
+
+    std::vector<int> ddmregs = listddmregions();
+    std::vector<bool> isddmpr(prs->getmaxphysicalregionnumber()+1, false);
+    for (int i = 0; i < ddmregs.size(); i++)
+        isddmpr[ddmregs[i]] = true;
+
+    // Get the info of all physical regions in which each element is:
+    std::vector<std::vector<int>> addressesinphysreglist(8);
+    std::vector<std::vector<int>> physreglist(8);
+    for (int i = 0; i < 8; i++)
+        prs->inphysicalregions(i, els->count(i), addressesinphysreglist[i], physreglist[i]);
+
+    // Get the list of (sub)elements in each inner and outer overlap region:
+    std::vector<std::vector<std::vector<int>>> elemsininneroverlaps(numneighbours, std::vector<std::vector<int>>(8, std::vector<int>(0)));
+    std::vector<std::vector<std::vector<int>>> elemsinouteroverlaps(numneighbours, std::vector<std::vector<int>>(8, std::vector<int>(0)));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        
+        std::vector<std::vector<int>>* inneroverlapcells = prs->get(myinneroverlaps[cn])->getelementlist();
+        std::vector<std::vector<int>>* outeroverlapcells = prs->get(myouteroverlaps[cn])->getelementlist();
+        
+        for (int i = 0; i < 8; i++)
+        {
+            els->follow(inneroverlapcells, i, elemsininneroverlaps[n][i]);
+            els->follow(outeroverlapcells, i, elemsinouteroverlaps[n][i]);
+        }
+    }
+
+    std::vector<std::vector<int>> physreglistsforeachneighbour(numneighbours);
+    std::vector<int> sendlens(numneighbours), reclens(numneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int prealloc = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < elemsininneroverlaps[n][i].size(); j++)
+            {
+                int curelem = elemsininneroverlaps[n][i][j];
+                prealloc += 1 + addressesinphysreglist[i][curelem+1]-addressesinphysreglist[i][curelem];
+            }
+        }
+        
+        physreglistsforeachneighbour[n].resize(prealloc);
+        
+        int pi = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < elemsininneroverlaps[n][i].size(); j++)
+            {
+                int curelem = elemsininneroverlaps[n][i][j];
+                int numphysregsincurelem = addressesinphysreglist[i][curelem+1]-addressesinphysreglist[i][curelem];
+                
+                int actualnumphysregsincurelem = 0;
+                for (int l = 0; l < numphysregsincurelem; l++)
+                {
+                    int cpr = physreglist[i][addressesinphysreglist[i][curelem]+l];
+                    if (isddmpr[cpr] == false)
+                    {
+                        physreglistsforeachneighbour[n][pi+1+actualnumphysregsincurelem] = cpr;
+                        actualnumphysregsincurelem++;
+                    }
+                }
+                physreglistsforeachneighbour[n][pi] = actualnumphysregsincurelem;
+                
+                pi += 1+actualnumphysregsincurelem;
+            }
+        }
+        physreglistsforeachneighbour[n].resize(pi+1);
+        
+        myalgorithm::compresszeros(physreglistsforeachneighbour[n]);
+        
+        sendlens[n] = physreglistsforeachneighbour[n].size();
+    }
+    
+    slmpi::exchange(myneighbours, sendlens, reclens);
+    
+    std::vector<std::vector<int>> physreglistsfromeachneighbour(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        physreglistsfromeachneighbour[n].resize(reclens[n]);
+
+    slmpi::exchange(myneighbours, physreglistsforeachneighbour, physreglistsfromeachneighbour);
+    
+    // Add the physical regions to the elements (the outer overlap matches the inner overlap for each neighbour):
+    std::vector<physicalregion*> allprs(prs->getmaxphysicalregionnumber()+1, NULL);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        myalgorithm::decompresszeros(physreglistsfromeachneighbour[n]);
+        
+        int pi = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < elemsinouteroverlaps[n][i].size(); j++)
+            {
+                int numphysregsincurelem = physreglistsfromeachneighbour[n][pi];
+                
+                for (int l = 0; l < numphysregsincurelem; l++)
+                {
+                    int curpreg = physreglistsfromeachneighbour[n][pi+1+l];
+
+                    if (allprs[curpreg] == NULL)
+                    {
+                        if (isddmpr[curpreg])
+                        {
+                            std::cout << "Error in 'dtracker' object: cannot merge physical region " << curpreg << " from the inner overlap of rank " << myneighbours[n] << " into the outer overlap of rank " << rank << " (it is a DDM owned region on the latter rank)" << std::endl;
+                            abort();
+                        }
+                        
+                        allprs[curpreg] = prs->get(curpreg);
+                    }
+                        
+                    allprs[curpreg]->addelement(i, elemsinouteroverlaps[n][i][j]);
+                }
+                pi += 1+numphysregsincurelem;
+            }
+        }
+    }
+}
+
 void dtracker::mapnooverlapinterfaces(void)
 {
     elements* els = getrawmesh()->getelements();
@@ -1421,6 +1549,8 @@ void dtracker::overlap(void)
     if (isoverlap())
     {   
         defineinneroverlaps();
+        exchangeoverlaps();
+        exchangephysicalregions();
     }
 }
 
@@ -1573,6 +1703,43 @@ void dtracker::writeglobalnodenumbers(std::string filename)
         nodenums[i] = myglobalnodenumbers[i];
 
     els->write(filename, 0, myalgorithm::getequallyspaced(0, 1, numnodes), nodenums);
+}
+
+std::vector<int> dtracker::listddmregions(void)
+{
+    std::vector<int> prlist = {};
+    
+    int numneighbours = myneighbours.size();
+    
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+        
+        if (mynooverlapinterfaces.size() > 0)
+        {
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = mynooverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                    prlist.push_back(cr);
+            }
+        }
+        
+        if (myinneroverlaps.size() > 0)
+            prlist.push_back(myinneroverlaps[cn]);
+        if (myouteroverlaps.size() > 0)
+            prlist.push_back(myouteroverlaps[cn]);
+        if (myinneroverlapskins.size() > 0)
+            prlist.push_back(myinneroverlapskins[cn]);
+        if (myouteroverlapskins.size() > 0)
+            prlist.push_back(myouteroverlapskins[cn]);
+        if (myinneroverlapinterfaces.size() > 0)
+            prlist.push_back(myinneroverlapinterfaces[cn]);
+        if (myouteroverlapinterfaces.size() > 0)
+            prlist.push_back(myouteroverlapinterfaces[cn]);
+    }
+    
+    return prlist;
 }
 
 void dtracker::print(void)

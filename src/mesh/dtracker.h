@@ -70,6 +70,8 @@ class dtracker
         void defineinneroverlaps(void);
         // Define the outer overlaps and their skins:
         void exchangeoverlaps(void);
+        // Exchange the physical regions on the overlaps:
+        void exchangephysicalregions(void);
 
         // Map the outer-overlap/no-overlap interfaces:
         void mapnooverlapinterfaces(void);
@@ -124,6 +126,9 @@ class dtracker
         long long int* getglobalnodenumbers(void);
         void writeglobalnodenumbers(std::string filename);
 
+        // Return the list of all ddm-specific regions:
+        std::vector<int> listddmregions(void);
+        
         // Print connectivity information:
         void print(void);
         // Write no-overlap domain interfaces:
