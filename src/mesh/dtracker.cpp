@@ -742,6 +742,19 @@ void dtracker::exchangephysicalregions(void)
                 {
                     int curpreg = physreglistsfromeachneighbour[n][pi+1+l];
 
+                    // The received physical region number might be larger than any in this rank:
+                    if (curpreg >= allprs.size())
+                    {
+                        int prevlen = allprs.size();
+                        allprs.resize(curpreg+1);
+                        isddmpr.resize(curpreg+1);
+                        for (int p = prevlen; p < allprs.size(); p++)
+                        {
+                            allprs[p] = NULL;
+                            isddmpr[p] = false;
+                        }
+                    }
+                    
                     if (allprs[curpreg] == NULL)
                     {
                         if (isddmpr[curpreg])
