@@ -710,7 +710,7 @@ void dtracker::exchangephysicalregions(void)
                 pi += 1+actualnumphysregsincurelem;
             }
         }
-        physreglistsforeachneighbour[n].resize(pi+1);
+        physreglistsforeachneighbour[n].resize(pi);
         
         myalgorithm::compresszeros(physreglistsforeachneighbour[n]);
         

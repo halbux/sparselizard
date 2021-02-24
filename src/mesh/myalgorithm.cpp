@@ -1683,7 +1683,7 @@ void myalgorithm::decompresszeros(std::vector<int>& todecompress)
     todecompress = std::vector<int>(dlen, 0);
 
     int di = 0;
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len-1; i++)
     {
         if (tdc[i] > 0) // there are no 0 values in the compressed vector
         {
