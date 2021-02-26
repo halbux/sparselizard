@@ -33,11 +33,19 @@ void physicalregion::addelement(int elementtypenumber, int elementnumber)
 
 int physicalregion::countelements(void)
 {
-    std::vector<int> alldisjointregions = getdisjointregions();
-    int numelem = 0;
-    for (int i = 0; i < alldisjointregions.size(); i++)
-        numelem += mydisjointregions->countelements(alldisjointregions[i]);
-    return numelem;
+    int numelems = 0;
+    if (includesdisjointregion.size() > 0)
+    {
+        std::vector<int> alldisjointregions = getdisjointregions();
+        for (int i = 0; i < alldisjointregions.size(); i++)
+            numelems += mydisjointregions->countelements(alldisjointregions[i]);
+    }
+    else
+    {
+        for (int i = 0; i < 8; i++)
+            numelems += elementlist[i].size();
+    }
+    return numelems;
 }
 
 int physicalregion::getelementdimension(void)

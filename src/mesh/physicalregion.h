@@ -30,7 +30,7 @@ class physicalregion
         physicalregions* myphysicalregions;
 
         // 'includesdisjointregion[i]' is true if disjoint region i is in the physical region.
-        std::vector<bool> includesdisjointregion;
+        std::vector<bool> includesdisjointregion = {};
         // List of all element numbers in the physical region.
         std::vector<std::vector<int>> elementlist = std::vector<std::vector<int>>(8, std::vector<int>(0));
         

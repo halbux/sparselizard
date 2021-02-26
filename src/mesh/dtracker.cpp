@@ -801,7 +801,7 @@ void dtracker::defineouteroverlapinterfaces(void)
 
     regdef.regionskin(firstnewpr+numneighbours, -1);
     // This domain might not be in contact with the global geometry skin:
-    if (prs->getindex(myglobalgeometryskin) != -1)
+    if (prs->getindex(myglobalgeometryskin) != -1 && prs->get(myglobalgeometryskin)->countelements() > 0)
         regdef.regionexclusion(candidatesregion, firstnewpr+numneighbours, {myglobalgeometryskin});
     else
         candidatesregion = firstnewpr+numneighbours;
