@@ -18,6 +18,7 @@
 #include "mat.h"
 #include "formulation.h"
 #include "rawmesh.h"
+#include "dofmanager.h"
 
 class rawmesh;
 class expression;
@@ -28,6 +29,7 @@ class field;
 class parameter;
 class formulation;
 class shape;
+class dofmanager;
 
 namespace sl
 {
@@ -234,6 +236,8 @@ namespace sl
     // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
     std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity = 1);
     
+    // Know which dofs to send and at which dofs to receive for the DDM:
+    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);
     
     std::vector<double> linspace(double a, double b, int num);
     std::vector<double> logspace(double a, double b, int num, double basis = 10.0);

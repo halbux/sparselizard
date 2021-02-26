@@ -1716,6 +1716,248 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     return relresvec;
 }
 
+void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
+{
+    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    
+    elements* els = dt->getrawmesh()->getelements();
+    disjointregions* drs = dt->getrawmesh()->getdisjointregions();
+    physicalregions* prs = dt->getrawmesh()->getphysicalregions();
+    
+    int rank = slmpi::getrank();
+    
+    std::vector<std::vector<std::vector<int>>>* elemmap = dt->getmap();
+    
+    int numrawfields = rfs.size();
+    int numdisjregs = drs->count();
+    int numneighbours = dt->countneighbours();
+    
+    // Get the disjoint regions in each overlap/no-overlap interface:
+    std::vector<std::vector<bool>> isdisjregininnerinterface(numneighbours, std::vector<bool>(numdisjregs, false));
+    std::vector<std::vector<bool>> isdisjreginouterinterface(numneighbours, std::vector<bool>(numdisjregs, false));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = dt->getneighbour(n);
+        
+        if (dt->isoverlap())
+        {
+            isdisjregininnerinterface[n] = prs->get(dt->getinneroverlapinterface(cn))->getdefinition();
+            isdisjreginouterinterface[n] = prs->get(dt->getouteroverlapinterface(cn))->getdefinition();
+        }
+        else
+        {
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = dt->getnooverlapinterface(cn, dim);
+                if (cr >= 0)
+                {
+                    std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
+                    for (int i = 0; i < cdrs.size(); i++)
+                        isdisjregininnerinterface[n][cdrs[i]] = true;
+                }
+            }
+            isdisjreginouterinterface[n] = isdisjregininnerinterface[n];
+        }
+    }
+    
+    // Count the number of dofs to send for each rawfield and the number of data send ranges:
+    std::vector<std::vector<int>> numsenddofsperfield(numneighbours, std::vector<int>(numrawfields, 0));
+    std::vector<std::vector<int>> numsendrangesperfield(numneighbours, std::vector<int>(numrawfields, 0));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int r = 0; r < numrawfields; r++)
+        {
+            dm->selectfield(rfs[r]);
+            for (int d = 0; d < numdisjregs; d++)
+            {
+                if (isdisjregininnerinterface[n][d])
+                {
+                    int ne = drs->countelements(d);
+                    int nff = dm->countformfunctions(d);
+                    numsenddofsperfield[n][r] += ne*nff;
+                    // Do not create and send empty ranges:
+                    if (nff > 0)
+                        numsendrangesperfield[n][r]++;
+                }
+            }
+        }
+    }
+    
+    // Count the number of dofs expected to be received for each rawfield:
+    std::vector<std::vector<int>> numexpectedrecvdofsperfield(numneighbours, std::vector<int>(numrawfields, 0));
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int r = 0; r < numrawfields; r++)
+        {
+            dm->selectfield(rfs[r]);
+            for (int d = 0; d < numdisjregs; d++)
+            {
+                if (isdisjreginouterinterface[n][d])
+                    numexpectedrecvdofsperfield[n][r] += drs->countelements(d)*dm->countformfunctions(d);
+            }
+        }
+    }
+    
+    // Preallocate the outputs:
+    sendinds = std::vector<intdensematrix>(numneighbours);
+    recvinds = std::vector<intdensematrix>(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int totsendlen = 0;
+        for (int r = 0; r < numrawfields; r++)
+            totsendlen += numsenddofsperfield[n][r];
+        sendinds[n] = intdensematrix(totsendlen, 1);
+        
+        int totrecvlen = 0;
+        for (int r = 0; r < numrawfields; r++)
+            totrecvlen += numexpectedrecvdofsperfield[n][r];
+        recvinds[n] = intdensematrix(totrecvlen, 1);
+    }
+    
+    // Create the send range data and populate the send indexes:
+    std::vector<std::vector<int>> dofrangesforneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int index = 0;
+        int* sivals = sendinds[n].getvalues();
+    
+        int totnumsendranges = 0;
+        for (int r = 0; r < numrawfields; r++)
+            totnumsendranges += numsendrangesperfield[n][r];
+        
+        // Format is {numrfs, numsenddofsrf0,...,numsenddofsrfn, numrangesrf0,...,numrangesrfn, type0,rbe0,ree0,nff0, type1,...}:    
+        dofrangesforneighbours[n] = std::vector<int>(1 + 2*numrawfields + 4*totnumsendranges);
+        dofrangesforneighbours[n][0] = numrawfields;
+        
+        int ind = 1+2*numrawfields;
+        for (int r = 0; r < numrawfields; r++)
+        {
+            dofrangesforneighbours[n][1+r] = numsenddofsperfield[n][r];
+            dofrangesforneighbours[n][1+numrawfields+r] = numsendrangesperfield[n][r];
+            
+            dm->selectfield(rfs[r]);
+            for (int d = 0; d < numdisjregs; d++)
+            {
+                if (isdisjregininnerinterface[n][d])
+                {
+                    int elemtype = drs->getelementtypenumber(d);
+                    int rbe = drs->getrangebegin(d);
+                    int ree = drs->getrangeend(d);
+                    int ne = ree-rbe+1;
+                    int nff = dm->countformfunctions(d);
+                    if (nff > 0)
+                    {
+                        dofrangesforneighbours[n][ind+0] = elemtype;
+                        dofrangesforneighbours[n][ind+1] = rbe;
+                        dofrangesforneighbours[n][ind+2] = ree;
+                        dofrangesforneighbours[n][ind+3] = nff;
+                        
+                        for (int f = 0; f < nff; f++)
+                        {
+                            int rb = dm->getrangebegin(d, f);
+                            
+                            for (int e = 0; e < ne; e++)
+                                sivals[index+e] = rb+e;
+                            index += ne;
+                        }
+                        ind += 4;
+                    }
+                }
+            }
+        }
+    }
+    
+    std::vector<int> sendlens(numneighbours), recvlens;
+    for (int n = 0; n < numneighbours; n++)
+        sendlens[n] = dofrangesforneighbours[n].size();
+        
+    slmpi::exchange(dt->getneighbours(), sendlens, recvlens);
+    
+    std::vector<std::vector<int>> dofrangesfromneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        dofrangesfromneighbours[n].resize(recvlens[n]);
+        
+    slmpi::exchange(dt->getneighbours(), dofrangesforneighbours, dofrangesfromneighbours);
+    
+    // Sanity check. The number of rawfields is allowed to change from a domain to another.
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int numrecvrawfields = dofrangesfromneighbours[n][0];
+        
+        std::vector<int> numdofsexpected = {};
+        for (int r = 0; r < numrawfields; r++)
+        {
+            if (numexpectedrecvdofsperfield[n][r] > 0)
+                numdofsexpected.push_back(numexpectedrecvdofsperfield[n][r]);
+        }
+        std::vector<int> numdofsrecv = {};
+        for (int r = 0; r < dofrangesfromneighbours[n][0]; r++)
+        {
+            if (dofrangesfromneighbours[n][1+r] > 0)
+                numdofsrecv.push_back(dofrangesfromneighbours[n][1+r]);
+        }
+        if (numdofsexpected != numdofsrecv)
+        {
+            std::cout << "Error in 'sl' namespace: DDM interface data size does not match for at least one field between ranks " << rank << " and " << dt->getneighbour(n) << std::endl;
+            std::cout << "Make sure the fields are provided in the same order to the dof manager and that the interpolation orders match on the DDM interfaces" << std::endl; 
+            abort();
+        }
+    }
+
+    // Populate the receive indexes (already preallocated above):
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int numrecvrawfields = dofrangesfromneighbours[n][0];
+        
+        int index = 0;
+        int* rivals = recvinds[n].getvalues();
+        
+        int ind = 1+2*numrecvrawfields;
+        int rfindex = 0, recvrfindex = 0;
+        for (int r = 0; r < std::max(numrawfields, numrecvrawfields); r++)
+        {
+            if (numexpectedrecvdofsperfield[n][rfindex] == 0)
+            {
+                rfindex++;
+                continue;
+            }
+            if (dofrangesfromneighbours[n][1+recvrfindex] == 0)
+            {
+                recvrfindex++;
+                continue;
+            }
+            
+            dm->selectfield(rfs[rfindex]);
+                
+            int recvnumranges = dofrangesfromneighbours[n][1+numrecvrawfields+recvrfindex];
+            for (int i = 0; i < recvnumranges; i++)
+            {
+                int elemtype = dofrangesfromneighbours[n][ind+0];
+                int rbe = dofrangesfromneighbours[n][ind+1];
+                int ree = dofrangesfromneighbours[n][ind+2];
+                int nff = dofrangesfromneighbours[n][ind+3];
+                
+                int ne = ree-rbe+1;
+                
+                for (int f = 0; f < nff; f++)
+                {
+                    for (int e = 0; e < ne; e++)
+                    {
+                        int ce = elemmap->at(n)[elemtype][rbe+e];
+                        int cdr = els->getdisjointregion(elemtype, ce);
+                        int crbe = drs->getrangebegin(cdr);
+                        int crb = dm->getrangebegin(cdr, f);
+                        
+                        rivals[index+e] = crb + ce-crbe;
+                    }
+                    index += ne;
+                }
+                ind += 4;
+            }
+            rfindex++; recvrfindex++;            
+        }
+    }
+}
 
 std::vector<double> sl::linspace(double a, double b, int num)
 {
