@@ -202,12 +202,11 @@ int elements::count(int elementtypenumber)
 
 int elements::countcells(int elementtypenumber)
 {
-    int dim = getdimension();
-    
-    if (dim == 0 && elementtypenumber != 0 || dim == 1 && elementtypenumber != 1 || dim == 2 && elementtypenumber != 2 && elementtypenumber != 3 || dim == 3 && elementtypenumber < 4)
+    element el(elementtypenumber);
+    if (el.getelementdimension() != getdimension())
         return 0;
-    
-    return count(elementtypenumber);
+    else
+        return count(elementtypenumber);
 }
 
 int elements::countindim(int dim)
