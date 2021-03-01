@@ -17,7 +17,7 @@ cd ~/SLlibs;
 
 echo '__________________________________________';
 echo 'FETCHING THE LATEST PETSC VERSION FROM GIT';
-git clone -b master https://gitlab.com/petsc/petsc.git petsc;
+git clone -b main https://gitlab.com/petsc/petsc.git petsc;
 
 
 ########## CONFIGURE PETSC (SELECT THE APPROPRIATE CONFIGURATION OPTIONS BELOW) :
