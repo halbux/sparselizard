@@ -1105,7 +1105,7 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
     int numsubs = count(subtype);
     
     // To treat only once each subelement:
-    std::vector<bool> iselemdone(numsubs, false);
+    std::vector<bool> issubdone(numsubs, false);
 
     // Preallocate to max possible size:
     sublist.resize(numsubs);
@@ -1132,10 +1132,10 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
             {
                 int cursub = getsubelement(subtype,i,elem,k);
 
-                if (iselemdone[cursub] == false && (mustbeinelementlists.size() == 0 || issuballowed[cursub]))
+                if (issubdone[cursub] == false && (mustbeinelementlists.size() == 0 || issuballowed[cursub]))
                 {
                     sublist[index] = cursub;
-                    iselemdone[cursub] = true;
+                    issubdone[cursub] = true;
 
                     index++;
                 }
