@@ -1695,3 +1695,16 @@ void myalgorithm::decompresszeros(std::vector<int>& todecompress)
     }
 }
 
+int myalgorithm::getmaxdim(std::vector<std::vector<int>>* elementlist)
+{
+    int highestdim = -1;
+    for (int i = 0; i < 8; i++)
+    {
+        element el(i);
+        int eldim = el.getelementdimension();
+        if (elementlist->at(i).size() > 0 && eldim > highestdim)
+            highestdim = eldim;
+    }
+    return highestdim;
+}
+

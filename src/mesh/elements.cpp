@@ -1093,25 +1093,25 @@ void elements::explode(void)
 
 void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<std::vector<int>>*> mustbeinelementlists)
 {
-    int highestdim = -1;
-    for (int i = 0; i < 8; i++)
-    {
-        element el(i);
-        int eldim = el.getelementdimension();
-        if (elementlist->at(i).size() > 0 && eldim > highestdim)
-            highestdim = eldim;
-    }
+    int highestdim = myalgorithm::getmaxdim(elementlist);
 
     int numsubs = count(subtype);
     
     // To treat only once each subelement:
     std::vector<bool> issubdone(numsubs, false);
-
     // Preallocate to max possible size:
     sublist.resize(numsubs);
+    
+    // All NULL last argument should not lead to any restriction:
+    int numnotnull = 0;
+    for (int i = 0; i < mustbeinelementlists.size(); i++)
+    {
+        if (mustbeinelementlists[i] != NULL)
+            numnotnull++;
+    }
 
     std::vector<bool> issuballowed = {};
-    if (mustbeinelementlists.size() > 0)
+    if (numnotnull > 0)
         istypeinelementlists(subtype, mustbeinelementlists, issuballowed, false);
 
     int index = 0;
@@ -1132,7 +1132,7 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
             {
                 int cursub = getsubelement(subtype,i,elem,k);
 
-                if (issubdone[cursub] == false && (mustbeinelementlists.size() == 0 || issuballowed[cursub]))
+                if (issubdone[cursub] == false && (numnotnull == 0 || issuballowed[cursub]))
                 {
                     sublist[index] = cursub;
                     issubdone[cursub] = true;

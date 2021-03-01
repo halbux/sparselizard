@@ -236,6 +236,9 @@ namespace myalgorithm
     void compresszeros(std::vector<int>& tocompress);
     void decompresszeros(std::vector<int>& todecompress);
     
+    // Get the maximum element dimension found in the element list (-1 if empty):
+    int getmaxdim(std::vector<std::vector<int>>* elementlist);
+    
 };
 
 #endif
