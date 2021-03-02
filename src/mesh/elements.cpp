@@ -1322,7 +1322,7 @@ void elements::definedisjointregionsranges(void)
 
 std::vector<bool> elements::iscornernode(void)
 {
-    std::vector<bool> output(count(0), false);
+    std::vector<bool> output(count(0), true);
     for (int typenum = 1; typenum <= 7; typenum++)
     {
         element curvedelement(typenum, getcurvatureorder());
@@ -1332,8 +1332,8 @@ std::vector<bool> elements::iscornernode(void)
         for (int i = 0; i < count(typenum); i++)
         {    
             // The first 'numcornernodes' are corner nodes, the remaining ones not.
-            for (int node = 0; node < numcornernodes; node++)
-                output[subelementsinelements[typenum][0][i*numcurvednodes+node]] = true;
+            for (int node = numcornernodes; node < numcurvednodes; node++)
+                output[subelementsinelements[typenum][0][i*numcurvednodes+node]] = false;
         }
     }
     return output;
