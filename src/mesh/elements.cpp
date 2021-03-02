@@ -571,13 +571,13 @@ std::vector<double>* elements::getboxdimensions(int elementtypenumber)
     return &(boxdimensions[elementtypenumber]);
 }
 
-void elements::getbarycenters(std::vector<std::vector<int>>* elementlist, std::vector<double>& barycenters)
+void elements::getbarycenters(std::vector<std::vector<int>>* elementlist, std::vector<double>& barys)
 {
     int numelems = 0;
     for (int i = 0; i < 8; i++)
         numelems += elementlist->at(i).size();
 
-    barycenters = std::vector<double>(3*numelems);
+    barys = std::vector<double>(3*numelems);
 
     int index = 0;
     for (int i = 0; i < 8; i++)
@@ -585,42 +585,42 @@ void elements::getbarycenters(std::vector<std::vector<int>>* elementlist, std::v
         if (elementlist->at(i).size() == 0)
             continue;
 
-        double* bcs = &(getbarycenters(i)->at(0));
+        double* bcs = getbarycenters(i)->data();
         for (int j = 0; j < elementlist->at(i).size(); j++)
         {
             int elem = elementlist->at(i)[j];
 
-            barycenters[3*index+0] = bcs[3*elem+0];
-            barycenters[3*index+1] = bcs[3*elem+1];
-            barycenters[3*index+2] = bcs[3*elem+2];
+            barys[3*index+0] = bcs[3*elem+0];
+            barys[3*index+1] = bcs[3*elem+1];
+            barys[3*index+2] = bcs[3*elem+2];
 
             index++;
         }
     }
 }
 
-void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, std::vector<double>& barycenters)
+void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, std::vector<double>& barys)
 {
-    barycenters = std::vector<double>(3*elementlist.size());
-    getbarycenters(elementtypenumber, elementlist, barycenters.data());
+    barys = std::vector<double>(3*elementlist.size());
+    getbarycenters(elementtypenumber, elementlist, barys.data());
 }
 
-void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, double* barycenters)
+void elements::getbarycenters(int elementtypenumber, std::vector<int>& elementlist, double* barys)
 {
     int numelems = elementlist.size();
     
     if (numelems == 0)
         return;
     
-    double* bcs = &(getbarycenters(elementtypenumber)->at(0));
+    double* bcs = getbarycenters(elementtypenumber)->data();
 
     for (int i = 0; i < numelems; i++)
     {
         int elem = elementlist[i];
 
-        barycenters[3*i+0] = bcs[3*elem+0];
-        barycenters[3*i+1] = bcs[3*elem+1];
-        barycenters[3*i+2] = bcs[3*elem+2];
+        barys[3*i+0] = bcs[3*elem+0];
+        barys[3*i+1] = bcs[3*elem+1];
+        barys[3*i+2] = bcs[3*elem+2];
     }
 }
 
