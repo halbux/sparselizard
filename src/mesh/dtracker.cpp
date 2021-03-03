@@ -1915,17 +1915,17 @@ std::vector<int> dtracker::listddmregions(void)
             }
         }
         
-        if (myinneroverlaps.size() > 0)
+        if (myinneroverlaps.size() > 0 && myinneroverlaps[cn] >= 0)
             prlist.push_back(myinneroverlaps[cn]);
-        if (myouteroverlaps.size() > 0)
+        if (myouteroverlaps.size() > 0 && myouteroverlaps[cn] >= 0)
             prlist.push_back(myouteroverlaps[cn]);
-        if (myinneroverlapskins.size() > 0)
+        if (myinneroverlapskins.size() > 0 && myinneroverlapskins[cn] >= 0)
             prlist.push_back(myinneroverlapskins[cn]);
-        if (myouteroverlapskins.size() > 0)
+        if (myouteroverlapskins.size() > 0 && myouteroverlapskins[cn] >= 0)
             prlist.push_back(myouteroverlapskins[cn]);
-        if (myinneroverlapinterfaces.size() > 0)
+        if (myinneroverlapinterfaces.size() > 0 && myinneroverlapinterfaces[cn] >= 0)
             prlist.push_back(myinneroverlapinterfaces[cn]);
-        if (myouteroverlapinterfaces.size() > 0)
+        if (myouteroverlapinterfaces.size() > 0 && myouteroverlapinterfaces[cn] >= 0)
             prlist.push_back(myouteroverlapinterfaces[cn]);
     }
     
