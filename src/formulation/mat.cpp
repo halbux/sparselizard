@@ -53,6 +53,8 @@ void mat::permute(intdensematrix rowpermute, intdensematrix colpermute)
     IS rowpermutis, colpermutis;
     ISCreateGeneral(PETSC_COMM_SELF, rowpermute.count(), rowpermute.getvalues(), PETSC_USE_POINTER, &rowpermutis);
     ISCreateGeneral(PETSC_COMM_SELF, colpermute.count(), colpermute.getvalues(), PETSC_USE_POINTER, &colpermutis);
+    ISSetPermutation(rowpermutis);
+    ISSetPermutation(colpermutis);
     
     MatPermute(getpetsc(), rowpermutis, colpermutis, &permutedmat);
     

@@ -30,6 +30,7 @@ void vec::permute(intdensematrix rowpermute, bool invertit)
 
     IS rowpermutis;
     ISCreateGeneral(PETSC_COMM_SELF, rowpermute.count(), rowpermute.getvalues(), PETSC_USE_POINTER, &rowpermutis);
+    ISSetPermutation(rowpermutis);
     
     if (invertit == false)
         VecPermute(getpetsc(), rowpermutis, PETSC_FALSE);
