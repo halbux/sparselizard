@@ -586,7 +586,8 @@ void dtracker::exchangeoverlaps(void)
         }
         nodeshift += coordsfromeachneighbour[n].size()/3;
     }
-    tmpels.explode();
+    if (numneighbours > 0)
+        tmpels.explode();
     
     // Merge while removing the duplicates:
     std::vector<int> nooverlapregs = {};
@@ -600,7 +601,8 @@ void dtracker::exchangeoverlaps(void)
                 nooverlapregs.push_back(cr);
         }
     }
-    els->merge(nooverlapregs, &tmpels);
+    if (numneighbours > 0)
+        els->merge(nooverlapregs, &tmpels);
     
     // Define the outer overlap regions and their skins:
     myouteroverlaps = std::vector<int>(numranks, -1);
