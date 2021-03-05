@@ -800,6 +800,9 @@ void dtracker::defineouteroverlapinterfaces(void)
 
     myouteroverlapinterfaces = std::vector<int>(numranks, -1);
     
+    if (numneighbours == 0)
+        return;
+    
     int meshdim = getrawmesh()->getmeshdimension();
     int skintype = meshdim-1; // this does not provide the quad element in a 3D mesh
 
@@ -866,8 +869,10 @@ void dtracker::defineinneroverlapinterfaces(void)
     
     int meshdim = getrawmesh()->getmeshdimension();
     
-    // Define the inner overlap interfaces:
     myinneroverlapinterfaces = std::vector<int>(numranks, -1);
+    
+    if (numneighbours == 0)
+        return;
     
     // Get the list of (sub)elements in each inner and outer overlap skin region:
     std::vector<std::vector<std::vector<int>>> elemsininneroverlapskins(numneighbours, std::vector<std::vector<int>>(8, std::vector<int>(0)));
