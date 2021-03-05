@@ -145,7 +145,7 @@ void physicalregion::removeduplicatedelements(void)
             continue;
 
         // Sort every vector:
-        sort(elementlist[i].begin(),elementlist[i].end());
+        std::sort(elementlist[i].begin(),elementlist[i].end());
         // Unique every vector and resize it to fit:
         std::vector<int>::iterator iter;
         iter = std::unique(elementlist[i].begin(),elementlist[i].end());
