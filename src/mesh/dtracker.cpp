@@ -774,6 +774,13 @@ void dtracker::exchangephysicalregions(void)
             }
         }
     }
+    
+    // Remove the duplicated elements that have been created above:
+    for (int i = 0; i < allprs.size(); i++)
+    {
+        if (allprs[i] != NULL)
+            allprs[i]->removeduplicatedelements();
+    }
 }
 
 void dtracker::defineouteroverlapinterfaces(void)

@@ -66,8 +66,7 @@ class physicalregion
         // 'elementtypenumber' is the uncurved version of the actual element.
         void renumberelements(int elementtypenumber, std::vector<int>& elementrenumbering);
         
-        // 'removeduplicatedelements' removes all duplicated elements in 'elementlist'. 
-        // As a side effect all elements are sorted in a every physical region.
+        // 'removeduplicatedelements' removes all duplicated elements in 'elementlist' (this call SORTS THE ELEMENTS).
         void removeduplicatedelements(void);
         
         std::vector<std::vector<int>>* getelementlist(void);
