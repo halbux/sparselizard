@@ -41,7 +41,7 @@ class dtracker
         std::vector<int> myouteroverlaps = {};
         std::vector<int> myinneroverlapskins = {};
         std::vector<int> myouteroverlapskins = {};
-        // Inner and outer overlap interfaces (length is 3*numranks).
+        // Inner and outer overlap interfaces (length is 3*numranks, -1 if none).
         // Entry 3*r+i is the interface of i-dimensional elements with rank r:
         std::vector<int> myinneroverlapinterfaces = {};
         std::vector<int> myouteroverlapinterfaces = {};
