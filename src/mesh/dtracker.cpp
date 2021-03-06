@@ -798,62 +798,77 @@ void dtracker::defineouteroverlapinterfaces(void)
 
     int numneighbours = myneighbours.size();
 
-    myouteroverlapinterfaces = std::vector<int>(numranks, -1);
+    myouteroverlapinterfaces = std::vector<int>(3*numranks, -1);
     
     if (numneighbours == 0)
         return;
     
-    int meshdim = getrawmesh()->getmeshdimension();
-    int skintype = meshdim-1; // this does not provide the quad element in a 3D mesh
-
-    int firstnewpr = prs->getmaxphysicalregionnumber()+1;
-    int candidatesregion = firstnewpr+numneighbours+1;
+    int skinregion = prs->getmaxphysicalregionnumber()+1;
+    int candidatesregion = skinregion+1;
     
     regiondefiner regdef(*nds, *els, *prs);
 
-    regdef.regionskin(firstnewpr+numneighbours, -1);
+    regdef.regionskin(skinregion, -1);
     // This domain might not be in contact with the global geometry skin:
     if (prs->getindex(myglobalgeometryskin) != -1 && prs->get(myglobalgeometryskin)->countelements() > 0)
-        regdef.regionexclusion(candidatesregion, firstnewpr+numneighbours, {myglobalgeometryskin});
+        regdef.regionexclusion(candidatesregion, skinregion, {myglobalgeometryskin});
     else
-        candidatesregion = firstnewpr+numneighbours;
+        candidatesregion = skinregion;
 
     regdef.defineregions();
 
     std::vector<std::vector<int>>* candidateelementlist = prs->get(candidatesregion)->getelementlist();
-    std::vector<bool> iscandidate = {}, iscandidateq = {};
-    els->istypeinelementlists(skintype, {candidateelementlist}, iscandidate, false);
-    if (meshdim == 3)
-        els->istypeinelementlists(3, {candidateelementlist}, iscandidateq, false);
+    
+    int numinterfacetype = els->countinterfaceelementtypes();
+    std::vector<std::vector<bool>> iscandidate(numinterfacetype, std::vector<bool>(0));
+    for (int i = 0; i < numinterfacetype; i++)
+        els->istypeinelementlists(i, {candidateelementlist}, iscandidate[i], false);
     
     // Remove the construction regions:
-    prs->remove({firstnewpr+numneighbours, candidatesregion}, false);
+    prs->remove({skinregion, candidatesregion}, false);
     
     // Create the outer overlap interfaces as the intersection between the above created region and each outer overlap skin:
     for (int n = 0; n < numneighbours; n++)
     {
         int cn = myneighbours[n];
         
-        myouteroverlapinterfaces[cn] = firstnewpr+n;
-        physicalregion* curpr = prs->get(myouteroverlapinterfaces[cn]);
+        std::vector<std::vector<bool>> isinoos(numinterfacetype, std::vector<bool>(0));
+        for (int i = 0; i < numinterfacetype; i++)
+            els->istypeinelementlists(i, {prs->get(myouteroverlapskins[cn])->getelementlist()}, isinoos[i], false);
     
-        std::vector<std::vector<int>>* outeroverlapskin = prs->get(myouteroverlapskins[cn])->getelementlist();
-        
-        std::vector<bool> isinoo = {}, isinooq = {};
-        els->istypeinelementlists(skintype, {outeroverlapskin}, isinoo, false);
-        if (meshdim == 3)
-            els->istypeinelementlists(3, {outeroverlapskin}, isinooq, false);
-    
-        // Add the intersection elements:
-        for (int i = 0; i < isinoo.size(); i++)
+        // Add the intersection faces, edges and nodes (if any):
+        std::vector<physicalregion*> dimprs(3, NULL);
+        for (int i = numinterfacetype-1; i >= 0; i--)
         {
-            if (iscandidate[i] && isinoo[i])
-                curpr->addelement(skintype, i);
-        }
-        for (int i = 0; i < isinooq.size(); i++)
-        {
-            if (iscandidateq[i] && isinooq[i])
-                curpr->addelement(3, i);
+            element el(i);
+            int dim = el.getelementdimension();
+            int nn = el.countnodes();
+            int ne = el.countedges();
+            
+            for (int j = 0; j < els->count(i); j++)
+            {
+                if (iscandidate[i][j] && isinoos[i][j])
+                {
+                    if (dimprs[dim] == NULL)
+                    {
+                        myouteroverlapinterfaces[3*cn+dim] = prs->getmaxphysicalregionnumber()+1;
+                        dimprs[dim] = prs->get(myouteroverlapinterfaces[3*cn+dim]);
+                    }
+                    dimprs[dim]->addelement(i, j);
+                    
+                    // Remove the underlying edges and nodes:
+                    if (dim > 1)
+                    {
+                        for (int k = 0; k < ne; k++)
+                            isinoos[1][els->getsubelement(1,i,j,k)] = false;
+                    }
+                    if (dim > 0)
+                    {
+                        for (int k = 0; k < nn; k++)
+                            isinoos[0][els->getsubelement(0,i,j,k)] = false;
+                    }
+                }
+            }
         }
     }
 }
@@ -869,14 +884,16 @@ void dtracker::defineinneroverlapinterfaces(void)
     
     int meshdim = getrawmesh()->getmeshdimension();
     
-    myinneroverlapinterfaces = std::vector<int>(numranks, -1);
+    myinneroverlapinterfaces = std::vector<int>(3*numranks, -1);
     
     if (numneighbours == 0)
         return;
     
+    int numinterfacetype = els->countinterfaceelementtypes();
+    
     // Get the list of (sub)elements in each inner and outer overlap skin region:
-    std::vector<std::vector<std::vector<int>>> elemsininneroverlapskins(numneighbours, std::vector<std::vector<int>>(8, std::vector<int>(0)));
-    std::vector<std::vector<std::vector<int>>> elemsinouteroverlapskins(numneighbours, std::vector<std::vector<int>>(8, std::vector<int>(0)));
+    std::vector<std::vector<std::vector<int>>> elemsininneroverlapskins(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
+    std::vector<std::vector<std::vector<int>>> elemsinouteroverlapskins(numneighbours, std::vector<std::vector<int>>(numinterfacetype, std::vector<int>(0)));
     for (int n = 0; n < numneighbours; n++)
     {
         int cn = myneighbours[n];
@@ -887,14 +904,10 @@ void dtracker::defineinneroverlapinterfaces(void)
         std::vector<std::vector<int>>* inneroverlapskinelems = prs->get(myinneroverlapskins[cn])->getelementlist();
         std::vector<std::vector<int>>* outeroverlapskinelems = prs->get(myouteroverlapskins[cn])->getelementlist();
         
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < numinterfacetype; i++)
         {
-            element el(i);
-            if (el.getelementdimension() == meshdim-1)
-            {
-                els->follow(inneroverlapelems, i, elemsininneroverlapskins[n][i], {inneroverlapskinelems});
-                els->follow(outeroverlapelems, i, elemsinouteroverlapskins[n][i], {outeroverlapskinelems});
-            }
+            els->follow(inneroverlapelems, i, elemsininneroverlapskins[n][i], {inneroverlapskinelems});
+            els->follow(outeroverlapelems, i, elemsinouteroverlapskins[n][i], {outeroverlapskinelems});
         }
     }
     
@@ -905,20 +918,26 @@ void dtracker::defineinneroverlapinterfaces(void)
     {
         int cn = myneighbours[n];
         
-        std::vector<std::vector<int>>* ooielems = prs->get(myouteroverlapinterfaces[cn])->getelementlist();
-        
         int oosnumbits = 0;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < numinterfacetype; i++)
             oosnumbits += elemsinouteroverlapskins[n][i].size();
             
         std::vector<bool> isininterface(oosnumbits, false);
         
         int pos = 0;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < numinterfacetype; i++)
         {
+            element el(i);
+            int dim = el.getelementdimension();
+        
             int ne = elemsinouteroverlapskins[n][i].size();
             if (ne == 0)
                 continue;
+                
+            std::vector<std::vector<int>>* ooielems = NULL;
+            int cr = myouteroverlapinterfaces[3*cn+dim];
+            if (cr >= 0)
+                ooielems = prs->get(cr)->getelementlist();
                 
             std::vector<bool> issubinooi;
             els->istypeinelementlists(i, {ooielems}, issubinooi, false);
@@ -933,7 +952,7 @@ void dtracker::defineinneroverlapinterfaces(void)
         
         myalgorithm::pack(isininterface, dataforneighbours[n]);
         
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < numinterfacetype; i++)
             iosnumbits[n] += elemsininneroverlapskins[n][i].size();
         datafromneighbours[n].resize(myalgorithm::getpackedsize(iosnumbits[n]));
     }
@@ -947,17 +966,26 @@ void dtracker::defineinneroverlapinterfaces(void)
         std::vector<bool> isininterface;
         myalgorithm::unpack(iosnumbits[n], datafromneighbours[n], isininterface);
     
-        myinneroverlapinterfaces[cn] = prs->getmaxphysicalregionnumber()+1;
-        physicalregion* curpr = prs->get(myinneroverlapinterfaces[cn]);
-    
+        std::vector<physicalregion*> dimprs(3, NULL);
+        
         int pos = 0;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < numinterfacetype; i++)
         {
+            element el(i);
+            int dim = el.getelementdimension();
+            
             int ne = elemsininneroverlapskins[n][i].size();
             for (int j = 0; j < ne; j++)
             {
                 if (isininterface[pos+j])
-                    curpr->addelement(i, elemsininneroverlapskins[n][i][j]);
+                {
+                    if (dimprs[dim] == NULL)
+                    {
+                        myinneroverlapinterfaces[3*cn+dim] = prs->getmaxphysicalregionnumber()+1;
+                        dimprs[dim] = prs->get(myinneroverlapinterfaces[3*cn+dim]);
+                    }
+                    dimprs[dim]->addelement(i, elemsininneroverlapskins[n][i][j]);
+                }
             }
             pos += ne;
         }
@@ -1139,10 +1167,16 @@ void dtracker::mapoverlapinterfaces(void)
         std::vector<std::vector<int>> sublists(numinterfacetype, std::vector<int>(0));
         for (int i = 0; i < numinterfacetype; i++)
         {
-            std::vector<std::vector<int>>* inneroverlapinterfaceelems = prs->get(myinneroverlapinterfaces[cn])->getelementlist();
+            std::vector<std::vector<std::vector<int>>*> inneroverlapinterfaceelemlists(3, NULL);
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = myinneroverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                    inneroverlapinterfaceelemlists[dim] = prs->get(cr)->getelementlist();
+            }
             std::vector<std::vector<int>>* inneroverlapelems = prs->get(myinneroverlaps[cn])->getelementlist();
         
-            els->follow(inneroverlapelems, i, sublists[i], {inneroverlapinterfaceelems});
+            els->follow(inneroverlapelems, i, sublists[i], inneroverlapinterfaceelemlists);
         }
         sublistforneighbours[n] = myalgorithm::concatenate(sublists);
         sublistforneighbours[n].resize(sublistforneighbours[n].size() + numinterfacetype);
@@ -1153,10 +1187,16 @@ void dtracker::mapoverlapinterfaces(void)
         int totlen = 0;
         for (int i = 0; i < numinterfacetype; i++)
         {
-            std::vector<std::vector<int>>* outeroverlapinterfaceelems = prs->get(myouteroverlapinterfaces[cn])->getelementlist();
+            std::vector<std::vector<std::vector<int>>*> outeroverlapinterfaceelems(3, NULL);
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = myouteroverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                    outeroverlapinterfaceelems[dim] = prs->get(cr)->getelementlist();
+            }
             std::vector<std::vector<int>>* outeroverlapelems = prs->get(myouteroverlaps[cn])->getelementlist();
         
-            els->follow(outeroverlapelems, i, sublistouteroverlapinterface[n][i], {outeroverlapinterfaceelems});
+            els->follow(outeroverlapelems, i, sublistouteroverlapinterface[n][i], outeroverlapinterfaceelems);
             
             totlen += sublistouteroverlapinterface[n][i].size();
         }
@@ -1818,10 +1858,10 @@ int dtracker::getnooverlapinterface(int neighbour, int elementdimension)
     }
 }
 
-int dtracker::getinneroverlapinterface(int neighbour)
+int dtracker::getinneroverlapinterface(int neighbour, int elementdimension)
 {
-    if (neighbour >= 0 && neighbour < myinneroverlapinterfaces.size())
-        return myinneroverlapinterfaces[neighbour];
+    if (neighbour >= 0 && neighbour < myinneroverlapinterfaces.size() && elementdimension >= 0 && elementdimension < 3)
+        return myinneroverlapinterfaces[3*neighbour+elementdimension];
     else
     {
         std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap interface region" << std::endl;
@@ -1829,10 +1869,10 @@ int dtracker::getinneroverlapinterface(int neighbour)
     }
 }
 
-int dtracker::getouteroverlapinterface(int neighbour)
+int dtracker::getouteroverlapinterface(int neighbour, int elementdimension)
 {
-    if (neighbour >= 0 && neighbour < myouteroverlapinterfaces.size())
-        return myouteroverlapinterfaces[neighbour];
+    if (neighbour >= 0 && neighbour < myouteroverlapinterfaces.size() && elementdimension >= 0 && elementdimension < 3)
+        return myouteroverlapinterfaces[3*neighbour+elementdimension];
     else
     {
         std::cout << "Error in 'dtracker' object: cannot provide the requested outer overlap interface region" << std::endl;
@@ -1937,10 +1977,25 @@ std::vector<int> dtracker::listddmregions(void)
             prlist.push_back(myinneroverlapskins[cn]);
         if (myouteroverlapskins.size() > 0 && myouteroverlapskins[cn] >= 0)
             prlist.push_back(myouteroverlapskins[cn]);
-        if (myinneroverlapinterfaces.size() > 0 && myinneroverlapinterfaces[cn] >= 0)
-            prlist.push_back(myinneroverlapinterfaces[cn]);
-        if (myouteroverlapinterfaces.size() > 0 && myouteroverlapinterfaces[cn] >= 0)
-            prlist.push_back(myouteroverlapinterfaces[cn]);
+            
+        if (myinneroverlapinterfaces.size() > 0)
+        {
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = myinneroverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                    prlist.push_back(cr);
+            }
+        }
+        if (myouteroverlapinterfaces.size() > 0)
+        {
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = myouteroverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                    prlist.push_back(cr);
+            }
+        }
     }
     
     return prlist;

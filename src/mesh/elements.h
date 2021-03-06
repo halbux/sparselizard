@@ -208,7 +208,7 @@ class elements
         // For each element follow the subelements of type 'subtype' in the element-subs order.
         // Each subelement is passed only once. If the last argument is provided then only the
         // subelements that are also subelements of any last argument element list are returned.
-        // NULL pointers in the last argument are ignored. Curvature nodes are NOT returned.
+        // NULL pointers in the last argument are empty lists. Curvature nodes are NOT returned.
         void follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<std::vector<int>>*> mustbeinelementlists = {});         
         
         

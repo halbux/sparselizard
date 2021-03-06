@@ -1741,8 +1741,23 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         
         if (dt->isoverlap())
         {
-            isdisjregininnerinterface[n] = prs->get(dt->getinneroverlapinterface(cn))->getdefinition();
-            isdisjreginouterinterface[n] = prs->get(dt->getouteroverlapinterface(cn))->getdefinition();
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = dt->getinneroverlapinterface(cn, dim);
+                if (cr >= 0)
+                {
+                    std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
+                    for (int i = 0; i < cdrs.size(); i++)
+                        isdisjregininnerinterface[n][cdrs[i]] = true;
+                }
+                cr = dt->getouteroverlapinterface(cn, dim);
+                if (cr >= 0)
+                {
+                    std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
+                    for (int i = 0; i < cdrs.size(); i++)
+                        isdisjreginouterinterface[n][cdrs[i]] = true;
+                }
+            }
         }
         else
         {
