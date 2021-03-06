@@ -36,15 +36,15 @@ class dtracker
         // Entry 3*r+i is the interface of i-dimensional elements with rank r:
         std::vector<int> mynooverlapinterfaces = {};
 
+        // Inner and outer overlap interfaces (length is 3*numranks, -1 if none).
+        // Entry 3*r+i is the interface of i-dimensional elements with rank r:
+        std::vector<int> myinneroverlapinterfaces = {};
+        std::vector<int> myouteroverlapinterfaces = {};
         // Inner and outer overlaps and their skins (length is numranks):
         std::vector<int> myinneroverlaps = {};
         std::vector<int> myouteroverlaps = {};
         std::vector<int> myinneroverlapskins = {};
         std::vector<int> myouteroverlapskins = {};
-        // Inner and outer overlap interfaces (length is 3*numranks, -1 if none).
-        // Entry 3*r+i is the interface of i-dimensional elements with rank r:
-        std::vector<int> myinneroverlapinterfaces = {};
-        std::vector<int> myouteroverlapinterfaces = {};
         
         // Map entry [n][type][i] gives the element number of type 'type' in this domain that corresponds to the
         // ith element of that type in the nth neighbour domain. Only elements in the outer-overlap/no-overlap
