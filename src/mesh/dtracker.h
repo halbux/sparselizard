@@ -74,8 +74,10 @@ class dtracker
         void exchangeoverlaps(void);
         // Exchange the physical regions on the overlaps:
         void exchangephysicalregions(void);
-        // Define the outer and inner overlap interfaces:
+        // Define the outer overlap interface.
+        // This works for any geometry whose global skin region does not intersect itself.
         void defineouteroverlapinterfaces(void);
+        // Define the inner overlap interface:
         void defineinneroverlapinterfaces(void);
 
         // Map the outer-overlap/no-overlap interfaces:
