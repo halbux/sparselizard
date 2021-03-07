@@ -1860,7 +1860,7 @@ int dtracker::getnooverlapinterface(int neighbour, int elementdimension)
 
 int dtracker::getinneroverlapinterface(int neighbour, int elementdimension)
 {
-    if (neighbour >= 0 && neighbour < myinneroverlapinterfaces.size() && elementdimension >= 0 && elementdimension < 3)
+    if (neighbour >= 0 && 3*neighbour < myinneroverlapinterfaces.size() && elementdimension >= 0 && elementdimension < 3)
         return myinneroverlapinterfaces[3*neighbour+elementdimension];
     else
     {
@@ -1871,7 +1871,7 @@ int dtracker::getinneroverlapinterface(int neighbour, int elementdimension)
 
 int dtracker::getouteroverlapinterface(int neighbour, int elementdimension)
 {
-    if (neighbour >= 0 && neighbour < myouteroverlapinterfaces.size() && elementdimension >= 0 && elementdimension < 3)
+    if (neighbour >= 0 && 3*neighbour < myouteroverlapinterfaces.size() && elementdimension >= 0 && elementdimension < 3)
         return myouteroverlapinterfaces[3*neighbour+elementdimension];
     else
     {
