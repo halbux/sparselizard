@@ -929,21 +929,18 @@ void dtracker::defineinneroverlapinterfaces(void)
             int dim = el.getelementdimension();
         
             int ne = elemsinouteroverlapskins[n][i].size();
-            if (ne == 0)
-                continue;
-                
-            std::vector<std::vector<int>>* ooielems = NULL;
             int cr = myouteroverlapinterfaces[3*cn+dim];
-            if (cr >= 0)
-                ooielems = prs->get(cr)->getelementlist();
-                
-            std::vector<bool> issubinooi;
-            els->istypeinelementlists(i, {ooielems}, issubinooi, false);
             
-            for (int j = 0; j < ne; j++)
+            if (ne > 0 && cr >= 0)
             {
-                if (issubinooi[elemsinouteroverlapskins[n][i][j]])
-                    isininterface[pos+j] = true;
+                std::vector<bool> issubinooi;
+                els->istypeinelementlists(i, {prs->get(cr)->getelementlist()}, issubinooi, false);
+                
+                for (int j = 0; j < ne; j++)
+                {
+                    if (issubinooi[elemsinouteroverlapskins[n][i][j]])
+                        isininterface[pos+j] = true;
+                }
             }
             pos += ne;
         }
