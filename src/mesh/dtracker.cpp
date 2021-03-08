@@ -1007,11 +1007,11 @@ void dtracker::mapnooverlapinterfaces(void)
         for (int i = 0; i < numinterfacetype; i++)
         {   
             std::vector<std::vector<std::vector<int>>*> interfaceelems(3, NULL);
-            for (int j = 0; j < 3; j++)
+            for (int dim = 0; dim < 3; dim++)
             {
-                int cr = mynooverlapinterfaces[3*cn+j];
-                if (cr > 0)
-                    interfaceelems[j] = prs->get(cr)->getelementlist();
+                int cr = mynooverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                    interfaceelems[dim] = prs->get(cr)->getelementlist();
             }
             std::vector<bool> isininterface;
             int numininterface = els->istypeinelementlists(i, interfaceelems, isininterface, false); // no curvature nodes
