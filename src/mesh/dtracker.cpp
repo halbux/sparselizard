@@ -882,8 +882,6 @@ void dtracker::defineinneroverlapinterfaces(void)
 
     int numneighbours = myneighbours.size();
     
-    int meshdim = getrawmesh()->getmeshdimension();
-    
     myinneroverlapinterfaces = std::vector<int>(3*numranks, -1);
     
     if (numneighbours == 0)
