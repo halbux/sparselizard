@@ -1778,7 +1778,7 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     }
     
     if (verbosity > 0)
-        std::cout << "Found all neighbour domains with " << numits << " set" << myalgorithm::getplurals(numits) << " of " << numtrialelements << " trial element" << myalgorithm::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << myalgorithm::getplurals(numcrossits) << std::endl;
+        std::cout << "Found all neighbours with " << numits << " set" << myalgorithm::getplurals(numits) << " of " << numtrialelements << " trial element" << myalgorithm::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << myalgorithm::getplurals(numcrossits) << std::endl;
 }
 
 void dtracker::overlap(void)
