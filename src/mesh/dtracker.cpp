@@ -1233,7 +1233,6 @@ void dtracker::createglobalnodenumbersnooverlap(void)
     int numneighbours = myneighbours.size();
     
     int numnodes = nds->count();
-    int curvatureorder = els->getcurvatureorder();
     
     // Curvature nodes have a -1 global numbering:
     std::vector<bool> isitacornernode = els->iscornernode();
@@ -1360,7 +1359,6 @@ void dtracker::createglobalnodenumbersoverlap(void)
     int numneighbours = myneighbours.size();
     
     int numnodes = nds->count();
-    int curvatureorder = els->getcurvatureorder();
     
     // Split neighbours into lower ranks and higher ranks (neighbours are sorted ascendingly):
     std::vector<int> lowerranks, higherranks;
