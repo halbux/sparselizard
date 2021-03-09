@@ -26,7 +26,7 @@ int main(void)
     
     // Define extra regions for convenience:
     int conductor = selectunion({coil,tube});
-    int wholedomain = selectunion({conductor,air});
+    int wholedomain = selectall();
     domainboundary = selectunion({domainboundary,vin,vout});
     
     parameter mu, sigma;
