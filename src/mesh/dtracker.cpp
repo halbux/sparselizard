@@ -1484,7 +1484,13 @@ void dtracker::createglobalnodenumbersoverlap(void)
             globalnoinodesforneighbours[n].resize(numnoinodes);
             // Not owned nodes will send a -1 global number:
             for (int i = 0; i < numnoinodes; i++)
-                globalnoinodesforneighbours[n][i] = myglobalnodenumbers[nodesinnoiseenfromio[n][i]]-offsetforeachrank[rank]; // referenced to offset
+            {
+                long long int gnn = myglobalnodenumbers[nodesinnoiseenfromio[n][i]];
+                if (gnn >= 0)
+                    globalnoinodesforneighbours[n][i] = gnn-offsetforeachrank[rank]; // referenced to offset
+                else
+                    globalnoinodesforneighbours[n][i] = -1;
+            }
         }
     }
     
