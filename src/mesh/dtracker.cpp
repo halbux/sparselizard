@@ -1516,11 +1516,15 @@ void dtracker::createglobalnodenumbersoverlap(void)
     std::vector<std::vector<int>> globalnodesfromneighbours(numneighbours, std::vector<int>(0));
     for (int n = 0; n < numneighbours; n++)
     {
-        globalnodesforneighbours[n].resize(nodesinio[n].size());
+        globalnodesforneighbours[n].resize(2*nodesinio[n].size());
         for (int i = 0; i < nodesinio[n].size(); i++)
-            globalnodesforneighbours[n][i] = myglobalnodenumbers[nodesinio[n][i]]-offsetforeachrank[rank]; // referenced to offset
+        {
+            int curowner = nodeownerrank[nodesinio[n][i]];
+            globalnodesforneighbours[n][2*i+0] = curowner;
+            globalnodesforneighbours[n][2*i+1] = myglobalnodenumbers[nodesinio[n][i]]-offsetforeachrank[curowner]; // referenced to offset
+        }
     
-        globalnodesfromneighbours[n].resize(nodesinoo[n].size());
+        globalnodesfromneighbours[n].resize(2*nodesinoo[n].size());
     }
     
     slmpi::exchange(myneighbours, globalnodesforneighbours, globalnodesfromneighbours);
@@ -1529,7 +1533,7 @@ void dtracker::createglobalnodenumbersoverlap(void)
     {
         int cn = myneighbours[n];
         for (int i = 0; i < nodesinoo[n].size(); i++)
-            myglobalnodenumbers[nodesinoo[n][i]] = globalnodesfromneighbours[n][i]+offsetforeachrank[cn];
+            myglobalnodenumbers[nodesinoo[n][i]] = globalnodesfromneighbours[n][2*i+1]+offsetforeachrank[globalnodesfromneighbours[n][2*i+0]];
     }
 }
 
