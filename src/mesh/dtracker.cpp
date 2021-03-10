@@ -1531,7 +1531,6 @@ void dtracker::createglobalnodenumbersoverlap(void)
     
     for (int n = 0; n < numneighbours; n++)
     {
-        int cn = myneighbours[n];
         for (int i = 0; i < nodesinoo[n].size(); i++)
             myglobalnodenumbers[nodesinoo[n][i]] = globalnodesfromneighbours[n][2*i+1]+offsetforeachrank[globalnodesfromneighbours[n][2*i+0]];
     }
