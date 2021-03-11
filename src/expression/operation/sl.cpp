@@ -1716,7 +1716,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     return relresvec;
 }
 
-void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
+void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
 {
     std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
     
@@ -1743,19 +1743,22 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         {
             for (int dim = 0; dim < 3; dim++)
             {
-                int cr = dt->getinneroverlapinterface(cn, dim);
-                if (cr >= 0)
+                if (isdimactive[dim])
                 {
-                    std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
-                    for (int i = 0; i < cdrs.size(); i++)
-                        isdisjregininnerinterface[n][cdrs[i]] = true;
-                }
-                cr = dt->getouteroverlapinterface(cn, dim);
-                if (cr >= 0)
-                {
-                    std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
-                    for (int i = 0; i < cdrs.size(); i++)
-                        isdisjreginouterinterface[n][cdrs[i]] = true;
+                    int cr = dt->getinneroverlapinterface(cn, dim);
+                    if (cr >= 0)
+                    {
+                        std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
+                        for (int i = 0; i < cdrs.size(); i++)
+                            isdisjregininnerinterface[n][cdrs[i]] = true;
+                    }
+                    cr = dt->getouteroverlapinterface(cn, dim);
+                    if (cr >= 0)
+                    {
+                        std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
+                        for (int i = 0; i < cdrs.size(); i++)
+                            isdisjreginouterinterface[n][cdrs[i]] = true;
+                    }
                 }
             }
         }
@@ -1763,12 +1766,15 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         {
             for (int dim = 0; dim < 3; dim++)
             {
-                int cr = dt->getnooverlapinterface(cn, dim);
-                if (cr >= 0)
+                if (isdimactive[dim])
                 {
-                    std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
-                    for (int i = 0; i < cdrs.size(); i++)
-                        isdisjregininnerinterface[n][cdrs[i]] = true;
+                    int cr = dt->getnooverlapinterface(cn, dim);
+                    if (cr >= 0)
+                    {
+                        std::vector<int> cdrs = prs->get(cr)->getdisjointregions(-1);
+                        for (int i = 0; i < cdrs.size(); i++)
+                            isdisjregininnerinterface[n][cdrs[i]] = true;
+                    }
                 }
             }
             isdisjreginouterinterface[n] = isdisjregininnerinterface[n];
@@ -1790,7 +1796,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
                     int ne = drs->countelements(d);
                     int nff = dm->countformfunctions(d);
                     numsenddofsperfield[n][r] += ne*nff;
-                    // Do not create and send empty ranges:
+                    // Skip empty ranges:
                     if (nff > 0)
                         numsendrangesperfield[n][r]++;
                 }

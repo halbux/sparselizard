@@ -236,8 +236,8 @@ namespace sl
     // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
     std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity = 1);
     
-    // Know which dofs to send and at which dofs to receive for the DDM:
-    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);
+    // Know which dofs to send and at which dofs to receive for the DDM. Choose the rawfields and the interface element dimensions (length 3) to consider.
+    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);
     
     std::vector<double> linspace(double a, double b, int num);
     std::vector<double> logspace(double a, double b, int num, double basis = 10.0);
