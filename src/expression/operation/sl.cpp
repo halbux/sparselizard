@@ -1898,7 +1898,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         if (numdofsexpected != numdofsrecv)
         {
             std::cout << "Error in 'sl' namespace: DDM interface data size does not match for at least one field between ranks " << rank << " and " << dt->getneighbour(n) << std::endl;
-            std::cout << "Make sure the fields are provided in the same order to the dof manager and that the interpolation orders match on the DDM interfaces" << std::endl; 
+            std::cout << "Make sure that the fields are provided in the same order to the dof manager and that the interpolation orders match on the DDM interfaces" << std::endl; 
             abort();
         }
     }
