@@ -1708,3 +1708,19 @@ int myalgorithm::getmaxdim(std::vector<std::vector<int>>* elementlist)
     return highestdim;
 }
 
+int myalgorithm::sum(std::vector<int>& tosum)
+{
+    int out = 0;
+    for (int i = 0; i < tosum.size(); i++)
+        out += tosum[i];
+    return out;
+}
+
+double myalgorithm::sum(std::vector<double>& tosum)
+{
+    double out = 0;
+    for (int i = 0; i < tosum.size(); i++)
+        out += tosum[i];
+    return out;
+}
+

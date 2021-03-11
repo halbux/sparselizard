@@ -1784,27 +1784,6 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     // Count the number of dofs to send for each rawfield and the number of data send ranges:
     std::vector<std::vector<int>> numsenddofsperfield(numneighbours, std::vector<int>(numrawfields, 0));
     std::vector<std::vector<int>> numsendrangesperfield(numneighbours, std::vector<int>(numrawfields, 0));
-    for (int n = 0; n < numneighbours; n++)
-    {
-        for (int r = 0; r < numrawfields; r++)
-        {
-            dm->selectfield(rfs[r]);
-            for (int d = 0; d < numdisjregs; d++)
-            {
-                if (isdisjregininnerinterface[n][d])
-                {
-                    int ne = drs->countelements(d);
-                    int nff = dm->countformfunctions(d);
-                    numsenddofsperfield[n][r] += ne*nff;
-                    // Skip empty ranges:
-                    if (nff > 0)
-                        numsendrangesperfield[n][r]++;
-                }
-            }
-        }
-    }
-    
-    // Count the number of dofs expected to be received for each rawfield:
     std::vector<std::vector<int>> numexpectedrecvdofsperfield(numneighbours, std::vector<int>(numrawfields, 0));
     for (int n = 0; n < numneighbours; n++)
     {
@@ -1813,8 +1792,17 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
             dm->selectfield(rfs[r]);
             for (int d = 0; d < numdisjregs; d++)
             {
+                int ne = drs->countelements(d);
+                int nff = dm->countformfunctions(d);
+
+                if (isdisjregininnerinterface[n][d])
+                {
+                    numsenddofsperfield[n][r] += ne*nff;
+                    if (nff > 0)
+                        numsendrangesperfield[n][r]++;
+                }
                 if (isdisjreginouterinterface[n][d])
-                    numexpectedrecvdofsperfield[n][r] += drs->countelements(d)*dm->countformfunctions(d);
+                    numexpectedrecvdofsperfield[n][r] += ne*nff;
             }
         }
     }
@@ -1824,15 +1812,8 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     recvinds = std::vector<intdensematrix>(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
-        int totsendlen = 0;
-        for (int r = 0; r < numrawfields; r++)
-            totsendlen += numsenddofsperfield[n][r];
-        sendinds[n] = intdensematrix(totsendlen, 1);
-        
-        int totrecvlen = 0;
-        for (int r = 0; r < numrawfields; r++)
-            totrecvlen += numexpectedrecvdofsperfield[n][r];
-        recvinds[n] = intdensematrix(totrecvlen, 1);
+        sendinds[n] = intdensematrix(myalgorithm::sum(numsenddofsperfield[n]), 1);
+        recvinds[n] = intdensematrix(myalgorithm::sum(numexpectedrecvdofsperfield[n]), 1);
     }
     
     // Create the send range data and populate the send indexes:
@@ -1841,10 +1822,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     {
         int index = 0;
         int* sivals = sendinds[n].getvalues();
-    
-        int totnumsendranges = 0;
-        for (int r = 0; r < numrawfields; r++)
-            totnumsendranges += numsendrangesperfield[n][r];
+        int totnumsendranges = myalgorithm::sum(numsendrangesperfield[n]);
         
         // Format is {numrfs, numsenddofsrf0,...,numsenddofsrfn, numrangesrf0,...,numrangesrfn, type0,rbe0,ree0,nff0, type1,...}:    
         dofrangesforneighbours[n] = std::vector<int>(1 + 2*numrawfields + 4*totnumsendranges);

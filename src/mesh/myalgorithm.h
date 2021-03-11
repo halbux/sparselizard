@@ -239,6 +239,10 @@ namespace myalgorithm
     // Get the maximum element dimension found in the element list (-1 if empty):
     int getmaxdim(std::vector<std::vector<int>>* elementlist);
     
+    // Sum all entries in the vector (return 0 if empty):
+    int sum(std::vector<int>& tosum);
+    double sum(std::vector<double>& tosum);
+    
 };
 
 #endif
