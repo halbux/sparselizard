@@ -1912,21 +1912,16 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         int* rivals = recvinds[n].getvalues();
         
         int ind = 1+2*numrecvrawfields;
-        int rfindex = 0, recvrfindex = 0;
-        for (int r = 0; r < std::max(numrawfields, numrecvrawfields); r++)
+        int recvrfindex = 0;
+        for (int r = 0; r < numrawfields; r++)
         {
-            if (numexpectedrecvdofsperfield[n][rfindex] == 0)
-            {
-                rfindex++;
+            if (numexpectedrecvdofsperfield[n][r] == 0)
                 continue;
-            }
-            if (dofrangesfromneighbours[n][1+recvrfindex] == 0)
-            {
+
+            while (dofrangesfromneighbours[n][1+recvrfindex] == 0)
                 recvrfindex++;
-                continue;
-            }
             
-            dm->selectfield(rfs[rfindex]);
+            dm->selectfield(rfs[r]);
                 
             int recvnumranges = dofrangesfromneighbours[n][1+numrecvrawfields+recvrfindex];
             for (int i = 0; i < recvnumranges; i++)
@@ -1953,7 +1948,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
                 }
                 ind += 4;
             }
-            rfindex++; recvrfindex++;            
+            recvrfindex++;            
         }
     }
 }
