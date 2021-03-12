@@ -1912,6 +1912,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         int* rivals = recvinds[n].getvalues();
         
         int ind = 1+2*numrecvrawfields;
+        
         int recvrfindex = 0;
         for (int r = 0; r < numrawfields; r++)
         {
