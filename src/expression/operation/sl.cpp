@@ -1890,7 +1890,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
                 numdofsexpected.push_back(numexpectedrecvdofsperfield[n][r]);
         }
         std::vector<int> numdofsrecv = {};
-        for (int r = 0; r < dofrangesfromneighbours[n][0]; r++)
+        for (int r = 0; r < numrecvrawfields; r++)
         {
             if (dofrangesfromneighbours[n][1+r] > 0)
                 numdofsrecv.push_back(dofrangesfromneighbours[n][1+r]);
