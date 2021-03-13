@@ -1331,7 +1331,7 @@ std::vector<bool> elements::iscornernode(void)
     return output;
 }
 
-void elements::orient(void)
+void elements::orient(long long int* noderenumbering)
 {
     // Loop on all element types except the point element (type 0):
     for (int elementtypenumber = 1; elementtypenumber <= 7; elementtypenumber++)
@@ -1346,11 +1346,17 @@ void elements::orient(void)
         int numelemofcurrenttype = count(elementtypenumber);
         
         // Loop on all elements:
-        std::vector<int> cornernodes(numelemofcurrenttype*numberofnodes);
+        std::vector<long long int> cornernodes(numelemofcurrenttype*numberofnodes);
         for (int i = 0; i < numelemofcurrenttype; i++)
         {
             for (int j = 0; j < numberofnodes; j++)
-                cornernodes[i*numberofnodes+j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
+            {
+                int curnode = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
+                if (noderenumbering == NULL)
+                    cornernodes[i*numberofnodes+j] = curnode;
+                else
+                    cornernodes[i*numberofnodes+j] = noderenumbering[curnode];
+            }
         }
         totalorientations[elementtypenumber] = orientation::gettotalorientation(elementtypenumber, cornernodes); 
     }

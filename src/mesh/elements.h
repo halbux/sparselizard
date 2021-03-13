@@ -226,7 +226,7 @@ class elements
         // 'orient' defines 'totalorientations'. Note: 'totalorientations'
         // is untouched in all renumbering and reordering steps and
         // should thus be called last, after all other steps.
-        void orient(void);
+        void orient(long long int* noderenumbering = NULL);
         
         
         // Make a full copy of this object (linking objects used are the arguments):

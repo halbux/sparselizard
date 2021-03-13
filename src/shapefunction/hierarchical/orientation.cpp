@@ -1,6 +1,6 @@
 #include "orientation.h"
 
-std::vector<int> orientation::gettotalorientation(int elementtypenumber, std::vector<int>& nodelist)
+std::vector<int> orientation::gettotalorientation(int elementtypenumber, std::vector<long long int>& nodelist)
 {
     element myelement(elementtypenumber);
     int numberofnodes = myelement.countnodes();
@@ -116,7 +116,7 @@ std::vector<std::vector<int>> orientation::getreorderingtoreferencequadrangularf
     return reordering;
 }
 
-std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist)
+std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumber, std::vector<long long int>& nodelist)
 {
     element myelement(elementtypenumber);
     int numberofnodes = myelement.countnodes();
@@ -125,7 +125,7 @@ std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumbe
     
     std::vector<int> alledgesorientations(numberofelements*numberofedges);
     std::vector<int> edgesdefinitionbasedonnodes = myelement.getedgesdefinitionsbasedonnodes();
-    std::vector<int> nodesinedges(2);
+    std::vector<long long int> nodesinedges(2);
     
     // Loop on all elements:
     for (int e = 0; e < numberofelements; e++)
@@ -143,7 +143,7 @@ std::vector<int> orientation::getedgesorientationsinelement(int elementtypenumbe
     return alledgesorientations;
 }
 
-std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist)
+std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumber, std::vector<long long int>& nodelist)
 {
     element myelement(elementtypenumber);
     int numberofnodes = myelement.countnodes();
@@ -162,7 +162,7 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
         {
             if (i < numberoftriangularfaces)
             {
-                std::vector<int> nodesinface(3);
+                std::vector<long long int> nodesinface(3);
 
                 // Create the triangle node list:
                 nodesinface[0] = nodelist[e*numberofnodes+facesdefinitionbasedonnodes[3*i+0]];
@@ -173,7 +173,7 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
             }
             else
             {
-                std::vector<int> nodesinface(4);
+                std::vector<long long int> nodesinface(4);
                 int offset = 3*numberoftriangularfaces;
 
                 // Create the quadrangle node list:
@@ -189,7 +189,7 @@ std::vector<int> orientation::getfacesorientationsinelement(int elementtypenumbe
     return allfacesorientations;
 }
 
-int orientation::getorientationofedge(std::vector<int>& physicalnodesinedge)
+int orientation::getorientationofedge(std::vector<long long int>& physicalnodesinedge)
 {
     if (physicalnodesinedge[0] > physicalnodesinedge[1])
         return 0;
@@ -197,7 +197,7 @@ int orientation::getorientationofedge(std::vector<int>& physicalnodesinedge)
         return 1;
 }
 
-int orientation::getorientationoftriangle(std::vector<int>& physicalnodesintriangle)
+int orientation::getorientationoftriangle(std::vector<long long int>& physicalnodesintriangle)
 {
     // Get the position of the maximum:
     int maxpos = 0;
@@ -212,7 +212,7 @@ int orientation::getorientationoftriangle(std::vector<int>& physicalnodesintrian
         return 2*maxpos + 1;
 }
 
-int orientation::getorientationofquadrangle(std::vector<int>& physicalnodesinquadrangle)
+int orientation::getorientationofquadrangle(std::vector<long long int>& physicalnodesinquadrangle)
 {
     // Get the position of the maximum:
     int maxpos = 0;

@@ -73,7 +73,7 @@
 namespace orientation
 {
     // Only the corner nodes must be provided in the node list.
-    std::vector<int> gettotalorientation(int elementtypenumber, std::vector<int>& nodelist); 
+    std::vector<int> gettotalorientation(int elementtypenumber, std::vector<long long int>& nodelist); 
     
     // Count the number of orientations for a given element type:
     int countorientations(int elemtypenum);
@@ -92,14 +92,14 @@ namespace orientation
     
     // 'getedgesorientationsinelement' outputs a vector listing the 
     // orientation of all edges in the element.
-    std::vector<int> getedgesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist);
-    std::vector<int> getfacesorientationsinelement(int elementtypenumber, std::vector<int>& nodelist);
+    std::vector<int> getedgesorientationsinelement(int elementtypenumber, std::vector<long long int>& nodelist);
+    std::vector<int> getfacesorientationsinelement(int elementtypenumber, std::vector<long long int>& nodelist);
     
     // 'getorientationofedgeargument' gives the orientation 
     // of the edge whose nodes are provided as input argument
-    int getorientationofedge(std::vector<int>& physicalnodesinedge);
-    int getorientationoftriangle(std::vector<int>& physicalnodesintriangle);
-    int getorientationofquadrangle(std::vector<int>& physicalnodesinquadrangle);
+    int getorientationofedge(std::vector<long long int>& physicalnodesinedge);
+    int getorientationoftriangle(std::vector<long long int>& physicalnodesintriangle);
+    int getorientationofquadrangle(std::vector<long long int>& physicalnodesinquadrangle);
 };
 
 #endif
