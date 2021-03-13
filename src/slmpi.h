@@ -70,9 +70,6 @@ namespace slmpi
     // Exchange a fixed number of values with each unique target:
     void exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues);
     void exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues);
-    // Exchange a message with each unique target (same message sent to each target):
-    void exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer, std::vector<int> receivelens, std::vector<int*> receivebuffers);
-    void exchange(std::vector<int> targetranks, int sendlen, double* sendbuffer, std::vector<int> receivelens, std::vector<double*> receivebuffers);
     // Exchange a message with each unique target (send and receive data must be preallocated to the correct size):
     void exchange(std::vector<int> targetranks, std::vector<std::vector<int>>& sends, std::vector<std::vector<int>>& receives);
     void exchange(std::vector<int> targetranks, std::vector<std::vector<double>>& sends, std::vector<std::vector<double>>& receives);

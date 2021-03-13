@@ -42,8 +42,6 @@ void slmpi::scatter(int scatterer, std::vector<int>& toscatter, std::vector<int>
 void slmpi::scatter(int scatterer, std::vector<double>& toscatter, std::vector<double>& fragment, std::vector<int>& fragsizes) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int>& sendvalues, std::vector<int>& receivevalues) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalues, std::vector<double>& receivevalues) { errornompi(); }
-void slmpi::exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
-void slmpi::exchange(std::vector<int> targetranks, int sendlen, double* sendbuffer, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<int>>& sends, std::vector<std::vector<int>>& receives) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<double>>& sends, std::vector<std::vector<double>>& receives) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
@@ -323,46 +321,6 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<double>& sendvalu
 
     MPI_Waitall(numtargets, &sendrequests[0], MPI_STATUSES_IGNORE);
     MPI_Waitall(numtargets, &receiverequests[0], MPI_STATUSES_IGNORE);
-}
-
-void slmpi::exchange(std::vector<int> targetranks, int sendlen, int* sendbuffer, std::vector<int> receivelens, std::vector<int*> receivebuffers)
-{
-    // Depending on the MPI implementation it might not be safe to reuse a same send buffer for multiple MPI_Isend
-    
-    int numtargets = targetranks.size();
-    
-    std::vector<int> sendlens(numtargets, sendlen);
-    std::vector<int*> sendbuffers(numtargets);
-    
-    std::vector<std::vector<int>> duplicatedsenddata(numtargets, std::vector<int>(sendlen));
-    for (int i = 0; i < numtargets; i++)
-    {
-        sendbuffers[i] = duplicatedsenddata[i].data();
-        for (int j = 0; j < sendlen; j++)
-            duplicatedsenddata[i][j] = sendbuffer[j];
-    }
-    
-    exchange(targetranks, sendlens, sendbuffers, receivelens, receivebuffers);
-}
-
-void slmpi::exchange(std::vector<int> targetranks, int sendlen, double* sendbuffer, std::vector<int> receivelens, std::vector<double*> receivebuffers)
-{
-    // Depending on the MPI implementation it might not be safe to reuse a same send buffer for multiple MPI_Isend
-    
-    int numtargets = targetranks.size();
-    
-    std::vector<int> sendlens(numtargets, sendlen);
-    std::vector<double*> sendbuffers(numtargets);
-    
-    std::vector<std::vector<double>> duplicatedsenddata(numtargets, std::vector<double>(sendlen));
-    for (int i = 0; i < numtargets; i++)
-    {
-        sendbuffers[i] = duplicatedsenddata[i].data();
-        for (int j = 0; j < sendlen; j++)
-            duplicatedsenddata[i][j] = sendbuffer[j];
-    }
-    
-    exchange(targetranks, sendlens, sendbuffers, receivelens, receivebuffers);
 }
 
 void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<int>>& sends, std::vector<std::vector<int>>& receives)
