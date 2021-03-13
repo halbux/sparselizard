@@ -161,6 +161,8 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
 
 void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<double>& interfaceelembarys, std::vector<int>& allnumelementsininterface, std::vector<int>& inneighbour)
 {
+    int rank = slmpi::getrank();
+    
     int numelementsininterface = interfaceelembarys.size()/3;
     
     inneighbour = std::vector<int>(numelementsininterface, -1);
@@ -168,46 +170,91 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
     int numneighbours = neighbours.size();
     if (numneighbours == 0)
         return;
+        
+    // Split neighbours into lower ranks and higher ranks:
+    std::vector<int> lowerranks, higherranks;
+    myalgorithm::split(neighbours, rank, lowerranks, higherranks);
     
-    // Place in one vector all received candidate coordinates:
+    // Send all interface barycenter coordinates to the higher ranks and receive from the lower ranks in a vector:
     int totnumcand = 0;
-    for (int n = 0; n < numneighbours; n++)
-        totnumcand += allnumelementsininterface[neighbours[n]];
+    for (int n = 0; n < lowerranks.size(); n++)
+        totnumcand += allnumelementsininterface[lowerranks[n]];
         
     std::vector<double> candidatebarys(3*totnumcand);
     
-    // Exchange all interface barycenter coordinates with every neighbour:
+    // It is safer not to send with the same buffer:
+    std::vector<std::vector<double>> sends(higherranks.size(), interfaceelembarys);
+    
+    std::vector<int> sendlens(numneighbours, 0);
+    std::vector<double*> sendbuffers(numneighbours, NULL);
     std::vector<int> receivelens(numneighbours, 0);
     std::vector<double*> receivebuffers(numneighbours, NULL);
     
     int pos = 0;
     if (totnumcand > 0)
     {
-        for (int n = 0; n < numneighbours; n++)
+        for (int n = 0; n < lowerranks.size(); n++)
         {
-            int len = 3*allnumelementsininterface[neighbours[n]];
+            int len = 3*allnumelementsininterface[lowerranks[n]];
             receivelens[n] = len;
             receivebuffers[n] = &candidatebarys[pos];
             pos += len;
         }
     }
-    slmpi::exchange(neighbours, 3*numelementsininterface, interfaceelembarys.data(), receivelens, receivebuffers);
+    for (int n = 0; n < higherranks.size(); n++)
+    {
+        sendlens[lowerranks.size()+n] = 3*numelementsininterface;
+        sendbuffers[lowerranks.size()+n] = sends[n].data();
+    }
+    
+    slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
     
     // Find matches:
     std::vector<int> posfound;
     myalgorithm::findcoordinates(interfaceelembarys, candidatebarys, posfound);
     
+    std::vector<std::vector<bool>> isfound(lowerranks.size());
+    
     pos = 0;
-    for (int n = 0; n < numneighbours; n++)
+    for (int n = 0; n < lowerranks.size(); n++)
     {
-        int len = allnumelementsininterface[neighbours[n]];
+        int len = allnumelementsininterface[lowerranks[n]];
+        
+        isfound[n] = std::vector<bool>(len, false);
+        
         for (int i = 0; i < len; i++)
         {
             int pf = posfound[pos+i];
             if (pf != -1)
-                inneighbour[pf] = neighbours[n];
+            {
+                inneighbour[pf] = lowerranks[n];
+                isfound[n][i] = true;
+            }
         }
         pos += len;
+    }
+    
+    // Send match information to every neighbour of lower rank:
+    std::vector<std::vector<int>> tosend(numneighbours, std::vector<int>(0));
+    for (int n = 0; n < lowerranks.size(); n++)
+        myalgorithm::pack(isfound[n], tosend[n]);
+
+    std::vector<std::vector<int>> toreceive(numneighbours, std::vector<int>(0));
+    for (int n = 0; n < higherranks.size(); n++)
+        toreceive[lowerranks.size()+n].resize(myalgorithm::getpackedsize(numelementsininterface));
+
+    slmpi::exchange(neighbours, tosend, toreceive);
+
+    for (int n = lowerranks.size(); n < numneighbours; n++)
+    {
+        std::vector<bool> wasfound;
+        myalgorithm::unpack(numelementsininterface, toreceive[n], wasfound);
+    
+        for (int i = 0; i < numelementsininterface; i++)
+        {
+            if (wasfound[i])
+                inneighbour[i] = neighbours[n];
+        }
     }
 }
 
