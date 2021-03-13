@@ -1655,14 +1655,32 @@ void dtracker::setconnectivity(std::vector<int>& neighbours, std::vector<int>& n
     }
 }
 
-void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements, int verbosity)
+void dtracker::discoverconnectivity(int numtrialelements, int verbosity)
 {        
+    nodes* nds = getrawmesh()->getnodes();
     elements* els = getrawmesh()->getelements();
     physicalregions* prs = getrawmesh()->getphysicalregions();
 
     int rank = slmpi::getrank();
     int numranks = slmpi::count();
+
+    // Define the interface of the domain with its neighbours:
+    int skinregion = prs->getmaxphysicalregionnumber()+1;
+    int wholeneighbourinterface = skinregion+1;
+
+    regiondefiner regdef(*nds, *els, *prs);
+    regdef.regionskin(skinregion, -1);
+    // This domain might not be in contact with the global geometry skin:
+    if (prs->getindex(myglobalgeometryskin) != -1 && prs->get(myglobalgeometryskin)->countelements() > 0)
+        regdef.regionexclusion(wholeneighbourinterface, skinregion, {myglobalgeometryskin});
+    else
+        wholeneighbourinterface = skinregion;
+    regdef.defineregions();
     
+    std::vector<std::vector<int>> interfaceelems = *(prs->get(wholeneighbourinterface)->getelementlist());    
+    // Remove the construction regions:
+    prs->remove({skinregion, wholeneighbourinterface}, false);
+
     // Avoid any conflict between DDM-created regions and the other regions:
     std::vector<int> lastpr = {prs->getmaxphysicalregionnumber()};
     slmpi::max(lastpr);
@@ -1671,8 +1689,6 @@ void dtracker::discoverconnectivity(int nooverlapinterface, int numtrialelements
     int meshdim = getrawmesh()->getmeshdimension();
     numtrialelements = std::max(1,numtrialelements);
     
-    std::vector<std::vector<int>> interfaceelems = *(prs->get(nooverlapinterface)->getelementlist());
-
     std::vector<bool> isnodeininterface, isedgeininterface;
     int numnodesininterface = els->istypeinelementlists(0, {&interfaceelems}, isnodeininterface, false);
     int numedgesininterface = els->istypeinelementlists(1, {&interfaceelems}, isedgeininterface, false);

@@ -101,8 +101,7 @@ class dtracker
         void setconnectivity(std::vector<int>& neighbours, std::vector<int>& nooverlapinterfaces);
         // Discover automatically the no-overlap connectivity of this rank.
         // This works for any geometry whose global skin region does not intersect itself.
-        // Region 'nooverlapinterface' must include all elements of dimension cell-1 which touch the neighbour domains.
-        void discoverconnectivity(int nooverlapinterface, int numtrialelements = 10, int verbosity = 0);
+        void discoverconnectivity(int numtrialelements = 10, int verbosity = 0);
 
         // Exchange the overlaps (and the physical regions included) with the neighbours and define the overlap interfaces:
         void overlap(void);
