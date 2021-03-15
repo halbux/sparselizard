@@ -62,7 +62,7 @@ class dtracker
         std::vector<int> discoversomeneighbours(int numtrialelements, std::vector<double>& interfaceelembarys, std::vector<int>& neighboursfound);
 
         // Upon return 'inneighbours[i]' is the number of the neighbour touching the ith interface element (-1 if no neighbour touching).
-        // The neighbours provided must be unique. The number of interface elements for each rank must be provided in 'allnumelementsininterface'.
+        // The neighbours provided must be unique and sorted ascendingly. The number of interface elements for each rank must be provided in 'allnumelementsininterface'.
         void discoverinterfaces(std::vector<int> neighbours, std::vector<double>& interfaceelembarys, std::vector<int>& allnumelementsininterface, std::vector<int>& inneighbour);
 
         // Find new interfaces and populate the output accordingly. Return false if no more interfaces can be found on any rank.
