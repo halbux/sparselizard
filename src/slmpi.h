@@ -31,6 +31,7 @@ namespace slmpi
     
     // Sum values from all ranks and distribute the result back to all ranks:
     void sum(int len, int* data);
+    void sum(int len, long long int* data);
     void sum(int len, double* data);
     void sum(std::vector<int>& data);
     void sum(std::vector<double>& data);

@@ -21,6 +21,7 @@ void slmpi::send(int destination, int tag, std::vector<double>& data) { errornom
 void slmpi::receive(int source, int tag, std::vector<int>& data) { errornompi(); }
 void slmpi::receive(int source, int tag, std::vector<double>& data) { errornompi(); }
 void slmpi::sum(int len, int* data) {}
+void slmpi::sum(int len, long long int* data) {}
 void slmpi::sum(int len, double* data) {}
 void slmpi::sum(std::vector<int>& data) {}
 void slmpi::sum(std::vector<double>& data) {}
@@ -111,6 +112,11 @@ void slmpi::receive(int source, int tag, std::vector<double>& data)
 void slmpi::sum(int len, int* data)
 {
     MPI_Allreduce(MPI_IN_PLACE, data, len, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+}
+
+void slmpi::sum(int len, long long int* data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data, len, MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD);
 }
 
 void slmpi::sum(int len, double* data)
