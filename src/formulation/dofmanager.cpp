@@ -531,6 +531,37 @@ int dofmanager::countdofs(void)
     return numberofdofs;
 }
 
+long long int dofmanager::allcountdofs(void)
+{
+    synchronize();
+    
+    if (slmpi::count() == 1)
+        return countdofs();
+    
+    std::shared_ptr<dtracker> mydtracker = universe::mymesh->getdtracker();
+    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    
+    mydtracker->errorundefined();
+    
+    long long int out = 0;
+    std::vector<bool> isowndr = mydtracker->isdisjointregionowned();
+    
+    for (int d = 0; d < isowndr.size(); d++)
+    {
+        int ne = mydisjointregions->countelements(d);
+        for (int i = 0; i < myfields.size(); i++)
+        {
+            int nff = rangebegin[i][d].size();
+            if (isowndr[d])
+                out += ne*nff;
+        }
+    }
+    
+    slmpi::sum(1, &out);
+    
+    return out;
+}
+
 int dofmanager::countformfunctions(int disjointregion)
 {
     synchronize();

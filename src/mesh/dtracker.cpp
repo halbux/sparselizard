@@ -4,6 +4,15 @@
 #include "physicalregions.h"
 
 
+void dtracker::errorundefined(void)
+{
+    if (mynumoverlaplayers < 0)
+    {
+        std::cout << "Error in 'dtracker' object: DDM context has not been provided" << std::endl;
+        abort();
+    }
+}
+
 dtracker::dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numoverlaplayers)
 {
     if (rm == NULL)
@@ -2064,6 +2073,77 @@ std::vector<int> dtracker::listddmregions(void)
     }
     
     return prlist;
+}
+
+std::vector<bool> dtracker::isdisjointregioninnooverlap(void)
+{
+    disjointregions* drs = getrawmesh()->getdisjointregions();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    std::vector<bool> isinnooverlap(drs->count(), true);
+
+    if (isoverlap())
+    {
+        for (int n = 0; n < myneighbours.size(); n++)
+        {
+            std::vector<bool> drsdef = prs->get(myouteroverlaps[myneighbours[n]])->getdefinition();
+            for (int d = 0; d < drsdef.size(); d++)
+            {
+                if (drsdef[d])
+                    isinnooverlap[d] = false;
+            }
+        }
+        for (int n = 0; n < myneighbours.size(); n++)
+        {
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = mynooverlapinterfaces[3*myneighbours[n]+dim];
+                if (cr >= 0)
+                {
+                    std::vector<bool> drsdef = prs->get(cr)->getdefinition();
+                    for (int d = 0; d < drsdef.size(); d++)
+                    {
+                        if (drsdef[d])
+                            isinnooverlap[d] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return isinnooverlap;
+}
+
+std::vector<bool> dtracker::isdisjointregionowned(void)
+{
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    int rank = slmpi::getrank();
+    
+    std::vector<bool> isowned = isdisjointregioninnooverlap();
+    
+    for (int n = 0; n < myneighbours.size(); n++)
+    {
+        int cn = myneighbours[n];
+        if (cn < rank)
+        {
+            for (int dim = 0; dim < 3; dim++)
+            {
+                int cr = mynooverlapinterfaces[3*cn+dim];
+                if (cr >= 0)
+                {
+                    std::vector<bool> drsdef = prs->get(cr)->getdefinition();
+                    for (int d = 0; d < drsdef.size(); d++)
+                    {
+                        if (drsdef[d])
+                            isowned[d] = false;
+                    }
+                }
+            }
+        }
+    }
+
+    return isowned;
 }
 
 void dtracker::print(void)

@@ -111,6 +111,11 @@ int formulation::countdofs(void)
     return mydofmanager->countdofs(); 
 }
 
+long long int formulation::allcountdofs(void)
+{
+    return mydofmanager->allcountdofs();
+}
+
 bool formulation::isstiffnessmatrixdefined(void)
 {
     return (mycontributions[1].size() != 0);

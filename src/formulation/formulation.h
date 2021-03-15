@@ -66,6 +66,7 @@ class formulation
         void operator+=(std::vector<integration> integrationobject);
         
         int countdofs(void);
+        long long int allcountdofs(void);
         
         bool isstiffnessmatrixdefined(void);
         bool isdampingmatrixdefined(void);

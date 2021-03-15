@@ -113,6 +113,7 @@ class dofmanager
         std::vector<int> getselectedfieldorders(void);
         
         int countdofs(void);
+        long long int allcountdofs(void);
         int countformfunctions(int disjointregion);
         
         void print(void);
