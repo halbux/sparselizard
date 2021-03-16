@@ -98,11 +98,11 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<rawmesh> getattarget(std::shared_ptr<ptracker> targetpt);
 
         // Load from file name:
-        void load(std::string name, int verbosity = 1, bool legacyreader = true);   
+        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity = 1, bool legacyreader = true);   
         // Load from multiple files:
         void load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity = 1);
         // Load from shape vector:
-        void load(std::vector<shape> inputshapes, int verbosity = 1);
+        void load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity = 1);
 
         // Write to file name:
         void write(std::string name, int verbosity = 1);     

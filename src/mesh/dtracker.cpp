@@ -20,11 +20,6 @@ dtracker::dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numo
         std::cout << "Error in 'dtracker' object: cannot provide a NULL rawmesh pointer" << std::endl;
         abort();
     }
-    if (numoverlaplayers < 0)
-    {
-        std::cout << "Error in 'dtracker' object: cannot have a negative number of overlap layers" << std::endl;
-        abort();
-    }
 
     myrawmesh = rm;
 

@@ -234,7 +234,7 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
     return om;
 }
 
-void rawmesh::load(std::string name, int verbosity, bool legacyreader)
+void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader)
 {
     // Do not call this when the mesh is already loaded!
 
@@ -263,11 +263,28 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
     removeduplicates();
     myregiondefiner.defineregions();
     
+    // For DDM:
+    mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), globalgeometryskin, numoverlaplayers));
+    if (numoverlaplayers >= 0)
+    {
+        mydtracker->discoverconnectivity(10, verbosity);
+        mydtracker->overlap();
+    }
+    
     myelements.definedisjointregions();
     // The reordering is stable and the elements are thus still ordered 
     // by barycenter coordinates in every disjoint region!
     myelements.reorderbydisjointregions();
     myelements.definedisjointregionsranges();
+    
+    // For DDM:
+    long long int* orientrenum = NULL;
+    if (numoverlaplayers >= 0)
+    {
+        mydtracker->mapinterfaces();
+        mydtracker->createglobalnodenumbers();
+        orientrenum = mydtracker->getglobalnodenumbers();
+    }
     
     // Define the physical regions based on the disjoint regions they contain:
     for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
@@ -276,7 +293,7 @@ void rawmesh::load(std::string name, int verbosity, bool legacyreader)
         currentphysicalregion->definewithdisjointregions();
     }
     
-    myelements.orient();
+    myelements.orient(orientrenum);
     errorondisconnecteddisjointregion();
     
     if (verbosity > 0)
@@ -383,7 +400,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
         abort();
     }
     
-    load(flat, verbosity);
+    load(flat, -1, -1, verbosity);
     
     // Shift back to the original position:
     if (mergeduplicates == false)
@@ -396,7 +413,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
     }
 }
 
-void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
+void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity)
 {
     // Do not call this when the mesh is already loaded!
 
@@ -478,11 +495,28 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
     removeduplicates();
     myregiondefiner.defineregions();
     
+    // For DDM:
+    mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), globalgeometryskin, numoverlaplayers));
+    if (numoverlaplayers >= 0)
+    {
+        mydtracker->discoverconnectivity(10, verbosity);
+        mydtracker->overlap();
+    }
+    
     myelements.definedisjointregions();
     // The reordering is stable and the elements are thus still ordered 
     // by barycenter coordinates in every disjoint region!
     myelements.reorderbydisjointregions();
     myelements.definedisjointregionsranges();
+    
+    // For DDM:
+    long long int* orientrenum = NULL;
+    if (numoverlaplayers >= 0)
+    {
+        mydtracker->mapinterfaces();
+        mydtracker->createglobalnodenumbers();
+        orientrenum = mydtracker->getglobalnodenumbers();
+    }
     
     // Define the physical regions based on the disjoint regions they contain:
     for (int physregindex = 0; physregindex < myphysicalregions.count(); physregindex++)
@@ -491,7 +525,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int verbosity)
         currentphysicalregion->definewithdisjointregions();
     }
     
-    myelements.orient();
+    myelements.orient(orientrenum);
     errorondisconnecteddisjointregion();
     
     if (verbosity > 0)

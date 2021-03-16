@@ -29,7 +29,16 @@ mesh::mesh(std::string filename, int verbosity, bool legacyreader)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
-    rawmeshptr->load(filename, verbosity, legacyreader);
+    rawmeshptr->load(filename, -1, -1, verbosity, legacyreader);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    isloaded = true;
+}
+
+mesh::mesh(std::string filename, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader)
+{
+    rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
+    universe::mymesh = rawmeshptr;
+    rawmeshptr->load(filename, globalgeometryskin, numoverlaplayers, verbosity, legacyreader);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
@@ -47,15 +56,29 @@ mesh::mesh(std::vector<shape> inputshapes, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
-    rawmeshptr->load(inputshapes, verbosity);
+    rawmeshptr->load(inputshapes, -1, -1, verbosity);
+    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    isloaded = true;
+}
+
+mesh::mesh(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity)
+{
+    rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
+    universe::mymesh = rawmeshptr;
+    rawmeshptr->load(inputshapes, globalgeometryskin, numoverlaplayers, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 void mesh::load(std::string name, int verbosity, bool legacyreader)
 {
+    load(name, -1, -1, verbosity, legacyreader);
+}
+
+void mesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader)
+{
     errorifloaded();
-    rawmeshptr->load(name, verbosity, legacyreader);
+    rawmeshptr->load(name, globalgeometryskin, numoverlaplayers, verbosity, legacyreader);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
@@ -70,8 +93,13 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
 
 void mesh::load(std::vector<shape> inputshapes, int verbosity)
 {
+    load(inputshapes, -1, -1, verbosity);
+}
+
+void mesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity)
+{
     errorifloaded();
-    rawmeshptr->load(inputshapes, verbosity);
+    rawmeshptr->load(inputshapes, globalgeometryskin, numoverlaplayers, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
