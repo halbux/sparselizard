@@ -1448,6 +1448,13 @@ void elements::merge(elements* elstomerge, std::vector<std::vector<int>>& renumb
             }
         }
     }
+    
+    // These containers have been invalidated by adding new elements to this object:
+    cleancoordinatedependentcontainers();
+    adressedgesatnodes = {};
+    edgesatnodes = {};
+    adresscellsattype = std::vector<std::vector<int>>(4, std::vector<int>(0));
+    cellsattype = std::vector<std::vector<int>>(4, std::vector<int>(0));
 }
 
 void elements::merge(std::vector<int> intersectionphysregs, elements* elstomerge)
