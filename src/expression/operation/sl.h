@@ -59,6 +59,9 @@ namespace sl
     // Load a vector of doubles separated by a character:
     std::vector<double> loadvector(std::string filename, char delimiter = ',', bool sizeincluded = false);
 
+    // Partition the mesh into numranks parts:
+    void allpartition(std::string meshfile);
+
     // Compute the L2 norm of an expression:
     expression norm(expression expr);
 

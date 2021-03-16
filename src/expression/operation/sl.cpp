@@ -195,6 +195,43 @@ std::vector<double> sl::loadvector(std::string filename, char delimiter, bool si
     return output;
 }
 
+#ifndef HAVE_GMSH
+void sl::allpartition(std::string meshfile)
+{
+    if (slmpi::count() == 1)
+        return;
+    
+    std::cout << "Error in 'sl' namespace: GMSH API is required to partition the mesh" << std::endl;
+    abort();
+}
+#endif
+#ifdef HAVE_GMSH
+#include "gmsh.h"
+void sl::allpartition(std::string meshfile)
+{
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    if (numranks == 1)
+        return;
+    
+    if (rank == 0)
+    {
+        gmsh::initialize();
+        gmsh::open(meshfile);
+        // Unfortunately dropping the global info and saving in format 2 is not allowed
+        // gmsh::option::setNumber("Mesh.Format", 2);
+        gmsh::option::setNumber("Mesh.PartitionSplitMeshFiles", 1);
+        gmsh::option::setNumber("Mesh.PartitionCreateTopology", 0);
+        gmsh::model::mesh::partition(numranks);
+        gmsh::write(meshfile);
+        gmsh::finalize();
+    }
+    // Wait for rank 0 to finish:
+    slmpi::barrier();
+}
+#endif
+
 expression sl::norm(expression expr)
 {
     if (expr.isscalar())
