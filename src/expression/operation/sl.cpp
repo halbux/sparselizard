@@ -1643,6 +1643,28 @@ void sl::solve(std::vector<formulation> formuls)
         solve(formuls[i]);
 }
 
+void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives)
+{
+    int numtargets = targetranks.size();
+
+    if (numtargets == 0)
+        return;
+
+    std::vector<int> sendlens(numtargets), reclens(numtargets);
+    std::vector<double*> sendbuffers(numtargets), recbuffers(numtargets);
+
+    for (int i = 0; i < numtargets; i++)
+    {
+        sendlens[i] = sends[i].count();
+        reclens[i] = receives[i].count();
+
+        sendbuffers[i] = sends[i].getvalues();
+        recbuffers[i] = receives[i].getvalues();
+    }
+
+    slmpi::exchange(targetranks, sendlens, sendbuffers, reclens, recbuffers);
+}
+
 std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity)
 {   
     if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
