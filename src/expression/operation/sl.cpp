@@ -1617,7 +1617,7 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
     KSPDestroy(ksp);
 }
 
-void sl::solve(formulation formul)
+void sl::solve(formulation formul, std::vector<int> blockstoconsider)
 {
     // Make sure the problem is of the form Ax = b:
     if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
@@ -1629,7 +1629,10 @@ void sl::solve(formulation formul)
     // Remove leftovers (if any):
     mat A = formul.A(); vec b = formul.b();
     // Generate:
-    formul.generate();
+    if (blockstoconsider.size() == 1 && blockstoconsider[0] == -1)
+        formul.generate();
+    else
+        formul.generate(blockstoconsider);
     // Solve:
     vec sol = sl::solve(formul.A(), formul.b());
 
@@ -1641,6 +1644,156 @@ void sl::solve(std::vector<formulation> formuls)
 {
     for (int i = 0; i < formuls.size(); i++)
         solve(formuls[i]);
+}
+
+densematrix Fgmultrobin(densematrix gprev)
+{
+    mat A = universe::ddmmats[0];
+    formulation formul = universe::ddmformuls[0];
+    std::vector<std::vector<int>> artificialterms = universe::ddmints;
+
+    vec rhs(formul);
+
+    double* gprevptr = gprev.getvalues();
+
+    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    int numneighbours = dt->countneighbours();
+
+    // Compute Ag:
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = universe::ddmrecvinds[n].count();
+        densematrix Bm = gprev.extractrows(pos, pos+len-1);
+        rhs.setvalues(universe::ddmrecvinds[n], Bm, "add");
+        pos += len;
+    }
+        
+    vec sol = sl::solve(A, rhs);
+    sl::setdata(sol);
+
+    // Create the artificial sources solution on the inner interface:
+    std::vector<densematrix> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        formul.generatein(0, artificialterms[n]);
+        vec gartificial = formul.b(false, false);
+    
+        Agmatssend[n] = gartificial.getvalues(universe::ddmsendinds[n]);
+        Agmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
+    
+    densematrix Ag(Agmatsrecv);
+    
+    // Calculate I - A*g:
+    double* Agptr = Ag.getvalues();
+    densematrix Fg(Ag.count(), 1);
+    double* Fgptr = Fg.getvalues();
+    
+    for (int i = 0; i < Ag.count(); i++)
+        Fgptr[i] = gprevptr[i] - Agptr[i];
+
+    return Fg;
+}
+
+std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, int maxits, double relrestol, int verbosity)
+{
+    // Make sure the problem is of the form Ax = b:
+    if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
+    {
+        std::cout << "Error in 'sl' namespace: formulation to solve cannot have a damping/mass matrix (use a time resolution algorithm)" << std::endl;
+        abort();  
+    }
+    
+    wallclock clktot;
+
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    if (numranks == 1)
+    {
+        solve(formul, formulterms);
+        return {};
+    }
+    
+    universe::ddmints = artificialterms;
+    universe::ddmformuls = {formul};
+
+    std::shared_ptr<dofmanager> dm = formul.getdofmanager();
+    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    int numneighbours = dt->countneighbours();
+
+    // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
+    std::vector<std::shared_ptr<rawfield>> rfs = dm->getfields();
+    mapdofs(dm, dm->getfields(), {true, true, true}, true, universe::ddmsendinds, universe::ddmrecvinds);
+    
+    // Get A and allow to reuse its factorization:
+    formul.generate(formulterms);
+    for (int n = 0; n < numneighbours; n++)
+        formul.generatein(1, physicalterms[n]); // S term in A
+    mat A = formul.A();
+    A.reusefactorization();
+    universe::ddmmats = {A};
+    
+    // Get the rhs of the physical sources contribution:
+    vec bphysical = formul.b();
+
+    // Get the physical sources solution:
+    vec w = solve(A, bphysical);
+    setdata(w);
+    
+    // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
+    std::vector<densematrix> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        formul.generatein(0, physicalterms[n]);
+        vec gphysical = formul.b(false, false);
+    
+        Bmatssend[n] = gphysical.getvalues(universe::ddmsendinds[n]);
+        Bmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+    }
+    exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
+    
+    densematrix B(Bmatsrecv);
+    
+    // Initial value of the artificial sources solution:
+    densematrix vi(B.count(), 1, 0.0);
+    
+    // Gmres iteration:
+    std::vector<double> resvec = gmres(Fgmultrobin, B, vi, maxits, relrestol, verbosity*(rank == 0));
+    int numits = resvec.size()-1;
+    if (verbosity > 0 && rank == 0)
+    {
+        if (numits < maxits)
+            std::cout << "gmres converged after " << numits << " iterations" << std::endl;
+        else
+            std::cout << "gmres could not converge to the requested " << relrestol << " relative tolerance (could only reach " << resvec[numits] << ")" << std::endl;
+    }
+
+    // Compute the total solution (physical + artificial):
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = Bmatsrecv[n].count();
+        densematrix Bm = vi.extractrows(pos, pos+len-1);
+        bphysical.setvalues(universe::ddmrecvinds[n], Bm, "add");
+        pos += len;
+    }
+
+    vec totalsol = solve(A, bphysical);
+    setdata(totalsol);
+    
+    if (verbosity > 0)
+    {
+        long long int allndfs = formul.allcountdofs();
+        if (rank == 0)
+            clktot.print("DDM solve for "+std::to_string(allndfs)+" dofs took");
+    }
+    
+    universe::clearddmcontainers();
+    
+    return resvec;
 }
 
 void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives)
