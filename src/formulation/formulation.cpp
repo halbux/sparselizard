@@ -225,10 +225,10 @@ void formulation::generate(int contributionnumber)
 }
 
 
-vec formulation::b(bool keepvector) { return rhs(keepvector); }
+vec formulation::b(bool keepvector, bool dirichletupdate) { return rhs(keepvector, dirichletupdate); }
 mat formulation::A(bool keepfragments, bool skipdiagonalones) { return K(keepfragments, skipdiagonalones); }
 
-vec formulation::rhs(bool keepvector)
+vec formulation::rhs(bool keepvector, bool dirichletupdate)
 {
     if (myvec == NULL)
         myvec = std::shared_ptr<rawvec>(new rawvec(mydofmanager));
@@ -242,7 +242,7 @@ vec formulation::rhs(bool keepvector)
     else
         output = vec(myvec).copy();
     
-    if (isconstraintcomputation == false)
+    if (dirichletupdate == true && isconstraintcomputation == false)
         output.updateconstraints(); 
     
     return output; 

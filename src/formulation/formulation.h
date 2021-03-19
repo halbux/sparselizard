@@ -91,10 +91,10 @@ class formulation
         // Choose to add or not the diagonal ones for the Dirichlet constraints.
         
         // b() is an alias for rhs() and A() for K():
-        vec b(bool keepvector = false);
+        vec b(bool keepvector = false, bool dirichletupdate = true);
         mat A(bool keepfragments = false, bool skipdiagonalones = false);
         
-        vec rhs(bool keepvector = false);
+        vec rhs(bool keepvector = false, bool dirichletupdate = true);
         mat K(bool keepfragments = false, bool skipdiagonalones = false);
         mat C(bool keepfragments = false, bool skipdiagonalones = false);
         mat M(bool keepfragments = false, bool skipdiagonalones = false);
