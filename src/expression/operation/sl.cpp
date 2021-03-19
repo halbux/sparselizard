@@ -1775,7 +1775,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     return relresvec;
 }
 
-void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
+void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, bool excludedirichlet, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
 {
     std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
     
@@ -1851,6 +1851,9 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
             dm->selectfield(rfs[r]);
             for (int d = 0; d < numdisjregs; d++)
             {
+                if (rfs[r]->isconstrained(d) && excludedirichlet)
+                    continue;
+                    
                 int ne = drs->countelements(d);
                 int nff = dm->countformfunctions(d);
 
@@ -1896,6 +1899,9 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
             dm->selectfield(rfs[r]);
             for (int d = 0; d < numdisjregs; d++)
             {
+                if (rfs[r]->isconstrained(d) && excludedirichlet)
+                    continue;
+                    
                 if (isdisjregininnerinterface[n][d])
                 {
                     int elemtype = drs->getelementtypenumber(d);
