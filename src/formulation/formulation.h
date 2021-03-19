@@ -80,6 +80,7 @@ class formulation
         void generatemassmatrix(void);
         void generaterhs(void);
         
+        void generatein(int rhskcm, std::vector<int> contributionnumbers);
         void generate(std::vector<int> contributionnumbers);
         void generate(int contributionnumber);
         

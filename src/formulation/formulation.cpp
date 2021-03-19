@@ -203,6 +203,12 @@ void formulation::generaterhs(void)
 }
 
 
+void formulation::generatein(int rhskcm, std::vector<int> contributionnumbers)
+{
+    for (int i = 0; i < contributionnumbers.size(); i++)
+        generate(rhskcm, contributionnumbers[i]);
+}
+
 void formulation::generate(std::vector<int> contributionnumbers)
 {
     for (int i = 0; i < mycontributions.size(); i++)

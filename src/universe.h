@@ -48,6 +48,16 @@ class universe
         // Shift the physical region numbers by (physregdim+1) x physregshift when loading a mesh:
         static int physregshift;
         
+        // Temporary containers for DDM:
+        static std::vector<std::vector<int>> ddmints;
+        static std::vector<vec> ddmvecs;
+        static std::vector<mat> ddmmats;
+        static std::vector<formulation> ddmformuls;
+        static std::vector<intdensematrix> ddmsendinds;
+        static std::vector<intdensematrix> ddmrecvinds;
+        
+        static void clearddmcontainers(void);
+        
         // Error estimators need evaluations across elements and can therefore not be efficiently evaluated in the usual way.
         // Error estimators will be updated if 'numallowedtimes' > 0 and their state number is different than the one here.
         static void allowestimatorupdate(bool allowitonce);

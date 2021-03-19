@@ -45,6 +45,23 @@ double universe::getfundamentalfrequency(void)
 
 int universe::physregshift = 0;
 
+std::vector<std::vector<int>> universe::ddmints = {};
+std::vector<vec> universe::ddmvecs = {};
+std::vector<mat> universe::ddmmats = {};
+std::vector<formulation> universe::ddmformuls = {};
+std::vector<intdensematrix> universe::ddmsendinds = {};
+std::vector<intdensematrix> universe::ddmrecvinds = {};
+
+void universe::clearddmcontainers(void)
+{
+    ddmints = {};
+    ddmvecs = {};
+    ddmmats = {};
+    ddmformuls = {};
+    ddmsendinds = {};
+    ddmrecvinds = {};
+}
+
 void universe::allowestimatorupdate(bool allowitonce)
 {
     if (allowitonce)
