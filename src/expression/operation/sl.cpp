@@ -1758,7 +1758,7 @@ std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterm
     densematrix B(Bmatsrecv);
     
     // Initial value of the artificial sources solution:
-    densematrix vi(B.count(), 1, 0.0);
+    densematrix vi(B.countrows(), B.countcolumns(), 0.0);
     
     // Gmres iteration:
     std::vector<double> resvec = gmres(Fgmultrobin, B, vi, maxits, relrestol, verbosity*(rank == 0));
