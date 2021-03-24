@@ -629,6 +629,17 @@ void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindex
         selected[i] = vals[selectedindexes[i]];
 }
 
+void myalgorithm::select(std::vector<bool>& vals, intdensematrix selectedindexes, std::vector<bool>& selected)
+{
+    int numselected = selectedindexes.count();
+    selected.resize(numselected);
+
+    int* selptr = selectedindexes.getvalues();
+
+    for (int i = 0; i < numselected; i++)
+        selected[i] = vals[selptr[i]];
+}
+
 bool myalgorithm::isflipped(std::vector<int>& a, std::vector<int>& b)
 {
     int num = a.size();

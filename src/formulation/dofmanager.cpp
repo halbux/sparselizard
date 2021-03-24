@@ -216,6 +216,31 @@ int dofmanager::countconstraineddofs(void)
     return numconstraineddofs;
 }
 
+std::vector<bool> dofmanager::isconstrained(void)
+{
+    synchronize();
+    
+    std::vector<bool> output(numberofdofs, false);
+    
+    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    {
+        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        {
+            // If the field is constrained on the disjoint region.
+            if (myfields[fieldindex]->isconstrained(disjreg))
+            {
+                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
+                {
+                    int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
+                    for (int i = 0; i < numdofshere; i++)
+                        output[rangebegin[fieldindex][disjreg][ff] + i] = true;
+                }
+            }
+        }
+    }
+    return output;
+}
+
 intdensematrix dofmanager::getconstrainedindexes(void)
 {
     synchronize();

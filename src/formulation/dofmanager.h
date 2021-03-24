@@ -92,6 +92,7 @@ class dofmanager
         bool isdefined(int disjreg, int formfunc);
         
         int countconstraineddofs(void);
+        std::vector<bool> isconstrained(void);
         intdensematrix getconstrainedindexes(void);
         
         int countgaugeddofs(void);
