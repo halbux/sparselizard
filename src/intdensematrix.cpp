@@ -1,4 +1,5 @@
 #include "intdensematrix.h"
+#include "myalgorithm.h"
 
 
 void intdensematrix::errorifempty(void)
@@ -336,4 +337,28 @@ intdensematrix intdensematrix::extractcols(std::vector<int>& selected)
     return output;
 }
     
+intdensematrix intdensematrix::select(std::vector<bool>& selectedindexes, bool selectif)
+{
+    int numtrue = myalgorithm::counttrue(selectedindexes);
+    int num = numtrue;
+    if (selectif == false)
+        num = selectedindexes.size() - numtrue;
+
+    intdensematrix output(num, 1);
+
+    int* myvaluesptr = myvalues.get();
+    int* outvaluesptr = output.myvalues.get();
+
+    int index = 0;
+    for (int i = 0; i < selectedindexes.size(); i++)
+    {
+        if (selectedindexes[i] == selectif)
+        {
+            outvaluesptr[index] = myvaluesptr[i];
+            index++;
+        }
+    }
+
+    return output;
+}
 

@@ -89,6 +89,9 @@ class intdensematrix
         // Extract a set of rows/columns from the matrix:
         intdensematrix extractrows(std::vector<int>& selected);
         intdensematrix extractcols(std::vector<int>& selected);
+        
+        // Select all indexes for which the selection equals the last argument:
+        intdensematrix select(std::vector<bool>& selectedindexes, bool selectif);
 
 };
 
