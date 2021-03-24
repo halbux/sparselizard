@@ -1726,18 +1726,36 @@ std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterm
 
     // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
     std::vector<std::shared_ptr<rawfield>> rfs = dm->getfields();
-    mapdofs(dm, dm->getfields(), {true, true, true}, true, universe::ddmsendinds, universe::ddmrecvinds);
+    mapdofs(dm, dm->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
+    
+    // Get all Dirichlet constraints set on the neighbours but not on this rank:
+    std::vector<std::vector<intdensematrix>> dcdata = dm->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
+
+    // Unconstrained send and receive indexes:
+    universe::ddmsendinds = dcdata[2];
+    universe::ddmrecvinds = dcdata[3];
     
     // Get A and allow to reuse its factorization:
     formul.generate(formulterms);
     for (int n = 0; n < numneighbours; n++)
         formul.generatein(1, physicalterms[n]); // S term in A
-    mat A = formul.A();
+    mat A = formul.getmatrix(0, false, false, {intdensematrix(dcdata[1])});
     A.reusefactorization();
     universe::ddmmats = {A};
     
     // Get the rhs of the physical sources contribution:
     vec bphysical = formul.b();
+    
+    // Set the value from the neighbour Dirichlet conditions:
+    std::vector<densematrix> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
+        dirichletvalsfromneighbours[n] = densematrix(dcdata[1][n].count(), 1);
+    }
+    exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        bphysical.setvalues(dcdata[1][n], dirichletvalsfromneighbours[n]);
 
     // Get the physical sources solution:
     vec w = solve(A, bphysical);
@@ -1928,7 +1946,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     return relresvec;
 }
 
-void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, bool excludedirichlet, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
+void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
 {
     std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
     
@@ -2004,9 +2022,6 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
             dm->selectfield(rfs[r]);
             for (int d = 0; d < numdisjregs; d++)
             {
-                if (rfs[r]->isconstrained(d) && excludedirichlet)
-                    continue;
-                    
                 int ne = drs->countelements(d);
                 int nff = dm->countformfunctions(d);
 
@@ -2052,9 +2067,6 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
             dm->selectfield(rfs[r]);
             for (int d = 0; d < numdisjregs; d++)
             {
-                if (rfs[r]->isconstrained(d) && excludedirichlet)
-                    continue;
-                    
                 if (isdisjregininnerinterface[n][d])
                 {
                     int elemtype = drs->getelementtypenumber(d);
