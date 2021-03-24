@@ -54,6 +54,39 @@ intdensematrix::intdensematrix(long long int numberofrows, long long int numbero
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
+intdensematrix::intdensematrix(std::vector<intdensematrix> input)
+{
+    if (input.size() == 0)
+        return;
+        
+    // Calculate the final concatenated size:
+    numcols = input[0].countcolumns();
+    numrows = input[0].countrows();
+    for (long long int i = 1; i < input.size(); i++)
+    {
+        numrows += input[i].countrows();
+        if (input[i].countcolumns() != numcols)
+        {
+            std::cout << "Error in 'intdensematrix' object: dimension mismatch in concatenation" << std::endl;
+            abort();
+        }
+    }
+    int* myvaluesptr = new int[numrows*numcols];
+    
+    long long int index = 0;
+    for (long long int i = 0; i < input.size(); i++)
+    {
+        int* curvals = input[i].getvalues();
+        for (long long int j = 0; j < input[i].count(); j++)
+        {
+            myvaluesptr[index] = curvals[j];
+            index++;
+        }
+    }
+    
+    myvalues = std::shared_ptr<int>(myvaluesptr);
+}
+
 long long int intdensematrix::countpositive(void)
 {
     int* myvaluesptr = myvalues.get();
