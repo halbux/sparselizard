@@ -99,7 +99,7 @@ class formulation
         mat C(bool keepfragments = false, bool skipdiagonalones = false);
         mat M(bool keepfragments = false, bool skipdiagonalones = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
-        mat getmatrix(int KCM, bool keepfragments = false, bool skipdiagonalones = false);
+        mat getmatrix(int KCM, bool keepfragments = false, bool skipdiagonalones = false, std::vector<intdensematrix> additionalconstraints = {});
 
 };
 

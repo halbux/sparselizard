@@ -252,7 +252,7 @@ mat formulation::K(bool keepfragments, bool skipdiagonalones) { return getmatrix
 mat formulation::C(bool keepfragments, bool skipdiagonalones) { return getmatrix(1, keepfragments, skipdiagonalones); }
 mat formulation::M(bool keepfragments, bool skipdiagonalones) { return getmatrix(2, keepfragments, skipdiagonalones); }
 
-mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
+mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones, std::vector<intdensematrix> additionalconstraints)
 {
     if (mymat[KCM] == NULL)
         mymat[KCM] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
@@ -302,6 +302,16 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones)
         {
             densematrix ones(1, numcondconstraineddofs, 1);
             rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
+        } 
+    }
+    
+    for (int i = 0; i < additionalconstraints.size(); i++)
+    {
+        rawout->zeroentries(additionalconstraints[i], true, false);
+        if (skipdiagonalones == false)
+        {
+            densematrix ones(1, additionalconstraints[i].count(), 1);
+            rawout->accumulate(additionalconstraints[i], additionalconstraints[i], ones); 
         } 
     }
 
