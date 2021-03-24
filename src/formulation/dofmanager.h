@@ -117,6 +117,15 @@ class dofmanager
         long long int allcountdofs(void);
         int countformfunctions(int disjointregion);
         
+        // Return {sendnewconstrainedinds, recvnewconstrainedinds, sendunconstrainedinds, recvunconstrainedinds} where
+        //
+        // - sendnewconstrainedinds[n] are the indexes of all interface dofs constrained on this rank but not constrained on the neighbour
+        // - recvnewconstrainedinds[n] are the indexes of all interface dofs not constrained on this rank but constrained on the neighbour
+        // - sendunconstrainedinds[n] are all unconstrained indexes in senddofinds (same ordering)
+        // - recvunconstrainedinds[n] are all unconstrained indexes in recvdofinds (same ordering)
+        //
+        std::vector<std::vector<intdensematrix>> discovernewconstraints(std::vector<int> neighbours, std::vector<intdensematrix> senddofinds, std::vector<intdensematrix> recvdofinds);
+        
         void print(void);
         
         // 'getadresses' is required in the matrix generation step.
