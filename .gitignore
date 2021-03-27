@@ -36,3 +36,5 @@ build/
 
 # CCLS cache
 .ccls-cache/
+
+**/.idea
