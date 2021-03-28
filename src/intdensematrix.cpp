@@ -30,7 +30,7 @@ intdensematrix::intdensematrix(long long int numberofrows, long long int numbero
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<int> valvec)
+intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;

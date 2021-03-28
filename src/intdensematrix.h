@@ -36,7 +36,7 @@ class intdensematrix
         // Initialise to a value:
         intdensematrix(long long int numberofrows, long long int numberofcolumns, int initvalue);
         // Initialise with a vector (row major):
-        intdensematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<int> valvec);
+        intdensematrix(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
         intdensematrix(long long int numberofrows, long long int numberofcolumns, int init, int step);
         // Vertical concatenation of dense matrices:
