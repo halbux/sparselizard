@@ -573,12 +573,14 @@ long long int dofmanager::allcountdofs(void)
     
     for (int d = 0; d < isowndr.size(); d++)
     {
-        int ne = mydisjointregions->countelements(d);
-        for (int i = 0; i < myfields.size(); i++)
+        if (isowndr[d])
         {
-            int nff = rangebegin[i][d].size();
-            if (isowndr[d])
+            int ne = mydisjointregions->countelements(d);
+            for (int i = 0; i < myfields.size(); i++)
+            {
+                int nff = rangebegin[i][d].size();
                 out += ne*nff;
+            }
         }
     }
     
