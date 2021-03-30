@@ -709,7 +709,12 @@ std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
 {
     std::shared_ptr<rawmesh> loadedmesh(new rawmesh());
     
-    loadedmesh->readfromfile(meshfile);
+    std::string tool, source;
+    myalgorithm::splitatcolon(meshfile, tool, source);
+    if (tool.size() == 0)
+        tool = "native";
+        
+    loadedmesh->readfromfile(tool, source);
     
     nodes* loadednodes = loadedmesh->getnodes();
     std::vector<double>* nodecoords = loadednodes->getcoordinates();

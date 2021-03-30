@@ -68,7 +68,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
     public:
         
         // 'readfromfile' hands over to the function reading the format of the mesh file.
-        void readfromfile(std::string);
+        void readfromfile(std::string tool, std::string source);
         // 'writetofile' hands over to the function writing the format of the mesh file.
         void writetofile(std::string);
 
@@ -98,7 +98,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<rawmesh> getattarget(std::shared_ptr<ptracker> targetpt);
 
         // Load from file name:
-        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader);   
+        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity);   
         // Load from multiple files:
         void load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity);
         // Load from shape vector:
