@@ -196,10 +196,10 @@ std::vector<double> sl::loadvector(std::string filename, char delimiter, bool si
 }
 
 #ifndef HAVE_GMSH
-void sl::allpartition(std::string meshfile)
+std::string sl::allpartition(std::string meshfile)
 {
     if (slmpi::count() == 1)
-        return;
+        return meshfile;
     
     std::cout << "Error in 'sl' namespace: GMSH API is required to partition the mesh" << std::endl;
     abort();
@@ -207,13 +207,13 @@ void sl::allpartition(std::string meshfile)
 #endif
 #ifdef HAVE_GMSH
 #include "gmsh.h"
-void sl::allpartition(std::string meshfile)
+std::string sl::allpartition(std::string meshfile)
 {
     int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
     if (numranks == 1)
-        return;
+        return meshfile;
     
     if (rank == 0)
     {
@@ -229,6 +229,8 @@ void sl::allpartition(std::string meshfile)
     }
     // Wait for rank 0 to finish:
     slmpi::barrier();
+    
+    return (meshfile.substr(0, meshfile.size()-4)+"_"+std::to_string(rank+1)+".msh");
 }
 #endif
 
