@@ -1735,3 +1735,27 @@ double myalgorithm::sum(std::vector<double>& tosum)
     return out;
 }
 
+void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::string& last)
+{
+    int colonpos = -1;
+    for (int i = 0; i < tosplit.size(); i++)
+    {
+        if (tosplit[i] == ':')
+        {
+            colonpos = i;
+            break;
+        }
+    }
+    
+    if (colonpos == -1)
+    {
+        first = "";
+        last = tosplit;
+    }
+    else
+    {
+        first = tosplit.substr(0, colonpos);
+        last = tosplit.substr(colonpos+1, tosplit.size()-colonpos-1);
+    }
+}
+
