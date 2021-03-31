@@ -370,12 +370,12 @@ intdensematrix intdensematrix::extractcols(std::vector<int>& selected)
     return output;
 }
     
-intdensematrix intdensematrix::select(std::vector<bool>& selectedindexes, bool selectif)
+intdensematrix intdensematrix::select(std::vector<bool>& sel, bool selectif)
 {
-    int numtrue = myalgorithm::counttrue(selectedindexes);
+    int numtrue = myalgorithm::counttrue(sel);
     int num = numtrue;
     if (selectif == false)
-        num = selectedindexes.size() - numtrue;
+        num = sel.size() - numtrue;
 
     intdensematrix output(num, 1);
 
@@ -383,9 +383,9 @@ intdensematrix intdensematrix::select(std::vector<bool>& selectedindexes, bool s
     int* outvaluesptr = output.myvalues.get();
 
     int index = 0;
-    for (int i = 0; i < selectedindexes.size(); i++)
+    for (int i = 0; i < sel.size(); i++)
     {
-        if (selectedindexes[i] == selectif)
+        if (sel[i] == selectif)
         {
             outvaluesptr[index] = myvaluesptr[i];
             index++;

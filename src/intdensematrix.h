@@ -93,7 +93,7 @@ class intdensematrix
         intdensematrix extractcols(std::vector<int>& selected);
         
         // Select all indexes for which the selection equals the last argument:
-        intdensematrix select(std::vector<bool>& selectedindexes, bool selectif);
+        intdensematrix select(std::vector<bool>& sel, bool selectif);
 
 };
 
