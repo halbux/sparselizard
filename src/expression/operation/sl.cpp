@@ -1634,7 +1634,7 @@ void sl::solve(formulation formul, std::vector<int> blockstoconsider)
     }
     
     // Remove leftovers (if any):
-    mat A = formul.A(); vec b = formul.b();
+    mat A = formul.A(); vec b = formul.b(false, false);
     // Generate:
     if (blockstoconsider.size() == 1 && blockstoconsider[0] == -1)
         formul.generate();
