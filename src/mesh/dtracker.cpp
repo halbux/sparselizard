@@ -20,6 +20,19 @@ dtracker::dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numo
         std::cout << "Error in 'dtracker' object: cannot provide a NULL rawmesh pointer" << std::endl;
         abort();
     }
+    
+    physicalregions* prs = rm->getphysicalregions();
+    int meshdim = rm->getmeshdimension();
+    
+    // Set globalgeometryskin to -1 if empty:
+    if (prs->getindex(globalgeometryskin) == -1 || prs->get(globalgeometryskin)->countelements() == 0)
+        globalgeometryskin = -1;
+    
+    if (globalgeometryskin >= 0 && prs->get(globalgeometryskin)->getelementdimension() != meshdim-1)
+    {
+        std::cout << "Error in 'dtracker' object: expected " << meshdim-1 << "D elements in the global geometry skin region but found " << prs->get(globalgeometryskin)->getelementdimension() << "D elements (use -1 if empty)" << std::endl;
+        abort();
+    }
 
     myrawmesh = rm;
 
@@ -861,7 +874,7 @@ void dtracker::defineouteroverlapinterfaces(void)
 
     regdef.regionskin(skinregion, -1);
     // This domain might not be in contact with the global geometry skin:
-    if (prs->getindex(myglobalgeometryskin) != -1 && prs->get(myglobalgeometryskin)->countelements() > 0)
+    if (myglobalgeometryskin >= 0)
         regdef.regionexclusion(candidatesregion, skinregion, {myglobalgeometryskin});
     else
         candidatesregion = skinregion;
@@ -1675,7 +1688,7 @@ void dtracker::discoverconnectivity(int numtrialelements, int verbosity)
     regiondefiner regdef(*nds, *els, *prs);
     regdef.regionskin(skinregion, -1);
     // This domain might not be in contact with the global geometry skin:
-    if (prs->getindex(myglobalgeometryskin) != -1 && prs->get(myglobalgeometryskin)->countelements() > 0)
+    if (myglobalgeometryskin >= 0)
         regdef.regionexclusion(wholeneighbourinterface, skinregion, {myglobalgeometryskin});
     else
         wholeneighbourinterface = skinregion;

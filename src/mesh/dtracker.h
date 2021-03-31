@@ -20,7 +20,7 @@ class dtracker
 
     private:
     
-        // Skin of the global geometry:
+        // Skin of the global geometry (-1 if empty):
         int myglobalgeometryskin = -1;
         
         // Number of overlap layers (0 for no-overlap):
