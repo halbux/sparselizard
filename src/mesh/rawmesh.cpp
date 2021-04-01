@@ -133,10 +133,13 @@ void rawmesh::readfromfile(std::string tool, std::string source)
             nastraninterface::readfromfile(source, mynodes, myelements, myphysicalregions);
             return;    
         }
+        
+        std::cout << "Error: file '" << source << "' cannot be read by the native mesh reader." << std::endl;
+        std::cout << "Use the GMSH or the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
+        abort();
     }
 
-    std::cout << "Error: file '" << source << "' cannot be read by the " << tool << " mesh reader." << std::endl;
-    std::cout << "Use the GMSH or the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
+    std::cout << "Error: unknown mesh reader '" << tool << "'" << std::endl;
     abort();
 }
 
