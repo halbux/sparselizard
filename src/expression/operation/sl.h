@@ -46,10 +46,10 @@ namespace sl
     int selectall(void);
     
     // Check if a region is defined/empty/fully included in another region/touches another region:
-    bool isregiondefined(int physreg);
-    bool isregionempty(int physreg);
-    bool isregioninside(int physregtocheck, int physreg);
-    bool isregiontouching(int physregtocheck, int physreg);
+    bool isdefined(int physreg);
+    bool isempty(int physreg);
+    bool isinside(int physregtocheck, int physreg);
+    bool istouching(int physregtocheck, int physreg);
 
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);

@@ -48,12 +48,12 @@ int sl::selectall(void)
     return (universe::mymesh->getphysicalregions())->createunionofall(false);
 }
 
-bool sl::isregiondefined(int physreg)
+bool sl::isdefined(int physreg)
 {
     return (universe::mymesh->getphysicalregions()->getindex(physreg) != -1);
 }
 
-bool sl::isregionempty(int physreg)
+bool sl::isempty(int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
 
@@ -68,7 +68,7 @@ bool sl::isregionempty(int physreg)
     return true;
 }
 
-bool sl::isregioninside(int physregtocheck, int physreg)
+bool sl::isinside(int physregtocheck, int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
@@ -85,7 +85,7 @@ bool sl::isregioninside(int physregtocheck, int physreg)
     return true;
 }
 
-bool sl::isregiontouching(int physregtocheck, int physreg)
+bool sl::istouching(int physregtocheck, int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
