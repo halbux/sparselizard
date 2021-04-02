@@ -261,6 +261,7 @@ expression sl::normal(void)
 
 expression sl::normal(int physreg)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return getnormal(physreg);
 }
 
@@ -575,11 +576,13 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
 
 std::vector<double> sl::gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return gettotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
 std::vector<double> sl::gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return gettotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
@@ -605,11 +608,13 @@ std::vector<double> sl::printtotalforce(int physreg, expression* meshdeform, exp
 
 std::vector<double> sl::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
 std::vector<double> sl::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
@@ -920,8 +925,17 @@ expression sl::min(parameter a, parameter b)
 }
 
 
-expression sl::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
-expression sl::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
+expression sl::on(int physreg, expression expr, bool errorifnotfound)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return expr.on(physreg, NULL, errorifnotfound);
+}
+
+expression sl::on(int physreg, expression coordshift, expression expr, bool errorifnotfound)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return expr.on(physreg, &coordshift, errorifnotfound);
+}
 
 expression sl::comp(int selectedcomp, expression input)
 {
@@ -1249,21 +1263,25 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
 
 integration sl::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, numcoefharms, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, numcoefharms, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
@@ -1274,6 +1292,7 @@ expression sl::dof(expression input)
 
 expression sl::dof(expression input, int physreg)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return input.dof(physreg);
 }
 
@@ -1284,6 +1303,7 @@ expression sl::tf(expression input)
 
 expression sl::tf(expression input, int physreg)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return input.tf(physreg);
 }
 
@@ -2396,6 +2416,8 @@ expression sl::predefinedviscousforce(expression dofv, expression tfv, expressio
 
 std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
@@ -2433,6 +2455,8 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
 
 std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
 {       
+    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
@@ -2550,6 +2574,8 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
 
 std::vector<integration> sl::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();

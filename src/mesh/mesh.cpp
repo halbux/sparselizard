@@ -151,6 +151,9 @@ void mesh::split(int n)
 void mesh::move(int physreg, expression u)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     if (rawmeshptr->getmeshnumber() == 0)
         rawmeshptr->move(physreg, u);
     rawmeshptr->gethadaptedpointer()->move(physreg, u);
@@ -167,6 +170,9 @@ void mesh::move(expression u)
 void mesh::shift(int physreg, double x, double y, double z)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     rawmeshptr->shift(physreg, x, y, z);
     rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
 }
@@ -181,6 +187,9 @@ void mesh::shift(double x, double y, double z)
 void mesh::rotate(int physreg, double ax, double ay, double az)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     rawmeshptr->rotate(physreg, ax, ay, az);
     rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
 }
@@ -195,6 +204,9 @@ void mesh::rotate(double ax, double ay, double az)
 void mesh::scale(int physreg, double x, double y, double z)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     rawmeshptr->scale(physreg, x, y, z);
     rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
 }

@@ -1036,6 +1036,8 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     if (startcoords.size() == 0)
         return;
 
@@ -1231,6 +1233,8 @@ bool expression::iszero(void)
 
 vec expression::atbarycenter(int physreg, field onefield)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     // The field must be a "one" type:
     std::string ft = onefield.getpointer()->gettypename();
     if (ft != "one0" && ft != "one1" && ft != "one2" && ft != "one3")
