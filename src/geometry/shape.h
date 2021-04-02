@@ -90,7 +90,7 @@ class shape
 
         int getphysicalregion(void);
 
-         std::shared_ptr<rawshape> getpointer(void);
+        std::shared_ptr<rawshape> getpointer(void);
 };
 
 
