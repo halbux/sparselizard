@@ -85,7 +85,6 @@ vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); 
 void vec::setdata(int physreg, field myfield, std::string op)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     vectorfieldselect(rawvecptr, myfield.getpointer()).setdata(physreg, myfield, op);
 }
 
