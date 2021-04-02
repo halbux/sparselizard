@@ -254,16 +254,23 @@ expression sl::norm(expression expr)
     return sqrt(mynorm);
 }
 
+expression sl::normal(void)
+{
+    return getnormal(-1);
+}
+
 expression sl::normal(int physreg)
+{
+    return getnormal(physreg);
+}
+
+expression sl::getnormal(int physreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
     if (physreg >= 0)
     {
-        universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    
         int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-
         if (elementdimension != problemdimension)
         {
             std::cout << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;

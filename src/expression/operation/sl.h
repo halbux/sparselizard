@@ -66,7 +66,9 @@ namespace sl
     expression norm(expression expr);
 
     // Normal vector with unit norm and pointing outward of a physical region:
-    expression normal(int physreg = -1);
+    expression normal(void);
+    expression normal(int physreg);
+    expression getnormal(int physreg);
     // Tangent vector with unit norm:
     expression tangent(void);
 
