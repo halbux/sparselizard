@@ -18,9 +18,6 @@ int physicalregions::createunion(std::vector<int> input, bool createifexisting)
             disjregs.push_back(disjregsinthisphysreg[j]);
     }
 
-    if (disjregs.size() == 0)
-        return -1;
-
     if (createifexisting == false)
     {
         int existingnumber = find(disjregs);
@@ -50,9 +47,6 @@ int physicalregions::createintersection(std::vector<int> input, bool createifexi
             disjregs = disjregsinthisphysreg;
     }
     
-    if (disjregs.size() == 0)
-        return -1;
-
     if (createifexisting == false)
     {
         int existingnumber = find(disjregs);
