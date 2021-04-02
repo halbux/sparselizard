@@ -198,8 +198,10 @@ namespace sl
     integration integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
     integration integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
 
-    expression dof(expression input, int physreg = -1);
-    expression tf(expression input, int physreg = -1);
+    expression dof(expression input);
+    expression dof(expression input, int physreg);
+    expression tf(expression input);
+    expression tf(expression input, int physreg);
     
     // Return an expression whose value will be calculated on the argument mesh state (the expression is hp-synchronized to that mesh state after the call):
     expression athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);

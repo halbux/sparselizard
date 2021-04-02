@@ -1260,8 +1260,25 @@ integration sl::integral(int physreg, int numcoefharms, expression meshdeform, e
     return integration(physreg, numcoefharms, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
-expression sl::dof(expression input, int physreg) { return input.dof(physreg); }
-expression sl::tf(expression input, int physreg) { return input.tf(physreg); }
+expression sl::dof(expression input)
+{
+    return input.dof(-1);
+}
+
+expression sl::dof(expression input, int physreg)
+{
+    return input.dof(physreg);
+}
+
+expression sl::tf(expression input)
+{
+    return input.tf(-1);
+}
+
+expression sl::tf(expression input, int physreg)
+{
+    return input.tf(physreg);
+}
 
 expression sl::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
