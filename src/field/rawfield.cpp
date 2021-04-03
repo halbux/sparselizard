@@ -625,7 +625,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     // Interpolation order can only be set on highest dimension regions:
     int problemdimension = universe::mymesh->getmeshdimension();
     int regdim = ((universe::mymesh->getphysicalregions())->get(physreg))->getelementdimension();
-    if (iscalledbyuser && problemdimension != regdim)
+    if (iscalledbyuser && regdim >= 0 && problemdimension != regdim)
     {
         std::cout << "Error in 'rawfield' object: cannot set the interpolation order on a " << regdim << "D region in a " << problemdimension << "D problem (must be " << problemdimension << "D)" << std::endl;
         abort();
@@ -2061,6 +2061,9 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     indexinintvec++;
     std::vector<int> disjregs(numdisjregs); std::vector<int> numelems(numdisjregs);
     
+    if (numdisjregs == 0)
+        return doubledata;
+        
     for (int i = 0; i < numdisjregs; i++)
     {
         disjregs[i] = intdata[indexinintvec+0];

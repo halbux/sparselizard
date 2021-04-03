@@ -887,6 +887,9 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
     }
+    
+    if (universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
+        return;
 
     // Minimum lagrange order is 1!
     if (lagrangeorder < 1)
@@ -1038,9 +1041,9 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 {
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
     
-    if (startcoords.size() == 0)
+    if (startcoords.size() == 0 || universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
         return;
-
+    
     // This can happen with int divisions:
     if (stepsize == 0)
     {

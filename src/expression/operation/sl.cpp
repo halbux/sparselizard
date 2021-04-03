@@ -272,7 +272,7 @@ expression sl::getnormal(int physreg)
     if (physreg >= 0)
     {
         int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-        if (elementdimension != problemdimension)
+        if (elementdimension >= 0 && elementdimension != problemdimension)
         {
             std::cout << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
             abort();

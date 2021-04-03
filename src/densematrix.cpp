@@ -586,8 +586,6 @@ double densematrix::maxabs(void)
 
 double densematrix::sum(void)
 {
-    errorifempty();
-    
     double* myvaluesptr = myvalues.get();
     double val = 0;
 

@@ -102,9 +102,13 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
             // To write all doubles with enough digits to the file:
             name << std::setprecision(17);
 
-            for (int i = 0; i < doubledata.size()-1; i++)
-                name << doubledata[i] << std::endl;
-            name << doubledata[doubledata.size()-1];
+            for (int i = 0; i < doubledata.size(); i++)
+            {
+                if (i == doubledata.size()-1)
+                    name << doubledata[i];
+                else
+                    name << doubledata[i] << std::endl;
+            }
 
             name.close();
         }
