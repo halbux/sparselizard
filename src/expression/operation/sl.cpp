@@ -29,6 +29,7 @@ double sl::getpi(void)
 int sl::selectunion(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    universe::mymesh->getphysicalregions()->errornotsamedim(physregs);
     
     universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs, false);
     return (universe::mymesh->getphysicalregions())->createunion(physregs, false);
