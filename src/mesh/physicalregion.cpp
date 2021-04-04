@@ -55,8 +55,7 @@ int physicalregion::getelementdimension(void)
 
 void physicalregion::definewithdisjointregions(void)
 {   
-    includesdisjointregion.resize(mydisjointregions->count());
-    std::fill(includesdisjointregion.begin(), includesdisjointregion.end(), false);
+    includesdisjointregion = std::vector<bool>(mydisjointregions->count(), false);
 
     int prindex = myphysicalregions->getindex(myphysicalregionnumber);
     
