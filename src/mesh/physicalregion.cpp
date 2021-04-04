@@ -67,9 +67,6 @@ void physicalregion::definewithdisjointregions(void)
 void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)
 {
     myelementdimension = -1;
-    if (disjointregionlist.size() > 0)
-        myelementdimension = mydisjointregions->getelementdimension(disjointregionlist[0]);
-        
     includesdisjointregion = std::vector<bool>(mydisjointregions->count(), false);
     
     for (int i = 0; i < disjointregionlist.size(); i++)
