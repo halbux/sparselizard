@@ -19,6 +19,10 @@ void formulation::operator+=(integration integrationobject)
 
     int integrationphysreg = integrationobject.getphysicalregion();
     int elementdimension = universe::mymesh->getphysicalregions()->get(integrationphysreg)->getelementdimension();
+    // Return on empty integration region:
+    if (elementdimension < 0)
+        return;
+    
     int integrationorderdelta = integrationobject.getintegrationorderdelta();
     expression myexpression = integrationobject.getexpression();
 
