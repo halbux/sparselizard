@@ -2050,12 +2050,12 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             for (int j = productterms.size()-1; j >= 0; j--)
             {
                 // Remove the dof and tf terms to get the coefficient:
-                if (productterms[j]->isdof())
+                if (currentdof->getfieldpointer() == NULL && productterms[j]->isdof())
                 {
                     currentdof = productterms[j];
                     currentcoef->removeterm(j);
                 }
-                if (productterms[j]->istf())
+                if (currenttf->getfieldpointer() == NULL && productterms[j]->istf())
                 {
                     currenttf = productterms[j];
                     currentcoef->removeterm(j);
