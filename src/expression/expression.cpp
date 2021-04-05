@@ -2112,6 +2112,13 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                 numdofterms = elementdimension;
             if (currenttf->getspacederivative() > 0)
                 numtfterms = elementdimension;
+                
+            if (numdofterms < 0 || numtfterms < 0)
+            {
+                std::cout << "Error in 'expression' object: cannot process the term for " << elementdimension << "D elements" << std::endl;
+                std::cout << "Are you working with an empty physical region?" << std::endl;
+                abort();
+            }
 
             std::vector<std::shared_ptr<operation>> currentdofsplit(numdofterms*numtfterms);
             std::vector<std::shared_ptr<operation>> currenttfsplit(numdofterms*numtfterms);
