@@ -11,7 +11,7 @@
 #include <experimental/filesystem>
 #include <iostream>
 #include "sparselizard.h"
-
+#include <vector>
 
 using namespace std;
 using namespace sl;
@@ -22,29 +22,81 @@ expression polarscalar(expression);
 
 expression projection(expression e, expression a);
 
-void createPath(std::string path) {
-    std::string command = "mkdir -p " + path;
-    bool success = system(command.c_str());
-    // namespace fs = std::experimental::filesystem; // In C++17 use std::filesystem.
-
-    // std::error_code ec;
-    // bool success = fs::create_directories(path, ec);
-
-    if (!success) {
-        std::cout << "Couldn't create directory path: " << path << std::endl; // Fun fact: In case of success ec.message() returns "The operation completed successfully." using vc++.
+const char* getVar(int argc, char* argv[], int position) {
+    if(argc > position) {
+        return argv[position];
+    } else {
+        cout
+            << "Use this software as follows:" << endl
+        << "Example command to load only one mesh file" << endl << endl
+        << "./loadem.sh FilenameToLoad" << endl << endl
+        << "Example command to load only one mesh file save to folderName (default:December)" << endl << endl
+        << "./loadem.sh FilenameToLoad FolderName" << endl << endl
+        << "Example command to load only multiple mesh file of the name convention: FilenameToLoad{alpha}A{ironAlpha}.msh" << endl << endl << endl
+        << "./loadem.sh FilenameToLoad alphaStep ironStep pieces ironpieces" << endl << endl;
+        exit(1);
+    }
+}
+void writeVec(vector<double> v, string filename) {
+    ofstream myfile(filename);
+    int vsize = v.size();
+    for (int n=0; n<vsize; n++)
+    {
+        myfile << v[n] << endl;
     }
 }
 
-void writeFile(std::string filename, std::string data) {
+string twodigits(int num) {
+    return ((num <= 9) ? "0" : "") + (to_string((int)(num)));
+}
+
+
+
+void createPath(string path) {
+    string command = "mkdir -p " + path;
+    bool success = system(command.c_str());
+    // namespace fs = experimental::filesystem; // In C++17 use filesystem.
+
+    // error_code ec;
+    // bool success = fs::create_directories(path, ec);
+
+    if (!success) {
+        //cout << "Couldn't create directory path: " << path << endl; // Fun fact: In case of success ec.message() returns "The operation completed successfully." using vc++.
+    }
+}
+
+void writeFile(string filename, string data) {
     ofstream myfile;
     myfile.open (filename.c_str());
     myfile << data;
     myfile.close();
 }
 
+struct DataArray {
+    vector<double> array;
+    string name;
+
+    DataArray(string n) {
+
+        this->name = n;
+    }
+
+    void add(double x) {
+        this->array.push_back(x);
+    }
+
+    void save(string filename) {
+        string path = "results/" + this->name;
+        createPath(path);
+        createPath(path + "/Arrays");
+        writeVec(this->array, path + "/Arrays/" + filename + ".csv");
+    }
+};
+
 struct DataPack {
     expression A;
     expression B;
+    expression H;
     expression F;
     double T;
     double TBottom;
@@ -55,80 +107,75 @@ struct DataPack {
     double alpha;
     double ironAlpha;
 
-    std::string name;
+    string name;
     int allRegion;
 
-    DataPack(std::string name) {
+    DataPack(string name) {
         this->name = name;
     }
 
     void saveData() {
         cout << "Saving datapack to folder " << this->name << endl;
 
-        std::string path = "results/" + this->name;
+        string path = "results/" + this->name;
         createPath(path);
 
         createPath(path + "/B");
         createPath(path + "/A");
         createPath(path + "/F");
         createPath(path + "/T");
+        createPath(path + "/H");
 
         int all = this->allRegion;
         int alpha = this->alpha;
         int ironAlpha = this->ironAlpha;
         
-        this->A.write(all, path + "/A/AField"+std::to_string((int)alpha)+".vtu", 2);
-        this->B.write(all, path + "/B/BField"+std::to_string((int)alpha)+std::to_string((int)ironAlpha)+".vtu", 2);
-        this->F.write(all, path + "/F/Force"+std::to_string((int)alpha)+".vtu", 2);
-        std::string data = "Bottom,Iron,Top,Bottom Magnets,Top Magnets\r\n" +
-            std::to_string(this->TBottom) + "," + std::to_string(this->TIron) + "," + std::to_string(this->TTop) + "," + std::to_string(this->TBM) + "," + std::to_string(this->TTM);
-        writeFile(path + "/T/torgues"+std::to_string((int)alpha)+std::to_string((int)ironAlpha)+".csv", data);
-        // polar(this->B).write(all, path + "TestPolarB"+std::to_string((int)alpha)+".vtu", 2);
-        // polar(this->F).write(all, path + "TestPolarF"+std::to_string((int)alpha)+".vtu", 2);
-        // polarscalar(this->B).write(all, path + "TestPolarScalarB"+std::to_string((int)alpha)+".vtu", 2);
+        this->A.write(all, path + "/A/AField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+        this->B.write(all, path + "/B/BField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+        this->H.write(all, path + "/H/HField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+        this->F.write(all, path + "/F/Force"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+        string data = "Bottom,Iron,Top,Bottom Magnets,Top Magnets\r\n" +
+            to_string(this->TBottom) + "," + to_string(this->TIron) + "," + to_string(this->TTop) + "," + to_string(this->TBM) + "," + to_string(this->TTM);
+        writeFile(path + "/T/torgues"+twodigits(alpha)+twodigits(ironAlpha)+".csv", data);
+        // polar(this->B).write(all, path + "TestPolarB"+twodigits(alpha)+".vtu", 2);
+        // polar(this->F).write(all, path + "TestPolarF"+twodigits(alpha)+".vtu", 2);
+        // polarscalar(this->B).write(all, path + "TestPolarScalarB"+twodigits(alpha)+".vtu", 2);
     }
 };
 
-void writeVec(std::vector<double> v, std::string filename) {
-    ofstream myfile(filename);
-    int vsize = v.size();
-    for (int n=0; n<vsize; n++)
-    {
-        myfile << v[n] << endl;
-    }
-}
 
 // Input is rotor angular position in degrees. Output is torque in Nm.
-DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool autoload = false, std::string name="December")
-{   
+DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool autoload = false, string name="December", bool timeit = false)
+{
+    wallclock clk;
     // Magnet Power
     double MagnetB = 1;
 
-    int stator = 1, firstmagnetup = 2, firstmagnetdown = 3,
-     ironbars = 4,
-     secondmagnetup = 6, secondmagnetdown = 7,
-    //  secondmagnetair = 8, ironair = 9,
-     topStator = 20;
-    // int IronTop = 21, SecondMagnetBottom = 22;
-    // int topStatorTop = 24, bottomStatorBottom = 23;
-    
+    int bottomStator = 1,
+        firstmagnetup = 2,
+        firstmagnetdown = 3,
+        ironbars = 4,
+        secondmagnetup = 6,
+        secondmagnetdown = 7,
+        air = 10,
+        topStator = 20;
+
     // Define new physical regions for convenience:
     int magnetsdown = selectunion({secondmagnetdown, firstmagnetdown});
     int magnetsup = selectunion({secondmagnetup, firstmagnetup});
     int magnets = selectunion({firstmagnetdown, firstmagnetup, secondmagnetdown, secondmagnetup});
-    int iron = selectunion({ironbars, stator, topStator});
+    int iron = selectunion({ironbars, bottomStator, topStator});
     int topPart = selectunion({ secondmagnetup, secondmagnetdown, topStator });
-    int bottomPart = selectunion({ firstmagnetup, firstmagnetdown, stator, ironbars });
+    int bottomPart = selectunion({ firstmagnetup, firstmagnetdown, bottomStator });
     int rotor = selectunion({secondmagnetup, secondmagnetdown});
     int all = selectall();
-
     int bottommagnets = selectunion({firstmagnetup, firstmagnetdown});
     int topmagnets = selectunion({secondmagnetup, secondmagnetdown});
     int middlesection = selectunion({ironbars});
 
     // Define a spanning tree to gauge the magnetic vector potential (otherwise the matrix is singular).
     // Start growing the tree from the regions with constrained potential vector (here the contour): 
-    spanningtree spantree({topStator});
+    spanningtree spantree({ bottomStator, topStator });
     // Write it for illustration:
     // spantree.write("results/spantree.pos");
 
@@ -140,10 +187,10 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     // maybe  ? 
     az.setgauge(all);
     // Use interpolation order 2:
-    az.setorder(all, 1);
+    az.setorder(all, 2);
     // Put a magnetic wall
     // az.setconstraint(topStator);
-    // az.setconstraint(bottomStatorBottom);
+    // az.setconstraint(bottomStator);
 
     // The remanent induction field in the magnet is 0.5 Tesla perpendicular to the magnet:
     expression normedradialdirection = array3x1(0,0,1);
@@ -172,13 +219,19 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     magnetostatics += integral(magnetsdown, -1/mu* minusbremanent * curl(tf(az)));
     magnetostatics += integral(magnetsup, -1/mu* bremanent * curl(tf(az)));
     // magnetostatics += continuitycondition(IronTop, SecondMagnetBottom, az, az, 1, false);
+
+    if(timeit) clk.print("Setup experiment:\t");
     if(autoload == true) {
-        az.loadraw("cache/aaz"+std::to_string((int)alpha)+std::to_string((int)ironAlpha)+".slz.gz", true);
+        cout << "Autoloading cache..." << endl;
+        az.loadraw("cache/aaz"+twodigits(alpha)+twodigits(ironAlpha)+".slz.gz", true);
+        cout << "Cache loaded" << endl;
+        if(timeit) clk.print("CacheLoaded:\t");
     } else {
-        std::cout << "Solving..." << std::endl;
-        solve(magnetostatics);
-        std::cout << "Solved!" << std::endl;
-        az.writeraw(all, "cache/aaz"+std::to_string((int)alpha)+std::to_string((int)ironAlpha)+".slz.gz", true);
+        cout << "Solving..." << endl;
+        magnetostatics.solve();
+        az.writeraw(all, "cache/aaz"+twodigits(alpha)+twodigits(ironAlpha)+".slz.gz", true);
+        cout << "Solved!" << endl;
+        if(timeit) clk.print("Solving time:\t");
     }
 
     // phiProjection.setdata(all, )
@@ -188,7 +241,7 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     // double integration = polito.integrate(firstmagnetup, 4);
     // double integrationdown = polito.integrate(firstmagnetdown, 4);
 
-    // polito.write(bottommagnets, "results/bottommagnets"+std::to_string((int)alpha)+".vtu");
+    // polito.write(bottommagnets, "results/bottommagnets"+twodigits(alpha)+".vtu");
     // cout << "First row INTEGRATION  UP : " << polito.integrate(firstmagnetup, 4) << endl;
     // cout << "First row INTEGRATION DOWN: " << polito.integrate(firstmagnetdown, 4) << endl;
     // cout << " ---------------------------------------------------------------- " << integration << endl;
@@ -200,8 +253,6 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
 
 
     // The magnetostatic force acting on the motor is computed below.
-
-    // This field will hold the x and y component of the magnetic forces:
     field magforce("h1xyz");
     magforce.setorder(all, 2);
 
@@ -212,27 +263,33 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     forceprojection += integral(all, dof(magforce)*tf(magforce));
     forceprojection += integral(all, -predefinedmagnetostaticforce(tf(magforce, all), 1/mu*curl(az), mu));
 
-    solve(forceprojection);
+    forceprojection.solve();
+
+    if(timeit) clk.print("Forces calc time:\t");
 
     expression magforcescalar = polarscalar((expression)magforce);
-    // magforcescalar.write(bottomPart, "results/bottomMagForce"+std::to_string((int)alpha)+".vtu");
+    // magforcescalar.write(bottomPart, "results/bottomMagForce"+twodigits(alpha)+".vtu");
 
 
     // Calculate the torque:
     expression leverarm = array3x1(x,y,0);
     expression torgue = compz(crossproduct(leverarm, magforce));
 
-    double T = torgue.integrate(bottomPart, 5);
+    double T = torgue.integrate(bottomPart, 4);
     double TBottom = T;
-    double TTop = torgue.integrate(topPart, 5);
-    double TIron = torgue.integrate(middlesection, 5);
-    double TBM = torgue.integrate(bottommagnets, 5);
-    double TTM = torgue.integrate(topmagnets, 5);
+    double TTop = torgue.integrate(topPart, 4);
+    double TIron = torgue.integrate(middlesection, 4);
+    double TBM = torgue.integrate(bottommagnets, 4);
+    double TTM = torgue.integrate(topmagnets, 4);
 
-    double scaleFactor = 1;
+    double scaleFactor = 1.;
+    cout << "--------------------------------------------------------" << endl;
     cout << "TorgueBottom: " << TBottom   * scaleFactor << endl;
     cout << "TorgueIron: " << TIron   * scaleFactor << endl;
     cout << "TorgueTop: " << TTop   * scaleFactor << endl;
+    cout << "--------------------------------------------------------" << endl;
+    cout << "--------------------------------------------------------" << endl;
+    cout << "--------------------------------------------------------" << endl;
 
     DataPack* pack = new DataPack(name);
     pack->T = T* scaleFactor;
@@ -245,33 +302,106 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     pack->F = (expression)magforce;
     pack->A = (expression)az;
     pack->B = curl(az);
+    pack->H = curl(az)/mu;
     pack->alpha = alpha;
     pack->ironAlpha = ironAlpha;
     pack->allRegion = selectall();
 
     // pack->saveData();
 
+    if(timeit) clk.print("Pack Ready:\t");
     return pack;
 }
 
-std::string getFilename(int alpha,int ironAlpha,int argc,char* argv[]) {
+string getFilename(int alpha,int ironAlpha,int argc,char* argv[], bool autoname = false) {
     // FILE MESH 2.2 .msh
-    std::string num = ((alpha <= 9) ? "0" : "") + (std::to_string((int)(alpha)));
-    std::string numiron = ((ironAlpha <= 9) ? "0" : "") + (std::to_string((int)(ironAlpha)));
-    // std::string test = "models/New.msh";
-    std::string filename;
-    if ( argc < 4 ) {
+    string num = twodigits(alpha);
+    string numiron = twodigits(ironAlpha);
+    // string test = "models/New.msh";
+    string filename;
+    if ( argc < 4 && autoname == false ) {
         // take file from args
-        filename = (std::string)"models/" + argv[1];
-        std::cout << "Loading model: " << filename << endl;
+        filename = (string)"models/" + argv[1];
+        cout << "Loading model: " << filename << endl;
     } else {
-        filename = (std::string)"models/parts/" + argv[1] + num + "A" + numiron + ".msh";
-        std::cout << "Loading model(autoname): " << filename << endl;
+        filename = (string)"models/parts/" + argv[1] + num + "A" + numiron + ".msh";
+        cout << "Loading model(autoname): " << filename << endl;
     }
     return filename;
 }
 
+void simulate(int argc, char *argv[]) {
+    if (argc < 2) {
+        cout << "Provide the name of the mesh file!" << endl;
+        return;
+    }
+
+    string filename = getFilename(0, 0, argc, argv, true);
+    mesh mymesh(filename);
+
+    DataPack* pack;
+    pack = sparselizard(mymesh, 0, 0, false);
+    pack->saveData();
+}
+
 int main(int argc, char *argv[])
+{
+    PetscInitialize(0,{},0,0);
+    wallclock clk;
+
+    if(argc < 2) {
+        cout << "Need to specify a model name. e.g. ./mcvt Parrot" << endl;
+        return 0;
+    }
+
+    int start = 0;
+    int end = 45;
+    int alphaStep = atoi(getVar(argc, argv, 2));
+    int pieces = (end-start)/alphaStep;
+
+
+    string folderName = "AprilLate";
+
+    createPath("cache");
+
+    int ironstart = 0;
+    int ironend = 45;
+    int ironStep = atoi(getVar(argc, argv, 3));
+    int ironpieces = (ironend - ironstart)/ironStep;
+
+    DataPack* pack;
+    // make only one loop
+    for (double ironAlpha = ironstart; ironAlpha <= ironstart+(ironpieces*ironStep); ironAlpha += ironStep)
+    {
+        DataArray* torguesB = new DataArray(folderName);
+        DataArray* torguesI = new DataArray(folderName);
+        DataArray* torguesT = new DataArray(folderName);
+        for (double alpha = start; alpha <= start+(pieces*alphaStep); alpha += alphaStep)
+        {
+            cout << "Iron Angle\t" << ironAlpha << "\t Rotor Angle:\t" << alpha << endl;
+            string filename = getFilename(alpha, ironAlpha, argc, argv, true);
+            mesh mymesh(filename);
+            pack = sparselizard(mymesh, alpha, ironAlpha, false, folderName, true);
+//            clk.print("Calculations:");
+//            cout << "--------------------------------------" << endl << endl;
+            pack->saveData();
+            torguesB->add(pack->TBottom);
+            torguesI->add(pack->TIron);
+            torguesT->add(pack->TTop);
+            delete pack;
+        }
+        torguesB->save("TBottom" + twodigits(ironAlpha));
+        torguesI->save("TIron" + twodigits(ironAlpha));
+        torguesT->save("TTop" + twodigits(ironAlpha));
+        delete torguesB, torguesI, torguesT;
+    }
+
+    clk.print("Total run time:");
+    PetscFinalize();
+    return 0;
+}
+
+int oldmain(int argc, char *argv[])
 {   
     PetscInitialize(0,{},0,0);
 
@@ -288,7 +418,7 @@ int main(int argc, char *argv[])
     int ironpieces = 0;
     int ironStep = 5;
 
-    std::string folderName = "December";
+    string folderName = "December";
 
     if(argc > 3) {
         alphaStep = atoi(argv[2]);
@@ -299,7 +429,7 @@ int main(int argc, char *argv[])
     } else if(argc == 3) {
         folderName = argv[2];
     } else if(argc == 1) {
-        std::cout 
+        cout
         << "Use this software as follows:" << endl
         << "Example command to load only one mesh file" << endl << endl
         << "./loadem.sh FilenameToLoad" << endl << endl
@@ -309,7 +439,7 @@ int main(int argc, char *argv[])
         << "./loadem.sh FilenameToLoad alphaStep ironStep pieces ironpieces" << endl << endl << endl;
         return 0;
     }
-    std::cout << "Settings" << endl 
+    cout << "Settings" << endl
     << "FolderName: " << folderName << endl 
     << "AlphaStep: " << alphaStep << endl 
     << "IronStep: " << ironStep << endl
@@ -331,7 +461,7 @@ int main(int argc, char *argv[])
         if (alpha < 0) alpha += 18;
         if (alpha < 0) alpha += 18;
             // settime(alpha - start+0.0001);
-            std::string filename = getFilename(alpha, ironAlpha, argc, argv);
+            string filename = getFilename(alpha, ironAlpha, argc, argv);
             mesh mymesh(filename);
             // mymesh.scale(regionall(), 0.01,0.01,0.01);
             pack = sparselizard(mymesh, alpha, ironAlpha, false, folderName);
@@ -342,15 +472,15 @@ int main(int argc, char *argv[])
             // torguesIron.push_back(pack->TIron);
             // torguesTM.push_back(pack->TTop);
 
-            // std::cout << "Iron Angle\t| Mechanical angle [degrees] and torque [Nm]:" << std::endl;
-            // std::cout << ironAlpha << "\t\t|" << alpha << "\t\t\t\t\t|" << pack->T << std::endl;   
+            // cout << "Iron Angle\t| Mechanical angle [degrees] and torque [Nm]:" << endl;
+            // cout << ironAlpha << "\t\t|" << alpha << "\t\t\t\t\t|" << pack->T << endl;
             
             delete pack;
         }
 
-        // writeVec(torguesBM, "results/IronB"+ std::to_string((int)(ironAlpha))+"A"+ std::to_string((int)(alphaStep))+"torguesTBottom.csv");
-        // writeVec(torguesTM, "results/IronB"+ std::to_string((int)(ironAlpha))+"A"+ std::to_string((int)(alphaStep))+"torguesTTop.csv");
-        // writeVec(torguesIron, "results/IronB"+ std::to_string((int)(ironAlpha))+"A"+ std::to_string((int)(alphaStep))+"torguesTIron.csv");
+        // writeVec(torguesBM, "results/IronB"+ to_string((int)(ironAlpha))+"A"+ to_string((int)(alphaStep))+"torguesTBottom.csv");
+        // writeVec(torguesTM, "results/IronB"+ to_string((int)(ironAlpha))+"A"+ to_string((int)(alphaStep))+"torguesTTop.csv");
+        // writeVec(torguesIron, "results/IronB"+ to_string((int)(ironAlpha))+"A"+ to_string((int)(alphaStep))+"torguesTIron.csv");
         
         // torgues.clear();
         // torguesBM.clear();
@@ -367,9 +497,11 @@ int main(int argc, char *argv[])
 
 
 
-expression normalize(expression e) {
+expression normalize(expression e)
+{
     return e / norm(e);
 }
+
 expression polar(expression e) {
     field x("x"), y("y"), z("z");
     // expression proj = e * array3x1(-y,x,0);

@@ -30,3 +30,12 @@ In order to create a new simulation:
 1. Add line `add_subdirectory(newsim)` to `simulations/CMakeLists.txt`
 1. Build as usual. Executable file will be located in `build/simulations/newsim` folder
 
+
+
+# Custom specific instructions 
+
+### How to run
+
+1. Open `simulations/mcvt` and check `models/model.geo` 
+1. Fix `BarIntervals` and `RotIntervals` variables to adjust the angle interval size.
+1. Run `./run_pipeline.sh 5 10` with arguments the rotor and iron bar's angle interval respectively

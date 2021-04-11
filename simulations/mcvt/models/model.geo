@@ -2,25 +2,46 @@
 SetFactory("OpenCASCADE");
 
 Mesh.MshFileVersion = 2.2;
-Mesh.CharacteristicLengthFactor = 0.3;
+Mesh.CharacteristicLengthFactor = 1;
+Mesh.CharacteristicLengthMax = 0.005;
 
-For barsAngle In {0:10:10}
-  For rotAngle In {0:45:45}
+// Construction Parameters
+BottomIron = 2/1000;
+BottomMagnets = 10/1000;
+AirgapBottom = 1/1000;
+Iron = 6/1000;
+AirgapTop = 1/1000;
+TopMagnets = 10/1000;
+TopIron = 2/1000;
+
+// Iteration Parameters
+BarIntervals = 55;
+RotIntervals = 55;
+
+// Main Parameters
+Radius = 7.5/100;
+
+// Magnet Parameters
+MagnetDiameter = 12/1000;
+MagnetRadius = MagnetDiameter/2;
+
+For barsAngle In {0:45:BarIntervals}
+  For rotAngle In {0:45:RotIntervals}
     //Deletes the current model (all model entities and their associated meshes).
     Delete Model;
     //Deletes all physical groups.
     Delete Physicals;
 
     counter = 0;
-    Radius = 7.5/100;
-    airgap = 0.1/100;
 
+
+    // Calculate thickness for these magnets https://www.kjmagnetics.com/thickness.calculator.asp
     // FIRST LAYER
     poles = 2;
     pieces = {24, 16, 12};
-    magnetR = 0.6/100;
+    magnetR = MagnetRadius;
     magnetD = {6.2/100, 4.6/100, 3/100};
-    layerHeight = 1/100;
+    layerHeight = BottomMagnets;
 
     // create surface pieces
     //+
@@ -60,11 +81,10 @@ For barsAngle In {0:10:10}
     
 
 
-    // SECOND LAYER 
-
-    zpos = layerHeight + airgap;
+    // SECOND LAYER
+    zpos = layerHeight + AirgapBottom;
     ironPoles = 8;
-    layerHeight = 1/100;
+    layerHeight = Iron;
     ironS = 2/100;
     ironE = 7/100;
 
@@ -112,19 +132,23 @@ For barsAngle In {0:10:10}
 
 
     // Third LAYER
-    zpos = zpos + layerHeight + airgap;
+    zpos = zpos + layerHeight + AirgapTop;
     poles = 6;
     pieces = {24, 12, 12};
-    magnetR = {0.6/100,0.6/100, 0.6/100};
+    magnetR = { MagnetRadius, MagnetRadius, MagnetRadius};
     // magnetD = {6.5/100, 4.6/100, 3/100};
-    layerHeight = 1/100;
+    layerHeight = TopMagnets;
 
     //+
     Disk(3000) = {0, 0, zpos, Radius, Radius};
     c = 0;
     For j In {0:#pieces[]-1}
+      extraAngle = 0;
+      If (pieces[j] > 13)
+        extraAngle = Pi / pieces[j];
+      EndIf
       For i In {1:pieces[j]}
-        angle = 2 * Pi / pieces[j] * i + rotAngle;
+        angle = 2 * Pi / pieces[j] * i + rotAngle + extraAngle;
         yangle = magnetD[j] * Cos(angle);
         xangle = magnetD[j] * Sin(angle);
 
@@ -138,6 +162,7 @@ For barsAngle In {0:10:10}
     Extrude {0, 0, layerHeight} {
       Surface{3001:3001+c};
     }
+
 
     //+
     Physical Volume("ThirdLayerMagnetsU",6) = {};
@@ -158,25 +183,26 @@ For barsAngle In {0:10:10}
 
 
     zpos = zpos + layerHeight;
-    backIronHeight = 1/100;
+    backIronHeight = TopIron;
     //+
     Cylinder(4000) = {0, 0, -backIronHeight, 0, 0, backIronHeight, Radius, 2*Pi};
     //+
     Cylinder(4001) = {0, 0, zpos, 0, 0, backIronHeight, Radius, 2*Pi};
 
+
     //+
-    Cylinder(6666) = {0, 0, -backIronHeight, 0, 0, zpos+layerHeight+backIronHeight, Radius, 2*Pi};
+    Cylinder(6666) = {0, 0, -backIronHeight, 0, 0, zpos+2*backIronHeight, Radius, 2*Pi};
     //+
-    BooleanFragments{ 
+    BooleanFragments{
       Volume{6666}; Delete;
-    } { 
-      Physical Volume {101:103,1,2} ; Delete; 
+    } {
+      Physical Volume {101:103,1,2} ; Delete;
     }
 
     Physical Volume("Air", 10) = {4003, 4004};
     //+
     Recursive Delete {
-      Volume{4000,4001}; 
+      Volume{4000,4001};
     }
 
     Physical Volume("BackIronBottom", 1) = {4005};
@@ -190,8 +216,8 @@ For barsAngle In {0:10:10}
     //    angle = 2 * Pi / points * i + rotAngle;
     //    yangle = d * Cos(angle);
     //    xangle = d * Sin(angle);
-    //    c = c+1; 
-    //    Point(99000+c) = {xangle, yangle, 1.6/100, 0.001}; 
+    //    c = c+1;
+    //    Point(99000+c) = {xangle, yangle, 1.6/100, 0.001};
     //  EndFor
     //EndFor
     //EndFor
@@ -202,8 +228,9 @@ For barsAngle In {0:10:10}
     //Recombine Volume {61};
     // HOW TO Transfinite IRON
     // https://gitlab.onelab.info/gmsh/gmsh/-/issues/358
-    // CHECKL ? 
+    // CHECKL ?
     Mesh 3;
     Save Sprintf("parts/Parrot%02gA%02g.msh", rotAngle, barsAngle);
 
   EndFor
+EndFor

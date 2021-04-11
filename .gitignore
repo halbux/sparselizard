@@ -38,3 +38,9 @@ build/
 .ccls-cache/
 
 **/.idea
+**/models/parts
+**/.DS_Store
+**/results
+
+**/Shots
+**/Flows

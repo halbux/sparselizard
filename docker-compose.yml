@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  sparselizard-mcvt:
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '6'
+#          memory: 16G
+    image: sparselizard-mcvt
+    build:
+      context: .
+      dockerfile: docker/container.dockerfile
+    container_name: sparselizard-mcvt
+    restart: unless-stopped
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: ${MEMORY_LIMIT}
+    #     reservations:
+    #       cpus: '0.1'
+    #       memory: 500M
+    env_file: .env
+    volumes:
+      - ${PWD}/build:/app/build
+      #- sparselizard-build:/app/build
+      - ${PWD}/scripts:/app/scripts
+      - ${PWD}/simulations/mcvt:/app/simulations/mcvt
+      - ${PWD}/install_external_libs:/app/install_external_libs
+    #command: gmsh --version
+    #command: sh scripts/run_pipeline.sh 55 55
+    command: sh scripts/mnrun.sh 55 55
+    #command: ${GCC_BINARY} --version
+
+volumes:
+  sparselizard-build:
