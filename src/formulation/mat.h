@@ -54,9 +54,6 @@ class mat
         
         long long int countnnz(void);
         
-        // Permute the rows and columns:
-        void permute(intdensematrix rowpermute, intdensematrix colpermute);
-        
         // Remove the rows and columns associated to Dirichlet constraints:
         void removeconstraints(void);
         

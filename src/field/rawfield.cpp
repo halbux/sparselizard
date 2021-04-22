@@ -247,10 +247,17 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
             transferdata(physreg, v|thisfield, "add");
         }
         
-        A.permute(renumtodiagblocks, renumtodiagblocks);
+        // Permute A:
+        Mat permutedmat;
+        IS permutis;
+        ISCreateGeneral(PETSC_COMM_SELF, renumtodiagblocks.count(), renumtodiagblocks.getvalues(), PETSC_USE_POINTER, &permutis);
+        ISSetPermutation(permutis);
+        MatPermute(A.getpetsc(), permutis, permutis, &permutedmat);
+        
         densematrix blockvals(preallocsize, 1);
-        MatInvertVariableBlockDiagonal(A.getpetsc(), blocksizes.count(), bsvals, blockvals.getvalues());
-
+        MatInvertVariableBlockDiagonal(permutedmat, blocksizes.count(), bsvals, blockvals.getvalues());
+        MatDestroy(&permutedmat);
+        
         // Solve block-diagonal system:
         v.permute(renumtodiagblocks);
         intdensematrix alladds(v.size(),1, 0,1);

@@ -40,27 +40,6 @@ long long int mat::countcolumns(void) { errorifpointerisnull(); errorifinvalidat
         
 long long int mat::countnnz(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->countnnz(); }
 
-void mat::permute(intdensematrix rowpermute, intdensematrix colpermute)
-{
-    if (rowpermute.count() != countrows() || colpermute.count() != countcolumns())
-    {
-        std::cout << "Error in 'mat' object: unexpected argument size for permutation" << std::endl;
-        abort();
-    }
-
-    Mat permutedmat;
-    
-    IS rowpermutis, colpermutis;
-    ISCreateGeneral(PETSC_COMM_SELF, rowpermute.count(), rowpermute.getvalues(), PETSC_USE_POINTER, &rowpermutis);
-    ISCreateGeneral(PETSC_COMM_SELF, colpermute.count(), colpermute.getvalues(), PETSC_USE_POINTER, &colpermutis);
-    ISSetPermutation(rowpermutis);
-    ISSetPermutation(colpermutis);
-    
-    MatPermute(getpetsc(), rowpermutis, colpermutis, &permutedmat);
-    
-    rawmatptr = std::shared_ptr<rawmat>(new rawmat(rawmatptr->getdofmanager(), permutedmat));
-}
-
 void mat::removeconstraints(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->removeconstraints(); };
 
 void mat::reusefactorization(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->reusefactorization(); }
