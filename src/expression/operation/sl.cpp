@@ -1667,7 +1667,7 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
     KSPDestroy(ksp);
 }
 
-void sl::solve(formulation formul, std::vector<int> blockstoconsider)
+void sl::solve(formulation formul, std::string soltype, std::vector<int> blockstoconsider)
 {
     // Make sure the problem is of the form Ax = b:
     if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
@@ -1684,16 +1684,16 @@ void sl::solve(formulation formul, std::vector<int> blockstoconsider)
     else
         formul.generate(blockstoconsider);
     // Solve:
-    vec sol = sl::solve(formul.A(), formul.b());
+    vec sol = sl::solve(formul.A(), formul.b(), soltype);
 
     // Save to fields:
     setdata(sol);
 }
 
-void sl::solve(std::vector<formulation> formuls)
+void sl::solve(std::vector<formulation> formuls, std::string soltype)
 {
     for (int i = 0; i < formuls.size(); i++)
-        solve(formuls[i]);
+        solve(formuls[i], soltype);
 }
 
 densematrix Fgmultrobin(densematrix gprev)
@@ -1747,7 +1747,7 @@ densematrix Fgmultrobin(densematrix gprev)
     return Fg;
 }
 
-std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, int verbosity)
+std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, std::string soltype, int verbosity)
 {
     // Make sure the problem is of the form Ax = b:
     if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
@@ -1763,7 +1763,7 @@ std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterm
     
     if (numranks == 1)
     {
-        solve(formul, formulterms);
+        solve(formul, soltype, formulterms);
         return {};
     }
     
@@ -1808,7 +1808,7 @@ std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterm
         bphysical.setvalues(dcdata[1][n], dirichletvalsfromneighbours[n]);
 
     // Get the physical sources solution:
-    vec w = solve(A, bphysical);
+    vec w = solve(A, bphysical, soltype);
     setdata(w);
     
     // Create the gmres rhs 'B' from the physical sources solution on the inner interface:

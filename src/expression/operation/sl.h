@@ -236,11 +236,11 @@ namespace sl
     void solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
 
     // Generate, solve and save to field a formulation:
-    void solve(formulation formul, std::vector<int> blockstoconsider = {-1});
-    void solve(std::vector<formulation> formuls);
+    void solve(formulation formul, std::string soltype = "lu", std::vector<int> blockstoconsider = {-1});
+    void solve(std::vector<formulation> formuls, std::string soltype = "lu");
     
     // DDM resolution with mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
-    std::vector<double> allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, int verbosity = 1);
+    std::vector<double> allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
     
     // Exchange densematrix data with MPI:
     void exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives);
