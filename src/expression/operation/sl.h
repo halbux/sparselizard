@@ -240,14 +240,14 @@ namespace sl
     void solve(std::vector<formulation> formuls);
     
     // DDM resolution with mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
-    std::vector<double> allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, int maxits, double relrestol, int verbosity = 1);
+    std::vector<double> allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, int verbosity = 1);
     
     // Exchange densematrix data with MPI:
     void exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives);
     
     // MPI based gmres with custom matrix free product (no restart). Initial guess and solution are in x.
     // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
-    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity = 1);
+    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity = 1);
     
     // Know which dofs to send and at which dofs to receive for the DDM. Choose the rawfields and the domain interface dimensions (length 3) to consider.
     void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);

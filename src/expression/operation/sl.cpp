@@ -1747,7 +1747,7 @@ densematrix Fgmultrobin(densematrix gprev)
     return Fg;
 }
 
-std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, int maxits, double relrestol, int verbosity)
+std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, int verbosity)
 {
     // Make sure the problem is of the form Ax = b:
     if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
@@ -1829,11 +1829,11 @@ std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterm
     densematrix vi(B.countrows(), B.countcolumns(), 0.0);
     
     // Gmres iteration:
-    std::vector<double> resvec = gmres(Fgmultrobin, B, vi, maxits, relrestol, verbosity*(rank == 0));
+    std::vector<double> resvec = gmres(Fgmultrobin, B, vi, relrestol, maxnumit, verbosity*(rank == 0));
     int numits = resvec.size()-1;
     if (verbosity > 0 && rank == 0)
     {
-        if (numits < maxits)
+        if (numits < maxnumit)
             std::cout << "gmres converged after " << numits << " iterations" << std::endl;
         else
             std::cout << "gmres could not converge to the requested " << relrestol << " relative tolerance (could only reach " << resvec[numits] << ")" << std::endl;
@@ -1886,7 +1886,7 @@ void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, 
     slmpi::exchange(targetranks, sendlens, sendbuffers, reclens, recbuffers);
 }
 
-std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity)
+std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity)
 {   
     if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
     {
@@ -1898,10 +1898,10 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     int n = b.count();
     
     // Initialize the 1D vectors:
-    std::vector<double> sn(maxits, 0.0);
-    std::vector<double> cs(maxits, 0.0);
-    std::vector<double> beta(maxits+1, 0.0);
-    std::vector<double> relresvec(maxits+1, 0.0);
+    std::vector<double> sn(maxnumit, 0.0);
+    std::vector<double> cs(maxnumit, 0.0);
+    std::vector<double> beta(maxnumit+1, 0.0);
+    std::vector<double> relresvec(maxnumit+1, 0.0);
     
     double* xptr = x.getvalues();
     double* bptr = b.getvalues();
@@ -1943,7 +1943,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     relresvec[0] = normr/normb;
         
     // Holder for all Krylov vectors (one on each row):
-    densematrix Q(maxits+1, n);
+    densematrix Q(maxnumit+1, n);
     double* Qptr = Q.getvalues();
     
     // First row is the normed residual:
@@ -1952,12 +1952,12 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
         Qptr[i] = invnormr * rptr[i];
         
     // Hessenberg matrix (columnwise upper triangular {r0c0,r0c1,r1c1,r0c2,...}):
-    densematrix H(1, ((1+maxits)*maxits)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
+    densematrix H(1, ((1+maxnumit)*maxnumit)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
     double* Hptr = H.getvalues();
     
     // GMRES iteration:
     int k = 0;
-    for (k = 0; k < maxits; k++)
+    for (k = 0; k < maxnumit; k++)
     {
         if (verbosity > 0)
             std::cout << "gmres @" << k << " -> " << relresvec[k] << std::endl;
