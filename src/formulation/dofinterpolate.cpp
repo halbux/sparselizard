@@ -255,7 +255,7 @@ densematrix dofinterpolate::getvalues(elementselector& elemselec, int dofopindex
     return myvals[dofopindex].extractrows(oi);
 }
 
-intdensematrix dofinterpolate::getadresses(elementselector& elemselec, int harmnum)
+intdensematrix dofinterpolate::getaddresses(elementselector& elemselec, int harmnum)
 {
     std::vector<int> oi = elemselec.getoriginalindexes();
     return mydofnums[harmnum][0].extractrows(oi);

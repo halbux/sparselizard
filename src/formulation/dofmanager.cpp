@@ -691,7 +691,7 @@ void dofmanager::print(void)
 }
 
 
-intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
+intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
 {
     synchronize();
     

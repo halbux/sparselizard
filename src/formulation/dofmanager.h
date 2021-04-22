@@ -128,7 +128,7 @@ class dofmanager
         
         void print(void);
         
-        // 'getadresses' is required in the matrix generation step.
+        // 'getaddresses' is required in the matrix generation step.
         // It returns an intdensematrix representing an numberofformfunctions
         // by elementlist.size() matrix (row-major). The matrix gives 
         // the adresses in the formulation matrix at which the dofs of field 
@@ -139,7 +139,7 @@ class dofmanager
         // - adress -1 is used for constrained fields (requires 'useminusonetag' true)
         // - adress -2 is used for field dofs not in 'fieldphysreg' 
         //
-        intdensematrix getadresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
+        intdensematrix getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
                                                         
 };
 

@@ -247,14 +247,14 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                     ///// Get the adresses corresponding to every form function of 
                     // the test function/dof field in the elements of 'elementlist':
-                    intdensematrix testfunadresses = mydofmanager->getadresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg, computeconstraints);
+                    intdensematrix testfunadresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg, computeconstraints);
                     intdensematrix dofadresses;
                     if (doffield != NULL)
                     {
                         if (isdofinterpolate)
-                            dofadresses = mydofinterp.getadresses(myselector, currentdofharm);
+                            dofadresses = mydofinterp.getaddresses(myselector, currentdofharm);
                         else
-                            dofadresses = mydofmanager->getadresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg, false);
+                            dofadresses = mydofmanager->getaddresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg, false);
                     }
                     
                     ///// Duplicate the tf and dof adresses to get an adress matrix of the size of the stiffness matrix.
