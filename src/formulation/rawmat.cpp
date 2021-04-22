@@ -27,7 +27,7 @@ rawmat::~rawmat(void)
     if (ispetscinitialized == PETSC_TRUE)
     {
         MatDestroy(&mymat);
-        if (ludefined) 
+        if (isitfactored) 
             KSPDestroy(&myksp);
     }
 }
@@ -100,7 +100,7 @@ void rawmat::removeconstraints(void)
     if (mydofmanager->countconstraineddofs() == 0)
         return;
     
-    if (ludefined)
+    if (isitfactored)
     {
         std::cout << "Error in 'rawmat' object: cannot remove the constraints when an LU decomposition is associated" << std::endl;
         abort();

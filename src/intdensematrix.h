@@ -71,6 +71,9 @@ class intdensematrix
  
         int* getvalues(void);
         
+        // Get a full copy (all values are copied).
+        intdensematrix copy(void);
+        
         // Get the transpose without modifying this object.
         intdensematrix gettranspose(void);
 

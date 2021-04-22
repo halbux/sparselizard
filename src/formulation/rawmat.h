@@ -40,8 +40,8 @@ class rawmat
         
         // 'myksp' will store the LU decomposition if it is to be reused:
         KSP myksp = PETSC_NULL;
-        bool lureuse = false;
-        bool ludefined = false;
+        bool factorizationreuse = false;
+        bool isitfactored = false;
         
         std::shared_ptr<dofmanager> mydofmanager = NULL;
         
@@ -70,10 +70,10 @@ class rawmat
         // Remove the rows and columns associated to Dirichlet constraints:
         void removeconstraints(void);
         
-        void reuselu(void) { lureuse = true; };
-        bool islutobereused(void) { return lureuse; };
-        bool isludefined(void) { return ludefined; };
-        void isludefined(bool isdefined) { ludefined = isdefined; };
+        void reusefactorization(void) { factorizationreuse = true; };
+        bool isfactorizationreuseallowed(void) { return factorizationreuse; };
+        bool isfactored(void) { return isitfactored; };
+        void isfactored(bool isfact) { isitfactored = isfact; };
     
         // Add a fragment to the matrix.
         void accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);   

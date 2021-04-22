@@ -1438,7 +1438,7 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 
     KSP* ksp = A.getpointer()->getksp();
 
-    if (A.getpointer()->isludefined() == false)
+    if (A.getpointer()->isfactored() == false)
     {
         PC pc;
         KSPCreate(PETSC_COMM_SELF, ksp);
@@ -1456,12 +1456,12 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 
     KSPSolve(*ksp, bpetsc, solpetsc);
 
-    A.getpointer()->isludefined(true);
+    A.getpointer()->isfactored(true);
 
-    if (A.getpointer()->islutobereused() == false)
+    if (A.getpointer()->isfactorizationreuseallowed() == false)
     {
         KSPDestroy(ksp);
-        A.getpointer()->isludefined(false);
+        A.getpointer()->isfactored(false);
     }
 
     return sol;
@@ -1544,7 +1544,7 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
     
     KSP* ksp = A.getpointer()->getksp();
     PC pc;
-    if (A.getpointer()->isludefined() == false)
+    if (A.getpointer()->isfactored() == false)
     {
         KSPCreate(PETSC_COMM_SELF, ksp);
         KSPSetOperators(*ksp, Apetsc, Apetsc);
@@ -1572,12 +1572,12 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
     MatDestroy(&sols);
     MatDestroy(&rhses);
 
-    A.getpointer()->isludefined(true);
+    A.getpointer()->isfactored(true);
 
-    if (A.getpointer()->islutobereused() == false)
+    if (A.getpointer()->isfactorizationreuseallowed() == false)
     {
         KSPDestroy(ksp);
-        A.getpointer()->isludefined(false);
+        A.getpointer()->isfactored(false);
     }
     
     return densesols;

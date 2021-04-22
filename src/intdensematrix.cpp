@@ -236,6 +236,23 @@ int* intdensematrix::getvalues(void)
     return myvalues.get();
 }
 
+intdensematrix intdensematrix::copy(void)
+{
+    intdensematrix intdensematrixcopy = *this;
+    
+    // The pointed value has to be copied as well.
+    if (intdensematrixcopy.myvalues != NULL)
+    {
+        intdensematrixcopy.myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
+        int* copiedmyvaluesptr = intdensematrixcopy.myvalues.get();
+        int* myvaluesptr = myvalues.get();
+        for (long long int i = 0; i < numcols*numrows; i++)
+            copiedmyvaluesptr[i] = myvaluesptr[i];
+    }
+        
+    return intdensematrixcopy;
+}
+
 intdensematrix intdensematrix::gettranspose(void)
 {
     intdensematrix output(numcols, numrows);
