@@ -1426,10 +1426,6 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
         abort();
     }
     
-    // The copy of the rhs is returned in case there is no nonzero entry in A:
-    if (A.countnnz() == 0)
-        return b.copy();
-
     Vec bpetsc = b.getpetsc();
     Mat Apetsc = A.getpetsc();
 
@@ -1497,15 +1493,6 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
     int numrhs = b.size();
     int len = b[0].size();
     
-    // The copy of the rhs is returned in case there is no nonzero entry in A:
-    if (A.countnnz() == 0)
-    {
-        std::vector<vec> bcopy(numrhs);
-        for (int i = 0; i < numrhs; i++)
-            bcopy[i] = b[i].copy();
-        return bcopy;
-    }
-
     // Concatenate rhs vecs to densematrix:
     intdensematrix ads(len, 1, 0, 1);
     densematrix rhs(numrhs, len);
