@@ -1409,9 +1409,9 @@ expression sl::array3x3(expression term11, expression term12, expression term13,
 
 vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
-    if (soltype != "lu")
+    if (soltype != "lu" && soltype != "cholesky")
     {
-        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
         abort();
     }
     if (A.countrows() != b.size())
@@ -1450,7 +1450,10 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
         KSPSetFromOptions(*ksp);
 
         KSPGetPC(*ksp,&pc);
-        PCSetType(pc,PCLU);
+        if (soltype == "lu")
+            PCSetType(pc,PCLU);
+        if (soltype == "cholesky")
+            PCSetType(pc,PCCHOLESKY);
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
     }
 
@@ -1469,9 +1472,9 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 
 std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
 {
-    if (soltype != "lu")
+    if (soltype != "lu" && soltype != "cholesky")
     {
-        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
         abort();
     }
     for (int i = 0; i < b.size(); i++)
@@ -1551,7 +1554,10 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
         KSPSetFromOptions(*ksp);
 
         KSPGetPC(*ksp,&pc);
-        PCSetType(pc,PCLU);
+        if (soltype == "lu")
+            PCSetType(pc,PCLU);
+        if (soltype == "cholesky")
+            PCSetType(pc,PCCHOLESKY);
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
         PCSetUp(pc);
     }
