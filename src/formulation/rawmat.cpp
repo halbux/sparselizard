@@ -97,7 +97,7 @@ void rawmat::gauge(void)
 
 void rawmat::removeconstraints(void)
 {
-    if (mydofmanager->countconstraineddofs() == 0)
+    if (mydofmanager->countdisjregconstraineddofs() == 0)
         return;
     
     if (isitfactored)

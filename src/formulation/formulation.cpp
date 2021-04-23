@@ -273,10 +273,10 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones, s
     // Add the constraint diagonal ones to the matrix (if any):
     if (skipdiagonalones == false && isconstraintcomputation == false)
     {
-        int numconstraineddofs = mydofmanager->countconstraineddofs();
+        int numconstraineddofs = mydofmanager->countdisjregconstraineddofs();
         if (numconstraineddofs > 0)
         {
-            intdensematrix constrainedindexes = mydofmanager->getconstrainedindexes();
+            intdensematrix constrainedindexes = mydofmanager->getdisjregconstrainedindexes();
             // Create a vector of same length full of double ones:
             densematrix ones(1, numconstraineddofs, 1);
 

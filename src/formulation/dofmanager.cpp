@@ -197,8 +197,47 @@ bool dofmanager::isdefined(int disjreg, int formfunc)
     
     return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
 }
+
+std::vector<bool> dofmanager::isconstrained(void)
+{
+    synchronize();
+    
+    std::vector<bool> output(numberofdofs, false);
+    
+    std::vector<intdensematrix> allconstrinds = {getdisjregconstrainedindexes(), getgaugedindexes(), getconditionalconstraintdata().first};
+    
+    for (int i = 0; i < allconstrinds.size(); i++)
+    {
+        int* cptr = allconstrinds[i].getvalues();
+        for (int j = 0; j < allconstrinds[i].count(); j++)
+            output[cptr[j]] = true;
+    }
+
+    return output;
+}
+
+intdensematrix dofmanager::getconstrainedindexes(void)
+{
+    std::vector<bool> isconstr = isconstrained();
+
+    int numconstr = myalgorithm::counttrue(isconstr);
+    intdensematrix out(numconstr, 1);
+    int* outptr = out.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < isconstr.size(); i++)
+    {
+        if (isconstr[i])
+        {
+            outptr[index] = i;
+            index++;
+        }
+    }
+    
+    return out;
+}
         
-int dofmanager::countconstraineddofs(void)
+int dofmanager::countdisjregconstraineddofs(void)
 {
     synchronize();
     
@@ -216,36 +255,11 @@ int dofmanager::countconstraineddofs(void)
     return numconstraineddofs;
 }
 
-std::vector<bool> dofmanager::isconstrained(void)
+intdensematrix dofmanager::getdisjregconstrainedindexes(void)
 {
     synchronize();
     
-    std::vector<bool> output(numberofdofs, false);
-    
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
-    {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
-        {
-            // If the field is constrained on the disjoint region.
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg))
-            {
-                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
-                {
-                    int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
-                    for (int i = 0; i < numdofshere; i++)
-                        output[rangebegin[fieldindex][disjreg][ff] + i] = true;
-                }
-            }
-        }
-    }
-    return output;
-}
-
-intdensematrix dofmanager::getconstrainedindexes(void)
-{
-    synchronize();
-    
-    intdensematrix output(1,countconstraineddofs());
+    intdensematrix output(1,countdisjregconstraineddofs());
     int* myval = output.getvalues();
     
     int currentindex = 0;
@@ -606,7 +620,8 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
     
     std::vector<intdensematrix> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
     
-    std::vector<bool> isdofconstrained = isconstrained();
+    // Get all types of constraints:
+    std::vector<bool> isdofconstrained = isconstrained(); 
     
     // Exchange the constrained indexes:
     std::vector<std::vector<int>> isconstrainedforneighbours(numneighbours), isconstrainedfromneighbours(numneighbours);

@@ -8,7 +8,7 @@ void eigenvalue::errorifdirichletnotremoved(std::vector<mat> input)
     // Make sure the Dirichlet constraints have been removed:
     for (int i = 0; i < input.size(); i++)
     {
-        if (input[i].getpointer()->getdofmanager()->countconstraineddofs() > 0)
+        if (input[i].getpointer()->getdofmanager()->countdisjregconstraineddofs() > 0)
         {
             std::cout << "Error in 'eigenvalue' object: remove the Dirichlet constraints in the matrices with removeconstraints()" << std::endl;
             abort();

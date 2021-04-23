@@ -126,7 +126,7 @@ void rawvec::removeconstraints(void)
     synchronize();
     
     int numdofs = mydofmanager->countdofs();
-    int numconstraineddofs = mydofmanager->countconstraineddofs();
+    int numconstraineddofs = mydofmanager->countdisjregconstraineddofs();
     if (numconstraineddofs == 0)
         return;
     
