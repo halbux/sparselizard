@@ -52,7 +52,7 @@ void vec::updateconstraints(void)
     // Update the disjoint region constraints:
     std::vector<std::shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
-        rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
+        rawvecptr->updatedisjregconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
     std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();

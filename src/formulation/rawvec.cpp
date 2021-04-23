@@ -170,12 +170,12 @@ void rawvec::removeconstraints(void)
     mycurrentstructure[0].donotsynchronize();
 }
 
-void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
+void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
 {    
     synchronize();
     
     mydofmanager->selectfield(constrainedfield);
-    std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getconstraints();
+    std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getdisjregconstraints();
 
     // Loop on all disjoint regions:
     for (int d = 0; d < disjregs.size(); d++)

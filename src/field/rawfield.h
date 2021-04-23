@@ -82,9 +82,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // interpolationorder[disjreg] gives the interpolation 
         // order of the field on disjoint region 'disjreg'.
         std::vector<int> interpolationorder = {};
-        // myconstraints[disjreg] gives the integration object to compute the 
+        // mydisjregconstraints[disjreg] gives the integration object to compute the 
         // constraint value on the disjoint region. NULL means unconstrained.
-        std::vector<std::shared_ptr<integration>> myconstraints = {};
+        std::vector<std::shared_ptr<integration>> mydisjregconstraints = {};
         // myconditionalconstraints[disjreg] gives the {conditional expression, constraint value} 
         // on the NODAL disjoint region 'disjreg'. Empty means unconstrained.
         std::vector<std::vector<expression>> myconditionalconstraints = {};
@@ -101,10 +101,10 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         std::shared_ptr<ptracker> myptracker = NULL;
 
-        // Track the calls to 'setorder', 'setconstraint', 'setconditionalconstraint', 'setgauge'.
+        // Track the calls to 'setorder', 'setdisjregconstraint', 'setconditionalconstraint', 'setgauge'.
         std::vector<std::pair<int, int>> myordertracker = {};
-        std::vector<int> myconstraintphysregtracker = {};
-        std::vector<std::shared_ptr<integration>> myconstraintcalctracker = {};
+        std::vector<int> mydisjregconstraintphysregtracker = {};
+        std::vector<std::shared_ptr<integration>> mydisjregconstraintcalctracker = {};
         std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
         std::vector<int> mygaugetracker = {};
         
@@ -183,9 +183,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void setnodalvalues(intdensematrix nodenumbers, densematrix values);
         densematrix getnodalvalues(intdensematrix nodenumbers);
         
-        void setconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
+        void setdisjregconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
-        void setconstraint(int physreg);
+        void setdisjregconstraint(int physreg);
         
         // Set a conditional constraint:
         void setconditionalconstraint(int physreg, expression condexpr, expression valexpr);
@@ -221,8 +221,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<std::shared_ptr<rawfield>> getsons(void);
         
         // Only valid for fields without subfields.
-        bool isconstrained(int disjreg);
-        std::vector<std::shared_ptr<integration>> getconstraints(void);
+        bool isdisjregconstrained(int disjreg);
+        std::vector<std::shared_ptr<integration>> getdisjregconstraints(void);
         
         bool isconditionallyconstrained(int disjreg);
         std::vector<std::vector<expression>> getconditionalconstraints(void);

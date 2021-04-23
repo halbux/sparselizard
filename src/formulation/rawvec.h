@@ -65,7 +65,7 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         
         // Update the indexes that correspond to constrained 
         // values of a rawfield on given disjoint regions. 
-        void updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
+        void updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
         void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");

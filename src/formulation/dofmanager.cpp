@@ -209,7 +209,7 @@ int dofmanager::countconstraineddofs(void)
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is constrained on the disjoint region and there is at least one form function:
-            if (rangebegin[fieldindex][disjreg].size() > 0 && myfields[fieldindex]->isconstrained(disjreg))
+            if (rangebegin[fieldindex][disjreg].size() > 0 && myfields[fieldindex]->isdisjregconstrained(disjreg))
                 numconstraineddofs += rangebegin[fieldindex][disjreg].size() * (rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1);
         }
     }
@@ -227,7 +227,7 @@ std::vector<bool> dofmanager::isconstrained(void)
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is constrained on the disjoint region.
-            if (myfields[fieldindex]->isconstrained(disjreg))
+            if (myfields[fieldindex]->isdisjregconstrained(disjreg))
             {
                 for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
                 {
@@ -254,7 +254,7 @@ intdensematrix dofmanager::getconstrainedindexes(void)
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is constrained on the disjoint region.
-            if (myfields[fieldindex]->isconstrained(disjreg))
+            if (myfields[fieldindex]->isdisjregconstrained(disjreg))
             {
                 for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
                 {
@@ -281,8 +281,8 @@ int dofmanager::countgaugeddofs(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Constraints have priority over the gauge!
-            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            // Disjreg constraints have priority over the gauge!
+            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
@@ -321,8 +321,8 @@ intdensematrix dofmanager::getgaugedindexes(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Constraints have priority over the gauge!
-            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            // Disjreg constraints have priority over the gauge!
+            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
@@ -371,8 +371,8 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
                 continue;
                 
-            // Constraints have priority over the conditional constraints!
-            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
+            // Disjreg constraints have priority over the conditional constraints!
+            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
                 isdisjregactive[disjreg] = true;
         }
             
@@ -488,7 +488,7 @@ std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
         for (int disjreg = 0; disjreg < newdofmanager->rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is not constrained on the disjoint region:
-            if (newdofmanager->myfields[fieldindex]->isconstrained(disjreg) == false)
+            if (newdofmanager->myfields[fieldindex]->isdisjregconstrained(disjreg) == false)
             {
                 for (int ff = 0; ff < newdofmanager->rangebegin[fieldindex][disjreg].size(); ff++)
                 {
@@ -753,7 +753,7 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
 
                 adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;     
 
-                if (useminusonetag && inputfield->isconstrained(currentdisjointregion))
+                if (useminusonetag && inputfield->isdisjregconstrained(currentdisjointregion))
                     adresses[ff*numcols+i] = -1;
             }
             else
