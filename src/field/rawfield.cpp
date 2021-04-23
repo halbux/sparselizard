@@ -743,6 +743,8 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
             projectedvalue.generate();
             solvec = sl::solve(projectedvalue.A(), projectedvalue.b());
         }
+        else
+            solvec.updateconstraints();
         
         setdata(physreg, solvec|thisfield, "set");
     }

@@ -44,30 +44,30 @@ void vec::updateconstraints(void)
 {
     errorifpointerisnull();
     
+    std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
+    // Get all disjoint regions:
     std::vector<int> disjregs((universe::mymesh->getdisjointregions())->count());
-    // Set 'disjregs' to [0 1 2 ...]:
-       std::iota(disjregs.begin(), disjregs.end(), 0);
+    std::iota(disjregs.begin(), disjregs.end(), 0);
     
+    // Update the disjoint region constraints:
     std::vector<std::shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
         rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
-    std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
     std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
     rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
     
     // Set the gauged indexes to zero:
     intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-    int numgaugedindexes = gaugedindexes.count();
-    if (numgaugedindexes > 0)
-        rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
+    rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
 }
 
 void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
 { 
     errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
+
 densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
 
 void vec::setvalue(int address, double value, std::string op)
