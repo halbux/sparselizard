@@ -85,6 +85,8 @@ class vec
         
         vec copy(void);
         
+        vec extract(intdensematrix addresses);
+        
         double norm(std::string type = "2");
         double sum(void);
         

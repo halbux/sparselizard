@@ -134,6 +134,14 @@ vec vec::copy(void)
     return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
 }
 
+vec vec::extract(intdensematrix addresses)
+{
+    densematrix extractedvals = getvalues(addresses);
+    std::shared_ptr<rawvec> newrawvecptr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(addresses.count()))));
+    newrawvecptr->setvalues(intdensematrix(addresses.count(), 1, 0, 1), extractedvals, "set");
+    return vec(newrawvecptr);
+}
+
 double vec::norm(std::string type)
 {
     double normval;
@@ -188,3 +196,4 @@ vec vec::operator-(vec input)
 
 
 vec operator*(double inputdouble, vec inputvec) { return inputvec*inputdouble; }
+
