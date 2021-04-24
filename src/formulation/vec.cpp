@@ -68,7 +68,21 @@ void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string o
     errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
 
+void vec::setallvalues(densematrix valsmat, std::string op)
+{ 
+    errorifpointerisnull();
+    intdensematrix ads(size(),1,0,1);
+    rawvecptr->setvalues(ads, valsmat, op); 
+}
+
 densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
+
+densematrix vec::getallvalues(void)
+{
+    errorifpointerisnull();
+    intdensematrix ads(size(),1,0,1);
+    return rawvecptr->getvalues(ads);
+}
 
 void vec::setvalue(int address, double value, std::string op)
 {

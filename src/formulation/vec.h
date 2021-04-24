@@ -55,7 +55,9 @@ class vec
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
         void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+        void setallvalues(densematrix valsmat, std::string op = "set");
         densematrix getvalues(intdensematrix addresses);
+        densematrix getallvalues(void);
         // Set and get value at a single index:
         void setvalue(int address, double value, std::string op = "set");
         double getvalue(int address);
