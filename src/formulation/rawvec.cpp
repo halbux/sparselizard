@@ -42,7 +42,8 @@ void rawvec::synchronize(void)
     VecDestroy(&myvec);
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
-    VecSetFromOptions(myvec);    
+    VecSetFromOptions(myvec);
+    VecSet(myvec, 0.0);
     
     // Update the dof manager to the current one:
     mycurrentstructure = {*mydofmanager};
@@ -69,6 +70,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
     VecSetFromOptions(myvec);   
+    VecSet(myvec, 0.0);
     
     if (mydofmanager->ismanaged())
     {
@@ -201,6 +203,9 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
         VecSetValues(myvec, numpositiveentries, filteredads, filteredvals, ADD_VALUES);
     if (op == "set")
         VecSetValues(myvec, numpositiveentries, filteredads, filteredvals, INSERT_VALUES);
+        
+    VecAssemblyBegin(myvec);
+    VecAssemblyEnd(myvec);
 }
 
 void rawvec::setvalue(int address, double value, std::string op)
@@ -214,6 +219,9 @@ void rawvec::setvalue(int address, double value, std::string op)
         VecSetValue(myvec, address, value, ADD_VALUES);
     if (op == "set")
         VecSetValue(myvec, address, value, INSERT_VALUES);
+        
+    VecAssemblyBegin(myvec);
+    VecAssemblyEnd(myvec);
 }
 
 densematrix rawvec::getvalues(intdensematrix addresses)

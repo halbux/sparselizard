@@ -139,9 +139,11 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
         Vec datvec;
         VecCreate(PETSC_COMM_SELF, &datvec);
         VecSetSizes(datvec, PETSC_DECIDE, totalsize);
-        VecSetFromOptions(datvec);  
+        VecSetFromOptions(datvec);
 
         VecSetValues(datvec, totalsize, addsvals, datavals, INSERT_VALUES);
+        VecAssemblyBegin(datvec);
+        VecAssemblyEnd(datvec);
 
         PetscViewer v;
         PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_WRITE, &v);
