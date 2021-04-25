@@ -73,7 +73,6 @@ vec mat::x0merge(vec x)
     intdensematrix dinds = getdinds();
     densematrix xvals = x.getallvalues();
     output.setvalues(ainds, xvals);
-    output.setvalues(dinds, densematrix(dinds.count(),1,0.0));
     return output;
 }
 
