@@ -160,9 +160,9 @@ void formulation::generate(int m, int contributionnumber)
     for (int i = 0; i < contributionstogenerate.size(); i++)
     {
         if (m == 0)
-            contributionstogenerate[i].generate(myvec, NULL, not(isconstraintcomputation));
+            contributionstogenerate[i].generate(myvec, NULL);
         else
-            contributionstogenerate[i].generate(NULL, mymat[m-1], not(isconstraintcomputation));
+            contributionstogenerate[i].generate(NULL, mymat[m-1]);
     }
     
     universe::allowestimatorupdate(false);
@@ -230,7 +230,7 @@ void formulation::generate(int contributionnumber)
 
 
 vec formulation::b(bool keepvector, bool dirichletupdate) { return rhs(keepvector, dirichletupdate); }
-mat formulation::A(bool keepfragments, bool skipdiagonalones) { return K(keepfragments, skipdiagonalones); }
+mat formulation::A(bool keepfragments) { return K(keepfragments); }
 
 vec formulation::rhs(bool keepvector, bool dirichletupdate)
 {
@@ -252,11 +252,11 @@ vec formulation::rhs(bool keepvector, bool dirichletupdate)
     return output; 
 }
 
-mat formulation::K(bool keepfragments, bool skipdiagonalones) { return getmatrix(0, keepfragments, skipdiagonalones); }
-mat formulation::C(bool keepfragments, bool skipdiagonalones) { return getmatrix(1, keepfragments, skipdiagonalones); }
-mat formulation::M(bool keepfragments, bool skipdiagonalones) { return getmatrix(2, keepfragments, skipdiagonalones); }
+mat formulation::K(bool keepfragments) { return getmatrix(0, keepfragments); }
+mat formulation::C(bool keepfragments) { return getmatrix(1, keepfragments); }
+mat formulation::M(bool keepfragments) { return getmatrix(2, keepfragments); }
 
-mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones, std::vector<intdensematrix> additionalconstraints)
+mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematrix> additionalconstraints)
 {
     if (mymat[KCM] == NULL)
         mymat[KCM] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
@@ -266,63 +266,22 @@ mat formulation::getmatrix(int KCM, bool keepfragments, bool skipdiagonalones, s
     if (keepfragments == false)
         mymat[KCM] = NULL;
         
+    std::vector<bool> isconstr;
+    if (isconstraintcomputation)
+        isconstr = std::vector<bool>(mydofmanager->countdofs(), false);
+    else
+        isconstr = mydofmanager->isconstrained();
         
-    // Set the gauged indexes to all zero:
-    rawout->gauge();
-
-    // Add the constraint diagonal ones to the matrix (if any):
-    if (skipdiagonalones == false && isconstraintcomputation == false)
-    {
-        int numconstraineddofs = mydofmanager->countdisjregconstraineddofs();
-        if (numconstraineddofs > 0)
-        {
-            intdensematrix constrainedindexes = mydofmanager->getdisjregconstrainedindexes();
-            // Create a vector of same length full of double ones:
-            densematrix ones(1, numconstraineddofs, 1);
-
-            rawout->accumulate(constrainedindexes, constrainedindexes, ones);  
-        }
-    }
-    // Add the gauge diagonal ones to the matrix (if any):
-    int numgaugeddofs = mydofmanager->countgaugeddofs();
-    if (skipdiagonalones == false && numgaugeddofs > 0)
-    {
-        intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-        // Create a vector of same length full of double ones:
-        densematrix ones(1, numgaugeddofs, 1);
-
-        rawout->accumulate(gaugedindexes, gaugedindexes, ones);  
-    }
-    // Set the row indices of the conditionally constrained dofs to zero.
-    // Add the conditional constraint diagonal ones to the matrix (if any).
-    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
-    intdensematrix condconstrainedindexes = condconstrdata.first;
-    int numcondconstraineddofs = condconstrainedindexes.count();
-    
-    if (numcondconstraineddofs > 0)
-    {
-        rawout->zeroentries(condconstrainedindexes, true, false);
-        if (skipdiagonalones == false)
-        {
-            densematrix ones(1, numcondconstraineddofs, 1);
-            rawout->accumulate(condconstrainedindexes, condconstrainedindexes, ones); 
-        } 
-    }
-    
     for (int i = 0; i < additionalconstraints.size(); i++)
     {
-        rawout->zeroentries(additionalconstraints[i], true, false);
-        if (skipdiagonalones == false)
-        {
-            densematrix ones(1, additionalconstraints[i].count(), 1);
-            rawout->accumulate(additionalconstraints[i], additionalconstraints[i], ones); 
-        } 
+        int* acptr = additionalconstraints[i].getvalues();
+        for (int j = 0; j < additionalconstraints[i].count(); j++)
+            isconstr[acptr[j]] = true;
     }
 
-    rawout->process(); 
+    rawout->process(isconstr); 
     rawout->clearfragments();
     
     return mat(rawout);
 }
-
 

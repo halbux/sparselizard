@@ -51,11 +51,6 @@ int main(void)
     mat C = elasticity.C();
     mat M = elasticity.M();
 
-    // Remove the rows and columns corresponding to the 0 constraints:
-    K.removeconstraints();
-    C.removeconstraints();
-    M.removeconstraints();
-
     // In case of proportional damping this yields the same results:
     // C = alpha*M + beta*K;
 

@@ -121,55 +121,6 @@ int rawvec::size(void)
         return mydofmanager->countdofs(); 
 }
 
-void rawvec::removeconstraints(void)
-{
-    synchronize();
-    
-    int numdofs = mydofmanager->countdofs();
-    int numconstraineddofs = mydofmanager->countdisjregconstraineddofs();
-    if (numconstraineddofs == 0)
-        return;
-    
-    // Remove the constrained dofs from the dof manager and get the dof renumbering:
-    int* dofrenumbering = new int[numdofs];
-    mydofmanager = mydofmanager->removeconstraints(dofrenumbering);
-
-    // Rebuild the petsc vector:
-    intdensematrix oldaddresses(mydofmanager->countdofs(),1);
-    intdensematrix newaddresses(mydofmanager->countdofs(),1);
-    int* oldads = oldaddresses.getvalues();
-    int* newads = newaddresses.getvalues();
-    
-    int index = 0;
-    for (int i = 0; i < numdofs; i++)
-    {
-        if (dofrenumbering[i] >= 0)
-        {
-            oldads[index] = i;
-            newads[index] = dofrenumbering[i];
-            index++;
-        }
-    }
-    
-    densematrix vals = getvalues(oldaddresses);
-    
-    // Destroy the vector since it will be replaced:
-    VecDestroy(&myvec);
-    Vec newvec; myvec = newvec;
-    
-    VecCreate(PETSC_COMM_SELF, &myvec);
-    VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
-    VecSetFromOptions(myvec);   
-    
-    setvalues(newaddresses, vals, "set");
-    
-    delete[] dofrenumbering;
-    
-    // The current structure tracker must be updated to the new dof manager:
-    mycurrentstructure = {*mydofmanager};
-    mycurrentstructure[0].donotsynchronize();
-}
-
 void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
 {    
     synchronize();

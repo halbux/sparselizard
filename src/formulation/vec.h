@@ -47,9 +47,6 @@ class vec
         
         void permute(intdensematrix rowpermute, bool invertit = false);
         
-        // Remove the entries associated to Dirichlet constraints:
-        void removeconstraints(void);
-        
         // Update the Dirichlet constraints:
         void updateconstraints(void);
         

@@ -252,7 +252,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         IS permutis;
         ISCreateGeneral(PETSC_COMM_SELF, renumtodiagblocks.count(), renumtodiagblocks.getvalues(), PETSC_USE_POINTER, &permutis);
         ISSetPermutation(permutis);
-        MatPermute(A.getpetsc(), permutis, permutis, &permutedmat);
+        MatPermute(A.getapetsc(), permutis, permutis, &permutedmat);
         
         densematrix blockvals(preallocsize, 1);
         MatInvertVariableBlockDiagonal(permutedmat, blocksizes.count(), bsvals, blockvals.getvalues());

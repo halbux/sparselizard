@@ -18,6 +18,7 @@
 #include "memory.h"
 #include "petsc.h"
 #include "petscmat.h"
+#include <thread>
 
 class dofmanager;
 
@@ -25,18 +26,22 @@ class rawmat
 {
     private:
         
-        long long int nnz = -1;
-        
         // Combining all accumulated fragments below gives the overall matrix.
         std::vector<intdensematrix> accumulatedrowindices = {};
         std::vector<intdensematrix> accumulatedcolindices = {};
         std::vector<densematrix> accumulatedvals = {};
         
-        // Petsc does not deallocate the matrix data, we have to keep track of it.
-        intdensematrix petscrows, petsccols;
-        densematrix petscvals;
 
-        Mat mymat = PETSC_NULL;
+        long long int nnzA = -1, nnzD = -1;
+        
+        // The sparse matrix is stored in csr format. Dirichlet constraints are eliminated using A and D in Atotal = [A D; 0 1].
+        // The rows and columns in A and D are renumbered consecutively from zero.
+        intdensematrix Arows, Acols, Drows, Dcols;
+        densematrix Avals, Dvals;
+        // Ainds[i] is the index in Atotal of the ith index in A:
+        intdensematrix Ainds, Dinds;
+        
+        Mat Amat = PETSC_NULL, Dmat = PETSC_NULL;
         
         // 'myksp' will store the LU decomposition if it is to be reused:
         KSP myksp = PETSC_NULL;
@@ -50,25 +55,16 @@ class rawmat
     public:
                     
         rawmat(std::shared_ptr<dofmanager> dofmngr);
-        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input);
+        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensematrix inAinds, intdensematrix inDinds);
 
         ~rawmat(void);
      
         long long int countrows(void);
         long long int countcolumns(void);
         
-        long long int countnnz(void) { return nnz; };
+        long long int countnnz(void) { return nnzA; };
         
         int getmeshnumber(void) { return mymeshnumber; };
-        
-        // Set all row and/or column indices requested to -1 (-1 adresses are ignored at assembly):
-        void zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns);
-
-        // Set the gauged indices to -1:
-        void gauge(void);  
-        
-        // Remove the rows and columns associated to Dirichlet constraints:
-        void removeconstraints(void);
         
         void reusefactorization(void) { factorizationreuse = true; };
         bool isfactorizationreuseallowed(void) { return factorizationreuse; };
@@ -78,7 +74,7 @@ class rawmat
         // Add a fragment to the matrix.
         void accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);   
         // Create the petsc matrix.
-        void process(void);
+        void process(std::vector<bool>& isconstrained);
         // Remove the last added fragment:
         void removelastfragment(void);
         // Clear all the fragments:
@@ -86,11 +82,16 @@ class rawmat
         
         void print(void);
 
-        // Extract a new initialised rawmat that has all accumulated data. 
+        // Extract a new initialized rawmat that has all accumulated data. 
         std::shared_ptr<rawmat> extractaccumulated(void);
         
+        intdensematrix getainds(void);
+        intdensematrix getdinds(void);
+
+        Mat getapetsc(void);
+        Mat getdpetsc(void);
+        
         std::shared_ptr<dofmanager> getdofmanager(void);
-        Mat getpetsc(void);
         
         KSP* getksp(void);
 

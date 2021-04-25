@@ -1426,10 +1426,12 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
         abort();
     }
     
-    Vec bpetsc = b.getpetsc();
-    Mat Apetsc = A.getpetsc();
+    vec breduced = A.eliminate(b);
+    
+    Vec bpetsc = breduced.getpetsc();
+    Mat Apetsc = A.getapetsc();
 
-    vec sol(std::shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
+    vec sol(std::shared_ptr<rawvec>(new rawvec(breduced.getpointer()->getdofmanager())));
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
@@ -1463,7 +1465,7 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
         A.getpointer()->isfactored(false);
     }
 
-    return sol;
+    return A.xbmerge(sol, b);
 }
 
 std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
@@ -1491,15 +1493,19 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
         return {};
         
     int numrhs = b.size();
-    int len = b[0].size();
+    
+    std::vector<vec> breduced(numrhs);
+    for (int i = 0; i < numrhs; i++)
+        breduced[i] = A.eliminate(b[i]);
+
+    int len = breduced[0].size();
     
     // Concatenate rhs vecs to densematrix:
-    intdensematrix ads(len, 1, 0, 1);
     densematrix rhs(numrhs, len);
     double* rhsptr = rhs.getvalues();
     for (int i = 0; i < numrhs; i++)
     {
-        densematrix vecvals = b[i].getvalues(ads);
+        densematrix vecvals = breduced[i].getallvalues();
         double* vecvalsptr = vecvals.getvalues();
         for (int j = 0; j < len; j++)
             rhsptr[i*len+j] = vecvalsptr[j];
@@ -1519,7 +1525,8 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
             valsptr[j] = solsptr[i*len+j];
     
         outvecs[i] = vec(std::shared_ptr<rawvec>(new rawvec(b[i].getpointer()->getdofmanager())));
-        outvecs[i].setvalues(ads, vals);
+        outvecs[i].setvalues(A.getainds(), vals);
+        outvecs[i].setvalues(A.getdinds(), b[i].getvalues(A.getdinds()));
     }
     
     return outvecs;
@@ -1530,7 +1537,7 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
     int numrhs = b.countrows();
     int len = b.countcolumns();
  
-    Mat Apetsc = A.getpetsc();
+    Mat Apetsc = A.getapetsc();
     
     KSP* ksp = A.getpointer()->getksp();
     PC pc;
@@ -1610,11 +1617,14 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
         std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
         abort();
     }
+    
+    vec breduced = A.eliminate(b);
+    vec sola = sol.extract(A.getainds());
 
-    Vec bpetsc = b.getpetsc();
-    Mat Apetsc = A.getpetsc();
+    Vec bpetsc = breduced.getpetsc();
+    Mat Apetsc = A.getapetsc();
 
-    Vec solpetsc = sol.getpetsc();
+    Vec solpetsc = sola.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
 
@@ -1658,6 +1668,9 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
     KSPGetResidualNorm(*ksp, &relrestol);
 
     KSPDestroy(ksp);
+    
+    sol.setvalues(A.getainds(), sola.getallvalues());
+    sol.setvalues(A.getdinds(), b.getvalues(A.getdinds()));
 }
 
 void sl::solve(formulation formul, std::string soltype, std::vector<int> blockstoconsider)
@@ -1782,7 +1795,7 @@ std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterm
     formul.generate(formulterms);
     for (int n = 0; n < numneighbours; n++)
         formul.generatein(1, physicalterms[n]); // S term in A
-    mat A = formul.getmatrix(0, false, false, {intdensematrix(dcdata[1])});
+    mat A = formul.getmatrix(0, false, {intdensematrix(dcdata[1])});
     A.reusefactorization();
     universe::ddmmats = {A};
     

@@ -3,36 +3,20 @@
 #include <slepcpep.h>
 
 
-void eigenvalue::errorifdirichletnotremoved(std::vector<mat> input)
-{
-    // Make sure the Dirichlet constraints have been removed:
-    for (int i = 0; i < input.size(); i++)
-    {
-        if (input[i].getpointer()->getdofmanager()->countdisjregconstraineddofs() > 0)
-        {
-            std::cout << "Error in 'eigenvalue' object: remove the Dirichlet constraints in the matrices with removeconstraints()" << std::endl;
-            abort();
-        }
-    }
-}
-
 eigenvalue::eigenvalue(mat A)
 {
     myA = A;
-    errorifdirichletnotremoved({A});
 }
 
 eigenvalue::eigenvalue(mat A, mat B)
 {
     myA = A;
     myB = B;
-    errorifdirichletnotremoved({A,B});
 }
 
 eigenvalue::eigenvalue(mat K, mat C, mat M)
 {
     mymats = {K,C,M};
-    errorifdirichletnotremoved(mymats);
 }
 
 eigenvalue::eigenvalue(std::vector<mat> inmats)
@@ -44,7 +28,6 @@ eigenvalue::eigenvalue(std::vector<mat> inmats)
     }
 
     mymats = inmats;
-    errorifdirichletnotremoved(mymats);
 }
 
 void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemagnitude)
@@ -59,12 +42,12 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         // To be general we assume a non-hermitian problem:
         if (myB.getpointer() == NULL)
         {
-            EPSSetOperators( eps, myA.getpetsc(), NULL );
+            EPSSetOperators( eps, myA.getapetsc(), NULL );
             EPSSetProblemType(eps, EPS_NHEP);    
         }
         else
         {
-            EPSSetOperators( eps, myA.getpetsc(), myB.getpetsc() );
+            EPSSetOperators( eps, myA.getapetsc(), myB.getapetsc() );
             EPSSetProblemType(eps, EPS_GNHEP);
         }
         
@@ -114,7 +97,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
             double eigvalr, eigvali;
             
             // Create the 'eigvecr' and 'eigveci' vectors based on the dofmanager in myA:
-            std::shared_ptr<rawvec> rawr(new rawvec(myA.getpointer()->getdofmanager())); std::shared_ptr<rawvec> rawi( new rawvec(myA.getpointer()->getdofmanager()));
+            std::shared_ptr<rawvec> rawr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(myA.getainds().count())))); 
+            std::shared_ptr<rawvec> rawi(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(myA.getainds().count())))); 
             vec eigvecr(rawr); vec eigveci(rawi);
             
             EPSGetEigenpair( eps, i, &eigvalr, &eigvali, eigvecr.getpetsc(), eigveci.getpetsc() );
@@ -122,8 +106,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
             eigenvaluereal[i] = eigvalr;
             eigenvalueimaginary[i] = eigvali;
             
-            eigenvectorreal[i] = eigvecr;
-            eigenvectorimaginary[i] = eigveci;
+            eigenvectorreal[i] = myA.x0merge(eigvecr);
+            eigenvectorimaginary[i] = myA.x0merge(eigveci);
         }
     }
     else
@@ -135,7 +119,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         
         Mat* petscmats = new Mat[mymats.size()];
         for (int i = 0; i < mymats.size(); i++)
-            petscmats[i] = mymats[i].getpetsc();
+            petscmats[i] = mymats[i].getapetsc();
         
         PEPSetOperators( pep, mymats.size(), petscmats );
         // We assume a general problem:
@@ -189,7 +173,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
             double eigvalr, eigvali;
             
             // Create the 'eigvecr' and 'eigveci' vectors based on the dofmanager in mymats[0]:
-            std::shared_ptr<rawvec> rawr(new rawvec(mymats[0].getpointer()->getdofmanager())); std::shared_ptr<rawvec> rawi( new rawvec(mymats[0].getpointer()->getdofmanager()));
+            std::shared_ptr<rawvec> rawr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(mymats[0].getainds().count())))); 
+            std::shared_ptr<rawvec> rawi(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(mymats[0].getainds().count())))); 
             vec eigvecr(rawr); vec eigveci(rawi);
             
             PEPGetEigenpair( pep, i, &eigvalr, &eigvali, eigvecr.getpetsc(), eigveci.getpetsc() );
@@ -197,8 +182,8 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
             eigenvaluereal[i] = eigvalr;
             eigenvalueimaginary[i] = eigvali;
             
-            eigenvectorreal[i] = eigvecr;
-            eigenvectorimaginary[i] = eigveci;
+            eigenvectorreal[i] = mymats[0].x0merge(eigvecr);
+            eigenvectorimaginary[i] = mymats[0].x0merge(eigveci);
         }
         
         delete[] petscmats;

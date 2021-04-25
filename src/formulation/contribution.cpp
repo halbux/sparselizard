@@ -17,7 +17,7 @@ void contribution::setintegrationorderdelta(int integrorderdelta) { integrationo
 void contribution::setnumfftcoeffs(int numcoeffs) { numfftcoeffs = numcoeffs; }
 void contribution::setbarycenterevalflag(void) { isbarycentereval = true; }
 
-void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat, bool computeconstraints)
+void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat)
 {   
     bool isdofinterpolate = (doffield != NULL && mydofs[0]->ison());
 
@@ -247,33 +247,29 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                     ///// Get the adresses corresponding to every form function of 
                     // the test function/dof field in the elements of 'elementlist':
-                    intdensematrix testfunadresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg, computeconstraints);
+                    intdensematrix testfunadresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg);
                     intdensematrix dofadresses;
                     if (doffield != NULL)
                     {
                         if (isdofinterpolate)
                             dofadresses = mydofinterp.getaddresses(myselector, currentdofharm);
                         else
-                            dofadresses = mydofmanager->getaddresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg, false);
+                            dofadresses = mydofmanager->getaddresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg);
                     }
                     
                     ///// Duplicate the tf and dof adresses to get an adress matrix of the size of the stiffness matrix.
                     if (doffield != NULL)
                     {
-                        intdensematrix duplicateddofadresses;
+                        intdensematrix duplicateddofadresses = dofadresses;
                         if (isdofinterpolate)
                             duplicateddofadresses = dofadresses.duplicateallcolstogether(tfformfunctionvalue.countrows());
-                        else
-                            duplicateddofadresses = dofadresses.duplicateallrowstogether(tfformfunctionvalue.countrows());
                             
-                        intdensematrix duplicatedtestfunadresses;
+                        intdensematrix duplicatedtestfunadresses = testfunadresses;
                         if (isdofinterpolate)
                         {
                             duplicatedtestfunadresses = testfunadresses.gettranspose();
                             duplicatedtestfunadresses = duplicatedtestfunadresses.duplicatecolsonebyone(dofadresses.countcolumns());
                         }
-                        else
-                            duplicatedtestfunadresses = testfunadresses.duplicaterowsonebyone(dofformfunctionvalue.countrows());
                         
                         mymat->accumulate(duplicatedtestfunadresses, duplicateddofadresses, stiffnesses[currenttfharm][currentdofharm][0]);
                     }

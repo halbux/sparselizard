@@ -92,14 +92,14 @@ class formulation
         
         // b() is an alias for rhs() and A() for K():
         vec b(bool keepvector = false, bool dirichletupdate = true);
-        mat A(bool keepfragments = false, bool skipdiagonalones = false);
+        mat A(bool keepfragments = false);
         
         vec rhs(bool keepvector = false, bool dirichletupdate = true);
-        mat K(bool keepfragments = false, bool skipdiagonalones = false);
-        mat C(bool keepfragments = false, bool skipdiagonalones = false);
-        mat M(bool keepfragments = false, bool skipdiagonalones = false);
+        mat K(bool keepfragments = false);
+        mat C(bool keepfragments = false);
+        mat M(bool keepfragments = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
-        mat getmatrix(int KCM, bool keepfragments = false, bool skipdiagonalones = false, std::vector<intdensematrix> additionalconstraints = {});
+        mat getmatrix(int KCM, bool keepfragments = false, std::vector<intdensematrix> additionalconstraints = {});
 
 };
 

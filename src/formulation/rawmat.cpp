@@ -9,11 +9,14 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)
     mymeshnumber = universe::mymesh->getmeshnumber();
 }
 
-rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat input)
+rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensematrix inAinds, intdensematrix inDinds)
 {
     mydofmanager = dofmngr;
     
-    mymat = input;
+    Amat = inA;
+    Dmat = inD;
+    Ainds = inAinds;
+    Dinds = inDinds;
     
     mymeshnumber = universe::mymesh->getmeshnumber();
 }
@@ -26,8 +29,10 @@ rawmat::~rawmat(void)
 
     if (ispetscinitialized == PETSC_TRUE)
     {
-        if (mymat != PETSC_NULL)
-            MatDestroy(&mymat);
+        if (Amat != PETSC_NULL)
+            MatDestroy(&Amat);
+        if (Dmat != PETSC_NULL)
+            MatDestroy(&Dmat);
         if (isitfactored) 
             KSPDestroy(&myksp);
     }
@@ -49,107 +54,6 @@ long long int rawmat::countcolumns(void)
         return mydofmanager->countdofs();
 }
 
-void rawmat::zeroentries(intdensematrix entriestozero, bool zerorows, bool zerocolumns)
-{
-    int* entriestozeroptr = entriestozero.getvalues();
-
-    long long int numentries = entriestozero.count();
-    if (numentries > 0)
-    {
-        // First build a vector for direct access:
-        std::vector<bool> istozero(mydofmanager->countdofs(), false);
-
-        for (long long int i = 0; i < numentries; i++)
-            istozero[entriestozeroptr[i]] = true;
-            
-        if (zerorows)
-        {
-            for (int i = 0; i < accumulatedrowindices.size(); i++)
-            {
-                int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-                for (long long int j = 0; j < accumulatedrowindices[i].count(); j++)
-                {
-                    if (accumulatedrowindicesptr[j] >= 0 && istozero[accumulatedrowindicesptr[j]])
-                        accumulatedrowindicesptr[j] = -1;
-                }
-            }
-        }
-        if (zerocolumns)
-        {
-            for (int i = 0; i < accumulatedcolindices.size(); i++)
-            {
-                int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
-                for (long long int j = 0; j < accumulatedcolindices[i].count(); j++)
-                {
-                    if (accumulatedcolindicesptr[j] >= 0 && istozero[accumulatedcolindicesptr[j]])
-                        accumulatedcolindicesptr[j] = -1;
-                }
-            }
-        }
-    }
-}
-
-void rawmat::gauge(void)
-{
-    intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-    zeroentries(gaugedindexes, true, true);
-}
-
-
-void rawmat::removeconstraints(void)
-{
-    if (mydofmanager->countdisjregconstraineddofs() == 0)
-        return;
-    
-    if (isitfactored)
-    {
-        std::cout << "Error in 'rawmat' object: cannot remove the constraints when an LU decomposition is associated" << std::endl;
-        abort();
-    }
-    if (petscrows.getvalues() == NULL)
-    {
-        std::cout << "Error in 'rawmat' object: cannot remove the constraints for this matrix (make sure you got the matrix directly from the formulation and it is not a copy)" << std::endl;
-        abort();
-    }
-    
-    // Free the matrix since it will be replaced:
-    if (nnz >= 0) 
-    {
-        MatDestroy(&mymat);
-        Mat newmat; mymat = newmat;
-    }
-        
-    // Bring 'petscrows' from CSR to ijk format:
-    intdensematrix ijkpetscrows(petscvals.count(),1);
-    myalgorithm::csrtoijk(mydofmanager->countdofs(), petscrows.getvalues(), ijkpetscrows.getvalues());
-    petscrows = ijkpetscrows;
-    
-    // Remove the constrained dofs from the dof manager and get the dof renumbering:
-    int* dofrenumbering = new int[mydofmanager->countdofs()];
-    mydofmanager = mydofmanager->removeconstraints(dofrenumbering);
-
-    
-    // Rebuild the petsc matrix:
-    
-    accumulatedrowindices = {petscrows};
-    accumulatedcolindices = {petsccols};
-    accumulatedvals = {petscvals};
-    
-    int* myrows = petscrows.getvalues();
-    int* mycols = petsccols.getvalues();
-    
-    for (long long int i = 0; i < petscrows.count(); i++)
-    {
-        myrows[i] = dofrenumbering[myrows[i]];
-        mycols[i] = dofrenumbering[mycols[i]];
-    }
-    
-    delete[] dofrenumbering;
-    
-    process();
-    clearfragments();
-}
-
 void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
     accumulatedrowindices.push_back(rowadresses);
@@ -157,106 +61,232 @@ void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, 
     accumulatedvals.push_back(vals);
 }
 
-void rawmat::process(void)
+void processrows(int firstrow, int lastrow, int* maxnnzinrows, long long int* adsofrows, std::pair<int, double>* valsptr, std::vector<bool>* isconstrained, int* nnzApart, int* nnzDpart)
 {
-    // Concatenate all accumulated fragments!
-    // Remove negative indexes. First get the overall length.
-    long long int veclen = 0;
-    for (int i = 0; i < accumulatedvals.size(); i++)
+    // Avoid cache line invalidation:
+    int curnnzA = 0, curnnzD = 0;
+    
+    for (int i = firstrow; i <= lastrow; i++)
     {
-        int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-        int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
+        int maxnnzinrow = maxnnzinrows[i];
+        std::pair<int, double>* curvalsptr = valsptr + adsofrows[i];
         
-        for (long long int j = 0; j < accumulatedvals[i].count(); j++)
+        std::vector<int> curcols(maxnnzinrow);
+        std::vector<double> curvals(maxnnzinrow);
+        for (int j = 0; j < maxnnzinrow; j++)
         {
-            if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
-                veclen++;            
+            curcols[j] = curvalsptr[j].first;
+            curvals[j] = curvalsptr[j].second;
         }
-    }
-    
-    // Stitch all fragments together while removing negative indexes.
-    std::vector<std::tuple<int,int,double>> tupl(veclen);
-    
-    long long int ind = 0;
-    for (int i = 0; i < accumulatedvals.size(); i++)
-    {
-        double* valsptr = accumulatedvals[i].getvalues();
-        int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
-        int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
         
-        for (long long int j = 0; j < accumulatedvals[i].count(); j++)
-        {
-            if (accumulatedrowindicesptr[j] >= 0 && accumulatedcolindicesptr[j] >= 0)
-            {
-                std::get<0>(tupl[ind]) = accumulatedrowindicesptr[j];
-                std::get<1>(tupl[ind]) = accumulatedcolindicesptr[j];
-                std::get<2>(tupl[ind]) = valsptr[j];
-                ind++;            
-            }
-        }
-    }
+        // Single threaded sort:
+        std::vector<int> reorderingvector(maxnnzinrow);
+        std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
+        std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
+        { 
+            if (curcols[elem1] < curcols[elem2])
+                return true;
+            if (curcols[elem1] > curcols[elem2])
+                return false;
+            return elem1 < elem2;
+        });
     
-    // Sort according to the rows then according to the columns:
-    myalgorithm::tuple3sort(tupl);
-        
-    // Get the number of nonzeros:
-    nnz = 0;
-    if (veclen > 0)
-        nnz = 1;
-    for (long long int i = 1; i < veclen; i++)
-    {
-        if (std::get<0>(tupl[i]) != std::get<0>(tupl[i-1]) || std::get<1>(tupl[i]) != std::get<1>(tupl[i-1]))
-            nnz++;
-    }
-
-    // We now add together the values at the same adresses. Sparse format used is CSR.
-    petscrows = intdensematrix(countrows()+1,1);
-    petsccols = intdensematrix(nnz,1);
-    petscvals = densematrix(nnz,1);
-    
-    int* finalrowindices = petscrows.getvalues();
-    int* finalcolindices = petsccols.getvalues();
-    double* finalvals = petscvals.getvalues();
-
-    int row = -1; 
-    ind = -1;
-    for (long long int i = 0; i < veclen; i++)
-    {
-        // Same row:
-        if (i > 0 && std::get<0>(tupl[i]) == std::get<0>(tupl[i-1]))
+        int pc = -1;
+        int ind = -1;
+        for (int j = 0; j < maxnnzinrow; j++)
         {
-            // Same row and column:
-            if (std::get<1>(tupl[i]) == std::get<1>(tupl[i-1]))
-                finalvals[ind] += std::get<2>(tupl[i]);
+            int cc = curcols[reorderingvector[j]];
+            double cv = curvals[reorderingvector[j]];
+            
+            if (cc == pc)
+                curvalsptr[ind].second += cv;
             else
             {
-                // New column:
                 ind++;
-                finalvals[ind] = std::get<2>(tupl[i]);
-                finalcolindices[ind] = std::get<1>(tupl[i]);
+                curvalsptr[ind].first = cc;
+                curvalsptr[ind].second = cv;
+
+                if (isconstrained->at(cc))
+                    curnnzD++;
+                else
+                    curnnzA++;
+            }
+                
+            pc = cc;
+        }
+        maxnnzinrows[i] = ind+1;
+    }
+    
+    *nnzApart = curnnzA;
+    *nnzDpart = curnnzD;
+}
+
+void rawmat::process(std::vector<bool>& isconstrained)
+{
+    int ndofs = countrows();
+    
+    // Create Ainds and Dinds:
+    std::vector<int> renumtolocalindex;
+    myalgorithm::findtruefalse(isconstrained, Dinds, Ainds, renumtolocalindex);
+    
+    // Get an upper bound on the number of nonzeros in each row:
+    long long int maxnnz = 0;
+    std::vector<int> maxnnzinrows(ndofs, 0);
+    for (int i = 0; i < accumulatedvals.size(); i++)
+    {
+        int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
+        int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
+        
+        int nr = accumulatedvals[i].countrows();
+        int nc = accumulatedvals[i].countcolumns();
+        int ndr = accumulatedcolindices[i].countrows();
+        
+        for (int r = 0; r < nr; r++)
+        {
+            int ctr = r, cdr = r;
+            if (ndr != nr)
+            {
+                ctr = r/ndr;
+                cdr = r%ndr;
+            }
+        
+            for (long long int c = 0; c < nc; c++)
+            {
+                int cr = accumulatedrowindicesptr[ctr*nc+c];
+                int cc = accumulatedcolindicesptr[cdr*nc+c];
+                
+                if (cr >= 0 && cc >= 0 && isconstrained[cr] == false)
+                {
+                    maxnnzinrows[cr]++;
+                    maxnnz++;
+                }
+            }
+        } 
+    }
+
+    // Create a vector for direct addressing:
+    std::vector<long long int> adsofrows(ndofs, 0);
+    for (int i = 1; i < ndofs; i++)
+        adsofrows[i] = adsofrows[i-1] + maxnnzinrows[i-1];
+        
+    // Collect the values for each row:
+    std::vector<std::pair<int, double>> valspairs(maxnnz);
+    std::pair<int, double>* valsptr = valspairs.data();
+    
+    std::vector<int> indexinrow(ndofs, 0);
+    for (int i = 0; i < accumulatedvals.size(); i++)
+    {
+        int* accumulatedrowindicesptr = accumulatedrowindices[i].getvalues();
+        int* accumulatedcolindicesptr = accumulatedcolindices[i].getvalues();
+        double* accumulatedvalsptr = accumulatedvals[i].getvalues();
+        
+        int nr = accumulatedvals[i].countrows();
+        int nc = accumulatedvals[i].countcolumns();
+        int ndr = accumulatedcolindices[i].countrows();
+        
+        for (int r = 0; r < nr; r++)
+        {
+            int ctr = r, cdr = r;
+            if (ndr != nr)
+            {
+                ctr = r/ndr;
+                cdr = r%ndr;
+            }
+        
+            for (long long int c = 0; c < nc; c++)
+            {
+                int cr = accumulatedrowindicesptr[ctr*nc+c];
+                int cc = accumulatedcolindicesptr[cdr*nc+c];
+                
+                double cv = accumulatedvalsptr[r*nc+c];
+                    
+                if (cr >= 0 && cc >= 0 && isconstrained[cr] == false)
+                {
+                    long long int curind = adsofrows[cr] + indexinrow[cr];
+                    valsptr[curind].first = cc;
+                    valsptr[curind].second = cv;
+                    
+                    indexinrow[cr]++;
+                }
+            }
+        } 
+    }
+
+    // Multithreaded sort and duplicate removal:
+    int numthreadstouse = std::thread::hardware_concurrency(); // might return 0
+    numthreadstouse = std::max(numthreadstouse, 1);
+    
+    std::vector<std::thread> threadobjs(numthreadstouse);
+    int rowchunksize = ndofs/numthreadstouse+1;
+
+    std::vector<int> nnzAparts(numthreadstouse, 0), nnzDparts(numthreadstouse, 0);
+    for (int t = 0; t < numthreadstouse; t++)
+        threadobjs[t] = std::thread(processrows, t*rowchunksize, std::min((t+1)*rowchunksize, ndofs-1), maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[t], &nnzDparts[t]);
+    
+    for (int t = 0; t < numthreadstouse; t++)
+        threadobjs[t].join();
+
+    nnzA = myalgorithm::sum(nnzAparts);
+    nnzD = myalgorithm::sum(nnzDparts);
+
+    // Create A and D:
+    Arows = intdensematrix(Ainds.count()+1,1);
+    Acols = intdensematrix(nnzA, 1);
+    Avals = densematrix(nnzA, 1);
+    int* Arowsptr = Arows.getvalues();
+    int* Acolsptr = Acols.getvalues();
+    double* Avalsptr = Avals.getvalues();
+    
+    Drows = intdensematrix(Ainds.count()+1,1);
+    Dcols = intdensematrix(nnzD, 1);
+    Dvals = densematrix(nnzD, 1);
+    int* Drowsptr = Drows.getvalues();
+    int* Dcolsptr = Dcols.getvalues();
+    double* Dvalsptr = Dvals.getvalues();
+    
+    Arowsptr[0] = 0;
+    Drowsptr[0] = 0;
+
+    int index = 0;
+    for (int i = 0; i < ndofs; i++)
+    {
+        if (isconstrained[i])
+            continue;
+    
+        Arowsptr[index+1] = Arowsptr[index];
+        Drowsptr[index+1] = Drowsptr[index];
+        
+        std::pair<int, double>* curvalsptr = valsptr + adsofrows[i];        
+
+        for (int j = 0; j < maxnnzinrows[i]; j++)
+        {
+            int cc = curvalsptr[j].first;
+            double cv = curvalsptr[j].second;
+            
+            if (isconstrained[cc])
+            {
+                Dcolsptr[Drowsptr[index+1]] = renumtolocalindex[cc];
+                Dvalsptr[Drowsptr[index+1]] = cv;
+                Drowsptr[index+1]++;
+            }
+            else
+            {
+                Acolsptr[Arowsptr[index+1]] = renumtolocalindex[cc];
+                Avalsptr[Arowsptr[index+1]] = cv;
+                Arowsptr[index+1]++;
             }
         }
-        else
-        {
-            // New row:
-            row++; ind++;
-        
-            // If empty row move to the next not empty one:
-            int newrow = std::get<0>(tupl[i]);
-            while (row < newrow) { finalrowindices[row] = ind; row++; }
-            
-            finalvals[ind] = std::get<2>(tupl[i]);
-            finalcolindices[ind] = std::get<1>(tupl[i]);
-            finalrowindices[row] = ind;
-        }
+        index++;
     }
-    while (row < countrows()) { row++; finalrowindices[row] = nnz; }
-    
-    
-    MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, countrows(), countcolumns(), finalrowindices, finalcolindices, finalvals, &mymat);
-    
-    MatAssemblyBegin(mymat, MAT_FINAL_ASSEMBLY);
-    MatAssemblyEnd(mymat, MAT_FINAL_ASSEMBLY);
+
+    // Create the petsc objects:
+    MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, Ainds.count(), Ainds.count(), Arowsptr, Acolsptr, Avalsptr, &Amat);
+    MatAssemblyBegin(Amat, MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(Amat, MAT_FINAL_ASSEMBLY);
+
+    MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, Ainds.count(), Dinds.count(), Drowsptr, Dcolsptr, Dvalsptr, &Dmat);
+    MatAssemblyBegin(Dmat, MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(Dmat, MAT_FINAL_ASSEMBLY);
 }
 
 void rawmat::removelastfragment(void)
@@ -275,13 +305,17 @@ void rawmat::clearfragments(void)
 
 void rawmat::print(void)
 {            
-    std::cout << std::endl;
     if (mydofmanager == NULL)
         std::cout << "Undefined matrix" << std::endl;
     else
     {
         if (countrows() > 0)
-            MatView(mymat, PETSC_VIEWER_STDOUT_SELF);
+        {
+            std::cout << std::endl << "A block " << Ainds.count() << "x" << Ainds.count() << ":" << std::endl << std::endl;
+            MatView(Amat, PETSC_VIEWER_STDOUT_SELF);
+            std::cout << std::endl << "D block " << Ainds.count() << "x" << Dinds.count() << ":" << std::endl << std::endl;
+            MatView(Dmat, PETSC_VIEWER_STDOUT_SELF);
+        }
         else
             std::cout << "Empty matrix" << std::endl;
     }
@@ -299,21 +333,33 @@ std::shared_ptr<rawmat> rawmat::extractaccumulated(void)
     return output;
 }
 
+intdensematrix rawmat::getainds(void)
+{
+    return Ainds;
+}
+
+intdensematrix rawmat::getdinds(void)
+{
+    return Dinds;
+}
+
+Mat rawmat::getapetsc(void)
+{
+    return Amat;
+}
+
+Mat rawmat::getdpetsc(void)
+{
+    return Dmat;
+}
 
 std::shared_ptr<dofmanager> rawmat::getdofmanager(void)
 {
     return mydofmanager;
 }
 
-Mat rawmat::getpetsc(void)
-{
-    return mymat;
-}
-
 KSP* rawmat::getksp(void)
 {
     return &myksp;
 }
-
-
 

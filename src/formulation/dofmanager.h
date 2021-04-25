@@ -104,11 +104,6 @@ class dofmanager
         // Get the conditionally constrained adresses as well as the constraint values:
         std::pair<intdensematrix, densematrix> getconditionalconstraintdata(void);
         
-        // Return a new dofmanager object that does not include the Dirichlet constraints.
-        // 'dofrenumbering' must have a size equal to the number of dofs before the call.
-        // Removed dofs are renumbered as -1.
-        std::shared_ptr<dofmanager> removeconstraints(int* dofrenumbering);
-        
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
         // The replacing field must have an identical type and order vector as the replaced one:
@@ -132,17 +127,13 @@ class dofmanager
         void print(void);
         
         // 'getaddresses' is required in the matrix generation step.
-        // It returns an intdensematrix representing an numberofformfunctions
+        // It returns an intdensematrix representing a numberofformfunctions
         // by elementlist.size() matrix (row-major). The matrix gives 
-        // the adresses in the formulation matrix at which the dofs of field 
+        // the addresses in the formulation matrix at which the dofs of field 
         // 'inputfield' defined on the elements in elementlist can be found. 
+        // Address -1 is used for field dofs not in 'fieldphysreg'.
         //
-        // The following adress tags have a special meaning:
-        //
-        // - adress -1 is used for constrained fields (requires 'useminusonetag' true)
-        // - adress -2 is used for field dofs not in 'fieldphysreg' 
-        //
-        intdensematrix getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag);
+        intdensematrix getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg);
                                                         
 };
 

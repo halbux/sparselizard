@@ -148,12 +148,12 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
-                K = myformulation.K(false, false);
+                K = myformulation.K(false);
             }
             if (isconstant[2] == false || isfirstcall)
             {
                 myformulation.generatedampingmatrix();
-                C = myformulation.C(false, true);
+                C = myformulation.C(false);
             }
             
             // Reuse matrices when possible (including the factorization):

@@ -23,7 +23,8 @@ mat::mat(long long int matsize, intdensematrix rowadresses, intdensematrix colad
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(std::shared_ptr<dofmanager>(new dofmanager(matsize))));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
-    rawmatptr->process();
+    std::vector<bool> isconstr(matsize, false);
+    rawmatptr->process(isconstr);
     rawmatptr->clearfragments();
 }
 
@@ -31,7 +32,8 @@ mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix c
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
-    rawmatptr->process();
+    std::vector<bool> isconstr = myformulation.getdofmanager()->isconstrained();
+    rawmatptr->process(isconstr);
     rawmatptr->clearfragments();
 }
 
@@ -39,8 +41,6 @@ long long int mat::countrows(void) { errorifpointerisnull(); errorifinvalidated(
 long long int mat::countcolumns(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->countcolumns(); }
         
 long long int mat::countnnz(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->countnnz(); }
-
-void mat::removeconstraints(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->removeconstraints(); };
 
 void mat::reusefactorization(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->reusefactorization(); }
 
@@ -50,16 +50,76 @@ std::shared_ptr<rawmat> mat::getpointer(void)
     return rawmatptr;
 }
         
-Mat mat::getpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getpetsc(); }   
+vec mat::xbmerge(vec x, vec b)
+{
+    errorifpointerisnull(); errorifinvalidated();
+
+    vec output(std::shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
+    intdensematrix ainds = getainds();
+    intdensematrix dinds = getdinds();
+    densematrix xvals = x.getallvalues();
+    densematrix bdvals = b.getvalues(dinds);
+    output.setvalues(ainds, xvals);
+    output.setvalues(dinds, bdvals);
+    return output;
+}
+
+vec mat::x0merge(vec x)
+{
+    errorifpointerisnull(); errorifinvalidated();
+    
+    vec output(std::shared_ptr<rawvec>(new rawvec(rawmatptr->getdofmanager())));
+    intdensematrix ainds = getainds();
+    intdensematrix dinds = getdinds();
+    densematrix xvals = x.getallvalues();
+    output.setvalues(ainds, xvals);
+    output.setvalues(dinds, densematrix(dinds.count(),1,0.0));
+    return output;
+}
+
+vec mat::eliminate(vec b)
+{
+    errorifpointerisnull(); errorifinvalidated();
+    
+    intdensematrix ainds = getainds();
+    intdensematrix dinds = getdinds();
+
+    if (dinds.count() == 0)
+        return b.copy();
+
+    vec ba = b.extract(ainds);
+    vec bd = b.extract(dinds);
+
+    Vec bapetsc = ba.getpetsc();
+    Vec bdpetsc = bd.getpetsc();
+
+    Vec prodvec;
+    VecCreate(PETSC_COMM_SELF, &prodvec);
+    VecSetSizes(prodvec, PETSC_DECIDE, ainds.count());
+    VecSetFromOptions(prodvec);   
+    MatMult(getdpetsc(), bdpetsc, prodvec);
+    VecAXPY(bapetsc, -1, prodvec);
+    VecDestroy(&prodvec);
+
+    return ba;
+}
+        
+intdensematrix mat::getainds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getainds(); }
+intdensematrix mat::getdinds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdinds(); }
+
+Mat mat::getapetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getapetsc(); }
+Mat mat::getdpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdpetsc(); }
 
 void mat::print(void) { errorifpointerisnull(); errorifinvalidated(); rawmatptr->print(); }
 
 mat mat::copy(void)
 {
-    Mat A = getpetsc();
-    Mat output;
-    MatConvert(A, MATSAME, MAT_INITIAL_MATRIX, &output);
-    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
+    errorifpointerisnull(); errorifinvalidated();
+    
+    Mat outa, outd;
+    MatDuplicate(getapetsc(), MAT_COPY_VALUES, &outa);
+    MatDuplicate(getdpetsc(), MAT_COPY_VALUES, &outd);
+    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), outa, outd, getainds().copy(), getdinds().copy()  )));
 }
 
 
@@ -68,54 +128,84 @@ mat mat::operator-(void) { return *this*-1; }
 
 mat mat::operator*(double input)
 {
-    Mat A = getpetsc();
-    Mat output;
-    MatDuplicate(A, MAT_SHARE_NONZERO_PATTERN, &output);
-    MatAXPY(output, input, A, SAME_NONZERO_PATTERN);
-    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
+    errorifpointerisnull(); errorifinvalidated();
+    
+    Mat outa, outd;
+    MatDuplicate(getapetsc(), MAT_DO_NOT_COPY_VALUES, &outa);
+    MatDuplicate(getdpetsc(), MAT_DO_NOT_COPY_VALUES, &outd);
+    MatAXPY(outa, input, getapetsc(), SAME_NONZERO_PATTERN);
+    MatAXPY(outd, input, getdpetsc(), SAME_NONZERO_PATTERN);
+    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), outa, outd, getainds().copy(), getdinds().copy()  )));
 }
 
 mat mat::operator/(double input) { return *this*(1.0/input); }
 
 mat mat::operator*(mat input)
 {
-    Mat A = getpetsc();
-    Mat B = input.getpetsc();
-    Mat output;
-    MatMatMult(A, B, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &output);
-    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), output  )));
+    errorifpointerisnull(); errorifinvalidated();
+
+    // | A   D |  | B   E |   | AB  AE+D |
+    // |       |  |       | = |          |
+    // | 0   1 |  | 0   1 |   | 0      1 |
+    
+    Mat A = getapetsc();
+    Mat D = getdpetsc();
+    Mat B = input.getapetsc();
+    Mat E = input.getdpetsc();
+    
+    Mat AB, AEplusD;
+    MatMatMult(A, B, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &AB);
+    MatMatMult(A, E, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &AEplusD);
+    MatAXPY(AEplusD, 1, D, DIFFERENT_NONZERO_PATTERN);
+    
+    return mat(std::shared_ptr<rawmat>(new rawmat(  rawmatptr->getdofmanager(), AB, AEplusD, getainds().copy(), getdinds().copy()  )));
 }
 
 mat mat::operator+(mat input)
 {
+    errorifpointerisnull(); errorifinvalidated();
+    
     mat copied = copy();
-    Mat Y = copied.getpetsc();
-    Mat X = input.getpetsc();
-    MatAXPY(Y, 1, X, DIFFERENT_NONZERO_PATTERN);
+    MatAXPY(copied.getapetsc(), 1, input.getapetsc(), DIFFERENT_NONZERO_PATTERN);
+    MatAXPY(copied.getdpetsc(), 1, input.getdpetsc(), DIFFERENT_NONZERO_PATTERN);
     return copied;
 }
 
 mat mat::operator-(mat input)
 {
+    errorifpointerisnull(); errorifinvalidated();
+    
     mat copied = copy();
-    Mat Y = copied.getpetsc();
-    Mat X = input.getpetsc();
-    MatAXPY(Y, -1, X, DIFFERENT_NONZERO_PATTERN);
+    MatAXPY(copied.getapetsc(), -1, input.getapetsc(), DIFFERENT_NONZERO_PATTERN);
+    MatAXPY(copied.getdpetsc(), -1, input.getdpetsc(), DIFFERENT_NONZERO_PATTERN);
     return copied;
 }
 
 vec mat::operator*(vec input)
 {
-    Mat A = getpetsc();
-    Vec x = input.getpetsc();
-    Vec output;
-    VecDuplicate(x, &output);
-    MatMult(A, x, output);
-    return vec(std::shared_ptr<rawvec>(new rawvec(  rawmatptr->getdofmanager(), output  )));
+    errorifpointerisnull(); errorifinvalidated();
+    
+    intdensematrix ainds = getainds();
+    intdensematrix dinds = getdinds();
+
+    vec ia = input.extract(ainds);
+    vec id = input.extract(dinds);
+
+    Vec iapetsc = ia.getpetsc();
+    Vec idpetsc = id.getpetsc();
+
+    Vec prodvec;
+    VecCreate(PETSC_COMM_SELF, &prodvec);
+    VecSetSizes(prodvec, PETSC_DECIDE, ainds.count());
+    VecSetFromOptions(prodvec);
+    MatMult(getapetsc(), iapetsc, prodvec);
+    MatMultAdd(getdpetsc(), idpetsc, prodvec, prodvec);
+
+    vec vp(std::shared_ptr<rawvec>(new rawvec(  rawmatptr->getdofmanager(), prodvec  )));
+
+    return xbmerge(vp, input);
 }
 
 
 mat operator*(double inputdouble, mat inputmat) { return inputmat*inputdouble; }
-
-
 

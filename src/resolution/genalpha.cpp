@@ -166,18 +166,18 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
-                K = myformulation.K(false, true);
+                K = myformulation.K(false);
             }
             if (isconstant[2] == false || isfirstcall)
             {
                 myformulation.generatedampingmatrix();
-                C = myformulation.C(false, true);
+                C = myformulation.C(false);
             }
             universe::currenttimestep = t-alpham*dt;
             if (isconstant[3] == false || isfirstcall)
             {
                 myformulation.generatemassmatrix();
-                M = myformulation.M(false, false);
+                M = myformulation.M(false);
             }
             universe::currenttimestep = t;
             
@@ -201,7 +201,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             // displacement at the next time step:
             vec unextdirichlet(myformulation); 
             unextdirichlet.updateconstraints();
-            vec anextdirichlet = (1.0-alpham)/(beta*dt*dt)*( unextdirichlet-u - dt*v - dt*dt*(0.5-beta)*a );
+            vec anextdirichlet = 1.0/(beta*dt*dt)*( unextdirichlet-u - dt*v - dt*dt*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
             intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
             densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);

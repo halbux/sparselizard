@@ -101,6 +101,6 @@ int main(void)
     double errorh1 = adapth1();
     double errorhcurl = adapthcurl();
     
-    std::cout << (errorh1 < 1e-14 && errorhcurl < 1e-14);
+    std::cout << (errorh1 < 2e-14 && errorhcurl < 1e-14);
 }
 

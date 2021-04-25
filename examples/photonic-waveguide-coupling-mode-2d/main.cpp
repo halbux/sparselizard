@@ -95,10 +95,6 @@ int main(void)
     mat K = mode.K();
     mat M = mode.M();
 
-    // Remove the rows and columns corresponding to 0 constraints:
-    K.removeconstraints();
-    M.removeconstraints();
-
     // Create the object to solve the eigenvalue problem:
     eigenvalue eig(K, M); 
 

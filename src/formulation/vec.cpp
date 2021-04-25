@@ -38,8 +38,6 @@ void vec::permute(intdensematrix rowpermute, bool invertit)
         VecPermute(getpetsc(), rowpermutis, PETSC_TRUE);
 }
 
-void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
-        
 void vec::updateconstraints(void)
 {
     errorifpointerisnull();

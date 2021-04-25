@@ -484,54 +484,6 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     return std::make_pair(condconstrindices, condconstrval);
 }
 
-
-std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
-{
-    synchronize();
-    
-    // Set a default -1 renumbering:
-    for (int i = 0; i < numberofdofs; i++)
-        dofrenumbering[i] = -1;
-    
-    std::shared_ptr<dofmanager> newdofmanager(new dofmanager);
-    *(newdofmanager.get()) = *this;
-    newdofmanager->numberofdofs = 0;
-    
-    for (int fieldindex = 0; fieldindex < newdofmanager->rangebegin.size(); fieldindex++)
-    {
-        for (int disjreg = 0; disjreg < newdofmanager->rangebegin[fieldindex].size(); disjreg++)
-        {
-            // If the field is not constrained on the disjoint region:
-            if (newdofmanager->myfields[fieldindex]->isdisjregconstrained(disjreg) == false)
-            {
-                for (int ff = 0; ff < newdofmanager->rangebegin[fieldindex][disjreg].size(); ff++)
-                {
-                    // Update the range begin and end:
-                    int numdofshere = newdofmanager->rangeend[fieldindex][disjreg][0] - newdofmanager->rangebegin[fieldindex][disjreg][0] + 1;
-                    
-                    newdofmanager->rangebegin[fieldindex][disjreg][ff] = newdofmanager->numberofdofs;
-                    newdofmanager->rangeend[fieldindex][disjreg][ff] = newdofmanager->numberofdofs + numdofshere - 1;
-                    
-                    // Renumber the dofs:
-                    int offset = rangebegin[fieldindex][disjreg][ff];                    
-                    for (int i = 0; i < numdofshere; i++)
-                        dofrenumbering[offset+i] = newdofmanager->numberofdofs+i;
-                    
-                    newdofmanager->numberofdofs += numdofshere;
-                }
-            }
-            else
-            {
-                // Remove the constrained dofs:
-                newdofmanager->rangebegin[fieldindex][disjreg] = {};
-                newdofmanager->rangeend[fieldindex][disjreg] = {};
-            }
-        }
-    }
-    
-    return newdofmanager;
-}
-
 std::shared_ptr<rawfield> dofmanager::getselectedfield(void)
 {
     synchronize();
@@ -706,7 +658,7 @@ void dofmanager::print(void)
 }
 
 
-intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
+intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg)
 {
     synchronize();
     
@@ -766,13 +718,10 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
 
-                adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;     
-
-                if (useminusonetag && inputfield->isdisjregconstrained(currentdisjointregion))
-                    adresses[ff*numcols+i] = -1;
+                adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
             }
             else
-                adresses[ff*numcols+i] = -2;
+                adresses[ff*numcols+i] = -1;
         }
         myiterator.next();
     }
