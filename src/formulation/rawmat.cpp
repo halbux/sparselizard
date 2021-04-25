@@ -221,7 +221,7 @@ void rawmat::process(std::vector<bool>& isconstrained)
 
     std::vector<int> nnzAparts(numthreadstouse, 0), nnzDparts(numthreadstouse, 0);
     for (int t = 0; t < numthreadstouse; t++)
-        threadobjs[t] = std::thread(processrows, t*rowchunksize, std::min((t+1)*rowchunksize, ndofs-1), maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[t], &nnzDparts[t]);
+        threadobjs[t] = std::thread(processrows, t*rowchunksize, std::min((t+1)*rowchunksize-1, ndofs-1), maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[t], &nnzDparts[t]);
     
     for (int t = 0; t < numthreadstouse; t++)
         threadobjs[t].join();
