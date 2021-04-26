@@ -213,17 +213,22 @@ void rawmat::process(std::vector<bool>& isconstrained)
     }
 
     // Multithreaded sort and duplicate removal:
-    int numthreadstouse = std::min(ndofs/1000+1, universe::getmaxnumthreads()); // require a min num dofs per thread
-    
-    std::vector<std::thread> threadobjs(numthreadstouse);
-    int rowchunksize = ndofs/numthreadstouse+1;
+    int numthreadstouse = std::min(ndofs/10000+1, universe::getmaxnumthreads()); // require a min num dofs per thread
 
-    std::vector<int> nnzAparts(numthreadstouse, 0), nnzDparts(numthreadstouse, 0);
-    for (int t = 0; t < numthreadstouse; t++)
-        threadobjs[t] = std::thread(processrows, t*rowchunksize, std::min((t+1)*rowchunksize-1, ndofs-1), maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[t], &nnzDparts[t]);
-    
-    for (int t = 0; t < numthreadstouse; t++)
-        threadobjs[t].join();
+    std::vector<int> nnzAparts(numthreadstouse, 0), nnzDparts(numthreadstouse, 0);    
+    if (numthreadstouse > 1)
+    {
+        std::vector<std::thread> threadobjs(numthreadstouse);
+        int rowchunksize = ndofs/numthreadstouse+1;
+
+        for (int t = 0; t < numthreadstouse; t++)
+            threadobjs[t] = std::thread(processrows, t*rowchunksize, std::min((t+1)*rowchunksize-1, ndofs-1), maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[t], &nnzDparts[t]);
+        
+        for (int t = 0; t < numthreadstouse; t++)
+            threadobjs[t].join();
+    }
+    else
+        processrows(0, ndofs-1, maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[0], &nnzDparts[0]);
 
     nnzA = myalgorithm::sum(nnzAparts);
     nnzD = myalgorithm::sum(nnzDparts);
