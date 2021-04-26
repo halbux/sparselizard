@@ -213,8 +213,7 @@ void rawmat::process(std::vector<bool>& isconstrained)
     }
 
     // Multithreaded sort and duplicate removal:
-    int numthreadstouse = std::thread::hardware_concurrency(); // might return 0
-    numthreadstouse = std::max(numthreadstouse, 1);
+    int numthreadstouse = std::min(ndofs/1000+1, universe::getmaxnumthreads()); // require a min num dofs per thread
     
     std::vector<std::thread> threadobjs(numthreadstouse);
     int rowchunksize = ndofs/numthreadstouse+1;

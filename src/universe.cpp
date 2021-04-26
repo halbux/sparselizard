@@ -23,6 +23,24 @@ void universe::addtorawmeshcounter(int val)
     mynumrawmeshes += val;
 }
 
+int universe::maxnumthreads = -1;
+int universe::getmaxnumthreads(void)
+{
+    if (maxnumthreads > 0)
+        return maxnumthreads;
+    else
+    {
+        int maxnumthreadstouse = std::thread::hardware_concurrency(); // might return 0
+        maxnumthreadstouse = std::max(maxnumthreadstouse, 1);
+        return maxnumthreadstouse;
+    }
+}
+
+void universe::setmaxnumthreads(int mnt)
+{
+    maxnumthreads = mnt;
+}
+
 double universe::roundoffnoiselevel = 1e-12;
 
 std::shared_ptr<rawmesh> universe::mymesh = NULL;
