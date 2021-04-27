@@ -241,7 +241,7 @@ int dofmanager::countdisjregconstraineddofs(void)
 {
     synchronize();
     
-    int numconstraineddofs = 0;
+    int numdisjregconstraineddofs = 0;
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
     {
@@ -249,10 +249,10 @@ int dofmanager::countdisjregconstraineddofs(void)
         {
             // If the field is constrained on the disjoint region and there is at least one form function:
             if (rangebegin[fieldindex][disjreg].size() > 0 && myfields[fieldindex]->isdisjregconstrained(disjreg))
-                numconstraineddofs += rangebegin[fieldindex][disjreg].size() * (rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1);
+                numdisjregconstraineddofs += rangebegin[fieldindex][disjreg].size() * (rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1);
         }
     }
-    return numconstraineddofs;
+    return numdisjregconstraineddofs;
 }
 
 intdensematrix dofmanager::getdisjregconstrainedindexes(void)
