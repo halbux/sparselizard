@@ -43,7 +43,7 @@ class rawmat
         
         Mat Amat = PETSC_NULL, Dmat = PETSC_NULL;
         
-        // 'myksp' will store the LU decomposition if it is to be reused:
+        // 'myksp' will store the factorization if it is to be reused:
         KSP myksp = PETSC_NULL;
         bool factorizationreuse = false;
         bool isitfactored = false;
