@@ -712,12 +712,11 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
 
             previousdisjreg = currentdisjointregion;
             
-            // If not in a disjoint region on which the field is defined set -2 adress.
+            // If not in a disjoint region on which the field is defined set -1 address.
             if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
-
                 adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
             }
             else
