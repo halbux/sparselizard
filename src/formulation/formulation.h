@@ -88,7 +88,6 @@ class formulation
         
         // Get the assembled matrices or get the right hanside vector.
         // Choose to discard or not all values after getting the vector/matrix.
-        // Choose to add or not the diagonal ones for the Dirichlet constraints.
         
         // b() is an alias for rhs() and A() for K():
         vec b(bool keepvector = false, bool dirichletupdate = true);
