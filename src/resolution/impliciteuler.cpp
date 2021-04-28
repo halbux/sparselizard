@@ -165,8 +165,15 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
                 defdt = dt;
             }
             
+            // Here are the constrained values of the next solution:
+            intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
+            densematrix xnextdirichletval = rhs.getpointer()->getvalues(constraintindexes);
+            vec rightvec = C*x+dt*rhs;
+            // Force the solution on the constrained dofs:
+            rightvec.getpointer()->setvalues(constraintindexes, xnextdirichletval);
+            
             // Update the solution xnext.
-            xnext = relaxationfactor * sl::solve(leftmat, C*x+dt*rhs) + (1.0-relaxationfactor)*xnext;
+            xnext = relaxationfactor * sl::solve(leftmat, rightvec) + (1.0-relaxationfactor)*xnext;
             
             dtxnext = 1.0/dt*(xnext-x);
             
