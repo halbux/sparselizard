@@ -96,7 +96,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         {
             double eigvalr, eigvali;
             
-            // Create the 'eigvecr' and 'eigveci' vectors based on the dofmanager in myA:
+            // Create the 'eigvecr' and 'eigveci' vectors:
             std::shared_ptr<rawvec> rawr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(myA.getainds().count())))); 
             std::shared_ptr<rawvec> rawi(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(myA.getainds().count())))); 
             vec eigvecr(rawr); vec eigveci(rawi);
@@ -172,7 +172,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         {
             double eigvalr, eigvali;
             
-            // Create the 'eigvecr' and 'eigveci' vectors based on the dofmanager in mymats[0]:
+            // Create the 'eigvecr' and 'eigveci' vectors:
             std::shared_ptr<rawvec> rawr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(mymats[0].getainds().count())))); 
             std::shared_ptr<rawvec> rawi(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(mymats[0].getainds().count())))); 
             vec eigvecr(rawr); vec eigveci(rawi);
