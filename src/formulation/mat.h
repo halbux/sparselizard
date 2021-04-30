@@ -58,9 +58,9 @@ class mat
         
         std::shared_ptr<rawmat> getpointer(void);
         
-        // Return [xa; bd]:
+        // Return [x; bd]:
         vec xbmerge(vec x, vec b);
-        // Return [xa; 0]:
+        // Return [x; 0]:
         vec x0merge(vec x);
 
         // Return ba - D*bd:
