@@ -159,10 +159,13 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             if (isconstant[0] == false || isfirstcall)
             {
                 myformulation.generaterhs();
-                rhs = myformulation.rhs();
+                rhs = myformulation.rhs(false, false);
             }
-            else
-                rhs.updateconstraints();
+                
+            universe::currenttimestep = t;
+            
+            rhs.updateconstraints();
+                
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
@@ -173,13 +176,11 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 myformulation.generatedampingmatrix();
                 C = myformulation.C(false);
             }
-            universe::currenttimestep = t-alpham*dt;
             if (isconstant[3] == false || isfirstcall)
             {
                 myformulation.generatemassmatrix();
                 M = myformulation.M(false);
             }
-            universe::currenttimestep = t;
             
             // Reuse matrices when possible (including the factorization):
             if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || isfirstcall || defdt != dt || defbeta != beta || defgamma != gamma || defalphaf != alphaf || defalpham != alpham)
