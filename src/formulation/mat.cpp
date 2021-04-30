@@ -69,10 +69,7 @@ vec mat::x0merge(vec x)
     errorifpointerisnull(); errorifinvalidated();
     
     vec output(std::shared_ptr<rawvec>(new rawvec(rawmatptr->getdofmanager())));
-    intdensematrix ainds = getainds();
-    intdensematrix dinds = getdinds();
-    densematrix xvals = x.getallvalues();
-    output.setvalues(ainds, xvals);
+    output.setvalues(getainds(), x.getallvalues());
     return output;
 }
 
