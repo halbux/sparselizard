@@ -70,3 +70,7 @@ endif()
 
 target_include_directories(sparselizard PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
+install(TARGETS sparselizard)
+install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/include/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sparselizard"
+        FILES_MATCHING PATTERN "*.h")
