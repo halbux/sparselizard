@@ -1,5 +1,4 @@
 #include "rawmat.h"
-#include <tuple>
 
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)
