@@ -309,13 +309,14 @@ void rawmat::clearfragments(void)
 
 void rawmat::print(void)
 {            
+    std::cout << std::endl;
     if (mydofmanager == NULL)
         std::cout << "Undefined matrix" << std::endl;
     else
     {
         if (countrows() > 0)
         {
-            std::cout << std::endl << "A block " << Ainds.count() << "x" << Ainds.count() << ":" << std::endl << std::endl;
+            std::cout << "A block " << Ainds.count() << "x" << Ainds.count() << ":" << std::endl << std::endl;
             MatView(Amat, PETSC_VIEWER_STDOUT_SELF);
             std::cout << std::endl << "D block " << Ainds.count() << "x" << Dinds.count() << ":" << std::endl << std::endl;
             MatView(Dmat, PETSC_VIEWER_STDOUT_SELF);
