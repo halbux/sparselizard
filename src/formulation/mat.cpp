@@ -197,7 +197,7 @@ vec mat::operator*(vec input)
     MatMult(getapetsc(), iapetsc, prodvec);
     MatMultAdd(getdpetsc(), idpetsc, prodvec, prodvec);
 
-    vec vp(std::shared_ptr<rawvec>(new rawvec(  rawmatptr->getdofmanager(), prodvec  )));
+    vec vp(std::shared_ptr<rawvec>(new rawvec(  ia.getpointer()->getdofmanager(), prodvec  )));
 
     return xbmerge(vp, input);
 }
