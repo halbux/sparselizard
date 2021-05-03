@@ -71,9 +71,9 @@ class rawmat
         bool isfactored(void) { return isitfactored; };
         void isfactored(bool isfact) { isitfactored = isfact; };
     
-        // Add a fragment to the matrix.
+        // Add a fragment to the matrix:
         void accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);   
-        // Create the petsc matrix.
+        // Create the petsc matrices:
         void process(std::vector<bool>& isconstrained);
         // Remove the last added fragment:
         void removelastfragment(void);
@@ -82,7 +82,7 @@ class rawmat
         
         void print(void);
 
-        // Extract a new initialized rawmat that has all accumulated data. 
+        // Extract a new initialized rawmat that has all accumulated data:
         std::shared_ptr<rawmat> extractaccumulated(void);
         
         intdensematrix getainds(void);
