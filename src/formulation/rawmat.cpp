@@ -138,12 +138,13 @@ void rawmat::process(std::vector<bool>& isconstrained)
         
         int nr = accumulatedvals[i].countrows();
         int nc = accumulatedvals[i].countcolumns();
+        int ntr = accumulatedrowindices[i].countrows();
         int ndr = accumulatedcolindices[i].countrows();
         
         for (int r = 0; r < nr; r++)
         {
             int ctr = r, cdr = r;
-            if (ndr != nr)
+            if (ntr != nr || ndr != nr)
             {
                 ctr = r/ndr;
                 cdr = r%ndr;
@@ -181,12 +182,13 @@ void rawmat::process(std::vector<bool>& isconstrained)
         
         int nr = accumulatedvals[i].countrows();
         int nc = accumulatedvals[i].countcolumns();
+        int ntr = accumulatedrowindices[i].countrows();
         int ndr = accumulatedcolindices[i].countrows();
         
         for (int r = 0; r < nr; r++)
         {
             int ctr = r, cdr = r;
-            if (ndr != nr)
+            if (ntr != nr || ndr != nr)
             {
                 ctr = r/ndr;
                 cdr = r%ndr;
