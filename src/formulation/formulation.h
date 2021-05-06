@@ -101,7 +101,7 @@ class formulation
         mat getmatrix(int KCM, bool keepfragments = false, std::vector<intdensematrix> additionalconstraints = {});
         
         
-        // Generate, solve and save to field:
+        // Generate, solve and save to fields:
         void solve(std::string soltype = "lu", bool diagscaling = false, std::vector<int> blockstoconsider = {-1});
 
         // DDM resolution with mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
