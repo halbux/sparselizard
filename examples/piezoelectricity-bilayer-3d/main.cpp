@@ -79,7 +79,7 @@ int main(void)
     // Define the electrical equations of the problem in the piezo:
     piezo += integral(pztlayer, ( transpose(C)*strain(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
     
-    solve(piezo);
+    piezo.solve();
     
     // Display the peak displacement:
     double umax = norm(u.harmonic(2)).max(wholedomain, 5)[0];

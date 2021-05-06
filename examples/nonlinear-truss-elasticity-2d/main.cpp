@@ -39,7 +39,7 @@ int main(void)
     double prevumax = 1, umax = 2;
     while (std::abs(umax-prevumax)/std::abs(prevumax) > 1e-8)
     {
-        solve(elasticity);
+        elasticity.solve();
 
         prevumax = umax;
         umax = norm(u).max(solid, 5)[0];

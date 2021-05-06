@@ -25,7 +25,7 @@ double hadapt1d(void)
 
     poisson += integral(line, grad(dof(v))*grad(tf(v)));
 
-    solve(poisson);
+    poisson.solve();
 
     adapt(1);
     adapt(1);
@@ -66,7 +66,7 @@ double hadapt2d(void)
     for (int i = 0; i < 5; i++)
         adapt(1);
     
-    solve(poisson);
+    poisson.solve();
 
     double intgr = norm(grad(v)).integrate(sur, 5);
     double exact = 2.0*getpi();
@@ -98,7 +98,7 @@ double hadapt3d(void)
     for (int i = 0; i < 5; i++)
         adapt(1);
     
-    solve(poisson);
+    poisson.solve();
 
     double intgr = norm(grad(v)).integrate(vol, 5);
     double exact = 10.0;

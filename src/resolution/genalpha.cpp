@@ -148,7 +148,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             universe::currenttimestep = t;
             
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
-            sl::solve(tosolvebefore);
+            for (int i = 0; i < tosolvebefore.size(); i++)
+                tosolvebefore[i].solve();
         
             vec utolcalc = unext;
             
@@ -223,7 +224,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             nlit++; 
 
             // Solve all formulations that must be solved at the end of the nonlinear loop:
-            sl::solve(tosolveafter);
+            for (int i = 0; i < tosolveafter.size(); i++)
+                tosolveafter[i].solve();
             
             // Make all time derivatives available in the universe:
             universe::xdtxdtdtx = {{},{vnext},{anext}};

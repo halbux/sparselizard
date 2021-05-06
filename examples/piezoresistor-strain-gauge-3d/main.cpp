@@ -92,13 +92,13 @@ int main(void)
     
     
     // First solve the mechanic problem to get the stresses:
-    solve(elasticity);
+    elasticity.solve();
     
     // Transfer the deflection u to the ugauge field using mesh-to-mesh interpolation:
     ugauge.setvalue(trace, on(silicon, u));
     
     // Solve the DC current flow problem:
-    solve(currentflow);
+    currentflow.solve();
     
     // Expression for the electric field E [V/m] and current density j [A/m^2]:
     expression E = -grad(v);

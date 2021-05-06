@@ -285,3 +285,194 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
     return mat(rawout);
 }
 
+void formulation::solve(std::string soltype, bool diagscaling, std::vector<int> blockstoconsider)
+{
+    // Make sure the problem is of the form Ax = b:
+    if (isdampingmatrixdefined() || ismassmatrixdefined())
+    {
+        std::cout << "Error in 'formulation' object: cannot solve with a damping/mass matrix (use a time resolution algorithm)" << std::endl;
+        abort();  
+    }
+    
+    // Remove leftovers (if any):
+    myvec = NULL; mymat = {NULL, NULL, NULL};
+    
+    // Generate:
+    if (blockstoconsider.size() == 1 && blockstoconsider[0] == -1)
+        generate();
+    else
+        generate(blockstoconsider);
+    // Solve:
+    vec sol = sl::solve(this->A(), this->b(), soltype, diagscaling);
+
+    // Save to fields:
+    sl::setdata(sol);
+}
+
+densematrix Fgmultrobin(densematrix gprev)
+{
+    mat A = universe::ddmmats[0];
+    formulation formul = universe::ddmformuls[0];
+    std::vector<std::vector<int>> artificialterms = universe::ddmints;
+
+    vec rhs(formul);
+
+    double* gprevptr = gprev.getvalues();
+
+    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    int numneighbours = dt->countneighbours();
+
+    // Compute Ag:
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = universe::ddmrecvinds[n].count();
+        densematrix Bm = gprev.extractrows(pos, pos+len-1);
+        rhs.setvalues(universe::ddmrecvinds[n], Bm, "add");
+        pos += len;
+    }
+        
+    vec sol = sl::solve(A, rhs);
+    sl::setdata(sol);
+
+    // Create the artificial sources solution on the inner interface:
+    std::vector<densematrix> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        formul.generatein(0, artificialterms[n]);
+        vec gartificial = formul.b(false, false);
+    
+        Agmatssend[n] = gartificial.getvalues(universe::ddmsendinds[n]);
+        Agmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
+    
+    densematrix Ag(Agmatsrecv);
+    
+    // Calculate I - A*g:
+    double* Agptr = Ag.getvalues();
+    densematrix Fg(Ag.count(), 1);
+    double* Fgptr = Fg.getvalues();
+    
+    for (int i = 0; i < Ag.count(); i++)
+        Fgptr[i] = gprevptr[i] - Agptr[i];
+
+    return Fg;
+}
+
+std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, std::string soltype, int verbosity)
+{
+    // Make sure the problem is of the form Ax = b:
+    if (isdampingmatrixdefined() || ismassmatrixdefined())
+    {
+        std::cout << "Error in 'formulation' object: cannot solve with a damping/mass matrix (use a time resolution algorithm)" << std::endl;
+        abort();  
+    }
+    
+    wallclock clktot;
+
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    if (numranks == 1)
+    {
+        solve(soltype, false, formulterms);
+        return {};
+    }
+    
+    universe::ddmints = artificialterms;
+    universe::ddmformuls = {*this};
+
+    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    int numneighbours = dt->countneighbours();
+
+    // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
+    std::vector<std::shared_ptr<rawfield>> rfs = mydofmanager->getfields();
+    sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
+    
+    // Get all Dirichlet constraints set on the neighbours but not on this rank:
+    std::vector<std::vector<intdensematrix>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
+
+    // Unconstrained send and receive indexes:
+    universe::ddmsendinds = dcdata[2];
+    universe::ddmrecvinds = dcdata[3];
+    
+    // Get A and allow to reuse its factorization:
+    generate(formulterms);
+    for (int n = 0; n < numneighbours; n++)
+        generatein(1, physicalterms[n]); // S term in A
+    mat A = getmatrix(0, false, {intdensematrix(dcdata[1])});
+    A.reusefactorization();
+    universe::ddmmats = {A};
+    
+    // Get the rhs of the physical sources contribution:
+    vec bphysical = b();
+    
+    // Set the value from the neighbour Dirichlet conditions:
+    std::vector<densematrix> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
+        dirichletvalsfromneighbours[n] = densematrix(dcdata[1][n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        bphysical.setvalues(dcdata[1][n], dirichletvalsfromneighbours[n]);
+
+    // Get the physical sources solution:
+    vec w = sl::solve(A, bphysical, soltype);
+    sl::setdata(w);
+    
+    // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
+    std::vector<densematrix> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        generatein(0, physicalterms[n]);
+        vec gphysical = b(false, false);
+    
+        Bmatssend[n] = gphysical.getvalues(universe::ddmsendinds[n]);
+        Bmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
+    
+    densematrix B(Bmatsrecv);
+    
+    // Initial value of the artificial sources solution:
+    densematrix vi(B.countrows(), B.countcolumns(), 0.0);
+    
+    // Gmres iteration:
+    std::vector<double> resvec = sl::gmres(Fgmultrobin, B, vi, relrestol, maxnumit, verbosity*(rank == 0));
+    int numits = resvec.size()-1;
+    if (verbosity > 0 && rank == 0)
+    {
+        if (numits < maxnumit)
+            std::cout << "gmres converged after " << numits << " iterations" << std::endl;
+        else
+            std::cout << "gmres could not converge to the requested " << relrestol << " relative tolerance (could only reach " << resvec[numits] << ")" << std::endl;
+    }
+
+    // Compute the total solution (physical + artificial):
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = Bmatsrecv[n].count();
+        densematrix Bm = vi.extractrows(pos, pos+len-1);
+        bphysical.setvalues(universe::ddmrecvinds[n], Bm, "add");
+        pos += len;
+    }
+
+    vec totalsol = sl::solve(A, bphysical);
+    sl::setdata(totalsol);
+    
+    if (verbosity > 0)
+    {
+        long long int allndfs = allcountdofs();
+        if (rank == 0)
+            clktot.print("DDM solve for "+std::to_string(allndfs)+" dofs took");
+    }
+    
+    universe::clearddmcontainers();
+    
+    return resvec;
+}
+

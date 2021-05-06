@@ -44,7 +44,7 @@ int main(void)
     // This is the weak formulation for electromagnetic waves:
     maxwell += integral(sur, -curl(dof(E))*curl(tf(E)) + k*k*dof(E)*tf(E));
 
-    solve(maxwell);  
+    maxwell.solve();  
 
     E.write(sur, "E.pos", 2);
     compx(E).write(sur, "Ex.pos", 2);

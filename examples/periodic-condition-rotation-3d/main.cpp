@@ -65,7 +65,7 @@ int main(void)
 
 
     // Generate, solve and store the solution to field u:
-    solve(elasticity);
+    elasticity.solve();
 
     // Write the deflection to ParaView .vtk format. Write with an order 2 interpolation.
     u.write(solid, "u.vtk", 2);

@@ -103,7 +103,7 @@ double sparselizard(double alpha)
     magnetostatics += periodicitycondition(gamma1, gamma2, az, {0,0,0}, {0,0,45.0}, -1.0);
 
 
-    solve(magnetostatics);
+    magnetostatics.solve();
 
     az.write(all, "a"+std::to_string((int)alpha)+".vtu", 2);
     curl(a).write(all, "b"+std::to_string((int)alpha)+".vtu", 2);
@@ -122,7 +122,7 @@ double sparselizard(double alpha)
     forceprojection += integral(statmagmat, dof(magforce)*tf(magforce));
     forceprojection += integral(stator, - predefinedmagnetostaticforce(tf(magforce, statmagmat), 1/mu*curl(a), mu));
 
-    solve(forceprojection);
+    forceprojection.solve();
 
     // Calculate the torque:
     expression leverarm = array3x1(x,y,0);

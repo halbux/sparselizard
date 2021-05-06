@@ -107,8 +107,8 @@ int main(void)
     {
         // Solve the fluid-structure interaction and the Laplace formulation to smooth the mesh. 
         // The fields are updated in each 'solve' call.
-        solve(fsi);
-        solve(laplacian);
+        fsi.solve();
+        laplacian.solve();
         
         // Output the max pillar deflection:
         uprev = umax; 
