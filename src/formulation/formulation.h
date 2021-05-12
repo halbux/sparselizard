@@ -104,7 +104,8 @@ class formulation
         // Generate, solve and save to fields:
         void solve(std::string soltype = "lu", bool diagscaling = false, std::vector<int> blockstoconsider = {-1});
 
-        // DDM resolution with mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
+        // DDM resolution with Dirichlet / mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
+        std::vector<double> allsolve(double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
         std::vector<double> allsolve(std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
 
 };
