@@ -1,0 +1,5 @@
+sparselizard (0.0.1-0) unstable; urgency=medium
+
+  * Initial debian package
+
+ -- Jean-Samuel Reynaud <js.reynaud@gmail.com>  Wed, 12 May 2021 10:19:53 +0200
