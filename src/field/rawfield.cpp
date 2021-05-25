@@ -314,7 +314,7 @@ void rawfield::setupdateaccuracy(int extraintegrationorder)
 
 rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnumbers, bool ismultiharm)
 {
-    multiharmonic = ismultiharm;
+    amimultiharmonic = ismultiharm;
     
     // Treat the coordinate fields:
     if (fieldtypename == "x" || fieldtypename == "y" || fieldtypename == "z")
@@ -407,7 +407,7 @@ rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<
     
     std::shared_ptr<rawfield> selectedrf = dm->getselectedfield();
 
-    multiharmonic = selectedrf->multiharmonic;
+    amimultiharmonic = selectedrf->amimultiharmonic;
     mytypename = selectedrf->gettypename();
     mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, pt->getdisjointregions()));
     
@@ -516,7 +516,7 @@ void rawfield::printharmonics(void)
 {
     synchronize();
     
-    if (multiharmonic == false)
+    if (amimultiharmonic == false)
     {
         std::cout << "Field is not multiharmonic" << std::endl;
         return;
@@ -1275,7 +1275,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
         else
         {
             // Extract the actual field from non-multiharmonic fields:
-            if (selectedrawfield->multiharmonic == false)
+            if (selectedrawfield->amimultiharmonic == false)
                 selectedrawfield = selectedrawfield->harmonic(1);
             
             // Get the data for a single field.
@@ -1385,7 +1385,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
         return;
     }
     // Extract the actual field from non-multiharmonic fields:
-    if (selectedrawfield->multiharmonic == false)
+    if (selectedrawfield->amimultiharmonic == false)
         selectedrawfield = selectedrawfield->harmonic(1);
     
     // Transfer the data for a single field.

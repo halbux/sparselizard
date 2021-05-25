@@ -63,7 +63,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
     
     private:
         
-        bool multiharmonic = false;
+        bool amimultiharmonic = false;
 
         std::string myname = "";
         std::string mytypename = "";
@@ -143,7 +143,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         ~rawfield(void);
         
-        bool ismultiharmonic(void) { return multiharmonic; };
+        bool ismultiharmonic(void) { return amimultiharmonic; };
         
         int countcomponents(void);
         int countsubfields(void) { return mysubfields.size(); };

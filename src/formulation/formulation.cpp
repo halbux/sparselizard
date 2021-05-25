@@ -30,7 +30,7 @@ void formulation::operator+=(integration integrationobject)
     
     // The element dimension is required to decompose space derivatives 
     // into the ki, eta and phi derivatives in the reference element.
-    std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = myexpression.extractdoftfpolynomial(elementdimension);
+    std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = myexpression.extractdoftf(elementdimension);
 
     std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
     std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];

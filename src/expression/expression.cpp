@@ -1841,13 +1841,13 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, onexpr.myoperations[i], errorifnotfound));
         else
         {
-            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftfpolynomial').
+            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftf').
             field dummy("h1");
             expression curexpr = expression(onexpr.myoperations[i]) * sl::tf(dummy);
             curexpr.expand();
         
             int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftfpolynomial(elementdimension);
+            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftf(elementdimension);
             // Do not retrieve the info for the tf:
             std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
             std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
@@ -1992,12 +1992,12 @@ void expression::expand(void)
     else
     {
         std::cout << "Error in 'expression' object: expand is only defined for scalar expressions" << std::endl;
-        std::cout << "Did you try to define a nonscalar formulation?" << std::endl;
+        std::cout << "Did you try to define a nonscalar formulation term?" << std::endl;
         abort();
     }
 }
 
-std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftfpolynomial(int elementdimension)
+std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftf(int elementdimension)
 {
     // Simplify the operation:
     myoperations[0] = myoperations[0]->simplify({});

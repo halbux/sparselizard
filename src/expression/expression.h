@@ -236,7 +236,7 @@ class expression
         // pair (with a unique combination of applied time derivatives). 
         //
         // The expression must be scalar!
-        std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftfpolynomial(int elementdimension);
+        std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftf(int elementdimension);
         
         
         // Defining the +, -, * and / operators:
