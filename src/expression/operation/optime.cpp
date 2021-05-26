@@ -3,9 +3,9 @@
 
 std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    if (universe::fundamentalfrequency != -1)
+    if (universe::fundamentalfrequency > 0)
     {
-        std::cout << "Error in 'optime' object: in harmonic domain the time variable 't' cannot be computed without FFT" << std::endl;
+        std::cout << "Error in 'optime' object: the time variable 't' cannot be computed without FFT in harmonic domain" << std::endl;
         abort();
     }
 
@@ -48,6 +48,28 @@ std::shared_ptr<operation> optime::copy(void)
     *op = *this;
     op->reuse = false;
     return op;
+}
+
+double optime::evaluate(void)
+{
+    if (universe::fundamentalfrequency <= 0)
+        return universe::currenttimestep;
+    else
+    {
+        std::cout << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
+        abort();
+    }
+}
+
+std::vector<double> optime::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+{
+    if (universe::fundamentalfrequency <= 0)
+        return std::vector<double>(xcoords.size(), universe::currenttimestep);
+    else
+    {
+        std::cout << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
+        abort();
+    }
 }
 
 void optime::print(void)

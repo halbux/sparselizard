@@ -1388,8 +1388,23 @@ expression expression::at(int row, int col)
     return arrayentry;
 }
 
+double expression::evaluate(void)
+{
+    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
+    
+    if (isscalar())
+        return myoperations[0]->evaluate();
+    else
+    {
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
+        abort();
+    }
+}
+
 std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
+    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
+    
     if (isscalar())
     {
         if (xcoords.size() == ycoords.size() && xcoords.size() == zcoords.size())
@@ -1407,7 +1422,7 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
     }
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on a scalar expression" << std::endl;
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
         abort();
     }
 }

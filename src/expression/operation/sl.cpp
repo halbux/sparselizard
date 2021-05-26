@@ -2776,7 +2776,7 @@ expression sl::predefinedacoustics(expression dofp, expression tfp, expression c
         return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::fundamentalfrequency == -1)
+    if (universe::fundamentalfrequency <= 0)
     {
         std::cout << "Error in 'sl' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
@@ -2799,7 +2799,7 @@ expression sl::predefinedacousticradiation(expression dofp, expression tfp, expr
         return ( -1.0/c*dt(dofp)*tfp );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::fundamentalfrequency == -1)
+    if (universe::fundamentalfrequency <= 0)
     {
         std::cout << "Error in 'sl' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
@@ -2826,7 +2826,7 @@ expression sl::predefinedacousticstructureinteraction(expression dofp, expressio
         return ( -dofp*tfu*n * scaling + rho*dtdt(dofu)*n*tfp * invscal );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::fundamentalfrequency == -1)
+    if (universe::fundamentalfrequency <= 0)
     {
         std::cout << "Error in 'sl' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();

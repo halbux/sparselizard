@@ -163,7 +163,9 @@ class expression
         
         expression at(int row, int col);
         
-        // Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
+        // Evaluate a space-independent scalar expression:
+        double evaluate(void);
+        // Same but allow x, y and/or z fields without derivatives:
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
         // Output the resized expression (filled with zero if larger):
