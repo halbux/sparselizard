@@ -82,7 +82,7 @@ std::shared_ptr<operation> opsum::expand(void)
     for (int i = 0; i < sumterms.size(); i++)
     {
         // We only want to expand operations that include a dof() or tf().
-        if (sumterms[i]->isdofincluded() || sumterms[i]->istfincluded())
+        if (sumterms[i]->isdofincluded() || sumterms[i]->istfincluded() || sumterms[i]->isportincluded())
             sumterms[i] = sumterms[i]->expand();
     }
     // Regroup all sum terms in this one:

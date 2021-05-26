@@ -2222,6 +2222,83 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     return {coeffs, dofs, tfs};
 }
 
+void expression::extractport(std::vector<port>& ports, std::vector<expression>& coefs, expression& noportcoef)
+{
+    ports = {}; coefs = {}; noportcoef = 0.0;
+
+    // Simplify the operation:
+    myoperations[0] = myoperations[0]->simplify({});
+
+    bool isformatok = true;
+
+    // Extract the sum terms from the operation:
+    std::vector<std::shared_ptr<operation>> sumterms;
+    if (myoperations[0]->issum())
+        sumterms = myoperations[0]->getarguments();
+    else
+        sumterms = {myoperations[0]};
+
+    // Loop on all elementary sum terms in the formulation:
+    for (int i = 0; i < sumterms.size(); i++)
+    {
+        // If needed multiply the sum term by a constant 1 to get a product:
+        if (sumterms[i]->isproduct() == false)
+        {
+            std::shared_ptr<opproduct> op(new opproduct);
+            op->multiplybyterm(sumterms[i]);
+            op->multiplybyterm(std::shared_ptr<operation>(new opconstant(1)));
+            sumterms[i] = op;
+        }
+
+        std::shared_ptr<rawport> currentport = NULL;
+
+        // The coef is what remains after port removal.
+        // We thus remove the port term.
+        std::shared_ptr<operation> currentcoef = sumterms[i]->copy();
+
+        std::vector<std::shared_ptr<operation>> productterms = sumterms[i]->getarguments();
+
+        for (int j = productterms.size()-1; j >= 0; j--)
+        {
+            // Remove the port term to get the coefficient:
+            if (currentport == NULL && productterms[j]->isport())
+            {
+                currentport = productterms[j]->getportpointer();
+                currentcoef->removeterm(j);
+            }
+        }
+
+        // A coef without factors actually has value 1:
+        if (currentcoef->count() == 0)
+            currentcoef = std::shared_ptr<opconstant>(new opconstant(1));
+
+        // Do some error checking.
+        // Make sure there is no port in the coef.
+        if (currentcoef->isportincluded())
+            isformatok = false;
+
+        if (currentport != NULL)
+        {
+            ports.push_back(port(currentport));
+            coefs.push_back(expression(currentcoef));
+        }
+        else
+            noportcoef = noportcoef + expression(currentcoef);
+    }
+
+    if (not(isformatok))
+    {
+        std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
+        std::cout << "The expression should be rewritable into a sum of products of the form coef*port (time derivatives allowed)" << std::endl;
+        std::cout << "Expression was:" << std::endl;
+        myoperations[0]->print();
+        std::cout << std::endl;
+        abort();
+    }
+
+    noportcoef.myoperations[0] = noportcoef.myoperations[0]->simplify({});
+}
+
 
 expression expression::operator+(void) { return this->getcopy(); }
 expression expression::operator-(void) { return (this->getcopy() * -1.0); }
