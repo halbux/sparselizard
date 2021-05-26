@@ -21,11 +21,13 @@
 #include "elementselector.h"
 #include "hierarchicalformfunction.h"
 #include "oncontext.h"
+#include "rawport.h"
 
 // ALL SON-OPERATIONS ARE INCLUDED AT THE END OF THIS HEADER.
 
 class rawfield;
 class rawparameter;
+class rawport;
 class oncontext;
 
 class operation : public std::enable_shared_from_this<operation>
@@ -63,6 +65,7 @@ class operation : public std::enable_shared_from_this<operation>
         virtual bool isfield(void) { return false; };
         virtual bool isconstant(void) { return false; };
         virtual bool isparameter(void) { return false; };
+        virtual bool isport(void) { return false; };
         
         // True if the expression is a constant 0:
         bool iszero(void);
@@ -70,6 +73,8 @@ class operation : public std::enable_shared_from_this<operation>
         // True if the expression includes or is a dof/tf:
         virtual bool isdofincluded(void);
         virtual bool istfincluded(void);
+        
+        virtual bool isportincluded(void);
         
         // True if the operation only includes harmonic 1:
         virtual bool isharmonicone(std::vector<int> disjregs);
@@ -83,6 +88,9 @@ class operation : public std::enable_shared_from_this<operation>
         // Get the selected row/column of a parameter operation:
         virtual int getselectedrow(void) { abort(); }; // fix return warning
         virtual int getselectedcol(void) { abort(); }; // fix return warning
+        
+        // Get the rawport of a port operation:
+        virtual std::shared_ptr<rawport> getportpointer(void);
         
         // Get the field pointer of expressions including a field:
         virtual std::shared_ptr<rawfield> getfieldpointer(void);
@@ -172,6 +180,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opon.h"
 #include "oporientation.h"
 #include "opparameter.h"
+#include "opport.h"
 #include "oppower.h"
 #include "opproduct.h"
 #include "opsin.h"
