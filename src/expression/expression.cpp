@@ -2335,17 +2335,18 @@ expression expression::operator*(parameter param) { return this->getcopy() * (ex
 expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
 
 
-expression operator+(double val, expression expr) { return expr+val; }
-expression operator-(double val, expression expr) { return -expr+val; }
-expression operator*(double val, expression expr) { return expr*val; }
-expression operator/(double val, expression expr) { return ( (expression)val ) / expr; }
+expression operator+(double val, expression expr) { return (expression)val + expr; }
+expression operator-(double val, expression expr) { return (expression)val - expr; }
+expression operator*(double val, expression expr) { return (expression)val * expr; }
+expression operator/(double val, expression expr) { return (expression)val / expr; }
 
-expression operator+(field inputfield, expression expr) { return expr+inputfield; }
-expression operator-(field inputfield, expression expr) { return -expr+inputfield; }
-expression operator*(field inputfield, expression expr) { return expr*inputfield; }
-expression operator/(field inputfield, expression expr) { return ( (expression)inputfield ) / expr; }
+expression operator+(field inputfield, expression expr) { return (expression)inputfield + expr; }
+expression operator-(field inputfield, expression expr) { return (expression)inputfield - expr; }
+expression operator*(field inputfield, expression expr) { return (expression)inputfield * expr; }
+expression operator/(field inputfield, expression expr) { return (expression)inputfield / expr; }
 
-expression operator+(parameter param, expression expr) { return expr+param; }
-expression operator-(parameter param, expression expr) { return -expr+param; }
-expression operator*(parameter param, expression expr) { return expr*param; }
-expression operator/(parameter param, expression expr) { return ( (expression)param ) / expr; }
+expression operator+(parameter param, expression expr) { return (expression)param + expr; }
+expression operator-(parameter param, expression expr) { return (expression)param - expr; }
+expression operator*(parameter param, expression expr) { return (expression)param * expr; }
+expression operator/(parameter param, expression expr) { return (expression)param / expr; }
+

@@ -92,12 +92,8 @@ expression parameter::operator*(double val) { return (expression)*this * val; }
 expression parameter::operator/(double val) { return (expression)*this / val; }
 
 
-expression operator+(double val, parameter inputparameter) { return inputparameter+val; }
-expression operator-(double val, parameter inputparameter) { return -inputparameter+val; }
-expression operator*(double val, parameter inputparameter) { return inputparameter*val; }
-expression operator/(double val, parameter inputparameter) { return ( (expression)val )/( (expression)inputparameter ); }
-
-
-
-
+expression operator+(double val, parameter inputparameter) { return (expression)val + inputparameter; }
+expression operator-(double val, parameter inputparameter) { return (expression)val - inputparameter; }
+expression operator*(double val, parameter inputparameter) { return (expression)val * inputparameter; }
+expression operator/(double val, parameter inputparameter) { return (expression)val / inputparameter; }
 
