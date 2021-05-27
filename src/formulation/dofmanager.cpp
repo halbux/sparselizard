@@ -18,6 +18,8 @@ void dofmanager::synchronize(void)
     rangeend = {};
 
     // Rebuild the structure:
+    for (int i = 0; i < myportstructuretracker.size(); i++)
+        addtostructure(myportstructuretracker[i], false);
     for (int i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
@@ -117,6 +119,15 @@ void dofmanager::donotsynchronize(void)
     issynchronizing = true;
 }
 
+void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd, bool isusercall)
+{
+    synchronize();
+    
+    // Keep track of the calls to 'addtostructure':
+    if (isusercall)
+        myportstructuretracker.push_back(porttoadd);
+}
+
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     synchronize();
@@ -129,13 +140,6 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physic
     std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
     
     addtostructure(fieldtoadd, disjregs);
-}
-
-void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
-{
-    synchronize();
-    
-    
 }
 
 void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)

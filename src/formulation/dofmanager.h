@@ -58,6 +58,7 @@ class dofmanager
         int mymeshnumber = 0;
         
         // Track the calls to 'addtostructure'.
+        std::vector<std::shared_ptr<rawport>> myportstructuretracker = {};
         std::vector<std::pair<std::shared_ptr<rawfield>, int>> mystructuretracker = {};
         
         // Synchronize with the hp-adapted mesh:
@@ -79,11 +80,12 @@ class dofmanager
         
         void donotsynchronize(void);
         
+        // Add a rawport to the structure:
+        void addtostructure(std::shared_ptr<rawport> porttoadd, bool isusercall = true);
+        
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
-        // Add a rawport to the structure:
-        void addtostructure(std::shared_ptr<rawport> porttoadd);
         
         // Always select the field before accessing the dof structure.
         void selectfield(std::shared_ptr<rawfield> selectedfield);
