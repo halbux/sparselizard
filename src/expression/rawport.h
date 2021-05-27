@@ -29,11 +29,11 @@ class rawport : public std::enable_shared_from_this<rawport>
         bool myisprimal = true;
         
         // Dual/primal port if this is the primal/dual.
-        std::shared_ptr<rawport> mybrother = NULL;
+        std::weak_ptr<rawport> mybrother;
         
         // This port is associated to a unique rawfield and physical region:
         int myphysreg = -1;
-        std::shared_ptr<rawfield> myrawfield = NULL;
+        std::weak_ptr<rawfield> myrawfield;
     
     public:
     

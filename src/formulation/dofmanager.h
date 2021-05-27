@@ -89,7 +89,7 @@ class dofmanager
         void donotsynchronize(void);
         
         // Add a rawport to the structure:
-        void addtostructure(std::shared_ptr<rawport> porttoadd, bool isusercall = true);
+        void addtostructure(std::shared_ptr<rawport> porttoadd);
         
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.

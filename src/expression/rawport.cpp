@@ -115,28 +115,46 @@ int rawport::getphysicalregion(void)
 
 std::shared_ptr<rawfield> rawport::getrawfield(void)
 {
-    return myrawfield;
+    if (myrawfield.expired())
+    {
+        std::cout << "Error in 'rawport' object: the associated rawfield is needed but it was destroyed" << std::endl;
+        abort();
+    }
+    
+    return myrawfield.lock();
 }
 
 std::shared_ptr<rawport> rawport::getprimal(void)
 {
+    if (mybrother.expired())
+    {
+        std::cout << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
+        abort();
+    }
+    
     if (myisprimal)
         return shared_from_this();
     else
-        return mybrother;
+        return mybrother.lock();
 }
 
 std::shared_ptr<rawport> rawport::getdual(void)
 {
+    if (mybrother.expired())
+    {
+        std::cout << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
+        abort();
+    }
+    
     if (myisprimal)
-        return mybrother;
+        return mybrother.lock();
     else
         return shared_from_this();
 }
 
 bool rawport::isassociated(void)
 {
-    return (myrawfield != NULL);
+    return (myphysreg != -1);
 }
 
 void rawport::associate(bool isprim, std::shared_ptr<rawport> bro, int physreg, std::shared_ptr<rawfield> rf)

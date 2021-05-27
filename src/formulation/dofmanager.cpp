@@ -21,7 +21,7 @@ void dofmanager::synchronize(void)
 
     // Rebuild the structure:
     for (int i = 0; i < myportstructuretracker.size(); i++)
-        addtostructure(myportstructuretracker[i], false);
+        addtostructure(myportstructuretracker[i]);
     for (int i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
@@ -140,12 +140,12 @@ void dofmanager::donotsynchronize(void)
     issynchronizing = true;
 }
 
-void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd, bool isusercall)
+void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
 {
     synchronize();
     
     // Keep track of the calls to 'addtostructure':
-    if (isusercall)
+    if (issynchronizing == false)
         myportstructuretracker.push_back(porttoadd);
         
     if (porttoadd->isassociated())
