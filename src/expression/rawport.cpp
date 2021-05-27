@@ -109,10 +109,21 @@ std::shared_ptr<rawfield> rawport::getrawfield(void)
 {
     return myrawfield;
 }
-        
-std::shared_ptr<rawport> rawport::getbrother(void)
+
+std::shared_ptr<rawport> rawport::getprimal(void)
 {
-    return mybrother;
+    if (myisprimal)
+        return shared_from_this();
+    else
+        return mybrother;
+}
+
+std::shared_ptr<rawport> rawport::getdual(void)
+{
+    if (myisprimal)
+        return mybrother;
+    else
+        return shared_from_this();
 }
 
 bool rawport::isassociated(void)

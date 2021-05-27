@@ -14,6 +14,8 @@ void dofmanager::synchronize(void)
     int selectedfieldnumberbkp = selectedfieldnumber;
     selectedfieldnumber = -1;
     myfieldorders = {};
+    primalondisjreg = {};
+    myrawportmap.clear();
     rangebegin = {};
     rangeend = {};
 
@@ -54,6 +56,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         myfields.push_back(fieldtoadd);
         myfieldorders.push_back(fieldtoadd->getinterpolationorders());
         int numberofdisjointregions = mydisjointregions->count();
+        primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
         std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
         rangebegin.push_back(temp);
         rangeend.push_back(temp);
@@ -88,7 +91,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         {
             int numffdefinedbeforeresize = rangebegin[fieldindex][disjreg].size();
             int currentnumberofdofs = mydisjointregions->countelements(disjreg);
-
+            
             rangebegin[fieldindex][disjreg].resize(numberofformfunctions);
             rangeend[fieldindex][disjreg].resize(numberofformfunctions);
                 
@@ -126,6 +129,62 @@ void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd, bool isuserc
     // Keep track of the calls to 'addtostructure':
     if (isusercall)
         myportstructuretracker.push_back(porttoadd);
+        
+    if (porttoadd->isassociated())
+    {
+        std::shared_ptr<rawfield> associatedfield = porttoadd->getrawfield();
+    
+        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+        physicalregions* myphysicalregions = universe::mymesh->getphysicalregions();
+
+        // Find the field index of 'associatedfield' (if present):
+        int fieldindex = -1;
+        for (int i = 0; i < myfields.size(); i++)
+        {
+            if (myfields[i].get() == associatedfield.get())
+            {
+                fieldindex = i;
+                break;
+            }
+        }
+        // Add the field to the structure if not existing.
+        // Add an entry for every disjoint region at the same time.
+        if (fieldindex == -1)
+        {
+            fieldindex = myfields.size();
+            myfields.push_back(associatedfield);
+            myfieldorders.push_back(associatedfield->getinterpolationorders());
+            int numberofdisjointregions = mydisjointregions->count();
+            primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
+            std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
+            rangebegin.push_back(temp);
+            rangeend.push_back(temp);
+        }
+        else
+        {
+            // Make sure the field order has not changed between two calls:
+            if (associatedfield->getinterpolationorders() != myfieldorders[fieldindex])
+            {
+                std::cout << "Error in 'dofmanager' object: ";
+                associatedfield->print();
+                std::cout << " order was changed and does not match dof structure anymore" << std::endl;
+                abort();
+            }
+        }
+        
+        std::vector<int> disjregs = myphysicalregions->get(porttoadd->getphysicalregion())->getdisjointregions(-1);
+
+        for (int i = 0; i < disjregs.size(); i++)
+            primalondisjreg[fieldindex][disjregs[i]] = porttoadd->getprimal();
+    }
+
+    // Add the dual to the hashmap (the primal will be added during a regular 'addtostructure' call):
+    bool isdualnotthere = (myrawportmap.find(porttoadd->getdual().get()) == myrawportmap.end());
+    if (isdualnotthere)
+    {
+        myrawportmap[porttoadd->getdual().get()] = numberofdofs;
+        numberofdofs++;
+    }
 }
 
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)

@@ -17,6 +17,7 @@
 #include "disjointregions.h"
 #include "intdensematrix.h"
 #include <memory>
+#include <unordered_map>
 #include "selector.h"
 #include "rawport.h"
 
@@ -37,6 +38,13 @@ class dofmanager
         
         // Order of each field on each disjoint region:
         std::vector<std::vector<int>> myfieldorders = {};
+        
+        // 'primalondisjreg[selectedfieldnumber][disjreg]' gives
+        // the primal rawport on the disjoint region (NULL if none):
+        std::vector<std::vector<std::shared_ptr<rawport>>> primalondisjreg = {};
+        
+        // Map every added port to its dof index:
+        std::unordered_map<rawport*, int> myrawportmap;
         
         // 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
         // the first row/column in the matrix at which the data for 

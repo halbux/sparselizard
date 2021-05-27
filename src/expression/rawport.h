@@ -55,7 +55,9 @@ class rawport : public std::enable_shared_from_this<rawport>
         
         std::shared_ptr<rawfield> getrawfield(void);
         
-        std::shared_ptr<rawport> getbrother(void);
+        // Get the primal/dual corresponding to this port:
+        std::shared_ptr<rawport> getprimal(void);
+        std::shared_ptr<rawport> getdual(void);
         
         // Check if this rawport is associated to a rawfield:
         bool isassociated(void);
