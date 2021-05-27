@@ -43,3 +43,19 @@ int hierarchicalformfunction::getminorder(std::string fftypename)
     std::cout << "Error in 'hierarchicalformfunction' object: unknown type name '" << fftypename << "'" << std::endl;
     abort();
 }
+
+int hierarchicalformfunction::getminorderdim(std::string fftypename)
+{
+    if (fftypename == "h1" || fftypename == "one0" || fftypename == "h1d0" || fftypename == "x" || fftypename == "y" || fftypename == "z")
+        return 0;
+    if (fftypename == "hcurl" || fftypename == "one1" || fftypename == "h1d1")
+        return 1;
+    if (fftypename == "one2" || fftypename == "h1d2")
+        return 2;
+    if (fftypename == "one3" || fftypename == "h1d3")
+        return 3;
+        
+    std::cout << "Error in 'hierarchicalformfunction' object: unknown type name '" << fftypename << "'" << std::endl;
+    abort();
+}
+
