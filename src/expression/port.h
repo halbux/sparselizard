@@ -13,6 +13,8 @@
 #include <memory>
 #include "rawport.h"
 
+class rawport;
+
 class port
 {
 

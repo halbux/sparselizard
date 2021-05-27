@@ -154,6 +154,20 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
     rawfieldptr->setorder(crit, loworder, highorder, highorder-loworder+1);
 }
 
+void field::setport(int physreg, port& primal, port& dual)
+{
+    errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
+    if (rawfieldptr->gettypename() != "h1" && rawfieldptr->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'field' object: cannot set ports to a '" << rawfieldptr->gettypename() << "' type field" << std::endl;
+        abort();
+    }
+    
+    rawfieldptr->setport(physreg, primal.getpointer(), dual.getpointer());
+}
+
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();

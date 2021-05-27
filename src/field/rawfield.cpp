@@ -707,6 +707,41 @@ void rawfield::setorder(expression criterion, int loworder, int highorder, doubl
     }
 }
 
+void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared_ptr<rawport> dual)
+{
+    synchronize();
+ 
+    if (mysubfields.size() > 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set ports to a field with multiple components (work with the individual components instead)" << std::endl;
+        abort();
+    }
+    
+    std::vector<int> fieldharms = getharmonics();
+    if (fieldharms != primal->getharmonics() || fieldharms != dual->getharmonics())
+    {
+        std::cout << "Error in 'rawfield' object: cannot set a port with a harmonic content that does not match the field" << std::endl;
+        abort();
+    }
+    
+    for (int h = 0; h < fieldharms.size(); h++)
+    {
+        int harm = fieldharms[h];
+        std::shared_ptr<rawport> ph = primal->harmonic(harm);
+        std::shared_ptr<rawport> dh = dual->harmonic(harm);
+        std::shared_ptr<rawfield> fh = harmonic(harm);
+    
+        if (ph->isassociated() || dh->isassociated())
+        {
+            std::cout << "Error in 'rawfield' object: at least one port to set is already associated to a field" << std::endl;
+            abort();
+        }
+
+        ph->associate(true, dh, physreg, fh);
+        dh->associate(false, ph, physreg, fh);
+    }
+}
+
 void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     synchronize();
