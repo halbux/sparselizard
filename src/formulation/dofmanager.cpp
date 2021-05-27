@@ -194,13 +194,16 @@ void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
 
         for (int i = 0; i < disjregs.size(); i++)
             primalondisjreg[fieldindex][disjregs[i]] = porttoadd->getprimal();
+            
+        // Port to add below to the hashmap:
+        porttoadd = porttoadd->getdual();
     }
 
     // Add the dual to the hashmap (the primal will be added during a regular 'addtostructure' call):
-    bool isdualnotthere = (myrawportmap.find(porttoadd->getdual().get()) == myrawportmap.end());
-    if (isdualnotthere)
+    bool isnotthere = (myrawportmap.find(porttoadd.get()) == myrawportmap.end());
+    if (isnotthere)
     {
-        myrawportmap[porttoadd->getdual().get()] = numberofdofs;
+        myrawportmap[porttoadd.get()] = numberofdofs;
         numberofdofs++;
     }
 }
