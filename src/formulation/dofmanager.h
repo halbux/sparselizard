@@ -18,8 +18,10 @@
 #include "intdensematrix.h"
 #include <memory>
 #include "selector.h"
+#include "rawport.h"
 
 class rawfield;
+class rawport;
 
 class dofmanager
 {
@@ -80,6 +82,9 @@ class dofmanager
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
+        // Add a rawport to the structure:
+        void addtostructure(std::shared_ptr<rawport> porttoadd);
+        
         // Always select the field before accessing the dof structure.
         void selectfield(std::shared_ptr<rawfield> selectedfield);
         

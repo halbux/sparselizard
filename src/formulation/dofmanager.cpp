@@ -131,6 +131,13 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physic
     addtostructure(fieldtoadd, disjregs);
 }
 
+void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
+{
+    synchronize();
+    
+    
+}
+
 void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
 {
     synchronize();

@@ -11,6 +11,8 @@
 
 #include "rawfield.h"
 
+class rawfield;
+
 class rawport : public std::enable_shared_from_this<rawport>
 {
 
