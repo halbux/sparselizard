@@ -75,7 +75,7 @@ class field
         void setorder(double targeterror, int loworder, int highorder, double absthres);
 
         // Associate the primal and dual port to the field.
-        void setport(int physreg, port& primal, port& dual);
+        void setport(int physreg, port primal, port dual);
 
         // Set a value for the field on a given geometrical region.
         // Use the default order + 'extraintegrationdegree' to 

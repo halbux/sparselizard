@@ -154,7 +154,7 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
     rawfieldptr->setorder(crit, loworder, highorder, highorder-loworder+1);
 }
 
-void field::setport(int physreg, port& primal, port& dual)
+void field::setport(int physreg, port primal, port dual)
 {
     errorifpointerisnull();
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
