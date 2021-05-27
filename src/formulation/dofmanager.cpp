@@ -85,6 +85,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         // Get the number of form functions:
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fieldtoadd->gettypename());
         int numberofformfunctions = myformfunction->count(fieldtoadd->getinterpolationorder(disjreg), elementdimension, 0);
+        int lowestformfunctionelementdimension = myformfunction->getminorderdim(fieldtoadd->gettypename());
         
         // Only treat the form functions not yet in the dof structure.
         if (rangebegin[fieldindex][disjreg].size() < numberofformfunctions)
@@ -97,9 +98,26 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
                 
             for (int ff = numffdefinedbeforeresize; ff < numberofformfunctions; ff++)
             {
-                rangebegin[fieldindex][disjreg][ff] = numberofdofs;
-                rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
-                numberofdofs += currentnumberofdofs;
+                std::shared_ptr<rawport> pdr = primalondisjreg[fieldindex][disjreg];
+                if (pdr != NULL && lowestformfunctionelementdimension == elementdimension && ff == 0)
+                {
+                    bool isprimalnotthere = (myrawportmap.find(pdr.get()) == myrawportmap.end());
+                    if (isprimalnotthere)
+                    {
+                        myrawportmap[pdr.get()] = numberofdofs;
+                        numberofdofs++;
+                    }
+                    int primaladdress = myrawportmap[pdr.get()];
+                        
+                    rangebegin[fieldindex][disjreg][ff] = primaladdress;
+                    rangeend[fieldindex][disjreg][ff] = primaladdress;
+                }
+                else
+                {
+                    rangebegin[fieldindex][disjreg][ff] = numberofdofs;
+                    rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
+                    numberofdofs += currentnumberofdofs;
+                }
             }
         }
     }
@@ -266,6 +284,23 @@ bool dofmanager::isdefined(int disjreg, int formfunc)
     synchronize();
     
     return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
+}
+
+int dofmanager::getaddress(std::shared_ptr<rawport> prt)
+{
+    synchronize();
+
+    bool isnotthere = (myrawportmap.find(prt.get()) == myrawportmap.end());
+    if (isnotthere == false)
+        return myrawportmap[prt.get()];
+    else
+    {
+        std::string pn = prt->getname();
+        if (pn.size() > 0)
+            pn = "'"+pn+"' ";
+        std::cout << "Error in 'dofmanager' object: requested port " << pn << "could not be found in the dof structure" << std::endl;
+        abort();
+    }
 }
 
 std::vector<bool> dofmanager::isconstrained(void)
@@ -787,7 +822,13 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
-                adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
+                
+                int rb = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex];
+                int re = rangeend[selectedfieldnumber][currentdisjointregion][formfunctionindex];
+                if (rb != re)
+                    adresses[ff*numcols+i] = rb + currentsubelem;
+                else
+                    adresses[ff*numcols+i] = rb;
             }
             else
                 adresses[ff*numcols+i] = -1;

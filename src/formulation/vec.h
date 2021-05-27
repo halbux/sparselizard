@@ -20,6 +20,7 @@
 #include "memory.h"
 #include "rawvec.h"
 #include "petscvec.h"
+#include "port.h"
 
 class field;
 class rawvec;
@@ -58,6 +59,8 @@ class vec
         // Set and get value at a single index:
         void setvalue(int address, double value, std::string op = "set");
         double getvalue(int address);
+        void setvalue(port prt, double value, std::string op = "set");
+        double getvalue(port prt);
         
         vectorfieldselect operator|(field selectedfield);
         

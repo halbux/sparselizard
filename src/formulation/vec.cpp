@@ -92,6 +92,34 @@ double vec::getvalue(int address)
     errorifpointerisnull(); return rawvecptr->getvalue(address); 
 }
 
+void vec::setvalue(port prt, double value, std::string op)
+{
+    if (prt.getpointer()->isharmonicone())
+    {
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1));
+        setvalue(address, value, op);
+    }
+    else
+    {
+        std::cout << "Error in 'vec' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+}
+
+double vec::getvalue(port prt)
+{
+    if (prt.getpointer()->isharmonicone())
+    {
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1));
+        return getvalue(address);
+    }
+    else
+    {
+        std::cout << "Error in 'vec' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+}
+
 vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); return vectorfieldselect(rawvecptr, selectedfield.getpointer()); }
 
 void vec::setdata(int physreg, field myfield, std::string op)

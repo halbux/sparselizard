@@ -106,6 +106,9 @@ class dofmanager
         
         bool isdefined(int disjreg, int formfunc);
         
+        // Get the port dof index:
+        int getaddress(std::shared_ptr<rawport> prt);
+        
         // For all types of constraints:
         std::vector<bool> isconstrained(void);
         intdensematrix getconstrainedindexes(void);

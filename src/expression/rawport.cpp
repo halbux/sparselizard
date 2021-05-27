@@ -26,6 +26,14 @@ void rawport::setname(std::string name)
 
 std::string rawport::getname(void) { return myname; }
 
+bool rawport::isharmonicone(void)
+{
+    if (myharmonics.size() == 0 || myharmonics.size() == 2 && myharmonics[1].size() == 1)
+        return true;
+    else
+        return false;
+}
+
 std::vector<int> rawport::getharmonics(void)
 {
     std::vector<int> harms = {};

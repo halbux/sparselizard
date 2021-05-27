@@ -45,6 +45,7 @@ class rawport : public std::enable_shared_from_this<rawport>
         void setname(std::string name);
         std::string getname(void);
         
+        bool isharmonicone(void);
         std::vector<int> getharmonics(void);
         std::shared_ptr<rawport> harmonic(int harmonicnumber);
         std::shared_ptr<rawport> harmonic(std::vector<int> harmonicnumbers);
