@@ -271,6 +271,8 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     
     mydofmanager->selectfield(selectedfield);
     
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    
     // Return an empty matrix if the entries are not in the vector:
     if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
     {
@@ -282,9 +284,17 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     int rangeend = mydofmanager->getrangeend(disjointregionnumber, formfunctionindex);
     
     int numentries = rangeend-rangebegin+1;
+    int step = 1;
+    
+    int drnumelems = drs->countelements(disjointregionnumber);
+    if (numentries == 1 && drnumelems > 1)
+    {
+        numentries = drnumelems;
+        step = 0;
+    }
     
     densematrix vals(numentries, 1);
-    intdensematrix addressestoget(numentries, 1, rangebegin, 1);
+    intdensematrix addressestoget(numentries, 1, rangebegin, step);
     VecGetValues(myvec, numentries, addressestoget.getvalues(), vals.getvalues());
     
     return vals;

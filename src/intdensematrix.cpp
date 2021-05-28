@@ -87,6 +87,14 @@ intdensematrix::intdensematrix(std::vector<intdensematrix> input)
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
+intdensematrix intdensematrix::getresized(long long int m, long long int n)
+{
+    intdensematrix out = *this; 
+    out.numrows = m;
+    out.numcols = n;
+    return out;
+}
+
 long long int intdensematrix::countpositive(void)
 {
     int* myvaluesptr = myvalues.get();

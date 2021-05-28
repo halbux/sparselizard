@@ -122,6 +122,13 @@ class dofmanager
         // Get the conditionally constrained adresses as well as the constraint values:
         std::pair<intdensematrix, densematrix> getconditionalconstraintdata(void);
         
+        // Count the total number of ports:
+        int countports(void);
+        int countassociatedprimalports(void);
+        
+        // Return the primal and dual addresses for all associated ports: 
+        std::pair<intdensematrix, intdensematrix> findassociatedports(void);
+        
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
         // The replacing field must have an identical type and order vector as the replaced one:

@@ -263,6 +263,68 @@ void formulation::generate(int contributionnumber)
             generate(i, contributionnumber);
 }
 
+densematrix formulation::getportrelationrhs(void)
+{
+    int numrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
+    if (myportrelations.size() != numrelations)
+    {
+        std::cout << "Error in 'formulation' object: expected " << numrelations << " port relations to match the number of unknown ports provided" << std::endl;
+        abort();
+    }
+    
+    densematrix rhsvals(numrelations, 1);
+    double* vptr = rhsvals.getvalues();
+    
+    for (int i = 0; i < numrelations; i++)
+        vptr[i] = -std::get<2>(myportrelations[i]).getoperationinarray(0,0)->evaluate();
+
+    return rhsvals;
+}
+
+std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrelation(int KCM)
+{
+    // TREAT KCM + MH CASE!
+    
+    int numrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
+    if (myportrelations.size() != numrelations)
+    {
+        std::cout << "Error in 'formulation' object: expected " << numrelations << " port relations to match the number of unknown ports provided" << std::endl;
+        abort();
+    }
+    
+    // Compute a container size upper bound:
+    int maxsize = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+        maxsize += std::get<0>(myportrelations[i]).size();
+    
+    intdensematrix rowads(maxsize, 1);
+    intdensematrix colads(maxsize, 1);
+    densematrix vals(maxsize, 1);
+    
+    int* rptr = rowads.getvalues();
+    int* cptr = colads.getvalues();
+    double* vptr = vals.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < numrelations; i++)
+    {
+        for (int j = 0; j < std::get<0>(myportrelations[i]).size(); j++)
+        {
+            rptr[index] = i;
+            cptr[index] = mydofmanager->getaddress(std::get<0>(myportrelations[i])[j].getpointer()->harmonic(1)); ///////////// TREAT MULTIHARMONIC CASE!!!!!!!!!!!!!!!!!!!! ->loop on all harmonics!
+            vptr[index] = std::get<1>(myportrelations[i])[j].evaluate(); // CHECK TIMEDERIVATIVE...!
+            
+            index++;
+        }
+    }
+    
+    rowads = rowads.getresized(index, 1);
+    colads = colads.getresized(index, 1);
+    vals = vals.getresized(index, 1);
+
+    return std::make_tuple(rowads, colads, vals);
+}
+
 
 vec formulation::b(bool keepvector, bool dirichletupdate) { return rhs(keepvector, dirichletupdate); }
 mat formulation::A(bool keepfragments) { return K(keepfragments); }
@@ -282,8 +344,11 @@ vec formulation::rhs(bool keepvector, bool dirichletupdate)
         output = vec(myvec).copy();
     
     if (dirichletupdate == true && isconstraintcomputation == false)
-        output.updateconstraints(); 
-    
+        output.updateconstraints();
+
+    densematrix portrhsvals = getportrelationrhs();
+    output.setvalues(intdensematrix(portrhsvals.count(), 1, 0, 1), portrhsvals);
+
     return output; 
 }
 
@@ -313,6 +378,11 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
         for (int j = 0; j < additionalconstraints[i].count(); j++)
             isconstr[acptr[j]] = true;
     }
+    
+    std::pair<intdensematrix, intdensematrix> assocports = mydofmanager->findassociatedports();
+    rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, -1.0));
+    std::tuple<intdensematrix, intdensematrix, densematrix> portrelterms = getportrelation(KCM);
+    rawout->accumulate(std::get<0>(portrelterms), std::get<1>(portrelterms), std::get<2>(portrelterms));
 
     rawout->process(isconstr); 
     rawout->clearfragments();

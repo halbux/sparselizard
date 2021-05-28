@@ -95,6 +95,10 @@ class formulation
         void generate(std::vector<int> contributionnumbers);
         void generate(int contributionnumber);
         
+        // Compute the no-port term value for every port relation:
+        densematrix getportrelationrhs(void);
+        std::tuple<intdensematrix, intdensematrix, densematrix> getportrelation(int KCM);
+        
         std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         
         // Get the assembled matrices or get the right hanside vector.

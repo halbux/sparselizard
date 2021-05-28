@@ -591,6 +591,58 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     return std::make_pair(condconstrindices, condconstrval);
 }
 
+int dofmanager::countports(void)
+{
+    synchronize();
+    
+    return myrawportmap.size();
+}
+
+int dofmanager::countassociatedprimalports(void)
+{
+    synchronize();
+    
+    int cnt = 0;
+    
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+            cnt++;
+    }
+    
+    return cnt;
+}
+
+std::pair<intdensematrix, intdensematrix> dofmanager::findassociatedports(void)
+{
+    synchronize();
+    
+    intdensematrix primalads(countports(), 1);
+    intdensematrix dualads(countports(), 1);
+    
+    int* paptr = primalads.getvalues();
+    int* daptr = dualads.getvalues();
+    
+    int index = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+        {
+            paptr[index] = it->second;
+            daptr[index] = myrawportmap[rp->getdual().get()];
+            
+            index++;
+        }
+    }
+
+    primalads = primalads.getresized(index, 1);
+    dualads = dualads.getresized(index, 1);
+    
+    return std::make_pair(primalads, dualads);
+}
+
 std::shared_ptr<rawfield> dofmanager::getselectedfield(void)
 {
     synchronize();

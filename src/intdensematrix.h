@@ -46,6 +46,9 @@ class intdensematrix
         long long int countcolumns(void) { return numcols; };
         long long int count(void) { return numrows*numcols; };
         
+        // Output the mxn resized matrix (this only changes 'numrows' and 'numcols'). Values are NOT copied!
+        intdensematrix getresized(long long int m, long long int n);
+        
         // Count the number of positive or zero integer values:
         long long int countpositive(void);
         // Count the number of occurences of a value:
