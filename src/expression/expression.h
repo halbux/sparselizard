@@ -34,12 +34,14 @@
 #include "iointerface.h"
 #include "spline.h"
 #include "referencecoordinategroup.h"
+#include "port.h"
 
 
 class vec;
 class operation;
 class parameter;
 class field;
+class port;
 class shape;
 
 class expression
@@ -73,6 +75,7 @@ class expression
         expression(field);
         expression(double);
         expression(parameter);
+        expression(port);
         expression(int numrows, int numcols, std::vector<expression>);
         // Concatenate expressions to create a new one:
         expression(const std::vector<std::vector<expression>> input);
@@ -264,6 +267,11 @@ class expression
         expression operator-(parameter);
         expression operator*(parameter);
         expression operator/(parameter);
+        
+        expression operator+(port);
+        expression operator-(port);
+        expression operator*(port);
+        expression operator/(port);
 };
 
 // Define the left version of the operators based on the right one.
@@ -282,7 +290,10 @@ expression operator-(parameter, expression);
 expression operator*(parameter, expression);
 expression operator/(parameter, expression);
 
+expression operator+(port, expression);
+expression operator-(port, expression);
+expression operator*(port, expression);
+expression operator/(port, expression);
+
 #endif
-
-
 

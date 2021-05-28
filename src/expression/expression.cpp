@@ -50,6 +50,14 @@ expression::expression(parameter input)
     }
 }
 
+expression::expression(port input)
+{
+    mynumrows = 1;
+    mynumcols = 1;
+
+    //myoperations = {std::shared_ptr<opport>(new opport(input.getpointer()))};
+}
+
 expression::expression(int numrows, int numcols, std::vector<expression> input)
 {
     mynumrows = numrows;
@@ -2334,6 +2342,11 @@ expression expression::operator-(parameter param) { return this->getcopy() - (ex
 expression expression::operator*(parameter param) { return this->getcopy() * (expression)param; }
 expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
 
+expression expression::operator+(port prt) { return this->getcopy() + (expression)prt; }
+expression expression::operator-(port prt) { return this->getcopy() - (expression)prt; }
+expression expression::operator*(port prt) { return this->getcopy() * (expression)prt; }
+expression expression::operator/(port prt) { return this->getcopy() / (expression)prt; }
+
 
 expression operator+(double val, expression expr) { return (expression)val + expr; }
 expression operator-(double val, expression expr) { return (expression)val - expr; }
@@ -2349,4 +2362,9 @@ expression operator+(parameter param, expression expr) { return (expression)para
 expression operator-(parameter param, expression expr) { return (expression)param - expr; }
 expression operator*(parameter param, expression expr) { return (expression)param * expr; }
 expression operator/(parameter param, expression expr) { return (expression)param / expr; }
+
+expression operator+(port prt, expression expr) { return (expression)prt + expr; }
+expression operator-(port prt, expression expr) { return (expression)prt - expr; }
+expression operator*(port prt, expression expr) { return (expression)prt * expr; }
+expression operator/(port prt, expression expr) { return (expression)prt / expr; }
 
