@@ -239,9 +239,15 @@ class expression
         // output[0], output[1] and output[2] may have multiple slices 
         // output[0][s] each corresponding to a unique dof field*-tf field* 
         // pair (with a unique combination of applied time derivatives). 
-        //
-        // The expression must be scalar!
+        // The expression must be scalar.
         std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftf(int elementdimension);
+        
+        // Extract the ports and their coefficients from an expanded expression
+        // that can be rewritten as coefs[0]*ports[0] + ... + noportcoef
+        // where the coefficients are space-independent numerical values
+        // that do not include ports. The expression must be scalar.
+        // The ports extracted might contain duplicates.
+        void extractport(std::vector<port>& ports, std::vector<expression>& coefs, expression& noportcoef);
         
         
         // Defining the +, -, * and / operators:
