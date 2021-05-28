@@ -55,7 +55,7 @@ expression::expression(port input)
     mynumrows = 1;
     mynumcols = 1;
 
-    //myoperations = {std::shared_ptr<opport>(new opport(input.getpointer()))};
+    myoperations = {std::shared_ptr<opport>(new opport(input.getpointer()))};
 }
 
 expression::expression(int numrows, int numcols, std::vector<expression> input)

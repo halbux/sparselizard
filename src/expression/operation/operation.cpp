@@ -54,6 +54,18 @@ bool operation::istfincluded(void)
     return istf();
 }
 
+bool operation::isportincluded(void)
+{ 
+    std::vector<std::shared_ptr<operation>> arguments = getarguments();
+
+    for (int i = 0; i < arguments.size(); i++)
+    {
+        if (arguments[i]->isportincluded())
+            return true;
+    }
+    return isport();
+}
+
 bool operation::isharmonicone(std::vector<int> disjregs)
 {
     std::vector<std::shared_ptr<operation>> arguments = getarguments();
@@ -69,6 +81,15 @@ bool operation::isharmonicone(std::vector<int> disjregs)
 std::shared_ptr<rawparameter> operation::getparameterpointer(void)
 {
     std::cout << "Error in 'operation' object: cannot get the rawparameter pointer" << std::endl;
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    std::cout << std::endl;
+    abort();
+}
+
+std::shared_ptr<rawport> operation::getportpointer(void)
+{
+    std::cout << "Error in 'operation' object: cannot get the rawport pointer" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     std::cout << std::endl;

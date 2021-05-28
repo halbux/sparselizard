@@ -124,8 +124,8 @@ std::shared_ptr<operation> opproduct::expand(void)
     // to expand the other ones for the formulations.
     for (int i = 0; i < productterms.size(); i++)
     {
-        // We only want to expand operations that include a dof() or tf().
-        if (productterms[i]->isdofincluded() || productterms[i]->istfincluded())
+        // We only want to expand operations that include a dof(), tf() or port.
+        if (productterms[i]->isdofincluded() || productterms[i]->istfincluded() || productterms[i]->isportincluded())
             productterms[i] = productterms[i]->expand();
     }
     
@@ -138,7 +138,7 @@ std::shared_ptr<operation> opproduct::expand(void)
     for (int i = 0; i < productterms.size(); i++)
     {
         prodtrms[i] = productterms[i];
-        if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()))
+        if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()) && not(productterms[i]->isportincluded()))
         {
             std::shared_ptr<opsum> op(new opsum);
             op->addterm(productterms[i]);
