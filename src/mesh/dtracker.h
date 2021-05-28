@@ -136,6 +136,7 @@ class dtracker
 
         // Return the list of all ddm-specific regions:
         std::vector<int> listddmregions(void);
+        std::vector<bool> isddmdisjointregion(void);
         
         // Know which disjoint region is in the no-overlap region/is owned by this rank:
         std::vector<bool> isdisjointregioninnooverlap(void);

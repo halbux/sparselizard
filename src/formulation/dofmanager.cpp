@@ -85,7 +85,6 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         // Get the number of form functions:
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, fieldtoadd->gettypename());
         int numberofformfunctions = myformfunction->count(fieldtoadd->getinterpolationorder(disjreg), elementdimension, 0);
-        int lowestformfunctionelementdimension = myformfunction->getminorderdim(fieldtoadd->gettypename());
         
         // Only treat the form functions not yet in the dof structure.
         if (rangebegin[fieldindex][disjreg].size() < numberofformfunctions)
@@ -99,7 +98,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
             for (int ff = numffdefinedbeforeresize; ff < numberofformfunctions; ff++)
             {
                 std::shared_ptr<rawport> pdr = primalondisjreg[fieldindex][disjreg];
-                if (pdr != NULL && lowestformfunctionelementdimension == elementdimension && ff == 0)
+                if (pdr != NULL)
                 {
                     bool isprimalnotthere = (myrawportmap.find(pdr.get()) == myrawportmap.end());
                     if (isprimalnotthere)

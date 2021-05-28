@@ -32,9 +32,6 @@ class hierarchicalformfunction
         
         // Get the minimum order allowed:
         int getminorder(std::string fftypename);
-        
-        // Get the element dimension associated to the lowest order form function:
-        int getminorderdim(std::string fftypename);
 
         // Get the number of form functions of order <= 'order':
         virtual int count(int order) { abort(); }; // fix return warning

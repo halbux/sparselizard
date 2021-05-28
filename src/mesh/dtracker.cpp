@@ -2083,6 +2083,21 @@ std::vector<int> dtracker::listddmregions(void)
     return prlist;
 }
 
+std::vector<bool> dtracker::isddmdisjointregion(void)
+{
+    disjointregions* drs = getrawmesh()->getdisjointregions();
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    std::vector<bool> isddmdr(drs->count(), false);
+
+    for (int n = 0; n < myneighbours.size(); n++)
+    {
+/// WRITE IT
+    }
+
+    return isddmdr;
+}
+
 std::vector<bool> dtracker::isdisjointregioninnooverlap(void)
 {
     disjointregions* drs = getrawmesh()->getdisjointregions();

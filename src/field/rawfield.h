@@ -96,6 +96,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
         std::vector<bool> isitgauged = {};
         
+        // isitported[disjreg] is true if a port is associated to the disjoint region.
+        std::vector<bool> isitported = {};
+        
         
         
         bool ispadaptive = false;

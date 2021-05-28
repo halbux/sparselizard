@@ -36,6 +36,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
     isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
     
     // Rebuild the containers:
     if (disjregsfororder.size() == 0)
@@ -86,10 +87,12 @@ void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool
     std::vector<std::shared_ptr<integration>> mydisjregconstraintsbkp = mydisjregconstraints;
     std::vector<std::vector<expression>> myconditionalconstraintsbkp = myconditionalconstraints;
     std::vector<bool> isitgaugedbkp = isitgauged;
+    std::vector<bool> isitportedbkp = isitported;
     
     mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
     isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
         
 
     wallclock clkn;
@@ -117,6 +120,7 @@ void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool
     mydisjregconstraints = mydisjregconstraintsbkp;
     myconditionalconstraints = myconditionalconstraintsbkp;
     isitgauged = isitgaugedbkp;
+    isitported = isitportedbkp;
 }
 
 void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
@@ -392,6 +396,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
             myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
 
             isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+            
+            isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
 
             mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
         }
@@ -416,6 +422,7 @@ rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<
     mydisjregconstraints = std::vector<std::shared_ptr<integration>>(numdrs, NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>(numdrs, std::vector<expression>(0));
     isitgauged = std::vector<bool>( numdrs, false);
+    isitported = std::vector<bool>( numdrs, false);
     
     for (int i = 0; i < numdrs; i++)
         mycoefmanager->fitinterpolationorder(i, interpolationorder[i]); 
@@ -724,6 +731,11 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
         abort();
     }
     
+    hierarchicalformfunction myhff;
+    int lowestfieldorder = myhff.getminorder(gettypename());
+    
+    std::vector<bool> isddmdisjreg = universe::mymesh->getdtracker()->isddmdisjointregion();
+    
     for (int h = 0; h < fieldharms.size(); h++)
     {
         int harm = fieldharms[h];
@@ -739,6 +751,24 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
 
         ph->associate(true, dh, physreg, fh);
         dh->associate(false, ph, physreg, fh);
+        
+        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+        for (int i = 0; i < selecteddisjregs.size(); i++)
+        {
+            int cdr = selecteddisjregs[i];
+            
+            if (isddmdisjreg[cdr])
+            {
+                std::cout << "Error in 'rawfield' object: trying to set a port on a DDM interface (ports must be confined inside a DDM domain)" << std::endl;
+                abort();
+            }
+
+            fh->interpolationorder[cdr] = lowestfieldorder; // + CALL AGAIN AFTER P ADAPT!
+            fh->mydisjregconstraints[cdr] = NULL;
+            fh->myconditionalconstraints[cdr] = {};
+            fh->isitgauged[cdr] = false;
+            fh->isitported[cdr] = true;
+        }
     }
 }
 
