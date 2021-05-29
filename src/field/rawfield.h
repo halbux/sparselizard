@@ -103,8 +103,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
 
         // Track the calls to 'setorder', 'setdisjregconstraint', 'setconditionalconstraint', 'setgauge'.
         std::vector<std::pair<int, int>> myordertracker = {};
-        std::vector<int> mydisjregconstraintphysregtracker = {};
-        std::vector<std::shared_ptr<integration>> mydisjregconstraintcalctracker = {};
+        std::vector<std::tuple<int, int, std::vector<expression>, expression, int>> mydisjregconstrainttracker = {};
         std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
         std::vector<int> mygaugetracker = {};
         

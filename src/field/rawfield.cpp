@@ -58,11 +58,12 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
         for (int i = 0; i < interpolationorder.size(); i++)
             mycoefmanager->fitinterpolationorder(i, interpolationorder[i]); 
     }
-    for (int i = 0; i < mydisjregconstraintphysregtracker.size(); i++)
+    for (int i = 0; i < mydisjregconstrainttracker.size(); i++)
     {
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(mydisjregconstraintphysregtracker[i]))->getdisjointregions(-1);
-        for (int j = 0; j < selecteddisjregs.size(); j++)
-            mydisjregconstraints[selecteddisjregs[j]] = mydisjregconstraintcalctracker[i];
+        expression* meshdef = NULL;
+        if (std::get<2>(mydisjregconstrainttracker[i]).size() > 0)
+            meshdef = &(std::get<2>(mydisjregconstrainttracker[i])[0]);
+        setdisjregconstraint(std::get<0>(mydisjregconstrainttracker[i]), std::get<1>(mydisjregconstrainttracker[i]), meshdef, std::get<3>(mydisjregconstrainttracker[i]), std::get<4>(mydisjregconstrainttracker[i]));
     }
     for (int i = 0; i < myconditionalconstrainttracker.size(); i++)
         setconditionalconstraint(std::get<0>(myconditionalconstrainttracker[i]), std::get<1>(myconditionalconstrainttracker[i]), std::get<2>(myconditionalconstrainttracker[i]));
@@ -1049,8 +1050,10 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
         {
             if (issynchronizing == false)
             {
-                mydisjregconstraintphysregtracker.push_back(physreg);
-                mydisjregconstraintcalctracker.push_back(disjregconstraintcomputation);
+                std::vector<expression> mdv = {};
+                if (meshdeform != NULL)
+                    mdv = {*meshdeform};
+                mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
             }
         
             for (int i = 0; i < selecteddisjregs.size(); i++)
@@ -1064,8 +1067,10 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
                 {
                     if (issynchronizing == false)
                     {
-                        myharmonics[h][0]->mydisjregconstraintphysregtracker.push_back(physreg);
-                        myharmonics[h][0]->mydisjregconstraintcalctracker.push_back(disjregconstraintcomputation);
+                        std::vector<expression> mdv = {};
+                        if (meshdeform != NULL)
+                            mdv = {*meshdeform};
+                        myharmonics[h][0]->mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
                     }
                 
                     for (int i = 0; i < selecteddisjregs.size(); i++)
