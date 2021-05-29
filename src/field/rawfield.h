@@ -49,6 +49,7 @@
 #include "vectorfieldselect.h"
 #include "spanningtree.h"
 #include "rawmesh.h"
+#include "rawport.h"
 
 class rawmesh;
 class vectorfieldselect;
@@ -168,6 +169,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
 
         void setorder(int physreg, int interpolorder, bool iscalledbyuser = true);
         void setorder(expression criterion, int loworder, int highorder, double critrange); // critrange -1 for automatic choice
+        
+        // Associate the primal and dual port to the field:
+        void setport(int physreg, std::shared_ptr<rawport> primal, std::shared_ptr<rawport> dual);
         
         void setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set a zero value:
