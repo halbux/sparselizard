@@ -295,8 +295,7 @@ int dofmanager::countgaugeddofs(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Disjreg constraints have priority over the gauge!
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            if (myfields[fieldindex]->isgauged(disjreg))
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
@@ -335,8 +334,7 @@ intdensematrix dofmanager::getgaugedindexes(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Disjreg constraints have priority over the gauge!
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            if (myfields[fieldindex]->isgauged(disjreg))
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
@@ -385,8 +383,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
                 continue;
                 
-            // Disjreg constraints have priority over the conditional constraints!
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
+            if (myfields[fieldindex]->isconditionallyconstrained(disjreg))
                 isdisjregactive[disjreg] = true;
         }
             

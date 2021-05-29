@@ -1057,7 +1057,11 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
             }
         
             for (int i = 0; i < selecteddisjregs.size(); i++)
+            {
                 mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
+                myconditionalconstraints[selecteddisjregs[i]] = {};
+                isitgauged[selecteddisjregs[i]] = false;
+            }
         }
         else
         {
@@ -1074,7 +1078,11 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
                     }
                 
                     for (int i = 0; i < selecteddisjregs.size(); i++)
+                    {
                         myharmonics[h][0]->mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
+                        myharmonics[h][0]->myconditionalconstraints[selecteddisjregs[i]] = {};
+                        myharmonics[h][0]->isitgauged[selecteddisjregs[i]] = false;
+                    }
                 }
             }
         }
@@ -1139,7 +1147,11 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(0);
 
         for (int i = 0; i < selecteddisjregs.size(); i++)
-            myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
+        {
+            // Disjreg constraints have priority over the conditional constraints!
+            if (mydisjregconstraints[selecteddisjregs[i]] == NULL)
+                myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
+        }
     }
 }
 
@@ -1167,7 +1179,11 @@ void rawfield::setgauge(int physreg)
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
         for (int i = 0; i < selecteddisjregs.size(); i++)
-            isitgauged[selecteddisjregs[i]] = true;
+        {
+            // Disjreg constraints have priority over the gauge!
+            if (mydisjregconstraints[selecteddisjregs[i]] == NULL)
+                isitgauged[selecteddisjregs[i]] = true;
+        }
     }
 }
 
