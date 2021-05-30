@@ -17,6 +17,7 @@
 #include "disjointregions.h"
 #include "intdensematrix.h"
 #include <memory>
+#include <unordered_map>
 #include "selector.h"
 #include "rawport.h"
 
@@ -38,6 +39,9 @@ class dofmanager
         // Order of each field on each disjoint region:
         std::vector<std::vector<int>> myfieldorders = {};
         
+        // Map every added port to its dof index:
+        std::unordered_map<rawport*, int> myrawportmap;
+        
         // 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
         // the first row/column in the matrix at which the data for 
         //
@@ -58,6 +62,7 @@ class dofmanager
         int mymeshnumber = 0;
         
         // Track the calls to 'addtostructure'.
+        std::vector<std::shared_ptr<rawport>> myportstructuretracker = {};
         std::vector<std::pair<std::shared_ptr<rawfield>, int>> mystructuretracker = {};
         
         // Synchronize with the hp-adapted mesh:
@@ -119,6 +124,9 @@ class dofmanager
         void replaceselectedfield(std::shared_ptr<rawfield> rf);
         
         std::vector<int> getselectedfieldorders(void);
+        
+        // Count the total number of ports (primal, dual and not-associated):
+        int countports(void);
         
         int countdofs(void);
         long long int allcountdofs(void);

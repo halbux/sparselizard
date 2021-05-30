@@ -14,10 +14,13 @@ void dofmanager::synchronize(void)
     int selectedfieldnumberbkp = selectedfieldnumber;
     selectedfieldnumber = -1;
     myfieldorders = {};
+    myrawportmap.clear();
     rangebegin = {};
     rangeend = {};
 
     // Rebuild the structure:
+    for (int i = 0; i < myportstructuretracker.size(); i++)
+        addtostructure(myportstructuretracker[i]);
     for (int i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
@@ -121,6 +124,10 @@ void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
 {
     synchronize();
     
+    // Keep track of the calls to 'addtostructure':
+    if (issynchronizing == false)
+        myportstructuretracker.push_back(porttoadd);
+    
     // NOT COMPLETE YET
 }
 
@@ -202,7 +209,17 @@ int dofmanager::getaddress(std::shared_ptr<rawport> prt)
 {
     synchronize();
     
-    // NOT COMPLETE YET
+    bool isnotthere = (myrawportmap.find(prt.get()) == myrawportmap.end());
+    if (isnotthere == false)
+        return myrawportmap[prt.get()];
+    else
+    {
+        std::string pn = prt->getname();
+        if (pn.size() > 0)
+            pn = "'"+pn+"' ";
+        std::cout << "Error in 'dofmanager' object: requested port " << pn << "could not be found in the dof structure" << std::endl;
+        abort();
+    }
 }
 
 bool dofmanager::isdefined(int disjreg, int formfunc)
@@ -524,6 +541,13 @@ std::vector<int> dofmanager::getselectedfieldorders(void)
     synchronize();
     
     return myfieldorders[selectedfieldnumber];
+}
+
+int dofmanager::countports(void)
+{
+    synchronize();
+
+    return myrawportmap.size();
 }
 
 int dofmanager::countdofs(void)
