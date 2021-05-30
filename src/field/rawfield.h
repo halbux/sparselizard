@@ -96,6 +96,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
         std::vector<bool> isitgauged = {};
         
+        // isitported[disjreg] is true if a port is associated to the disjoint region.
+        std::vector<bool> isitported = {};
+        
         
         
         bool ispadaptive = false;
@@ -107,6 +110,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         std::vector<std::tuple<int, int, std::vector<expression>, expression, int>> mydisjregconstrainttracker = {};
         std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
         std::vector<int> mygaugetracker = {};
+        std::vector<std::tuple<int, std::shared_ptr<rawport>, std::shared_ptr<rawport>>> myporttracker = {};
         
         // To avoid infinite recursive calls:
         bool issynchronizing = false;

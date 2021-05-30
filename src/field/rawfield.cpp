@@ -36,6 +36,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
     isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
     
     // Rebuild the containers:
     if (disjregsfororder.size() == 0)
@@ -69,6 +70,9 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
         setconditionalconstraint(std::get<0>(myconditionalconstrainttracker[i]), std::get<1>(myconditionalconstrainttracker[i]), std::get<2>(myconditionalconstrainttracker[i]));
     for (int i = 0; i < mygaugetracker.size(); i++)
         setgauge(mygaugetracker[i]);
+    // This forces the lowest order on all ports (overwrites also p-adaptivity):
+    for (int i = 0; i < myporttracker.size(); i++)
+        setport(std::get<0>(myporttracker[i]), std::get<1>(myporttracker[i]), std::get<2>(myporttracker[i]));
         
     // Update the coef manager with the new nodal/edge/face/volume shape function coefficients:
     if (isvaluesynchronizingallowed)
@@ -87,10 +91,12 @@ void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool
     std::vector<std::shared_ptr<integration>> mydisjregconstraintsbkp = mydisjregconstraints;
     std::vector<std::vector<expression>> myconditionalconstraintsbkp = myconditionalconstraints;
     std::vector<bool> isitgaugedbkp = isitgauged;
+    std::vector<bool> isitportedbkp = isitported;
     
     mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
     isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
         
 
     wallclock clkn;
@@ -118,6 +124,7 @@ void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool
     mydisjregconstraints = mydisjregconstraintsbkp;
     myconditionalconstraints = myconditionalconstraintsbkp;
     isitgauged = isitgaugedbkp;
+    isitported = isitportedbkp;
 }
 
 void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
@@ -393,6 +400,8 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
             myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
 
             isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+            
+            isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
 
             mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
         }
@@ -416,7 +425,8 @@ rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<
     
     mydisjregconstraints = std::vector<std::shared_ptr<integration>>(numdrs, NULL);
     myconditionalconstraints = std::vector<std::vector<expression>>(numdrs, std::vector<expression>(0));
-    isitgauged = std::vector<bool>( numdrs, false);
+    isitgauged = std::vector<bool>(numdrs, false);
+    isitported = std::vector<bool>(numdrs, false);
     
     for (int i = 0; i < numdrs; i++)
         mycoefmanager->fitinterpolationorder(i, interpolationorder[i]); 
@@ -671,8 +681,17 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
         // Consider ALL disjoint regions in the physical region with (-1):
         std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
         
+        hierarchicalformfunction myhff;
+        int lowestfieldorder = myhff.getminorder(mytypename);
+    
         for (int i = 0; i < selecteddisjregs.size(); i++)
         {
+            if (isitported[selecteddisjregs[i]] && interpolorder > lowestfieldorder)
+            {
+                std::cout << "Error in 'rawfield' object: lowest field order must be used on port regions" << std::endl;
+                abort();
+            }
+        
             interpolationorder[selecteddisjregs[i]] = interpolorder;
             mycoefmanager->fitinterpolationorder(selecteddisjregs[i], interpolorder);
         }
@@ -714,12 +733,12 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
  
     if (mytypename != "h1" && mytypename != "hcurl")
     {
-        std::cout << "Error in 'rawfield' object: cannot set ports to a '" << mytypename << "' type field" << std::endl;
+        std::cout << "Error in 'rawfield' object: cannot set ports to '" << mytypename << "' type fields" << std::endl;
         abort();
     }
     if (mysubfields.size() > 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set ports to a field with multiple components (work with the individual components instead)" << std::endl;
+        std::cout << "Error in 'rawfield' object: cannot set ports to fields with multiple components (work with individual components instead)" << std::endl;
         abort();
     }
     
@@ -742,7 +761,7 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
         std::shared_ptr<rawport> dh = dual->harmonic(harm);
         std::shared_ptr<rawfield> fh = harmonic(harm);
     
-        if (ph->isassociated() || dh->isassociated())
+        if (issynchronizing == false && (ph->isassociated() || dh->isassociated()))
         {
             std::cout << "Error in 'rawfield' object: at least one port to set is already associated to a field" << std::endl;
             abort();
@@ -762,11 +781,18 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
                 abort();
             }
 
-            //fh->interpolationorder[cdr] = lowestfieldorder;
+            // Set lowest order:
+            fh->interpolationorder[cdr] = lowestfieldorder;
+            fh->mycoefmanager->fitinterpolationorder(cdr, lowestfieldorder);
+            
             fh->mydisjregconstraints[cdr] = NULL;
             fh->myconditionalconstraints[cdr] = {};
             fh->isitgauged[cdr] = false;
-            //fh->isitported[cdr] = true;
+            fh->isitported[cdr] = true;
+            
+            // Keep track of the calls to 'setport':
+            if (issynchronizing == false)
+                fh->myporttracker.push_back(std::make_tuple(physreg, ph, dh));
         }
     }
 }
@@ -1121,9 +1147,13 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
         
             for (int i = 0; i < selecteddisjregs.size(); i++)
             {
-                mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
-                myconditionalconstraints[selecteddisjregs[i]] = {};
-                isitgauged[selecteddisjregs[i]] = false;
+                // Ports have priority over the disjreg constraints!
+                if (isitported[selecteddisjregs[i]] == false)
+                {
+                    mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
+                    myconditionalconstraints[selecteddisjregs[i]] = {};
+                    isitgauged[selecteddisjregs[i]] = false;
+                }
             }
         }
         else
@@ -1142,9 +1172,13 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
                 
                     for (int i = 0; i < selecteddisjregs.size(); i++)
                     {
-                        myharmonics[h][0]->mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
-                        myharmonics[h][0]->myconditionalconstraints[selecteddisjregs[i]] = {};
-                        myharmonics[h][0]->isitgauged[selecteddisjregs[i]] = false;
+                        // Ports have priority over the disjreg constraints!
+                        if (myharmonics[h][0]->isitported[selecteddisjregs[i]] == false)
+                        {
+                            myharmonics[h][0]->mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
+                            myharmonics[h][0]->myconditionalconstraints[selecteddisjregs[i]] = {};
+                            myharmonics[h][0]->isitgauged[selecteddisjregs[i]] = false;
+                        }
                     }
                 }
             }
@@ -1211,8 +1245,8 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
 
         for (int i = 0; i < selecteddisjregs.size(); i++)
         {
-            // Disjreg constraints have priority over the conditional constraints!
-            if (mydisjregconstraints[selecteddisjregs[i]] == NULL)
+            // Ports and disjreg constraints have priority over the conditional constraints!
+            if (isitported[selecteddisjregs[i]] == false && mydisjregconstraints[selecteddisjregs[i]] == NULL)
                 myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
         }
     }
@@ -1243,8 +1277,8 @@ void rawfield::setgauge(int physreg)
 
         for (int i = 0; i < selecteddisjregs.size(); i++)
         {
-            // Disjreg constraints have priority over the gauge!
-            if (mydisjregconstraints[selecteddisjregs[i]] == NULL)
+            // Ports and disjreg constraints have priority over the gauge!
+            if (isitported[selecteddisjregs[i]] == false && mydisjregconstraints[selecteddisjregs[i]] == NULL)
                 isitgauged[selecteddisjregs[i]] = true;
         }
     }
