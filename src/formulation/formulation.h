@@ -23,9 +23,11 @@
 #include "rawvec.h"
 #include "rawmat.h"
 #include "integration.h"
+#include "port.h"
 
 class integration;
 class contribution;
+class port;
 
 class formulation
 {
@@ -41,7 +43,13 @@ class formulation
         std::vector<std::shared_ptr<rawmat>> mymat = {NULL, NULL, NULL};
         
         // The link between the dof number and its row and column in the matrix:
-        std::shared_ptr<dofmanager> mydofmanager;
+        std::shared_ptr<dofmanager> mydofmanager = NULL;
+        
+        // myportrelations[i] gives for relation i:
+        // - the list of ports
+        // - the list of port coefficients
+        // - the no-port term
+        std::vector< std::tuple< std::vector<port>, std::vector<expression>, expression > > myportrelations = {};
         
         // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
@@ -60,6 +68,9 @@ class formulation
         
         
         formulation(void);
+        
+        // Add a port relation:
+        void operator+=(expression expr);
         
         // The following adds the contribution defined in the integration object.
         void operator+=(integration integrationobject);

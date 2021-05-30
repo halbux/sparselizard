@@ -3,6 +3,41 @@
 
 formulation::formulation(void) { mydofmanager = std::shared_ptr<dofmanager>(new dofmanager); }
 
+void formulation::operator+=(expression expr)
+{
+    if (isstructurelocked)
+    {
+        std::cout << "Error in 'formulation' object: cannot add port relations after a generation step" << std::endl;
+        abort();
+    }
+    if (mycontributions[0].size() != 0 || mycontributions[1].size() != 0 || mycontributions[2].size() != 0 || mycontributions[3].size() != 0)
+    {
+        std::cout << "Error in 'formulation' object: port relations must be added before integral terms" << std::endl;
+        abort();
+    }
+
+    expr.expand();
+
+    // Extract the ports from the expression:
+    std::vector<port> prts; std::vector<expression> coefs; expression npcoef;
+    expr.extractport(prts, coefs, npcoef);
+
+    if (prts.size() == 0)
+    {
+        std::cout << "Error in 'formulation' object: could not find any port in the port relation provided" << std::endl;
+        abort();
+    }
+    myportrelations.push_back( std::make_tuple(prts,coefs,npcoef) );
+
+    // Add the ports found to the dofmanager:
+    for (int i = 0; i < prts.size(); i++)
+    {
+        std::vector<int> portharms = prts[i].getharmonics();
+        for (int h = 0; h < portharms.size(); h++)
+            mydofmanager->addtostructure(prts[i].getpointer()->harmonic(portharms[h]));
+    }
+}
+
 void formulation::operator+=(std::vector<integration> integrationobject)
 {
     for (int i = 0; i < integrationobject.size(); i++)

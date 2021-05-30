@@ -117,6 +117,13 @@ void dofmanager::donotsynchronize(void)
     issynchronizing = true;
 }
 
+void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
+{
+    synchronize();
+    
+    // NOT COMPLETE YET
+}
+
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     synchronize();
@@ -189,6 +196,13 @@ int dofmanager::getrangeend(int disjreg, int formfunc)
     synchronize();
     
     return rangeend[selectedfieldnumber][disjreg][formfunc];
+}
+
+int dofmanager::getaddress(std::shared_ptr<rawport> prt)
+{
+    synchronize();
+    
+    // NOT COMPLETE YET
 }
 
 bool dofmanager::isdefined(int disjreg, int formfunc)
