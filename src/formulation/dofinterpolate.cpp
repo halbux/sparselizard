@@ -217,6 +217,9 @@ void dofinterpolate::eval(void)
                                     // Use it to get the subelem index in the disjoint region:
                                     currentsubelem -= mydisjointregions->getrangebegin(curdisjreg);
                                     
+                                    if (mydofmanager->isported(curdisjreg))
+                                        currentsubelem = 0;
+                                    
                                     int rb = mydofmanager->getrangebegin(curdisjreg, formfunctionindex[ff]);
                                 
                                     dofnumsptr[rowstart+mynumrefcoords*ff+callingevalpt] = rb + currentsubelem;

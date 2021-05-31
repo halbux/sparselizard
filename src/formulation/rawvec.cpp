@@ -252,8 +252,8 @@ void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregi
     
     mydofmanager->selectfield(selectedfield);
 
-    // Do nothing if the entries are not in the vector:
-    if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
+    // Do nothing if the entries are not in the vector or the target is a port:
+    if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false || mydofmanager->isported(disjointregionnumber) == true)
         return;
 
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
@@ -283,8 +283,12 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     
     int numentries = rangeend-rangebegin+1;
     
+    int step = 1;
+    if (mydofmanager->isported(disjointregionnumber))
+        step = 0;
+    
     densematrix vals(numentries, 1);
-    intdensematrix addressestoget(numentries, 1, rangebegin, 1);
+    intdensematrix addressestoget(numentries, 1, rangebegin, step);
     VecGetValues(myvec, numentries, addressestoget.getvalues(), vals.getvalues());
     
     return vals;

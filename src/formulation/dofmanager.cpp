@@ -15,6 +15,7 @@ void dofmanager::synchronize(void)
     selectedfieldnumber = -1;
     myfieldorders = {};
     myrawportmap.clear();
+    primalondisjreg = {};
     rangebegin = {};
     rangeend = {};
 
@@ -55,6 +56,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         myfields.push_back(fieldtoadd);
         myfieldorders.push_back(fieldtoadd->getinterpolationorders());
         int numberofdisjointregions = mydisjointregions->count();
+        primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
         std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
         rangebegin.push_back(temp);
         rangeend.push_back(temp);
@@ -95,9 +97,27 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
                 
             for (int ff = numffdefinedbeforeresize; ff < numberofformfunctions; ff++)
             {
-                rangebegin[fieldindex][disjreg][ff] = numberofdofs;
-                rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
-                numberofdofs += currentnumberofdofs;
+                std::shared_ptr<rawport> pdr = primalondisjreg[fieldindex][disjreg];
+                if (pdr != NULL)
+                {
+                    // Add the primal to the hashmap if not already there:
+                    bool isprimalnotthere = (myrawportmap.find(pdr.get()) == myrawportmap.end());
+                    if (isprimalnotthere)
+                    {
+                        myrawportmap[pdr.get()] = numberofdofs;
+                        numberofdofs++;
+                    }
+                    int primaladdress = myrawportmap[pdr.get()];
+
+                    rangebegin[fieldindex][disjreg][ff] = primaladdress;
+                    rangeend[fieldindex][disjreg][ff] = primaladdress;
+                }
+                else
+                {
+                    rangebegin[fieldindex][disjreg][ff] = numberofdofs;
+                    rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
+                    numberofdofs += currentnumberofdofs;
+                }
             }
         }
     }
@@ -127,8 +147,65 @@ void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
     // Keep track of the calls to 'addtostructure':
     if (issynchronizing == false)
         myportstructuretracker.push_back(porttoadd);
-    
-    // NOT COMPLETE YET
+        
+    if (porttoadd->isassociated())
+    {
+        std::shared_ptr<rawfield> associatedfield = porttoadd->getrawfield();
+
+        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+        physicalregions* myphysicalregions = universe::mymesh->getphysicalregions();
+
+        // Find the field index of 'associatedfield' (if present):
+        int fieldindex = -1;
+        for (int i = 0; i < myfields.size(); i++)
+        {
+            if (myfields[i].get() == associatedfield.get())
+            {
+                fieldindex = i;
+                break;
+            }
+        }
+        // Add the field to the structure if not existing.
+        // Add an entry for every disjoint region at the same time.
+        if (fieldindex == -1)
+        {
+            fieldindex = myfields.size();
+            myfields.push_back(associatedfield);
+            myfieldorders.push_back(associatedfield->getinterpolationorders());
+            int numberofdisjointregions = mydisjointregions->count();
+            primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
+            std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
+            rangebegin.push_back(temp);
+            rangeend.push_back(temp);
+        }
+        else
+        {
+            // Make sure the field order has not changed between two calls:
+            if (associatedfield->getinterpolationorders() != myfieldorders[fieldindex])
+            {
+                std::cout << "Error in 'dofmanager' object: ";
+                associatedfield->print();
+                std::cout << " order was changed and does not match dof structure anymore" << std::endl;
+                abort();
+            }
+        }
+
+        std::vector<int> disjregs = myphysicalregions->get(porttoadd->getphysicalregion())->getdisjointregions(-1);
+
+        for (int i = 0; i < disjregs.size(); i++)
+            primalondisjreg[fieldindex][disjregs[i]] = porttoadd->getprimal();
+
+        // Port to add below to the hashmap:
+        porttoadd = porttoadd->getdual();
+    }
+
+    // Add the dual to the hashmap (the primal will be added during a regular 'addtostructure' call):
+    bool isnotthere = (myrawportmap.find(porttoadd.get()) == myrawportmap.end());
+    if (isnotthere)
+    {
+        myrawportmap[porttoadd.get()] = numberofdofs;
+        numberofdofs++;
+    }
 }
 
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
@@ -227,6 +304,13 @@ bool dofmanager::isdefined(int disjreg, int formfunc)
     synchronize();
     
     return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
+}
+
+bool dofmanager::isported(int disjreg)
+{
+    synchronize();
+    
+    return (primalondisjreg[selectedfieldnumber][disjreg] != NULL); 
 }
 
 std::vector<bool> dofmanager::isconstrained(void)
@@ -752,7 +836,11 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
-                adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
+                
+                if (primalondisjreg[selectedfieldnumber][currentdisjointregion] == NULL)
+                    adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
+                else
+                    adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + 0;
             }
             else
                 adresses[ff*numcols+i] = -1;

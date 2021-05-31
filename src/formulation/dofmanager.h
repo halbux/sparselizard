@@ -42,6 +42,10 @@ class dofmanager
         // Map every added port to its dof index:
         std::unordered_map<rawport*, int> myrawportmap;
         
+        // 'primalondisjreg[selectedfieldnumber][disjreg]' gives
+        // the primal rawport on the disjoint region (NULL if none):
+        std::vector<std::vector< std::shared_ptr<rawport> >> primalondisjreg = {};
+        
         // 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
         // the first row/column in the matrix at which the data for 
         //
@@ -104,6 +108,8 @@ class dofmanager
         int getaddress(std::shared_ptr<rawport> prt);
         
         bool isdefined(int disjreg, int formfunc);
+        
+        bool isported(int disjreg);
         
         // For all types of constraints:
         std::vector<bool> isconstrained(void);
