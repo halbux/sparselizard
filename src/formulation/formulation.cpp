@@ -16,7 +16,14 @@ void formulation::operator+=(expression expr)
         abort();
     }
 
-    // myportrelations
+    // Add the port relation:
+    std::shared_ptr<portrelation> pr(new portrelation(expr));
+    myportrelations.push_back(pr);
+
+    // Add all ports to the dofmanager:
+    std::vector<std::shared_ptr<rawport>> rps = pr->getrawports();
+    for (int p = 0; p < rps.size(); p++)
+        mydofmanager->addtostructure(rps[p]);
 }
 
 void formulation::operator+=(std::vector<integration> integrationobject)
@@ -244,6 +251,91 @@ void formulation::generate(int contributionnumber)
             generate(i, contributionnumber);
 }
 
+densematrix formulation::getportrelationrhs(void)
+{
+    int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
+
+    densematrix rhsvals(expectednumrelations, 1, 0.0);
+    double* vptr = rhsvals.getvalues();
+
+    int actualnumrelations = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+    {
+        if (myportrelations[i]->hasnoportterm())
+            vptr[actualnumrelations] = -myportrelations[i]->evalnoportterm();
+        
+        actualnumrelations += myportrelations[i]->count();
+    }
+
+    if (expectednumrelations != actualnumrelations)
+    {
+        std::cout << "Error in 'formulation' object: expected " << expectednumrelations << " port relations to match the number of unknown ports provided but found " << actualnumrelations << std::endl;
+        abort();
+    }
+
+    return rhsvals;
+}
+
+std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrelations(int KCM)
+{
+    int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
+    
+    std::vector< std::vector<int> > rinds(myportrelations.size());
+    std::vector< std::vector<int> > cinds(myportrelations.size());
+    std::vector< std::vector<double> > vals(myportrelations.size());
+
+    int portnnz = 0;
+    
+    int actualnumrelations = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+    {
+        std::vector<std::shared_ptr<rawport>> rps;
+        myportrelations[i]->evalrelations(KCM, rps, rinds[i], vals[i]);
+    
+        int len = rps.size();
+        cinds[i].resize(len);
+    
+        for (int j = 0; j < len; j++)
+        {
+            rinds[i][j] += actualnumrelations;
+            cinds[i][j] = mydofmanager->getaddress(rps[j]);
+        }
+    
+        portnnz += len;
+        actualnumrelations += myportrelations[i]->count();
+    }
+    
+    if (expectednumrelations != actualnumrelations)
+    {
+        std::cout << "Error in 'formulation' object: expected " << expectednumrelations << " port relations to match the number of unknown ports provided but found " << actualnumrelations << std::endl;
+        abort();
+    }
+    
+    // Concatenate all:
+    intdensematrix allrinds(portnnz, 1);
+    intdensematrix allcinds(portnnz, 1);
+    densematrix allvals(portnnz, 1);
+    
+    int* arptr = allrinds.getvalues();
+    int* acptr = allcinds.getvalues();
+    double* avptr = allvals.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+    {
+        for (int j = 0; j < rinds[i].size(); j++)
+        {
+            arptr[index] = rinds[i][j];
+            acptr[index] = cinds[i][j];
+            avptr[index] = vals[i][j];
+        
+            index++;
+        }
+    }
+    
+    return std::make_tuple(allrinds, allcinds, allvals);
+}
+
 
 vec formulation::b(bool keepvector, bool dirichletupdate) { return rhs(keepvector, dirichletupdate); }
 mat formulation::A(bool keepfragments) { return K(keepfragments); }
@@ -264,6 +356,9 @@ vec formulation::rhs(bool keepvector, bool dirichletupdate)
     
     if (dirichletupdate == true && isconstraintcomputation == false)
         output.updateconstraints(); 
+        
+    densematrix portrhsvals = getportrelationrhs();
+    output.setvalues(intdensematrix(portrhsvals.count(), 1, 0, 1), portrhsvals);
     
     return output; 
 }
@@ -295,8 +390,13 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
             isconstr[acptr[j]] = true;
     }
 
-    std::pair<intdensematrix, intdensematrix> assocports = mydofmanager->findassociatedports();
-    rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, -1.0));
+    if (KCM == 0)
+    {
+        std::pair<intdensematrix, intdensematrix> assocports = mydofmanager->findassociatedports();
+        rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, -1.0));
+    }
+    std::tuple<intdensematrix, intdensematrix, densematrix> portterms = getportrelations(KCM);
+    rawout->accumulate(std::get<0>(portterms), std::get<1>(portterms), std::get<2>(portterms));
     
     rawout->process(isconstr); 
     rawout->clearfragments();

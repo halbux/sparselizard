@@ -24,10 +24,12 @@
 #include "rawmat.h"
 #include "integration.h"
 #include "port.h"
+#include "portrelation.h"
 
 class integration;
 class contribution;
 class port;
+class portrelation;
 
 class formulation
 {
@@ -45,7 +47,8 @@ class formulation
         // The link between the dof number and its row and column in the matrix:
         std::shared_ptr<dofmanager> mydofmanager = NULL;
         
-        // myportrelations
+        // The port relations:
+        std::vector<std::shared_ptr<portrelation>> myportrelations = {};
         
         // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
@@ -90,6 +93,10 @@ class formulation
         void generatein(int rhskcm, std::vector<int> contributionnumbers);
         void generate(std::vector<int> contributionnumbers);
         void generate(int contributionnumber);
+        
+        // Compute the no-port term value for every port relation:
+        densematrix getportrelationrhs(void);
+        std::tuple<intdensematrix, intdensematrix, densematrix> getportrelations(int KCM);
         
         std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         

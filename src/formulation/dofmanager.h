@@ -136,6 +136,7 @@ class dofmanager
         
         // Count the total number of ports (primal, dual and not-associated):
         int countports(void);
+        int countassociatedprimalports(void);
         
         int countdofs(void);
         long long int allcountdofs(void);

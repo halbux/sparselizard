@@ -663,6 +663,21 @@ int dofmanager::countports(void)
     return myrawportmap.size();
 }
 
+int dofmanager::countassociatedprimalports(void)
+{
+    synchronize();
+
+    int cnt = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+            cnt++;
+    }
+
+    return cnt;
+}
+
 int dofmanager::countdofs(void)
 {
     synchronize();
