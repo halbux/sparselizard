@@ -107,6 +107,9 @@ class dofmanager
         // Get the port dof index:
         int getaddress(std::shared_ptr<rawport> prt);
         
+        // Return the primal and dual addresses for all associated ports: 
+        std::pair<intdensematrix, intdensematrix> findassociatedports(void);
+        
         bool isdefined(int disjreg, int formfunc);
         
         bool isported(int disjreg);

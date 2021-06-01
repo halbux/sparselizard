@@ -55,9 +55,12 @@ long long int rawmat::countcolumns(void)
 
 void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
 {
-    accumulatedrowindices.push_back(rowadresses);
-    accumulatedcolindices.push_back(coladresses);
-    accumulatedvals.push_back(vals);
+    if (vals.count() > 0)
+    {
+        accumulatedrowindices.push_back(rowadresses);
+        accumulatedcolindices.push_back(coladresses);
+        accumulatedvals.push_back(vals);
+    }
 }
 
 void processrows(int firstrow, int lastrow, int* maxnnzinrows, long long int* adsofrows, std::pair<int, double>* valsptr, std::vector<bool>* isconstrained, int* nnzApart, int* nnzDpart)
@@ -292,13 +295,6 @@ void rawmat::process(std::vector<bool>& isconstrained)
     MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, Ainds.count(), Dinds.count(), Drowsptr, Dcolsptr, Dvalsptr, &Dmat);
     MatAssemblyBegin(Dmat, MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(Dmat, MAT_FINAL_ASSEMBLY);
-}
-
-void rawmat::removelastfragment(void)
-{
-    accumulatedrowindices.pop_back();
-    accumulatedcolindices.pop_back();
-    accumulatedvals.pop_back();
 }
 
 void rawmat::clearfragments(void)

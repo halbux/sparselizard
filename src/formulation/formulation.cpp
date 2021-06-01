@@ -314,6 +314,9 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
             isconstr[acptr[j]] = true;
     }
 
+    std::pair<intdensematrix, intdensematrix> assocports = mydofmanager->findassociatedports();
+    rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, -1.0));
+    
     rawout->process(isconstr); 
     rawout->clearfragments();
     
