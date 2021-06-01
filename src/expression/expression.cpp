@@ -2222,9 +2222,9 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     return {coeffs, dofs, tfs};
 }
 
-void expression::extractport(std::vector<port>& ports, std::vector<expression>& coefs, expression& noportcoef)
+void expression::extractport(std::vector<port>& ports, std::vector<int>& dtorders, std::vector<expression>& coefs, std::vector<expression>& noportcoef)
 {
-    ports = {}; coefs = {}; noportcoef = 0.0;
+    ports = {}; dtorders = {}; coefs = {}; noportcoef = {};
 
     // Simplify the operation:
     myoperations[0] = myoperations[0]->simplify({});
@@ -2251,6 +2251,7 @@ void expression::extractport(std::vector<port>& ports, std::vector<expression>& 
         }
 
         std::shared_ptr<rawport> currentport = NULL;
+        int currentdtorder = -1;
 
         // The coef is what remains after port removal.
         // We thus remove the port term.
@@ -2264,6 +2265,7 @@ void expression::extractport(std::vector<port>& ports, std::vector<expression>& 
             if (currentport == NULL && productterms[j]->isport())
             {
                 currentport = productterms[j]->getportpointer();
+                currentdtorder = productterms[j]->gettimederivative();
                 currentcoef->removeterm(j);
             }
         }
@@ -2280,10 +2282,16 @@ void expression::extractport(std::vector<port>& ports, std::vector<expression>& 
         if (currentport != NULL)
         {
             ports.push_back(port(currentport));
+            dtorders.push_back(currentdtorder);
             coefs.push_back(expression(currentcoef));
         }
         else
-            noportcoef = noportcoef + expression(currentcoef);
+        {
+            if (noportcoef.size() == 0)
+                noportcoef = {expression(currentcoef)};
+            else
+                noportcoef[0] = noportcoef[0] + expression(currentcoef);
+        }
     }
 
     if (not(isformatok))
@@ -2295,8 +2303,6 @@ void expression::extractport(std::vector<port>& ports, std::vector<expression>& 
         std::cout << std::endl;
         abort();
     }
-
-    noportcoef.myoperations[0] = noportcoef.myoperations[0]->simplify({});
 }
 
 

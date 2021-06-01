@@ -242,12 +242,13 @@ class expression
         // The expression must be scalar.
         std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftf(int elementdimension);
         
-        // Extract the ports and their coefficients from an expanded expression
-        // that can be rewritten as coefs[0]*ports[0] + ... + noportcoef
-        // where the coefficients are space-independent numerical values
-        // that do not include ports. The expression must be scalar.
-        // The ports extracted might contain duplicates.
-        void extractport(std::vector<port>& ports, std::vector<expression>& coefs, expression& noportcoef);
+        // Extract the ports, their time derivative orders as well as their 
+        // coefficients from an expanded expression that can be rewritten
+        // as coefs[0]*ports[0] + ... + noportcoef where the coefficients
+        // are space-independent numerical values that do not include ports.
+        // The expression must be scalar. The ports extracted might contain
+        // duplicates. The no-port term is optional (empty vector if none).
+        void extractport(std::vector<port>& ports, std::vector<int>& dtorders, std::vector<expression>& coefs, std::vector<expression>& noportcoef);
         
         
         // Defining the +, -, * and / operators:

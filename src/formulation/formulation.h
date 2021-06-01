@@ -45,11 +45,7 @@ class formulation
         // The link between the dof number and its row and column in the matrix:
         std::shared_ptr<dofmanager> mydofmanager = NULL;
         
-        // myportrelations[i] gives for relation i:
-        // - the list of ports
-        // - the list of port coefficients
-        // - the no-port term
-        std::vector< std::tuple< std::vector<port>, std::vector<expression>, expression > > myportrelations = {};
+        // myportrelations
         
         // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
