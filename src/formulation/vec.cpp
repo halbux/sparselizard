@@ -139,6 +139,8 @@ void vec::setdata(void)
     std::vector<std::shared_ptr<rawfield>> rfs = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < rfs.size(); i++)
         rfs[i]->transferdata(-1, vectorfieldselect(rawvecptr, rfs[i]), "set");
+        
+    rawvecptr->setvaluesfromports();
 }
 
 void vec::automaticupdate(bool updateit)

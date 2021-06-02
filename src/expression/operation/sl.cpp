@@ -2103,6 +2103,8 @@ void sl::setdata(vec invec)
     
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, invec|field(allfields[i]));
+        
+    invec.getpointer()->setvaluestoports();
 }
 
 

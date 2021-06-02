@@ -290,6 +290,40 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     return vals;
 }
 
+void rawvec::setvaluestoports(void)
+{
+    synchronize();
+    
+    std::vector<rawport*> rps;
+    intdensematrix inds;
+    
+    mydofmanager->getportsinds(rps, inds);
+    
+    densematrix vecvals = getvalues(inds);
+    double* vptr = vecvals.getvalues();
+    
+    for (int p = 0; p < rps.size(); p++)
+        rps[p]->setvalue(vptr[p]);
+}
+
+void rawvec::setvaluesfromports(void)
+{
+    synchronize();
+    
+    std::vector<rawport*> rps;
+    intdensematrix inds;
+    
+    mydofmanager->getportsinds(rps, inds);
+    
+    densematrix prtvals(rps.size(), 1);
+    double* vptr = prtvals.getvalues();
+    
+    for (int p = 0; p < rps.size(); p++)
+        vptr[p] = rps[p]->getvalue();
+        
+    setvalues(inds, prtvals);
+}
+
 void rawvec::write(std::string filename)
 {
     synchronize();

@@ -299,6 +299,26 @@ int dofmanager::getaddress(std::shared_ptr<rawport> prt)
     }
 }
 
+void dofmanager::getportsinds(std::vector<rawport*>& rps, intdensematrix& inds)
+{
+    synchronize();
+    
+    int numports = myrawportmap.size();
+    
+    rps.resize(numports);
+    inds = intdensematrix(numports, 1);
+    int* iptr = inds.getvalues();
+
+    int index = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rps[index] = it->first;
+        iptr[index] = it->second;
+        
+        index++;
+    }
+}
+
 std::pair<intdensematrix, intdensematrix> dofmanager::findassociatedports(void)
 {
     synchronize();

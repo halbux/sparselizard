@@ -76,6 +76,9 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         void setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
         densematrix getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
         
+        void setvaluestoports(void);
+        void setvaluesfromports(void);
+        
         // Write and load raw vec data:
         void write(std::string filename);
         void load(std::string filename);
