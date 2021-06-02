@@ -731,6 +731,12 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
 {
     synchronize();
  
+    if (sl::isempty(physreg))
+    {
+        std::cout << "Error in 'rawfield' object: cannot set a port to empty physical region " << physreg << std::endl;
+        abort();
+    }
+    
     if (mytypename != "h1" && mytypename != "hcurl")
     {
         std::cout << "Error in 'rawfield' object: cannot set ports to '" << mytypename << "' type fields" << std::endl;
@@ -789,11 +795,11 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
             fh->myconditionalconstraints[cdr] = {};
             fh->isitgauged[cdr] = false;
             fh->isitported[cdr] = true;
-            
-            // Keep track of the calls to 'setport':
-            if (issynchronizing == false)
-                fh->myporttracker.push_back(std::make_tuple(physreg, ph, dh));
         }
+        
+        // Keep track of the calls to 'setport':
+        if (issynchronizing == false)
+            fh->myporttracker.push_back(std::make_tuple(physreg, ph, dh));
     }
 }
 
