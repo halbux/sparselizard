@@ -13,6 +13,38 @@ rawport::rawport(std::vector<int> harmonicnumbers, bool ismultiharm)
     // Nothing to preallocate otherwise
 }
 
+void rawport::setvalue(double portval)
+{
+    if (myharmonics.size() == 0)
+        myvalue = portval;
+    else
+    {
+        if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
+            myharmonics[1][0]->myvalue = portval;
+        else
+        {
+            std::cout << "Error in 'rawport' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+            abort();
+        }
+    }
+}
+
+double rawport::getvalue(void)
+{
+    if (myharmonics.size() == 0)
+        return myvalue;
+    else
+    {
+        if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
+            return myharmonics[1][0]->myvalue;
+        else
+        {
+            std::cout << "Error in 'rawport' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+            abort();
+        }
+    }
+}
+
 void rawport::setname(std::string name)
 {
     myname = name;

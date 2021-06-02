@@ -26,6 +26,8 @@ class rawport : public std::enable_shared_from_this<rawport>
         
         // The data below is not defined if the above vector is not empty.
         
+        double myvalue = 0.0;
+        
         bool myisprimal = true;
         
         // Dual/primal port if this is the primal/dual:
@@ -42,6 +44,9 @@ class rawport : public std::enable_shared_from_this<rawport>
     
         bool ismultiharmonic(void) { return amimultiharmonic; };
     
+        void setvalue(double portval);
+        double getvalue(void);
+        
         void setname(std::string name);
         std::string getname(void);
         

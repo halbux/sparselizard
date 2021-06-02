@@ -19,13 +19,13 @@ void opport::increasetimederivativeorder(int amount)
 
 std::vector<std::vector<densematrix>> opport::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    std::cout << "Error in 'opport' object: cannot numerically evaluate a port" << std::endl;
+    std::cout << "Error in 'opport' object: cannot interpolate a port" << std::endl;
     abort();
 }
 
 densematrix opport::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    std::cout << "Error in 'opport' object: cannot numerically evaluate a port" << std::endl;
+    std::cout << "Error in 'opport' object: cannot interpolate a port" << std::endl;
     abort();
 }
 

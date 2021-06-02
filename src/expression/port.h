@@ -29,6 +29,9 @@ class port
         port(std::vector<int> harmonicnumbers);
         port(std::shared_ptr<rawport> rp);
         
+        void setvalue(double portval);
+        double getvalue(void);
+        
         void setname(std::string name);
         std::string getname(void);
         
@@ -40,6 +43,8 @@ class port
         port cos(int freqindex);
     
         std::shared_ptr<rawport> getpointer(void);
+        
+        void print(void);
     
         // Defining the +, -, * and / operators:
         expression operator+(void);
