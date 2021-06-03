@@ -42,6 +42,7 @@ portrelation::portrelation(expression prtrel)
         for (int h = 0; h < portharms[p].size(); h++)
         {
             int harm = portharms[p][h];
+            int harmfreq = harmonic::getfrequency(harm);
             std::shared_ptr<rawport> crp = prts[p].getpointer()->harmonic(harm);
             
             int targetharm = harm;
@@ -53,22 +54,22 @@ portrelation::portrelation(expression prtrel)
             {
                 if (curdtorder == 1)
                 {
-                    if (harm%2 == 0) // sin harm
+                    if (harmonic::issine(harm))
                     {
                         targetharm = harm+1;
-                        targetfactor = 2.0*pi;
+                        targetfactor = 2.0*pi*harmfreq;
                         targetf0pow = 1;
                     }
-                    else // cos harm
+                    else
                     {
                         targetharm = harm-1;
-                        targetfactor = -2.0*pi;
+                        targetfactor = -2.0*pi*harmfreq;
                         targetf0pow = 1;
                     }
                 }
                 if (curdtorder == 2)
                 {
-                    targetfactor = -4.0*pi*pi;
+                    targetfactor = -4.0*pi*pi*harmfreq*harmfreq;
                     targetf0pow = 2;
                 }
             }
