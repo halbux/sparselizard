@@ -19,9 +19,14 @@ genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int 
 
 void genalpha::setparameter(double rinf)
 {
-    if (rinf < 0)
+    if (rinf < -1e-8)
     {
         std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be negative" << std::endl;
+        abort();  
+    }
+    if (rinf > 1+1e-8)
+    {
+        std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be larger than one" << std::endl;
         abort();  
     }
     
