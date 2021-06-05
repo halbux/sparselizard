@@ -7,7 +7,22 @@ port::port(void)
 
 port::port(std::vector<int> harmonicnumbers)
 {
-    rawportptr = std::shared_ptr<rawport>(new rawport(harmonicnumbers, true));
+    // Make sure all harmonic numbers are positive and non zero:
+    for (int i = 0; i < harmonicnumbers.size(); i++)
+    {
+        if (harmonicnumbers[i] <= 0)
+        {
+            std::cout << "Error in 'port' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
+            abort();
+        }
+    }
+    if (harmonicnumbers.size() > 0)
+        rawportptr = std::shared_ptr<rawport>(new rawport(harmonicnumbers, true));
+    else
+    {
+        std::cout << "Error in 'port' object: provided an empty harmonic number list" << std::endl;
+        abort();
+    }
 }
 
 port::port(std::shared_ptr<rawport> rp)
@@ -35,6 +50,20 @@ port port::harmonic(int harmonicnumber)
 
 port port::harmonic(std::vector<int> harmonicnumbers)
 {
+    if (harmonicnumbers.size() == 0)
+    {
+        std::cout << "Error in 'port' object: no harmonics provided to the .harmonic function" << std::endl;
+        abort();
+    }    
+    // Make sure all harmonic numbers are positive and non zero:
+    for (int i = 0; i < harmonicnumbers.size(); i++)
+    {
+        if (harmonicnumbers[i] <= 0)
+        {
+            std::cout << "Error in 'port' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
+            abort();
+        }
+    }
     return port(rawportptr->harmonic(harmonicnumbers));
 }
 
