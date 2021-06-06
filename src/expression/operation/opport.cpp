@@ -43,15 +43,20 @@ bool opport::isharmonicone(std::vector<int> disjregs)
 std::shared_ptr<operation> opport::copy(void)
 {
     std::shared_ptr<opport> op(new opport(myport));
+    *op = *this;
     return op;
 }
 
 void opport::print(void)
 {
+    for (int i = 0; i < timederivativeorder; i++)
+        std::cout << "dt";
+        
     std::string portname = myport->getname();
 
-    std::cout << "port";
-    if (portname.size() > 0)
-        std::cout << "(" << portname << ")";
+    if (portname.size() == 0)
+        std::cout << "port";
+    else
+        std::cout << portname;
 }
 
