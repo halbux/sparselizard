@@ -20,7 +20,7 @@ void rawport::setvalue(double portval)
     else
     {
         if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
-            myharmonics[1][0]->myvalue = portval;
+            myharmonics[1][0]->setvalue(portval);
         else
         {
             std::cout << "Error in 'rawport' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
@@ -36,7 +36,7 @@ double rawport::getvalue(void)
     else
     {
         if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
-            return myharmonics[1][0]->myvalue;
+            return myharmonics[1][0]->getvalue();
         else
         {
             std::cout << "Error in 'rawport' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
