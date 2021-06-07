@@ -134,7 +134,7 @@ void operation::setkietaphiderivative(int whichderivative)
 
 void operation::increasetimederivativeorder(int derivativeorder)
 {
-    std::cout << "Error in 'operation' object: can only apply time derivatives to fields, dof() and tf()" << std::endl;
+    std::cout << "Error in 'operation' object: can only apply time derivatives to ports, fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     std::cout << std::endl;
