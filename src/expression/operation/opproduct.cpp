@@ -133,7 +133,7 @@ std::shared_ptr<operation> opproduct::expand(void)
     group();
         
     // Everything is first put in form of a sum, possibly with a single sum term.
-    // If there is no dof or tf this leads to treating a sum as a monolithic block.
+    // If there is no dof, tf or port this leads to treating a sum as a monolithic block.
     std::vector<std::shared_ptr<operation>> prodtrms(productterms.size());
     for (int i = 0; i < productterms.size(); i++)
     {
