@@ -22,7 +22,7 @@ int main(void)
     // Use interpolation order 3:
     v.setorder(all, 3);
     
-    // Ground on the bottom face (i.e. 0 valued-Dirichlet condition):
+    // Ground:
     v.setconstraint(ground);
     
     // Electric permittivity:
