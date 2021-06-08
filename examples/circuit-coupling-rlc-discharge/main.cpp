@@ -17,7 +17,7 @@
 //
 // with
 //
-// a = R/(2*L), w0 = 1/sqrt(L*C), wd = sqrt(w0^2 - a^2), B = -V0/(wd*L) and V0 = 100.
+// a = R/(2*L), w0 = 1/sqrt(L*C), wd = sqrt(w0^2 - a^2), B = V0/(wd*L) and V0 = 100.
 
 
 #include "sparselizard.h"
