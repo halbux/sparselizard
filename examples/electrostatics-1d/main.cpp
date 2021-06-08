@@ -29,7 +29,7 @@ int main(void)
   
     formulation electrostatics;
 
-    electrostatics += integral(line, epsilon*grad(dof(v))*grad(tf(v)));
+    electrostatics += integral(line, -epsilon*grad(dof(v))*grad(tf(v)));
 
     electrostatics.generate();
 

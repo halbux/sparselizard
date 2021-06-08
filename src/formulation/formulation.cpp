@@ -393,7 +393,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
     if (KCM == 0)
     {
         std::pair<intdensematrix, intdensematrix> assocports = mydofmanager->findassociatedports();
-        rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, -1.0));
+        rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, 1.0));
     }
     std::tuple<intdensematrix, intdensematrix, densematrix> portterms = getportrelations(KCM);
     rawout->accumulate(std::get<0>(portterms), std::get<1>(portterms), std::get<2>(portterms));
