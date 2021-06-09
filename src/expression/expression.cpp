@@ -2239,7 +2239,7 @@ void expression::extractport(std::vector<port>& ports, std::vector<int>& dtorder
     // Loop on all elementary sum terms in the formulation:
     for (int i = 0; i < sumterms.size(); i++)
     {
-        // If needed multiply the sum term by a constant 1 to get a product:
+        // If needed make a multiply out of it:
         if (sumterms[i]->isproduct() == false)
         {
             std::shared_ptr<opproduct> op(new opproduct);
