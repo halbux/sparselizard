@@ -120,7 +120,9 @@ int main(void)
         std::cout << "Current iteration has relative residual: " << relres << std::endl;
     }
 
-    // Compute the total current flowing trough the input face.
+    // Compute the total current flowing trough the input face
+    // in an alternative (but less accurate) way to using ports.
+    //
     // Since the computation involves a gradient that has to be 
     // calculated in the volume (and not on the input face) 
     // one can not simply call (normal(volume)*j).integrate(input,4)
