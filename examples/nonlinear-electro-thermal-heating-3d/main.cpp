@@ -120,7 +120,7 @@ int main(void)
         std::cout << "Current iteration has relative residual: " << relres << std::endl;
     }
 
-    // Compute the total current flowing trough the input face
+    // Compute the total current flowing through the input face
     // in an alternative (but less accurate) way to using ports.
     //
     // Since the computation involves a gradient that has to be 
