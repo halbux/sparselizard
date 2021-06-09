@@ -2049,13 +2049,11 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     // Loop on all elementary sum terms in the formulation:
     for (int i = 0; i < sumterms.size(); i++)
     {
-        // Deal with the very specific case of a tf() term without
-        // coefficient by multiplying it by a constant 1 to get a product:
+        // Deal with the very specific case of a tf() term without coefficient:
         if (sumterms[i]->istf())
         {
             std::shared_ptr<opproduct> op(new opproduct);
             op->multiplybyterm(sumterms[i]);
-            op->multiplybyterm(std::shared_ptr<operation>(new opconstant(1)));
             sumterms[i] = op;
         }
         // In a valid formulation term sumterms[i] must now always be a product:
@@ -2246,7 +2244,6 @@ void expression::extractport(std::vector<port>& ports, std::vector<int>& dtorder
         {
             std::shared_ptr<opproduct> op(new opproduct);
             op->multiplybyterm(sumterms[i]);
-            op->multiplybyterm(std::shared_ptr<operation>(new opconstant(1)));
             sumterms[i] = op;
         }
 
