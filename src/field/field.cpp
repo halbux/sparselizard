@@ -162,7 +162,7 @@ void field::setport(int physreg, port primal, port dual)
     int problemdimension = universe::mymesh->getmeshdimension();
     if (universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension() >= problemdimension)
     {
-        std::cout << "Error in 'field' object: ports can only be set on region boundaries" << std::endl;
+        std::cout << "Error in 'field' object: ports can only be set on boundary regions" << std::endl;
         abort();
     }
     
