@@ -105,7 +105,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         std::shared_ptr<ptracker> myptracker = NULL;
 
-        // Track the calls to 'setorder', 'setdisjregconstraint', 'setconditionalconstraint', 'setgauge'.
+        // Track the calls to 'setorder', 'setdisjregconstraint', 'setconditionalconstraint', 'setgauge', 'setport'.
         std::vector<std::pair<int, int>> myordertracker = {};
         std::vector<std::tuple<int, int, std::vector<expression>, expression, int>> mydisjregconstrainttracker = {};
         std::vector<std::tuple<int, expression, expression>> myconditionalconstrainttracker = {};
