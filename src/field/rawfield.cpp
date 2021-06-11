@@ -686,14 +686,16 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     
         for (int i = 0; i < selecteddisjregs.size(); i++)
         {
-            if (isitported[selecteddisjregs[i]] && interpolorder > lowestfieldorder)
+            if (isitported[selecteddisjregs[i]])
             {
-                std::cout << "Error in 'rawfield' object: lowest field order must be used on port regions" << std::endl;
-                abort();
+                interpolationorder[selecteddisjregs[i]] = lowestfieldorder;
+                mycoefmanager->fitinterpolationorder(selecteddisjregs[i], lowestfieldorder);
             }
-        
-            interpolationorder[selecteddisjregs[i]] = interpolorder;
-            mycoefmanager->fitinterpolationorder(selecteddisjregs[i], interpolorder);
+            else
+            {
+                interpolationorder[selecteddisjregs[i]] = interpolorder;
+                mycoefmanager->fitinterpolationorder(selecteddisjregs[i], interpolorder);
+            }
         }
     }
 }
