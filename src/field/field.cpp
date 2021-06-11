@@ -165,6 +165,12 @@ void field::setport(int physreg, port primal, port dual)
         std::cout << "Error in 'field' object: ports can only be set on boundary regions" << std::endl;
         abort();
     }
+ 
+    if (primal.getpointer() == dual.getpointer())
+    {
+        std::cout << "Error in 'field' object: cannot use the same port for the primal and the dual" << std::endl;
+        abort();
+    }
     
     rawfieldptr->setport(physreg, primal.getpointer(), dual.getpointer());
 }
