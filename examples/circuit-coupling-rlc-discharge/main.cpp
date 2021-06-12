@@ -44,8 +44,8 @@ int main(void)
     // Electric conductivity [S/m]:
     expression sigma = 0.005;
     
-    // Associate a V/I (voltage/current) port pair to field v on the left
-    // right electrode. Field v will be constant on the electrode.
+    // Associate a V/I (voltage/current) port pair to field v on the electrode.
+    // The electrode is supposed to be a perfect conductor with a constant v.
     port Vc, I, V;
     v.setport(left, V, I);
     //              |  |
