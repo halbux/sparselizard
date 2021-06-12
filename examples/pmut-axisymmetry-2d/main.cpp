@@ -162,7 +162,7 @@ int main(void)
     pmutmodel += integral(pmuttop, predefinedacousticstructureinteraction(dof(p), tf(p), dof(u), tf(u), c, rho, array3x1(0,1,0), alpha, scaling));
 
     // Generate, solve and transfer the solution to the u, p and v fields:
-    solve(pmutmodel);
+    pmutmodel.solve();
 
     // Write the deflection, pressure and electric potential to file (with an order 2 interpolation for p and u).
     u.write(solid, "u.vtk", 2);

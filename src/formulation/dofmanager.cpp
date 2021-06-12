@@ -14,10 +14,14 @@ void dofmanager::synchronize(void)
     int selectedfieldnumberbkp = selectedfieldnumber;
     selectedfieldnumber = -1;
     myfieldorders = {};
+    myrawportmap.clear();
+    primalondisjreg = {};
     rangebegin = {};
     rangeend = {};
 
     // Rebuild the structure:
+    for (int i = 0; i < myportstructuretracker.size(); i++)
+        addtostructure(myportstructuretracker[i]);
     for (int i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
@@ -52,6 +56,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         myfields.push_back(fieldtoadd);
         myfieldorders.push_back(fieldtoadd->getinterpolationorders());
         int numberofdisjointregions = mydisjointregions->count();
+        primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
         std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
         rangebegin.push_back(temp);
         rangeend.push_back(temp);
@@ -92,9 +97,27 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
                 
             for (int ff = numffdefinedbeforeresize; ff < numberofformfunctions; ff++)
             {
-                rangebegin[fieldindex][disjreg][ff] = numberofdofs;
-                rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
-                numberofdofs += currentnumberofdofs;
+                std::shared_ptr<rawport> pdr = primalondisjreg[fieldindex][disjreg];
+                if (pdr != NULL)
+                {
+                    // Add the primal to the hashmap if not already there:
+                    bool isprimalnotthere = (myrawportmap.find(pdr.get()) == myrawportmap.end());
+                    if (isprimalnotthere)
+                    {
+                        myrawportmap[pdr.get()] = numberofdofs;
+                        numberofdofs++;
+                    }
+                    int primaladdress = myrawportmap[pdr.get()];
+
+                    rangebegin[fieldindex][disjreg][ff] = primaladdress;
+                    rangeend[fieldindex][disjreg][ff] = primaladdress;
+                }
+                else
+                {
+                    rangebegin[fieldindex][disjreg][ff] = numberofdofs;
+                    rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
+                    numberofdofs += currentnumberofdofs;
+                }
             }
         }
     }
@@ -115,6 +138,74 @@ dofmanager::dofmanager(int numdofs)
 void dofmanager::donotsynchronize(void)
 {
     issynchronizing = true;
+}
+
+void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
+{
+    synchronize();
+    
+    // Keep track of the calls to 'addtostructure':
+    if (issynchronizing == false)
+        myportstructuretracker.push_back(porttoadd);
+        
+    if (porttoadd->isassociated())
+    {
+        std::shared_ptr<rawfield> associatedfield = porttoadd->getrawfield();
+
+        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+        physicalregions* myphysicalregions = universe::mymesh->getphysicalregions();
+
+        // Find the field index of 'associatedfield' (if present):
+        int fieldindex = -1;
+        for (int i = 0; i < myfields.size(); i++)
+        {
+            if (myfields[i].get() == associatedfield.get())
+            {
+                fieldindex = i;
+                break;
+            }
+        }
+        // Add the field to the structure if not existing.
+        // Add an entry for every disjoint region at the same time.
+        if (fieldindex == -1)
+        {
+            fieldindex = myfields.size();
+            myfields.push_back(associatedfield);
+            myfieldorders.push_back(associatedfield->getinterpolationorders());
+            int numberofdisjointregions = mydisjointregions->count();
+            primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
+            std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
+            rangebegin.push_back(temp);
+            rangeend.push_back(temp);
+        }
+        else
+        {
+            // Make sure the field order has not changed between two calls:
+            if (associatedfield->getinterpolationorders() != myfieldorders[fieldindex])
+            {
+                std::cout << "Error in 'dofmanager' object: ";
+                associatedfield->print();
+                std::cout << " order was changed and does not match dof structure anymore" << std::endl;
+                abort();
+            }
+        }
+
+        std::vector<int> disjregs = myphysicalregions->get(porttoadd->getphysicalregion())->getdisjointregions(-1);
+
+        for (int i = 0; i < disjregs.size(); i++)
+            primalondisjreg[fieldindex][disjregs[i]] = porttoadd->getprimal();
+
+        // Port to add below to the hashmap:
+        porttoadd = porttoadd->getdual();
+    }
+
+    // Add the dual to the hashmap (the primal will be added during a regular 'addtostructure' call):
+    bool isnotthere = (myrawportmap.find(porttoadd.get()) == myrawportmap.end());
+    if (isnotthere)
+    {
+        myrawportmap[porttoadd.get()] = numberofdofs;
+        numberofdofs++;
+    }
 }
 
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
@@ -191,29 +282,84 @@ int dofmanager::getrangeend(int disjreg, int formfunc)
     return rangeend[selectedfieldnumber][disjreg][formfunc];
 }
 
+int dofmanager::getaddress(std::shared_ptr<rawport> prt)
+{
+    synchronize();
+    
+    bool isnotthere = (myrawportmap.find(prt.get()) == myrawportmap.end());
+    if (isnotthere == false)
+        return myrawportmap[prt.get()];
+    else
+    {
+        std::string pn = prt->getname();
+        if (pn.size() > 0)
+            pn = "'"+pn+"' ";
+        std::cout << "Error in 'dofmanager' object: requested port " << pn << "could not be found in the dof structure" << std::endl;
+        abort();
+    }
+}
+
+void dofmanager::getportsinds(std::vector<rawport*>& rps, intdensematrix& inds)
+{
+    synchronize();
+    
+    int numports = myrawportmap.size();
+    
+    rps.resize(numports);
+    inds = intdensematrix(numports, 1);
+    int* iptr = inds.getvalues();
+
+    int index = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rps[index] = it->first;
+        iptr[index] = it->second;
+        
+        index++;
+    }
+}
+
+std::pair<intdensematrix, intdensematrix> dofmanager::findassociatedports(void)
+{
+    synchronize();
+
+    intdensematrix primalads(countports(), 1);
+    intdensematrix dualads(countports(), 1);
+
+    int* paptr = primalads.getvalues();
+    int* daptr = dualads.getvalues();
+
+    int index = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+        {
+            paptr[index] = it->second;
+            daptr[index] = myrawportmap[rp->getdual().get()];
+
+            index++;
+        }
+    }
+
+    primalads = primalads.getresized(index, 1);
+    dualads = dualads.getresized(index, 1);
+
+    return std::make_pair(primalads, dualads);
+}
+
 bool dofmanager::isdefined(int disjreg, int formfunc)
 {
     synchronize();
     
     return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
 }
-        
-int dofmanager::countconstraineddofs(void)
+
+bool dofmanager::isported(int disjreg)
 {
     synchronize();
     
-    int numconstraineddofs = 0;
-    
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
-    {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
-        {
-            // If the field is constrained on the disjoint region and there is at least one form function:
-            if (rangebegin[fieldindex][disjreg].size() > 0 && myfields[fieldindex]->isconstrained(disjreg))
-                numconstraineddofs += rangebegin[fieldindex][disjreg].size() * (rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1);
-        }
-    }
-    return numconstraineddofs;
+    return (primalondisjreg[selectedfieldnumber][disjreg] != NULL); 
 }
 
 std::vector<bool> dofmanager::isconstrained(void)
@@ -222,30 +368,62 @@ std::vector<bool> dofmanager::isconstrained(void)
     
     std::vector<bool> output(numberofdofs, false);
     
-    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    std::vector<intdensematrix> allconstrinds = {getdisjregconstrainedindexes(), getgaugedindexes(), getconditionalconstraintdata().first};
+    
+    for (int i = 0; i < allconstrinds.size(); i++)
     {
-        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
-        {
-            // If the field is constrained on the disjoint region.
-            if (myfields[fieldindex]->isconstrained(disjreg))
-            {
-                for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
-                {
-                    int numdofshere = rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1;
-                    for (int i = 0; i < numdofshere; i++)
-                        output[rangebegin[fieldindex][disjreg][ff] + i] = true;
-                }
-            }
-        }
+        int* cptr = allconstrinds[i].getvalues();
+        for (int j = 0; j < allconstrinds[i].count(); j++)
+            output[cptr[j]] = true;
     }
+
     return output;
 }
 
 intdensematrix dofmanager::getconstrainedindexes(void)
 {
+    std::vector<bool> isconstr = isconstrained();
+
+    int numconstr = myalgorithm::counttrue(isconstr);
+    intdensematrix out(numconstr, 1);
+    int* outptr = out.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < isconstr.size(); i++)
+    {
+        if (isconstr[i])
+        {
+            outptr[index] = i;
+            index++;
+        }
+    }
+    
+    return out;
+}
+        
+int dofmanager::countdisjregconstraineddofs(void)
+{
     synchronize();
     
-    intdensematrix output(1,countconstraineddofs());
+    int numdisjregconstraineddofs = 0;
+    
+    for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
+    {
+        for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
+        {
+            // If the field is constrained on the disjoint region and there is at least one form function:
+            if (rangebegin[fieldindex][disjreg].size() > 0 && myfields[fieldindex]->isdisjregconstrained(disjreg))
+                numdisjregconstraineddofs += rangebegin[fieldindex][disjreg].size() * (rangeend[fieldindex][disjreg][0] - rangebegin[fieldindex][disjreg][0] + 1);
+        }
+    }
+    return numdisjregconstraineddofs;
+}
+
+intdensematrix dofmanager::getdisjregconstrainedindexes(void)
+{
+    synchronize();
+    
+    intdensematrix output(1,countdisjregconstraineddofs());
     int* myval = output.getvalues();
     
     int currentindex = 0;
@@ -254,7 +432,7 @@ intdensematrix dofmanager::getconstrainedindexes(void)
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
             // If the field is constrained on the disjoint region.
-            if (myfields[fieldindex]->isconstrained(disjreg))
+            if (myfields[fieldindex]->isdisjregconstrained(disjreg))
             {
                 for (int ff = 0; ff < rangebegin[fieldindex][disjreg].size(); ff++)
                 {
@@ -281,8 +459,7 @@ int dofmanager::countgaugeddofs(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Constraints have priority over the gauge!
-            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            if (myfields[fieldindex]->isgauged(disjreg))
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
@@ -321,8 +498,7 @@ intdensematrix dofmanager::getgaugedindexes(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Constraints have priority over the gauge!
-            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            if (myfields[fieldindex]->isgauged(disjreg))
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
@@ -371,8 +547,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
                 continue;
                 
-            // Constraints have priority over the conditional constraints!
-            if (myfields[fieldindex]->isconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
+            if (myfields[fieldindex]->isconditionallyconstrained(disjreg))
                 isdisjregactive[disjreg] = true;
         }
             
@@ -470,54 +645,6 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     return std::make_pair(condconstrindices, condconstrval);
 }
 
-
-std::shared_ptr<dofmanager> dofmanager::removeconstraints(int* dofrenumbering)
-{
-    synchronize();
-    
-    // Set a default -1 renumbering:
-    for (int i = 0; i < numberofdofs; i++)
-        dofrenumbering[i] = -1;
-    
-    std::shared_ptr<dofmanager> newdofmanager(new dofmanager);
-    *(newdofmanager.get()) = *this;
-    newdofmanager->numberofdofs = 0;
-    
-    for (int fieldindex = 0; fieldindex < newdofmanager->rangebegin.size(); fieldindex++)
-    {
-        for (int disjreg = 0; disjreg < newdofmanager->rangebegin[fieldindex].size(); disjreg++)
-        {
-            // If the field is not constrained on the disjoint region:
-            if (newdofmanager->myfields[fieldindex]->isconstrained(disjreg) == false)
-            {
-                for (int ff = 0; ff < newdofmanager->rangebegin[fieldindex][disjreg].size(); ff++)
-                {
-                    // Update the range begin and end:
-                    int numdofshere = newdofmanager->rangeend[fieldindex][disjreg][0] - newdofmanager->rangebegin[fieldindex][disjreg][0] + 1;
-                    
-                    newdofmanager->rangebegin[fieldindex][disjreg][ff] = newdofmanager->numberofdofs;
-                    newdofmanager->rangeend[fieldindex][disjreg][ff] = newdofmanager->numberofdofs + numdofshere - 1;
-                    
-                    // Renumber the dofs:
-                    int offset = rangebegin[fieldindex][disjreg][ff];                    
-                    for (int i = 0; i < numdofshere; i++)
-                        dofrenumbering[offset+i] = newdofmanager->numberofdofs+i;
-                    
-                    newdofmanager->numberofdofs += numdofshere;
-                }
-            }
-            else
-            {
-                // Remove the constrained dofs:
-                newdofmanager->rangebegin[fieldindex][disjreg] = {};
-                newdofmanager->rangeend[fieldindex][disjreg] = {};
-            }
-        }
-    }
-    
-    return newdofmanager;
-}
-
 std::shared_ptr<rawfield> dofmanager::getselectedfield(void)
 {
     synchronize();
@@ -549,6 +676,28 @@ std::vector<int> dofmanager::getselectedfieldorders(void)
     return myfieldorders[selectedfieldnumber];
 }
 
+int dofmanager::countports(void)
+{
+    synchronize();
+
+    return myrawportmap.size();
+}
+
+int dofmanager::countassociatedprimalports(void)
+{
+    synchronize();
+
+    int cnt = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+            cnt++;
+    }
+
+    return cnt;
+}
+
 int dofmanager::countdofs(void)
 {
     synchronize();
@@ -573,12 +722,14 @@ long long int dofmanager::allcountdofs(void)
     
     for (int d = 0; d < isowndr.size(); d++)
     {
-        int ne = mydisjointregions->countelements(d);
-        for (int i = 0; i < myfields.size(); i++)
+        if (isowndr[d])
         {
-            int nff = rangebegin[i][d].size();
-            if (isowndr[d])
+            int ne = mydisjointregions->countelements(d);
+            for (int i = 0; i < myfields.size(); i++)
+            {
+                int nff = rangebegin[i][d].size();
                 out += ne*nff;
+            }
         }
     }
     
@@ -604,7 +755,8 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
     
     std::vector<intdensematrix> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
     
-    std::vector<bool> isdofconstrained = isconstrained();
+    // Get all types of constraints:
+    std::vector<bool> isdofconstrained = isconstrained(); 
     
     // Exchange the constrained indexes:
     std::vector<std::vector<int>> isconstrainedforneighbours(numneighbours), isconstrainedfromneighbours(numneighbours);
@@ -689,7 +841,7 @@ void dofmanager::print(void)
 }
 
 
-intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg, bool useminusonetag)
+intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg)
 {
     synchronize();
     
@@ -743,19 +895,19 @@ intdensematrix dofmanager::getadresses(std::shared_ptr<rawfield> inputfield, int
 
             previousdisjreg = currentdisjointregion;
             
-            // If not in a disjoint region on which the field is defined set -2 adress.
+            // If not in a disjoint region on which the field is defined set -1 address.
             if (isfielddefinedondisjointregion[currentdisjointregion] && formfunctionindex < currentnumberofformfunctions)
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
-
-                adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;     
-
-                if (useminusonetag && inputfield->isconstrained(currentdisjointregion))
-                    adresses[ff*numcols+i] = -1;
+                
+                if (primalondisjreg[selectedfieldnumber][currentdisjointregion] == NULL)
+                    adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
+                else
+                    adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + 0;
             }
             else
-                adresses[ff*numcols+i] = -2;
+                adresses[ff*numcols+i] = -1;
         }
         myiterator.next();
     }

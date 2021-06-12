@@ -110,7 +110,7 @@ double sparselizard(double alpha)
     // Simple p-adaptivity loop:
     for (int i = 0; i <= 2; i++)
     {
-        solve(magnetostatics);
+        magnetostatics.solve();
         adapt();
     }
     
@@ -133,7 +133,7 @@ double sparselizard(double alpha)
     forceprojection += integral(statmagmat, dof(magforce)*tf(magforce));
     forceprojection += integral(stator, - predefinedmagnetostaticforce(tf(magforce, statmagmat), 1/mu*curl(a), mu));
 
-    solve(forceprojection);
+    forceprojection.solve();
 
     // Calculate the torque:
     expression leverarm = array3x1(x,y,0);

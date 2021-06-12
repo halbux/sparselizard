@@ -72,7 +72,7 @@ class dofinterpolate
         dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr);
         
         densematrix getvalues(elementselector& elemselec, int dofopindex);
-        intdensematrix getadresses(elementselector& elemselec, int harmnum);
+        intdensematrix getaddresses(elementselector& elemselec, int harmnum);
                                             
 };
 

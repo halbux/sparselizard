@@ -25,11 +25,13 @@
 #include "rawfield.h"
 #include "vectorfieldselect.h"
 #include "spanningtree.h"
+#include "port.h"
 
 class spanningtree;
 class vectorfieldselect;
 class parameter;
 class rawfield;
+class port;
 
 class field
 {
@@ -71,6 +73,9 @@ class field
         void setorder(int physreg, int interpolorder);
         void setorder(expression criterion, int loworder, int highorder);
         void setorder(double targeterror, int loworder, int highorder, double absthres);
+        
+        // Associate the primal and dual port to the field.
+        void setport(int physreg, port primal, port dual);
 
         // Set a value for the field on a given geometrical region.
         // Use the default order + 'extraintegrationdegree' to 
@@ -202,3 +207,4 @@ expression operator*(parameter, field);
 expression operator/(parameter, field);
 
 #endif
+

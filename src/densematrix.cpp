@@ -30,7 +30,7 @@ densematrix::densematrix(long long int numberofrows, long long int numberofcolum
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
-densematrix::densematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<double> valvec)
+densematrix::densematrix(long long int numberofrows, long long int numberofcolumns, std::vector<double> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -586,8 +586,6 @@ double densematrix::maxabs(void)
 
 double densematrix::sum(void)
 {
-    errorifempty();
-    
     double* myvaluesptr = myvalues.get();
     double val = 0;
 

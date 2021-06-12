@@ -105,27 +105,41 @@ void rawmesh::splitmesh(void)
     }
 }
 
-void rawmesh::readfromfile(std::string name)
-{
-    if (name == "gmshapi")
+void rawmesh::readfromfile(std::string tool, std::string source)
+{       
+    if (tool == "gmsh")
     {
-        gmshinterface::readfromapi(mynodes, myelements, myphysicalregions);
-        return;   
+        if (source == "api")
+            gmshinterface::readfromapi(mynodes, myelements, myphysicalregions);
+        else
+            gmshinterface::readwithapi(source, mynodes, myelements, myphysicalregions);
+        return;
     }
-    
-    if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
+    if (tool == "petsc")
     {
-        gmshinterface::readfromfile(name, mynodes, myelements, myphysicalregions);
-        return;    
+        petscmesh pmesh(source);
+        pmesh.extract(mynodes, myelements, myphysicalregions);
+        return;
     }
-    if (name.length() >= 5 && name.compare(name.size()-4,4,".nas") == 0)
+    if (tool == "native")
     {
-        nastraninterface::readfromfile(name, mynodes, myelements, myphysicalregions);
-        return;    
+        if (source.length() >= 5 && source.compare(source.size()-4,4,".msh") == 0)
+        {
+            gmshinterface::readfromfile(source, mynodes, myelements, myphysicalregions);
+            return;    
+        }
+        if (source.length() >= 5 && source.compare(source.size()-4,4,".nas") == 0)
+        {
+            nastraninterface::readfromfile(source, mynodes, myelements, myphysicalregions);
+            return;    
+        }
+        
+        std::cout << "Error: file '" << source << "' cannot be read by the native mesh reader." << std::endl;
+        std::cout << "Use the GMSH or the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
+        abort();
     }
 
-    std::cout << "Error: file '" << name << "' cannot be read by the legacy mesh reader." << std::endl;
-    std::cout << "Use the GMSH API or the petsc mesh reader instead or use the GMSH .msh or Nastran .nas format." << std::endl;
+    std::cout << "Error: unknown mesh reader '" << tool << "'" << std::endl;
     abort();
 }
 
@@ -234,27 +248,21 @@ std::shared_ptr<rawmesh> rawmesh::getattarget(std::shared_ptr<ptracker> targetpt
     return om;
 }
 
-void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader)
+void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity)
 {
     // Do not call this when the mesh is already loaded!
 
+    std::string tool, source;
+    myalgorithm::splitatcolon(name, tool, source);
+    if (tool.size() == 0)
+        tool = "native";
+
     if (verbosity > 0)
-    {
-        if (name == "gmshapi")
-            std::cout << "Loading mesh from GMSH API" << std::endl;
-        else
-            std::cout << "Loading mesh from file '" << name << "'" << std::endl;
-    }
+        std::cout << "Loading mesh from '" << source << "' with the " << tool << " mesh reader" << std::endl;
     
     wallclock loadtime;
     
-    if (legacyreader || name == "gmshapi")
-        readfromfile(name);
-    else
-    {
-        petscmesh pmesh(name);
-        pmesh.extract(mynodes, myelements, myphysicalregions);
-    }
+    readfromfile(tool, source);
     
     splitmesh();
     mynodes.fixifaxisymmetric();

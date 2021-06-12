@@ -54,7 +54,7 @@ int main(void)
     viscousflow += integral(fluid, predefinedstokes(dof(v), tf(v), dof(p), tf(p), mu, rho, 0, 0) );	
     
     // Generate, solve and save:
-    solve(viscousflow);
+    viscousflow.solve();
     
     // Write the p and v fields to file. Write v with an order 2 interpolation.
     p.write(fluid, "p.vtk");

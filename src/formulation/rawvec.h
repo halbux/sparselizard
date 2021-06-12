@@ -60,12 +60,9 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         
         int size(void);
         
-        // Remove the entries associated to Dirichlet constraints:
-        void removeconstraints(void);
-        
         // Update the indexes that correspond to constrained 
         // values of a rawfield on given disjoint regions. 
-        void updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
+        void updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
         void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
@@ -78,6 +75,9 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         
         void setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
         densematrix getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
+        
+        void setvaluestoports(void);
+        void setvaluesfromports(void);
         
         // Write and load raw vec data:
         void write(std::string filename);

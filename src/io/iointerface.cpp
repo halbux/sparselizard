@@ -102,9 +102,13 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
             // To write all doubles with enough digits to the file:
             name << std::setprecision(17);
 
-            for (int i = 0; i < doubledata.size()-1; i++)
-                name << doubledata[i] << std::endl;
-            name << doubledata[doubledata.size()-1];
+            for (int i = 0; i < doubledata.size(); i++)
+            {
+                if (i == doubledata.size()-1)
+                    name << doubledata[i];
+                else
+                    name << doubledata[i] << std::endl;
+            }
 
             name.close();
         }
@@ -135,9 +139,11 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
         Vec datvec;
         VecCreate(PETSC_COMM_SELF, &datvec);
         VecSetSizes(datvec, PETSC_DECIDE, totalsize);
-        VecSetFromOptions(datvec);  
+        VecSetFromOptions(datvec);
 
         VecSetValues(datvec, totalsize, addsvals, datavals, INSERT_VALUES);
+        VecAssemblyBegin(datvec);
+        VecAssemblyEnd(datvec);
 
         PetscViewer v;
         PetscViewerBinaryOpen(PETSC_COMM_SELF, filename.c_str(), FILE_MODE_WRITE, &v);

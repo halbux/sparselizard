@@ -32,7 +32,7 @@ int main(void)
     elasticity += integral(vol, array3x1(0,0,-10)*tf(u));
 
     // Generate, solve and transfer the solution to field u:
-    solve(elasticity);
+    elasticity.solve();
     
     // Write the deflection to ParaView .vtk format.
     // Write with an order 2 interpolation. Exaggerate the deflection by a factor 0.5e9.

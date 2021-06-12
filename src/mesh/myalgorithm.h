@@ -244,6 +244,12 @@ namespace myalgorithm
     int sum(std::vector<int>& tosum);
     double sum(std::vector<double>& tosum);
     
+    // Split a string at the first colon. If there is no colon then the string to split is placed in 'last':
+    void splitatcolon(std::string tosplit, std::string& first, std::string& last);
+    
+    // Find the true and false indexes in the argument vector and provide the renumbering of each vector entry to its true/false index:
+    void findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum);
+    
 };
 
 #endif

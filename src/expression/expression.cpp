@@ -50,6 +50,14 @@ expression::expression(parameter input)
     }
 }
 
+expression::expression(port input)
+{
+    mynumrows = 1;
+    mynumcols = 1;
+
+    myoperations = {std::shared_ptr<opport>(new opport(input.getpointer()))};
+}
+
 expression::expression(int numrows, int numcols, std::vector<expression> input)
 {
     mynumrows = numrows;
@@ -887,6 +895,9 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
     }
+    
+    if (universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
+        return;
 
     // Minimum lagrange order is 1!
     if (lagrangeorder < 1)
@@ -1036,9 +1047,11 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
-    if (startcoords.size() == 0)
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
+    if (startcoords.size() == 0 || universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
         return;
-
+    
     // This can happen with int divisions:
     if (stepsize == 0)
     {
@@ -1231,6 +1244,8 @@ bool expression::iszero(void)
 
 vec expression::atbarycenter(int physreg, field onefield)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
     // The field must be a "one" type:
     std::string ft = onefield.getpointer()->gettypename();
     if (ft != "one0" && ft != "one1" && ft != "one2" && ft != "one3")
@@ -1381,8 +1396,23 @@ expression expression::at(int row, int col)
     return arrayentry;
 }
 
+double expression::evaluate(void)
+{
+    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
+    
+    if (isscalar())
+        return myoperations[0]->evaluate();
+    else
+    {
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
+        abort();
+    }
+}
+
 std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
+    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
+    
     if (isscalar())
     {
         if (xcoords.size() == ycoords.size() && xcoords.size() == zcoords.size())
@@ -1400,7 +1430,7 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
     }
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on a scalar expression" << std::endl;
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
         abort();
     }
 }
@@ -1834,13 +1864,13 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, onexpr.myoperations[i], errorifnotfound));
         else
         {
-            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftfpolynomial').
+            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftf').
             field dummy("h1");
             expression curexpr = expression(onexpr.myoperations[i]) * sl::tf(dummy);
             curexpr.expand();
         
             int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftfpolynomial(elementdimension);
+            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftf(elementdimension);
             // Do not retrieve the info for the tf:
             std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
             std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
@@ -1985,12 +2015,12 @@ void expression::expand(void)
     else
     {
         std::cout << "Error in 'expression' object: expand is only defined for scalar expressions" << std::endl;
-        std::cout << "Did you try to define a nonscalar formulation?" << std::endl;
+        std::cout << "Did you try to define a nonscalar formulation term?" << std::endl;
         abort();
     }
 }
 
-std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftfpolynomial(int elementdimension)
+std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftf(int elementdimension)
 {
     // Simplify the operation:
     myoperations[0] = myoperations[0]->simplify({});
@@ -2019,13 +2049,11 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     // Loop on all elementary sum terms in the formulation:
     for (int i = 0; i < sumterms.size(); i++)
     {
-        // Deal with the very specific case of a tf() term without
-        // coefficient by multiplying it by a constant 1 to get a product:
+        // Deal with the very specific case of a tf() term without coefficient:
         if (sumterms[i]->istf())
         {
             std::shared_ptr<opproduct> op(new opproduct);
             op->multiplybyterm(sumterms[i]);
-            op->multiplybyterm(std::shared_ptr<operation>(new opconstant(1)));
             sumterms[i] = op;
         }
         // In a valid formulation term sumterms[i] must now always be a product:
@@ -2043,12 +2071,12 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             for (int j = productterms.size()-1; j >= 0; j--)
             {
                 // Remove the dof and tf terms to get the coefficient:
-                if (productterms[j]->isdof())
+                if (currentdof->getfieldpointer() == NULL && productterms[j]->isdof())
                 {
                     currentdof = productterms[j];
                     currentcoef->removeterm(j);
                 }
-                if (productterms[j]->istf())
+                if (currenttf->getfieldpointer() == NULL && productterms[j]->istf())
                 {
                     currenttf = productterms[j];
                     currentcoef->removeterm(j);
@@ -2105,6 +2133,13 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                 numdofterms = elementdimension;
             if (currenttf->getspacederivative() > 0)
                 numtfterms = elementdimension;
+                
+            if (numdofterms < 0 || numtfterms < 0)
+            {
+                std::cout << "Error in 'expression' object: cannot process the term for " << elementdimension << "D elements" << std::endl;
+                std::cout << "Are you working with an empty physical region?" << std::endl;
+                abort();
+            }
 
             std::vector<std::shared_ptr<operation>> currentdofsplit(numdofterms*numtfterms);
             std::vector<std::shared_ptr<operation>> currenttfsplit(numdofterms*numtfterms);
@@ -2183,6 +2218,88 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     }
 
     return {coeffs, dofs, tfs};
+}
+
+void expression::extractport(std::vector<port>& ports, std::vector<int>& dtorders, std::vector<expression>& coefs, std::vector<expression>& noportcoef)
+{
+    ports = {}; dtorders = {}; coefs = {}; noportcoef = {};
+
+    // Simplify the operation:
+    myoperations[0] = myoperations[0]->simplify({});
+
+    bool isformatok = true;
+
+    // Extract the sum terms from the operation:
+    std::vector<std::shared_ptr<operation>> sumterms;
+    if (myoperations[0]->issum())
+        sumterms = myoperations[0]->getarguments();
+    else
+        sumterms = {myoperations[0]};
+
+    // Loop on all elementary sum terms in the formulation:
+    for (int i = 0; i < sumterms.size(); i++)
+    {
+        // If needed make a product out of it:
+        if (sumterms[i]->isproduct() == false)
+        {
+            std::shared_ptr<opproduct> op(new opproduct);
+            op->multiplybyterm(sumterms[i]);
+            sumterms[i] = op;
+        }
+
+        std::shared_ptr<rawport> currentport = NULL;
+        int currentdtorder = -1;
+
+        // The coef is what remains after port removal.
+        // We thus remove the port term.
+        std::shared_ptr<operation> currentcoef = sumterms[i]->copy();
+
+        std::vector<std::shared_ptr<operation>> productterms = sumterms[i]->getarguments();
+
+        for (int j = productterms.size()-1; j >= 0; j--)
+        {
+            // Remove the port term to get the coefficient:
+            if (currentport == NULL && productterms[j]->isport())
+            {
+                currentport = productterms[j]->getportpointer();
+                currentdtorder = productterms[j]->gettimederivative();
+                currentcoef->removeterm(j);
+            }
+        }
+
+        // A coef without factors actually has value 1:
+        if (currentcoef->count() == 0)
+            currentcoef = std::shared_ptr<opconstant>(new opconstant(1));
+
+        // Do some error checking.
+        // Make sure there is no port in the coef.
+        if (currentcoef->isportincluded())
+            isformatok = false;
+
+        if (currentport != NULL)
+        {
+            ports.push_back(port(currentport));
+            dtorders.push_back(currentdtorder);
+            coefs.push_back(expression(currentcoef));
+        }
+        else
+        {
+            if (noportcoef.size() == 0)
+                noportcoef = {expression(currentcoef)};
+            else
+                noportcoef[0] = noportcoef[0] + expression(currentcoef);
+        }
+    }
+
+    if (not(isformatok))
+    {
+        std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
+        std::cout << "The expression should be rewritable into a sum of products of the form coef*port (time derivatives allowed)" << std::endl;
+        std::cout << "Expression was:" << std::endl;
+        myoperations[0]->print();
+        std::cout << std::endl;
+        abort();
+    }
 }
 
 
@@ -2305,18 +2422,29 @@ expression expression::operator-(parameter param) { return this->getcopy() - (ex
 expression expression::operator*(parameter param) { return this->getcopy() * (expression)param; }
 expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
 
+expression expression::operator+(port prt) { return this->getcopy() + (expression)prt; }
+expression expression::operator-(port prt) { return this->getcopy() - (expression)prt; }
+expression expression::operator*(port prt) { return this->getcopy() * (expression)prt; }
+expression expression::operator/(port prt) { return this->getcopy() / (expression)prt; }
 
-expression operator+(double val, expression expr) { return expr+val; }
-expression operator-(double val, expression expr) { return -expr+val; }
-expression operator*(double val, expression expr) { return expr*val; }
-expression operator/(double val, expression expr) { return ( (expression)val ) / expr; }
 
-expression operator+(field inputfield, expression expr) { return expr+inputfield; }
-expression operator-(field inputfield, expression expr) { return -expr+inputfield; }
-expression operator*(field inputfield, expression expr) { return expr*inputfield; }
-expression operator/(field inputfield, expression expr) { return ( (expression)inputfield ) / expr; }
+expression operator+(double val, expression expr) { return (expression)val + expr; }
+expression operator-(double val, expression expr) { return (expression)val - expr; }
+expression operator*(double val, expression expr) { return (expression)val * expr; }
+expression operator/(double val, expression expr) { return (expression)val / expr; }
 
-expression operator+(parameter param, expression expr) { return expr+param; }
-expression operator-(parameter param, expression expr) { return -expr+param; }
-expression operator*(parameter param, expression expr) { return expr*param; }
-expression operator/(parameter param, expression expr) { return ( (expression)param ) / expr; }
+expression operator+(field inputfield, expression expr) { return (expression)inputfield + expr; }
+expression operator-(field inputfield, expression expr) { return (expression)inputfield - expr; }
+expression operator*(field inputfield, expression expr) { return (expression)inputfield * expr; }
+expression operator/(field inputfield, expression expr) { return (expression)inputfield / expr; }
+
+expression operator+(parameter param, expression expr) { return (expression)param + expr; }
+expression operator-(parameter param, expression expr) { return (expression)param - expr; }
+expression operator*(parameter param, expression expr) { return (expression)param * expr; }
+expression operator/(parameter param, expression expr) { return (expression)param / expr; }
+
+expression operator+(port prt, expression expr) { return (expression)prt + expr; }
+expression operator-(port prt, expression expr) { return (expression)prt - expr; }
+expression operator*(port prt, expression expr) { return (expression)prt * expr; }
+expression operator/(port prt, expression expr) { return (expression)prt / expr; }
+

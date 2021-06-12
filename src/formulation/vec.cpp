@@ -38,37 +38,49 @@ void vec::permute(intdensematrix rowpermute, bool invertit)
         VecPermute(getpetsc(), rowpermutis, PETSC_TRUE);
 }
 
-void vec::removeconstraints(void) { errorifpointerisnull(); rawvecptr->removeconstraints(); };
-        
 void vec::updateconstraints(void)
 {
     errorifpointerisnull();
     
+    std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
+    // Get all disjoint regions:
     std::vector<int> disjregs((universe::mymesh->getdisjointregions())->count());
-    // Set 'disjregs' to [0 1 2 ...]:
-       std::iota(disjregs.begin(), disjregs.end(), 0);
+    std::iota(disjregs.begin(), disjregs.end(), 0);
     
+    // Update the disjoint region constraints:
     std::vector<std::shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
-        rawvecptr->updateconstraints(fieldsindofmanager[i], disjregs);
+        rawvecptr->updatedisjregconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
-    std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
     std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
     rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
     
     // Set the gauged indexes to zero:
     intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-    int numgaugedindexes = gaugedindexes.count();
-    if (numgaugedindexes > 0)
-        rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(),gaugedindexes.countcolumns(), 0.0));
+    rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
 }
 
 void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
 { 
     errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
+
+void vec::setallvalues(densematrix valsmat, std::string op)
+{ 
+    errorifpointerisnull();
+    intdensematrix ads(size(),1,0,1);
+    rawvecptr->setvalues(ads, valsmat, op); 
+}
+
 densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
+
+densematrix vec::getallvalues(void)
+{
+    errorifpointerisnull();
+    intdensematrix ads(size(),1,0,1);
+    return rawvecptr->getvalues(ads);
+}
 
 void vec::setvalue(int address, double value, std::string op)
 {
@@ -78,6 +90,38 @@ void vec::setvalue(int address, double value, std::string op)
 double vec::getvalue(int address)
 {
     errorifpointerisnull(); return rawvecptr->getvalue(address); 
+}
+
+void vec::setvalue(port prt, double value, std::string op)
+{
+    errorifpointerisnull();
+    
+    if (prt.getpointer()->isharmonicone())
+    {
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1));
+        setvalue(address, value, op);
+    }
+    else
+    {
+        std::cout << "Error in 'vec' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+}
+
+double vec::getvalue(port prt)
+{
+    errorifpointerisnull();
+    
+    if (prt.getpointer()->isharmonicone())
+    {
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1));
+        return getvalue(address);
+    }
+    else
+    {
+        std::cout << "Error in 'vec' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+        abort();
+    }
 }
 
 vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); return vectorfieldselect(rawvecptr, selectedfield.getpointer()); }
@@ -95,6 +139,8 @@ void vec::setdata(void)
     std::vector<std::shared_ptr<rawfield>> rfs = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < rfs.size(); i++)
         rfs[i]->transferdata(-1, vectorfieldselect(rawvecptr, rfs[i]), "set");
+        
+    rawvecptr->setvaluesfromports();
 }
 
 void vec::automaticupdate(bool updateit)
@@ -132,6 +178,14 @@ vec vec::copy(void)
     VecDuplicate(x, &output);
     VecCopy(x, output);
     return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
+}
+
+vec vec::extract(intdensematrix addresses)
+{
+    densematrix extractedvals = getvalues(addresses);
+    std::shared_ptr<rawvec> newrawvecptr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(addresses.count()))));
+    newrawvecptr->setvalues(intdensematrix(addresses.count(), 1, 0, 1), extractedvals, "set");
+    return vec(newrawvecptr);
 }
 
 double vec::norm(std::string type)
@@ -188,3 +242,4 @@ vec vec::operator-(vec input)
 
 
 vec operator*(double inputdouble, vec inputvec) { return inputvec*inputdouble; }
+

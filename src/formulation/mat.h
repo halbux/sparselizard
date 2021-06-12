@@ -54,17 +54,23 @@ class mat
         
         long long int countnnz(void);
         
-        // Permute the rows and columns:
-        void permute(intdensematrix rowpermute, intdensematrix colpermute);
-        
-        // Remove the rows and columns associated to Dirichlet constraints:
-        void removeconstraints(void);
-        
         void reusefactorization(void);
         
         std::shared_ptr<rawmat> getpointer(void);
         
-        Mat getpetsc(void);
+        // Return [x; bd]:
+        vec xbmerge(vec x, vec b);
+        // Return [x; 0]:
+        vec x0merge(vec x);
+
+        // Return ba - D*bd:
+        vec eliminate(vec b);
+
+        intdensematrix getainds(void);
+        intdensematrix getdinds(void);
+
+        Mat getapetsc(void);
+        Mat getdpetsc(void);
         
         void print(void);
         

@@ -36,7 +36,7 @@ class intdensematrix
         // Initialise to a value:
         intdensematrix(long long int numberofrows, long long int numberofcolumns, int initvalue);
         // Initialise with a vector (row major):
-        intdensematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<int> valvec);
+        intdensematrix(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
         intdensematrix(long long int numberofrows, long long int numberofcolumns, int init, int step);
         // Vertical concatenation of dense matrices:
@@ -45,6 +45,9 @@ class intdensematrix
         long long int countrows(void) { return numrows; };
         long long int countcolumns(void) { return numcols; };
         long long int count(void) { return numrows*numcols; };
+        
+        // Output the mxn resized matrix (this only changes 'numrows' and 'numcols'). Values are NOT copied!
+        intdensematrix getresized(long long int m, long long int n);
         
         // Count the number of positive or zero integer values:
         long long int countpositive(void);
@@ -71,6 +74,9 @@ class intdensematrix
  
         int* getvalues(void);
         
+        // Get a full copy (all values are copied).
+        intdensematrix copy(void);
+        
         // Get the transpose without modifying this object.
         intdensematrix gettranspose(void);
 
@@ -93,7 +99,7 @@ class intdensematrix
         intdensematrix extractcols(std::vector<int>& selected);
         
         // Select all indexes for which the selection equals the last argument:
-        intdensematrix select(std::vector<bool>& selectedindexes, bool selectif);
+        intdensematrix select(std::vector<bool>& sel, bool selectif);
 
 };
 

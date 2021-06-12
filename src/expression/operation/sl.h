@@ -46,10 +46,10 @@ namespace sl
     int selectall(void);
     
     // Check if a region is defined/empty/fully included in another region/touches another region:
-    bool isregiondefined(int physreg);
-    bool isregionempty(int physreg);
-    bool isregioninside(int physregtocheck, int physreg);
-    bool isregiontouching(int physregtocheck, int physreg);
+    bool isdefined(int physreg);
+    bool isempty(int physreg);
+    bool isinside(int physregtocheck, int physreg);
+    bool istouching(int physregtocheck, int physreg);
 
     void printvector(std::vector<double> input);
     void printvector(std::vector<int> input);
@@ -59,14 +59,16 @@ namespace sl
     // Load a vector of doubles separated by a character:
     std::vector<double> loadvector(std::string filename, char delimiter = ',', bool sizeincluded = false);
 
-    // Partition the mesh into numranks parts:
-    void allpartition(std::string meshfile);
+    // Partition the mesh into numranks parts and return the mesh file name for each rank:
+    std::string allpartition(std::string meshfile);
 
     // Compute the L2 norm of an expression:
     expression norm(expression expr);
 
     // Normal vector with unit norm and pointing outward of a physical region:
-    expression normal(int physreg = -1);
+    expression normal(void);
+    expression normal(int physreg);
+    expression getnormal(int physreg);
     // Tangent vector with unit norm:
     expression tangent(void);
 
@@ -198,8 +200,10 @@ namespace sl
     integration integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
     integration integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta = 0, int blocknumber = 0);
 
-    expression dof(expression input, int physreg = -1);
-    expression tf(expression input, int physreg = -1);
+    expression dof(expression input);
+    expression dof(expression input, int physreg);
+    expression tf(expression input);
+    expression tf(expression input, int physreg);
     
     // Return an expression whose value will be calculated on the argument mesh state (the expression is hp-synchronized to that mesh state after the call):
     expression athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt);
@@ -221,6 +225,7 @@ namespace sl
     expression array3x2(expression term11, expression term12, expression term21, expression term22, expression term31, expression term32);
     expression array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33);
 
+
     // Direct resolution (with or without diagonal scaling):
     vec solve(mat A, vec b, std::string soltype = "lu", bool diagscaling = false);
     // Multi-rhs direct resolution:
@@ -230,20 +235,14 @@ namespace sl
     
     // Iterative resolution (with or without diagonal scaling):
     void solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
-
-    // Generate, solve and save to field a formulation:
-    void solve(formulation formul, std::vector<int> blockstoconsider = {-1});
-    void solve(std::vector<formulation> formuls);
     
-    // DDM resolution with mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
-    std::vector<double> allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, int maxits, double relrestol, int verbosity = 1);
     
     // Exchange densematrix data with MPI:
     void exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives);
     
     // MPI based gmres with custom matrix free product (no restart). Initial guess and solution are in x.
     // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
-    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity = 1);
+    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity = 1);
     
     // Know which dofs to send and at which dofs to receive for the DDM. Choose the rawfields and the domain interface dimensions (length 3) to consider.
     void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);
@@ -255,7 +254,7 @@ namespace sl
     expression dbtoneper(expression toconvert);
     
     
-    // Set the data on all regions of all fields defined in the vec object:
+    // Set all fields and ports to the values available in the vec object:
     void setdata(vec invec);
 
 

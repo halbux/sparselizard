@@ -43,15 +43,15 @@ class mesh
     public:
 
         mesh(void);
-        mesh(std::string filename, int verbosity = 1, bool legacyreader = true);
-        mesh(std::string filename, int globalgeometryskin, int numoverlaplayers, int verbosity = 1, bool legacyreader = true);
+        mesh(std::string filename, int verbosity = 1);
+        mesh(std::string filename, int globalgeometryskin, int numoverlaplayers, int verbosity = 1);
         mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity = 1);
         mesh(std::vector<shape> inputshapes, int verbosity = 1);
         mesh(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity = 1);
 
         // Load from file name:
-        void load(std::string name, int verbosity = 1, bool legacyreader = true);   
-        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity = 1, bool legacyreader = true);   
+        void load(std::string name, int verbosity = 1);   
+        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity = 1);   
         // Load from multiple files:
         void load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity = 1);
         // Load from shape vector:

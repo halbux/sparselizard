@@ -25,20 +25,20 @@ mesh::mesh(void)
     universe::mymesh = rawmeshptr;
 }
 
-mesh::mesh(std::string filename, int verbosity, bool legacyreader)
+mesh::mesh(std::string filename, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
-    rawmeshptr->load(filename, -1, -1, verbosity, legacyreader);
+    rawmeshptr->load(filename, -1, -1, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
-mesh::mesh(std::string filename, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader)
+mesh::mesh(std::string filename, int globalgeometryskin, int numoverlaplayers, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
     universe::mymesh = rawmeshptr;
-    rawmeshptr->load(filename, globalgeometryskin, numoverlaplayers, verbosity, legacyreader);
+    rawmeshptr->load(filename, globalgeometryskin, numoverlaplayers, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
@@ -70,15 +70,15 @@ mesh::mesh(std::vector<shape> inputshapes, int globalgeometryskin, int numoverla
     isloaded = true;
 }
 
-void mesh::load(std::string name, int verbosity, bool legacyreader)
+void mesh::load(std::string name, int verbosity)
 {
-    load(name, -1, -1, verbosity, legacyreader);
+    load(name, -1, -1, verbosity);
 }
 
-void mesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity, bool legacyreader)
+void mesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity)
 {
     errorifloaded();
-    rawmeshptr->load(name, globalgeometryskin, numoverlaplayers, verbosity, legacyreader);
+    rawmeshptr->load(name, globalgeometryskin, numoverlaplayers, verbosity);
     universe::mymesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
@@ -151,6 +151,9 @@ void mesh::split(int n)
 void mesh::move(int physreg, expression u)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     if (rawmeshptr->getmeshnumber() == 0)
         rawmeshptr->move(physreg, u);
     rawmeshptr->gethadaptedpointer()->move(physreg, u);
@@ -167,6 +170,9 @@ void mesh::move(expression u)
 void mesh::shift(int physreg, double x, double y, double z)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     rawmeshptr->shift(physreg, x, y, z);
     rawmeshptr->gethadaptedpointer()->shift(physreg, x, y, z);
 }
@@ -181,6 +187,9 @@ void mesh::shift(double x, double y, double z)
 void mesh::rotate(int physreg, double ax, double ay, double az)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     rawmeshptr->rotate(physreg, ax, ay, az);
     rawmeshptr->gethadaptedpointer()->rotate(physreg, ax, ay, az);
 }
@@ -195,6 +204,9 @@ void mesh::rotate(double ax, double ay, double az)
 void mesh::scale(int physreg, double x, double y, double z)
 {
     errorifnotloaded();
+    rawmeshptr->getphysicalregions()->errorundefined({physreg});
+    rawmeshptr->gethadaptedpointer()->getphysicalregions()->errorundefined({physreg});
+    
     rawmeshptr->scale(physreg, x, y, z);
     rawmeshptr->gethadaptedpointer()->scale(physreg, x, y, z);
 }

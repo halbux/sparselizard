@@ -68,7 +68,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
     public:
         
         // 'readfromfile' hands over to the function reading the format of the mesh file.
-        void readfromfile(std::string);
+        void readfromfile(std::string tool, std::string source);
         // 'writetofile' hands over to the function writing the format of the mesh file.
         void writetofile(std::string);
 
@@ -98,17 +98,17 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         std::shared_ptr<rawmesh> getattarget(std::shared_ptr<ptracker> targetpt);
 
         // Load from file name:
-        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity = 1, bool legacyreader = true);   
+        void load(std::string name, int globalgeometryskin, int numoverlaplayers, int verbosity);   
         // Load from multiple files:
-        void load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity = 1);
+        void load(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity);
         // Load from shape vector:
-        void load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity = 1);
+        void load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity);
 
         // Write to file name:
-        void write(std::string name, int verbosity = 1);     
+        void write(std::string name, int verbosity);     
         
         // Split each element in the mesh n times:
-        void split(int n = 1);
+        void split(int n);
         
         // Get a bool vector telling if the nodes are in a physical region:
         std::vector<bool> isnodeinphysicalregion(int physreg);
@@ -126,7 +126,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         int getmeshdimension(void);
         
         // Get the physical regions of a given dimension (use -1 for all).
-        std::vector<int> getphysicalregionnumbers(int dim = -1);
+        std::vector<int> getphysicalregionnumbers(int dim);
         
         // Additional region selection tools. Will become effective only after loading the mesh. Can reuse previous selections!
         void selectskin(int newphysreg, int physregtoskin);

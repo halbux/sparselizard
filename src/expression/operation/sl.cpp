@@ -29,7 +29,6 @@ double sl::getpi(void)
 int sl::selectunion(std::vector<int> physregs)
 {
     universe::mymesh->getphysicalregions()->errorundefined(physregs);
-    universe::mymesh->getphysicalregions()->errornotsamedim(physregs);
     
     universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs, false);
     return (universe::mymesh->getphysicalregions())->createunion(physregs, false);
@@ -49,12 +48,12 @@ int sl::selectall(void)
     return (universe::mymesh->getphysicalregions())->createunionofall(false);
 }
 
-bool sl::isregiondefined(int physreg)
+bool sl::isdefined(int physreg)
 {
     return (universe::mymesh->getphysicalregions()->getindex(physreg) != -1);
 }
 
-bool sl::isregionempty(int physreg)
+bool sl::isempty(int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
 
@@ -69,7 +68,7 @@ bool sl::isregionempty(int physreg)
     return true;
 }
 
-bool sl::isregioninside(int physregtocheck, int physreg)
+bool sl::isinside(int physregtocheck, int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
@@ -86,7 +85,7 @@ bool sl::isregioninside(int physregtocheck, int physreg)
     return true;
 }
 
-bool sl::isregiontouching(int physregtocheck, int physreg)
+bool sl::istouching(int physregtocheck, int physreg)
 {
     universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
@@ -196,10 +195,10 @@ std::vector<double> sl::loadvector(std::string filename, char delimiter, bool si
 }
 
 #ifndef HAVE_GMSH
-void sl::allpartition(std::string meshfile)
+std::string sl::allpartition(std::string meshfile)
 {
     if (slmpi::count() == 1)
-        return;
+        return meshfile;
     
     std::cout << "Error in 'sl' namespace: GMSH API is required to partition the mesh" << std::endl;
     abort();
@@ -207,13 +206,13 @@ void sl::allpartition(std::string meshfile)
 #endif
 #ifdef HAVE_GMSH
 #include "gmsh.h"
-void sl::allpartition(std::string meshfile)
+std::string sl::allpartition(std::string meshfile)
 {
     int rank = slmpi::getrank();
     int numranks = slmpi::count();
     
     if (numranks == 1)
-        return;
+        return meshfile;
     
     if (rank == 0)
     {
@@ -229,6 +228,8 @@ void sl::allpartition(std::string meshfile)
     }
     // Wait for rank 0 to finish:
     slmpi::barrier();
+    
+    return (meshfile.substr(0, meshfile.size()-4)+"_"+std::to_string(rank+1)+".msh");
 }
 #endif
 
@@ -253,17 +254,25 @@ expression sl::norm(expression expr)
     return sqrt(mynorm);
 }
 
+expression sl::normal(void)
+{
+    return getnormal(-1);
+}
+
 expression sl::normal(int physreg)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return getnormal(physreg);
+}
+
+expression sl::getnormal(int physreg)
 {
     int problemdimension = universe::mymesh->getmeshdimension();
 
     if (physreg >= 0)
     {
-        universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    
         int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-
-        if (elementdimension != problemdimension)
+        if (elementdimension >= 0 && elementdimension != problemdimension)
         {
             std::cout << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
             abort();
@@ -567,11 +576,13 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
 
 std::vector<double> sl::gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return gettotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
 std::vector<double> sl::gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return gettotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
@@ -597,11 +608,13 @@ std::vector<double> sl::printtotalforce(int physreg, expression* meshdeform, exp
 
 std::vector<double> sl::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
 std::vector<double> sl::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
@@ -707,7 +720,12 @@ std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
 {
     std::shared_ptr<rawmesh> loadedmesh(new rawmesh());
     
-    loadedmesh->readfromfile(meshfile);
+    std::string tool, source;
+    myalgorithm::splitatcolon(meshfile, tool, source);
+    if (tool.size() == 0)
+        tool = "native";
+        
+    loadedmesh->readfromfile(tool, source);
     
     nodes* loadednodes = loadedmesh->getnodes();
     std::vector<double>* nodecoords = loadednodes->getcoordinates();
@@ -907,8 +925,17 @@ expression sl::min(parameter a, parameter b)
 }
 
 
-expression sl::on(int physreg, expression expr, bool errorifnotfound) { return expr.on(physreg, NULL, errorifnotfound); }
-expression sl::on(int physreg, expression coordshift, expression expr, bool errorifnotfound) { return expr.on(physreg, &coordshift, errorifnotfound); }
+expression sl::on(int physreg, expression expr, bool errorifnotfound)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return expr.on(physreg, NULL, errorifnotfound);
+}
+
+expression sl::on(int physreg, expression coordshift, expression expr, bool errorifnotfound)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return expr.on(physreg, &coordshift, errorifnotfound);
+}
 
 expression sl::comp(int selectedcomp, expression input)
 {
@@ -1236,26 +1263,49 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
 
 integration sl::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, numcoefharms, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, numcoefharms, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
-expression sl::dof(expression input, int physreg) { return input.dof(physreg); }
-expression sl::tf(expression input, int physreg) { return input.tf(physreg); }
+expression sl::dof(expression input)
+{
+    return input.dof(-1);
+}
+
+expression sl::dof(expression input, int physreg)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return input.dof(physreg);
+}
+
+expression sl::tf(expression input)
+{
+    return input.tf(-1);
+}
+
+expression sl::tf(expression input, int physreg)
+{
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    return input.tf(physreg);
+}
 
 expression sl::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
 {
@@ -1359,9 +1409,9 @@ expression sl::array3x3(expression term11, expression term12, expression term13,
 
 vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
-    if (soltype != "lu")
+    if (soltype != "lu" && soltype != "cholesky")
     {
-        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
         abort();
     }
     if (A.countrows() != b.size())
@@ -1376,19 +1426,17 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
         abort();
     }
     
-    // The copy of the rhs is returned in case there is no nonzero entry in A:
-    if (A.countnnz() == 0)
-        return b.copy();
+    vec breduced = A.eliminate(b);
+    
+    Vec bpetsc = breduced.getpetsc();
+    Mat Apetsc = A.getapetsc();
 
-    Vec bpetsc = b.getpetsc();
-    Mat Apetsc = A.getpetsc();
-
-    vec sol(std::shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
+    vec sol(std::shared_ptr<rawvec>(new rawvec(breduced.getpointer()->getdofmanager())));
     Vec solpetsc = sol.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
 
-    if (A.getpointer()->isludefined() == false)
+    if (A.getpointer()->isfactored() == false)
     {
         PC pc;
         KSPCreate(PETSC_COMM_SELF, ksp);
@@ -1400,28 +1448,31 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
         KSPSetFromOptions(*ksp);
 
         KSPGetPC(*ksp,&pc);
-        PCSetType(pc,PCLU);
+        if (soltype == "lu")
+            PCSetType(pc,PCLU);
+        if (soltype == "cholesky")
+            PCSetType(pc,PCCHOLESKY);
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
     }
 
     KSPSolve(*ksp, bpetsc, solpetsc);
 
-    A.getpointer()->isludefined(true);
+    A.getpointer()->isfactored(true);
 
-    if (A.getpointer()->islutobereused() == false)
+    if (A.getpointer()->isfactorizationreuseallowed() == false)
     {
         KSPDestroy(ksp);
-        A.getpointer()->isludefined(false);
+        A.getpointer()->isfactored(false);
     }
 
-    return sol;
+    return A.xbmerge(sol, b);
 }
 
 std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
 {
-    if (soltype != "lu")
+    if (soltype != "lu" && soltype != "cholesky")
     {
-        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu')" << std::endl;
+        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
         abort();
     }
     for (int i = 0; i < b.size(); i++)
@@ -1442,24 +1493,19 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
         return {};
         
     int numrhs = b.size();
-    int len = b[0].size();
     
-    // The copy of the rhs is returned in case there is no nonzero entry in A:
-    if (A.countnnz() == 0)
-    {
-        std::vector<vec> bcopy(numrhs);
-        for (int i = 0; i < numrhs; i++)
-            bcopy[i] = b[i].copy();
-        return bcopy;
-    }
+    std::vector<vec> breduced(numrhs);
+    for (int i = 0; i < numrhs; i++)
+        breduced[i] = A.eliminate(b[i]);
 
+    int len = breduced[0].size();
+    
     // Concatenate rhs vecs to densematrix:
-    intdensematrix ads(len, 1, 0, 1);
     densematrix rhs(numrhs, len);
     double* rhsptr = rhs.getvalues();
     for (int i = 0; i < numrhs; i++)
     {
-        densematrix vecvals = b[i].getvalues(ads);
+        densematrix vecvals = breduced[i].getallvalues();
         double* vecvalsptr = vecvals.getvalues();
         for (int j = 0; j < len; j++)
             rhsptr[i*len+j] = vecvalsptr[j];
@@ -1479,7 +1525,8 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
             valsptr[j] = solsptr[i*len+j];
     
         outvecs[i] = vec(std::shared_ptr<rawvec>(new rawvec(b[i].getpointer()->getdofmanager())));
-        outvecs[i].setvalues(ads, vals);
+        outvecs[i].setvalues(A.getainds(), vals);
+        outvecs[i].setvalues(A.getdinds(), b[i].getvalues(A.getdinds()));
     }
     
     return outvecs;
@@ -1490,18 +1537,21 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
     int numrhs = b.countrows();
     int len = b.countcolumns();
  
-    Mat Apetsc = A.getpetsc();
+    Mat Apetsc = A.getapetsc();
     
     KSP* ksp = A.getpointer()->getksp();
     PC pc;
-    if (A.getpointer()->isludefined() == false)
+    if (A.getpointer()->isfactored() == false)
     {
         KSPCreate(PETSC_COMM_SELF, ksp);
         KSPSetOperators(*ksp, Apetsc, Apetsc);
         KSPSetFromOptions(*ksp);
 
         KSPGetPC(*ksp,&pc);
-        PCSetType(pc,PCLU);
+        if (soltype == "lu")
+            PCSetType(pc,PCLU);
+        if (soltype == "cholesky")
+            PCSetType(pc,PCCHOLESKY);
         PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
         PCSetUp(pc);
     }
@@ -1522,12 +1572,12 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
     MatDestroy(&sols);
     MatDestroy(&rhses);
 
-    A.getpointer()->isludefined(true);
+    A.getpointer()->isfactored(true);
 
-    if (A.getpointer()->islutobereused() == false)
+    if (A.getpointer()->isfactorizationreuseallowed() == false)
     {
         KSPDestroy(ksp);
-        A.getpointer()->isludefined(false);
+        A.getpointer()->isfactored(false);
     }
     
     return densesols;
@@ -1567,11 +1617,14 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
         std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
         abort();
     }
+    
+    vec breduced = A.eliminate(b);
+    vec sola = sol.extract(A.getainds());
 
-    Vec bpetsc = b.getpetsc();
-    Mat Apetsc = A.getpetsc();
+    Vec bpetsc = breduced.getpetsc();
+    Mat Apetsc = A.getapetsc();
 
-    Vec solpetsc = sol.getpetsc();
+    Vec solpetsc = sola.getpetsc();
 
     KSP* ksp = A.getpointer()->getksp();
 
@@ -1615,203 +1668,9 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
     KSPGetResidualNorm(*ksp, &relrestol);
 
     KSPDestroy(ksp);
-}
-
-void sl::solve(formulation formul, std::vector<int> blockstoconsider)
-{
-    // Make sure the problem is of the form Ax = b:
-    if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
-    {
-        std::cout << "Error in 'sl' namespace: formulation to solve cannot have a damping/mass matrix (use a time resolution algorithm)" << std::endl;
-        abort();  
-    }
     
-    // Remove leftovers (if any):
-    mat A = formul.A(); vec b = formul.b();
-    // Generate:
-    if (blockstoconsider.size() == 1 && blockstoconsider[0] == -1)
-        formul.generate();
-    else
-        formul.generate(blockstoconsider);
-    // Solve:
-    vec sol = sl::solve(formul.A(), formul.b());
-
-    // Save to fields:
-    setdata(sol);
-}
-
-void sl::solve(std::vector<formulation> formuls)
-{
-    for (int i = 0; i < formuls.size(); i++)
-        solve(formuls[i]);
-}
-
-densematrix Fgmultrobin(densematrix gprev)
-{
-    mat A = universe::ddmmats[0];
-    formulation formul = universe::ddmformuls[0];
-    std::vector<std::vector<int>> artificialterms = universe::ddmints;
-
-    vec rhs(formul);
-
-    double* gprevptr = gprev.getvalues();
-
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
-    int numneighbours = dt->countneighbours();
-
-    // Compute Ag:
-    int pos = 0;
-    for (int n = 0; n < numneighbours; n++)
-    {
-        int len = universe::ddmrecvinds[n].count();
-        densematrix Bm = gprev.extractrows(pos, pos+len-1);
-        rhs.setvalues(universe::ddmrecvinds[n], Bm, "add");
-        pos += len;
-    }
-        
-    vec sol = sl::solve(A, rhs);
-    sl::setdata(sol);
-
-    // Create the artificial sources solution on the inner interface:
-    std::vector<densematrix> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
-    for (int n = 0; n < numneighbours; n++)
-    {
-        formul.generatein(0, artificialterms[n]);
-        vec gartificial = formul.b(false, false);
-    
-        Agmatssend[n] = gartificial.getvalues(universe::ddmsendinds[n]);
-        Agmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
-    }
-    sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
-    
-    densematrix Ag(Agmatsrecv);
-    
-    // Calculate I - A*g:
-    double* Agptr = Ag.getvalues();
-    densematrix Fg(Ag.count(), 1);
-    double* Fgptr = Fg.getvalues();
-    
-    for (int i = 0; i < Ag.count(); i++)
-        Fgptr[i] = gprevptr[i] - Agptr[i];
-
-    return Fg;
-}
-
-std::vector<double> sl::allsolve(formulation formul, std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, int maxits, double relrestol, int verbosity)
-{
-    // Make sure the problem is of the form Ax = b:
-    if (formul.isdampingmatrixdefined() || formul.ismassmatrixdefined())
-    {
-        std::cout << "Error in 'sl' namespace: formulation to solve cannot have a damping/mass matrix (use a time resolution algorithm)" << std::endl;
-        abort();  
-    }
-    
-    wallclock clktot;
-
-    int rank = slmpi::getrank();
-    int numranks = slmpi::count();
-    
-    if (numranks == 1)
-    {
-        solve(formul, formulterms);
-        return {};
-    }
-    
-    universe::ddmints = artificialterms;
-    universe::ddmformuls = {formul};
-
-    std::shared_ptr<dofmanager> dm = formul.getdofmanager();
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
-    int numneighbours = dt->countneighbours();
-
-    // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
-    std::vector<std::shared_ptr<rawfield>> rfs = dm->getfields();
-    mapdofs(dm, dm->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
-    
-    // Get all Dirichlet constraints set on the neighbours but not on this rank:
-    std::vector<std::vector<intdensematrix>> dcdata = dm->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
-
-    // Unconstrained send and receive indexes:
-    universe::ddmsendinds = dcdata[2];
-    universe::ddmrecvinds = dcdata[3];
-    
-    // Get A and allow to reuse its factorization:
-    formul.generate(formulterms);
-    for (int n = 0; n < numneighbours; n++)
-        formul.generatein(1, physicalterms[n]); // S term in A
-    mat A = formul.getmatrix(0, false, false, {intdensematrix(dcdata[1])});
-    A.reusefactorization();
-    universe::ddmmats = {A};
-    
-    // Get the rhs of the physical sources contribution:
-    vec bphysical = formul.b();
-    
-    // Set the value from the neighbour Dirichlet conditions:
-    std::vector<densematrix> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
-    for (int n = 0; n < numneighbours; n++)
-    {
-        dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
-        dirichletvalsfromneighbours[n] = densematrix(dcdata[1][n].count(), 1);
-    }
-    exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
-    for (int n = 0; n < numneighbours; n++)
-        bphysical.setvalues(dcdata[1][n], dirichletvalsfromneighbours[n]);
-
-    // Get the physical sources solution:
-    vec w = solve(A, bphysical);
-    setdata(w);
-    
-    // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
-    std::vector<densematrix> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
-    for (int n = 0; n < numneighbours; n++)
-    {
-        formul.generatein(0, physicalterms[n]);
-        vec gphysical = formul.b(false, false);
-    
-        Bmatssend[n] = gphysical.getvalues(universe::ddmsendinds[n]);
-        Bmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
-    }
-    exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
-    
-    densematrix B(Bmatsrecv);
-    
-    // Initial value of the artificial sources solution:
-    densematrix vi(B.countrows(), B.countcolumns(), 0.0);
-    
-    // Gmres iteration:
-    std::vector<double> resvec = gmres(Fgmultrobin, B, vi, maxits, relrestol, verbosity*(rank == 0));
-    int numits = resvec.size()-1;
-    if (verbosity > 0 && rank == 0)
-    {
-        if (numits < maxits)
-            std::cout << "gmres converged after " << numits << " iterations" << std::endl;
-        else
-            std::cout << "gmres could not converge to the requested " << relrestol << " relative tolerance (could only reach " << resvec[numits] << ")" << std::endl;
-    }
-
-    // Compute the total solution (physical + artificial):
-    int pos = 0;
-    for (int n = 0; n < numneighbours; n++)
-    {
-        int len = Bmatsrecv[n].count();
-        densematrix Bm = vi.extractrows(pos, pos+len-1);
-        bphysical.setvalues(universe::ddmrecvinds[n], Bm, "add");
-        pos += len;
-    }
-
-    vec totalsol = solve(A, bphysical);
-    setdata(totalsol);
-    
-    if (verbosity > 0)
-    {
-        long long int allndfs = formul.allcountdofs();
-        if (rank == 0)
-            clktot.print("DDM solve for "+std::to_string(allndfs)+" dofs took");
-    }
-    
-    universe::clearddmcontainers();
-    
-    return resvec;
+    sol.setvalues(A.getainds(), sola.getallvalues());
+    sol.setvalues(A.getdinds(), b.getvalues(A.getdinds()));
 }
 
 void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives)
@@ -1836,7 +1695,7 @@ void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, 
     slmpi::exchange(targetranks, sendlens, sendbuffers, reclens, recbuffers);
 }
 
-std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, int maxits, double relrestol, int verbosity)
+std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity)
 {   
     if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
     {
@@ -1848,10 +1707,10 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     int n = b.count();
     
     // Initialize the 1D vectors:
-    std::vector<double> sn(maxits, 0.0);
-    std::vector<double> cs(maxits, 0.0);
-    std::vector<double> beta(maxits+1, 0.0);
-    std::vector<double> relresvec(maxits+1, 0.0);
+    std::vector<double> sn(maxnumit, 0.0);
+    std::vector<double> cs(maxnumit, 0.0);
+    std::vector<double> beta(maxnumit+1, 0.0);
+    std::vector<double> relresvec(maxnumit+1, 0.0);
     
     double* xptr = x.getvalues();
     double* bptr = b.getvalues();
@@ -1893,7 +1752,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     relresvec[0] = normr/normb;
         
     // Holder for all Krylov vectors (one on each row):
-    densematrix Q(maxits+1, n);
+    densematrix Q(maxnumit+1, n);
     double* Qptr = Q.getvalues();
     
     // First row is the normed residual:
@@ -1902,12 +1761,12 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
         Qptr[i] = invnormr * rptr[i];
         
     // Hessenberg matrix (columnwise upper triangular {r0c0,r0c1,r1c1,r0c2,...}):
-    densematrix H(1, ((1+maxits)*maxits)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
+    densematrix H(1, ((1+maxnumit)*maxnumit)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
     double* Hptr = H.getvalues();
     
     // GMRES iteration:
     int k = 0;
-    for (k = 0; k < maxits; k++)
+    for (k = 0; k < maxnumit; k++)
     {
         if (verbosity > 0)
             std::cout << "gmres @" << k << " -> " << relresvec[k] << std::endl;
@@ -2244,6 +2103,8 @@ void sl::setdata(vec invec)
     
     for (int i = 0; i < allfields.size(); i++)
         allfields[i]->setdata(-1, invec|field(allfields[i]));
+        
+    invec.getpointer()->setvaluestoports();
 }
 
 
@@ -2366,6 +2227,8 @@ expression sl::predefinedviscousforce(expression dofv, expression tfv, expressio
 
 std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
@@ -2403,6 +2266,8 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
 
 std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
 {       
+    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
@@ -2520,6 +2385,8 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
 
 std::vector<integration> sl::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
 {
+    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    
     int problemdimension = universe::mymesh->getmeshdimension();
     int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
     int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
@@ -2911,7 +2778,7 @@ expression sl::predefinedacoustics(expression dofp, expression tfp, expression c
         return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::fundamentalfrequency == -1)
+    if (universe::fundamentalfrequency <= 0)
     {
         std::cout << "Error in 'sl' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
@@ -2934,7 +2801,7 @@ expression sl::predefinedacousticradiation(expression dofp, expression tfp, expr
         return ( -1.0/c*dt(dofp)*tfp );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::fundamentalfrequency == -1)
+    if (universe::fundamentalfrequency <= 0)
     {
         std::cout << "Error in 'sl' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();
@@ -2961,7 +2828,7 @@ expression sl::predefinedacousticstructureinteraction(expression dofp, expressio
         return ( -dofp*tfu*n * scaling + rho*dtdt(dofu)*n*tfp * invscal );
     
     // Only valid for harmonic problems in case of nonzero attenuation:
-    if (universe::fundamentalfrequency == -1)
+    if (universe::fundamentalfrequency <= 0)
     {
         std::cout << "Error in 'sl' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
         abort();

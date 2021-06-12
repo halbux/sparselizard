@@ -17,11 +17,11 @@ void contribution::setintegrationorderdelta(int integrorderdelta) { integrationo
 void contribution::setnumfftcoeffs(int numcoeffs) { numfftcoeffs = numcoeffs; }
 void contribution::setbarycenterevalflag(void) { isbarycentereval = true; }
 
-void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat, bool computeconstraints)
+void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat)
 {   
     bool isdofinterpolate = (doffield != NULL && mydofs[0]->ison());
 
-    // Get the harmonics in the dof and tf fields. Get the max harmonic numbers as well.
+    // Get the harmonics in the dof and tf fields. Get the max harmonic numbers as well:
     std::vector<int> tfharms = tffield->getharmonics();
     int maxtfharm = *std::max_element(tfharms.begin(), tfharms.end());
     std::vector<int> dofharms = {1};
@@ -52,7 +52,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             dofinterpolorders[i] = doffield->getinterpolationorder(selectedelemdisjregs[i]);
     }
     
-    // Group disj. regs. with same element types and same tf and dof interpolation order.
+    // Group disj. regs. with same element types and same tf and dof interpolation order:
     disjointregionselector mydisjregselector(selectedelemdisjregs, {tfinterpolorders, dofinterpolorders});
     for (int i = 0; i < mydisjregselector.countgroups(); i++)
     {
@@ -123,13 +123,13 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             // stiffnesses[tf][1][0] must be used in case there is no dof.
             std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
 
-            // Compute the Jacobian for the variable change to the reference element.
+            // Compute the Jacobian for the variable change to the reference element:
             std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeformationptr));
             densematrix detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();
 
-            // Store it in the universe for reuse.
+            // Store it in the universe for reuse:
             universe::computedjacobian = myjacobian;
             universe::allowreuse();
             
@@ -230,10 +230,10 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     }
                 }
             }
-            // Clear all reused data from the universe.
+            // Clear all reused data from the universe:
             universe::forbidreuse();
             
-            // Get the adresses of all stiffnesses in the assembled matrix.
+            // Get the addresses of all stiffnesses in the assembled matrix:
             for (int htf = 0; htf < tfharms.size(); htf++)
             {
                 int currenttfharm = tfharms[htf];
@@ -245,47 +245,43 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     if (stiffnesses[currenttfharm][currentdofharm].size() == 0)
                         continue;
                         
-                    ///// Get the adresses corresponding to every form function of 
+                    ///// Get the addresses corresponding to every form function of 
                     // the test function/dof field in the elements of 'elementlist':
-                    intdensematrix testfunadresses = mydofmanager->getadresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg, computeconstraints);
-                    intdensematrix dofadresses;
+                    intdensematrix testfunaddresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg);
+                    intdensematrix dofaddresses;
                     if (doffield != NULL)
                     {
                         if (isdofinterpolate)
-                            dofadresses = mydofinterp.getadresses(myselector, currentdofharm);
+                            dofaddresses = mydofinterp.getaddresses(myselector, currentdofharm);
                         else
-                            dofadresses = mydofmanager->getadresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg, false);
+                            dofaddresses = mydofmanager->getaddresses(doffield->harmonic(currentdofharm), dofinterpolationorder, elementtypenumber, elementnumbers, dofphysreg);
                     }
                     
-                    ///// Duplicate the tf and dof adresses to get an adress matrix of the size of the stiffness matrix.
+                    ///// Duplicate the tf and dof addresses as needed by the rawmat object:
                     if (doffield != NULL)
                     {
-                        intdensematrix duplicateddofadresses;
+                        intdensematrix duplicateddofaddresses = dofaddresses;
                         if (isdofinterpolate)
-                            duplicateddofadresses = dofadresses.duplicateallcolstogether(tfformfunctionvalue.countrows());
-                        else
-                            duplicateddofadresses = dofadresses.duplicateallrowstogether(tfformfunctionvalue.countrows());
+                            duplicateddofaddresses = dofaddresses.duplicateallcolstogether(tfformfunctionvalue.countrows());
                             
-                        intdensematrix duplicatedtestfunadresses;
+                        intdensematrix duplicatedtestfunaddresses = testfunaddresses;
                         if (isdofinterpolate)
                         {
-                            duplicatedtestfunadresses = testfunadresses.gettranspose();
-                            duplicatedtestfunadresses = duplicatedtestfunadresses.duplicatecolsonebyone(dofadresses.countcolumns());
+                            duplicatedtestfunaddresses = testfunaddresses.gettranspose();
+                            duplicatedtestfunaddresses = duplicatedtestfunaddresses.duplicatecolsonebyone(dofaddresses.countcolumns());
                         }
-                        else
-                            duplicatedtestfunadresses = testfunadresses.duplicaterowsonebyone(dofformfunctionvalue.countrows());
                         
-                        mymat->accumulate(duplicatedtestfunadresses, duplicateddofadresses, stiffnesses[currenttfharm][currentdofharm][0]);
+                        mymat->accumulate(duplicatedtestfunaddresses, duplicateddofaddresses, stiffnesses[currenttfharm][currentdofharm][0]);
                     }
                     else
                     {
                         // Bring back to the right hand side with a minus:
                         stiffnesses[currenttfharm][1][0].minus();
-                        myvec->setvalues(testfunadresses, stiffnesses[currenttfharm][1][0], "add");
+                        myvec->setvalues(testfunaddresses, stiffnesses[currenttfharm][1][0], "add");
                         
                         // Keep track of how the rhs was assembled if requested:
                         if (universe::keeptrackofrhsassembly)
-                            universe::rhsterms.push_back(std::make_pair(testfunadresses, stiffnesses[currenttfharm][1][0]));
+                            universe::rhsterms.push_back(std::make_pair(testfunaddresses, stiffnesses[currenttfharm][1][0]));
                     }
                 }
             }

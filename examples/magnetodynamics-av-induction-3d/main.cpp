@@ -79,15 +79,8 @@ int main(void)
     // Electric equation:
     magdyn += integral(conductor, sigma*grad(dof(v))*grad(tf(v)) + sigma*dt(dof(a))*grad(tf(v)) );
     
-    // Generate the algebraic matrices A and vector b of the Ax = b problem:
-    magdyn.generate();
-    
-    // Get the x solution vector:
-    vec sol = solve(magdyn.A(), magdyn.b());
-    
-    // Update the fields with the solution that has just been computed:
-    a.setdata(wholedomain, sol);
-    v.setdata(conductor, sol);
+    // Generate, solve and transfer the solution to fields a and v:
+    magdyn.solve();
     
     // Write the magnetic induction field b = curl(a) [T], electric field e = -dt(a) - grad(v) [V/m] and current density j [A/m^2]:
     expression e = -dt(a) - grad(v);

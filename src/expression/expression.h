@@ -34,12 +34,14 @@
 #include "iointerface.h"
 #include "spline.h"
 #include "referencecoordinategroup.h"
+#include "port.h"
 
 
 class vec;
 class operation;
 class parameter;
 class field;
+class port;
 class shape;
 
 class expression
@@ -73,6 +75,7 @@ class expression
         expression(field);
         expression(double);
         expression(parameter);
+        expression(port);
         expression(int numrows, int numcols, std::vector<expression>);
         // Concatenate expressions to create a new one:
         expression(const std::vector<std::vector<expression>> input);
@@ -163,7 +166,9 @@ class expression
         
         expression at(int row, int col);
         
-        // Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
+        // Evaluate a space-independent scalar expression:
+        double evaluate(void);
+        // Same but allow x, y and/or z fields without derivatives:
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
         // Output the resized expression (filled with zero if larger):
@@ -234,9 +239,16 @@ class expression
         // output[0], output[1] and output[2] may have multiple slices 
         // output[0][s] each corresponding to a unique dof field*-tf field* 
         // pair (with a unique combination of applied time derivatives). 
-        //
-        // The expression must be scalar!
-        std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftfpolynomial(int elementdimension);
+        // The expression must be scalar.
+        std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftf(int elementdimension);
+        
+        // Extract the ports, their time derivative orders as well as their 
+        // coefficients from an expanded expression that can be rewritten
+        // as coefs[0]*ports[0] + ... + noportcoef where the coefficients
+        // are space-independent numerical values that do not include ports.
+        // The expression must be scalar. The ports extracted might contain
+        // duplicates. The no-port term is optional (empty vector if none).
+        void extractport(std::vector<port>& ports, std::vector<int>& dtorders, std::vector<expression>& coefs, std::vector<expression>& noportcoef);
         
         
         // Defining the +, -, * and / operators:
@@ -262,6 +274,11 @@ class expression
         expression operator-(parameter);
         expression operator*(parameter);
         expression operator/(parameter);
+        
+        expression operator+(port);
+        expression operator-(port);
+        expression operator*(port);
+        expression operator/(port);
 };
 
 // Define the left version of the operators based on the right one.
@@ -280,7 +297,10 @@ expression operator-(parameter, expression);
 expression operator*(parameter, expression);
 expression operator/(parameter, expression);
 
+expression operator+(port, expression);
+expression operator-(port, expression);
+expression operator*(port, expression);
+expression operator/(port, expression);
+
 #endif
-
-
 

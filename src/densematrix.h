@@ -43,7 +43,7 @@ class densematrix
         // Initialise to a double value. Use this to set a matrix with constant value.
         densematrix(long long int numberofrows, long long int numberofcolumns, double initvalue);
         // Initialise with a vector (row major):
-        densematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<double> valvec);
+        densematrix(long long int numberofrows, long long int numberofcolumns, std::vector<double> valvec);
         // Initialise to consecutive numbers [init init+step init+2*step ...].
         densematrix(long long int numberofrows, long long int numberofcolumns, double init, double step);
         // Vertical concatenation of dense matrices:

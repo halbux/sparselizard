@@ -154,6 +154,27 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
     rawfieldptr->setorder(crit, loworder, highorder, highorder-loworder+1);
 }
 
+void field::setport(int physreg, port primal, port dual)
+{
+    errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    
+    int problemdimension = universe::mymesh->getmeshdimension();
+    if (universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension() >= problemdimension)
+    {
+        std::cout << "Error in 'field' object: ports can only be set on boundary regions" << std::endl;
+        abort();
+    }
+ 
+    if (primal.getpointer() == dual.getpointer())
+    {
+        std::cout << "Error in 'field' object: cannot use the same port for the primal and the dual" << std::endl;
+        abort();
+    }
+    
+    rawfieldptr->setport(physreg, primal.getpointer(), dual.getpointer());
+}
+
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
@@ -245,35 +266,35 @@ void field::setconstraint(int physreg, expression input, int extraintegrationdeg
 {
     errorifpointerisnull(); 
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    rawfieldptr->setconstraint(physreg, -1, NULL, input, extraintegrationdegree);
+    rawfieldptr->setdisjregconstraint(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    rawfieldptr->setconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree);
+    rawfieldptr->setdisjregconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    rawfieldptr->setconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree);
+    rawfieldptr->setdisjregconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    rawfieldptr->setconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
+    rawfieldptr->setdisjregconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg)
 {
     errorifpointerisnull();
     universe::mymesh->getphysicalregions()->errorundefined({physreg});
-    rawfieldptr->setconstraint(physreg);
+    rawfieldptr->setdisjregconstraint(physreg);
 }
 
 void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr)
@@ -455,14 +476,13 @@ expression field::operator*(parameter param) { return (expression)*this * param;
 expression field::operator/(parameter param) { return (expression)*this / param; }       
  
 
-expression operator+(double val, field inputfield) { return inputfield+val; }
-expression operator-(double val, field inputfield) { return -inputfield+val; }
-expression operator*(double val, field inputfield) { return inputfield*val; }
-expression operator/(double val, field inputfield) { return ( (expression)val )/( (expression)inputfield ); }
+expression operator+(double val, field inputfield) { return (expression)val + inputfield; }
+expression operator-(double val, field inputfield) { return (expression)val - inputfield; }
+expression operator*(double val, field inputfield) { return (expression)val * inputfield; }
+expression operator/(double val, field inputfield) { return (expression)val / inputfield; }
 
-expression operator+(parameter param, field inputfield) { return inputfield+param; }
-expression operator-(parameter param, field inputfield) { return -inputfield+param; }
-expression operator*(parameter param, field inputfield) { return inputfield*param; }
-expression operator/(parameter param, field inputfield) { return ( (expression)param ) / ( (expression)inputfield ); }
-
+expression operator+(parameter param, field inputfield) { return (expression)param + inputfield; }
+expression operator-(parameter param, field inputfield) { return (expression)param - inputfield; }
+expression operator*(parameter param, field inputfield) { return (expression)param * inputfield; }
+expression operator/(parameter param, field inputfield) { return (expression)param / inputfield; }
 

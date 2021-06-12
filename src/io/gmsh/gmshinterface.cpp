@@ -8,6 +8,12 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
     std::cout << "Error in 'gmshinterface' namespace: GMSH API is not available" << std::endl;
     abort();
 }
+
+void gmshinterface::readwithapi(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
+{
+    std::cout << "Error in 'gmshinterface' namespace: GMSH API is not available" << std::endl;
+    abort();
+}
 #endif
 #ifdef HAVE_GMSH
 #include "gmsh.h"
@@ -104,6 +110,14 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
         }
     }
 }
+
+void gmshinterface::readwithapi(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
+{
+    gmsh::initialize();
+    gmsh::open(name);
+    readfromapi(mynodes, myelements, myphysicalregions);
+    gmsh::finalize();
+}
 #endif
 
 
@@ -134,7 +148,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
         // Give an error if version is not supported:
         if (formatversion >= 4)
         {
-            std::cout << "Error in 'gmshinterface': GMSH format " << formatversion << " is not supported in the legacy mesh reader." << std::endl;
+            std::cout << "Error in 'gmshinterface': GMSH format " << formatversion << " is not supported in the native mesh reader." << std::endl;
             std::cout << "Use the GMSH API, the petsc mesh reader or export as GMSH 2 format." << std::endl;
             abort();
         }

@@ -132,7 +132,8 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
         while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
-            sl::solve(tosolvebefore);
+            for (int i = 0; i < tosolvebefore.size(); i++)
+                tosolvebefore[i].solve();
             
             vec xtolcalc = xnext;
             
@@ -148,12 +149,12 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
-                K = myformulation.K(false, false);
+                K = myformulation.K(false);
             }
             if (isconstant[2] == false || isfirstcall)
             {
                 myformulation.generatedampingmatrix();
-                C = myformulation.C(false, true);
+                C = myformulation.C(false);
             }
             
             // Reuse matrices when possible (including the factorization):
@@ -165,8 +166,15 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
                 defdt = dt;
             }
             
+            // Here are the constrained values of the next solution:
+            intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
+            densematrix xnextdirichletval = rhs.getpointer()->getvalues(constraintindexes);
+            vec rightvec = C*x+dt*rhs;
+            // Force the solution on the constrained dofs:
+            rightvec.getpointer()->setvalues(constraintindexes, xnextdirichletval);
+            
             // Update the solution xnext.
-            xnext = relaxationfactor * sl::solve(leftmat, C*x+dt*rhs) + (1.0-relaxationfactor)*xnext;
+            xnext = relaxationfactor * sl::solve(leftmat, rightvec) + (1.0-relaxationfactor)*xnext;
             
             dtxnext = 1.0/dt*(xnext-x);
             
@@ -181,7 +189,8 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             nlit++; 
             
             // Solve all formulations that must be solved at the end of the nonlinear loop:
-            sl::solve(tosolveafter);
+            for (int i = 0; i < tosolveafter.size(); i++)
+                tosolveafter[i].solve();
             
             // Make all time derivatives available in the universe:
             universe::xdtxdtdtx = {{},{dtxnext},{}};

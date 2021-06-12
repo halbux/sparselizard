@@ -81,8 +81,8 @@ std::shared_ptr<operation> opsum::expand(void)
 {
     for (int i = 0; i < sumterms.size(); i++)
     {
-        // We only want to expand operations that include a dof() or tf().
-        if (sumterms[i]->isdofincluded() || sumterms[i]->istfincluded())
+        // We only want to expand operations that include a dof(), tf() or port.
+        if (sumterms[i]->isdofincluded() || sumterms[i]->istfincluded() || sumterms[i]->isportincluded())
             sumterms[i] = sumterms[i]->expand();
     }
     // Regroup all sum terms in this one:
@@ -150,6 +150,14 @@ std::shared_ptr<operation> opsum::copy(void)
     *op = *this;
     op->reuse = false;
     return op;
+}
+
+double opsum::evaluate(void)
+{
+    double evaluated = 0;
+    for (int i = 0; i < sumterms.size(); i++)
+        evaluated += sumterms[i]->evaluate();
+    return evaluated;
 }
 
 std::vector<double> opsum::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)

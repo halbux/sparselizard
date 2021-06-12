@@ -91,7 +91,7 @@ class contribution
         
         // Generate the contribution and store it in the 
         // vec (for rhs contributions) or in the mat.
-        void generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat, bool computeconstraints = true);
+        void generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawmat> mymat);
                                             
 };
 

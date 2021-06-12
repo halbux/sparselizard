@@ -217,6 +217,9 @@ void dofinterpolate::eval(void)
                                     // Use it to get the subelem index in the disjoint region:
                                     currentsubelem -= mydisjointregions->getrangebegin(curdisjreg);
                                     
+                                    if (mydofmanager->isported(curdisjreg))
+                                        currentsubelem = 0;
+                                    
                                     int rb = mydofmanager->getrangebegin(curdisjreg, formfunctionindex[ff]);
                                 
                                     dofnumsptr[rowstart+mynumrefcoords*ff+callingevalpt] = rb + currentsubelem;
@@ -255,7 +258,7 @@ densematrix dofinterpolate::getvalues(elementselector& elemselec, int dofopindex
     return myvals[dofopindex].extractrows(oi);
 }
 
-intdensematrix dofinterpolate::getadresses(elementselector& elemselec, int harmnum)
+intdensematrix dofinterpolate::getaddresses(elementselector& elemselec, int harmnum)
 {
     std::vector<int> oi = elemselec.getoriginalindexes();
     return mydofnums[harmnum][0].extractrows(oi);

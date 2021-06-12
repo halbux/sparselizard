@@ -42,7 +42,8 @@ void rawvec::synchronize(void)
     VecDestroy(&myvec);
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
-    VecSetFromOptions(myvec);    
+    VecSetFromOptions(myvec);
+    VecSet(myvec, 0.0);
     
     // Update the dof manager to the current one:
     mycurrentstructure = {*mydofmanager};
@@ -69,6 +70,7 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
     VecCreate(PETSC_COMM_SELF, &myvec);
     VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
     VecSetFromOptions(myvec);   
+    VecSet(myvec, 0.0);
     
     if (mydofmanager->ismanaged())
     {
@@ -102,7 +104,7 @@ rawvec::~rawvec(void)
     PetscBool ispetscinitialized;
     PetscInitialized(&ispetscinitialized);
 
-    if (ispetscinitialized == PETSC_TRUE)
+    if (ispetscinitialized == PETSC_TRUE && myvec != PETSC_NULL)
         VecDestroy(&myvec);
 }
 
@@ -121,61 +123,12 @@ int rawvec::size(void)
         return mydofmanager->countdofs(); 
 }
 
-void rawvec::removeconstraints(void)
-{
-    synchronize();
-    
-    int numdofs = mydofmanager->countdofs();
-    int numconstraineddofs = mydofmanager->countconstraineddofs();
-    if (numconstraineddofs == 0)
-        return;
-    
-    // Remove the constrained dofs from the dof manager and get the dof renumbering:
-    int* dofrenumbering = new int[numdofs];
-    mydofmanager = mydofmanager->removeconstraints(dofrenumbering);
-
-    // Rebuild the petsc vector:
-    intdensematrix oldaddresses(mydofmanager->countdofs(),1);
-    intdensematrix newaddresses(mydofmanager->countdofs(),1);
-    int* oldads = oldaddresses.getvalues();
-    int* newads = newaddresses.getvalues();
-    
-    int index = 0;
-    for (int i = 0; i < numdofs; i++)
-    {
-        if (dofrenumbering[i] >= 0)
-        {
-            oldads[index] = i;
-            newads[index] = dofrenumbering[i];
-            index++;
-        }
-    }
-    
-    densematrix vals = getvalues(oldaddresses);
-    
-    // Destroy the vector since it will be replaced:
-    VecDestroy(&myvec);
-    Vec newvec; myvec = newvec;
-    
-    VecCreate(PETSC_COMM_SELF, &myvec);
-    VecSetSizes(myvec, PETSC_DECIDE, mydofmanager->countdofs());
-    VecSetFromOptions(myvec);   
-    
-    setvalues(newaddresses, vals, "set");
-    
-    delete[] dofrenumbering;
-    
-    // The current structure tracker must be updated to the new dof manager:
-    mycurrentstructure = {*mydofmanager};
-    mycurrentstructure[0].donotsynchronize();
-}
-
-void rawvec::updateconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
+void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
 {    
     synchronize();
     
     mydofmanager->selectfield(constrainedfield);
-    std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getconstraints();
+    std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getdisjregconstraints();
 
     // Loop on all disjoint regions:
     for (int d = 0; d < disjregs.size(); d++)
@@ -250,6 +203,9 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
         VecSetValues(myvec, numpositiveentries, filteredads, filteredvals, ADD_VALUES);
     if (op == "set")
         VecSetValues(myvec, numpositiveentries, filteredads, filteredvals, INSERT_VALUES);
+        
+    VecAssemblyBegin(myvec);
+    VecAssemblyEnd(myvec);
 }
 
 void rawvec::setvalue(int address, double value, std::string op)
@@ -263,6 +219,9 @@ void rawvec::setvalue(int address, double value, std::string op)
         VecSetValue(myvec, address, value, ADD_VALUES);
     if (op == "set")
         VecSetValue(myvec, address, value, INSERT_VALUES);
+        
+    VecAssemblyBegin(myvec);
+    VecAssemblyEnd(myvec);
 }
 
 densematrix rawvec::getvalues(intdensematrix addresses)
@@ -293,14 +252,12 @@ void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregi
     
     mydofmanager->selectfield(selectedfield);
 
-    // Do nothing if the entries are not in the vector:
-    if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
+    // Do nothing if the entries are not in the vector or the target is a port:
+    if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false || mydofmanager->isported(disjointregionnumber) == true)
         return;
 
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
-    int rangeend = mydofmanager->getrangeend(disjointregionnumber, formfunctionindex);
-
-    int numentries = rangeend-rangebegin+1;
+    int numentries = myrawmesh->getdisjointregions()->countelements(disjointregionnumber);
 
     intdensematrix addressestoset(numentries, 1, rangebegin, 1);
     setvalues(addressestoset, vals, op);
@@ -320,15 +277,51 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     }
     
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
-    int rangeend = mydofmanager->getrangeend(disjointregionnumber, formfunctionindex);
+    int numentries = myrawmesh->getdisjointregions()->countelements(disjointregionnumber);
     
-    int numentries = rangeend-rangebegin+1;
+    int step = 1;
+    if (mydofmanager->isported(disjointregionnumber))
+        step = 0;
     
     densematrix vals(numentries, 1);
-    intdensematrix addressestoget(numentries, 1, rangebegin, 1);
+    intdensematrix addressestoget(numentries, 1, rangebegin, step);
     VecGetValues(myvec, numentries, addressestoget.getvalues(), vals.getvalues());
     
     return vals;
+}
+
+void rawvec::setvaluestoports(void)
+{
+    synchronize();
+    
+    std::vector<rawport*> rps;
+    intdensematrix inds;
+    
+    mydofmanager->getportsinds(rps, inds);
+    
+    densematrix vecvals = getvalues(inds);
+    double* vptr = vecvals.getvalues();
+    
+    for (int p = 0; p < rps.size(); p++)
+        rps[p]->setvalue(vptr[p]);
+}
+
+void rawvec::setvaluesfromports(void)
+{
+    synchronize();
+    
+    std::vector<rawport*> rps;
+    intdensematrix inds;
+    
+    mydofmanager->getportsinds(rps, inds);
+    
+    densematrix prtvals(rps.size(), 1);
+    double* vptr = prtvals.getvalues();
+    
+    for (int p = 0; p < rps.size(); p++)
+        vptr[p] = rps[p]->getvalue();
+        
+    setvalues(inds, prtvals);
 }
 
 void rawvec::write(std::string filename)
@@ -476,14 +469,12 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
     while (mydofmanager->isdefined(disjreg, ff) && inputvec->mydofmanager->isdefined(disjreg, ff))
     {
         int myrangebegin = mydofmanager->getrangebegin(disjreg,ff);
-        int myrangeend = mydofmanager->getrangeend(disjreg,ff);
+        int numentries = myrawmesh->getdisjointregions()->countelements(disjreg);
         
         int inputrangebegin = inputvec->mydofmanager->getrangebegin(disjreg,ff);
         
-        int numdofs = myrangeend-myrangebegin+1;
-        
-        intdensematrix myaddresses(numdofs, 1, myrangebegin, 1);
-        intdensematrix inputaddresses(numdofs, 1, inputrangebegin, 1);
+        intdensematrix myaddresses(numentries, 1, myrangebegin, 1);
+        intdensematrix inputaddresses(numentries, 1, inputrangebegin, 1);
         
         densematrix inputval = inputvec->getvalues(inputaddresses);
         setvalues(myaddresses, inputval, "set");
@@ -495,13 +486,11 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
     while (mydofmanager->isdefined(disjreg, ff))
     {
         int myrangebegin = mydofmanager->getrangebegin(disjreg,ff);
-        int myrangeend = mydofmanager->getrangeend(disjreg,ff);
+        int numentries = myrawmesh->getdisjointregions()->countelements(disjreg);
                 
-        int numdofs = myrangeend-myrangebegin+1;
+        intdensematrix myaddresses(numentries, 1, myrangebegin, 1);
         
-        intdensematrix myaddresses(numdofs, 1, myrangebegin, 1);
-        
-        densematrix zerovals(numdofs,1, 0);
+        densematrix zerovals(numentries,1, 0);
         setvalues(myaddresses, zerovals, "set");
         
         ff++;

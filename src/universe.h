@@ -33,6 +33,10 @@ class universe
         static int mynumrawmeshes;
         static void addtorawmeshcounter(int val);
         
+        static int maxnumthreads;
+        static int getmaxnumthreads(void);
+        static void setmaxnumthreads(int mnt);
+        
         // Round-off noise level on the node coordinates:
         static double roundoffnoiselevel;
         

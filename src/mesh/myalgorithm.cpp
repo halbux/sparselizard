@@ -1735,3 +1735,57 @@ double myalgorithm::sum(std::vector<double>& tosum)
     return out;
 }
 
+void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::string& last)
+{
+    int colonpos = -1;
+    for (int i = 0; i < tosplit.size(); i++)
+    {
+        if (tosplit[i] == ':')
+        {
+            colonpos = i;
+            break;
+        }
+    }
+    
+    if (colonpos == -1)
+    {
+        first = "";
+        last = tosplit;
+    }
+    else
+    {
+        first = tosplit.substr(0, colonpos);
+        last = tosplit.substr(colonpos+1, tosplit.size()-colonpos-1);
+    }
+}
+
+void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum)
+{
+    int numtot = invec.size();
+    int numtrue = counttrue(invec);
+
+    renum = std::vector<int>(numtot);
+
+    trueinds = intdensematrix(numtrue, 1);
+    falseinds = intdensematrix(numtot-numtrue, 1);
+    int* tiptr = trueinds.getvalues();
+    int* fiptr = falseinds.getvalues();
+
+    int ti = 0, fi = 0;
+    for (int i = 0; i < numtot; i++)
+    {
+        if (invec[i])
+        {
+            renum[i] = ti;
+            tiptr[ti] = i;
+            ti++;
+        }
+        else
+        {
+            renum[i] = fi;
+            fiptr[fi] = i;
+            fi++;
+        }
+    }
+}
+

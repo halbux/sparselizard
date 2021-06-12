@@ -34,8 +34,6 @@ class eigenvalue
         std::vector<vec> eigenvectorreal = {};
         std::vector<vec> eigenvectorimaginary = {};
         
-        void errorifdirichletnotremoved(std::vector<mat> input);
-        
     public:
 
         // Define a standard eigenvalue problem A*x = lambda*x:

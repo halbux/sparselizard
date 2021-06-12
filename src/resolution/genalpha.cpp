@@ -19,9 +19,14 @@ genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int 
 
 void genalpha::setparameter(double rinf)
 {
-    if (rinf < 0)
+    if (rinf < -1e-8)
     {
         std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be negative" << std::endl;
+        abort();  
+    }
+    if (rinf > 1+1e-8)
+    {
+        std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be larger than one" << std::endl;
         abort();  
     }
     
@@ -148,7 +153,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             universe::currenttimestep = t;
             
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
-            sl::solve(tosolvebefore);
+            for (int i = 0; i < tosolvebefore.size(); i++)
+                tosolvebefore[i].solve();
         
             vec utolcalc = unext;
             
@@ -159,27 +165,28 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             if (isconstant[0] == false || isfirstcall)
             {
                 myformulation.generaterhs();
-                rhs = myformulation.rhs();
+                rhs = myformulation.rhs(false, false);
             }
-            else
-                rhs.updateconstraints();
+                
+            universe::currenttimestep = t;
+            
+            rhs.updateconstraints();
+                
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
-                K = myformulation.K(false, true);
+                K = myformulation.K(false);
             }
             if (isconstant[2] == false || isfirstcall)
             {
                 myformulation.generatedampingmatrix();
-                C = myformulation.C(false, true);
+                C = myformulation.C(false);
             }
-            universe::currenttimestep = t-alpham*dt;
             if (isconstant[3] == false || isfirstcall)
             {
                 myformulation.generatemassmatrix();
-                M = myformulation.M(false, false);
+                M = myformulation.M(false);
             }
-            universe::currenttimestep = t;
             
             // Reuse matrices when possible (including the factorization):
             if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || isfirstcall || defdt != dt || defbeta != beta || defgamma != gamma || defalphaf != alphaf || defalpham != alpham)
@@ -194,18 +201,13 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
                 defdt = dt; defbeta = beta; defgamma = gamma; defalphaf = alphaf; defalpham = alpham;
             }
             
-            // Update the acceleration. 
-            // The acceleration is imposed on the Dirichlet-constrained dofs.
-            // The displacement update relation is used to make sure the 
-            // acceleration constraint leads to the exact constrained 
-            // displacement at the next time step:
-            vec unextdirichlet(myformulation); 
-            unextdirichlet.updateconstraints();
-            vec anextdirichlet = (1.0-alpham)/(beta*dt*dt)*( unextdirichlet-u - dt*v - dt*dt*(0.5-beta)*a );
+            // Update the acceleration. The acceleration is imposed on the Dirichlet constrained dofs.
+            // The displacement update relation is used to make sure the acceleration constraint leads
+            // to the exact constrained displacement at the next time step:
+            vec anextdirichlet = 1.0/(beta*dt*dt)*( rhs-u - dt*v - dt*dt*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
             intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-            densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);
-            
+            densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);    
             vec rightvec = matu*u + matv*v + mata*a + rhs;
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
@@ -227,7 +229,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             nlit++; 
 
             // Solve all formulations that must be solved at the end of the nonlinear loop:
-            sl::solve(tosolveafter);
+            for (int i = 0; i < tosolveafter.size(); i++)
+                tosolveafter[i].solve();
             
             // Make all time derivatives available in the universe:
             universe::xdtxdtdtx = {{},{vnext},{anext}};

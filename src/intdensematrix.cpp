@@ -30,7 +30,7 @@ intdensematrix::intdensematrix(long long int numberofrows, long long int numbero
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, const std::vector<int> valvec)
+intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -85,6 +85,14 @@ intdensematrix::intdensematrix(std::vector<intdensematrix> input)
     }
     
     myvalues = std::shared_ptr<int>(myvaluesptr);
+}
+
+intdensematrix intdensematrix::getresized(long long int m, long long int n)
+{
+    intdensematrix out = *this; 
+    out.numrows = m;
+    out.numcols = n;
+    return out;
 }
 
 long long int intdensematrix::countpositive(void)
@@ -236,6 +244,23 @@ int* intdensematrix::getvalues(void)
     return myvalues.get();
 }
 
+intdensematrix intdensematrix::copy(void)
+{
+    intdensematrix intdensematrixcopy = *this;
+    
+    // The pointed value has to be copied as well.
+    if (intdensematrixcopy.myvalues != NULL)
+    {
+        intdensematrixcopy.myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
+        int* copiedmyvaluesptr = intdensematrixcopy.myvalues.get();
+        int* myvaluesptr = myvalues.get();
+        for (long long int i = 0; i < numcols*numrows; i++)
+            copiedmyvaluesptr[i] = myvaluesptr[i];
+    }
+        
+    return intdensematrixcopy;
+}
+
 intdensematrix intdensematrix::gettranspose(void)
 {
     intdensematrix output(numcols, numrows);
@@ -370,12 +395,12 @@ intdensematrix intdensematrix::extractcols(std::vector<int>& selected)
     return output;
 }
     
-intdensematrix intdensematrix::select(std::vector<bool>& selectedindexes, bool selectif)
+intdensematrix intdensematrix::select(std::vector<bool>& sel, bool selectif)
 {
-    int numtrue = myalgorithm::counttrue(selectedindexes);
+    int numtrue = myalgorithm::counttrue(sel);
     int num = numtrue;
     if (selectif == false)
-        num = selectedindexes.size() - numtrue;
+        num = sel.size() - numtrue;
 
     intdensematrix output(num, 1);
 
@@ -383,9 +408,9 @@ intdensematrix intdensematrix::select(std::vector<bool>& selectedindexes, bool s
     int* outvaluesptr = output.myvalues.get();
 
     int index = 0;
-    for (int i = 0; i < selectedindexes.size(); i++)
+    for (int i = 0; i < sel.size(); i++)
     {
-        if (selectedindexes[i] == selectif)
+        if (sel[i] == selectif)
         {
             outvaluesptr[index] = myvaluesptr[i];
             index++;

@@ -89,7 +89,7 @@ int main(void)
         double measuresol = norm(v).integrate(fluid,2);
 
         // Generate and solve the laminar flow problem then save to the fields:
-        solve(laminarflow);
+        laminarflow.solve();
         
         // Adapt the mesh density and the field orders:
         adapt();

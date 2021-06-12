@@ -21,7 +21,7 @@ int main(void)
     gmsh::open("disk.msh");
     // Load mesh available in GMSH API.
     // Set verbosity to 2 to print the physical regions info.
-    mesh mymesh("gmshapi", 2);
+    mesh mymesh("gmsh:api", 2);
     
     gmsh::finalize();
 
@@ -65,7 +65,7 @@ int main(void)
     gmsh::write("boolean.msh");
 
     // Load mesh from GMSH API to sparselizard.
-    mesh mymesh("gmshapi");
+    mesh mymesh("gmsh:api");
 
     gmsh::finalize();
     */

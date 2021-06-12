@@ -55,8 +55,7 @@ int physicalregion::getelementdimension(void)
 
 void physicalregion::definewithdisjointregions(void)
 {   
-    includesdisjointregion.resize(mydisjointregions->count());
-    std::fill(includesdisjointregion.begin(), includesdisjointregion.end(), false);
+    includesdisjointregion = std::vector<bool>(mydisjointregions->count(), false);
 
     int prindex = myphysicalregions->getindex(myphysicalregionnumber);
     
@@ -66,16 +65,9 @@ void physicalregion::definewithdisjointregions(void)
 
 void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)
 {
-    if (disjointregionlist.size() == 0)
-    {
-        std::cout << "Error in 'physicalregion' object: physical region cannot be empty" << std::endl;
-        abort();
-    }
+    myelementdimension = -1;
+    includesdisjointregion = std::vector<bool>(mydisjointregions->count(), false);
     
-    includesdisjointregion.resize(mydisjointregions->count());
-    std::fill(includesdisjointregion.begin(), includesdisjointregion.end(), false);
-
-    myelementdimension = mydisjointregions->getelementdimension(disjointregionlist[0]);
     for (int i = 0; i < disjointregionlist.size(); i++)
     {
         includesdisjointregion[disjointregionlist[i]] = true;

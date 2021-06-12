@@ -23,9 +23,13 @@
 #include "rawvec.h"
 #include "rawmat.h"
 #include "integration.h"
+#include "port.h"
+#include "portrelation.h"
 
 class integration;
 class contribution;
+class port;
+class portrelation;
 
 class formulation
 {
@@ -41,7 +45,10 @@ class formulation
         std::vector<std::shared_ptr<rawmat>> mymat = {NULL, NULL, NULL};
         
         // The link between the dof number and its row and column in the matrix:
-        std::shared_ptr<dofmanager> mydofmanager;
+        std::shared_ptr<dofmanager> mydofmanager = NULL;
+        
+        // The port relations:
+        std::vector<std::shared_ptr<portrelation>> myportrelations = {};
         
         // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
@@ -60,6 +67,9 @@ class formulation
         
         
         formulation(void);
+        
+        // Add a port relation:
+        void operator+=(expression expr);
         
         // The following adds the contribution defined in the integration object.
         void operator+=(integration integrationobject);
@@ -84,22 +94,33 @@ class formulation
         void generate(std::vector<int> contributionnumbers);
         void generate(int contributionnumber);
         
+        // Compute the no-port term value for every port relation:
+        densematrix getportrelationrhs(void);
+        std::tuple<intdensematrix, intdensematrix, densematrix> getportrelations(int KCM);
+        
         std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         
         // Get the assembled matrices or get the right hanside vector.
         // Choose to discard or not all values after getting the vector/matrix.
-        // Choose to add or not the diagonal ones for the Dirichlet constraints.
         
         // b() is an alias for rhs() and A() for K():
         vec b(bool keepvector = false, bool dirichletupdate = true);
-        mat A(bool keepfragments = false, bool skipdiagonalones = false);
+        mat A(bool keepfragments = false);
         
         vec rhs(bool keepvector = false, bool dirichletupdate = true);
-        mat K(bool keepfragments = false, bool skipdiagonalones = false);
-        mat C(bool keepfragments = false, bool skipdiagonalones = false);
-        mat M(bool keepfragments = false, bool skipdiagonalones = false);
+        mat K(bool keepfragments = false);
+        mat C(bool keepfragments = false);
+        mat M(bool keepfragments = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
-        mat getmatrix(int KCM, bool keepfragments = false, bool skipdiagonalones = false, std::vector<intdensematrix> additionalconstraints = {});
+        mat getmatrix(int KCM, bool keepfragments = false, std::vector<intdensematrix> additionalconstraints = {});
+        
+        
+        // Generate, solve and save to fields:
+        void solve(std::string soltype = "lu", bool diagscaling = false, std::vector<int> blockstoconsider = {-1});
+
+        // DDM resolution with Dirichlet / mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
+        std::vector<double> allsolve(double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
+        std::vector<double> allsolve(std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
 
 };
 

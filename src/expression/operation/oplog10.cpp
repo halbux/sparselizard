@@ -62,6 +62,11 @@ std::shared_ptr<operation> oplog10::copy(void)
     return op;
 }
 
+double oplog10::evaluate(void)
+{
+    return std::log10(myarg->evaluate());
+}
+
 std::vector<double> oplog10::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);

@@ -237,6 +237,8 @@ void spanningtree::synchronize(void)
 
 spanningtree::spanningtree(std::vector<int> physregs)
 {
+    universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    
     startphysregs = physregs;
     
     myelements = universe::mymesh->getelements();
