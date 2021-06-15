@@ -50,7 +50,6 @@ class portrelation
         // Get all (possibly duplicated) rawports in the relation:
         std::vector<std::shared_ptr<rawport>> getrawports(void);
         
-        // Get the no-port term value:
         bool hasnoportterm(void);
         // Evaluate the no-port term
         double evalnoportterm(void);
