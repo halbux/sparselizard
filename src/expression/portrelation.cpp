@@ -138,7 +138,7 @@ void portrelation::evalrelations(int KCM, std::vector<std::shared_ptr<rawport>>&
 {
     // Count the number of terms:
     int numterms = 0;
-    for (int r = 0; r < mykcm.size(); r++)
+    for (int r = 1; r < mykcm.size(); r++)
     {
         for (int i = 0; i < mykcm[r].size(); i++)
         {
