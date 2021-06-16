@@ -1534,6 +1534,8 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     ///// Continue processing the mesh:
     
+    myhadaptedmesh->mydtracker = std::shared_ptr<dtracker>(new dtracker(myhadaptedmesh, -1, -1));
+    
     myhadaptedmesh->myelements.definedisjointregions();
     
     std::vector<std::vector<int>> renumbydr;
