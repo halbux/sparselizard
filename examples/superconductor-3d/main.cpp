@@ -129,7 +129,7 @@ int main(void)
         eul.next(timestep, 25);
         
         // Write b = curl(a) to disk:
-        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtk"); 
+        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtk", 1); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];

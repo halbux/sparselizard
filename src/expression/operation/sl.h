@@ -277,9 +277,9 @@ namespace sl
 
     ////////// PREDEFINED FORMULATIONS
     
-    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder = 1, bool errorifnotfound = true);
-    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor = 1.0, int lagmultorder = 1);
-    std::vector<integration> periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor = 1.0, int lagmultorder = 1);
+    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound = true);
+    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder);
+    std::vector<integration> periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder);
 
     // Isotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");

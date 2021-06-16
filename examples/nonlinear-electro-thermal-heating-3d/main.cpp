@@ -139,9 +139,9 @@ int main(void)
     std::cout << "Peak temperature is " << peaktemperature << " K" << std::endl << std::endl;
     
     // Write v, j and T:
-    v.write(volume, "v.pos");
-    j.write(volume, "j.pos");
-    T.write(volume, "T.pos");
+    v.write(volume, "v.pos", 2);
+    j.write(volume, "j.pos", 2);
+    T.write(volume, "T.pos", 2);
     
     // Code validation line. Can be removed.
     std::cout << (peaktemperature < 618.446 && peaktemperature > 618.444 && I < 1851.30 && I > 1851.28);

@@ -38,7 +38,7 @@ int main(void)
     int waveguides = selectunion({wavg1, wavg2});
     
     // Waveguide boundary plotting:
-    expression(1).write(selectintersection({waveguides, clad}), "skin.vtu");
+    expression(1).write(selectintersection({waveguides, clad}), "skin.vtu", 1);
 
     wallclock clk;
 

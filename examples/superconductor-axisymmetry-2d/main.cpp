@@ -104,8 +104,8 @@ int main(void)
         int numnlits = eul.next(timestep, -1);
         
         // Write a and b = curl(a) to disk:
-        norm(a).write(wholedomain, "norma" + std::to_string(i) + ".vtu"); 
-        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i) + ".vtu"); 
+        norm(a).write(wholedomain, "norma" + std::to_string(i) + ".vtu", 1); 
+        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i) + ".vtu", 1); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         // Interpolate at a x coordinate slightly away from 0 to avoid NaN issues:

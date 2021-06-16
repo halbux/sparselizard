@@ -65,7 +65,7 @@ int main(void)
     // Transfer the data from the solution vector to the v field:
     v.setdata(wholedomain, solv);
     // Write the electric potential:
-    v.write(wholedomain, "v.pos");
+    v.write(wholedomain, "v.pos", 1);
     
     // Compute the total current flowing through the electrode face
     // in an alternative (but less accurate) way to using ports.
