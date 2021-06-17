@@ -8,12 +8,12 @@
 
 int sl::getversion(void)
 {
-    return 202012;
+    return 202106;
 }
 
 std::string sl::getversionname(void)
 {
-    return "cold lake";
+    return "discrete dawn";
 }
 
 void sl::printversion(void)
