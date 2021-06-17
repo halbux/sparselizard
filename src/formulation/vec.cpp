@@ -98,7 +98,7 @@ void vec::setvalue(port prt, double value, std::string op)
     
     if (prt.getpointer()->isharmonicone())
     {
-        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1));
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1).get());
         setvalue(address, value, op);
     }
     else
@@ -114,7 +114,7 @@ double vec::getvalue(port prt)
     
     if (prt.getpointer()->isharmonicone())
     {
-        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1));
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1).get());
         return getvalue(address);
     }
     else

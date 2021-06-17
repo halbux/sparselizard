@@ -298,7 +298,7 @@ std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrela
         for (int j = 0; j < len; j++)
         {
             rinds[i][j] += actualnumrelations;
-            cinds[i][j] = mydofmanager->getaddress(rps[j]);
+            cinds[i][j] = mydofmanager->getaddress(rps[j].get());
         }
     
         portnnz += len;

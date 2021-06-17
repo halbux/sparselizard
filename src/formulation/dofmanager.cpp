@@ -282,13 +282,13 @@ int dofmanager::getrangeend(int disjreg, int formfunc)
     return rangeend[selectedfieldnumber][disjreg][formfunc];
 }
 
-int dofmanager::getaddress(std::shared_ptr<rawport> prt)
+int dofmanager::getaddress(rawport* prt)
 {
     synchronize();
     
-    bool isnotthere = (myrawportmap.find(prt.get()) == myrawportmap.end());
+    bool isnotthere = (myrawportmap.find(prt) == myrawportmap.end());
     if (isnotthere == false)
-        return myrawportmap[prt.get()];
+        return myrawportmap[prt];
     else
     {
         std::string pn = prt->getname();

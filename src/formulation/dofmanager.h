@@ -105,7 +105,7 @@ class dofmanager
         int getrangeend(int disjreg, int formfunc);
         
         // Get the port dof index:
-        int getaddress(std::shared_ptr<rawport> prt);
+        int getaddress(rawport* prt);
         
         // Get the pointer and dof index of every port defined in this object:
         void getportsinds(std::vector<rawport*>& rps, intdensematrix& inds);
