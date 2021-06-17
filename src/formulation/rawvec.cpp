@@ -273,7 +273,7 @@ void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregi
         return;
 
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
-    int numentries = myrawmesh->getdisjointregions()->countelements(disjointregionnumber);
+    int numentries = myptracker->getdisjointregions()->countelements(disjointregionnumber);
 
     intdensematrix addressestoset(numentries, 1, rangebegin, 1);
     setvalues(addressestoset, vals, op);
@@ -293,7 +293,7 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     }
     
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
-    int numentries = myrawmesh->getdisjointregions()->countelements(disjointregionnumber);
+    int numentries = myptracker->getdisjointregions()->countelements(disjointregionnumber);
     
     int step = 1;
     if (mydofmanager->isported(disjointregionnumber))
@@ -485,7 +485,7 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
     while (mydofmanager->isdefined(disjreg, ff) && inputvec->mydofmanager->isdefined(disjreg, ff))
     {
         int myrangebegin = mydofmanager->getrangebegin(disjreg,ff);
-        int numentries = myrawmesh->getdisjointregions()->countelements(disjreg);
+        int numentries = myptracker->getdisjointregions()->countelements(disjreg);
         
         int inputrangebegin = inputvec->mydofmanager->getrangebegin(disjreg,ff);
         
@@ -502,7 +502,7 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
     while (mydofmanager->isdefined(disjreg, ff))
     {
         int myrangebegin = mydofmanager->getrangebegin(disjreg,ff);
-        int numentries = myrawmesh->getdisjointregions()->countelements(disjreg);
+        int numentries = myptracker->getdisjointregions()->countelements(disjreg);
                 
         intdensematrix myaddresses(numentries, 1, myrangebegin, 1);
         
