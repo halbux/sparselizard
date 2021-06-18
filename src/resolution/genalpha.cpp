@@ -137,8 +137,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     {
         // Update and print the time:
         universe::currenttimestep = inittime+dt;
-        
-        // Print the time:
+
         if (myverbosity > 1 && istadapt)
             std::cout << "@" << inittime << "+" << dt << "s " << std::flush;
         if (myverbosity > 1 && not(istadapt))
