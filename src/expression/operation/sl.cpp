@@ -23,7 +23,7 @@ std::string sl::getversionname(void)
 
 void sl::printversion(void)
 {
-    std::cout << "sparselizard " << std::to_string(getversion()) << "." << std::to_string(getsubversion()) << " ('" <<  getversionname() << "')." << std::endl;
+    std::cout << "sparselizard " << std::to_string(getversion()) << "." << std::to_string(getsubversion()) << " ('" << getversionname() << "')." << std::endl;
 }
 
 double sl::getpi(void)
