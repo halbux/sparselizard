@@ -36,6 +36,7 @@ namespace sl
     // Get the code version number and name:
     void printversion(void);
     int getversion(void);
+    int getsubversion(void);
     std::string getversionname(void);
     
     double getpi(void);

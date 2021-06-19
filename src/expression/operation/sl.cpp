@@ -11,6 +11,11 @@ int sl::getversion(void)
     return 202106;
 }
 
+int sl::getsubversion(void)
+{
+    return 0;
+}
+
 std::string sl::getversionname(void)
 {
     return "discrete dawn";
@@ -18,7 +23,7 @@ std::string sl::getversionname(void)
 
 void sl::printversion(void)
 {
-    std::cout << "sparselizard " << std::to_string(getversion()) << " \"" << getversionname() << "\"." << std::endl;
+    std::cout << "sparselizard " << std::to_string(getversion()) << "." << std::to_string(getsubversion()) << " ('" <<  getversionname() << "')." << std::endl;
 }
 
 double sl::getpi(void)
