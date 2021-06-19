@@ -1183,6 +1183,8 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     
     ///// Update the mesh:
     
+    mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), -1, -1));
+    
     // The previous mesh tracker should not be touched:
     std::shared_ptr<ptracker> newptracker(new ptracker(myelements.count()));
     *newptracker = *myptracker;
