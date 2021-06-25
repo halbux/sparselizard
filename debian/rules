@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+
+# out of tree build folder for schematic symbols
+DEB_BUILD_DIR=debian/build
+# default install folder
+INSTDIR=$(CURDIR)/debian/tmp
+
+DEB_CMAKE_OPTS := \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DMPI_INCLUDE_PATH=/usr/lib/x86_64-linux-gnu/openmpi/include \
+        -DMPI_LIBRARIES=/usr/lib/x86_64-linux-gnu/openmpi/lib/libmpi_cxx.so \
+        -DMPI_PATH=/usr/lib/x86_64-linux-gnu/openmpi \
+        -DBLAS_INCLUDE_PATH=/usr/include/x86_64-linux-gnu \
+        -DBLAS_LIBRARIES=/usr/lib/x86_64-linux-gnu/blas/libblas.so \
+        -DMETIS_INCLUDE_PATH=/usr/include \
+        -DMETIS_LIBRARIES=/usr/lib/x86_64-linux-gnu/libmetis.so \
+        -DPETSCCONF_INCLUDE_PATH=/usr/lib/petsc/include \
+        -DPETSC_INCLUDE_PATH=/usr/lib/petsc/include \
+        -DPETSC_LIBRARIES=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real/lib/libpetsc_real.so \
+        -DPETSC_PATH=/usr/lib/petsc/ \
+        -DSLEPC_INCLUDE_PATH=/usr/lib/slepc/include \
+        -DSLEPC_LIBRARIES=/usr/lib/slepcdir/slepc3.12/x86_64-linux-gnu-real/lib/libslepc_real.so \
+        -DMUMPS_INCLUDE_PATH=/usr/include \
+        -DMUMPS_LIBRARIES=/usr/lib/x86_64-linux-gnu/libmumps_common.so \
+        $(NULL)
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(DEB_CMAKE_OPTS)
