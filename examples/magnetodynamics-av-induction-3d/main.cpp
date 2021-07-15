@@ -85,10 +85,10 @@ int main(void)
     // Write the magnetic induction field b = curl(a) [T], electric field e = -dt(a) - grad(v) [V/m] and current density j [A/m^2]:
     expression e = -dt(a) - grad(v);
     
-    curl(a).write(wholedomain, "b.pos");
-    e.write(conductor, "e.pos");
-    (sigma*e).write(conductor, "j.pos");
-    v.write(conductor, "v.pos");
+    curl(a).write(wholedomain, "b.pos", 1);
+    e.write(conductor, "e.pos", 1);
+    (sigma*e).write(conductor, "j.pos", 1);
+    v.write(conductor, "v.pos", 1);
     
     // Code validation line. Can be removed:
     double minj = norm(sigma*(-2*getpi()*50*a.harmonic(2) - grad(v.harmonic(3)))).min(tube,4)[0];

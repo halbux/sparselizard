@@ -138,8 +138,8 @@ int main(void)
         // Transfer the data from the solution vector to the v field:
         v.setdata(wholedomain, solv);
         // Write the electric field computed and saved on the geometry deformed by umesh.
-        (-grad(v)).write(wholedomain, umesh, "E.pos");
-        v.write(wholedomain, umesh, "v.pos");
+        (-grad(v)).write(wholedomain, umesh, "E.pos", 1);
+        v.write(wholedomain, umesh, "v.pos", 1);
         
         // Calculate the force balance at the contact using the now known electric potential:
         forcebalance.generate();
@@ -157,7 +157,7 @@ int main(void)
         solu = solve(A,b);
         u.setdata(solid, solu);
         // Write the deflection u:
-        u.write(solid, "u.pos"); 
+        u.write(solid, "u.pos", 1); 
         
         // Smooth the mesh in the cavity:
         laplacian.generate();
@@ -223,7 +223,7 @@ int main(void)
     helasticity.generate();
     vec soluh = solve(helasticity.A(), helasticity.b());
     uh.setdata(solid, soluh);
-    uh.write(solid, umesh, "usmallsignal.pos");
+    uh.write(solid, umesh, "usmallsignal.pos", 1);
     // Write the vibration at 50 timesteps of a period for a time visualization:
     (uh-uh.harmonic(1)).write(solid, umesh, "usmallsignal.pos", 1, 50);
     

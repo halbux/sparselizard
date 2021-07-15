@@ -104,10 +104,10 @@ class formulation
         // Choose to discard or not all values after getting the vector/matrix.
         
         // b() is an alias for rhs() and A() for K():
-        vec b(bool keepvector = false, bool dirichletupdate = true);
+        vec b(bool keepvector = false, bool dirichletandportupdate = true);
         mat A(bool keepfragments = false);
         
-        vec rhs(bool keepvector = false, bool dirichletupdate = true);
+        vec rhs(bool keepvector = false, bool dirichletandportupdate = true);
         mat K(bool keepfragments = false);
         mat C(bool keepfragments = false);
         mat M(bool keepfragments = false);

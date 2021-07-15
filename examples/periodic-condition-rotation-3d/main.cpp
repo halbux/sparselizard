@@ -61,7 +61,7 @@ int main(void)
 
     // Add the periodic condition between gamma1 and gamma2.
     // Region gamma2 is obtained from gamma1 by a 60 degrees rotation around z (rotation center is the origin).
-    elasticity += periodicitycondition(gamma1, gamma2, u, {0,0,0}, {0,0,60});
+    elasticity += periodicitycondition(gamma1, gamma2, u, {0,0,0}, {0,0,60}, 1.0, 1);
 
 
     // Generate, solve and store the solution to field u:

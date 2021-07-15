@@ -117,9 +117,9 @@ int main(void)
         vec solv = solve(electrostatics.A(), electrostatics.b());
         // Transfer the data from the solution vector to the v field:
         v.setdata(electricdomain, solv);
-        // Write the electric field with an order 1 interpolation (default).
+        // Write the electric field with an order 1 interpolation.
         // The electric field is computed and saved on the geometry deformed by umesh.
-        (-grad(v)).write(electricdomain, umesh, "E.pos");
+        (-grad(v)).write(electricdomain, umesh, "E.pos", 1);
         
         // Use the now known electric potential v to compute the membrane deflection:
         elasticity.generate();

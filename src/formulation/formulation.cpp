@@ -298,7 +298,7 @@ std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrela
         for (int j = 0; j < len; j++)
         {
             rinds[i][j] += actualnumrelations;
-            cinds[i][j] = mydofmanager->getaddress(rps[j]);
+            cinds[i][j] = mydofmanager->getaddress(rps[j].get());
         }
     
         portnnz += len;
@@ -337,10 +337,10 @@ std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrela
 }
 
 
-vec formulation::b(bool keepvector, bool dirichletupdate) { return rhs(keepvector, dirichletupdate); }
+vec formulation::b(bool keepvector, bool dirichletandportupdate) { return rhs(keepvector, dirichletandportupdate); }
 mat formulation::A(bool keepfragments) { return K(keepfragments); }
 
-vec formulation::rhs(bool keepvector, bool dirichletupdate)
+vec formulation::rhs(bool keepvector, bool dirichletandportupdate)
 {
     if (myvec == NULL)
         myvec = std::shared_ptr<rawvec>(new rawvec(mydofmanager));
@@ -354,11 +354,14 @@ vec formulation::rhs(bool keepvector, bool dirichletupdate)
     else
         output = vec(myvec).copy();
     
-    if (dirichletupdate == true && isconstraintcomputation == false)
+    if (dirichletandportupdate == true && isconstraintcomputation == false)
         output.updateconstraints(); 
         
-    densematrix portrhsvals = getportrelationrhs();
-    output.setvalues(intdensematrix(portrhsvals.count(), 1, 0, 1), portrhsvals);
+    if (dirichletandportupdate == true)
+    {
+        densematrix portrhsvals = getportrelationrhs();
+        output.setvalues(intdensematrix(portrhsvals.count(), 1, 0, 1), portrhsvals);
+    }
     
     return output; 
 }

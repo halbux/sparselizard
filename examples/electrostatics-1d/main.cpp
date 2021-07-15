@@ -38,7 +38,7 @@ int main(void)
     // Transfer the data from the solution vector to the v field:
     v.setdata(line, solv);
     // Write v:
-    v.write(line, "v.pos");
+    v.write(line, "v.pos", 1);
     
     // Code validation line. Can be removed.
     std::cout << (solv.norm() < 21.5964 && solv.norm() > 21.5962);

@@ -133,11 +133,11 @@ class expression
         double integrate(int physreg, expression meshdeform, int integrationorder);
         
         // Compute an FFT transform of the expression and save all the 'numfftharms' harmonics:
-        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder = 1);
-        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder = 1);
+        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder);
+        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder);
         // Save at 'numtimesteps' timesteps. Set -1 to save the harmonics for linear expressions.
-        void write(int physreg, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
-        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
+        void write(int physreg, std::string filename, int lagrangeorder, int numtimesteps = -1);
+        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps = -1);
         
         // Save to disk the part of the stream lines that lie on physical region 'physreg'.
         // The stream lines are grown (upstream and downstream) starting from 'startcoords'.

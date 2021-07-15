@@ -135,7 +135,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     vec unext, vnext, anext;
     while (true)
     {
-        // Print the time:
+        // Update and print the time:
+        universe::currenttimestep = inittime+dt;
+
         if (myverbosity > 1 && istadapt)
             std::cout << "@" << inittime << "+" << dt << "s " << std::flush;
         if (myverbosity > 1 && not(istadapt))
@@ -149,9 +151,6 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
         unext = u; vnext = v; anext = a;
         while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
-            double t = inittime+dt;
-            universe::currenttimestep = t;
-            
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
             for (int i = 0; i < tosolvebefore.size(); i++)
                 tosolvebefore[i].solve();
@@ -160,18 +159,13 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             
             // Reassemble only the non-constant matrices:
             bool isfirstcall = not(K.isdefined());
-            
-            universe::currenttimestep = t-alphaf*dt;
             if (isconstant[0] == false || isfirstcall)
             {
                 myformulation.generaterhs();
-                rhs = myformulation.rhs(false, false);
+                rhs = myformulation.rhs();
             }
-                
-            universe::currenttimestep = t;
-            
-            rhs.updateconstraints();
-                
+            else
+                rhs.updateconstraints();
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();

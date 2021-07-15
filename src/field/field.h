@@ -163,11 +163,11 @@ class field
         double integrate(int physreg, expression meshdeform, int integrationorder);
         double integrate(int physreg, int integrationorder);
 
-        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder = 1);
-        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder = 1);
+        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder);
+        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder);
 
-        void write(int physreg, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
-        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
+        void write(int physreg, std::string filename, int lagrangeorder, int numtimesteps = -1);
+        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps = -1);
         
         // Write/load the raw field data to/from compact sparselizard format:
         void writeraw(int physreg, std::string filename, bool isbinary = false, std::vector<double> extradata = {});

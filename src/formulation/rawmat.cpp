@@ -1,4 +1,5 @@
 #include "rawmat.h"
+#include <thread>
 
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)

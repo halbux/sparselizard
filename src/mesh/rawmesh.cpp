@@ -1183,6 +1183,8 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     
     ///// Update the mesh:
     
+    mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), -1, -1));
+    
     // The previous mesh tracker should not be touched:
     std::shared_ptr<ptracker> newptracker(new ptracker(myelements.count()));
     *newptracker = *myptracker;
@@ -1533,6 +1535,8 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     
     ///// Continue processing the mesh:
+    
+    myhadaptedmesh->mydtracker = std::shared_ptr<dtracker>(new dtracker(myhadaptedmesh, -1, -1));
     
     myhadaptedmesh->myelements.definedisjointregions();
     

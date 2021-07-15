@@ -18,7 +18,6 @@
 #include "memory.h"
 #include "petsc.h"
 #include "petscmat.h"
-#include <thread>
 
 class dofmanager;
 

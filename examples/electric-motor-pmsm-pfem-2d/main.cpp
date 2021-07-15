@@ -102,9 +102,9 @@ double sparselizard(double alpha)
     magnetostatics += integral(windings, -array3x1(0,0,jsz) * tf(a));
 
     // Rotor-stator continuity condition (including antiperiodicity settings with factor '-1'):
-    magnetostatics += continuitycondition(gammastat, gammarot, az, az, {0,0,0}, alpha, 45.0, -1.0);
+    magnetostatics += continuitycondition(gammastat, gammarot, az, az, {0,0,0}, alpha, 45.0, -1.0, 1);
     // Rotor and stator antiperiodicity condition:
-    magnetostatics += periodicitycondition(gamma1, gamma2, az, {0,0,0}, {0,0,45.0}, -1.0);
+    magnetostatics += periodicitycondition(gamma1, gamma2, az, {0,0,0}, {0,0,45.0}, -1.0, 1);
 
 
     // Simple p-adaptivity loop:
@@ -117,7 +117,7 @@ double sparselizard(double alpha)
     az.write(all, "a"+std::to_string((int)alpha)+".vtu", 2);
     curl(a).write(all, "b"+std::to_string((int)alpha)+".vtu", 2);
     // Write the adapted field order:
-    fieldorder(az).write(all, "fieldorderaz"+std::to_string((int)alpha)+".vtu");
+    fieldorder(az).write(all, "fieldorderaz"+std::to_string((int)alpha)+".vtu", 1);
 
 
     // The magnetostatic force acting on the motor is computed below.

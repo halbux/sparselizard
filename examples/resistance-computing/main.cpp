@@ -40,7 +40,7 @@ int main(void)
     port V0;
     
     // Associate a V/I (voltage/current) port pair to field v on the left
-    // and right electrode. Field v will be constant on each electrode.
+    // and right electrodes. Field v will be constant on each electrode.
     port Vl, Il, Vr, Ir;
     
     v.setport(left, Vl, Il);

@@ -69,8 +69,8 @@ int main(void)
     }
     
     // Write the fluid speed (i.e. grad(phi)) and the Mach number:
-    grad(phi).write(air, "flowspeed.pos");
-    machnumber.write(air, "machnumber.pos");
+    grad(phi).write(air, "flowspeed.pos", 1);
+    machnumber.write(air, "machnumber.pos", 1);
     
     // Code validation line. Can be removed.
     std::cout << (machnumber.integrate(air, 3) < 62.4149 && machnumber.integrate(air, 3) > 62.4145);
