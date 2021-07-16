@@ -2,9 +2,9 @@
 // to static Maxwell and magnetostriction stresses. The choke is supposed thin enough
 // to use a plane stress mechanical approximation. This example is based on an example
 // developed by M. Rossi and J. Le Besnerais for the GetDP software. Please refer to paper
-// 'Vibration Reduction of Inductors underMagnetostrictive and Maxwell Forces Excitation'
+// 'Vibration Reduction of Inductors under Magnetostrictive and Maxwell Forces Excitation'
 // for the simulation details. Further magnetostriction model details can be found in
-// 'Magnetostriction Measurement by Using Dual Heterodyne LaserInterferometers'.
+// 'Magnetostriction Measurement by Using Dual Heterodyne Laser Interferometers'.
 
 
 #include "sparselizard.h"
