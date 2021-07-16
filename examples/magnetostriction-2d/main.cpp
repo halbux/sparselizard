@@ -55,7 +55,7 @@ int main(void)
 
     // The strong form of the magnetostatic formulation is curl( 1/mu * curl(a) ) = j, with b = curl(a):
     magnetostatics += integral(all, 1/mu* curl(dof(a)) * curl(tf(a)) );
-    // Add the current density source js [A/m2] in the z direction:
+    // Add the current density source jsource [A/m2] in the z direction:
     magnetostatics += integral(windingpos, -array3x1(0,0,jsource) * tf(a));
     magnetostatics += integral(windingneg, -array3x1(0,0,-jsource) * tf(a));
 
