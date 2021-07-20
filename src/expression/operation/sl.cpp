@@ -2741,6 +2741,11 @@ expression sl::predefinedelectrostaticforce(expression input, expression E, expr
         std::cout << "Error in 'sl' namespace: the force formula expected a " << md << "x1 E/H expression" << std::endl;
         abort();
     }
+    if (epsilon.isscalar() == false)
+    {
+        std::cout << "Error in 'sl' namespace: the force formula is defined for a scalar epsilon/mu" << std::endl;
+        abort();
+    }
     E = E.resize(md,1);
     
     expression gradtfu = input;
