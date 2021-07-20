@@ -292,10 +292,8 @@ namespace sl
     // General anisotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
     expression predefinedelasticity(expression dofu, expression tfu, field u, expression elasticitymatrix, expression prestress, std::string myoption = "");
 
-    expression predefinedelectrostaticforce(expression tfu, expression E, expression epsilon);
-    expression predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon);
-    expression predefinedmagnetostaticforce(expression tfu, expression H, expression mu);
-    expression predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu);
+    expression predefinedelectrostaticforce(expression input, expression E, expression epsilon);
+    expression predefinedmagnetostaticforce(expression input, expression H, expression mu);
 
     expression predefinedacoustics(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
     expression predefinedacousticradiation(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);

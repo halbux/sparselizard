@@ -540,6 +540,8 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
     int wholedomain = universe::mymesh->getphysicalregions()->createunionofall();
 
     int numcomps = universe::mymesh->getmeshdimension();
+    if (universe::isaxisymmetric)
+        numcomps++;
     if (numcomps == 1)
     {
         std::cout << "Error in 'sl' namespace: force calculation formula is undefined in 1D" << std::endl;
@@ -2718,55 +2720,52 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, field u, ex
     abort(); // fix return warning
 }
 
-expression sl::predefinedelectrostaticforce(expression tfu, expression E, expression epsilon)
+expression sl::predefinedelectrostaticforce(expression input, expression E, expression epsilon)
 {
-    if (tfu.countcolumns() != 1)
+    int md = universe::mymesh->getmeshdimension();
+    if (universe::isaxisymmetric)
+        md++;
+       
+    if (md <= 1)
     {
-        std::cout << "Error in 'sl' namespace: the force formula expected a column vector expression as first argument" << std::endl;
+        std::cout << "Error in 'sl' namespace: the force formula is not defined in 1D" << std::endl;
         abort();
     }
-
-    std::vector<expression> spacederivatives(tfu.countrows());
-    for (int i = 0; i < tfu.countrows(); i++)
-        spacederivatives[i] = grad(tfu.at(i,0));
-
-    return predefinedelectrostaticforce(spacederivatives, E, epsilon);
-}
-
-expression sl::predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon)
-{
-    E.reuseit();
-    epsilon.reuseit();
-
-    std::vector<std::vector<expression>> exprs(dxyztfu.size());
-    for (int i = 0; i < dxyztfu.size(); i++)
-        exprs[i] = {dxyztfu[i]};
-
-    // Scalar gradient here:
-    expression gradtfu(exprs);
-
-    if (gradtfu.countcolumns() == 1)
+    if (input.countrows() != md)
     {
-        std::cout << "Error in 'sl' namespace: the force formula is undefined for 1D displacements" << std::endl;
+        std::cout << "Error in 'sl' namespace: the force formula expected a displacement field with " << md << " components" << std::endl;
         abort();
     }
-
-    if (gradtfu.countcolumns() == 2)
-        return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu)) );
-    if (gradtfu.countcolumns() == 3)
-        return -( epsilon*0.5 * (pow(compx(E),2) * entry(0,0,gradtfu) - pow(compy(E),2) * entry(0,0,gradtfu) - pow(compz(E),2) * entry(0,0,gradtfu) + 2 * compx(E) * compy(E) * entry(1,0,gradtfu) + 2 * compx(E) * compz(E) * entry(2,0,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(1,1,gradtfu) + pow(compy(E),2) * entry(1,1,gradtfu) - pow(compz(E),2) * entry(1,1,gradtfu) + 2 * compy(E) * compx(E) * entry(0,1,gradtfu) + 2 * compy(E) * compz(E) * entry(2,1,gradtfu))      +epsilon*0.5 * (-pow(compx(E),2) * entry(2,2,gradtfu) - pow(compy(E),2) * entry(2,2,gradtfu) + pow(compz(E),2) * entry(2,2,gradtfu) + 2 * compz(E) * compx(E) * entry(0,2,gradtfu) + 2 * compz(E) * compy(E) * entry(1,2,gradtfu)) );
+    if (E.countrows() < md || E.countcolumns() != 1)
+    {
+        std::cout << "Error in 'sl' namespace: the force formula expected a " << md << "x1 E/H expression" << std::endl;
+        abort();
+    }
+    E = E.resize(md,1);
+    
+    expression gradtfu = input;
+    if (input.countcolumns() == 1)
+        gradtfu = sl::grad(input);
+    
+    expression E2 = E*E;
         
-    abort(); // fix return warning
+    epsilon.reuseit();
+    E.reuseit();
+    E2.reuseit();
+    
+    expression T = epsilon * (E*transpose(E) - 0.5*E2 * eye(md) );
+    
+    if (md == 2)
+        T = expression(3,1,{T.at(0,0), T.at(1,1), T.at(0,1)});
+    if (md == 3)
+        T = expression(6,1,{T.at(0,0), T.at(1,1), T.at(2,2), T.at(1,2), T.at(0,2), T.at(0,1)});
+    
+    return -T*strain(gradtfu);
 }
 
-expression sl::predefinedmagnetostaticforce(expression tfu, expression H, expression mu)
+expression sl::predefinedmagnetostaticforce(expression input, expression H, expression mu)
 {
-    return predefinedelectrostaticforce(tfu, H, mu);
-}
-
-expression sl::predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu)
-{
-    return predefinedelectrostaticforce(dxyztfu, H, mu);
+    return predefinedelectrostaticforce(input, H, mu);
 }
 
 expression sl::predefinedacoustics(expression dofp, expression tfp, expression c, expression alpha)

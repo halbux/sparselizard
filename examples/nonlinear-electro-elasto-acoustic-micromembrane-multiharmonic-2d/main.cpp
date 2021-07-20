@@ -145,8 +145,7 @@ int main(void)
     //
     // The electrostatic forces must be computed on the mesh deformed by field umesh.
     // The calculations are brought back to the undeformed configuration.
-    expression gradtfu = invjac*expression({{grad(compx(tf(u,solid)))}, {grad(compy(tf(u,solid)))}});
-    elastoacoustic += integral(electricdomain, 20, predefinedelectrostaticforce({gradtfu.getcolumn(0),gradtfu.getcolumn(1)}, invjac*grad(v), epsilon) * detjac );
+    elastoacoustic += integral(electricdomain, 20, predefinedelectrostaticforce(grad(tf(u,solid))*transpose(invjac), invjac*grad(v), epsilon) * detjac );
     
     // The wave equation is solved in the fluid:
     elastoacoustic += integral(fluid, -grad(dof(p))*grad(tf(p)) -1/pow(c,2)*dtdt(dof(p))*tf(p));
