@@ -2758,7 +2758,7 @@ expression sl::predefinedelectrostaticforce(expression input, expression E, expr
     E.reuseit();
     E2.reuseit();
     
-    expression T = epsilon * (E*transpose(E) - 0.5*E2 * eye(md) );
+    expression T = epsilon * ( E*transpose(E) - 0.5*E2 * eye(md) );
     
     if (md == 2)
         T = expression(3,1,{T.at(0,0), T.at(1,1), T.at(0,1)});
