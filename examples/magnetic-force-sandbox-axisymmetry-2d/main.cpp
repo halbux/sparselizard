@@ -84,7 +84,7 @@ int main(void)
     // Use interpolation order 4:
     u.setorder(all, 4);
     
-    // Clamp the x and z displacement component.
+    // Clamp the x and z displacement components.
     // The y component is clamped using a port to be able to calculate the reaction force.
     u.compx().setconstraint(clamp);
     u.compz().setconstraint(clamp);
