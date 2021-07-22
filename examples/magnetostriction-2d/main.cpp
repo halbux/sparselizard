@@ -34,7 +34,7 @@ int main(void)
 
     // Nodal shape functions 'h1' for the z component of the vector potential.
     field az("h1");
-    az.setorder(all, 1);
+    az.setorder(all, 2);
 
     // Put a magnetic wall at the outer air boundary:
     az.setconstraint(boundary);
@@ -84,7 +84,7 @@ int main(void)
     
     // Mechanical displacement field:
     field u("h1xy");
-    u.setorder(all, 1);
+    u.setorder(all, 2);
     
     // E is Young's modulus. nu is Poisson's ratio:
     parameter E, nu;
@@ -107,8 +107,8 @@ int main(void)
     formulation elasticity;
     
     elasticity += integral(solid, predefinedelasticity(dof(u), tf(u), E, nu, "planestress"));
-    // Maxwell stress tensor in Voigt form (xx,yy,xy):
-    elasticity += integral(solid, -1/mu * array3x1(bx*bx-0.5*B*B, by*by-0.5*B*B, bx*by) * strain(tf(u)) );
+    // Magnetostatic Maxwell stresses:
+    elasticity += integral(all, predefinedmagnetostaticforce(tf(u, solid), b/mu, mu) );
     // Magnetostrictive stresses:
     elasticity += integral(core, H * ems * strain(tf(u)) );
     
@@ -121,6 +121,6 @@ int main(void)
     u.write(solid, "u.pos", 1);
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(probeval - 1.11156e-07)/probeval < 1e-4);
+    std::cout << (std::abs(probeval - 1.127e-07)/probeval < 1e-4);
 }
 
