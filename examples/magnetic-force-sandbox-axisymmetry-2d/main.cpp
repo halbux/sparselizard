@@ -17,7 +17,7 @@ int main(void)
 
     mesh mymesh;
     // Grow 5 element layers from the bar region:
-    mymesh.selectlayer(7, bar, 5);
+    mymesh.selectlayer(7, air, bar, 5);
     // Take the layer skin:
     mymesh.selectskin(8, 7);
     // Take the bar skin:
