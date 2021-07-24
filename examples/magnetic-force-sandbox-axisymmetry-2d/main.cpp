@@ -75,7 +75,7 @@ int main(void)
     double fvolcalc = gettotalforce(bar, b/mu, mu)[1];
     // Compute the total force acting on the bar using a boundary integral of the Maxwell stress tensor T:
     expression T = 1/mu * ( b*transpose(b) - 0.5*b*b * eye(3) );
-    double fsurcalc = 2*getpi()*compy(on(all, transpose(T))*normal(7)).integrate(bnd, 5);
+    double fsurcalc = 2*getpi()*compy(on(all, T)*normal(7)).integrate(bnd, 5);
     
     
     // Mechanical displacement field with 3 components:
