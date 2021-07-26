@@ -101,6 +101,11 @@ int main(void)
     elasticity += integral(bar, predefinedelasticity(dof(u), tf(u), 100e9, 0.3));
     // Add the magnetostatic Maxwell stresses:
     elasticity += integral(all, predefinedmagnetostaticforce(tf(u, bar), b/mu, mu));
+    // Alternatively an integration on the bar skin can be performed:
+    // elasticity += integral(9, compx(on(air,T)) * normal(bar) * compx(tf(u)));
+    // elasticity += integral(9, compx(on(bar,T)) * normal(air) * compx(tf(u)));
+    // elasticity += integral(9, compy(on(air,T)) * normal(bar) * compy(tf(u)));
+    // elasticity += integral(9, compy(on(bar,T)) * normal(air) * compy(tf(u)));
     
     elasticity.solve();
     
