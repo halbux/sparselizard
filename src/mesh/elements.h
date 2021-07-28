@@ -180,6 +180,8 @@ class elements
         void printtotalorientations(void);
         // Visualize elements for debug:
         void write(std::string filename, int elementtypenumber, std::vector<int> elementnumbers, std::vector<int> elementvalues);
+        // Visualize edge direction for debug:
+        void writeedgedirection(int physreg, std::string filename);
         
         // 'computebarycenters' computes the barycenter coordinates of all 
         // elements of type 'elementtypenumber'. The output vector has format 
