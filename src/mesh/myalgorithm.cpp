@@ -1789,3 +1789,113 @@ void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& truein
     }
 }
 
+void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit, std::vector<int>& edgenums)
+{
+    elements* els = universe::mymesh->getelements();
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    physicalregions* prs = universe::mymesh->getphysicalregions();
+    int totnumedges = els->count(1);
+    
+    std::vector<int> edgeinfo(totnumedges, 0);
+    
+    std::vector<int> ders = prs->get(physreg)->getdisjointregions(1);
+    
+    int numedgesinpr = 0;
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = drs->getrangebegin(ders[i]);
+        int ne = drs->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+            edgeinfo[rb+j] = 2;
+        
+        numedgesinpr += ne;
+    }
+    
+    // This loop on all edges is needed in case the physical region is made up of multiple disconnected islands:
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = drs->getrangebegin(ders[i]);
+        int ne = drs->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            int firstnode = els->getsubelement(0, 1, rb+j, 0);
+            // Process the whole island:
+            inoutorient(firstnode, edgeinfo, true, false);
+        }
+    }
+    
+    flipit = std::vector<bool>(numedgesinpr);
+    edgenums = std::vector<int>(numedgesinpr);
+        
+    int index = 0;
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = drs->getrangebegin(ders[i]);
+        int ne = drs->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            edgenums[index] = rb+j;
+            if (edgeinfo[rb+j] == 1.0)
+                flipit[index] = false;
+            else
+                flipit[index] = true;
+            index++;
+        }
+    }
+}
+
+// For edge number i value 'edgestatus[i]' is -1 if it is flipped, 1 if it is not flipped, 2 if
+// it is in the physical region but not yet processed and 0 if it is not in the physical region.
+void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall)
+{   
+    elements* els = universe::mymesh->getelements();
+    
+    std::vector<int> eon = els->getedgesonnode(startnode);
+
+    for (int e = 0; e < eon.size(); e++)
+    {
+        int ce = eon[e];
+        int firstnode = els->getsubelement(0, 1, ce, 0);
+        int lastnode = els->getsubelement(0, 1, ce, 1);
+            
+        if (edgestatus[ce] == 2)
+        {
+            if (isoutward)
+            {
+                if (firstnode == startnode)
+                    edgestatus[ce] = 1;
+                else
+                    edgestatus[ce] = -1;
+            }
+            else
+            {
+                if (firstnode == startnode)
+                    edgestatus[ce] = -1;
+                else
+                    edgestatus[ce] = 1;
+            }
+            
+            if (firstnode == startnode)
+                inoutorient(lastnode, edgestatus, not(isoutward), true);
+            else
+                inoutorient(firstnode, edgestatus, not(isoutward), true);
+        }
+        else
+        {
+            if (isrecursivecall && edgestatus[ce] != 0)
+            {
+                bool isedgeoutward = (firstnode == startnode && edgestatus[ce] == 1 || lastnode == startnode && edgestatus[ce] == -1);
+
+                if (isoutward != isedgeoutward)
+                {
+                    std::cout << "Error in 'myalgorithm' namespace: reorienting the edges to have them all pointing either inwards or outwards at every node is impossible on the requested physical region for the mesh provided" << std::endl;
+                    abort();
+                }
+            }
+        }
+    }
+}
+
