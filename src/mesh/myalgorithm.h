@@ -250,9 +250,9 @@ namespace myalgorithm
     // Find the true and false indexes in the argument vector and provide the renumbering of each vector entry to its true/false index:
     void findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum);
     
-    // For every edge in 'physreg' return its number as well as a flag telling if its direction has to be flipped
+    // For every edge in 'physreg' (in the 'der' order) return a flag telling if its direction has to be flipped
     // to fullfill the condition that at every node the touching edges point together either inwards or outwards.
-    void inoutorient(int physreg, std::vector<bool>& flipit, std::vector<int>& edgenums);
+    void inoutorient(int physreg, std::vector<bool>& flipit);
     // Helper function to be called recursively.
     void inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall);
     

@@ -217,6 +217,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Transfer data from the rawfield to a vectorfieldselect:
         void transferdata(int physreg, vectorfieldselect myvec, std::string op);
         
+        // Set the source value at every cut:
+        void setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues);
+        
         // Select a component.
         std::shared_ptr<rawfield> comp(int component);
         // Select a single or several harmonics. 

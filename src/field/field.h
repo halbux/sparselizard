@@ -123,6 +123,9 @@ class field
         void setdata(int physreg, vectorfieldselect myvec, std::string op = "set");
         // Transfer data from and to the current field:
         void setdata(int physreg, vec myvec, std::string op = "set");
+        
+        // Set the source value at every cut:
+        void setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues);
 
         // Allow/forbid automatic updating of the field value during hp-adaptivity:
         void automaticupdate(bool updateit);

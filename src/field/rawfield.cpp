@@ -1556,6 +1556,79 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     }
 }
 
+void rawfield::setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues)
+{
+    synchronize();
+
+    // There is no subfield for hcurl. No subfield loop needed.
+    if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
+    {
+        myharmonics[1][0]->setcuts(cutphysregs, cutvalues);
+        return;
+    }
+    
+    if (myharmonics.size() > 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set a cut value on a multiharmonic field (select harmonics one by one)" << std::endl;
+        abort();
+    }
+    
+    elements* els = universe::mymesh->getelements();
+    disjointregions* drs = universe::mymesh->getdisjointregions();
+    physicalregions* prs = universe::mymesh->getphysicalregions();
+
+    // Reset all cut sources:
+    std::vector<std::vector<int>> ders(cutphysregs.size());
+    for (int i = 0; i < cutphysregs.size(); i++)
+    {
+        ders[i] = prs->get(cutphysregs[i])->getdisjointregions(1);
+        
+        for (int d = 0; d < ders[i].size(); d++)
+        {
+            int ne = drs->countelements(ders[i][d]);
+            int nff = mycoefmanager->countformfunctions(ders[i][d]);
+
+            for (int f = 0; f < nff; f++)       
+            {
+                for (int j = 0; j < ne; j++)
+                    mycoefmanager->setcoef(ders[i][d], f, j, 0.0);
+            }   
+        }
+    }
+    
+    // Set all cut sources:
+    std::vector<bool> flipit; std::vector<int> edgenums;
+    for (int i = 0; i < cutphysregs.size(); i++)
+    {
+        if (ders[i].size() == 0)
+            continue;
+    
+        myalgorithm::inoutorient(cutphysregs[i], flipit);
+
+        int index = 0;
+        for (int d = 0; d < ders[i].size(); d++)
+        {
+            int rb = drs->getrangebegin(ders[i][d]);
+            int ne = drs->countelements(ders[i][d]);
+            
+            for (int j = 0; j < ne; j++)
+            {
+                int curorient = 2 * els->gettotalorientation(1, rb+j) - 1;
+                
+                int signfix = curorient;
+                if (flipit[index])
+                    signfix *= -1;
+
+                // Add the source with correct sign:
+                double curval = mycoefmanager->getcoef(ders[i][d], 0, j);
+                mycoefmanager->setcoef(ders[i][d], 0, j, curval + signfix * cutvalues[i]);
+                
+                index++;
+            }
+        }
+    }
+}
+
 std::shared_ptr<rawfield> rawfield::comp(int component)
 {   
     synchronize();

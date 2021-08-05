@@ -338,6 +338,26 @@ void field::setdata(int physreg, vec myvec, std::string op)
     setdata(physreg, myvec|thisfield, op);
 }
 
+void field::setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues)
+{
+    errorifpointerisnull();
+    universe::mymesh->getphysicalregions()->errorundefined(cutphysregs);
+
+    if (cutphysregs.size() != cutvalues.size())
+    {
+        std::cout << "Error in 'field' object: provided " << cutvalues.size() << " values for " << cutphysregs.size() << " cut regions" << std::endl;
+        abort();
+    }
+    if (rawfieldptr->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'field' object: cannot set a cut source to '" << rawfieldptr->gettypename() << "' type fields (use 'hcurl')" << std::endl;
+        abort();
+    }
+
+    if (cutphysregs.size() > 0)
+        rawfieldptr->setcuts(cutphysregs, cutvalues);
+}
+
 void field::automaticupdate(bool updateit)
 {
     errorifpointerisnull();

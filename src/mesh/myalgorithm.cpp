@@ -1789,7 +1789,7 @@ void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& truein
     }
 }
 
-void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit, std::vector<int>& edgenums)
+void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
 {
     elements* els = universe::mymesh->getelements();
     disjointregions* drs = universe::mymesh->getdisjointregions();
@@ -1827,7 +1827,6 @@ void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit, std::vecto
     }
     
     flipit = std::vector<bool>(numedgesinpr);
-    edgenums = std::vector<int>(numedgesinpr);
         
     int index = 0;
     for (int i = 0; i < ders.size(); i++)
@@ -1837,7 +1836,6 @@ void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit, std::vecto
         
         for (int j = 0; j < ne; j++)
         {
-            edgenums[index] = rb+j;
             if (edgeinfo[rb+j] == 1.0)
                 flipit[index] = false;
             else
