@@ -1556,14 +1556,14 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     }
 }
 
-void rawfield::setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues)
+void rawfield::setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues)
 {
     synchronize();
 
     // There is no subfield for hcurl. No subfield loop needed.
     if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
     {
-        myharmonics[1][0]->setcuts(cutphysregs, cutvalues);
+        myharmonics[1][0]->setcohomologysources(cutphysregs, cutvalues);
         return;
     }
     

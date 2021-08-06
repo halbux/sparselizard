@@ -338,7 +338,7 @@ void field::setdata(int physreg, vec myvec, std::string op)
     setdata(physreg, myvec|thisfield, op);
 }
 
-void field::setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues)
+void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues)
 {
     errorifpointerisnull();
     universe::mymesh->getphysicalregions()->errorundefined(cutphysregs);
@@ -355,7 +355,7 @@ void field::setcuts(std::vector<int> cutphysregs, std::vector<double> cutvalues)
     }
 
     if (cutphysregs.size() > 0)
-        rawfieldptr->setcuts(cutphysregs, cutvalues);
+        rawfieldptr->setcohomologysources(cutphysregs, cutvalues);
 }
 
 void field::automaticupdate(bool updateit)
