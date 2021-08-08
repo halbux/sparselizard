@@ -66,7 +66,7 @@ std::shared_ptr<operation> opspline::copy(void)
 
 void opspline::print(void)
 {
-    std::cout << "splineinterpolate(";
+    std::cout << "spline(";
     myarg->print();
     std::cout << ")";
 }
