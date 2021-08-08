@@ -3,20 +3,20 @@ SetFactory("OpenCASCADE");
 
 Mesh.MshFileVersion = 2.2;
 Mesh.CharacteristicLengthFactor = 1;
-Mesh.CharacteristicLengthMax = 0.005;
+Mesh.CharacteristicLengthMax = 0.001;
 
 // Construction Parameters
-BottomIron = 2/1000;
+BottomIron = 10/1000;
 BottomMagnets = 10/1000;
 AirgapBottom = 1/1000;
-Iron = 6/1000;
+Iron = 10/1000;
 AirgapTop = 1/1000;
 TopMagnets = 10/1000;
-TopIron = 2/1000;
+TopIron = 10/1000;
 
 // Iteration Parameters
 BarIntervals = 55;
-RotIntervals = 55;
+RotIntervals = 5;
 
 // Main Parameters
 Radius = 7.5/100;

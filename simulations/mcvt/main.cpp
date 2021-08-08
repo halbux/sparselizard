@@ -173,12 +173,17 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     int topmagnets = selectunion({secondmagnetup, secondmagnetdown});
     int middlesection = selectunion({ironbars});
 
+cout << "Calculating Spanning Tree" << endl;
     // Define a spanning tree to gauge the magnetic vector potential (otherwise the matrix is singular).
     // Start growing the tree from the regions with constrained potential vector (here the contour): 
-    spanningtree spantree({ bottomStator, topStator });
+//    spanningtree spantree({ bottomStator, topStator });
+    // change the span tree to magnet areas
+    spanningtree spantree({ magnetsdown, magnetsup });
+
+
     // Write it for illustration:
     // spantree.write("results/spantree.pos");
-
+cout << "Setting field" << endl;
     // Nodal shape functions 'h1' for the z component of the vector potential.
     field az("hcurl", spantree),
          x("x"), y("y"), z("z");
@@ -188,6 +193,7 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     az.setgauge(all);
     // Use interpolation order 2:
     az.setorder(all, 2);
+//    az.setorder(iron, 3);
     // Put a magnetic wall
     // az.setconstraint(topStator);
     // az.setconstraint(bottomStator);
@@ -205,12 +211,53 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
     // Taking into account saturation and measured B-H curves can be easily done
     // by defining an expression based on a 'spline' object (see documentation).
     //
+
+// Β-H curve can be performed like below
+//std :: vector<double> temperature = {273,300,320,340};
+//std :: vector<double> youngsmodulus = {5e9,4e9,2.5e9,1e9};
+//spline spl(temperature, youngsmodulus);
+//// The spline object can also be created from a measurement data file:
+//// spline spl ("smoothedmeasurements.txt");
+//// Temperature field:
+//field T("h1");
+//// Young’s modulus as a cubic (natural) spline interpolation of the experimental data:
+//expression E(spl, T);
+//This creates a continuous expression based on discrete data samples. As an application example, if
+//measurements of a material stiffness (Young’s modulus E) have been performed for a set of temperatures T (as illustrated in the example above) then this constructor allows to define expression E
+//that provides a 3rd order (natural) spline interpolation of Young’s modulus in the measured discrete
+//temperature range. Field T can contain any space-dependent temperature profile as long as it is in
+//the temperature data range provided.
+// Stainless steel 416 BH Curve
+// B  - - - H
+// 0.000    0.0
+// 0.200    318.3
+// 0.426    477.5
+// 0.761    795.8
+// 1.097    1591.6
+// 1.233    2387.3
+// 1.335    3978.9
+// 1.460    7957.8
+// 1.590    15915.5
+// 1.690    31831.0
+// 1.724    44456.3
+// 1.740    55704.3
+
+// BH Curve first try
+std :: vector<double> Bcurve = {0.0, 0.2,   0.426, 0.761,  1.097, 1.233,  1.335,   1.460,   1.590,   1.690,   1.724,   1.740 , 2.0, 2.5};
+std :: vector<double> Hcurve = {0.0, 318.3, 477.5, 795.8, 1591.6, 2387.3, 3978.9, 7957.8, 15915.5, 31831.0, 44456.3, 55704.3 , 58000.0, 60000.0};
+spline spl(Bcurve, Hcurve);
+spl.write("BHCurve.txt", 5);
+cout << "BH Curve..." << endl;
+expression BHCurve(spl.getderivative(), norm(curl(az)));
+cout << "BH Curve for iron..." << endl;
+expression mIron = BHCurve;
+
     parameter mu;
     mu|all = mu0;
     // Overwrite on non-magnetic regions:
     mu|magnets = mu0;
-    mu|iron = 2000*mu0;
-
+    mu|iron = mIron;//2000*mu0;
+cout << "Formulation" << endl;
     formulation magnetostatics;
     // The strong form of the magnetostatic formulation is curl( 1/mu * curl(a) ) = j, with b = curl(a):
     magnetostatics += integral(all, 1/mu* curl(dof(az)) * curl(tf(az)) );
@@ -360,7 +407,7 @@ int main(int argc, char *argv[])
     int pieces = (end-start)/alphaStep;
 
 
-    string folderName = "AprilLate";
+    string folderName = "July";
 
     createPath("cache");
 
