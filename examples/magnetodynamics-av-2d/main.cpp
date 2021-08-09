@@ -93,8 +93,8 @@ int main(void)
     // with b = curl(a) and e = -dt(a) - grad(v)
     //
     // Magnetic equation:
-    magdyn += integral(all, 1/mu* curl(dof(a)) * curl(tf(a)) );
-    magdyn += integral(conductor, sigma*dt(dof(a))*tf(a) + sigma* dof(gradvz)*tf(az) );
+    magdyn += integral(all, 1/mu * curl(dof(a)) * curl(tf(a)) );
+    magdyn += integral(conductor, sigma*dt(dof(a))*tf(a) + sigma*dof(gradvz)*tf(az) );
     // Electric equation:
     magdyn += integral(conductor, sigma*dof(gradvz)*tf(gradvz) + sigma*dt(dof(az))*tf(gradvz) );
     
