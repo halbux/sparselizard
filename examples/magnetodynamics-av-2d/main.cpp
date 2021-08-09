@@ -1,10 +1,7 @@
 // This code simulates the AC magnetic field and induced currents created
 // by three conducting wires, each with a prescribed total current flow.
 //
-// The so-called h-v (or h-phi) formulation is used. The 'main' section
-// of this code can be (and has been) used as it is for 3D h-v simulations. 
-//
-// Credits: J. Ruuskanen
+// The so-called A-v formulation is used.
 
 
 #include "sparselizard.h"
@@ -13,7 +10,7 @@
 
 using namespace sl;
 
-int air = 1, cond1 = 2, cond2 = 3, cond3 = 4, cohomcut1 = 5, cohomcut2 = 6, cohomcut3 = 7, point = 8;
+int air = 1, cond1 = 2, cond2 = 3, cond3 = 4, skin = 9;
 
 mesh createmesh(void);
 
@@ -26,10 +23,9 @@ int main(void)
 
     int all = selectall();
     int conductor = selectunion({cond1, cond2, cond3});
-    int cohomcuts = selectunion({cohomcut1, cohomcut2, cohomcut3});
 
     field x("x");
-    
+
     double mu0 = 4*getpi()*1e-7;
 
     // Define the electric conductivity and magnetic permeability:
@@ -41,95 +37,86 @@ int main(void)
     mu|air = mu0;
     mu|conductor = 1000*mu0;
 
+    sigma.write(conductor, "sigma.pos", 1);
+
     // Set the working frequency to 50 Hz:
     setfundamentalfrequency(50);
-
-    int condskin = selectintersection({air, conductor});
-
-    // A spanning tree is needed to gauge field 'hc'. The tree
-    // growth start on the region where 'hc' is constrained.
-    spanningtree spantree({condskin});
 
     // Since the solution has a component in phase with the actuation
     // and a quadrature component we need 2 harmonics at 50Hz 
     // (harmonic 1 is DC, 2 is sine at 50Hz and 3 cosine at 50Hz).
     std::vector<int> harms = {2, 3};
+    
+    // Nodal shape functions 'h1' for the z component of the vector potential.
+    field az("h1", harms);
+    
+    // In 2D the vector potential only has a z component:
+    expression a = array3x1(0,0,az);
 
-    field hc("hcurl", harms, spantree);
-
-    hc.setgauge(conductor);
-    hc.setorder(conductor, 2);
-    hc.setconstraint(condskin);
-
-    // Source magnetic field:
-    field hs("hcurl", harms);
-
-    hs.setorder(all, 0);
-
-    // Set the sources [A] on the three cohomology cuts for the 50Hz sine harmonic.
-    //
-    // The total current in each conductor and the cohomology sources are generally not equal.
-    // The actual total current flowing in each conductor is printed at the end of this code.
-    // It is determined by the circulation on a closed loop around each conductor. Since the
-    // orientation of a cohomology cut depends on the mesh, it is recommended to visualize
-    // the source field 'hs.pos' to determine which cohomology source coefficients must be
-    // used to get the desired total current in each conductor. 
-    //
-    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {300, 100, -200});
-
-    hs.write(cohomcuts, "hs.pos", 1);
-
-    // Scalar potential of the h-v formulation:
-    field v("h1", harms);
-
-    v.setorder(all, 2);   
-    // Fix the potential to 0 at a point in space:
-    v.setconstraint(point);
-
-    // The gradient has only two components in 2D but 'hcurl' fields have three.
-    // Add a 0-valued component to have a three component gradient.
-    expression graddofv = grad(dof(v)).resize(3,1);
-    expression gradtfv = grad(tf(v)).resize(3,1);
-    expression gradv = grad(v).resize(3,1);
-
-
+    // Select adapted interpolation orders for field az:
+    az.setorder(all, 2);
+    
+    // Put a magnetic wall (i.e. set field az to 0) all around the domain (no magnetic flux can cross it):
+    az.setconstraint(skin);
+    
+    // In 2D the electric potential field v is not needed but in order to set a total current
+    // flow [A] condition on each conductor a field 'gradvz' equal to compz(grad(v)) is defined.
+    field gradvz("h1", harms);
+    
+    // A port will be defined on each conductor so the lowest order is enough:
+    gradvz.setorder(conductor, 1);
+    
+    // One primal/dual port pair per conductor. The primal is the lumped gradvz field on a region while the dual is
+    // the total contribution of the Neumann term on that region, here the total current [A] in the z direction.
+    port gradvz1(harms), Iz1(harms), gradvz2(harms), Iz2(harms), gradvz3(harms), Iz3(harms);
+    
+    gradvz.setport(cond1, gradvz1, Iz1);
+    gradvz.setport(cond2, gradvz2, Iz2);
+    gradvz.setport(cond3, gradvz3, Iz3);
+    
+    // Define the weak magnetodynamic formulation with a total 300 / -400 / 200 [A] flowing through conductor 1 / 2 / 3. 
     formulation magdyn;
+    
+    magdyn += Iz1.harmonic(2) - 300.0;
+    magdyn += Iz1.harmonic(3) - 0;
+    
+    magdyn += Iz2.harmonic(2) + 400.0;
+    magdyn += Iz2.harmonic(3) - 0;
 
-    // The weak form of Faraday's law is
+    magdyn += Iz3.harmonic(2) - 200.0;
+    magdyn += Iz3.harmonic(3) - 0;
+    
+    // The strong form of the magnetodynamic a-v formulation is 
+    // 
+    // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js, with b = curl(a) and e = -dt(a) - grad(v)
     //
-    // 1/sigma * curl(h) * curl(h') + mu * dt(h) * h' = 0
-    //
-    magdyn += integral(conductor, 1/sigma * (curl(dof(hc)) + curl(hs)) * curl(tf(hc)));
-    magdyn += integral(conductor, mu * (dt(hs) + dt(dof(hc)) + dt(graddofv)) * tf(hc));
-
-    // The weak form of Gauss's law is
-    //
-    // mu * h * grad(v') = 0
-    //
-    magdyn += integral(conductor, mu * (hs + dof(hc) + graddofv) * gradtfv);
-    magdyn += integral(air, mu * (hs + graddofv) * gradtfv);
-
+    // Magnetic equation:
+    magdyn += integral(all, 1/mu* curl(dof(a)) * curl(tf(a)) );
+    magdyn += integral(conductor, sigma*dt(dof(a))*tf(a) + sigma* dof(gradvz)*tf(az) );
+    // Electric equation:
+    magdyn += integral(conductor, sigma*dof(gradvz)*tf(gradvz) + sigma*dt(dof(az))*tf(gradvz) );
+    
+    // Generate, solve and transfer the solution to fields a and v:
     magdyn.solve();
-
-    // Current density:
-    expression j = curl(hc) + curl(hs);
-    // Air and conductor magnetic field:
-    expression hair = hs + gradv;
-    expression hcond = hs + gradv + hc;
-
+    
+    // Write the magnetic induction field b = curl(a) [T], electric field e = -dt(a) - grad(v) [V/m] and current density j [A/m^2]:
+    expression e = -dt(az) - gradvz;
+    expression j = sigma*e;
+    
+    curl(a).write(conductor, "bcond.pos", 2);
+    curl(a).write(air, "bair.pos", 2);
+    e.write(conductor, "e.pos", 2);
     j.write(conductor, "j.pos", 2);
 
-    (mu*hcond).write(conductor, "bcond.pos", 2);
-    (mu*hair).write(air, "bair.pos", 2);
-    
-    double I1 = getharmonic(2, compz(j)).integrate(cond1, 5);
-    double I2 = getharmonic(2, compz(j)).integrate(cond2, 5);
-    double I3 = getharmonic(2, compz(j)).integrate(cond3, 5);
+    // Confirm the total current flow in each conductor:
+    double I1 = getharmonic(2, j).integrate(cond1, 5);
+    double I2 = getharmonic(2, j).integrate(cond2, 5);
+    double I3 = getharmonic(2, j).integrate(cond3, 5);
     
     std::cout << "Total current in wire 1/2/3 is " << I1 << " / " << I2 << " / " << I3 << " A" << std::endl;
-    
+
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-300)/300 < 1e-14 && std::abs(I2+400)/400 < 1e-14 && std::abs(I3-200)/200 < 1e-14);
+    std::cout << (std::abs(I1-300)/300 < 1e-13 && std::abs(I2+400)/400 < 1e-13 && std::abs(I3-200)/200 < 1e-13);
 }
 
 mesh createmesh(void)
@@ -186,15 +173,12 @@ mesh createmesh(void)
     gmsh::model::getBoundary({ {2,cond3geo} }, ironbnd, true, true, true);
     gmsh::model::mesh::setSize(ironbnd, mscond);
 
-    // Compute the cohomology basis:
-    gmsh::model::mesh::computeCohomology({air}, {}, {1});
-
     // Mesh in 2D:
     gmsh::model::mesh::generate(2);
 
     // Load mesh in sparselizard:
     mesh mymesh;
-    mymesh.selectanynode(point);
+    mymesh.selectskin(skin);
     mymesh.load("gmsh:api", 0);
 
     gmsh::finalize();
