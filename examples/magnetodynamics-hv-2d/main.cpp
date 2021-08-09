@@ -96,9 +96,9 @@ int main(void)
 
     formulation magdyn;
 
-    // The weak form of Faraday's law is
+    // The strong form of the magnetodynamic h-v formulation is
     //
-    // 1/sigma * curl(h) * curl(h') + mu * dt(h) * h' = 0
+    // curl( 1/sigma * curl(h) ) + dt(b) = 0
     //
     // with hair = hs + grad(v) and hconductor = hc + hs + grad(v)
     //
