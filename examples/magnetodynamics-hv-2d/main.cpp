@@ -40,24 +40,21 @@ int main(void)
 
     mu|air = mu0;
     mu|conductor = 1000*mu0;
+    
+    sigma.write(conductor, "sigma.pos", 1);
 
     // Set the working frequency to 50 Hz:
     setfundamentalfrequency(50);
 
     int condskin = selectintersection({air, conductor});
 
-    // A spanning tree is needed to gauge field 'hc'. The tree
-    // growth start on the region where 'hc' is constrained.
-    spanningtree spantree({condskin});
-
     // Since the solution has a component in phase with the actuation
     // and a quadrature component we need 2 harmonics at 50Hz 
     // (harmonic 1 is DC, 2 is sine at 50Hz and 3 cosine at 50Hz).
     std::vector<int> harms = {2, 3};
 
-    field hc("hcurl", harms, spantree);
+    field hc("hcurl", harms);
 
-    hc.setgauge(conductor);
     hc.setorder(conductor, 2);
     hc.setconstraint(condskin);
 
@@ -88,10 +85,14 @@ int main(void)
 
     // The gradient has only two components in 2D but 'hcurl' fields have three.
     // Add a 0-valued component to have a three component gradient.
-    expression graddofv = grad(dof(v)).resize(3,1);
-    expression gradtfv = grad(tf(v)).resize(3,1);
-    expression gradv = grad(v).resize(3,1);
-
+    // 
+    // In the formulation below the contribution of v to the conductor region
+    // elements should be taken into account but there should be no v unknown
+    // associated to the conductor except for its skin region. To achieve this
+    // an extra argument is provided to the dof() and tf() functions to define
+    // them only on the air region.
+    expression graddofv = grad(dof(v, air)).resize(3,1);
+    expression gradtfv = grad(tf(v, air)).resize(3,1);
 
     formulation magdyn;
 
@@ -100,16 +101,13 @@ int main(void)
     // 1/sigma * curl(h) * curl(h') + mu * dt(h) * h' = 0
     //
     magdyn += integral(conductor, 1/sigma * (curl(dof(hc)) + curl(hs)) * curl(tf(hc)));
-    magdyn += integral(conductor, mu * (dt(hs) + dt(dof(hc)) + dt(graddofv)) * tf(hc));
 
-    // The weak form of Gauss's law is
-    //
-    // mu * h * grad(v') = 0
-    //
-    magdyn += integral(conductor, mu * (hs + dof(hc) + graddofv) * gradtfv);
-    magdyn += integral(air, mu * (hs + graddofv) * gradtfv);
+    magdyn += integral(conductor, mu * (dt(hs) + dt(dof(hc)) + dt(graddofv)) * (tf(hc) + gradtfv));
+    magdyn += integral(air, mu * (dt(hs) + dt(graddofv)) * gradtfv);
 
     magdyn.solve();
+
+    expression gradv = grad(v).resize(3,1);
 
     // Current density:
     expression j = curl(hc) + curl(hs);
@@ -127,6 +125,10 @@ int main(void)
     double I3 = getharmonic(2, compz(j)).integrate(cond3, 5);
     
     std::cout << "Total current in wire 1/2/3 is " << I1 << " / " << I2 << " / " << I3 << " A" << std::endl;
+    
+    double Bmaxair = norm(getharmonic(2, mu * hair)).max(air, 5)[0];
+    double Bmaxcond = norm(getharmonic(2, mu * hcond)).max(conductor, 5)[0];
+    std::cout << "B max in air/conductor is " << Bmaxair << " / " << Bmaxcond << " T" << std::endl;
     
     // Code validation line. Can be removed.
     std::cout << (std::abs(I1-300)/300 < 1e-14 && std::abs(I2+400)/400 < 1e-14 && std::abs(I3-200)/200 < 1e-14);

@@ -100,21 +100,24 @@ int main(void)
     magdyn.solve();
     
     // Write the magnetic induction field b = curl(a) [T], electric field e = -dt(a) - grad(v) [V/m] and current density j [A/m^2]:
-    expression e = -dt(az) - gradvz;
-    expression j = sigma*e;
+    expression ez = -dt(az) - gradvz;
+    expression jz = sigma*ez;
     
     curl(a).write(conductor, "bcond.pos", 2);
     curl(a).write(air, "bair.pos", 2);
-    e.write(conductor, "e.pos", 2);
-    j.write(conductor, "j.pos", 2);
+    array3x1(0,0,jz).write(conductor, "j.pos", 2);
 
     // Confirm the total current flow in each conductor:
-    double I1 = getharmonic(2, j).integrate(cond1, 5);
-    double I2 = getharmonic(2, j).integrate(cond2, 5);
-    double I3 = getharmonic(2, j).integrate(cond3, 5);
+    double I1 = getharmonic(2, jz).integrate(cond1, 5);
+    double I2 = getharmonic(2, jz).integrate(cond2, 5);
+    double I3 = getharmonic(2, jz).integrate(cond3, 5);
     
     std::cout << "Total current in wire 1/2/3 is " << I1 << " / " << I2 << " / " << I3 << " A" << std::endl;
 
+    double Bmaxair = norm(getharmonic(2, curl(a))).max(air, 5)[0];
+    double Bmaxcond = norm(getharmonic(2, curl(a))).max(conductor, 5)[0];
+    std::cout << "B max in air/conductor is " << Bmaxair << " / " << Bmaxcond << " T" << std::endl;
+    
     // Code validation line. Can be removed.
     std::cout << (std::abs(I1-300)/300 < 1e-13 && std::abs(I2+400)/400 < 1e-13 && std::abs(I3-200)/200 < 1e-13);
 }
