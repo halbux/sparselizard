@@ -53,7 +53,7 @@ int main(void)
     // In 2D the vector potential only has a z component:
     expression a = array3x1(0,0,az);
 
-    // Select adapted interpolation orders for field az:
+    // Set the interpolation order for field az:
     az.setorder(all, 2);
     
     // Put a magnetic wall (i.e. set field az to 0) all around the domain (no magnetic flux can cross it):
