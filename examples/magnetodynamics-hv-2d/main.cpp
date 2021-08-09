@@ -86,11 +86,11 @@ int main(void)
     // The gradient has only two components in 2D but 'hcurl' fields have three.
     // Add a 0-valued component to have a three component gradient.
     // 
-    // In the formulation below the contribution of v to the conductor region
-    // elements should be taken into account but there should be no v unknown
-    // associated to the conductor except for its skin region. To achieve this
-    // an extra argument is provided to the dof() and tf() functions to define
-    // them only on the air region.
+    // In the formulation below the contribution of v to the conductor region elements
+    // should be taken into account but there should be no v unknown associated to the
+    // conductor except for its skin region. To achieve this an extra argument is
+    // provided to the dof() and tf() functions to define them only on the air region.
+    //
     expression graddofv = grad(dof(v, air)).resize(3,1);
     expression gradtfv = grad(tf(v, air)).resize(3,1);
 
