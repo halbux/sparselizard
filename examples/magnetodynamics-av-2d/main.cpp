@@ -88,7 +88,9 @@ int main(void)
     
     // The strong form of the magnetodynamic a-v formulation is 
     // 
-    // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js, with b = curl(a) and e = -dt(a) - grad(v)
+    // curl( 1/mu * curl(a) ) + sigma * (dt(a) + grad(v)) = js
+    //
+    // with b = curl(a) and e = -dt(a) - grad(v)
     //
     // Magnetic equation:
     magdyn += integral(all, 1/mu* curl(dof(a)) * curl(tf(a)) );
