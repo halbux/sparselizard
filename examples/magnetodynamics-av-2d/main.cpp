@@ -96,7 +96,6 @@ int main(void)
     // Electric equation:
     magdyn += integral(conductor, sigma*dof(gradvz)*tf(gradvz) + sigma*dt(dof(az))*tf(gradvz) );
     
-    // Generate, solve and transfer the solution to fields a and v:
     magdyn.solve();
     
     // Write the magnetic induction field b = curl(a) [T], electric field e = -dt(a) - grad(v) [V/m] and current density j [A/m^2]:
