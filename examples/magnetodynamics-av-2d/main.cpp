@@ -79,10 +79,8 @@ int main(void)
     
     magdyn += Iz1.harmonic(2) - 300.0;
     magdyn += Iz1.harmonic(3) - 0;
-    
     magdyn += Iz2.harmonic(2) + 400.0;
     magdyn += Iz2.harmonic(3) - 0;
-
     magdyn += Iz3.harmonic(2) - 200.0;
     magdyn += Iz3.harmonic(3) - 0;
     
