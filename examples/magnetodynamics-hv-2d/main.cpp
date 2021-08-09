@@ -100,6 +100,8 @@ int main(void)
     //
     // 1/sigma * curl(h) * curl(h') + mu * dt(h) * h' = 0
     //
+    // with hair = hs + grad(v) and hconductor = hs + grad(v) + hc
+    //
     magdyn += integral(conductor, 1/sigma * (curl(dof(hc)) + curl(hs)) * curl(tf(hc)));
 
     magdyn += integral(conductor, mu * (dt(hs) + dt(dof(hc)) + dt(graddofv)) * (tf(hc) + gradtfv));
