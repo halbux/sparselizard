@@ -47,7 +47,7 @@ int main(void)
     // (harmonic 1 is DC, 2 is sine at 50Hz and 3 cosine at 50Hz).
     std::vector<int> harms = {2,3};
     
-    // Nodal shape functions 'h1' for the z component of the vector potential.
+    // Nodal shape functions 'h1' for the z component of the vector potential:
     field az("h1", harms);
     
     // In 2D the vector potential only has a z component:
