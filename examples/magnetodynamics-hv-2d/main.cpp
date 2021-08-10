@@ -72,7 +72,7 @@ int main(void)
     // the source field 'hs.pos' to determine which cohomology source coefficients must be
     // used to get the desired total current in each conductor. 
     //
-    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {3, 1, -2});
+    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {1, -2, 2});
 
     hs.write(cohomcuts, "hs.pos", 1);
 
@@ -126,20 +126,21 @@ int main(void)
     double I2 = getharmonic(2, compz(j)).integrate(cond2, 5);
     double I3 = getharmonic(2, compz(j)).integrate(cond3, 5);
     
-    std::cout << "Total current in wire 1/2/3 is " << I1 << " / " << I2 << " / " << I3 << " A" << std::endl;
-    
-    double Bmaxair = norm(getharmonic(2, mu * hair)).max(air, 5)[0];
-    double Bmaxcond = norm(getharmonic(2, mu * hcond)).max(conductor, 5)[0];
-    std::cout << "B max in air/conductor is " << Bmaxair << " / " << Bmaxcond << " T" << std::endl;
+    std::cout << "Total current in wire 1/2/3 is " << I1 << "/" << I2 << "/" << I3 << " A" << std::endl;
+
+    double jz2max = abs(getharmonic(2, compz(j))).max(conductor, 5)[0];
+    double jz3max = abs(getharmonic(3, compz(j))).max(conductor, 5)[0];
+    std::cout << "J in-phase/quadrature max is " << jz2max << " / " << jz3max << " A/m2" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-3)/3 < 1e-14 && std::abs(I2+4)/4 < 1e-14 && std::abs(I3-2)/2 < 1e-14);
+    std::cout << (std::abs(I1-3)/3 < 1e-14 && std::abs(I2+4)/4 < 1e-14 && std::abs(I3-2)/2 < 1e-14 && std::abs(jz2max-688904)/688904 < 3e-3 && std::abs(jz3max-576794)/576794 < 6e-4);
 }
 
 mesh createmesh(void)
 {
     // Mesh size:
-    double msair = 1e-2, mscond = 5e-4;
+    double refinefact = 8.0;
+    double msair = 1e-2 / refinefact, mscond = 5e-4 / refinefact;
 
     // Radii of the air domain and the conductors:
     double rair = 5e-2, rcond = 2e-3;
@@ -199,7 +200,7 @@ mesh createmesh(void)
     // Load mesh in sparselizard:
     mesh mymesh;
     mymesh.selectanynode(point);
-    mymesh.load("gmsh:api", 0);
+    mymesh.load("gmsh:api", 1);
 
     gmsh::finalize();
 
