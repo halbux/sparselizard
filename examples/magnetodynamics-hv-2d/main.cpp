@@ -1,7 +1,7 @@
 // This code simulates the AC magnetic field and induced currents created
 // by three conducting wires, each with a prescribed total current flow.
 //
-// The so-called h-v (or h-phi) formulation is used. The 'main' section
+// The so-called h-v (a.k.a h-phi or t-w) formulation is used. The 'main' section
 // of this code can be (and has been) used as it is for 3D h-v simulations. 
 //
 // Credits: J. Ruuskanen
