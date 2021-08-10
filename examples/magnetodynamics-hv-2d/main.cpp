@@ -51,7 +51,7 @@ int main(void)
     // Since the solution has a component in phase with the actuation
     // and a quadrature component we need 2 harmonics at 50Hz 
     // (harmonic 1 is DC, 2 is sine at 50Hz and 3 cosine at 50Hz).
-    std::vector<int> harms = {2, 3};
+    std::vector<int> harms = {2,3};
 
     field hc("hcurl", harms);
 
@@ -72,7 +72,7 @@ int main(void)
     // the source field 'hs.pos' to determine which cohomology source coefficients must be
     // used to get the desired total current in each conductor. 
     //
-    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {300, 100, -200});
+    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {3, 1, -2});
 
     hs.write(cohomcuts, "hs.pos", 1);
 
@@ -133,7 +133,7 @@ int main(void)
     std::cout << "B max in air/conductor is " << Bmaxair << " / " << Bmaxcond << " T" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-300)/300 < 1e-14 && std::abs(I2+400)/400 < 1e-14 && std::abs(I3-200)/200 < 1e-14);
+    std::cout << (std::abs(I1-3)/3 < 1e-14 && std::abs(I2+4)/4 < 1e-14 && std::abs(I3-2)/2 < 1e-14);
 }
 
 mesh createmesh(void)
