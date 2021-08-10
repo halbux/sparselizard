@@ -60,7 +60,7 @@ int main(void)
     az.setconstraint(skin);
     
     // In 2D the electric potential field v is not needed but in order to set a total current
-    // flow [A] condition on each conductor a field 'gradvz' equal to compz(grad(v)) is defined.
+    // flow condition on each conductor a field 'gradvz' equal to compz(grad(v)) is defined.
     field gradvz("h1", harms);
     
     // A port will be defined on each conductor so the lowest order is enough:
