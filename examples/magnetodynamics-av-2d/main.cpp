@@ -1,7 +1,7 @@
 // This code simulates the AC magnetic field and induced currents created
 // by three conducting wires, each with a prescribed total current flow.
 //
-// The so-called a-v formulation is used.
+// The so-called a-v (a.k.a. a-phi) formulation is used.
 
 
 #include "sparselizard.h"
