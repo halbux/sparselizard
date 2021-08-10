@@ -98,7 +98,6 @@ int main(void)
     
     magdyn.solve();
     
-    // Write the magnetic induction field b = curl(a) [T], electric field e = -dt(a) - grad(v) [V/m] and current density j [A/m^2]:
     expression ez = -dt(az) - gradvz;
     expression jz = sigma*ez;
     
