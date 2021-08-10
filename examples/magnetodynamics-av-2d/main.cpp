@@ -113,12 +113,17 @@ int main(void)
     
     std::cout << "Total current in wire 1/2/3 is " << I1 << "/" << I2 << "/" << I3 << " A" << std::endl;
 
-    double jz2max = abs(getharmonic(2, jz)).max(conductor, 5)[0];
-    double jz3max = abs(getharmonic(3, jz)).max(conductor, 5)[0];
+    // It can be seen below that the a-v formulation gives a better accuracy on j than on b.
+    double B2max = norm(getharmonic(2, curl(a))).max(conductor, 5)[0];
+    double B3max = norm(getharmonic(3, curl(a))).max(conductor, 5)[0];
+    std::cout << "B in-phase/quadrature max is " << B2max << " / " << B3max << " T" << std::endl;
+
+    double jz2max = norm(getharmonic(2, jz)).max(conductor, 5)[0];
+    double jz3max = norm(getharmonic(3, jz)).max(conductor, 5)[0];
     std::cout << "J in-phase/quadrature max is " << jz2max << " / " << jz3max << " A/m2" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-3)/3 < 1e-13 && std::abs(I2+4)/4 < 1e-13 && std::abs(I3-2)/2 < 1e-13 && std::abs(jz2max-688904)/688904 < 1e-4 && std::abs(jz3max-576794)/576794 < 1e-4);
+    std::cout << (std::abs(I1-3)/3 < 1e-12 && std::abs(I2+4)/4 < 1e-12 && std::abs(I3-2)/2 < 1e-12 && std::abs(B2max-0.430244)/0.430244 < 6e-3 && std::abs(B3max-0.153331)/0.153331 < 2e-3 && std::abs(jz2max-688904)/688904 < 9e-5 && std::abs(jz3max-576794)/576794 < 8e-5);
 }
 
 mesh createmesh(void)
@@ -187,6 +192,8 @@ mesh createmesh(void)
     gmsh::finalize();
 
     mymesh.write("wires2d.msh", 0);
+    
+    std::cout << "Mesh refinement factor is " << refinefact << "." << std::endl;
 
     return mymesh;
 }
