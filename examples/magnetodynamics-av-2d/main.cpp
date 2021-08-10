@@ -45,7 +45,7 @@ int main(void)
     // Since the solution has a component in phase with the actuation
     // and a quadrature component we need 2 harmonics at 50Hz 
     // (harmonic 1 is DC, 2 is sine at 50Hz and 3 cosine at 50Hz).
-    std::vector<int> harms = {2, 3};
+    std::vector<int> harms = {2,3};
     
     // Nodal shape functions 'h1' for the z component of the vector potential.
     field az("h1", harms);
@@ -74,14 +74,14 @@ int main(void)
     gradvz.setport(cond2, gradvz2, Iz2);
     gradvz.setport(cond3, gradvz3, Iz3);
     
-    // Define the weak magnetodynamic formulation with a total 300 / -400 / 200 [A] flowing through conductor 1 / 2 / 3. 
+    // Define the weak magnetodynamic formulation with a total 3 / -4 / 2 [A] flowing through conductor 1 / 2 / 3. 
     formulation magdyn;
     
-    magdyn += Iz1.harmonic(2) - 300.0;
+    magdyn += Iz1.harmonic(2) - 3.0;
     magdyn += Iz1.harmonic(3) - 0;
-    magdyn += Iz2.harmonic(2) + 400.0;
+    magdyn += Iz2.harmonic(2) + 4.0;
     magdyn += Iz2.harmonic(3) - 0;
-    magdyn += Iz3.harmonic(2) - 200.0;
+    magdyn += Iz3.harmonic(2) - 2.0;
     magdyn += Iz3.harmonic(3) - 0;
     
     // The strong form of the magnetodynamic a-v formulation is 
@@ -92,9 +92,9 @@ int main(void)
     //
     // Magnetic equation:
     magdyn += integral(all, 1/mu * curl(dof(a)) * curl(tf(a)) );
-    magdyn += integral(conductor, sigma*dt(dof(a))*tf(a) + sigma*dof(gradvz)*tf(az) );
+    magdyn += integral(conductor, sigma * dt(dof(a)) * tf(a) + sigma * dof(gradvz) * tf(az) );
     // Electric equation:
-    magdyn += integral(conductor, sigma*dof(gradvz)*tf(gradvz) + sigma*dt(dof(az))*tf(gradvz) );
+    magdyn += integral(conductor, sigma * dof(gradvz) * tf(gradvz) + sigma * dt(dof(az)) * tf(gradvz) );
     
     magdyn.solve();
     
@@ -118,7 +118,7 @@ int main(void)
     std::cout << "B max in air/conductor is " << Bmaxair << " / " << Bmaxcond << " T" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-300)/300 < 1e-13 && std::abs(I2+400)/400 < 1e-13 && std::abs(I3-200)/200 < 1e-13);
+    std::cout << (std::abs(I1-3)/3 < 1e-13 && std::abs(I2+4)/4 < 1e-13 && std::abs(I3-2)/2 < 1e-13);
 }
 
 mesh createmesh(void)
