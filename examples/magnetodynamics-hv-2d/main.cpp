@@ -176,19 +176,19 @@ mesh createmesh(void)
     gmsh::model::addPhysicalGroup(2, {cond3geo}, cond3);
 
     // Set mesh size:
-    std::vector<std::pair<int, int> > domainbnd, ironbnd;
+    std::vector<std::pair<int, int> > domainbnd, condbnd;
     
     gmsh::model::getBoundary({{2, airgeo}}, domainbnd, true, true, true);
     gmsh::model::mesh::setSize(domainbnd, msair);
 
-    gmsh::model::getBoundary({ {2,cond1geo} }, ironbnd, true, true, true);
-    gmsh::model::mesh::setSize(ironbnd, mscond);
+    gmsh::model::getBoundary({ {2,cond1geo} }, condbnd, true, true, true);
+    gmsh::model::mesh::setSize(condbnd, mscond);
 
-    gmsh::model::getBoundary({ {2,cond2geo} }, ironbnd, true, true, true);
-    gmsh::model::mesh::setSize(ironbnd, mscond);
+    gmsh::model::getBoundary({ {2,cond2geo} }, condbnd, true, true, true);
+    gmsh::model::mesh::setSize(condbnd, mscond);
 
-    gmsh::model::getBoundary({ {2,cond3geo} }, ironbnd, true, true, true);
-    gmsh::model::mesh::setSize(ironbnd, mscond);
+    gmsh::model::getBoundary({ {2,cond3geo} }, condbnd, true, true, true);
+    gmsh::model::mesh::setSize(condbnd, mscond);
 
     // Compute the cohomology basis:
     gmsh::model::mesh::computeCohomology({air}, {}, {1});
