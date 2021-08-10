@@ -111,20 +111,21 @@ int main(void)
     double I2 = getharmonic(2, jz).integrate(cond2, 5);
     double I3 = getharmonic(2, jz).integrate(cond3, 5);
     
-    std::cout << "Total current in wire 1/2/3 is " << I1 << " / " << I2 << " / " << I3 << " A" << std::endl;
+    std::cout << "Total current in wire 1/2/3 is " << I1 << "/" << I2 << "/" << I3 << " A" << std::endl;
 
-    double Bmaxair = norm(getharmonic(2, curl(a))).max(air, 5)[0];
-    double Bmaxcond = norm(getharmonic(2, curl(a))).max(conductor, 5)[0];
-    std::cout << "B max in air/conductor is " << Bmaxair << " / " << Bmaxcond << " T" << std::endl;
+    double jz2max = abs(getharmonic(2, jz)).max(conductor, 5)[0];
+    double jz3max = abs(getharmonic(3, jz)).max(conductor, 5)[0];
+    std::cout << "J in-phase/quadrature max is " << jz2max << " / " << jz3max << " A/m2" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-3)/3 < 1e-13 && std::abs(I2+4)/4 < 1e-13 && std::abs(I3-2)/2 < 1e-13);
+    std::cout << (std::abs(I1-3)/3 < 1e-13 && std::abs(I2+4)/4 < 1e-13 && std::abs(I3-2)/2 < 1e-13 && std::abs(jz2max-688904)/688904 < 1e-4 && std::abs(jz3max-576794)/576794 < 1e-4);
 }
 
 mesh createmesh(void)
 {
     // Mesh size:
-    double msair = 1e-2, mscond = 5e-4;
+    double refinefact = 8.0;
+    double msair = 1e-2 / refinefact, mscond = 5e-4 / refinefact;
 
     // Radii of the air domain and the conductors:
     double rair = 5e-2, rcond = 2e-3;
@@ -181,7 +182,7 @@ mesh createmesh(void)
     // Load mesh in sparselizard:
     mesh mymesh;
     mymesh.selectskin(skin);
-    mymesh.load("gmsh:api", 0);
+    mymesh.load("gmsh:api", 1);
 
     gmsh::finalize();
 
