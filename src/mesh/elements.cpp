@@ -795,15 +795,11 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
 
 void elements::writeedgedirection(int physreg, std::string filename)
 {
-    elements* els = universe::mymesh->getelements();
-    disjointregions* drs = universe::mymesh->getdisjointregions();
-    physicalregions* prs = universe::mymesh->getphysicalregions();
-
-    std::vector<int> ders = prs->get(physreg)->getdisjointregions(1);
+    std::vector<int> ders = myphysicalregions->get(physreg)->getdisjointregions(1);
 
     int numedgesinpr = 0;
     for (int i = 0; i < ders.size(); i++)
-        numedgesinpr += drs->countelements(ders[i]);
+        numedgesinpr += mydisjointregions->countelements(ders[i]);
     
     densematrix xcoords(numedgesinpr, 1);
     densematrix ycoords(numedgesinpr, 1);
@@ -826,13 +822,13 @@ void elements::writeedgedirection(int physreg, std::string filename)
     int index = 0;
     for (int i = 0; i < ders.size(); i++)
     {
-        int rb = drs->getrangebegin(ders[i]);
-        int ne = drs->countelements(ders[i]);
+        int rb = mydisjointregions->getrangebegin(ders[i]);
+        int ne = mydisjointregions->countelements(ders[i]);
         
         for (int j = 0; j < ne; j++)
         {
-            int firstnode = els->getsubelement(0, 1, rb+j, 0);
-            int lastnode = els->getsubelement(0, 1, rb+j, 1);
+            int firstnode = getsubelement(0, 1, rb+j, 0);
+            int lastnode = getsubelement(0, 1, rb+j, 1);
         
             double xf = nodecoords[3*firstnode+0];
             double yf = nodecoords[3*firstnode+1];
