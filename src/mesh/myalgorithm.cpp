@@ -1836,7 +1836,7 @@ void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
         
         for (int j = 0; j < ne; j++)
         {
-            if (edgeinfo[rb+j] == 1.0)
+            if (edgeinfo[rb+j] == 1)
                 flipit[index] = false;
             else
                 flipit[index] = true;
