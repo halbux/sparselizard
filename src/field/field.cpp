@@ -336,25 +336,25 @@ void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<doubl
     errorifpointerisnull();
     universe::mymesh->getphysicalregions()->errorundefined(cutphysregs);
 
-    for (int i = 0; i < cutphysregs.size(); i++)
-    {
-        int prdim = universe::mymesh->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
-        if (prdim != 1)
-        {
-            std::cout << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
-            abort();
-        }
-    }
-
     if (cutphysregs.size() != cutvalues.size())
     {
         std::cout << "Error in 'field' object: provided " << cutvalues.size() << " values for " << cutphysregs.size() << " cohomology regions" << std::endl;
         abort();
     }
+    
     if (rawfieldptr->gettypename() != "hcurl")
     {
         std::cout << "Error in 'field' object: cannot set a cohomology source to '" << rawfieldptr->gettypename() << "' type fields (use 'hcurl')" << std::endl;
         abort();
+    }
+    for (int i = 0; i < cutphysregs.size(); i++)
+    {
+        int prdim = universe::mymesh->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
+        if (prdim != -1 && prdim != 1) // -1 for empty is ok
+        {
+            std::cout << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
+            abort();
+        }
     }
 
     if (cutphysregs.size() > 0)
