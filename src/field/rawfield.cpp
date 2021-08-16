@@ -1569,7 +1569,7 @@ void rawfield::setcohomologysources(std::vector<int> cutphysregs, std::vector<do
     
     if (myharmonics.size() > 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set a cut value on a multiharmonic field (select harmonics one by one)" << std::endl;
+        std::cout << "Error in 'rawfield' object: cannot set a cohomology source on a multiharmonic field (select harmonics one by one)" << std::endl;
         abort();
     }
     
