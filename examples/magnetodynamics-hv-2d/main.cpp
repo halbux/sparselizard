@@ -204,7 +204,7 @@ mesh createmesh(void)
 
     // Load mesh in sparselizard:
     mesh mymesh;
-    mymesh.selectanynode(point);
+    mymesh.selectanynode(point, air);
     mymesh.load("gmsh:api", 1);
 
     gmsh::finalize();
