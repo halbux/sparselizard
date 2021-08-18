@@ -1123,73 +1123,54 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
         abort();
     }
         
-    // Set the constraints on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setdisjregconstraint(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
-        
-    if (mysubfields.size() == 0)
+    // Set the constraints on the subfields:
+    if (mysubfields.size() > 0)
     {
-        // Consider ALL disjoint regions in the physical region with (-1):
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
-
-        field thisfield(getpointer());
-        std::shared_ptr<integration> disjregconstraintcomputation;
-        
-        if (meshdeform == NULL)
-            disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
-        else
-            disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
-        
-        if (input.iszero())
-            disjregconstraintcomputation->isprojectionofzero = true;
-            
-        if (myharmonics.size() == 0)
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->setdisjregconstraint(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
+        return;
+    }
+    // Set the constraints on the harmonics:
+    if (myharmonics.size() > 0)
+    {
+        for (int h = 0; h < myharmonics.size(); h++)
         {
-            if (issynchronizing == false)
-            {
-                std::vector<expression> mdv = {};
-                if (meshdeform != NULL)
-                    mdv = {*meshdeform};
-                mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
-            }
-        
-            for (int i = 0; i < selecteddisjregs.size(); i++)
-            {
-                // Ports have priority over the disjreg constraints!
-                if (isitported[selecteddisjregs[i]] == false)
-                {
-                    mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
-                    myconditionalconstraints[selecteddisjregs[i]] = {};
-                    isitgauged[selecteddisjregs[i]] = false;
-                }
-            }
+            if (myharmonics[h].size() > 0)
+                myharmonics[h][0]->setdisjregconstraint(physreg, numfftharms, meshdeform, sl::getharmonic(h, input, numfftharms), extraintegrationdegree);
         }
-        else
+        return;
+    }
+
+    if (issynchronizing == false)
+    {
+        std::vector<expression> mdv = {};
+        if (meshdeform != NULL)
+            mdv = {*meshdeform};
+        mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
+    }
+    
+    // Consider ALL disjoint regions in the physical region with (-1):
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+
+    field thisfield(getpointer());
+    std::shared_ptr<integration> disjregconstraintcomputation;
+    
+    if (meshdeform == NULL)
+        disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
+    else
+        disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
+    
+    if (input.iszero())
+        disjregconstraintcomputation->isprojectionofzero = true;
+
+    for (int i = 0; i < selecteddisjregs.size(); i++)
+    {
+        // Ports have priority over the disjreg constraints!
+        if (isitported[selecteddisjregs[i]] == false)
         {
-            for (int h = 0; h < myharmonics.size(); h++)
-            {
-                if (myharmonics[h].size() > 0)
-                {
-                    if (issynchronizing == false)
-                    {
-                        std::vector<expression> mdv = {};
-                        if (meshdeform != NULL)
-                            mdv = {*meshdeform};
-                        myharmonics[h][0]->mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
-                    }
-                
-                    for (int i = 0; i < selecteddisjregs.size(); i++)
-                    {
-                        // Ports have priority over the disjreg constraints!
-                        if (myharmonics[h][0]->isitported[selecteddisjregs[i]] == false)
-                        {
-                            myharmonics[h][0]->mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
-                            myharmonics[h][0]->myconditionalconstraints[selecteddisjregs[i]] = {};
-                            myharmonics[h][0]->isitgauged[selecteddisjregs[i]] = false;
-                        }
-                    }
-                }
-            }
+            mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
+            myconditionalconstraints[selecteddisjregs[i]] = {};
+            isitgauged[selecteddisjregs[i]] = false;
         }
     }
 }
