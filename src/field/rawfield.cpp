@@ -1216,10 +1216,13 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
 {
     synchronize();
     
-    // Keep track of the calls to 'setconditionalconstraint':
-    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
-        myconditionalconstrainttracker.push_back(std::make_tuple(physreg, condexpr, valexpr));
-    
+    // Multiharmonic expressions are not allowed.
+    std::vector<int> prdisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    if (not(condexpr.isharmonicone(prdisjregs)) || not(valexpr.isharmonicone(prdisjregs)))
+    {
+        std::cout << "Error in 'rawfield' object: cannot set a conditional constraint with multiharmonic arguments" << std::endl;
+        abort();
+    }
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
@@ -1235,28 +1238,37 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
         std::cout << "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" << std::endl;
         abort();
     }
-        
-    // Set the constraints on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setconditionalconstraint(physreg, condexpr, valexpr.at(i,0));
-    // Set the constraints on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
+    
+    // Set the conditional constraints on the subfields:
+    if (mysubfields.size() > 0)
     {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setconditionalconstraint(physreg, condexpr, valexpr);
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->setconditionalconstraint(physreg, condexpr, valexpr.at(i,0));
+        return;
+    }
+    if (myharmonics.size() == 2 && myharmonics[1].size() == 1)
+    {
+        myharmonics[1][0]->setconditionalconstraint(physreg, condexpr, valexpr);
+        return;
+    }
+    if (myharmonics.size() != 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set conditional constraints for fields with harmonics (select a single harmonic)" << std::endl;
+        abort();
     }
     
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-    {
-        // Consider only the NODAL disjoint regions in the physical region with (0):
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(0);
+    // Keep track of the calls to 'setconditionalconstraint':
+    if (issynchronizing == false)
+        myconditionalconstrainttracker.push_back(std::make_tuple(physreg, condexpr, valexpr));
+        
+    // Consider only the NODAL disjoint regions in the physical region with (0):
+    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(0);
 
-        for (int i = 0; i < selecteddisjregs.size(); i++)
-        {
-            // Ports and disjreg constraints have priority over the conditional constraints!
-            if (isitported[selecteddisjregs[i]] == false && mydisjregconstraints[selecteddisjregs[i]] == NULL)
-                myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
-        }
+    for (int i = 0; i < selecteddisjregs.size(); i++)
+    {
+        // Ports and disjreg constraints have priority over the conditional constraints!
+        if (isitported[selecteddisjregs[i]] == false && mydisjregconstraints[selecteddisjregs[i]] == NULL)
+            myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
     }
 }
 
