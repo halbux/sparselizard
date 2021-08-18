@@ -422,6 +422,9 @@ expression sl::getharmonic(int harmnum, expression input, int numfftharms)
         abort();
     }
     
+    if (input.iszero())
+        return input;
+    
     return moveharmonic({harmnum}, {1}, input, numfftharms);
 }
 
