@@ -13,7 +13,7 @@ int sl::getversion(void)
 
 int sl::getsubversion(void)
 {
-    return 4;
+    return 5;
 }
 
 std::string sl::getversionname(void)
