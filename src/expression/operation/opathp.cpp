@@ -27,7 +27,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
     int elemtype = elemselect.getelementtypenumber();
     std::vector<int> elemnums = elemselect.getelementnumbers();
     
-    int meshdim = universe::mymesh->getmeshdimension();
+    int meshdim = universe::getrawmesh()->getmeshdimension();
     
     
     ///// Get the corresponding reference coordinates on the highest dimension elements:
@@ -35,25 +35,25 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
     std::vector<int> elemnumshere;
     std::vector<double> evalcoordshere;
 
-    std::vector<int> maxdimdisjregs = universe::mymesh->getdisjointregions()->getindim(meshdim);
-    universe::mymesh->getelements()->getrefcoordsondisjregs(elemtype, elemnums, evaluationcoordinates, maxdimdisjregs, elemnumshere, evalcoordshere);
+    std::vector<int> maxdimdisjregs = universe::getrawmesh()->getdisjointregions()->getindim(meshdim);
+    universe::getrawmesh()->getelements()->getrefcoordsondisjregs(elemtype, elemnums, evaluationcoordinates, maxdimdisjregs, elemnumshere, evalcoordshere);
     
     
     ///// Bring the evaluation points to the mesh here.
     //
-    // UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
+    // UNIVERSE::MYRAWMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
-    if (universe::mymesh != myrawmesh)
+    if (universe::getrawmesh() != myrawmesh)
     {
         std::vector<std::vector<int>> ads;
         std::vector<std::vector<double>> rcs;
         std::vector<int> indexinrcsoforigin;
-        myalgorithm::toaddressdata(elemnumshere, evalcoordshere, universe::mymesh->getelements()->count(), ads, rcs, indexinrcsoforigin);
+        myalgorithm::toaddressdata(elemnumshere, evalcoordshere, universe::getrawmesh()->getelements()->count(), ads, rcs, indexinrcsoforigin);
         
         // Find at target:
         std::vector<std::vector<int>> tel;
         std::vector<std::vector<double>> trc;
-        (universe::mymesh->gethtracker())->getattarget(ads, rcs, myrawmesh->gethtracker().get(), tel, trc);
+        (universe::getrawmesh()->gethtracker())->getattarget(ads, rcs, myrawmesh->gethtracker().get(), tel, trc);
         
         // Recombine:
         for (int i = 0; i < elemnumshere.size()/2; i++)
@@ -73,7 +73,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
 
     ///// Bring the evaluation points to the ptracker here.
     //
-    // universe::mymesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
+    // universe::myrawmesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
     
     if (myrawmesh->getptracker() != myptracker)
     {
@@ -95,8 +95,8 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
     densematrix argmat(elemnums.size(), numevalpts);
     double* argmatptr = argmat.getvalues();
     
-    std::shared_ptr<rawmesh> bkp = universe::mymesh;
-    universe::mymesh = myrawmesh->getattarget(myptracker);
+    std::shared_ptr<rawmesh> bkp = universe::getrawmesh();
+    universe::myrawmesh = myrawmesh->getattarget(myptracker);
     
     for (int i = 0; i < 8; i++)
     {
@@ -140,7 +140,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
             while (myselector.next());  
         }
     }
-    universe::mymesh = bkp;
+    universe::myrawmesh = bkp;
     
     if (wasreuseallowed)
         universe::allowreuse();

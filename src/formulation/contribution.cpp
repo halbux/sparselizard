@@ -37,7 +37,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         meshdeformationptr = &(mymeshdeformation[0]);
         
     // The integration will be performed on the following disjoint regions:
-    std::vector<int> selectedelemdisjregs = ((universe::mymesh->getphysicalregions())->get(integrationphysreg))->getdisjointregions();
+    std::vector<int> selectedelemdisjregs = ((universe::getrawmesh()->getphysicalregions())->get(integrationphysreg))->getdisjointregions();
   
     // Prepare to send the disjoint regions with same element type 
     // numbers and same dof and tf interpolation order together:
@@ -58,7 +58,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
     {
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
         
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);        
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);        
         
         // Get the interpolation order of the dof and tf fields:
         int tfinterpolationorder = tffield->getinterpolationorder(mydisjregs[0]);

@@ -1,7 +1,16 @@
 #include "formulation.h"
 
 
-formulation::formulation(void) { mydofmanager = std::shared_ptr<dofmanager>(new dofmanager); }
+formulation::formulation(void)
+{
+    if (universe::myrawmesh == NULL)
+    {
+        std::cout << "Error in 'formulation' object: cannot define a formulation before the mesh is loaded" << std::endl;
+        abort();
+    }
+    
+    mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
+}
 
 void formulation::operator+=(expression expr)
 {
@@ -41,7 +50,7 @@ void formulation::operator+=(integration integrationobject)
     }
 
     int integrationphysreg = integrationobject.getphysicalregion();
-    int elementdimension = universe::mymesh->getphysicalregions()->get(integrationphysreg)->getelementdimension();
+    int elementdimension = universe::getrawmesh()->getphysicalregions()->get(integrationphysreg)->getelementdimension();
     // Return on empty integration region:
     if (elementdimension < 0)
         return;
@@ -440,7 +449,7 @@ densematrix Fgmultdirichlet(densematrix gprev)
 
     double* gprevptr = gprev.getvalues();
 
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
 
     // Compute Ag:
@@ -499,7 +508,7 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     
     universe::ddmformuls = {*this};
 
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
 
     // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
@@ -600,7 +609,7 @@ densematrix Fgmultrobin(densematrix gprev)
 
     double* gprevptr = gprev.getvalues();
 
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
 
     // Compute Ag:
@@ -664,7 +673,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     universe::ddmints = artificialterms;
     universe::ddmformuls = {*this};
 
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
 
     // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:

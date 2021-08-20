@@ -822,9 +822,9 @@ bool rawmesh::adapthp(int verbosity)
 {
     int meshdim = getmeshdimension();
 
-    elements* elptr = universe::mymesh->getelements();
-    disjointregions* drptr = universe::mymesh->getdisjointregions();
-    physicalregions* prptr = universe::mymesh->getphysicalregions();
+    elements* elptr = universe::getrawmesh()->getelements();
+    disjointregions* drptr = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prptr = universe::getrawmesh()->getphysicalregions();
     
     int totalnumelems = elptr->countindim(meshdim);
 
@@ -1021,7 +1021,7 @@ bool rawmesh::adapthp(int verbosity)
     if (washadapted)
     {
         for (int f = 0; f < numpadaptfields; f++)
-            getattarget(neworders[f], universe::mymesh);
+            getattarget(neworders[f], universe::getrawmesh());
     }
     
     
@@ -1029,7 +1029,7 @@ bool rawmesh::adapthp(int verbosity)
     
     bool waspadapted = false;
     if (not(isorderidentical) || washadapted)
-        waspadapted = universe::mymesh->adaptp(neworders, verbosity);
+        waspadapted = universe::getrawmesh()->adaptp(neworders, verbosity);
 
     if (ispadaptive && not(waspadapted) && verbosity > 0)
         std::cout << "Nothing to do for p-adaptation." << std::endl;
@@ -1286,9 +1286,9 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
 
     int meshdim = getmeshdimension();
     
-    universe::mymesh = myhadaptedmesh;
+    universe::myrawmesh = myhadaptedmesh;
         
-    elements* elptr = universe::mymesh->getelements();
+    elements* elptr = universe::getrawmesh()->getelements();
     
     std::shared_ptr<htracker> newhtracker(new htracker);
     *newhtracker = *(myhadaptedmesh->myhtracker);
@@ -1581,12 +1581,12 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker(myhadaptedmesh->myelements.count()));
     myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
-    myhadaptedmesh->mypadaptdata = universe::mymesh->mypadaptdata;
-    universe::mymesh->mypadaptdata = {};
+    myhadaptedmesh->mypadaptdata = universe::getrawmesh()->mypadaptdata;
+    universe::getrawmesh()->mypadaptdata = {};
     
     
     ///// Send mesh to universe:
-    universe::mymesh = myhadaptedmesh;
+    universe::myrawmesh = myhadaptedmesh;
     
     
     return true;

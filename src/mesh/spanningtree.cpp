@@ -195,7 +195,7 @@ void spanningtree::grow(void)
     for (int i = 0; i < startphysregs.size(); i++)
     {
         // Get all disjoint edge regions in the current physical region:
-        std::vector<int> edgedisjregs = ((universe::mymesh->getphysicalregions())->get(startphysregs[i]))->getdisjointregions(1);
+        std::vector<int> edgedisjregs = ((universe::getrawmesh()->getphysicalregions())->get(startphysregs[i]))->getdisjointregions(1);
 
         for (int j = 0; j < edgedisjregs.size(); j++)
             isprioritydisjointregion[edgedisjregs[j]] = true;
@@ -209,13 +209,13 @@ void spanningtree::grow(void)
 
 void spanningtree::synchronize(void)
 {
-    if (issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+    if (issynchronizing || universe::getrawmesh()->getmeshnumber() == mymeshnumber)
         return;
     issynchronizing = true;    
 
 
-    myelements = universe::mymesh->getelements();
-    mydisjointregions = universe::mymesh->getdisjointregions();
+    myelements = universe::getrawmesh()->getelements();
+    mydisjointregions = universe::getrawmesh()->getdisjointregions();
     
     // Reset structure:
     isedgeintree = NULL;
@@ -231,22 +231,28 @@ void spanningtree::synchronize(void)
     grow();
     
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
     issynchronizing = false;
 }
 
 spanningtree::spanningtree(std::vector<int> physregs)
 {
-    universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    if (universe::myrawmesh == NULL)
+    {
+        std::cout << "Error in 'spanningtree' object: cannot define a spanning tree before the mesh is loaded" << std::endl;
+        abort();
+    }
+    
+    universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);
     
     startphysregs = physregs;
     
-    myelements = universe::mymesh->getelements();
-    mydisjointregions = universe::mymesh->getdisjointregions();
+    myelements = universe::getrawmesh()->getelements();
+    mydisjointregions = universe::getrawmesh()->getdisjointregions();
     
     grow();
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
 bool spanningtree::isintree(int index, int disjreg)
@@ -310,7 +316,7 @@ void spanningtree::write(std::string filename)
 {
     synchronize();
     
-    nodes* mynodes = universe::mymesh->getnodes();
+    nodes* mynodes = universe::getrawmesh()->getnodes();
     std::vector<double>* nodecoords = mynodes->getcoordinates();
     
     densematrix xcoords(numberofedgesintree,2), ycoords(numberofedgesintree,2), zcoords(numberofedgesintree,2);

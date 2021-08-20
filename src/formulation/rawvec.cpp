@@ -3,7 +3,7 @@
 
 void rawvec::synchronize(void)
 {
-    if (mydofmanager == NULL || mydofmanager->ismanaged() == false || issynchronizing || myptracker == universe::mymesh->getptracker())
+    if (mydofmanager == NULL || mydofmanager->ismanaged() == false || issynchronizing || myptracker == universe::getrawmesh()->getptracker())
         return;
     issynchronizing = true; 
 
@@ -59,8 +59,8 @@ void rawvec::synchronize(void)
     mycurrentstructure[0].donotsynchronize();
     
     // Update the mesh tracker to the current one:
-    myptracker = universe::mymesh->getptracker();
-    myrawmesh = universe::mymesh;
+    myptracker = universe::getrawmesh()->getptracker();
+    myrawmesh = universe::getrawmesh();
     
     if (isvaluesynchronizingallowed)
     {
@@ -90,8 +90,8 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr)
     
     if (mydofmanager->ismanaged())
     {
-        myptracker = universe::mymesh->getptracker();
-        myrawmesh = universe::mymesh;
+        myptracker = universe::getrawmesh()->getptracker();
+        myrawmesh = universe::getrawmesh();
         
         mycurrentstructure = {*dofmngr};
         mycurrentstructure[0].donotsynchronize();
@@ -106,8 +106,8 @@ rawvec::rawvec(std::shared_ptr<dofmanager> dofmngr, Vec input)
     
     if (mydofmanager->ismanaged())
     {
-        myptracker = universe::mymesh->getptracker();
-        myrawmesh = universe::mymesh;
+        myptracker = universe::getrawmesh()->getptracker();
+        myrawmesh = universe::getrawmesh();
         
         mycurrentstructure = {*dofmngr};
         mycurrentstructure[0].donotsynchronize();

@@ -33,36 +33,36 @@ double sl::getpi(void)
 
 int sl::selectunion(std::vector<int> physregs)
 {
-    universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);
     
-    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs, false);
-    return (universe::mymesh->getphysicalregions())->createunion(physregs, false);
+    universe::getrawmesh()->getoriginalmeshpointer()->getphysicalregions()->createunion(physregs, false);
+    return (universe::getrawmesh()->getphysicalregions())->createunion(physregs, false);
 }
 
 int sl::selectintersection(std::vector<int> physregs)
 {
-    universe::mymesh->getphysicalregions()->errorundefined(physregs);
+    universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);
     
-    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs, false);
-    return (universe::mymesh->getphysicalregions())->createintersection(physregs, false);
+    universe::getrawmesh()->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs, false);
+    return (universe::getrawmesh()->getphysicalregions())->createintersection(physregs, false);
 }
 
 int sl::selectall(void)
 {
-    universe::mymesh->getoriginalmeshpointer()->getphysicalregions()->createunionofall(false);
-    return (universe::mymesh->getphysicalregions())->createunionofall(false);
+    universe::getrawmesh()->getoriginalmeshpointer()->getphysicalregions()->createunionofall(false);
+    return (universe::getrawmesh()->getphysicalregions())->createunionofall(false);
 }
 
 bool sl::isdefined(int physreg)
 {
-    return (universe::mymesh->getphysicalregions()->getindex(physreg) != -1);
+    return (universe::getrawmesh()->getphysicalregions()->getindex(physreg) != -1);
 }
 
 bool sl::isempty(int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
 
-    std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
+    std::vector<bool> defin = universe::getrawmesh()->getphysicalregions()->get(physreg)->getdefinition();
     
     for (int i = 0; i < defin.size(); i++)
     {
@@ -75,10 +75,10 @@ bool sl::isempty(int physreg)
 
 bool sl::isinside(int physregtocheck, int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
-    std::vector<bool> tocheckdefin = universe::mymesh->getphysicalregions()->get(physregtocheck)->getdefinition();
-    std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
+    std::vector<bool> tocheckdefin = universe::getrawmesh()->getphysicalregions()->get(physregtocheck)->getdefinition();
+    std::vector<bool> defin = universe::getrawmesh()->getphysicalregions()->get(physreg)->getdefinition();
     
     // All disjoint regions must be included:
     for (int i = 0; i < tocheckdefin.size(); i++)
@@ -92,10 +92,10 @@ bool sl::isinside(int physregtocheck, int physreg)
 
 bool sl::istouching(int physregtocheck, int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physregtocheck,physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physregtocheck,physreg});
     
-    std::vector<bool> tocheckdefin = universe::mymesh->getphysicalregions()->get(physregtocheck)->getdefinition();
-    std::vector<bool> defin = universe::mymesh->getphysicalregions()->get(physreg)->getdefinition();
+    std::vector<bool> tocheckdefin = universe::getrawmesh()->getphysicalregions()->get(physregtocheck)->getdefinition();
+    std::vector<bool> defin = universe::getrawmesh()->getphysicalregions()->get(physreg)->getdefinition();
     
     // At least one disjoint region must be included:
     for (int i = 0; i < tocheckdefin.size(); i++)
@@ -266,17 +266,17 @@ expression sl::normal(void)
 
 expression sl::normal(int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return getnormal(physreg);
 }
 
 expression sl::getnormal(int physreg)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     if (physreg >= 0)
     {
-        int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
+        int elementdimension = universe::getrawmesh()->getphysicalregions()->get(physreg)->getelementdimension();
         if (elementdimension >= 0 && elementdimension != problemdimension)
         {
             std::cout << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
@@ -320,7 +320,7 @@ expression sl::getnormal(int physreg)
 
 expression sl::tangent(void)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     expression expr;
     if (problemdimension == 1)
@@ -381,7 +381,7 @@ void sl::scatterwrite(std::string filename, std::vector<double> xcoords, std::ve
 void sl::setaxisymmetry(void)
 {
     // Make sure the call is done before loading the mesh:
-    if (universe::mymesh != NULL)
+    if (universe::myrawmesh != NULL)
     {
         std::cout << "Error in 'sl' namespace: 'setaxisymmetry' must be called before loading the mesh" << std::endl;
         abort();
@@ -444,7 +444,7 @@ expression sl::makeharmonic(std::vector<int> harms, std::vector<expression> expr
     int m = exprs[0].countrows();
     int n = exprs[0].countcolumns();
     
-    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::vector<int> alldisjregs(universe::getrawmesh()->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     
     for (int i = 0; i < harms.size(); i++)
@@ -532,7 +532,7 @@ expression sl::moveharmonic(std::vector<int> origharms, std::vector<int> desthar
 
 std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::vector<int> alldisjregs(universe::getrawmesh()->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(EorH.isharmonicone(alldisjregs)) || not(epsilonormu.isharmonicone(alldisjregs)))
     {
@@ -540,9 +540,9 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
         abort();
     }
     
-    int wholedomain = universe::mymesh->getphysicalregions()->createunionofall();
+    int wholedomain = universe::getrawmesh()->getphysicalregions()->createunionofall();
 
-    int numcomps = universe::mymesh->getmeshdimension();
+    int numcomps = universe::getrawmesh()->getmeshdimension();
     if (universe::isaxisymmetric)
         numcomps++;
     if (numcomps == 1)
@@ -579,20 +579,20 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
     if (universe::isaxisymmetric)
         output = {0, 2.0*getpi()*output[1], 0};
     
-    universe::mymesh->getphysicalregions()->remove({wholedomain}, false);
+    universe::getrawmesh()->getphysicalregions()->remove({wholedomain}, false);
     
     return output;
 }
 
 std::vector<double> sl::gettotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return gettotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
 std::vector<double> sl::gettotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return gettotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
@@ -618,13 +618,13 @@ std::vector<double> sl::printtotalforce(int physreg, expression* meshdeform, exp
 
 std::vector<double> sl::printtotalforce(int physreg, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return printtotalforce(physreg, NULL, EorH, epsilonormu, extraintegrationorder);
 }
 
 std::vector<double> sl::printtotalforce(int physreg, expression meshdeform, expression EorH, expression epsilonormu, int extraintegrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return printtotalforce(physreg, &meshdeform, EorH, epsilonormu, extraintegrationorder);
 }
 
@@ -937,13 +937,13 @@ expression sl::min(parameter a, parameter b)
 
 expression sl::on(int physreg, expression expr, bool errorifnotfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return expr.on(physreg, NULL, errorifnotfound);
 }
 
 expression sl::on(int physreg, expression coordshift, expression expr, bool errorifnotfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return expr.on(physreg, &coordshift, errorifnotfound);
 }
 
@@ -1002,7 +1002,7 @@ expression sl::grad(expression input)
             return expression(3,3, {compx(dx(input)),compx(dy(input)),-1.0/x*compz(input), compy(dx(input)),compy(dy(input)),0, compz(dx(input)),compz(dy(input)),1.0/x*compx(input)});
     }
 
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     // In case of axisymmetry we need a 3 component output vector:
     if (universe::isaxisymmetric)
         problemdimension++;
@@ -1273,25 +1273,25 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
 
 integration sl::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, int numcoefharms, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, numcoefharms, tointegrate, integrationorderdelta, blocknumber);
 }
 
 integration sl::integral(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integration(physreg, numcoefharms, meshdeform, tointegrate, integrationorderdelta, blocknumber);
 }
 
@@ -1302,7 +1302,7 @@ expression sl::dof(expression input)
 
 expression sl::dof(expression input, int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return input.dof(physreg);
 }
 
@@ -1313,7 +1313,7 @@ expression sl::tf(expression input)
 
 expression sl::tf(expression input, int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return input.tf(physreg);
 }
 
@@ -1337,12 +1337,12 @@ expression sl::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_pt
 
 bool sl::adapt(int verbosity)
 {
-    return universe::mymesh->adapthp(verbosity);
+    return universe::getrawmesh()->adapthp(verbosity);
 }
 
 expression sl::zienkiewiczzhu(expression input)
 {
-    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::vector<int> alldisjregs(universe::getrawmesh()->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(input.isharmonicone(alldisjregs)))
     {
@@ -1817,7 +1817,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
 
 void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
 {
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     
     elements* els = dt->getrawmesh()->getelements();
     disjointregions* drs = dt->getrawmesh()->getdisjointregions();
@@ -2237,11 +2237,11 @@ expression sl::predefinedviscousforce(expression dofv, expression tfv, expressio
 
 std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({gamma1, gamma2});
     
-    int problemdimension = universe::mymesh->getmeshdimension();
-    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
-    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
+    int gamma1dim = universe::getrawmesh()->getphysicalregions()->get(gamma1)->getelementdimension();
+    int gamma2dim = universe::getrawmesh()->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
         std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
@@ -2276,11 +2276,11 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
 
 std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder)
 {       
-    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({gamma1, gamma2});
     
-    int problemdimension = universe::mymesh->getmeshdimension();
-    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
-    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
+    int gamma1dim = universe::getrawmesh()->getphysicalregions()->get(gamma1)->getelementdimension();
+    int gamma2dim = universe::getrawmesh()->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
         std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
@@ -2395,11 +2395,11 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
 
 std::vector<integration> sl::periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({gamma1, gamma2});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({gamma1, gamma2});
     
-    int problemdimension = universe::mymesh->getmeshdimension();
-    int gamma1dim = universe::mymesh->getphysicalregions()->get(gamma1)->getelementdimension();
-    int gamma2dim = universe::mymesh->getphysicalregions()->get(gamma2)->getelementdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
+    int gamma1dim = universe::getrawmesh()->getphysicalregions()->get(gamma1)->getelementdimension();
+    int gamma2dim = universe::getrawmesh()->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
         std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'periodicitycondition'" << std::endl;
@@ -2725,7 +2725,7 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, field u, ex
 
 expression sl::predefinedelectrostaticforce(expression input, expression E, expression epsilon)
 {
-    int md = universe::mymesh->getmeshdimension();
+    int md = universe::getrawmesh()->getmeshdimension();
     if (universe::isaxisymmetric)
         md++;
        
@@ -2824,7 +2824,7 @@ expression sl::predefinedacousticradiation(expression dofp, expression tfp, expr
 
 expression sl::predefinedacousticstructureinteraction(expression dofp, expression tfp, expression dofu, expression tfu, expression c, expression rho, expression n, expression alpha, double scaling)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     
     double invscal = 1.0/scaling;
 
@@ -2851,7 +2851,7 @@ expression sl::predefinedacousticstructureinteraction(expression dofp, expressio
 
 expression sl::predefinedstokes(expression dofv, expression tfv, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     if (problemdimension < 2)
     {
@@ -2874,7 +2874,7 @@ expression sl::predefinedstokes(expression dofv, expression tfv, expression dofp
 
 expression sl::predefinednavierstokes(expression dofv, expression tfv, expression v, expression dofp, expression tfp, expression mu, expression rho, expression dtrho, expression gradrho, bool includetimederivs, bool isdensityconstant, bool isviscosityconstant)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     if (problemdimension < 2)
     {
@@ -2898,7 +2898,7 @@ expression sl::predefinednavierstokes(expression dofv, expression tfv, expressio
 
 expression sl::predefinedadvectiondiffusion(expression doff, expression tff, expression v, expression alpha, expression beta, expression gamma, bool isdivvzero)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     bool isvsizevalid = ( v.countcolumns() == 1 && (v.iszero() || v.countrows() >= problemdimension) );
 
@@ -2937,7 +2937,7 @@ expression sl::predefinedstabilization(std::string stabtype, expression delta, e
     expression invnormv = ifpositive(norm(v) - eps, 1.0/norm(v), 0.0);
     invnormv.reuseit();
     
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     expression meshsize = pow(sl::meshsize(2), 1.0/problemdimension );
      
     expression doff = dof(f);

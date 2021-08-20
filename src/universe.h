@@ -40,7 +40,8 @@ class universe
         // Round-off noise level on the node coordinates:
         static double roundoffnoiselevel;
         
-        static std::shared_ptr<rawmesh> mymesh;
+        static std::shared_ptr<rawmesh> myrawmesh;
+        static std::shared_ptr<rawmesh> getrawmesh(void);
 
         static bool isaxisymmetric;
         

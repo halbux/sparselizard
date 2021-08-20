@@ -179,7 +179,7 @@ bool opfield::isvalueorientationdependent(std::vector<int> disjregs)
 
     for (int i = 0; i < disjregs.size(); i++)
     {
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjregs[i]);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(disjregs[i]);
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, myfield->gettypename());
         if ( myformfunction->isorientationdependent(myfield->getinterpolationorder(disjregs[i])) )
             return true;
