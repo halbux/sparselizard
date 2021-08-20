@@ -41,7 +41,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
     
     ///// Bring the evaluation points to the mesh here.
     //
-    // UNIVERSE::MYMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
+    // UNIVERSE::MYRAWMESH ---- h ----> MYRAWMESH ---- p ----> myptracker
     
     if (universe::getrawmesh() != myrawmesh)
     {
@@ -73,7 +73,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
 
     ///// Bring the evaluation points to the ptracker here.
     //
-    // universe::getrawmesh() ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
+    // universe::myrawmesh ---- h ----> MYRAWMESH ---- p ----> MYPTRACKER
     
     if (myrawmesh->getptracker() != myptracker)
     {
