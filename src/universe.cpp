@@ -44,7 +44,18 @@ void universe::setmaxnumthreads(int mnt)
 
 double universe::roundoffnoiselevel = 1e-12;
 
-std::shared_ptr<rawmesh> universe::mymesh = NULL;
+std::shared_ptr<rawmesh> universe::myrawmesh = NULL;
+
+std::shared_ptr<rawmesh> universe::getrawmesh(void)
+{
+    if (myrawmesh != NULL)
+        return myrawmesh;
+    else
+    {
+        std::cout << "Error in 'universe' namespace: an operation tried to access the mesh object but it is not available" << std::endl;
+        abort();
+    }
+}
 
 bool universe::isaxisymmetric = false;
 

@@ -6,7 +6,7 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)
 {
     mydofmanager = dofmngr;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensematrix inAinds, intdensematrix inDinds)
@@ -18,7 +18,7 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensema
     Ainds = inAinds;
     Dinds = inDinds;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
         
 rawmat::~rawmat(void) 

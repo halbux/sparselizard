@@ -94,7 +94,7 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
     if (numpts == 0)
         return 0;
  
-    std::vector<double> noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
+    std::vector<double> noisethreshold = universe::getrawmesh()->getnodes()->getnoisethreshold();
     double ntx = noisethreshold[0], nty = noisethreshold[1], ntz = noisethreshold[2];
 
     coordinategroup coordgroup(coordinates);
@@ -472,10 +472,10 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
 
 void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     
-    disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
-    elements* myelems = universe::mymesh->getelements();
+    disjointregions* mydisjregs = universe::getrawmesh()->getdisjointregions();
+    elements* myelems = universe::getrawmesh()->getelements();
     
     // Get information related to the disjoint region:
     int elemtypenum = mydisjregs->getelementtypenumber(disjreg);
@@ -1791,9 +1791,9 @@ void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& truein
 
 void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
 {
-    elements* els = universe::mymesh->getelements();
-    disjointregions* drs = universe::mymesh->getdisjointregions();
-    physicalregions* prs = universe::mymesh->getphysicalregions();
+    elements* els = universe::getrawmesh()->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
     int totnumedges = els->count(1);
     
     std::vector<int> edgeinfo(totnumedges, 0);
@@ -1849,7 +1849,7 @@ void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
 // it is in the physical region but not yet processed and 0 if it is not in the physical region.
 void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall)
 {   
-    elements* els = universe::mymesh->getelements();
+    elements* els = universe::getrawmesh()->getelements();
     
     std::vector<int> eon = els->getedgesonnode(startnode);
 

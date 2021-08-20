@@ -44,7 +44,7 @@ void vec::updateconstraints(void)
     
     std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
     // Get all disjoint regions:
-    std::vector<int> disjregs((universe::mymesh->getdisjointregions())->count());
+    std::vector<int> disjregs((universe::getrawmesh()->getdisjointregions())->count());
     std::iota(disjregs.begin(), disjregs.end(), 0);
     
     // Update the disjoint region constraints:

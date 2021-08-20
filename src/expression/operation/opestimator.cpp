@@ -86,15 +86,15 @@ void opestimator::print(void)
 
 void opestimator::estimatezienkiewiczzhu(void)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     
-    elements* myelements = universe::mymesh->getelements();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    elements* myelements = universe::getrawmesh()->getelements();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
     
     // Compute 'myarg' at all mesh nodes: 
     std::vector<int> alldisjregsinmaxdim = mydisjointregions->getindim(problemdimension);
 
-    int numnodes = universe::mymesh->getnodes()->count();
+    int numnodes = universe::getrawmesh()->getnodes()->count();
 
     densematrix nodalvaluesmin(numnodes, 1);
     densematrix nodalvaluesmax(numnodes, 1);

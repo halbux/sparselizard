@@ -12,7 +12,7 @@ void mat::errorifpointerisnull(void)
 
 void mat::errorifinvalidated(void)
 {
-    if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::mymesh->getmeshnumber())
+    if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::getrawmesh()->getmeshnumber())
     {
         std::cout << "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" << std::endl;
         abort();

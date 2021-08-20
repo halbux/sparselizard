@@ -435,19 +435,19 @@ void expression::reordercolumns(std::vector<int> neworder)
 
 std::vector<double> expression::max(int physreg, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return max(physreg, NULL, refinement, xyzrange);
 }
 
 std::vector<double> expression::max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return max(physreg, &meshdeform, refinement, xyzrange);
 }
 
 std::vector<double> expression::min(int physreg, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, NULL, refinement, xyzrange);
@@ -458,7 +458,7 @@ std::vector<double> expression::min(int physreg, int refinement, std::vector<dou
 
 std::vector<double> expression::min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, &meshdeform, refinement, xyzrange);
@@ -482,7 +482,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         std::cout << "Error in 'expression' object: cannot get the max/min of a nonscalar expression" << std::endl;
         abort();
     }
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -490,7 +490,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
     }
 
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
@@ -516,7 +516,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
 
         // Get the node coordinates in the refined element:
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         element myelement(elementtypenumber, refinement);
         std::vector<double> evaluationpoints = myelement.listnodecoordinates();
 
@@ -560,19 +560,19 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
 
 void expression::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     interpolate(physreg, NULL, xyzcoord, interpolated, isfound);
 }
 
 void expression::interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
 }
 
 std::vector<double> expression::interpolate(int physreg, const std::vector<double> xyzcoord)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     std::vector<double> xyz = xyzcoord;
 
@@ -595,7 +595,7 @@ std::vector<double> expression::interpolate(int physreg, const std::vector<doubl
 
 std::vector<double> expression::interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     std::vector<double> xyz = xyzcoord;
 
@@ -619,7 +619,7 @@ std::vector<double> expression::interpolate(int physreg, expression meshdeform, 
 void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(disjregs)))
@@ -652,7 +652,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<std::vector<double>>& interpolated, std::vector<bool>& isfound, int numtimeevals)
 {
     // Make sure the mesh deformation expression has the right size.
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -660,7 +660,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     }
 
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
     if (meshdeform != NULL && not(meshdeform->isharmonicone(disjregs)))
     {
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
@@ -767,12 +767,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
 double expression::integrate(int physreg, int integrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integrate(physreg, NULL, integrationorder);
 }
 double expression::integrate(int physreg, expression meshdeform, int integrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integrate(physreg, &meshdeform, integrationorder);
 }
 
@@ -785,7 +785,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         std::cout << "Error in 'expression' object: cannot integrate a nonscalar expression" << std::endl;
         abort();
     }
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -793,7 +793,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
     }
 
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
@@ -817,7 +817,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
 
         // Get the Gauss points:
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         gausspoints mygausspoints(elementtypenumber, integrationorder);
         std::vector<double> evaluationpoints = mygausspoints.getcoordinates();
         std::vector<double> weights = mygausspoints.getweights();
@@ -857,25 +857,25 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
 
 void expression::write(int physreg, int numfftharms, std::string filename, int lagrangeorder)
 {   
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, numfftharms, NULL, filename, lagrangeorder, -1);
 }
 
 void expression::write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, numfftharms, &meshdeform, filename, lagrangeorder, -1);
 }
 
 void expression::write(int physreg, std::string filename, int lagrangeorder, int numtimesteps)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, -1, NULL, filename, lagrangeorder, numtimesteps);
 }
 
 void expression::write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, -1, &meshdeform, filename, lagrangeorder, numtimesteps);
 }
 
@@ -889,14 +889,14 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         std::cout << "Error in 'expression' object: can not write a " << mynumrows << "x" << mynumcols << " expression to file (only scalars or 2x1 or 3x1 column vectors)" << std::endl;
         abort();
     }
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
     }
     
-    if (universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
+    if (universe::getrawmesh()->getphysicalregions()->get(physreg)->countelements() == 0)
         return;
 
     // Minimum lagrange order is 1!
@@ -907,7 +907,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     expression xyz(3,1, {x,y,z});
 
     // Loop on all disjoint regions:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Make sure the 'meshdeform' expression is constant in time:
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
@@ -919,7 +919,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Get the geometry interpolation order (1 if the element is not curved):
     int geolagrangeorder = lagrangeorder;
     if (iointerface::isonlyisoparametric(filename) == false && meshdeform == NULL)
-        geolagrangeorder = universe::mymesh->getelements()->getcurvatureorder();
+        geolagrangeorder = universe::getrawmesh()->getelements()->getcurvatureorder();
 
     // These are the time tags that will be used:
     std::vector<double> timetags = {};
@@ -940,7 +940,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     {
         std::vector<int> mydisjregs = mydisjregselector.getgroup(g);
 
-        int elementtype = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtype = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         element myelement(elementtype);
 
         // The expression will be interpolated at the following Lagrange nodes:
@@ -1047,9 +1047,9 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
-    if (startcoords.size() == 0 || universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
+    if (startcoords.size() == 0 || universe::getrawmesh()->getphysicalregions()->get(physreg)->countelements() == 0)
         return;
     
     // This can happen with int divisions:
@@ -1060,7 +1060,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     }
 
     // Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (mynumrows < problemdimension || mynumrows > 3 || mynumcols != 1)
     {
         std::cout << "Error in 'expression' object: expected a column vector expression with " << problemdimension << " to 3 components to get the stream lines" << std::endl;
@@ -1244,7 +1244,7 @@ bool expression::iszero(void)
 
 vec expression::atbarycenter(int physreg, field onefield)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     // The field must be a "one" type:
     std::string ft = onefield.getpointer()->gettypename();
@@ -1462,7 +1462,7 @@ expression expression::spacederivative(int whichderivative)
         abort();
     }
 
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     expression derivated = this->getcopy();
 
@@ -1844,7 +1844,7 @@ expression expression::mod(double modval)
 
 expression expression::on(int physreg, expression* coordshift, bool errorifnotfound)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (coordshift != NULL && (coordshift->countcolumns() != 1 || coordshift->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: coordinate shift argument in 'on' has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -1869,7 +1869,7 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             expression curexpr = expression(onexpr.myoperations[i]) * sl::tf(dummy);
             curexpr.expand();
         
-            int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
+            int elementdimension = universe::getrawmesh()->getphysicalregions()->get(physreg)->getelementdimension();
             std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftf(elementdimension);
             // Do not retrieve the info for the tf:
             std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
@@ -1950,7 +1950,7 @@ expression expression::detjac(void)
 
 expression expression::invjac(void)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     switch (problemdimension)
     {
         case 1:
@@ -1971,7 +1971,7 @@ expression expression::invjac(void)
 
 expression expression::jac(void)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     switch (problemdimension)
     {
         case 1:

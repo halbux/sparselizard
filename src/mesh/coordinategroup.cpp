@@ -6,13 +6,13 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
 {
     mynumcoords = coords.size()/3;
     
-    noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
+    noisethreshold = universe::getrawmesh()->getnodes()->getnoisethreshold();
     double meshsize = 0.0;
     for (int i = 0; i < 3; i++)
-        meshsize += universe::mymesh->getnodes()->getgeometrydimension(i);
+        meshsize += universe::getrawmesh()->getnodes()->getgeometrydimension(i);
     
     // Define the number of slices in the x, y and z direction:
-    double powertouse = universe::mymesh->getmeshdimension();
+    double powertouse = universe::getrawmesh()->getmeshdimension();
     int ns = std::pow(mynumcoords, 1.0/powertouse);
     ns = std::max(ns, 1);
     numslices = {ns,ns,ns};

@@ -10,7 +10,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
 
     int elementdimension = elemselect.getelementdimension();
     int numberofelements = elemselect.countinselection();
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     int numberofgausspoints = evaluationcoordinates.size()/3;
 
     double *jac11, *jac12, *jac13, *jac21, *jac22, *jac23, *jac31, *jac32, *jac33, *detjacval;
@@ -406,7 +406,7 @@ densematrix jacobian::getinvjac(int row, int column)
         double* jac11, *jac12, *jac13, *jac21, *jac22, *jac23, *jac31, *jac32, *jac33, *detjacval;
         double* invjac11, *invjac12, *invjac13, *invjac21, *invjac22, *invjac23, *invjac31, *invjac32, *invjac33;
 
-        int problemdimension = universe::mymesh->getmeshdimension();
+        int problemdimension = universe::getrawmesh()->getmeshdimension();
         
         switch (problemdimension)
         {

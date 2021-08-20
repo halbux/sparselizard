@@ -3,7 +3,7 @@
 
 void dofmanager::synchronize(void)
 {
-    if (isitmanaged == false || issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+    if (isitmanaged == false || issynchronizing || universe::getrawmesh()->getmeshnumber() == mymeshnumber)
         return;
     issynchronizing = true;    
 
@@ -28,7 +28,7 @@ void dofmanager::synchronize(void)
     // Select the same field again:
     selectedfieldnumber = selectedfieldnumberbkp;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
     issynchronizing = false;
 }
 
@@ -36,7 +36,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
 {  
     synchronize();
     
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
 
     // Find the field index of 'fieldtoadd' (if present):
     int fieldindex = -1;
@@ -125,7 +125,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
 
 dofmanager::dofmanager(void)
 {
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
 dofmanager::dofmanager(int numdofs)
@@ -152,8 +152,8 @@ void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
     {
         std::shared_ptr<rawfield> associatedfield = porttoadd->getrawfield();
 
-        disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
-        physicalregions* myphysicalregions = universe::mymesh->getphysicalregions();
+        disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
+        physicalregions* myphysicalregions = universe::getrawmesh()->getphysicalregions();
 
         // Find the field index of 'associatedfield' (if present):
         int fieldindex = -1;
@@ -217,7 +217,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physic
         mystructuretracker.push_back(std::make_pair(fieldtoadd, physicalregionnumber));
 
     // Get all disjoint regions in the physical region with (-1):
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
+    std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
     
     addtostructure(fieldtoadd, disjregs);
 }
@@ -463,7 +463,7 @@ int dofmanager::countgaugeddofs(void)
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
-                int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+                int elementtype = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg);
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
                 std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
                 std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
@@ -502,7 +502,7 @@ intdensematrix dofmanager::getgaugedindexes(void)
             {
                 spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
 
-                int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+                int elementtype = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg);
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
                 std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
                 std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
@@ -544,7 +544,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
         for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
         {
             // Only the nodes are constrained:
-            if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
+            if (rangebegin[fieldindex][disjreg].size() == 0 || universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg) != 0)
                 continue;
                 
             if (myfields[fieldindex]->isconditionallyconstrained(disjreg))
@@ -712,8 +712,8 @@ long long int dofmanager::allcountdofs(void)
     if (slmpi::count() == 1)
         return countdofs();
     
-    std::shared_ptr<dtracker> mydtracker = universe::mymesh->getdtracker();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    std::shared_ptr<dtracker> mydtracker = universe::getrawmesh()->getdtracker();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
     
     mydtracker->errorundefined();
     
@@ -845,12 +845,12 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
 {
     synchronize();
     
-    elements* myelements = universe::mymesh->getelements();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    elements* myelements = universe::getrawmesh()->getelements();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
 
     // Create a vector whose ith index is true if the field is defined 
     // on the disjoint region number i and false otherwise.
-    std::vector<int> fielddisjregs = ((universe::mymesh->getphysicalregions())->get(fieldphysreg))->getdisjointregions(-1); // Get all disj regs with (-1)
+    std::vector<int> fielddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(fieldphysreg))->getdisjointregions(-1); // Get all disj regs with (-1)
     std::vector<bool> isfielddefinedondisjointregion(mydisjointregions->count(),false);
     for (int i = 0; i < fielddisjregs.size(); i++)
         isfielddefinedondisjointregion[fielddisjregs[i]] = true;

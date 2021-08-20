@@ -68,7 +68,7 @@ void field::print(void) { errorifpointerisnull(); rawfieldptr->print(); }
 void field::setorder(int physreg, int interpolorder) 
 { 
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (interpolorder < 0)
     {
@@ -96,7 +96,7 @@ void field::setorder(expression criterion, int loworder, int highorder)
         abort();   
     }
     // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs((universe::mymesh->getdisjointregions())->count());
+    std::vector<int> alldisjregs((universe::getrawmesh()->getdisjointregions())->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
@@ -157,7 +157,7 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
 void field::setport(int physreg, port primal, port dual)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
  
     if (primal.getpointer() == dual.getpointer())
     {
@@ -171,35 +171,35 @@ void field::setport(int physreg, port primal, port dual)
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg);
 }
 
@@ -215,7 +215,7 @@ void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
     
     if (nodenumbers.count() > 0)
     {
-        int numnodes = universe::mymesh->getelements()->count(0);
+        int numnodes = universe::getrawmesh()->getelements()->count(0);
         std::vector<int> minmax = nodenumbers.minmax();
         if (minmax[0] < 0)
         {
@@ -238,7 +238,7 @@ densematrix field::getnodalvalues(intdensematrix nodenumbers)
     
     if (nodenumbers.count() > 0)
     {
-        int numnodes = universe::mymesh->getelements()->count(0);
+        int numnodes = universe::getrawmesh()->getelements()->count(0);
         std::vector<int> minmax = nodenumbers.minmax();
         if (minmax[0] < 0)
         {
@@ -258,49 +258,49 @@ densematrix field::getnodalvalues(intdensematrix nodenumbers)
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg);
 }
 
 void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr);
 }
 
 void field::setgauge(int physreg) 
 { 
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (rawfieldptr->gettypename() != "hcurl")
     {
@@ -314,7 +314,7 @@ void field::setgauge(int physreg)
 void field::setdata(int physreg, vectorfieldselect myvec, std::string op) 
 { 
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (op != "set" && op != "add")
     {
@@ -334,7 +334,7 @@ void field::setdata(int physreg, vec myvec, std::string op)
 void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined(cutphysregs);
+    universe::getrawmesh()->getphysicalregions()->errorundefined(cutphysregs);
 
     if (cutphysregs.size() != cutvalues.size())
     {
@@ -349,7 +349,7 @@ void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<doubl
     }
     for (int i = 0; i < cutphysregs.size(); i++)
     {
-        int prdim = universe::mymesh->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
+        int prdim = universe::getrawmesh()->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
         if (prdim != -1 && prdim != 1) // -1 for empty is ok
         {
             std::cout << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
@@ -447,7 +447,7 @@ void field::write(int physreg, expression meshdeform, std::string filename, int 
 void field::writeraw(int physreg, std::string filename, bool isbinary, std::vector<double> extradata)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
     {

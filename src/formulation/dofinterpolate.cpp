@@ -9,7 +9,7 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     mydofops = dofops;
     mydofmanager = dofmngr;
     onphysreg = myoncontext->getphysicalregion();
-    std::vector<int> ondisjregs = ((universe::mymesh->getphysicalregions())->get(onphysreg))->getdisjointregions();
+    std::vector<int> ondisjregs = ((universe::getrawmesh()->getphysicalregions())->get(onphysreg))->getdisjointregions();
     myrefcoords = refcoords;
     mynumrefcoords = myrefcoords.size()/3;
     
@@ -75,7 +75,7 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     mymaxnumff = 0;
     for (int i = 0; i < ondisjregs.size(); i++)
     {
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(ondisjregs[i]); 
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(ondisjregs[i]); 
         int doforder = mydoffield->getinterpolationorder(ondisjregs[i]);
         std::shared_ptr<hierarchicalformfunction> dofformfunction = selector::select(elementtypenumber, mydoffield->gettypename());
         int curnumff = dofformfunction->count(doforder);
@@ -102,10 +102,10 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
 
 void dofinterpolate::eval(void)
 {
-    elements* myelements = universe::mymesh->getelements();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    elements* myelements = universe::getrawmesh()->getelements();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
 
-    std::vector<int> ondisjregs = ((universe::mymesh->getphysicalregions())->get(onphysreg))->getdisjointregions();
+    std::vector<int> ondisjregs = ((universe::getrawmesh()->getphysicalregions())->get(onphysreg))->getdisjointregions();
 
     std::vector<int> dofharms = mydoffield->getharmonics();
     

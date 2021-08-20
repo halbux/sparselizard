@@ -13,8 +13,8 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     int numelems = elemselect.countinselection();
     int numevalpts = evaluationcoordinates.size()/3;
     
-    int problemdimension = universe::mymesh->getmeshdimension();
-    std::vector<bool> prdef = universe::mymesh->getphysicalregions()->get(myphysreg)->getdefinition();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
+    std::vector<bool> prdef = universe::getrawmesh()->getphysicalregions()->get(myphysreg)->getdefinition();
     int elemdim = elemselect.getelementdimension();
     int elemtypenum = elemselect.getelementtypenumber();
     std::vector<int> elemnums = elemselect.getelementnumbers();
@@ -34,8 +34,8 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     
 
     // Calculate the orientations:
-    std::vector<double>* nodecoords = universe::mymesh->getnodes()->getcoordinates();
-    elements* els = universe::mymesh->getelements();
+    std::vector<double>* nodecoords = universe::getrawmesh()->getnodes()->getcoordinates();
+    elements* els = universe::getrawmesh()->getelements();
     
     std::vector<int> celltypes(numelems), cellnums(numelems);
     
@@ -119,7 +119,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         std::vector<bool> isflipped = els->isflipped(elemtypenum, subelemnums, t, cellnumsintype);
         
         // Check detjac sign of parent:
-        std::vector<int> disjregs = universe::mymesh->getphysicalregions()->get(myphysreg)->getdisjointregionsoftype(t);
+        std::vector<int> disjregs = universe::getrawmesh()->getphysicalregions()->get(myphysreg)->getdisjointregionsoftype(t);
         elementselector subselect(disjregs, cellnumsintype, false);
         
         gausspoints gp(t, 0);
