@@ -32,6 +32,12 @@ indexmat::indexmat(long long int numberofrows, long long int numberofcolumns, in
 
 indexmat::indexmat(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec)
 {
+    if (numberofrows*numberofcolumns != valvec.size())
+    {
+        std::cout << "Error in 'indexmat' object: expected a value vector of size " << numberofrows*numberofcolumns << std::endl;
+        abort();
+    }
+    
     numrows = numberofrows;
     numcols = numberofcolumns;
     int* myvaluesptr = new int[numcols*numrows];
