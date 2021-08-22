@@ -1,7 +1,7 @@
 #include "oplog10.h"
 
 
-std::vector<std::vector<densematrix>> oplog10::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> oplog10::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> oplog10::interpolate(elementselector& elem
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
     
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
@@ -26,7 +26,7 @@ std::vector<std::vector<densematrix>> oplog10::interpolate(elementselector& elem
     abort();
 }
 
-densematrix oplog10::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat oplog10::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -35,7 +35,7 @@ densematrix oplog10::multiharmonicinterpolate(int numtimeevals, elementselector&
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     output.log10();
 
     if (reuse && universe::isreuseallowed)

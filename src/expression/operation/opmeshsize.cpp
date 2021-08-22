@@ -1,7 +1,7 @@
 #include "opmeshsize.h"
 
 
-std::vector<std::vector<densematrix>> opmeshsize::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opmeshsize::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -16,13 +16,13 @@ std::vector<std::vector<densematrix>> opmeshsize::interpolate(elementselector& e
     int numgp = mygp.count();
     std::vector<double> evalcoords = mygp.getcoordinates();
     std::vector<double> weights = mygp.getweights();
-    densematrix weightsmat(numgp,1, weights);
+    densemat weightsmat(numgp,1, weights);
 
     std::shared_ptr<opdetjac> op(new opdetjac);
 
     bool wasreuseallowed = universe::isreuseallowed;
     universe::isreuseallowed = false;
-    densematrix output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
+    densemat output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
     universe::isreuseallowed = wasreuseallowed;
     
     output.abs();
@@ -36,7 +36,7 @@ std::vector<std::vector<densematrix>> opmeshsize::interpolate(elementselector& e
     return {{},{output}};
 }
 
-densematrix opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -51,13 +51,13 @@ densematrix opmeshsize::multiharmonicinterpolate(int numtimeevals, elementselect
     int numgp = mygp.count();
     std::vector<double> evalcoords = mygp.getcoordinates();
     std::vector<double> weights = mygp.getweights();
-    densematrix weightsmat(numgp,1, weights);
+    densemat weightsmat(numgp,1, weights);
 
     std::shared_ptr<opdetjac> op(new opdetjac);
 
     bool wasreuseallowed = universe::isreuseallowed;
     universe::isreuseallowed = false;
-    densematrix output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
+    densemat output = op->interpolate(elemselect, evalcoords, meshdeform)[1][0];
     universe::isreuseallowed = wasreuseallowed;
     
     output.abs();

@@ -68,8 +68,8 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     
     mynodes.setnumber(numberofnodes);
     // Transfer from Vec to the node object:
-    intdensematrix addresses(meshdim*numberofnodes,1, 0,1);
-    densematrix coordmat(meshdim*numberofnodes,1);
+    indexmat addresses(meshdim*numberofnodes,1, 0,1);
+    densemat coordmat(meshdim*numberofnodes,1);
     VecGetValues(coordvec, meshdim*numberofnodes, addresses.getvalues(), coordmat.getvalues());
     
     double* coordmatval = coordmat.getvalues();

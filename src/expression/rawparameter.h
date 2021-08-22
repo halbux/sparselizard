@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include "operation.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "universe.h"
 #include "elementselector.h"
 #include "expression.h"
@@ -67,8 +67,8 @@ class rawparameter
         int countrows(void);
         int countcolumns(void);
 
-        std::vector<std::vector<densematrix>> interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         void simplify(int row, int col, int disjreg);
 

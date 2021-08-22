@@ -12,7 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "densematrix.h"
+#include "densemat.h"
 
 class spline
 {
@@ -23,9 +23,9 @@ class spline
 
         double xmin, xmax;
         // The x and y axis data (sorted ascendingly):
-        densematrix myx, myy;
+        densemat myx, myy;
         // The spline parameters:
-        densematrix mya, myb;
+        densemat mya, myb;
         
         int derivativeorder = 0;
     
@@ -44,7 +44,7 @@ class spline
         
         double evalat(double input);
         std::vector<double> evalat(std::vector<double> input);
-        densematrix evalat(densematrix input);
+        densemat evalat(densemat input);
         
         void write(std::string filename, int numsplits, char delimiter = '\n');
     

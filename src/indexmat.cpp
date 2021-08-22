@@ -1,24 +1,24 @@
-#include "intdensematrix.h"
+#include "indexmat.h"
 #include "myalgorithm.h"
 
 
-void intdensematrix::errorifempty(void)
+void indexmat::errorifempty(void)
 {
     if (numrows*numcols == 0)
     {
-        std::cout << "Error in 'intdensematrix' object: cannot perform operation on empty matrix" << std::endl;
+        std::cout << "Error in 'indexmat' object: cannot perform operation on empty matrix" << std::endl;
         abort();
     }
 }
 
-intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns)
+indexmat::indexmat(long long int numberofrows, long long int numberofcolumns)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
 }
 
-intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, int initvalue)
+indexmat::indexmat(long long int numberofrows, long long int numberofcolumns, int initvalue)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -30,7 +30,7 @@ intdensematrix::intdensematrix(long long int numberofrows, long long int numbero
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec)
+indexmat::indexmat(long long int numberofrows, long long int numberofcolumns, std::vector<int> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -42,7 +42,7 @@ intdensematrix::intdensematrix(long long int numberofrows, long long int numbero
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(long long int numberofrows, long long int numberofcolumns, int init, int step)
+indexmat::indexmat(long long int numberofrows, long long int numberofcolumns, int init, int step)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -54,7 +54,7 @@ intdensematrix::intdensematrix(long long int numberofrows, long long int numbero
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix::intdensematrix(std::vector<intdensematrix> input)
+indexmat::indexmat(std::vector<indexmat> input)
 {
     if (input.size() == 0)
         return;
@@ -67,7 +67,7 @@ intdensematrix::intdensematrix(std::vector<intdensematrix> input)
         numrows += input[i].countrows();
         if (input[i].countcolumns() != numcols)
         {
-            std::cout << "Error in 'intdensematrix' object: dimension mismatch in concatenation" << std::endl;
+            std::cout << "Error in 'indexmat' object: dimension mismatch in concatenation" << std::endl;
             abort();
         }
     }
@@ -87,15 +87,15 @@ intdensematrix::intdensematrix(std::vector<intdensematrix> input)
     myvalues = std::shared_ptr<int>(myvaluesptr);
 }
 
-intdensematrix intdensematrix::getresized(long long int m, long long int n)
+indexmat indexmat::getresized(long long int m, long long int n)
 {
-    intdensematrix out = *this; 
+    indexmat out = *this; 
     out.numrows = m;
     out.numcols = n;
     return out;
 }
 
-long long int intdensematrix::countpositive(void)
+long long int indexmat::countpositive(void)
 {
     int* myvaluesptr = myvalues.get();
     
@@ -108,7 +108,7 @@ long long int intdensematrix::countpositive(void)
     return numpositive;
 }
 
-long long int intdensematrix::countoccurences(long long int value)
+long long int indexmat::countoccurences(long long int value)
 {
     int* myvaluesptr = myvalues.get();
     
@@ -121,13 +121,13 @@ long long int intdensematrix::countoccurences(long long int value)
     return num;
 }
 
-intdensematrix intdensematrix::removevalue(long long int toremove)
+indexmat indexmat::removevalue(long long int toremove)
 {
     int* myvaluesptr = myvalues.get();
     
     long long int num = countoccurences(toremove);
     
-    intdensematrix output(numcols*numrows-num,1);
+    indexmat output(numcols*numrows-num,1);
     int* outvals = output.getvalues();
     
     long long int index = 0;
@@ -142,7 +142,7 @@ intdensematrix intdensematrix::removevalue(long long int toremove)
     return output;
 }
 
-std::vector<int> intdensematrix::countalloccurences(int maxintval)
+std::vector<int> indexmat::countalloccurences(int maxintval)
 {
     int* myvaluesptr = myvalues.get();
     
@@ -154,7 +154,7 @@ std::vector<int> intdensematrix::countalloccurences(int maxintval)
     return output;
 }
 
-std::vector<std::vector<int>> intdensematrix::findalloccurences(int maxintval)
+std::vector<std::vector<int>> indexmat::findalloccurences(int maxintval)
 {
     int* myvaluesptr = myvalues.get();
  
@@ -175,7 +175,7 @@ std::vector<std::vector<int>> intdensematrix::findalloccurences(int maxintval)
     return output;
 }
 
-long long int intdensematrix::sum(void)
+long long int indexmat::sum(void)
 {
     int* myvaluesptr = myvalues.get();
     
@@ -185,7 +185,7 @@ long long int intdensematrix::sum(void)
     return summed;
 }
 
-std::vector<int> intdensematrix::minmax(void)
+std::vector<int> indexmat::minmax(void)
 {
     errorifempty();
 
@@ -204,7 +204,7 @@ std::vector<int> intdensematrix::minmax(void)
     return {minval, maxval};
 }
 
-int intdensematrix::max(void)
+int indexmat::max(void)
 {
     errorifempty();
 
@@ -220,7 +220,7 @@ int intdensematrix::max(void)
     return maxval;
 }
 
-void intdensematrix::print(void)
+void indexmat::print(void)
 {
     printsize();
 
@@ -234,36 +234,36 @@ void intdensematrix::print(void)
     std::cout << std::endl;
 }
 
-void intdensematrix::printsize(void)
+void indexmat::printsize(void)
 {
     std::cout << "Matrix size is " << numrows << "x" << numcols << std::endl;
 }
 
-int* intdensematrix::getvalues(void)
+int* indexmat::getvalues(void)
 {
     return myvalues.get();
 }
 
-intdensematrix intdensematrix::copy(void)
+indexmat indexmat::copy(void)
 {
-    intdensematrix intdensematrixcopy = *this;
+    indexmat indexmatcopy = *this;
     
     // The pointed value has to be copied as well.
-    if (intdensematrixcopy.myvalues != NULL)
+    if (indexmatcopy.myvalues != NULL)
     {
-        intdensematrixcopy.myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
-        int* copiedmyvaluesptr = intdensematrixcopy.myvalues.get();
+        indexmatcopy.myvalues = std::shared_ptr<int>(new int[numcols*numrows]);
+        int* copiedmyvaluesptr = indexmatcopy.myvalues.get();
         int* myvaluesptr = myvalues.get();
         for (long long int i = 0; i < numcols*numrows; i++)
             copiedmyvaluesptr[i] = myvaluesptr[i];
     }
         
-    return intdensematrixcopy;
+    return indexmatcopy;
 }
 
-intdensematrix intdensematrix::gettranspose(void)
+indexmat indexmat::gettranspose(void)
 {
-    intdensematrix output(numcols, numrows);
+    indexmat output(numcols, numrows);
 
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
@@ -277,9 +277,9 @@ intdensematrix intdensematrix::gettranspose(void)
     return output;
 }
 
-intdensematrix intdensematrix::duplicateallrowstogether(int n)
+indexmat indexmat::duplicateallrowstogether(int n)
 {
-    intdensematrix output(numrows*n, numcols);
+    indexmat output(numrows*n, numcols);
     
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
@@ -295,9 +295,9 @@ intdensematrix intdensematrix::duplicateallrowstogether(int n)
     return output;
 }
 
-intdensematrix intdensematrix::duplicaterowsonebyone(int n)
+indexmat indexmat::duplicaterowsonebyone(int n)
 {
-    intdensematrix output(numrows*n, numcols);
+    indexmat output(numrows*n, numcols);
     
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
@@ -314,9 +314,9 @@ intdensematrix intdensematrix::duplicaterowsonebyone(int n)
     return output;
 }
 
-intdensematrix intdensematrix::duplicateallcolstogether(int n)
+indexmat indexmat::duplicateallcolstogether(int n)
 {
-    intdensematrix output(numrows, numcols*n);
+    indexmat output(numrows, numcols*n);
 
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
@@ -337,9 +337,9 @@ intdensematrix intdensematrix::duplicateallcolstogether(int n)
     return output;
 }
 
-intdensematrix intdensematrix::duplicatecolsonebyone(int n)
+indexmat indexmat::duplicatecolsonebyone(int n)
 {
-    intdensematrix output(numrows, numcols*n);
+    indexmat output(numrows, numcols*n);
 
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();
@@ -360,11 +360,11 @@ intdensematrix intdensematrix::duplicatecolsonebyone(int n)
     return output;
 }
 
-intdensematrix intdensematrix::extractrows(std::vector<int>& selected)
+indexmat indexmat::extractrows(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
 
-    intdensematrix output(numselected, numcols);
+    indexmat output(numselected, numcols);
 
     int* vals = getvalues();
     int* outvals = output.getvalues();
@@ -378,11 +378,11 @@ intdensematrix intdensematrix::extractrows(std::vector<int>& selected)
     return output;
 }
 
-intdensematrix intdensematrix::extractcols(std::vector<int>& selected)
+indexmat indexmat::extractcols(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
 
-    intdensematrix output(numrows, numselected);
+    indexmat output(numrows, numselected);
 
     int* vals = getvalues();
     int* outvals = output.getvalues();
@@ -395,14 +395,14 @@ intdensematrix intdensematrix::extractcols(std::vector<int>& selected)
     return output;
 }
     
-intdensematrix intdensematrix::select(std::vector<bool>& sel, bool selectif)
+indexmat indexmat::select(std::vector<bool>& sel, bool selectif)
 {
     int numtrue = myalgorithm::counttrue(sel);
     int num = numtrue;
     if (selectif == false)
         num = sel.size() - numtrue;
 
-    intdensematrix output(num, 1);
+    indexmat output(num, 1);
 
     int* myvaluesptr = myvalues.get();
     int* outvaluesptr = output.myvalues.get();

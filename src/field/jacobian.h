@@ -34,7 +34,7 @@
 #include "rawfield.h"
 #include "expression.h"
 #include "universe.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "elementselector.h"
 #include "disjointregions.h"
 
@@ -47,9 +47,9 @@ class jacobian
 
     private:
         
-        densematrix detjac, xcoord;
-        std::vector<densematrix> jac = std::vector<densematrix>(3*3);
-        std::vector<densematrix> invjac = {};
+        densemat detjac, xcoord;
+        std::vector<densemat> jac = std::vector<densemat>(3*3);
+        std::vector<densemat> invjac = {};
 
     public:
         
@@ -63,10 +63,10 @@ class jacobian
         jacobian extractsubset(std::vector<int>& selectedelementindexes);
         
         // The detjac and jac terms are computed in the constructor.
-        densematrix getdetjac(void);    
-        densematrix getjac(int row, int column);
+        densemat getdetjac(void);    
+        densemat getjac(int row, int column);
         // The invjac terms are only computed when 'getinvjac' is called.
-        densematrix getinvjac(int row, int column);    
+        densemat getinvjac(int row, int column);    
 
 };
 

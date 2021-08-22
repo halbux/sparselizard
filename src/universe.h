@@ -15,7 +15,7 @@
 #include "jacobian.h"
 #include "memory.h"
 #include "operation.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "selector.h"
 #include "hierarchicalformfunction.h"
 #include "hierarchicalformfunctioncontainer.h"
@@ -58,8 +58,8 @@ class universe
         static std::vector<vec> ddmvecs;
         static std::vector<mat> ddmmats;
         static std::vector<formulation> ddmformuls;
-        static std::vector<intdensematrix> ddmsendinds;
-        static std::vector<intdensematrix> ddmrecvinds;
+        static std::vector<indexmat> ddmsendinds;
+        static std::vector<indexmat> ddmrecvinds;
         
         static void clearddmcontainers(void);
         
@@ -77,12 +77,12 @@ class universe
         static void forbidreuse(void);
         
         // Select an element subset of the available storage and return the unselected storage:
-        static std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> selectsubset(int numevalpts, std::vector<int>& selectedelementindexes);
+        static std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densemat>> >,std::vector< densemat >> selectsubset(int numevalpts, std::vector<int>& selectedelementindexes);
         
         // Backup the storage (not the form funcs):
-        static std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> backup(void);
+        static std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densemat>> >,std::vector< densemat >> backup(void);
         // Restore the storage (not the form funcs):
-        static void restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >>);
+        static void restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densemat>> >,std::vector< densemat >>);
         
         
         static std::shared_ptr<jacobian> computedjacobian;
@@ -91,8 +91,8 @@ class universe
         static std::vector<std::shared_ptr<operation>> oppointers;
         static std::vector<std::shared_ptr<operation>> oppointersfft;
         // Store all computed values:
-        static std::vector< std::vector<std::vector<densematrix>> > opcomputed;
-        static std::vector< densematrix > opcomputedfft;
+        static std::vector< std::vector<std::vector<densemat>> > opcomputed;
+        static std::vector< densemat > opcomputedfft;
         
         // Returns -1 if not yet precomputed.
         static int getindexofprecomputedvalue(std::shared_ptr<operation> op);
@@ -102,17 +102,17 @@ class universe
         static int getindexofprecomputedvalue(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc);
         static int getindexofprecomputedvaluefft(std::shared_ptr<rawfield> rf, int td, int sd, int kepd, int ffc);
         // Returns a copy to avoid any modification of the data stored here:
-        static std::vector<std::vector<densematrix>> getprecomputed(int index);
-        static densematrix getprecomputedfft(int index);
+        static std::vector<std::vector<densemat>> getprecomputed(int index);
+        static densemat getprecomputedfft(int index);
         // Sets a copy to avoid any modification of the data stored here:
-        static void setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densematrix>> val);
-        static void setprecomputedfft(std::shared_ptr<operation> op, densematrix val);
+        static void setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densemat>> val);
+        static void setprecomputedfft(std::shared_ptr<operation> op, densemat val);
         
         // If set to true the individual right handside contribution addresses and values are stored in 'rhsterms' when generating a formulation:
         static bool keeptrackofrhsassembly;
-        // Every row in a given (int)densematrix corresponds to a shape function and every column to a given mesh element.
+        // Every row in a given (int)densemat corresponds to a shape function and every column to a given mesh element.
         // Do not forget to clear 'rhsterms' when you don't want to keep track anymore!
-        static std::vector<std::pair<intdensematrix, densematrix>> rhsterms;
+        static std::vector<std::pair<indexmat, densemat>> rhsterms;
         
         // This stores the vec containing a solution x, its time derivative dtx and its second time derivative dtdtx
         // respectively at index 0, 1 and 2. If xdtxdtdtx[i] is an empty vector then that solution is not available.

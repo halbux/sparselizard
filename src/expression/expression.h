@@ -88,9 +88,9 @@ class expression
         // Piecewise expression definition:
         expression(std::vector<double> pos, std::vector<expression> exprs, expression tocompare);
         // Custom expression based on a user-defined function:
-        expression(int m, int n, std::vector<densematrix> customfct(std::vector<densematrix>), std::vector<expression> exprs);
+        expression(int m, int n, std::vector<densemat> customfct(std::vector<densemat>), std::vector<expression> exprs);
         // Advanced custom function:
-        expression(int m, int n, std::vector<densematrix> advancedcustomfct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields);
+        expression(int m, int n, std::vector<densemat> advancedcustomfct(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields);
         
         // Define a 1x1 expression from an operation:
         expression(std::shared_ptr<operation>);

@@ -368,11 +368,11 @@ void sl::scatterwrite(std::string filename, std::vector<double> xcoords, std::ve
     }
 
     iodata datatowrite(1, 1, isscalar, {});
-    datatowrite.addcoordinates(0, densematrix(n,1,xcoords), densematrix(n,1,ycoords), densematrix(n,1,zcoords));
+    datatowrite.addcoordinates(0, densemat(n,1,xcoords), densemat(n,1,ycoords), densemat(n,1,zcoords));
     if (isscalar)
-        datatowrite.adddata(0, {densematrix(n,1,compxevals)});
+        datatowrite.adddata(0, {densemat(n,1,compxevals)});
     else
-        datatowrite.adddata(0, {densematrix(n,1,compxevals), densematrix(n,1,compyevals), densematrix(n,1,compzevals)});
+        datatowrite.adddata(0, {densemat(n,1,compxevals), densemat(n,1,compyevals), densemat(n,1,compzevals)});
 
     iointerface::writetofile(filename, datatowrite);
 }
@@ -572,7 +572,7 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
     {
         // totalforce = integral(fdensity*1) = integral(fdensity*sumi(Ni)) = sumi(integral(fdensity*Ni))
         // where Ni includes all 'h1' nodal shape functions (their sum equals one). 
-        densematrix vecvals = fv.getvalues(intdensematrix(siz, 1, c*siz, 1));
+        densemat vecvals = fv.getvalues(indexmat(siz, 1, c*siz, 1));
         output[c] = vecvals.sum();
     }
     
@@ -653,10 +653,10 @@ void sl::writeshapefunctions(std::string filename, std::string sftypename, int e
 
     std::shared_ptr<hierarchicalformfunction> hff = selector::select(elementtypenumber, sftypename);
     int numcomp = hff->countcomponents();
-    std::vector<densematrix> ffvals(numcomp);
+    std::vector<densemat> ffvals(numcomp);
 
     // Prepare the element x, y and z coordinates:
-    densematrix x(1,numnodes), y(1,numnodes), z(1,numnodes);
+    densemat x(1,numnodes), y(1,numnodes), z(1,numnodes);
     double* xptr = x.getvalues();
     double* yptr = y.getvalues();
     double* zptr = z.getvalues();
@@ -1195,13 +1195,13 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
         tx = ax; ty = ay; tz = az;
     
         c = std::cos(tx); s = std::sin(tx);
-        densematrix Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
+        densemat Rx(3,3, { 1,0,0, 0,c,-s, 0,s,c });
         c = std::cos(ty); s = std::sin(ty);
-        densematrix Ry(3,3, { c,0,s, 0,1,0, -s,0,c });
+        densemat Ry(3,3, { c,0,s, 0,1,0, -s,0,c });
         c = std::cos(tz); s = std::sin(tz);
-        densematrix Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
+        densemat Rz(3,3, { c,-s,0, s,c,0, 0,0,1 });
         
-        densematrix R = Rz.multiply(Ry.multiply(Rx));
+        densemat R = Rz.multiply(Ry.multiply(Rx));
         
         double* Rval = R.getvalues();
         
@@ -1221,13 +1221,13 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
         tx = ax; ty = ay; tz = az;
     
         c = std::cos(tx); s = std::sin(tx);
-        densematrix Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
+        densemat Kx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
         c = std::cos(ty); s = std::sin(ty);
-        densematrix Ky(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
+        densemat Ky(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
         c = std::cos(tz); s = std::sin(tz);
-        densematrix Kz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
+        densemat Kz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
 
-        densematrix K = Kz.multiply(Ky.multiply(Kx));
+        densemat K = Kz.multiply(Ky.multiply(Kx));
         
         double* Kval = K.getvalues();
         
@@ -1244,13 +1244,13 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
         tx = -ax; ty = -ay; tz = -az;
     
         c = std::cos(tx); s = std::sin(tx);
-        densematrix invKx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
+        densemat invKx(6,6, { 1,0,0,0,0,0, 0,c*c,s*s,-2.0*c*s,0,0, 0,s*s,c*c,2.0*c*s,0,0, 0,c*s,-c*s,c*c-s*s,0,0, 0,0,0,0,c,s, 0,0,0,0,-s,c });
         c = std::cos(ty); s = std::sin(ty);
-        densematrix invKy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
+        densemat invKy(6,6, { c*c,0,s*s,0,2.0*c*s,0, 0,1,0,0,0,0, s*s,0,c*c,0,-2.0*c*s,0, 0,0,0,c,0,-s, -c*s,0,c*s,0,c*c-s*s,0, 0,0,0,s,0,c });
         c = std::cos(tz); s = std::sin(tz);
-        densematrix invKz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
+        densemat invKz(6,6, { c*c,s*s,0,0,0,-2.0*c*s, s*s,c*c,0,0,0,2.0*c*s, 0,0,1,0,0,0, 0,0,0,c,s,0, 0,0,0,-s,c,0, c*s,-c*s,0,0,0,c*c-s*s });
 
-        densematrix invK = invKx.multiply(invKy.multiply(invKz));
+        densemat invK = invKx.multiply(invKy.multiply(invKz));
         
         double* invKval = invK.getvalues();
         
@@ -1510,23 +1510,23 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
 
     int len = breduced[0].size();
     
-    // Concatenate rhs vecs to densematrix:
-    densematrix rhs(numrhs, len);
+    // Concatenate rhs vecs to densemat:
+    densemat rhs(numrhs, len);
     double* rhsptr = rhs.getvalues();
     for (int i = 0; i < numrhs; i++)
     {
-        densematrix vecvals = breduced[i].getallvalues();
+        densemat vecvals = breduced[i].getallvalues();
         double* vecvalsptr = vecvals.getvalues();
         for (int j = 0; j < len; j++)
             rhsptr[i*len+j] = vecvalsptr[j];
     }
     
     // Solve multi-rhs:
-    densematrix sols = solve(A, rhs, soltype);
+    densemat sols = solve(A, rhs, soltype);
     double* solsptr = sols.getvalues();
 
     // Extract 'sols' rows to sol vecs:
-    densematrix vals(len,1);
+    densemat vals(len,1);
     double* valsptr = vals.getvalues();
     std::vector<vec> outvecs(numrhs);
     for (int i = 0; i < numrhs; i++)
@@ -1542,7 +1542,7 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
     return outvecs;
 }
 
-densematrix sl::solve(mat A, densematrix b, std::string soltype)
+densemat sl::solve(mat A, densemat b, std::string soltype)
 {
     int numrhs = b.countrows();
     int len = b.countcolumns();
@@ -1570,7 +1570,7 @@ densematrix sl::solve(mat A, densematrix b, std::string soltype)
         
     PCFactorGetMatrix(pc, &Apetsc);
 
-    densematrix densesols(numrhs, len);
+    densemat densesols(numrhs, len);
 
     Mat sols, rhses;
     MatCreateSeqDense(PETSC_COMM_SELF, len, numrhs, densesols.getvalues(), &sols);
@@ -1683,7 +1683,7 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
     sol.setvalues(A.getdinds(), b.getvalues(A.getdinds()));
 }
 
-void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives)
+void sl::exchange(std::vector<int> targetranks, std::vector<densemat> sends, std::vector<densemat> receives)
 {
     int numtargets = targetranks.size();
 
@@ -1705,7 +1705,7 @@ void sl::exchange(std::vector<int> targetranks, std::vector<densematrix> sends, 
     slmpi::exchange(targetranks, sendlens, sendbuffers, reclens, recbuffers);
 }
 
-std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity)
+std::vector<double> sl::gmres(densemat (*mymatmult)(densemat), densemat b, densemat x, double relrestol, int maxnumit, int verbosity)
 {   
     if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
     {
@@ -1727,12 +1727,12 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
 
     // Compute r = b - A * x and the initial relative residual:
     double normb = 0.0; double normr = 0.0;
-    densematrix r = mymatmult(x.copy());
+    densemat r = mymatmult(x.copy());
     double* rptr = r.getvalues();
     
     if (r.countrows() != n || r.countcolumns() != 1)
     {
-        std::cout << "Error in 'sl' namespace: in function gmres the matrix product function call returned a densematrix of wrong size on rank " << slmpi::getrank() << std::endl;
+        std::cout << "Error in 'sl' namespace: in function gmres the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
         abort();
     }
     
@@ -1762,7 +1762,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     relresvec[0] = normr/normb;
         
     // Holder for all Krylov vectors (one on each row):
-    densematrix Q(maxnumit+1, n);
+    densemat Q(maxnumit+1, n);
     double* Qptr = Q.getvalues();
     
     // First row is the normed residual:
@@ -1771,7 +1771,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
         Qptr[i] = invnormr * rptr[i];
         
     // Hessenberg matrix (columnwise upper triangular {r0c0,r0c1,r1c1,r0c2,...}):
-    densematrix H(1, ((1+maxnumit)*maxnumit)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
+    densemat H(1, ((1+maxnumit)*maxnumit)/2 + 1, 0.0); // +1 because arnoldi returns length k+2
     double* Hptr = H.getvalues();
     
     // GMRES iteration:
@@ -1804,9 +1804,9 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     if (k > 0)
     {
         // Calculate the solution:
-        densematrix y(1,k);
+        densemat y(1,k);
         myalgorithm::solveuppertriangular(k, Hptr, &beta[0], y.getvalues());
-        densematrix Qy = y.multiply(Q.getresized(k,n));
+        densemat Qy = y.multiply(Q.getresized(k,n));
         x.add(Qy);
     }
 
@@ -1815,7 +1815,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     return relresvec;
 }
 
-void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
+void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<indexmat>& sendinds, std::vector<indexmat>& recvinds)
 {
     std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     
@@ -1907,12 +1907,12 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     }
     
     // Preallocate the outputs:
-    sendinds = std::vector<intdensematrix>(numneighbours);
-    recvinds = std::vector<intdensematrix>(numneighbours);
+    sendinds = std::vector<indexmat>(numneighbours);
+    recvinds = std::vector<indexmat>(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
-        sendinds[n] = intdensematrix(myalgorithm::sum(numsenddofsperfield[n]), 1);
-        recvinds[n] = intdensematrix(myalgorithm::sum(numexpectedrecvdofsperfield[n]), 1);
+        sendinds[n] = indexmat(myalgorithm::sum(numsenddofsperfield[n]), 1);
+        recvinds[n] = indexmat(myalgorithm::sum(numexpectedrecvdofsperfield[n]), 1);
     }
     
     // Create the send range data and populate the send indexes:

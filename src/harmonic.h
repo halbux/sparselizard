@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 #include "universe.h"
-#include "densematrix.h"
+#include "densemat.h"
 
 namespace harmonic
 {
@@ -36,7 +36,7 @@ namespace harmonic
     // Get the derivation factors (i.e. the wi and -wi^2) for the harmonic.
     double getderivationfactor(int timederivativeorder, int harm);
     // Apply the time derivative to 'input':
-    std::vector<std::vector<densematrix>> timederivative(int timederivativeorder, std::vector<std::vector<densematrix>> input);
+    std::vector<std::vector<densemat>> timederivative(int timederivativeorder, std::vector<std::vector<densemat>> input);
 };
 
 #endif

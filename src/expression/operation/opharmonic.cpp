@@ -9,7 +9,7 @@ opharmonic::opharmonic(std::vector<int> origharms, std::vector<int> destharms, s
     mynumfftharms = numfftharms;
 }
     
-std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opharmonic::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -20,17 +20,17 @@ std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& e
     
     int numelems = elemselect.countinselection();
     
-    std::vector<std::vector<densematrix>> argmat;
+    std::vector<std::vector<densemat>> argmat;
     if (mynumfftharms < 0)
         argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
     else
     {
-        densematrix timevals = myarg->multiharmonicinterpolate(mynumfftharms, elemselect, evaluationcoordinates, meshdeform);
+        densemat timevals = myarg->multiharmonicinterpolate(mynumfftharms, elemselect, evaluationcoordinates, meshdeform);
         argmat = myfft::fft(timevals, numelems, evaluationcoordinates.size()/3);
     }
     
     int maxdestharm = *std::max_element(mydestharms.begin(), mydestharms.end());
-    std::vector<std::vector<densematrix>> output(maxdestharm+1, std::vector<densematrix>(0));
+    std::vector<std::vector<densemat>> output(maxdestharm+1, std::vector<densemat>(0));
 
     for (int i = 0; i < myorigharms.size(); i++)
     {
@@ -47,7 +47,7 @@ std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& e
         else
         {
             if (output[hdest].size() == 0)
-                output[hdest] = {densematrix(numelems, evaluationcoordinates.size()/3, 0)};
+                output[hdest] = {densemat(numelems, evaluationcoordinates.size()/3, 0)};
         }
     }
 
@@ -57,7 +57,7 @@ std::vector<std::vector<densematrix>> opharmonic::interpolate(elementselector& e
     return output;
 }
 
-densematrix opharmonic::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opharmonic::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -66,9 +66,9 @@ densematrix opharmonic::multiharmonicinterpolate(int numtimeevals, elementselect
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> interpolated = interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> interpolated = interpolate(elemselect, evaluationcoordinates, meshdeform);
     // Compute at 'numtimevals' instants in time the multiharmonic data:
-    densematrix output = myfft::inversefft(interpolated, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
+    densemat output = myfft::inversefft(interpolated, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
 
     if (reuse && universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);

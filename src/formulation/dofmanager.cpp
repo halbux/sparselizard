@@ -299,14 +299,14 @@ int dofmanager::getaddress(rawport* prt)
     }
 }
 
-void dofmanager::getportsinds(std::vector<rawport*>& rps, intdensematrix& inds)
+void dofmanager::getportsinds(std::vector<rawport*>& rps, indexmat& inds)
 {
     synchronize();
     
     int numports = myrawportmap.size();
     
     rps.resize(numports);
-    inds = intdensematrix(numports, 1);
+    inds = indexmat(numports, 1);
     int* iptr = inds.getvalues();
 
     int index = 0;
@@ -319,12 +319,12 @@ void dofmanager::getportsinds(std::vector<rawport*>& rps, intdensematrix& inds)
     }
 }
 
-std::pair<intdensematrix, intdensematrix> dofmanager::findassociatedports(void)
+std::pair<indexmat, indexmat> dofmanager::findassociatedports(void)
 {
     synchronize();
 
-    intdensematrix primalads(countports(), 1);
-    intdensematrix dualads(countports(), 1);
+    indexmat primalads(countports(), 1);
+    indexmat dualads(countports(), 1);
 
     int* paptr = primalads.getvalues();
     int* daptr = dualads.getvalues();
@@ -368,7 +368,7 @@ std::vector<bool> dofmanager::isconstrained(void)
     
     std::vector<bool> output(numberofdofs, false);
     
-    std::vector<intdensematrix> allconstrinds = {getdisjregconstrainedindexes(), getgaugedindexes(), getconditionalconstraintdata().first};
+    std::vector<indexmat> allconstrinds = {getdisjregconstrainedindexes(), getgaugedindexes(), getconditionalconstraintdata().first};
     
     for (int i = 0; i < allconstrinds.size(); i++)
     {
@@ -380,12 +380,12 @@ std::vector<bool> dofmanager::isconstrained(void)
     return output;
 }
 
-intdensematrix dofmanager::getconstrainedindexes(void)
+indexmat dofmanager::getconstrainedindexes(void)
 {
     std::vector<bool> isconstr = isconstrained();
 
     int numconstr = myalgorithm::counttrue(isconstr);
-    intdensematrix out(numconstr, 1);
+    indexmat out(numconstr, 1);
     int* outptr = out.getvalues();
     
     int index = 0;
@@ -419,11 +419,11 @@ int dofmanager::countdisjregconstraineddofs(void)
     return numdisjregconstraineddofs;
 }
 
-intdensematrix dofmanager::getdisjregconstrainedindexes(void)
+indexmat dofmanager::getdisjregconstrainedindexes(void)
 {
     synchronize();
     
-    intdensematrix output(1,countdisjregconstraineddofs());
+    indexmat output(1,countdisjregconstraineddofs());
     int* myval = output.getvalues();
     
     int currentindex = 0;
@@ -486,11 +486,11 @@ int dofmanager::countgaugeddofs(void)
     return numgaugeddofs;
 }
 
-intdensematrix dofmanager::getgaugedindexes(void)
+indexmat dofmanager::getgaugedindexes(void)
 {
     synchronize();
     
-    intdensematrix output(1,countgaugeddofs());
+    indexmat output(1,countgaugeddofs());
     int* myval = output.getvalues();
     
     int currentindex = 0;
@@ -527,14 +527,14 @@ intdensematrix dofmanager::getgaugedindexes(void)
     return output;
 }
 
-std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(void)
+std::pair<indexmat, densemat> dofmanager::getconditionalconstraintdata(void)
 {
     synchronize();
     
     // This will have an entry for every field and every disjoint node region that is conditionally constrained:
-    std::vector<intdensematrix> indexmat = {};
-    std::vector<densematrix> condvalvec = {};
-    std::vector<densematrix> constrvalvec = {};
+    std::vector<indexmat> indmat = {};
+    std::vector<densemat> condvalvec = {};
+    std::vector<densemat> constrvalvec = {};
     
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
@@ -578,22 +578,22 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             std::vector<double> evaluationcoordinates = {0,0,0};
             elementselector myelemselect(curdisjregs, condop->isvalueorientationdependent(curdisjregs) || constrop->isvalueorientationdependent(curdisjregs));
 
-            std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            std::vector<std::vector<densemat>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
             // Skip if no conditional constraint is active:
             if (condval[1][0].max() < 0)
                 continue;
-            std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            std::vector<std::vector<densemat>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
 
             // Create a matrix with all indices:
-            intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
-            int* curindexmatptr = curindexmat.getvalues();
+            indexmat curindmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
+            int* curindmatptr = curindmat.getvalues();
             int index = 0;
             for (int i = 0; i < curdisjregs.size(); i++)
             {
                 // There is only a single shape function per node!
                 for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
                 {
-                    curindexmatptr[index] = ind;
+                    curindmatptr[index] = ind;
                     index++;
                 }
             }
@@ -601,7 +601,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             // Append to the vectors:
             condvalvec.push_back(condval[1][0]);
             constrvalvec.push_back(constrval[1][0]);
-            indexmat.push_back(curindexmat);
+            indmat.push_back(curindmat);
         }
     }
 
@@ -618,8 +618,8 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     }
     
     // Combine all active conditional constraints together:
-    intdensematrix condconstrindices(numactive,1);
-    densematrix condconstrval(numactive,1);
+    indexmat condconstrindices(numactive,1);
+    densemat condconstrval(numactive,1);
     
     int* indptr = condconstrindices.getvalues();
     double* valptr = condconstrval.getvalues();
@@ -629,7 +629,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     {
         double* condvalptr = condvalvec[i].getvalues();
         double* constrvalptr = constrvalvec[i].getvalues();
-        int* indmatptr = indexmat[i].getvalues();
+        int* indmatptr = indmat[i].getvalues();
         for (int j = 0; j < condvalvec[i].count(); j++)
         {
             if (condvalptr[j] >= 0)
@@ -745,7 +745,7 @@ int dofmanager::countformfunctions(int disjointregion)
     return rangebegin[selectedfieldnumber][disjointregion].size();
 }
 
-std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std::vector<int> neighbours, std::vector<intdensematrix> senddofinds, std::vector<intdensematrix> recvdofinds)
+std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vector<int> neighbours, std::vector<indexmat> senddofinds, std::vector<indexmat> recvdofinds)
 {
     // New constraints can only appear at the outer overlap/no-overlap interfaces.
 
@@ -753,7 +753,7 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
     
     int numneighbours = neighbours.size();
     
-    std::vector<intdensematrix> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
+    std::vector<indexmat> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
     
     // Get all types of constraints:
     std::vector<bool> isdofconstrained = isconstrained(); 
@@ -841,7 +841,7 @@ void dofmanager::print(void)
 }
 
 
-intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg)
+indexmat dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg)
 {
     synchronize();
     
@@ -863,7 +863,7 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
     int numrows = myiterator.count();
     int numcols = elementlist.size();
     
-    intdensematrix output(numrows, numcols);
+    indexmat output(numrows, numcols);
     int* adresses = output.getvalues();
 
     selectfield(inputfield);

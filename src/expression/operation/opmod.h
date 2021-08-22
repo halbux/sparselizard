@@ -24,8 +24,8 @@ class opmod: public operation
         
         opmod(std::shared_ptr<operation> arg, double modval) { myarg = arg; mymodval = modval; };
         
-        std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::vector<std::shared_ptr<operation>> getarguments(void) { return {myarg}; };
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);

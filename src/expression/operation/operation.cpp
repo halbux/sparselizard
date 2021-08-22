@@ -1,7 +1,7 @@
 #include "operation.h"
 
 
-std::vector<std::vector<densematrix>> operation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> operation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     std::cout << "Error in 'operation' object: cannot interpolate the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> operation::interpolate(elementselector& el
     abort();
 }
 
-densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat operation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     std::cout << "Error in 'operation' object: cannot interpolate the multiharmonic operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -19,7 +19,7 @@ densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselecto
     abort();
 }
 
-std::vector<std::vector<densematrix>> operation::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> operation::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     std::cout << "Error in 'operation' object: expression provided for mesh deformation is invalid" << std::endl;
     std::cout << "Operation was:" << std::endl;

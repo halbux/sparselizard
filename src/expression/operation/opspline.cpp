@@ -6,7 +6,7 @@ opspline::opspline(spline spl, std::shared_ptr<operation> arg)
     myarg = arg; myspline = spl; 
 }
         
-std::vector<std::vector<densematrix>> opspline::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opspline::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -15,7 +15,7 @@ std::vector<std::vector<densematrix>> opspline::interpolate(elementselector& ele
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
     
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
@@ -31,7 +31,7 @@ std::vector<std::vector<densematrix>> opspline::interpolate(elementselector& ele
     abort();
 }
 
-densematrix opspline::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opspline::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -40,7 +40,7 @@ densematrix opspline::multiharmonicinterpolate(int numtimeevals, elementselector
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     output = myspline.evalat(output);
             
     if (reuse && universe::isreuseallowed)

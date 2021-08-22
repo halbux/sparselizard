@@ -90,8 +90,8 @@ class field
         void setvalue(int physreg);
         
         // Set/get value at nodes for 'h1' type fields:
-        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
-        densematrix getnodalvalues(intdensematrix nodenumbers);
+        void setnodalvalues(indexmat nodenumbers, densemat values);
+        densemat getnodalvalues(indexmat nodenumbers);
 
         // Set an 'input' valued constraint on a physical region. 
         // Use the default order + 'extraintegrationdegree' to 

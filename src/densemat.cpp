@@ -1,24 +1,24 @@
-#include "densematrix.h"
+#include "densemat.h"
 #include "cblas.h"
 
 
-void densematrix::errorifempty(void)
+void densemat::errorifempty(void)
 {
     if (numrows*numcols == 0)
     {
-        std::cout << "Error in 'densematrix' object: cannot perform operation on empty matrix" << std::endl;
+        std::cout << "Error in 'densemat' object: cannot perform operation on empty matrix" << std::endl;
         abort();
     }
 }
 
-densematrix::densematrix(long long int numberofrows, long long int numberofcolumns)
+densemat::densemat(long long int numberofrows, long long int numberofcolumns)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
     myvalues = std::shared_ptr<double>(new double[numcols*numrows]);
 }
 
-densematrix::densematrix(long long int numberofrows, long long int numberofcolumns, double initvalue)
+densemat::densemat(long long int numberofrows, long long int numberofcolumns, double initvalue)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -30,7 +30,7 @@ densematrix::densematrix(long long int numberofrows, long long int numberofcolum
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
-densematrix::densematrix(long long int numberofrows, long long int numberofcolumns, std::vector<double> valvec)
+densemat::densemat(long long int numberofrows, long long int numberofcolumns, std::vector<double> valvec)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -42,7 +42,7 @@ densematrix::densematrix(long long int numberofrows, long long int numberofcolum
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
-densematrix::densematrix(long long int numberofrows, long long int numberofcolumns, double init, double step)
+densemat::densemat(long long int numberofrows, long long int numberofcolumns, double init, double step)
 {
     numrows = numberofrows;
     numcols = numberofcolumns;
@@ -54,7 +54,7 @@ densematrix::densematrix(long long int numberofrows, long long int numberofcolum
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
-densematrix::densematrix(std::vector<densematrix> input)
+densemat::densemat(std::vector<densemat> input)
 {
     if (input.size() == 0)
         return;
@@ -67,7 +67,7 @@ densematrix::densematrix(std::vector<densematrix> input)
         numrows += input[i].countrows();
         if (input[i].countcolumns() != numcols)
         {
-            std::cout << "Error in 'densematrix' object: dimension mismatch in concatenation" << std::endl;
+            std::cout << "Error in 'densemat' object: dimension mismatch in concatenation" << std::endl;
             abort();
         }
     }
@@ -87,27 +87,27 @@ densematrix::densematrix(std::vector<densematrix> input)
     myvalues = std::shared_ptr<double>(myvaluesptr);
 }
 
-void densematrix::setrow(long long int rownumber, std::vector<double> rowvals)
+void densemat::setrow(long long int rownumber, std::vector<double> rowvals)
 {
     double* myvaluesptr = myvalues.get();
     for (long long int i = 0; i < numcols; i++)
         myvaluesptr[rownumber*numcols+i] = rowvals[i];
 }
 
-densematrix densematrix::getresized(long long int m, long long int n)
+densemat densemat::getresized(long long int m, long long int n)
 {
-    densematrix out = *this; 
+    densemat out = *this; 
     out.numrows = m;
     out.numcols = n;
     return out;
 }
 
-densematrix densematrix::getflattened(void) 
+densemat densemat::getflattened(void) 
 { 
     return getresized(1, numrows*numcols);
 }
 
-void densematrix::insert(long long int row, long long int col, densematrix toinsert)
+void densemat::insert(long long int row, long long int col, densemat toinsert)
 {
     double* myvaluesptr = myvalues.get();
     double* toinsertvaluesptr = toinsert.myvalues.get();
@@ -119,7 +119,7 @@ void densematrix::insert(long long int row, long long int col, densematrix toins
     }
 }
 
-void densematrix::insertatrows(std::vector<int> selectedrows, densematrix toinsert)
+void densemat::insertatrows(std::vector<int> selectedrows, densemat toinsert)
 {
     double* myvaluesptr = myvalues.get();
     double* toinsertvaluesptr = toinsert.myvalues.get();
@@ -131,7 +131,7 @@ void densematrix::insertatrows(std::vector<int> selectedrows, densematrix toinse
     }
 }
 
-void densematrix::insertatcolumns(std::vector<int> selectedcolumns, densematrix toinsert)
+void densemat::insertatcolumns(std::vector<int> selectedcolumns, densemat toinsert)
 {
     double* myvaluesptr = myvalues.get();
     double* toinsertvaluesptr = toinsert.myvalues.get();
@@ -143,19 +143,19 @@ void densematrix::insertatcolumns(std::vector<int> selectedcolumns, densematrix 
     }
 }
 
-double densematrix::getvalue(long long int rownumber, long long int columnnumber)
+double densemat::getvalue(long long int rownumber, long long int columnnumber)
 {
     double* myvaluesptr = myvalues.get();
     return myvaluesptr[rownumber*numcols+columnnumber];
 }
 
-void densematrix::setvalue(long long int rownumber, long long int columnnumber, double val)
+void densemat::setvalue(long long int rownumber, long long int columnnumber, double val)
 {
     double* myvaluesptr = myvalues.get();
     myvaluesptr[rownumber*numcols+columnnumber] = val;
 }
 
-void densematrix::getvalues(std::vector<double>& topopulate)
+void densemat::getvalues(std::vector<double>& topopulate)
 {
     topopulate.resize(count());
 
@@ -164,24 +164,24 @@ void densematrix::getvalues(std::vector<double>& topopulate)
         topopulate[i] = myvaluesptr[i];
 }
 
-densematrix densematrix::copy(void)
+densemat densemat::copy(void)
 {
-    densematrix densematrixcopy = *this;
+    densemat densematcopy = *this;
     
     // The pointed value has to be copied as well.
-    if (densematrixcopy.myvalues != NULL)
+    if (densematcopy.myvalues != NULL)
     {
-        densematrixcopy.myvalues = std::shared_ptr<double>(new double[numcols*numrows]);
-        double* copiedmyvaluesptr = densematrixcopy.myvalues.get();
+        densematcopy.myvalues = std::shared_ptr<double>(new double[numcols*numrows]);
+        double* copiedmyvaluesptr = densematcopy.myvalues.get();
         double* myvaluesptr = myvalues.get();
         for (long long int i = 0; i < numcols*numrows; i++)
             copiedmyvaluesptr[i] = myvaluesptr[i];
     }
         
-    return densematrixcopy;
+    return densematcopy;
 }
 
-void densematrix::print(void)
+void densemat::print(void)
 {
     printsize();
     
@@ -195,12 +195,12 @@ void densematrix::print(void)
     std::cout << std::endl;
 }
 
-void densematrix::printsize(void)
+void densemat::printsize(void)
 {
     std::cout << "Matrix size is " << numrows << "x" << numcols << std::endl;
 }
 
-bool densematrix::isallzero(void)
+bool densemat::isallzero(void)
 {
     double* myvaluesptr = myvalues.get();
     for (long long int i = 0; i < numrows*numcols; i++)
@@ -211,12 +211,12 @@ bool densematrix::isallzero(void)
     return true;
 }
 
-void densematrix::transpose(void)
+void densemat::transpose(void)
 {
     istransposed = not(istransposed);
 }
 
-densematrix densematrix::multiply(densematrix B)
+densemat densemat::multiply(densemat B)
 {
     // Number of rows and columns of A and B after transposition:
     long long int numrowsA, numcolsA, numrowsB, numcolsB;
@@ -243,11 +243,11 @@ densematrix densematrix::multiply(densematrix B)
     
     if (numcolsA != numrowsB)
     {
-        std::cout << "Error in 'densematrix' object: trying to multiply a " << numrowsA << "x" << numcolsA << " matrix by a "  << numrowsB << "x" << numcolsB << std::endl;
+        std::cout << "Error in 'densemat' object: trying to multiply a " << numrowsA << "x" << numcolsA << " matrix by a "  << numrowsB << "x" << numcolsB << std::endl;
         abort();
     }
     
-    densematrix C(numrowsA, numcolsB);
+    densemat C(numrowsA, numcolsB);
     
     
     // For too small matrices the overhead of BLAS is too visible and we use a homemade product.
@@ -300,9 +300,9 @@ densematrix densematrix::multiply(densematrix B)
     return C;
 }
 
-double* densematrix::getvalues(void) { return myvalues.get(); }
+double* densemat::getvalues(void) { return myvalues.get(); }
 
-void densematrix::addproduct(double coef, densematrix B)
+void densemat::addproduct(double coef, densemat B)
 {
     double* myvaluesptr = myvalues.get();
     double* Bmyvaluesptr = B.myvalues.get();
@@ -319,7 +319,7 @@ void densematrix::addproduct(double coef, densematrix B)
     }
 }
 
-void densematrix::addproduct(densematrix A, densematrix B)
+void densemat::addproduct(densemat A, densemat B)
 {
     double* myvaluesptr = myvalues.get();
     double* Amyvaluesptr = A.myvalues.get();
@@ -329,9 +329,9 @@ void densematrix::addproduct(densematrix A, densematrix B)
         myvaluesptr[i] += Amyvaluesptr[i]*Bmyvaluesptr[i];
 }
 
-densematrix densematrix::getproduct(double coef)
+densemat densemat::getproduct(double coef)
 {
-    densematrix output(numrows, numcols);
+    densemat output(numrows, numcols);
     double* myvaluesptr = myvalues.get();
     double* outputmyvaluesptr = output.myvalues.get();
     
@@ -348,9 +348,9 @@ densematrix densematrix::getproduct(double coef)
     return output;
 }
 
-densematrix densematrix::gettranspose(void)
+densemat densemat::gettranspose(void)
 {
-    densematrix output(numcols, numrows);
+    densemat output(numcols, numrows);
     
     double* myvaluesptr = myvalues.get();
     double* outputmyvaluesptr = output.myvalues.get();
@@ -364,20 +364,20 @@ densematrix densematrix::gettranspose(void)
     return output;
 }
 
-densematrix densematrix::getinverse(void)
+densemat densemat::getinverse(void)
 {
     int n = numrows;
     if (numrows != numcols)
     {
-        std::cout << "Error in 'densematrix' object: can only invert a square densematrix" << std::endl;
+        std::cout << "Error in 'densemat' object: can only invert a square densemat" << std::endl;
         abort();
     }
     
     if (n == 0)
-        return densematrix(0,0);
+        return densemat(0,0);
 
-    intdensematrix csrrows(1, n+1, 0,n);
-    intdensematrix csrcols(n,n);
+    indexmat csrrows(1, n+1, 0,n);
+    indexmat csrcols(n,n);
     int* captr = csrcols.getvalues();
     for (int r = 0; r < n; r++)
     {
@@ -391,8 +391,8 @@ densematrix densematrix::getinverse(void)
     MatAssemblyBegin(bdmat, MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
 
-    intdensematrix blocksizes(1,1, n);
-    densematrix output(n,n);
+    indexmat blocksizes(1,1, n);
+    densemat output(n,n);
     MatInvertVariableBlockDiagonal(bdmat, 1, blocksizes.getvalues(), output.getvalues()); // output is column-major after the call
 
     MatDestroy(&bdmat);
@@ -401,7 +401,7 @@ densematrix densematrix::getinverse(void)
     return output.gettranspose();
 }
 
-void densematrix::multiplyelementwise(densematrix B)
+void densemat::multiplyelementwise(densemat B)
 {
     double* myvaluesptr = myvalues.get();
     double* Bmyvaluesptr = B.myvalues.get();
@@ -410,7 +410,7 @@ void densematrix::multiplyelementwise(densematrix B)
         myvaluesptr[i] *= Bmyvaluesptr[i];
 }
 
-void densematrix::multiplyelementwise(double val)
+void densemat::multiplyelementwise(double val)
 {
     double* myvaluesptr = myvalues.get();
     
@@ -418,7 +418,7 @@ void densematrix::multiplyelementwise(double val)
         myvaluesptr[i] *= val;
 }
 
-void densematrix::add(densematrix B)
+void densemat::add(densemat B)
 {
     double* myvaluesptr = myvalues.get();
     double* Bmyvaluesptr = B.myvalues.get();
@@ -427,7 +427,7 @@ void densematrix::add(densematrix B)
         myvaluesptr[i] += Bmyvaluesptr[i];
 }
 
-void densematrix::subtract(densematrix B)
+void densemat::subtract(densemat B)
 {
     double* myvaluesptr = myvalues.get();
     double* Bmyvaluesptr = B.myvalues.get();
@@ -436,7 +436,7 @@ void densematrix::subtract(densematrix B)
         myvaluesptr[i] -= Bmyvaluesptr[i];
 }
 
-void densematrix::minus(void)
+void densemat::minus(void)
 {
     double* myvaluesptr = myvalues.get();
     
@@ -444,7 +444,7 @@ void densematrix::minus(void)
         myvaluesptr[i] = -myvaluesptr[i];
 }
 
-void densematrix::power(densematrix exponent)
+void densemat::power(densemat exponent)
 {
     double* myvaluesptr = myvalues.get();
     double* expmyvaluesptr = exponent.myvalues.get();
@@ -453,7 +453,7 @@ void densematrix::power(densematrix exponent)
             myvaluesptr[i] = std::pow(myvaluesptr[i], expmyvaluesptr[i]);
 }
 
-void densematrix::invert(void)
+void densemat::invert(void)
 {
     double* myvaluesptr = myvalues.get();
     
@@ -461,7 +461,7 @@ void densematrix::invert(void)
         myvaluesptr[i] = 1.0/myvaluesptr[i];
 }
 
-void densematrix::abs(void)
+void densemat::abs(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -469,7 +469,7 @@ void densematrix::abs(void)
         myvaluesptr[i] = std::abs(myvaluesptr[i]);
 }
 
-void densematrix::sin(void)
+void densemat::sin(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -477,7 +477,7 @@ void densematrix::sin(void)
         myvaluesptr[i] = std::sin(myvaluesptr[i]);
 }
 
-void densematrix::cos(void)
+void densemat::cos(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -485,7 +485,7 @@ void densematrix::cos(void)
         myvaluesptr[i] = std::cos(myvaluesptr[i]);
 }
 
-void densematrix::tan(void)
+void densemat::tan(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -493,7 +493,7 @@ void densematrix::tan(void)
         myvaluesptr[i] = std::tan(myvaluesptr[i]);
 }
 
-void densematrix::asin(void)
+void densemat::asin(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -501,7 +501,7 @@ void densematrix::asin(void)
         myvaluesptr[i] = std::asin(myvaluesptr[i]);
 }
 
-void densematrix::acos(void)
+void densemat::acos(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -509,7 +509,7 @@ void densematrix::acos(void)
         myvaluesptr[i] = std::acos(myvaluesptr[i]);
 }
 
-void densematrix::atan(void)
+void densemat::atan(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -517,7 +517,7 @@ void densematrix::atan(void)
         myvaluesptr[i] = std::atan(myvaluesptr[i]);
 }
 
-void densematrix::log10(void)
+void densemat::log10(void)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -525,7 +525,7 @@ void densematrix::log10(void)
         myvaluesptr[i] = std::log10(myvaluesptr[i]);
 }
 
-void densematrix::mod(double modval)
+void densemat::mod(double modval)
 {
     double* myvaluesptr = myvalues.get();
 
@@ -533,7 +533,7 @@ void densematrix::mod(double modval)
         myvaluesptr[i] = std::fmod(myvaluesptr[i], modval);
 }
 
-std::vector<double> densematrix::minmax(void)
+std::vector<double> densemat::minmax(void)
 {
     errorifempty();
 
@@ -552,7 +552,7 @@ std::vector<double> densematrix::minmax(void)
     return {minval, maxval};
 }
 
-double densematrix::max(void)
+double densemat::max(void)
 {
     errorifempty();
 
@@ -568,7 +568,7 @@ double densematrix::max(void)
     return val;
 }
 
-double densematrix::maxabs(void)
+double densemat::maxabs(void)
 {
     errorifempty();
 
@@ -584,7 +584,7 @@ double densematrix::maxabs(void)
     return val;
 }
 
-double densematrix::sum(void)
+double densemat::sum(void)
 {
     double* myvaluesptr = myvalues.get();
     double val = 0;
@@ -594,7 +594,7 @@ double densematrix::sum(void)
     return val;
 }
 
-void densematrix::multiplycolumns(std::vector<double> input)
+void densemat::multiplycolumns(std::vector<double> input)
 {
     double* myvaluesptr = myvalues.get();
     
@@ -605,9 +605,9 @@ void densematrix::multiplycolumns(std::vector<double> input)
     }
 }
 
-densematrix densematrix::multiplyallrows(densematrix input)
+densemat densemat::multiplyallrows(densemat input)
 {
-    densematrix output(numrows*input.numrows, numcols);
+    densemat output(numrows*input.numrows, numcols);
     
     double* myvaluesptr = myvalues.get();
     double* inmyvaluesptr = input.myvalues.get();
@@ -624,14 +624,14 @@ densematrix densematrix::multiplyallrows(densematrix input)
     return output;
 }
 
-densematrix densematrix::dofinterpoltimestf(densematrix tfval)
+densemat densemat::dofinterpoltimestf(densemat tfval)
 {
     long long int fft = tfval.countrows();
     long long int gp = tfval.countcolumns();
     long long int elem = numrows;
     long long int ffd = numcols/gp;
     
-    densematrix output(elem, gp*ffd*fft);
+    densemat output(elem, gp*ffd*fft);
     
     double* myvaluesptr = myvalues.get();
     double* tfvaluesptr = tfval.myvalues.get();
@@ -656,7 +656,7 @@ densematrix densematrix::dofinterpoltimestf(densematrix tfval)
     return output;
 }
 
-void densematrix::multiplycolumns(densematrix input)
+void densemat::multiplycolumns(densemat input)
 {
     long long int collen = input.countcolumns();
     long long int numblocks = numcols/collen;
@@ -678,9 +678,9 @@ void densematrix::multiplycolumns(densematrix input)
     }
 }
 
-densematrix densematrix::duplicatevertically(int n)
+densemat densemat::duplicatevertically(int n)
 {
-    densematrix output(numrows*n, numcols);
+    densemat output(numrows*n, numcols);
     
     double* myvaluesptr = myvalues.get();
     double* outmyvaluesptr = output.myvalues.get();
@@ -695,9 +695,9 @@ densematrix densematrix::duplicatevertically(int n)
     return output;
 }
 
-densematrix densematrix::duplicatehorizontally(int n)
+densemat densemat::duplicatehorizontally(int n)
 {
-    densematrix output(numrows, numcols*n);
+    densemat output(numrows, numcols*n);
     
     double* myvaluesptr = myvalues.get();
     double* outmyvaluesptr = output.myvalues.get();
@@ -718,11 +718,11 @@ densematrix densematrix::duplicatehorizontally(int n)
     return output;
 }
 
-densematrix densematrix::extractrows(std::vector<int>& selected)
+densemat densemat::extractrows(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
 
-    densematrix output(numselected, numcols);
+    densemat output(numselected, numcols);
     
     double* vals = getvalues();
     double* outvals = output.getvalues();
@@ -736,11 +736,11 @@ densematrix densematrix::extractrows(std::vector<int>& selected)
     return output;
 }
 
-densematrix densematrix::extractcols(std::vector<int>& selected)
+densemat densemat::extractcols(std::vector<int>& selected)
 {
     long long int numselected = selected.size();
     
-    densematrix output(numrows, numselected);
+    densemat output(numrows, numselected);
     
     double* vals = getvalues();
     double* outvals = output.getvalues();
@@ -756,7 +756,7 @@ densematrix densematrix::extractcols(std::vector<int>& selected)
     return output;
 }
 
-densematrix densematrix::extractrows(long long int rangebegin, long long int rangeend)
+densemat densemat::extractrows(long long int rangebegin, long long int rangeend)
 {
     std::vector<int> selected(rangeend-rangebegin+1);
     for (long long int i = 0; i < selected.size(); i++)
@@ -765,7 +765,7 @@ densematrix densematrix::extractrows(long long int rangebegin, long long int ran
     return extractrows(selected);
 }
 
-densematrix densematrix::extractcols(long long int rangebegin, long long int rangeend)
+densemat densemat::extractcols(long long int rangebegin, long long int rangeend)
 {
     std::vector<int> selected(rangeend-rangebegin+1);
     for (long long int i = 0; i < selected.size(); i++)
@@ -774,7 +774,7 @@ densematrix densematrix::extractcols(long long int rangebegin, long long int ran
     return extractcols(selected);
 }
 
-densematrix densematrix::blockdiagonaltimesvector(intdensematrix blocklens, densematrix v)
+densemat densemat::blockdiagonaltimesvector(indexmat blocklens, densemat v)
 {
     long long int nb = blocklens.count();
     
@@ -782,7 +782,7 @@ densematrix densematrix::blockdiagonaltimesvector(intdensematrix blocklens, dens
     double* bdvals = getvalues();
     double* vvals = v.getvalues();
     
-    densematrix output(v.countrows(), v.countcolumns(), 0.0);
+    densemat output(v.countrows(), v.countcolumns(), 0.0);
     double* outvals = output.getvalues();
     
     // Loop on all blocks:

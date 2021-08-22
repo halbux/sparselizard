@@ -12,7 +12,7 @@ void rawvec::synchronize(void)
     
     // Value and pointer of each port:
     std::vector<rawport*> rps;
-    densematrix rpsvals;
+    densemat rpsvals;
     
     if (isvaluesynchronizingallowed)
     {
@@ -22,7 +22,7 @@ void rawvec::synchronize(void)
         *mydofmanager = mycurrentstructure[0];
         
         // Extract the ports values:
-        intdensematrix rpsinds;
+        indexmat rpsinds;
         mydofmanager->getportsinds(rps, rpsinds);
         rpsvals = getvalues(rpsinds);
         
@@ -69,7 +69,7 @@ void rawvec::synchronize(void)
             datafields[i]->transferdata(-1, vec(shared_from_this())|field(dmfields[i]), "set");
             
         // Restore the port values:
-        intdensematrix newrpsinds(rps.size(), 1);
+        indexmat newrpsinds(rps.size(), 1);
         int* newrpsindsptr = newrpsinds.getvalues();
         for (int i = 0; i < rps.size(); i++)
             newrpsindsptr[i] = mydofmanager->getaddress(rps[i]);
@@ -184,7 +184,7 @@ void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield
     }
 }
 
-void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op)
+void rawvec::setvalues(indexmat addresses, densemat valsmat, std::string op)
 {           
     synchronize();
      
@@ -199,8 +199,8 @@ void rawvec::setvalues(intdensematrix addresses, densematrix valsmat, std::strin
     if (numpositiveentries == 0)
         return;
 
-    intdensematrix filteredad(numpositiveentries,1);
-    densematrix filteredval(numpositiveentries,1);
+    indexmat filteredad(numpositiveentries,1);
+    densemat filteredval(numpositiveentries,1);
     int* filteredads = filteredad.getvalues();
     double* filteredvals = filteredval.getvalues();
 
@@ -240,12 +240,12 @@ void rawvec::setvalue(int address, double value, std::string op)
     VecAssemblyEnd(myvec);
 }
 
-densematrix rawvec::getvalues(intdensematrix addresses)
+densemat rawvec::getvalues(indexmat addresses)
 {
     synchronize();
     
     int numentries = addresses.count();
-    densematrix valmat(numentries,1);
+    densemat valmat(numentries,1);
     VecGetValues(myvec, numentries, addresses.getvalues(), valmat.getvalues());
     
     return valmat;
@@ -262,7 +262,7 @@ double rawvec::getvalue(int address)
     return outval[0];
 }
 
-void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op)
+void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densemat vals, std::string op)
 {
     synchronize();
     
@@ -275,11 +275,11 @@ void rawvec::setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregi
     int rangebegin = mydofmanager->getrangebegin(disjointregionnumber, formfunctionindex);
     int numentries = myptracker->getdisjointregions()->countelements(disjointregionnumber);
 
-    intdensematrix addressestoset(numentries, 1, rangebegin, 1);
+    indexmat addressestoset(numentries, 1, rangebegin, 1);
     setvalues(addressestoset, vals, op);
 }
 
-densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
+densemat rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex)
 {
     synchronize();
     
@@ -288,7 +288,7 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     // Return an empty matrix if the entries are not in the vector:
     if (mydofmanager->isdefined(disjointregionnumber, formfunctionindex) == false)
     {
-        densematrix vals;
+        densemat vals;
         return vals;
     }
     
@@ -299,8 +299,8 @@ densematrix rawvec::getvalues(std::shared_ptr<rawfield> selectedfield, int disjo
     if (mydofmanager->isported(disjointregionnumber))
         step = 0;
     
-    densematrix vals(numentries, 1);
-    intdensematrix addressestoget(numentries, 1, rangebegin, step);
+    densemat vals(numentries, 1);
+    indexmat addressestoget(numentries, 1, rangebegin, step);
     VecGetValues(myvec, numentries, addressestoget.getvalues(), vals.getvalues());
     
     return vals;
@@ -311,11 +311,11 @@ void rawvec::setvaluestoports(void)
     synchronize();
     
     std::vector<rawport*> rps;
-    intdensematrix inds;
+    indexmat inds;
     
     mydofmanager->getportsinds(rps, inds);
     
-    densematrix vecvals = getvalues(inds);
+    densemat vecvals = getvalues(inds);
     double* vptr = vecvals.getvalues();
     
     for (int p = 0; p < rps.size(); p++)
@@ -327,11 +327,11 @@ void rawvec::setvaluesfromports(void)
     synchronize();
     
     std::vector<rawport*> rps;
-    intdensematrix inds;
+    indexmat inds;
     
     mydofmanager->getportsinds(rps, inds);
     
-    densematrix prtvals(rps.size(), 1);
+    densemat prtvals(rps.size(), 1);
     double* vptr = prtvals.getvalues();
     
     for (int p = 0; p < rps.size(); p++)
@@ -358,8 +358,8 @@ void rawvec::write(std::string filename)
         if (fileext == ".txt")
         {
             std::vector<double> towrite;
-            intdensematrix adresses(1,size(),0,1);
-            densematrix curvals = getvalues(adresses);
+            indexmat adresses(1,size(),0,1);
+            densemat curvals = getvalues(adresses);
             curvals.getvalues(towrite);
             sl::writevector(filename, towrite, ',', true);
             return;
@@ -402,8 +402,8 @@ void rawvec::load(std::string filename)
                 std::cout << "Error in 'rawvec' object: loaded data size (" << loadedvals.size() << ") does not match the vector size (" << size() << ") " << std::endl;
                 abort();
             }
-            densematrix valsmat(1,size(), loadedvals);
-            intdensematrix adresses(1,size(),0,1);
+            densemat valsmat(1,size(), loadedvals);
+            indexmat adresses(1,size(),0,1);
             setvalues(adresses, valsmat);
             return;
         }
@@ -489,10 +489,10 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
         
         int inputrangebegin = inputvec->mydofmanager->getrangebegin(disjreg,ff);
         
-        intdensematrix myaddresses(numentries, 1, myrangebegin, 1);
-        intdensematrix inputaddresses(numentries, 1, inputrangebegin, 1);
+        indexmat myaddresses(numentries, 1, myrangebegin, 1);
+        indexmat inputaddresses(numentries, 1, inputrangebegin, 1);
         
-        densematrix inputval = inputvec->getvalues(inputaddresses);
+        densemat inputval = inputvec->getvalues(inputaddresses);
         setvalues(myaddresses, inputval, "set");
         
         ff++;
@@ -504,9 +504,9 @@ void rawvec::setdata(std::shared_ptr<rawvec> inputvec, int disjreg, std::shared_
         int myrangebegin = mydofmanager->getrangebegin(disjreg,ff);
         int numentries = myptracker->getdisjointregions()->countelements(disjreg);
                 
-        intdensematrix myaddresses(numentries, 1, myrangebegin, 1);
+        indexmat myaddresses(numentries, 1, myrangebegin, 1);
         
-        densematrix zerovals(numentries,1, 0);
+        densemat zerovals(numentries,1, 0);
         setvalues(myaddresses, zerovals, "set");
         
         ff++;

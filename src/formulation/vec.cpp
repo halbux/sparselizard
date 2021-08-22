@@ -12,7 +12,7 @@ void vec::errorifpointerisnull(void)
     }
 }
 
-vec::vec(int vecsize, intdensematrix addresses, densematrix vals)
+vec::vec(int vecsize, indexmat addresses, densemat vals)
 {
     rawvecptr = std::shared_ptr<rawvec>(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(vecsize))));
     rawvecptr->setvalues(addresses, vals, "set");
@@ -20,7 +20,7 @@ vec::vec(int vecsize, intdensematrix addresses, densematrix vals)
 
 int vec::size(void) { errorifpointerisnull(); return rawvecptr->size(); }
 
-void vec::permute(intdensematrix rowpermute, bool invertit)
+void vec::permute(indexmat rowpermute, bool invertit)
 {
     if (rowpermute.count() != size())
     {
@@ -53,32 +53,32 @@ void vec::updateconstraints(void)
         rawvecptr->updatedisjregconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
-    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+    std::pair<indexmat, densemat> condconstrdata = mydofmanager->getconditionalconstraintdata();
     rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
     
     // Set the gauged indexes to zero:
-    intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-    rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
+    indexmat gaugedindexes = mydofmanager->getgaugedindexes();
+    rawvecptr->setvalues(gaugedindexes, densemat(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
 }
 
-void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
+void vec::setvalues(indexmat addresses, densemat valsmat, std::string op) 
 { 
     errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
 
-void vec::setallvalues(densematrix valsmat, std::string op)
+void vec::setallvalues(densemat valsmat, std::string op)
 { 
     errorifpointerisnull();
-    intdensematrix ads(size(),1,0,1);
+    indexmat ads(size(),1,0,1);
     rawvecptr->setvalues(ads, valsmat, op); 
 }
 
-densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
+densemat vec::getvalues(indexmat addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
 
-densematrix vec::getallvalues(void)
+densemat vec::getallvalues(void)
 {
     errorifpointerisnull();
-    intdensematrix ads(size(),1,0,1);
+    indexmat ads(size(),1,0,1);
     return rawvecptr->getvalues(ads);
 }
 
@@ -180,11 +180,11 @@ vec vec::copy(void)
     return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
 }
 
-vec vec::extract(intdensematrix addresses)
+vec vec::extract(indexmat addresses)
 {
-    densematrix extractedvals = getvalues(addresses);
+    densemat extractedvals = getvalues(addresses);
     std::shared_ptr<rawvec> newrawvecptr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(addresses.count()))));
-    newrawvecptr->setvalues(intdensematrix(addresses.count(), 1, 0, 1), extractedvals, "set");
+    newrawvecptr->setvalues(indexmat(addresses.count(), 1, 0, 1), extractedvals, "set");
     return vec(newrawvecptr);
 }
 

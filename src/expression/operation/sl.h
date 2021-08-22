@@ -232,21 +232,21 @@ namespace sl
     // Multi-rhs direct resolution:
     std::vector<vec> solve(mat A, std::vector<vec> b, std::string soltype = "lu");
     // Densematrix 'b' has size #rhs x #dofs:
-    densematrix solve(mat A, densematrix b, std::string soltype);
+    densemat solve(mat A, densemat b, std::string soltype);
     
     // Iterative resolution (with or without diagonal scaling):
     void solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
     
     
-    // Exchange densematrix data with MPI:
-    void exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives);
+    // Exchange densemat data with MPI:
+    void exchange(std::vector<int> targetranks, std::vector<densemat> sends, std::vector<densemat> receives);
     
     // MPI based gmres with custom matrix free product (no restart). Initial guess and solution are in x.
     // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
-    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity = 1);
+    std::vector<double> gmres(densemat (*mymatmult)(densemat), densemat b, densemat x, double relrestol, int maxnumit, int verbosity = 1);
     
     // Know which dofs to send and at which dofs to receive for the DDM. Choose the rawfields and the domain interface dimensions (length 3) to consider.
-    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);
+    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<indexmat>& sendinds, std::vector<indexmat>& recvinds);
     
     std::vector<double> linspace(double a, double b, int num);
     std::vector<double> logspace(double a, double b, int num, double basis = 10.0);

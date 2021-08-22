@@ -44,9 +44,9 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     {
         std::vector<int> csorigindexes = cselsel.getoriginalindexes();
 
-        densematrix xevaled = xdef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
-        densematrix yevaled = ydef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
-        densematrix zevaled = zdef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
+        densemat xevaled = xdef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
+        densemat yevaled = ydef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
+        densemat zevaled = zdef.getoperationinarray(0,0)->interpolate(cselsel, myrefcoords, NULL)[1][0];
 
         double* xvals = xevaled.getvalues(); double* yvals = yevaled.getvalues(); double* zvals = zevaled.getvalues();
 
@@ -86,15 +86,15 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
     
     // Preallocate the matrix containers:
     int totalnumels = elemselec.count();
-    myvals = std::vector<densematrix>(mydofops.size());
+    myvals = std::vector<densemat>(mydofops.size());
     for (int i = 0; i < mydofops.size(); i++)
-        myvals[i] = densematrix(totalnumels, mymaxnumff*mynumrefcoords, 0);
+        myvals[i] = densemat(totalnumels, mymaxnumff*mynumrefcoords, 0);
     // Preallocate the adresses matrix for each harmonic:
     std::vector<int> dofharms = mydoffield->getharmonics();
-    mydofnums = std::vector<std::vector<intdensematrix>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<intdensematrix>(0));
+    mydofnums = std::vector<std::vector<indexmat>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<indexmat>(0));
    
     for (int h = 0; h < dofharms.size(); h++)
-        mydofnums[dofharms[h]] = {intdensematrix(totalnumels, mymaxnumff*mynumrefcoords, -2)};
+        mydofnums[dofharms[h]] = {indexmat(totalnumels, mymaxnumff*mynumrefcoords, -2)};
            
 
     eval();
@@ -176,7 +176,7 @@ void dofinterpolate::eval(void)
                     std::vector<int> origindexes = myselector.getoriginalindexes();
 
                     // Rows are shape functions and columns are evaluation points:
-                    std::vector<densematrix> evaled(mydofops.size());
+                    std::vector<densemat> evaled(mydofops.size());
                     if (h == 0)
                     {
                         for (int df = 0; df < mydofops.size(); df++)
@@ -252,13 +252,13 @@ void dofinterpolate::eval(void)
 }
 
 
-densematrix dofinterpolate::getvalues(elementselector& elemselec, int dofopindex)
+densemat dofinterpolate::getvalues(elementselector& elemselec, int dofopindex)
 {
     std::vector<int> oi = elemselec.getoriginalindexes();
     return myvals[dofopindex].extractrows(oi);
 }
 
-intdensematrix dofinterpolate::getaddresses(elementselector& elemselec, int harmnum)
+indexmat dofinterpolate::getaddresses(elementselector& elemselec, int harmnum)
 {
     std::vector<int> oi = elemselec.getoriginalindexes();
     return mydofnums[harmnum][0].extractrows(oi);

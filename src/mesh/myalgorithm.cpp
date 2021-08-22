@@ -629,7 +629,7 @@ void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindex
         selected[i] = vals[selectedindexes[i]];
 }
 
-void myalgorithm::select(std::vector<bool>& vals, intdensematrix selectedindexes, std::vector<bool>& selected)
+void myalgorithm::select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected)
 {
     int numselected = selectedindexes.count();
     selected.resize(numselected);
@@ -1171,29 +1171,29 @@ void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::v
     h[k+1] = 0.0;
 }
 
-std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k)
+std::vector<double> myalgorithm::arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k)
 {   
     // One Krylov vector on each row:
     int n = Q.countcolumns();
     double* Qptr = Q.getvalues();
     
     // Krylov vector fragment on each rank:
-    densematrix q = mymatmult(Q.extractrows(k,k).getresized(n,1));
+    densemat q = mymatmult(Q.extractrows(k,k).getresized(n,1));
     double* qptr = q.getvalues();
     
     if (q.countrows() != n || q.countcolumns() != 1)
     {
-        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densematrix of wrong size on rank " << slmpi::getrank() << std::endl;
+        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
         abort();
     }
     
     // Standard Gramm-Schmidt orthogonalization:
-    densematrix h = Q.getresized(k+1,n).multiply(q);
+    densemat h = Q.getresized(k+1,n).multiply(q);
     h = h.getresized(1,k+1);
     
     slmpi::sum(k+1, h.getvalues()); // reduce on all ranks
     
-    densematrix Qh = h.multiply(Q.getresized(k+1,n));
+    densemat Qh = h.multiply(Q.getresized(k+1,n));
     double* Qhptr = Qh.getvalues();
     
     // Subtract Qh and compute the norm of q:
@@ -1759,15 +1759,15 @@ void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::str
     }
 }
 
-void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum)
+void myalgorithm::findtruefalse(std::vector<bool>& invec, indexmat& trueinds, indexmat& falseinds, std::vector<int>& renum)
 {
     int numtot = invec.size();
     int numtrue = counttrue(invec);
 
     renum = std::vector<int>(numtot);
 
-    trueinds = intdensematrix(numtrue, 1);
-    falseinds = intdensematrix(numtot-numtrue, 1);
+    trueinds = indexmat(numtrue, 1);
+    falseinds = indexmat(numtot-numtrue, 1);
     int* tiptr = trueinds.getvalues();
     int* fiptr = falseinds.getvalues();
 

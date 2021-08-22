@@ -319,7 +319,7 @@ void spanningtree::write(std::string filename)
     nodes* mynodes = universe::getrawmesh()->getnodes();
     std::vector<double>* nodecoords = mynodes->getcoordinates();
     
-    densematrix xcoords(numberofedgesintree,2), ycoords(numberofedgesintree,2), zcoords(numberofedgesintree,2);
+    densemat xcoords(numberofedgesintree,2), ycoords(numberofedgesintree,2), zcoords(numberofedgesintree,2);
 
     double* xvals = xcoords.getvalues();
     double* yvals = ycoords.getvalues();    
@@ -347,7 +347,7 @@ void spanningtree::write(std::string filename)
     // Write to file:
     iodata datatowrite(1, 1, true, {});
     datatowrite.addcoordinates(1, xcoords, ycoords, zcoords);
-    datatowrite.adddata(1, {densematrix(numberofedgesintree, 2, 1.0)});
+    datatowrite.adddata(1, {densemat(numberofedgesintree, 2, 1.0)});
     
     iointerface::writetofile(filename, datatowrite);
 }

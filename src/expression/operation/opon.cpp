@@ -10,7 +10,7 @@ opon::opon(int physreg, expression* coordshift, std::shared_ptr<operation> arg, 
         mycoordshift = {*coordshift};
 }
 
-std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opon::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -39,7 +39,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     }   
     expression xyz(3, 1, {xdef,ydef,zdef});
     
-    std::vector<std::vector<densematrix>> xmatvec, ymatvec, zmatvec;
+    std::vector<std::vector<densemat>> xmatvec, ymatvec, zmatvec;
     
     xmatvec = xdef.getoperationinarray(0,0)->interpolate(elemselect, evaluationcoordinates, NULL);
     ymatvec = ydef.getoperationinarray(0,0)->interpolate(elemselect, evaluationcoordinates, NULL);
@@ -52,7 +52,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
         abort();
     }
     
-    densematrix xvalmat, yvalmat, zvalmat;
+    densemat xvalmat, yvalmat, zvalmat;
     xvalmat = xmatvec[1][0];
     yvalmat = ymatvec[1][0];
     zvalmat = zmatvec[1][0];
@@ -94,13 +94,13 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     }
     
     
-    // Place the interpolated values in a std::vector<std::vector<densematrix>>:
-    std::vector<std::vector<densematrix>> outvec(interpolated.size(), std::vector<densematrix>(0));
+    // Place the interpolated values in a std::vector<std::vector<densemat>>:
+    std::vector<std::vector<densemat>> outvec(interpolated.size(), std::vector<densemat>(0));
     for (int h = 0; h < interpolated.size(); h++)
     {
         if (interpolated[h].size() > 0)
         {
-            densematrix singleharm(numelems, numgp);
+            densemat singleharm(numelems, numgp);
             double* singleharmvals = singleharm.getvalues();
 
             for (int i = 0; i < numpts; i++)
@@ -118,7 +118,7 @@ std::vector<std::vector<densematrix>> opon::interpolate(elementselector& elemsel
     return outvec;
 }
 
-densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opon::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -147,7 +147,7 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
     }   
     expression xyz(3, 1, {xdef,ydef,zdef});
     
-    std::vector<std::vector<densematrix>> xmatvec, ymatvec, zmatvec;
+    std::vector<std::vector<densemat>> xmatvec, ymatvec, zmatvec;
     
     xmatvec = xdef.getoperationinarray(0,0)->interpolate(elemselect, evaluationcoordinates, NULL);
     ymatvec = ydef.getoperationinarray(0,0)->interpolate(elemselect, evaluationcoordinates, NULL);
@@ -160,7 +160,7 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
         abort();
     }
     
-    densematrix xvalmat, yvalmat, zvalmat;
+    densemat xvalmat, yvalmat, zvalmat;
     xvalmat = xmatvec[1][0];
     yvalmat = ymatvec[1][0];
     zvalmat = zmatvec[1][0];
@@ -201,8 +201,8 @@ densematrix opon::multiharmonicinterpolate(int numtimeevals, elementselector& el
         }
     }
     
-    // Place the interpolated values in a densematrix:
-    densematrix outmat(numtimeevals, numpts);
+    // Place the interpolated values in a densemat:
+    densemat outmat(numtimeevals, numpts);
     double* outmatvals = outmat.getvalues();
     
     for (int i = 0; i < numpts*numtimeevals; i++)

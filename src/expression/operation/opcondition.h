@@ -23,8 +23,8 @@ class opcondition: public operation
         
         opcondition(std::shared_ptr<operation> condarg, std::shared_ptr<operation> truearg, std::shared_ptr<operation> falsearg);
         
-        std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::vector<std::shared_ptr<operation>> getarguments(void) { return {mycond, mytrue, myfalse}; };
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);

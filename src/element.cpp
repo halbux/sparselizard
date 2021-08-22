@@ -1988,11 +1988,11 @@ void element::write(std::string filename, std::vector<double> coords)
     int ncn = countcurvednodes();
     int numelems = coords.size()/3/ncn;
     
-    densematrix xcoords(numelems, ncn);
-    densematrix ycoords(numelems, ncn);
-    densematrix zcoords(numelems, ncn);
+    densemat xcoords(numelems, ncn);
+    densemat ycoords(numelems, ncn);
+    densemat zcoords(numelems, ncn);
     
-    densematrix vals(numelems, ncn);
+    densemat vals(numelems, ncn);
 
     double* xptr = xcoords.getvalues();
     double* yptr = ycoords.getvalues();
