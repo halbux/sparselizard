@@ -7,8 +7,8 @@
 // This object stores the ROW-MAJOR values of a dense matrix of int.
 // In other words the matrix is stored as [row1 row2 row3 ...].
 
-#ifndef INTDENSEMATRIX_H
-#define INTDENSEMATRIX_H
+#ifndef INDEXMAT_H
+#define INDEXMAT_H
 
 #include <iostream>
 #include <vector>
