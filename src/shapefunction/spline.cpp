@@ -48,8 +48,8 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
         abort();
     }   
     
-    myx = densematrix(len,1);
-    myy = densematrix(len,1);
+    myx = densemat(len,1);
+    myy = densemat(len,1);
     double* xvals = myx.getvalues();
     double* yvals = myy.getvalues();
     
@@ -78,10 +78,10 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     indexmat Arows(3*len-2,1), Acols(3*len-2,1);
     int* Arowvals = Arows.getvalues();
     int* Acolvals = Acols.getvalues();
-    densematrix Av(3*len-2,1);
+    densemat Av(3*len-2,1);
     double* Avals = Av.getvalues();
 
-    densematrix bv(len,1);
+    densemat bv(len,1);
     double* bvals = bv.getvalues();
     
     // First row has no left neighbour:
@@ -112,13 +112,13 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     vec b(len, indexmat(len,1,0,1), bv);
     
     vec k = sl::solve(A,b);
-    densematrix kv = k.getvalues(indexmat(len,1,0,1));
+    densemat kv = k.getvalues(indexmat(len,1,0,1));
     double* kvals = kv.getvalues();
     
     
     // Compute the spline parameters a and b:
-    mya = densematrix(len,1);
-    myb = densematrix(len,1);
+    mya = densemat(len,1);
+    myb = densemat(len,1);
     double* aparamvals = mya.getvalues();
     double* bparamvals = myb.getvalues();
     
@@ -146,15 +146,15 @@ double spline::evalat(double input)
 
 std::vector<double> spline::evalat(std::vector<double> input)
 {
-    densematrix indm(input.size(),1, input);
-    densematrix outdm = evalat(indm);
+    densemat indm(input.size(),1, input);
+    densemat outdm = evalat(indm);
     std::vector<double> output;
     outdm.getvalues(output);
     
     return output;
 }
 
-densematrix spline::evalat(densematrix input)
+densemat spline::evalat(densemat input)
 {
     int numin = input.count();
     double* inputvals = input.getvalues();
@@ -211,7 +211,7 @@ densematrix spline::evalat(densematrix input)
     }
     
     // Unsort the data:
-    densematrix output(input.countrows(),input.countcolumns());
+    densemat output(input.countrows(),input.countcolumns());
     double* outputvals = output.getvalues();
     
     for (int i = 0; i < numin; i++)
@@ -231,7 +231,7 @@ void spline::write(std::string filename, int numsplits, char delimiter)
     // Get the x positions:
     double* xvalues = myx.getvalues();
     
-    densematrix xsplit(1+(myx.count()-1)*(numsplits+1),1);
+    densemat xsplit(1+(myx.count()-1)*(numsplits+1),1);
     double* xsplitvals = xsplit.getvalues();
     double step = 1.0/(numsplits+1.0);
     
@@ -246,7 +246,7 @@ void spline::write(std::string filename, int numsplits, char delimiter)
             index++;
         }
     }
-    densematrix evaled = evalat(xsplit);
+    densemat evaled = evalat(xsplit);
     double* evaledvals = evaled.getvalues();
     
     

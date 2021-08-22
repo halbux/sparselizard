@@ -668,9 +668,9 @@ void rawmesh::move(int physreg, expression u)
             universe::allowreuse();
 
             // Compute the expression at the evaluation points:
-            densematrix xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
-            densematrix yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
-            densematrix zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
 
             universe::forbidreuse();
 
@@ -862,9 +862,9 @@ bool rawmesh::adapthp(int verbosity)
     
     prptr->remove({wholedomain}, false);
     
-    // Move to densematrix container:
-    densematrix hcritmat;
-    std::vector<densematrix> pcritmats(numpadaptfields), fomats(numpadaptfields);
+    // Move to densemat container:
+    densemat hcritmat;
+    std::vector<densemat> pcritmats(numpadaptfields), fomats(numpadaptfields);
     
     double* hcritptr;
     std::vector<double*> pcritptrs(numpadaptfields), foptrs(numpadaptfields);

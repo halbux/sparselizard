@@ -15,7 +15,7 @@ opestimator::opestimator(std::string estimatortype, std::shared_ptr<operation> a
     }
 }
 
-std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opestimator::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     if (meshdeform != NULL)
     {
@@ -45,7 +45,7 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
         myvalue->getfieldpointer()->resetcoefmanager();
     
     // Provide the requested output:
-    std::vector<std::vector<densematrix>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, NULL);
+    std::vector<std::vector<densemat>> argmat = myvalue->interpolate(elemselect, evaluationcoordinates, NULL);
     
    if (wasreuseallowed)
         universe::allowreuse();
@@ -56,7 +56,7 @@ std::vector<std::vector<densematrix>> opestimator::interpolate(elementselector& 
     return argmat;
 }
 
-densematrix opestimator::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opestimator::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     std::cout << "Error in 'opestimator' object: cannot perform a multiharmonic interpolation on the estimator" << std::endl;
     abort();
@@ -96,8 +96,8 @@ void opestimator::estimatezienkiewiczzhu(void)
 
     int numnodes = universe::getrawmesh()->getnodes()->count();
 
-    densematrix nodalvaluesmin(numnodes, 1);
-    densematrix nodalvaluesmax(numnodes, 1);
+    densemat nodalvaluesmin(numnodes, 1);
+    densemat nodalvaluesmax(numnodes, 1);
     double* nvmin = nodalvaluesmin.getvalues();
     double* nvmax = nodalvaluesmax.getvalues();
     
@@ -125,7 +125,7 @@ void opestimator::estimatezienkiewiczzhu(void)
             std::vector<int> elemnums = myselector.getelementnumbers();
         
             universe::allowreuse();
-            densematrix interpolated = myarg->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat interpolated = myarg->interpolate(myselector, evaluationpoints, NULL)[1][0];
             universe::forbidreuse();
 
             double* interpvals = interpolated.getvalues();

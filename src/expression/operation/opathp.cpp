@@ -9,7 +9,7 @@ opathp::opathp(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std:
     myptracker = pt;
 }
 
-std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opathp::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {   
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -92,7 +92,7 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
     
     ///// Evaluate the operation at all reference coordinate groups:
 
-    densematrix argmat(elemnums.size(), numevalpts);
+    densemat argmat(elemnums.size(), numevalpts);
     double* argmatptr = argmat.getvalues();
     
     std::shared_ptr<rawmesh> bkp = universe::getrawmesh();
@@ -122,10 +122,10 @@ std::vector<std::vector<densematrix>> opathp::interpolate(elementselector& elems
             elementselector myselector(curdisjregs, elemens, isorientationdependent);
             do 
             {
-                densematrix interpoled = myarg->interpolate(myselector, kietaphi, meshdeform)[1][0];
+                densemat interpoled = myarg->interpolate(myselector, kietaphi, meshdeform)[1][0];
                 double* interpvals = interpoled.getvalues();
                       
-                // Place the interpolated values at the right position in the output densematrix:
+                // Place the interpolated values at the right position in the output densemat:
                 std::vector<int> originds = myselector.getoriginalindexes();
                 for (int j = 0; j < originds.size(); j++)
                 {

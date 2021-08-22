@@ -54,7 +54,7 @@ long long int rawmat::countcolumns(void)
         return mydofmanager->countdofs();
 }
 
-void rawmat::accumulate(indexmat rowadresses, indexmat coladresses, densematrix vals)
+void rawmat::accumulate(indexmat rowadresses, indexmat coladresses, densemat vals)
 {
     if (vals.count() > 0)
     {
@@ -241,14 +241,14 @@ void rawmat::process(std::vector<bool>& isconstrained)
     // Create A and D:
     Arows = indexmat(Ainds.count()+1,1);
     Acols = indexmat(nnzA, 1);
-    Avals = densematrix(nnzA, 1);
+    Avals = densemat(nnzA, 1);
     int* Arowsptr = Arows.getvalues();
     int* Acolsptr = Acols.getvalues();
     double* Avalsptr = Avals.getvalues();
     
     Drows = indexmat(Ainds.count()+1,1);
     Dcols = indexmat(nnzD, 1);
-    Dvals = densematrix(nnzD, 1);
+    Dvals = densemat(nnzD, 1);
     int* Drowsptr = Drows.getvalues();
     int* Dcolsptr = Dcols.getvalues();
     double* Dvalsptr = Dvals.getvalues();

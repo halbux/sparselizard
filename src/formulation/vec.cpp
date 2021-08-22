@@ -12,7 +12,7 @@ void vec::errorifpointerisnull(void)
     }
 }
 
-vec::vec(int vecsize, indexmat addresses, densematrix vals)
+vec::vec(int vecsize, indexmat addresses, densemat vals)
 {
     rawvecptr = std::shared_ptr<rawvec>(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(vecsize))));
     rawvecptr->setvalues(addresses, vals, "set");
@@ -53,29 +53,29 @@ void vec::updateconstraints(void)
         rawvecptr->updatedisjregconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
-    std::pair<indexmat, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+    std::pair<indexmat, densemat> condconstrdata = mydofmanager->getconditionalconstraintdata();
     rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
     
     // Set the gauged indexes to zero:
     indexmat gaugedindexes = mydofmanager->getgaugedindexes();
-    rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
+    rawvecptr->setvalues(gaugedindexes, densemat(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
 }
 
-void vec::setvalues(indexmat addresses, densematrix valsmat, std::string op) 
+void vec::setvalues(indexmat addresses, densemat valsmat, std::string op) 
 { 
     errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
 
-void vec::setallvalues(densematrix valsmat, std::string op)
+void vec::setallvalues(densemat valsmat, std::string op)
 { 
     errorifpointerisnull();
     indexmat ads(size(),1,0,1);
     rawvecptr->setvalues(ads, valsmat, op); 
 }
 
-densematrix vec::getvalues(indexmat addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
+densemat vec::getvalues(indexmat addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
 
-densematrix vec::getallvalues(void)
+densemat vec::getallvalues(void)
 {
     errorifpointerisnull();
     indexmat ads(size(),1,0,1);
@@ -182,7 +182,7 @@ vec vec::copy(void)
 
 vec vec::extract(indexmat addresses)
 {
-    densematrix extractedvals = getvalues(addresses);
+    densemat extractedvals = getvalues(addresses);
     std::shared_ptr<rawvec> newrawvecptr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(addresses.count()))));
     newrawvecptr->setvalues(indexmat(addresses.count(), 1, 0, 1), extractedvals, "set");
     return vec(newrawvecptr);

@@ -66,7 +66,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
             if (datatowrite.ispopulated(tn) == false)
                 continue;
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
             double* xvals = curcoords[0].getvalues();
             double* yvals = curcoords[1].getvalues();
             double* zvals = curcoords[2].getvalues();
@@ -102,7 +102,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
             element myelem(tn, datatowrite.getinterpolorder());
             std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 
             for (int elem = 0; elem < curcoords[0].countrows(); elem++)
             {
@@ -124,7 +124,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
 
             element myelem(tn, datatowrite.getinterpolorder());
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 
             for (int elem = 0; elem < curcoords[0].countrows(); elem++)
                 outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
@@ -145,7 +145,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
                 if (datatowrite.ispopulated(tn) == false)
                     continue;
 
-                densematrix scaldat = datatowrite.getdata(tn,timestepindex)[0];
+                densemat scaldat = datatowrite.getdata(tn,timestepindex)[0];
                 double* scalvals = scaldat.getvalues();
 
                 for (int i = 0; i < scaldat.count(); i++)
@@ -163,7 +163,7 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
                 if (datatowrite.ispopulated(tn) == false)
                     continue;
 
-                std::vector<densematrix> vecdat = datatowrite.getdata(tn,timestepindex);
+                std::vector<densemat> vecdat = datatowrite.getdata(tn,timestepindex);
                 double* compxvals = vecdat[0].getvalues();
                 double* compyvals = vecdat[1].getvalues();
                 double* compzvals = vecdat[2].getvalues();
@@ -222,7 +222,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
             if (datatowrite.ispopulated(tn) == false)
                 continue;
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
             double* xvals = curcoords[0].getvalues();
             double* yvals = curcoords[1].getvalues();
             double* zvals = curcoords[2].getvalues();
@@ -258,7 +258,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
             element myelem(tn, datatowrite.getinterpolorder());
             std::vector<int> reordering = getnodereordering(myelem.getcurvedtypenumber());
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 
             for (int elem = 0; elem < curcoords[0].countrows(); elem++)
             {
@@ -279,7 +279,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
             if (datatowrite.ispopulated(tn) == false)
                 continue;
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 
             for (int elem = 0; elem < curcoords[0].countrows(); elem++)
             {
@@ -299,7 +299,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
 
             element myelem(tn, datatowrite.getinterpolorder());
 
-            std::vector<densematrix> curcoords = datatowrite.getcoordinates(tn,timestepindex);
+            std::vector<densemat> curcoords = datatowrite.getcoordinates(tn,timestepindex);
 
             for (int elem = 0; elem < curcoords[0].countrows(); elem++)
                 outfile << converttoparaviewelementtypenumber(myelem.getcurvedtypenumber()) << "\n";
@@ -319,7 +319,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
                 if (datatowrite.ispopulated(tn) == false)
                     continue;
 
-                densematrix scaldat = datatowrite.getdata(tn,timestepindex)[0];
+                densemat scaldat = datatowrite.getdata(tn,timestepindex)[0];
                 double* scalvals = scaldat.getvalues();
 
                 for (int i = 0; i < scaldat.count(); i++)
@@ -339,7 +339,7 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
                 if (datatowrite.ispopulated(tn) == false)
                     continue;
 
-                std::vector<densematrix> vecdat = datatowrite.getdata(tn,timestepindex);
+                std::vector<densemat> vecdat = datatowrite.getdata(tn,timestepindex);
                 double* compxvals = vecdat[0].getvalues();
                 double* compyvals = vecdat[1].getvalues();
                 double* compzvals = vecdat[2].getvalues();

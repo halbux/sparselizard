@@ -201,7 +201,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             vec anextdirichlet = 1.0/(beta*dt*dt)*( rhs-u - dt*v - dt*dt*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
             indexmat constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-            densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);    
+            densemat anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);    
             vec rightvec = matu*u + matv*v + mata*a + rhs;
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);

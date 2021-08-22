@@ -203,7 +203,7 @@ void field::setvalue(int physreg)
     rawfieldptr->setvalue(physreg);
 }
 
-void field::setnodalvalues(indexmat nodenumbers, densematrix values)
+void field::setnodalvalues(indexmat nodenumbers, densemat values)
 {
     errorifpointerisnull();
     
@@ -232,7 +232,7 @@ void field::setnodalvalues(indexmat nodenumbers, densematrix values)
     rawfieldptr->setnodalvalues(nodenumbers, values);
 }
 
-densematrix field::getnodalvalues(indexmat nodenumbers)
+densemat field::getnodalvalues(indexmat nodenumbers)
 {
     errorifpointerisnull();
     

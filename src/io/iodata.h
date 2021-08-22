@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <vector>
-#include "densematrix.h"
+#include "densemat.h"
 #include "element.h"
 
 class iodata
@@ -39,11 +39,11 @@ class iodata
         // Coordinates of the nodes at which to write the data.
         // mycoords[xyz][i] gives the x, y or z coordinates for all elements of type i.
         // Every row corresponds to a given element. Every column corresponds to a node in the element.
-        std::vector<std::vector<std::vector<densematrix>>> mycoords;
+        std::vector<std::vector<std::vector<densemat>>> mycoords;
         
         // mydata[comp][i] gives the data at component 'comp' for all elements of type i.
         // The data for scalars is at component 0.
-        std::vector<std::vector<std::vector<densematrix>>> mydata;        
+        std::vector<std::vector<std::vector<densemat>>> mydata;        
         
         // Combine the data in every element type:
         void combine(void);
@@ -64,9 +64,9 @@ class iodata
         std::vector<int> getactiveelementtypes(void);
         
         // Rows correspond to the elements. Columns correspond to the element nodes.
-        void addcoordinates(int elemtypenum, densematrix xcoords, densematrix ycoords, densematrix zcoords);
+        void addcoordinates(int elemtypenum, densemat xcoords, densemat ycoords, densemat zcoords);
         // Add all components vals[comp] of the data:
-        void adddata(int elemtypenum, std::vector<densematrix> vals);
+        void adddata(int elemtypenum, std::vector<densemat> vals);
         
         int countcoordnodes(int elemtypenum);
         int countcoordnodes(void);
@@ -74,9 +74,9 @@ class iodata
         int countelements(void);
         
         // Get the x, y and z coordinates of the nodes in all elements of a given type:
-        std::vector<densematrix> getcoordinates(int elemtypenum, int timestepindex = -1);
+        std::vector<densemat> getcoordinates(int elemtypenum, int timestepindex = -1);
         // Get all components of the data at the nodes in all elements of a given type:
-        std::vector<densematrix> getdata(int elemtypenum, int timestepindex = -1);
+        std::vector<densemat> getdata(int elemtypenum, int timestepindex = -1);
         
 };
 

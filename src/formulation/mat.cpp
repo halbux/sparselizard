@@ -19,7 +19,7 @@ void mat::errorifinvalidated(void)
     }
 }
 
-mat::mat(long long int matsize, indexmat rowadresses, indexmat coladresses, densematrix vals)
+mat::mat(long long int matsize, indexmat rowadresses, indexmat coladresses, densemat vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(std::shared_ptr<dofmanager>(new dofmanager(matsize))));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
@@ -28,7 +28,7 @@ mat::mat(long long int matsize, indexmat rowadresses, indexmat coladresses, dens
     rawmatptr->clearfragments();
 }
 
-mat::mat(formulation myformulation, indexmat rowadresses, indexmat coladresses, densematrix vals)
+mat::mat(formulation myformulation, indexmat rowadresses, indexmat coladresses, densemat vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
@@ -57,8 +57,8 @@ vec mat::xbmerge(vec x, vec b)
     vec output(std::shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
     indexmat ainds = getainds();
     indexmat dinds = getdinds();
-    densematrix xvals = x.getallvalues();
-    densematrix bdvals = b.getvalues(dinds);
+    densemat xvals = x.getallvalues();
+    densemat bdvals = b.getvalues(dinds);
     output.setvalues(ainds, xvals);
     output.setvalues(dinds, bdvals);
     return output;

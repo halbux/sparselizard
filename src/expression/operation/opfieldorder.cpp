@@ -8,7 +8,7 @@ opfieldorder::opfieldorder(std::vector<std::shared_ptr<rawfield>> fieldsin, doub
     mythreshold = absthres;
 }
 
-std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opfieldorder::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -67,7 +67,7 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
         }
     }
     
-    densematrix output(numelems, 1);
+    densemat output(numelems, 1);
     double* outputvals = output.getvalues();
     for (int i = 0; i < numelems; i++)
         outputvals[i] = fieldorders[i];
@@ -81,7 +81,7 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
     return {{},{output}};
 }
 
-densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opfieldorder::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -90,7 +90,7 @@ densematrix opfieldorder::multiharmonicinterpolate(int numtimeevals, elementsele
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
 
-    densematrix output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
+    densemat output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
 
     output = output.getflattened();
     output = output.duplicatevertically(numtimeevals);

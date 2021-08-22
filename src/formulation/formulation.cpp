@@ -260,11 +260,11 @@ void formulation::generate(int contributionnumber)
             generate(i, contributionnumber);
 }
 
-densematrix formulation::getportrelationrhs(void)
+densemat formulation::getportrelationrhs(void)
 {
     int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
 
-    densematrix rhsvals(expectednumrelations, 1, 0.0);
+    densemat rhsvals(expectednumrelations, 1, 0.0);
     double* vptr = rhsvals.getvalues();
 
     int actualnumrelations = 0;
@@ -285,7 +285,7 @@ densematrix formulation::getportrelationrhs(void)
     return rhsvals;
 }
 
-std::tuple<indexmat, indexmat, densematrix> formulation::getportrelations(int KCM)
+std::tuple<indexmat, indexmat, densemat> formulation::getportrelations(int KCM)
 {
     int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
     
@@ -323,7 +323,7 @@ std::tuple<indexmat, indexmat, densematrix> formulation::getportrelations(int KC
     // Concatenate all:
     indexmat allrinds(portnnz, 1);
     indexmat allcinds(portnnz, 1);
-    densematrix allvals(portnnz, 1);
+    densemat allvals(portnnz, 1);
     
     int* arptr = allrinds.getvalues();
     int* acptr = allcinds.getvalues();
@@ -368,7 +368,7 @@ vec formulation::rhs(bool keepvector, bool dirichletandportupdate)
         
     if (dirichletandportupdate == true)
     {
-        densematrix portrhsvals = getportrelationrhs();
+        densemat portrhsvals = getportrelationrhs();
         output.setvalues(indexmat(portrhsvals.count(), 1, 0, 1), portrhsvals);
     }
     
@@ -405,9 +405,9 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<indexmat> ad
     if (KCM == 0)
     {
         std::pair<indexmat, indexmat> assocports = mydofmanager->findassociatedports();
-        rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, 1.0));
+        rawout->accumulate(assocports.first, assocports.second, densemat(assocports.first.count(), 1, 1.0));
     }
-    std::tuple<indexmat, indexmat, densematrix> portterms = getportrelations(KCM);
+    std::tuple<indexmat, indexmat, densemat> portterms = getportrelations(KCM);
     rawout->accumulate(std::get<0>(portterms), std::get<1>(portterms), std::get<2>(portterms));
     
     rawout->process(isconstr); 
@@ -440,7 +440,7 @@ void formulation::solve(std::string soltype, bool diagscaling, std::vector<int> 
     sl::setdata(sol);
 }
 
-densematrix Fgmultdirichlet(densematrix gprev)
+densemat Fgmultdirichlet(densemat gprev)
 {
     mat A = universe::ddmmats[0];
     formulation formul = universe::ddmformuls[0];
@@ -457,7 +457,7 @@ densematrix Fgmultdirichlet(densematrix gprev)
     for (int n = 0; n < numneighbours; n++)
     {
         int len = universe::ddmrecvinds[n].count();
-        densematrix Bm = gprev.extractrows(pos, pos+len-1);
+        densemat Bm = gprev.extractrows(pos, pos+len-1);
         rhs.setvalues(universe::ddmrecvinds[n], Bm);
         pos += len;
     }
@@ -465,19 +465,19 @@ densematrix Fgmultdirichlet(densematrix gprev)
     vec sol = sl::solve(A, rhs);
 
     // Create the artificial sources solution on the inner interface:
-    std::vector<densematrix> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
+    std::vector<densemat> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         Agmatssend[n] = sol.getvalues(universe::ddmsendinds[n]);
-        Agmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+        Agmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
     
-    densematrix Ag(Agmatsrecv);
+    densemat Ag(Agmatsrecv);
     
     // Calculate I - A*g:
     double* Agptr = Ag.getvalues();
-    densematrix Fg(Ag.count(), 1);
+    densemat Fg(Ag.count(), 1);
     double* Fgptr = Fg.getvalues();
     
     for (int i = 0; i < Ag.count(); i++)
@@ -533,14 +533,14 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     // Get the rhs of the physical sources contribution:
     vec bphysical = b();
     for (int n = 0; n < numneighbours; n++)
-        bphysical.setvalues(dcdata[3][n], densematrix(dcdata[3][n].count(), 1, 0.0));
+        bphysical.setvalues(dcdata[3][n], densemat(dcdata[3][n].count(), 1, 0.0));
     
     // Set the value from the neighbour Dirichlet conditions:
-    std::vector<densematrix> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
+    std::vector<densemat> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
-        dirichletvalsfromneighbours[n] = densematrix(dcdata[1][n].count(), 1);
+        dirichletvalsfromneighbours[n] = densemat(dcdata[1][n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
     for (int n = 0; n < numneighbours; n++)
@@ -550,18 +550,18 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     vec w = sl::solve(A, bphysical, soltype);
     
     // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
-    std::vector<densematrix> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
+    std::vector<densemat> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         Bmatssend[n] = w.getvalues(universe::ddmsendinds[n]);
-        Bmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+        Bmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
     
-    densematrix B(Bmatsrecv);
+    densemat B(Bmatsrecv);
     
     // Initial value of the artificial sources solution:
-    densematrix vi(B.countrows(), B.countcolumns(), 0.0);
+    densemat vi(B.countrows(), B.countcolumns(), 0.0);
     
     // Gmres iteration:
     std::vector<double> resvec = sl::gmres(Fgmultdirichlet, B, vi, relrestol, maxnumit, verbosity*(rank == 0));
@@ -579,7 +579,7 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     for (int n = 0; n < numneighbours; n++)
     {
         int len = Bmatsrecv[n].count();
-        densematrix Bm = vi.extractrows(pos, pos+len-1);
+        densemat Bm = vi.extractrows(pos, pos+len-1);
         bphysical.setvalues(universe::ddmrecvinds[n], Bm);
         pos += len;
     }
@@ -599,7 +599,7 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     return resvec;
 }
 
-densematrix Fgmultrobin(densematrix gprev)
+densemat Fgmultrobin(densemat gprev)
 {
     mat A = universe::ddmmats[0];
     formulation formul = universe::ddmformuls[0];
@@ -617,7 +617,7 @@ densematrix Fgmultrobin(densematrix gprev)
     for (int n = 0; n < numneighbours; n++)
     {
         int len = universe::ddmrecvinds[n].count();
-        densematrix Bm = gprev.extractrows(pos, pos+len-1);
+        densemat Bm = gprev.extractrows(pos, pos+len-1);
         rhs.setvalues(universe::ddmrecvinds[n], Bm, "add");
         pos += len;
     }
@@ -626,22 +626,22 @@ densematrix Fgmultrobin(densematrix gprev)
     sl::setdata(sol);
 
     // Create the artificial sources solution on the inner interface:
-    std::vector<densematrix> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
+    std::vector<densemat> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         formul.generatein(0, artificialterms[n]);
         vec gartificial = formul.b(false, false);
     
         Agmatssend[n] = gartificial.getvalues(universe::ddmsendinds[n]);
-        Agmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+        Agmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
     
-    densematrix Ag(Agmatsrecv);
+    densemat Ag(Agmatsrecv);
     
     // Calculate I - A*g:
     double* Agptr = Ag.getvalues();
-    densematrix Fg(Ag.count(), 1);
+    densemat Fg(Ag.count(), 1);
     double* Fgptr = Fg.getvalues();
     
     for (int i = 0; i < Ag.count(); i++)
@@ -699,11 +699,11 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     vec bphysical = b();
     
     // Set the value from the neighbour Dirichlet conditions:
-    std::vector<densematrix> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
+    std::vector<densemat> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
-        dirichletvalsfromneighbours[n] = densematrix(dcdata[1][n].count(), 1);
+        dirichletvalsfromneighbours[n] = densemat(dcdata[1][n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
     for (int n = 0; n < numneighbours; n++)
@@ -714,21 +714,21 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     sl::setdata(w);
     
     // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
-    std::vector<densematrix> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
+    std::vector<densemat> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         generatein(0, physicalterms[n]);
         vec gphysical = b(false, false);
     
         Bmatssend[n] = gphysical.getvalues(universe::ddmsendinds[n]);
-        Bmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+        Bmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
     
-    densematrix B(Bmatsrecv);
+    densemat B(Bmatsrecv);
     
     // Initial value of the artificial sources solution:
-    densematrix vi(B.countrows(), B.countcolumns(), 0.0);
+    densemat vi(B.countrows(), B.countcolumns(), 0.0);
     
     // Gmres iteration:
     std::vector<double> resvec = sl::gmres(Fgmultrobin, B, vi, relrestol, maxnumit, verbosity*(rank == 0));
@@ -746,7 +746,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     for (int n = 0; n < numneighbours; n++)
     {
         int len = Bmatsrecv[n].count();
-        densematrix Bm = vi.extractrows(pos, pos+len-1);
+        densemat Bm = vi.extractrows(pos, pos+len-1);
         bphysical.setvalues(universe::ddmrecvinds[n], Bm, "add");
         pos += len;
     }

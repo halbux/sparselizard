@@ -1,7 +1,7 @@
 #include "opproduct.h"
 
 
-std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opproduct::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,13 +10,13 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> product = productterms[0]->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> product = productterms[0]->interpolate(elemselect, evaluationcoordinates, meshdeform);
     bool isonlycos0 = (product.size() == 2 && product[1].size() == 1);
     
     // Multiply 'product' by all remaining terms:
     for (int i = 1; i < productterms.size(); i++)
     {
-        std::vector<std::vector<densematrix>> currentterm = productterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);        
+        std::vector<std::vector<densemat>> currentterm = productterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);        
         bool iscurrenttermonlycos0 = (currentterm.size() == 2 && currentterm[1].size() == 1);
 
         // Shortcut for cos0 * cos0:
@@ -49,7 +49,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
         // General case:
         if (not(isonlycos0) && not(iscurrenttermonlycos0))
         {
-            std::vector<std::vector<densematrix>> tempproduct = {};
+            std::vector<std::vector<densemat>> tempproduct = {};
         
             // Loop on all product harmonics:
             for (int pharm = 0; pharm < product.size(); pharm++)
@@ -64,7 +64,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
                         continue;
                     
                     // Precompute the product of the current set of harmonics:
-                    densematrix curprod = product[pharm][0].copy();
+                    densemat curprod = product[pharm][0].copy();
                     curprod.multiplyelementwise(currentterm[charm][0]);
                 
                     std::vector<std::pair<int, double>> harmsofproduct = harmonic::getproduct(pharm, charm);
@@ -98,7 +98,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
     return product;
 }
 
-densematrix opproduct::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opproduct::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -107,7 +107,7 @@ densematrix opproduct::multiharmonicinterpolate(int numtimeevals, elementselecto
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = productterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = productterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
     for (int i = 1; i < productterms.size(); i++)
         output.multiplyelementwise(productterms[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform));

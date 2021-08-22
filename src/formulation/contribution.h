@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <memory>
 #include "operation.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "indexmat.h"
 #include "dofmanager.h"
 #include "rawfield.h"
@@ -70,7 +70,7 @@ class contribution
         // The following vectors stores pointers to all the fragments that have been generated.
         std::vector<indexmat> fragmentrowadresses = {};
         std::vector<indexmat> fragmentcoladresses = {};
-        std::vector<densematrix> fragmentvalues = {};
+        std::vector<densemat> fragmentvalues = {};
 
     public:
     

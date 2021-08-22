@@ -168,7 +168,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
             
             // Here are the constrained values of the next solution:
             indexmat constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-            densematrix xnextdirichletval = rhs.getpointer()->getvalues(constraintindexes);
+            densemat xnextdirichletval = rhs.getpointer()->getvalues(constraintindexes);
             vec rightvec = C*x+dt*rhs;
             // Force the solution on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, xnextdirichletval);

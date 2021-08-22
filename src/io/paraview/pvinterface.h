@@ -15,7 +15,7 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
-#include "densematrix.h"
+#include "densemat.h"
 #include "iodata.h"
 #include "element.h"
 #include "mystring.h"

@@ -9,7 +9,7 @@
 #include "universe.h"
 #include <vector>
 #include "disjointregions.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "indexmat.h"
 #include "dofmanager.h"
 #include "field.h"
@@ -55,7 +55,7 @@ class dofinterpolate
         // One matrix per dof operation.
         // Rows are the elements in the calling region. 
         // Number of columns is maxnumff*numevalpoints (blocks of numevalpoints side by side).
-        std::vector<densematrix> myvals = {};
+        std::vector<densemat> myvals = {};
         
         // One matrix per dof harmonic. Harmonic h is at mydofnums[h][0].
         // Value is -2 for non existing entries.
@@ -71,7 +71,7 @@ class dofinterpolate
 
         dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr);
         
-        densematrix getvalues(elementselector& elemselec, int dofopindex);
+        densemat getvalues(elementselector& elemselec, int dofopindex);
         indexmat getaddresses(elementselector& elemselec, int harmnum);
                                             
 };

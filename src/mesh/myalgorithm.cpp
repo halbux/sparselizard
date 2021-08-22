@@ -1171,29 +1171,29 @@ void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::v
     h[k+1] = 0.0;
 }
 
-std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k)
+std::vector<double> myalgorithm::arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k)
 {   
     // One Krylov vector on each row:
     int n = Q.countcolumns();
     double* Qptr = Q.getvalues();
     
     // Krylov vector fragment on each rank:
-    densematrix q = mymatmult(Q.extractrows(k,k).getresized(n,1));
+    densemat q = mymatmult(Q.extractrows(k,k).getresized(n,1));
     double* qptr = q.getvalues();
     
     if (q.countrows() != n || q.countcolumns() != 1)
     {
-        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densematrix of wrong size on rank " << slmpi::getrank() << std::endl;
+        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
         abort();
     }
     
     // Standard Gramm-Schmidt orthogonalization:
-    densematrix h = Q.getresized(k+1,n).multiply(q);
+    densemat h = Q.getresized(k+1,n).multiply(q);
     h = h.getresized(1,k+1);
     
     slmpi::sum(k+1, h.getvalues()); // reduce on all ranks
     
-    densematrix Qh = h.multiply(Q.getresized(k+1,n));
+    densemat Qh = h.multiply(Q.getresized(k+1,n));
     double* Qhptr = Qh.getvalues();
     
     // Subtract Qh and compute the norm of q:

@@ -128,7 +128,7 @@ double harmonic::getderivationfactor(int timederivativeorder, int harm)
         return 1;
 }
 
-std::vector<std::vector<densematrix>> harmonic::timederivative(int timederivativeorder, std::vector<std::vector<densematrix>> input)
+std::vector<std::vector<densemat>> harmonic::timederivative(int timederivativeorder, std::vector<std::vector<densemat>> input)
 {
     if (timederivativeorder == 0)
         return input;
@@ -148,7 +148,7 @@ std::vector<std::vector<densematrix>> harmonic::timederivative(int timederivativ
         // Harmonic 1 is zero anyway. Start at 2.
         for (int h = 2; h < input.size(); h = h+2)
         {
-            std::vector<densematrix> temp = input[h];
+            std::vector<densemat> temp = input[h];
             input[h] = input[h+1];
             input[h+1] = temp;
         }

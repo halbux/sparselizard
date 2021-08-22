@@ -527,14 +527,14 @@ indexmat dofmanager::getgaugedindexes(void)
     return output;
 }
 
-std::pair<indexmat, densematrix> dofmanager::getconditionalconstraintdata(void)
+std::pair<indexmat, densemat> dofmanager::getconditionalconstraintdata(void)
 {
     synchronize();
     
     // This will have an entry for every field and every disjoint node region that is conditionally constrained:
     std::vector<indexmat> indmat = {};
-    std::vector<densematrix> condvalvec = {};
-    std::vector<densematrix> constrvalvec = {};
+    std::vector<densemat> condvalvec = {};
+    std::vector<densemat> constrvalvec = {};
     
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
@@ -578,11 +578,11 @@ std::pair<indexmat, densematrix> dofmanager::getconditionalconstraintdata(void)
             std::vector<double> evaluationcoordinates = {0,0,0};
             elementselector myelemselect(curdisjregs, condop->isvalueorientationdependent(curdisjregs) || constrop->isvalueorientationdependent(curdisjregs));
 
-            std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            std::vector<std::vector<densemat>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
             // Skip if no conditional constraint is active:
             if (condval[1][0].max() < 0)
                 continue;
-            std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            std::vector<std::vector<densemat>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
 
             // Create a matrix with all indices:
             indexmat curindmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
@@ -619,7 +619,7 @@ std::pair<indexmat, densematrix> dofmanager::getconditionalconstraintdata(void)
     
     // Combine all active conditional constraints together:
     indexmat condconstrindices(numactive,1);
-    densematrix condconstrval(numactive,1);
+    densemat condconstrval(numactive,1);
     
     int* indptr = condconstrindices.getvalues();
     double* valptr = condconstrval.getvalues();

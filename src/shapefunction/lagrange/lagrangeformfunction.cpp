@@ -97,7 +97,7 @@ lagrangeformfunction::lagrangeformfunction(int elementtypenumber, int order, con
     myevaluationpoints = evaluationpoints;
 }
 
-densematrix lagrangeformfunction::getderivative(int whichderivative)
+densemat lagrangeformfunction::getderivative(int whichderivative)
 {
     preparepoly();
     
@@ -109,7 +109,7 @@ densematrix lagrangeformfunction::getderivative(int whichderivative)
     int numberofformfunctions = myelement.countcurvednodes();
     int numberofevaluationpoints = myevaluationpoints.size()/3;
     
-    evaluated[whichderivative] = densematrix(numberofformfunctions, numberofevaluationpoints);
+    evaluated[whichderivative] = densemat(numberofformfunctions, numberofevaluationpoints);
     
     // Fill the dense matrices with the polynomial value:
     for (int i = 0; i < numberofformfunctions; i++)

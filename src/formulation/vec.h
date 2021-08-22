@@ -42,7 +42,7 @@ class vec
         vec(std::shared_ptr<rawvec> inputrawvec) { rawvecptr = inputrawvec; };
      
         // Create a pre-filled vector:
-        vec(int vecsize, indexmat addresses, densematrix vals);
+        vec(int vecsize, indexmat addresses, densemat vals);
      
         int size(void);
         
@@ -52,10 +52,10 @@ class vec
         void updateconstraints(void);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
-        void setvalues(indexmat addresses, densematrix valsmat, std::string op = "set");
-        void setallvalues(densematrix valsmat, std::string op = "set");
-        densematrix getvalues(indexmat addresses);
-        densematrix getallvalues(void);
+        void setvalues(indexmat addresses, densemat valsmat, std::string op = "set");
+        void setallvalues(densemat valsmat, std::string op = "set");
+        densemat getvalues(indexmat addresses);
+        densemat getallvalues(void);
         // Set and get value at a single index:
         void setvalue(int address, double value, std::string op = "set");
         double getvalue(int address);

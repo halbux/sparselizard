@@ -1,7 +1,7 @@
 #include "oporientation.h"
 
 
-std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> oporientation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -29,7 +29,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         abort();
     }
     
-    densematrix output(numelems,1,1);
+    densemat output(numelems,1,1);
     double* outptr = output.getvalues();
     
 
@@ -124,7 +124,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         
         gausspoints gp(t, 0);
         jacobian subjac(subselect, gp.getcoordinates(), NULL);
-        densematrix subdetjac = subjac.getdetjac();
+        densemat subdetjac = subjac.getdetjac();
         
         double* subdetjacptr = subdetjac.getvalues();
         
@@ -148,7 +148,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     return {{},{output}};
 }
 
-densematrix oporientation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat oporientation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -157,7 +157,7 @@ densematrix oporientation::multiharmonicinterpolate(int numtimeevals, elementsel
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
+    densemat output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
     
     output = output.getflattened();
     output = output.duplicatevertically(numtimeevals);

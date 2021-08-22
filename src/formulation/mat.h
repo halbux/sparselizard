@@ -21,7 +21,7 @@
 #include "rawvec.h"
 #include "formulation.h"
 #include "indexmat.h"
-#include "densematrix.h"
+#include "densemat.h"
 
 class vec;
 class rawmat;
@@ -43,9 +43,9 @@ class mat
         mat(std::shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
         
         // Create a pre-filled matrix:
-        mat(long long int matsize, indexmat rowadresses, indexmat coladresses, densematrix vals);
+        mat(long long int matsize, indexmat rowadresses, indexmat coladresses, densemat vals);
         // Create a matrix with structure based on a formulation and with initial values:
-        mat(formulation myformulation, indexmat rowadresses, indexmat coladresses, densematrix vals);
+        mat(formulation myformulation, indexmat rowadresses, indexmat coladresses, densemat vals);
      
         bool isdefined(void) { return (rawmatptr != NULL); };
          

@@ -17,7 +17,7 @@
 #include "mat.h"
 #include "sl.h"
 #include "resolution.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "indexmat.h"
 #include "spline.h"
 #include "port.h"

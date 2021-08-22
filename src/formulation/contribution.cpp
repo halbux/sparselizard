@@ -121,11 +121,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             // for test function harmonic 'tf' and dof harmonic 'dof'. 
             // If stiffnesses[tf][dof].size() is zero then it is empty.
             // stiffnesses[tf][1][0] must be used in case there is no dof.
-            std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
+            std::vector<std::vector<std::vector<densemat>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densemat>>(maxdofharm + 1, std::vector<densemat>(0)));
 
             // Compute the Jacobian for the variable change to the reference element:
             std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeformationptr));
-            densematrix detjac = myjacobian->getdetjac();
+            densemat detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();
 
@@ -134,24 +134,24 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             universe::allowreuse();
             
             // Compute all terms in the contribution sum:
-            densematrix tfformfunctionvalue, dofformfunctionvalue;
+            densemat tfformfunctionvalue, dofformfunctionvalue;
             for (int term = 0; term < mytfs.size(); term++)
             {
                 ///// Compute the coefficients:
                 // currentcoeff[i][0] holds the ith harmonic of the coefficient. 
                 // It is empty if currentcoeff[i].size() is zero.
-                std::vector<std::vector<densematrix>> currentcoeff;
+                std::vector<std::vector<densemat>> currentcoeff;
                 // Compute without or with FFT:
                 if (numfftcoeffs <= 0)
                     currentcoeff = mycoeffs[term]->interpolate(myselector, evaluationpoints, meshdeformationptr);
                 else
                 {
-                    densematrix timeevalinterpolated = mycoeffs[term]->multiharmonicinterpolate(numfftcoeffs, myselector, evaluationpoints, meshdeformationptr);
+                    densemat timeevalinterpolated = mycoeffs[term]->multiharmonicinterpolate(numfftcoeffs, myselector, evaluationpoints, meshdeformationptr);
                     currentcoeff = myfft::fft(timeevalinterpolated, myselector.countinselection(), evaluationpoints.size()/3);
                 }
                 
                 ///// Compute the dof*tf product (if any dof):
-                densematrix doftimestestfun;
+                densemat doftimestestfun;
                 tfformfunctionvalue = tfval.tomatrix(myselector.gettotalorientation(), tfinterpolationorder, mytfs[term]->getkietaphiderivative(), mytfs[term]->getformfunctioncomponent());
                 
                 // Multiply by the weights:
@@ -185,7 +185,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                         if (isdofinterpolate)
                         {
-                            densematrix dttf = doftimestestfun.copy();
+                            densemat dttf = doftimestestfun.copy();
                             dttf.multiplycolumns(currentcoeff[h][0]);
                             currentcoeff[h][0] = dttf;  
                         }

@@ -14,7 +14,7 @@
 #include <cmath>
 #include "myalgorithm.h"
 #include "indexmat.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "memory.h"
 #include "petsc.h"
 #include "petscmat.h"
@@ -28,7 +28,7 @@ class rawmat
         // Combining all accumulated fragments below gives the overall matrix.
         std::vector<indexmat> accumulatedrowindices = {};
         std::vector<indexmat> accumulatedcolindices = {};
-        std::vector<densematrix> accumulatedvals = {};
+        std::vector<densemat> accumulatedvals = {};
         
 
         long long int nnzA = -1, nnzD = -1;
@@ -36,7 +36,7 @@ class rawmat
         // The sparse matrix is stored in csr format. Dirichlet constraints are eliminated using A and D in Atotal = [A D; 0 1].
         // The rows and columns in A and D are renumbered consecutively from zero.
         indexmat Arows, Acols, Drows, Dcols;
-        densematrix Avals, Dvals;
+        densemat Avals, Dvals;
         // Ainds[i] is the index in Atotal of the ith index in A:
         indexmat Ainds, Dinds;
         
@@ -71,7 +71,7 @@ class rawmat
         void isfactored(bool isfact) { isitfactored = isfact; };
     
         // Add a fragment to the matrix (empty fragments are ignored):
-        void accumulate(indexmat rowadresses, indexmat coladresses, densematrix vals);   
+        void accumulate(indexmat rowadresses, indexmat coladresses, densemat vals);   
         // Create the petsc matrices:
         void process(std::vector<bool>& isconstrained);
         // Clear all the fragments:

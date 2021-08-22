@@ -23,19 +23,19 @@ class opcustom: public operation
         
         std::vector<std::weak_ptr<opcustom>> myfamily = {};
         
-        std::vector<densematrix> (*myfunction)(std::vector<densematrix>) = NULL;
-        std::vector<densematrix> (*myadvancedfunction)(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*) = NULL;
+        std::vector<densemat> (*myfunction)(std::vector<densemat>) = NULL;
+        std::vector<densemat> (*myadvancedfunction)(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*) = NULL;
         
     public:
         
-        opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>), std::vector<std::shared_ptr<operation>> args);
-        opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<std::shared_ptr<operation>> args, std::vector<field> infields);
+        opcustom(int outindex, std::vector<densemat> fct(std::vector<densemat>), std::vector<std::shared_ptr<operation>> args);
+        opcustom(int outindex, std::vector<densemat> fct(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<std::shared_ptr<operation>> args, std::vector<field> infields);
         
         // Provide all related operations:
         void setfamily(std::vector<std::weak_ptr<opcustom>> ops) { myfamily = ops; };
         
-        std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::vector<std::shared_ptr<operation>> getarguments(void) { return myargs; };
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);

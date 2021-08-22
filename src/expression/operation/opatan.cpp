@@ -1,7 +1,7 @@
 #include "opatan.h"
 
 
-std::vector<std::vector<densematrix>> opatan::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opatan::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> opatan::interpolate(elementselector& elems
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
     
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
@@ -26,7 +26,7 @@ std::vector<std::vector<densematrix>> opatan::interpolate(elementselector& elems
     abort();
 }
 
-densematrix opatan::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opatan::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -35,7 +35,7 @@ densematrix opatan::multiharmonicinterpolate(int numtimeevals, elementselector& 
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     output.atan();
             
     if (reuse && universe::isreuseallowed)

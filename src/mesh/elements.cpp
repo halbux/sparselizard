@@ -759,11 +759,11 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
     element myelem(elementtypenumber, mycurvatureorder);
     int ncn = myelem.countcurvednodes();
     
-    densematrix xcoords(numelems, ncn);
-    densematrix ycoords(numelems, ncn);
-    densematrix zcoords(numelems, ncn);
+    densemat xcoords(numelems, ncn);
+    densemat ycoords(numelems, ncn);
+    densemat zcoords(numelems, ncn);
     
-    densematrix vals(numelems, ncn);
+    densemat vals(numelems, ncn);
 
     double* xptr = xcoords.getvalues();
     double* yptr = ycoords.getvalues();
@@ -801,13 +801,13 @@ void elements::writeedgedirection(int physreg, std::string filename)
     for (int i = 0; i < ders.size(); i++)
         numedgesinpr += mydisjointregions->countelements(ders[i]);
     
-    densematrix xcoords(numedgesinpr, 1);
-    densematrix ycoords(numedgesinpr, 1);
-    densematrix zcoords(numedgesinpr, 1);
+    densemat xcoords(numedgesinpr, 1);
+    densemat ycoords(numedgesinpr, 1);
+    densemat zcoords(numedgesinpr, 1);
     
-    densematrix xvals(numedgesinpr, 1);
-    densematrix yvals(numedgesinpr, 1);
-    densematrix zvals(numedgesinpr, 1);
+    densemat xvals(numedgesinpr, 1);
+    densemat yvals(numedgesinpr, 1);
+    densemat zvals(numedgesinpr, 1);
     
     double* xptr = xcoords.getvalues();
     double* yptr = ycoords.getvalues();

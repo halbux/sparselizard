@@ -17,7 +17,7 @@
 #include "polynomial.h"
 #include "polynomials.h"
 #include "coordinategroup.h"
-#include "densematrix.h"
+#include "densemat.h"
 
 namespace myalgorithm
 {
@@ -175,7 +175,7 @@ namespace myalgorithm
     
     // Q has one row per Krylov vector (at least k+2 rows must be preallocated).
     // Column k of the unreduced upper Hessenberg matrix is returned (length k+2):
-    std::vector<double> arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k);
+    std::vector<double> arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k);
     
     // Create a vector to renumber integer values with gaps to values without gap.
     // Integers must all be positive or zero. The number of unique integers is returned.

@@ -11,7 +11,7 @@
 #include "nodes.h"
 #include "elements.h"
 #include "physicalregions.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -43,9 +43,9 @@ namespace gmshinterface
     // Write or append the header of a new view in the .pos file:
     void openview(std::string name, std::string viewname, double timetag, bool overwrite);
     // Write a scalar field to the current view in the .pos format:
-    void appendtoview(std::string name, int elementtypenumber, densematrix coordx, densematrix coordy, densematrix coordz, densematrix compxinterpolated);
+    void appendtoview(std::string name, int elementtypenumber, densemat coordx, densemat coordy, densemat coordz, densemat compxinterpolated);
     // Write a vector field to the current view in the .pos format:
-    void appendtoview(std::string name, int elementtypenumber, densematrix coordx, densematrix coordy, densematrix coordz, densematrix compxinterpolated, densematrix compyinterpolated, densematrix compzinterpolated);
+    void appendtoview(std::string name, int elementtypenumber, densemat coordx, densemat coordy, densemat coordz, densemat compxinterpolated, densemat compyinterpolated, densemat compzinterpolated);
     // Write poly.size() interpolation schemes in the current view in the .pos file:
     void writeinterpolationscheme(std::string name, std::vector<std::vector<polynomial>> poly);
     // Close the current view in the .pos file:

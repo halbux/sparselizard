@@ -128,7 +128,7 @@ class dofmanager
         indexmat getgaugedindexes(void);
         
         // Get the conditionally constrained adresses as well as the constraint values:
-        std::pair<indexmat, densematrix> getconditionalconstraintdata(void);
+        std::pair<indexmat, densemat> getconditionalconstraintdata(void);
         
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);

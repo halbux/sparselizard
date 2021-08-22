@@ -33,7 +33,7 @@
 #include "integration.h"
 #include "sl.h"
 #include "harmonic.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "element.h"
 #include "elements.h"
 #include "nodes.h"
@@ -184,11 +184,11 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Selected elements can include multiple orientations and field orders.
         // 'gpcoordsin' must correspond to Gauss coordinates for the selected element type.
         // If reuse is allowed then all arguments must correspond to the reused data.
-        void setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values);
+        void setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densemat values);
         
         // Set/get value at nodes for 'h1' type fields:
-        void setnodalvalues(indexmat nodenumbers, densematrix values);
-        densematrix getnodalvalues(indexmat nodenumbers);
+        void setnodalvalues(indexmat nodenumbers, densemat values);
+        densemat getnodalvalues(indexmat nodenumbers);
         
         void setdisjregconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
@@ -269,19 +269,19 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
 
         // Return {dkix,dkiy,...,detax,detay,...}:
-        std::vector<densematrix> getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+        std::vector<densemat> getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates);
 
 
         // This interpolate is called in practice:
-        std::vector<std::vector<densematrix>> interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+        std::vector<std::vector<densemat>> interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
         
         // The function works only on fields that are not containers.
-        densematrix getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementnumbers);
+        densemat getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementnumbers);
         // 'interpolate' outputs the field value at the evaluation coordinates
         // provided as second argument for all elements in 'elementlist'.
         // Set 'whichderivative' to 0, 1, 2 or 3 to get respectively the 
         // no derivative, ki, eta or phi derivative of the field.
-        std::vector<std::vector<densematrix>> interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates);
+        std::vector<std::vector<densemat>> interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates);
 
 };
 

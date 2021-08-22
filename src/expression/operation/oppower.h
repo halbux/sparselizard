@@ -22,8 +22,8 @@ class oppower: public operation
         
         oppower(std::shared_ptr<operation> base, std::shared_ptr<operation> exponent) { mybase = base; myexponent = exponent; };
         
-        std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::vector<std::shared_ptr<operation>> getarguments(void) { return {mybase, myexponent}; };
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);

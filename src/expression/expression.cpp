@@ -275,7 +275,7 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
     myoperations = expr.myoperations;
 }
 
-expression::expression(int m, int n, std::vector<densematrix> customfct(std::vector<densematrix>), std::vector<expression> exprs)
+expression::expression(int m, int n, std::vector<densemat> customfct(std::vector<densemat>), std::vector<expression> exprs)
 {
     mynumrows = m; mynumcols = n;
 
@@ -312,7 +312,7 @@ expression::expression(int m, int n, std::vector<densematrix> customfct(std::vec
         (weakops[i].lock())->setfamily(weakops);
 }
 
-expression::expression(int m, int n, std::vector<densematrix> advancedcustomfct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields)
+expression::expression(int m, int n, std::vector<densemat> advancedcustomfct(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields)
 {
     mynumrows = m; mynumcols = n;
 
@@ -528,11 +528,11 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
             universe::allowreuse();
 
             // Compute the expression at the evaluation points:
-            densematrix compxval = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat compxval = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
             // Get the coordinates corresponding to the interpolated values:
-            densematrix xval = expression(x).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
-            densematrix yval = expression(y).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
-            densematrix zval = expression(z).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat xval = expression(x).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat yval = expression(y).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat zval = expression(z).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
 
             universe::forbidreuse();
 
@@ -714,7 +714,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     // Clean storage before allowing reuse:
                     universe::forbidreuse();
                     universe::allowreuse();
-                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                    std::vector<std::vector<densemat>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
                     universe::forbidreuse();
 
                     if (interpolated.size() < interp.size())
@@ -740,7 +740,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     // Clean storage before allowing reuse:
                     universe::forbidreuse();
                     universe::allowreuse();
-                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                    densemat interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
                     universe::forbidreuse();
 
                     for (int tim = 0; tim < numtimeevals; tim++)
@@ -829,7 +829,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         {
             std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeform));
 
-            densematrix detjac = myjacobian->getdetjac();
+            densemat detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();
 
@@ -837,12 +837,12 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
             universe::computedjacobian = myjacobian;
             universe::allowreuse();
 
-            densematrix compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
             compxinterpolated.multiplyelementwise(detjac);
 
             universe::forbidreuse();
 
-            densematrix weightsmat(mygausspoints.count(), 1, weights);
+            densemat weightsmat(mygausspoints.count(), 1, weights);
             compxinterpolated = compxinterpolated.multiply(weightsmat);
 
             integralvalue += compxinterpolated.sum();
@@ -959,7 +959,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
             std::vector<int> harms = {};
 
             // Compute the mesh coordinates. Initialise all coordinates to zero.
-            std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), geolagrangecoords.size()/3,0));
+            std::vector<densemat> coords(3,densemat(myselector.countinselection(), geolagrangecoords.size()/3,0));
             for (int i = 0; i < problemdimension; i++)
             {
                 coords[i] = (xyz.myoperations[i]->interpolate(myselector, geolagrangecoords, NULL))[1][0];
@@ -967,8 +967,8 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     coords[i].add((meshdeform->myoperations[i]->interpolate(myselector, geolagrangecoords, NULL))[1][0]);
             }
             // Interpolate the current expression:
-            std::vector<  std::vector<std::vector<densematrix>>  > expr(countrows());
-            std::vector<densematrix> fftexpr(countrows());
+            std::vector<  std::vector<std::vector<densemat>>  > expr(countrows());
+            std::vector<densemat> fftexpr(countrows());
             // Reuse what's possible to reuse during the interpolation:
             universe::allowreuse();
             for (int i = 0; i < countrows(); i++)
@@ -1010,7 +1010,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                 for (int h = 0; h < harms.size(); h++)
                 {
                     datatowrite[harms[h]][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
-                    std::vector<densematrix> curdata(countrows());
+                    std::vector<densemat> curdata(countrows());
                     for (int comp = 0; comp < countrows(); comp++)
                         curdata[comp] = expr[comp][harms[h]][0];
                     datatowrite[harms[h]][0].adddata(elementtype, curdata);
@@ -1184,7 +1184,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         if (numlines == 0)
             continue;
 
-        densematrix xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
+        densemat xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
         double* xptr = xcoordsmat.getvalues(); double* yptr = ycoordsmat.getvalues(); double* zptr = zcoordsmat.getvalues();
         double* fsptr = flowspeedmat.getvalues();
 

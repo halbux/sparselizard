@@ -18,7 +18,7 @@
 #include "sl.h"
 #include "universe.h"
 #include "memory.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "indexmat.h"
 #include "rawvec.h"
 #include "rawmat.h"
@@ -95,8 +95,8 @@ class formulation
         void generate(int contributionnumber);
         
         // Compute the no-port term value for every port relation:
-        densematrix getportrelationrhs(void);
-        std::tuple<indexmat, indexmat, densematrix> getportrelations(int KCM);
+        densemat getportrelationrhs(void);
+        std::tuple<indexmat, indexmat, densemat> getportrelations(int KCM);
         
         std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         

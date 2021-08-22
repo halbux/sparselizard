@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include "densematrix.h"
+#include "densemat.h"
 #include "polynomial.h"
 #include "element.h"
 #include <iomanip>
@@ -43,7 +43,7 @@ class lagrangeformfunction
         // - with ki  derivative for i = 1
         // - with eta derivative for i = 2
         // - with phi derivative for i = 3
-        std::vector<densematrix> evaluated = std::vector<densematrix>(4);
+        std::vector<densemat> evaluated = std::vector<densemat>(4);
         
         // Make the Lagrange polynomials/coordinates available: 
         void preparepoly(void);
@@ -66,7 +66,7 @@ class lagrangeformfunction
         // - with phi derivative for whichderivative = 3
         //
         // It outputs a copy of evaluated[whichderivative] if available.
-        densematrix getderivative(int whichderivative);
+        densemat getderivative(int whichderivative);
         
         std::vector<double> getnodecoordinates(void);
         std::vector<polynomial> getformfunctionpolynomials(void);

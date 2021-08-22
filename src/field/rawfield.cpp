@@ -262,15 +262,15 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         ISSetPermutation(permutis);
         MatPermute(A.getapetsc(), permutis, permutis, &permutedmat);
         
-        densematrix blockvals(preallocsize, 1);
+        densemat blockvals(preallocsize, 1);
         MatInvertVariableBlockDiagonal(permutedmat, blocksizes.count(), bsvals, blockvals.getvalues());
         MatDestroy(&permutedmat);
         
         // Solve block-diagonal system:
         v.permute(renumtodiagblocks);
         indexmat alladds(v.size(),1, 0,1);
-        densematrix vmat = v.getvalues(alladds);
-        densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
+        densemat vmat = v.getvalues(alladds);
+        densemat prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
 
         v.setvalues(alladds, prod);
         v.permute(renumtodiagblocks, true);
@@ -866,7 +866,7 @@ void rawfield::setvalue(int physreg)
     }
 }
 
-void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values)
+void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densemat values)
 {
     synchronize();
     
@@ -883,7 +883,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     // Needs to be monoharmonic without FFT (the field cannot store the time vals).
     if (values.countrows() != numelems || 3*values.countcolumns() != gpcoordsin.size())
     {
-        std::cout << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densematrix (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
+        std::cout << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densemat (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
         abort();
     }
     
@@ -895,7 +895,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     
     // Manages reuse automatically:
     std::shared_ptr<opdetjac> dj(new opdetjac);
-    densematrix detjac = dj->interpolate(elemselect, gpcoords, meshdeform)[1][0];
+    densemat detjac = dj->interpolate(elemselect, gpcoords, meshdeform)[1][0];
     // The Jacobian determinant should be positive irrespective of the node numbering:
     detjac.abs();
 
@@ -924,8 +924,8 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         int fforder = getinterpolationorder(mydisjregs[0]);
         std::vector<int> elemindexes = elemselect.getelementindexes();
         
-        densematrix dj = detjac.extractrows(elemindexes);
-        densematrix vl = values.extractrows(elemindexes);
+        densemat dj = detjac.extractrows(elemindexes);
+        densemat vl = values.extractrows(elemindexes);
         
 
         ///// Projection formulation -> integral(dofv * tfv - vl * tfv) = 0
@@ -936,20 +936,20 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         // 1. Evaluate dofv and tfv * gpweights:
         
         hierarchicalformfunctioncontainer ffval = *(universe::gethff(mytypename, elementtypenumber, fforder, gpcoords));
-        densematrix testfunctionvalue = ffval.tomatrix(0, fforder, 0, 0); // total orientation is always 0 for h1d type
-        densematrix doffunctionvalue = testfunctionvalue.copy();
+        densemat testfunctionvalue = ffval.tomatrix(0, fforder, 0, 0); // total orientation is always 0 for h1d type
+        densemat doffunctionvalue = testfunctionvalue.copy();
         
         testfunctionvalue.multiplycolumns(gpweights);
             
         // 2. Compute the tf * dof product [tfrow1*dofrow1 tfrow1*dofrow2 ... tfrow2*dofrow1 ...]:
-        densematrix testfuntimesdof = testfunctionvalue.multiplyallrows(doffunctionvalue);
+        densemat testfuntimesdof = testfunctionvalue.multiplyallrows(doffunctionvalue);
         testfuntimesdof.transpose();
 
         // 3. Create matrix A terms:
-        densematrix Avals = dj.multiply(testfuntimesdof); // will be already row-col sorted
+        densemat Avals = dj.multiply(testfuntimesdof); // will be already row-col sorted
         
         // 4. Create right handside vector b terms:
-        densematrix bvals = testfunctionvalue.multiply(vl);
+        densemat bvals = testfunctionvalue.multiply(vl);
 
         // 5. Create A (block diagonal):
         int numffs = testfunctionvalue.countrows();
@@ -982,13 +982,13 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
 
         indexmat blocksizes(numinselection,1, numffs);
-        densematrix blockvals(numinselection*numffs, numffs);
+        densemat blockvals(numinselection*numffs, numffs);
         MatInvertVariableBlockDiagonal(bdmat, numinselection, blocksizes.getvalues(), blockvals.getvalues());
         
         MatDestroy(&bdmat);
         
         // 6. Solve block-diagonal system:
-        densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, bvals.gettranspose());
+        densemat prod = blockvals.blockdiagonaltimesvector(blocksizes, bvals.gettranspose());
         double* prodptr = prod.getvalues();
 
         // 7. Set coefs to coefmanager:
@@ -1011,7 +1011,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     elemselect.selectdisjointregions({});
 }
 
-void rawfield::setnodalvalues(indexmat nodenumbers, densematrix values)
+void rawfield::setnodalvalues(indexmat nodenumbers, densemat values)
 {
     synchronize();
     
@@ -1059,7 +1059,7 @@ void rawfield::setnodalvalues(indexmat nodenumbers, densematrix values)
     }
 }
 
-densematrix rawfield::getnodalvalues(indexmat nodenumbers)
+densemat rawfield::getnodalvalues(indexmat nodenumbers)
 {
     synchronize();
     
@@ -1072,7 +1072,7 @@ densematrix rawfield::getnodalvalues(indexmat nodenumbers)
     int numnodes = nodenumbers.count();
     int* nptr = nodenumbers.getvalues();
     
-    densematrix output(nodenumbers.countrows(), nodenumbers.countcolumns());
+    densemat output(nodenumbers.countrows(), nodenumbers.countcolumns());
     double* vptr = output.getvalues();
 
     // Only for 'h1' type fields:
@@ -1434,7 +1434,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
                 for (int ff = 0; ff < numformfunctionsperelement; ff++)
                 {
-                    densematrix values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
+                    densemat values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
                     double* vals = values.getvalues();
                     
                     // Transfer nothing if 'values' is empty:
@@ -1535,7 +1535,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
 
         for (int ff = 0; ff < numformfunctionsperelement; ff++)
         {
-            densematrix values(1,numelem,0.0);
+            densemat values(1,numelem,0.0);
             double* vals = values.getvalues();
             
             if (ff < numformfunctionsinoriginfield)
@@ -2351,7 +2351,7 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 }
 
 
-std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<densemat> rawfield::getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     synchronize();
     
@@ -2359,7 +2359,7 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     int elementtypenumber = elemselect.getelementtypenumber();
     
-    std::vector<densematrix> output(elementdimension*problemdimension);
+    std::vector<densemat> output(elementdimension*problemdimension);
 
     elements* myelements = universe::getrawmesh()->getelements();
 
@@ -2374,9 +2374,9 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     int numrows = numcurvednodes;
     int numcols = elementlist.size();
 
-    std::vector<densematrix> coefmatrix(problemdimension);
+    std::vector<densemat> coefmatrix(problemdimension);
     for (int d = 0; d < problemdimension; d++)
-        coefmatrix[d] = densematrix(numrows, numcols);
+        coefmatrix[d] = densemat(numrows, numcols);
         
     std::vector<double*> coefs(problemdimension);
     for (int d = 0; d < problemdimension; d++)
@@ -2400,7 +2400,7 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
 
     // Compute the form functions evaluated at the evaluation points:
     lagrangeformfunction mylagrange(elementtypenumber, myelements->getcurvatureorder(), evaluationcoordinates);
-    std::vector<densematrix> myformfunctionvalue(elementdimension);
+    std::vector<densemat> myformfunctionvalue(elementdimension);
     for (int ed = 0; ed < elementdimension; ed++)
         myformfunctionvalue[ed] = mylagrange.getderivative(1+ed);
 
@@ -2414,14 +2414,14 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
 }
         
 
-std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     synchronize();
     
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
-    std::vector<std::vector<densematrix>> out = {};
+    std::vector<std::vector<densemat>> out = {};
 
     // Group disj. regs. with same interpolation order (and same element type number).
     std::vector<int> interpolorders(alldisjregs.size());
@@ -2437,7 +2437,7 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
             continue;
         
         int elementtypenumber = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(mydisjregs[0]);
-        std::vector<std::vector<densematrix>> currentinterp = interpolate(whichderivative, formfunctioncomponent, elementtypenumber, elemselect.gettotalorientation(), getinterpolationorder(mydisjregs[0]), elemselect.getelementnumbers(), evaluationcoordinates);
+        std::vector<std::vector<densemat>> currentinterp = interpolate(whichderivative, formfunctioncomponent, elementtypenumber, elemselect.gettotalorientation(), getinterpolationorder(mydisjregs[0]), elemselect.getelementnumbers(), evaluationcoordinates);
         
         // Preallocate the harmonics not in 'out':
         if (out.size() < currentinterp.size())
@@ -2445,7 +2445,7 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         for (int h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1 && out[h].size() == 0)
-                out[h] = {densematrix(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
+                out[h] = {densemat(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
         }
         
         // Insert 'currentinterp' in 'out':
@@ -2461,7 +2461,7 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
     return out;
 }
 
-densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementlist)
+densemat rawfield::getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementlist)
 {   
     synchronize();
     
@@ -2485,7 +2485,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
         int numrows = numcurvednodes;
         int numcols = elementlist.size();
         
-        densematrix coefmatrix(numrows, numcols);
+        densemat coefmatrix(numrows, numcols);
         double* coefs = coefmatrix.getvalues();
 
         for (int num = 0; num < numcurvednodes; num++)
@@ -2511,7 +2511,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
         int numrows = myiterator.count();
         int numcols = elementlist.size();
 
-        densematrix coefmatrix(numrows, numcols);
+        densemat coefmatrix(numrows, numcols);
         double* coefs = coefmatrix.getvalues();
 
         for (int ff = 0; ff < myiterator.count(); ff++)
@@ -2541,7 +2541,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
     }
 }
 
-std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates)
 {   
     synchronize();
     
@@ -2550,13 +2550,13 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {        
         // Get the coefficients. The interpolation order is not used here.
-        densematrix mycoefs = getcoefficients(elementtypenumber, -1, elementnumbers);
+        densemat mycoefs = getcoefficients(elementtypenumber, -1, elementnumbers);
         // Compute the form functions evaluated at the evaluation points:
         lagrangeformfunction mylagrange(elementtypenumber, myelements->getcurvatureorder(), evaluationcoordinates);
-        densematrix myformfunctionvalue = mylagrange.getderivative(whichderivative);
+        densemat myformfunctionvalue = mylagrange.getderivative(whichderivative);
 
         mycoefs.transpose();
-        densematrix coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
+        densemat coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
 
         return {{},{coefstimesformfunctions}};
     }
@@ -2565,23 +2565,23 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         if (myharmonics.size() == 0)
         {
             // Get the coefficients:
-            densematrix mycoefs = getcoefficients(elementtypenumber, interpolorder, elementnumbers);
+            densemat mycoefs = getcoefficients(elementtypenumber, interpolorder, elementnumbers);
             // Compute the form functions evaluated at the evaluation points.
             // This reuses as much as possible what's already been computed:
             hierarchicalformfunctioncontainer* val = universe::gethff(mytypename, elementtypenumber, interpolorder, evaluationcoordinates);
             
             // We can get the total orientation from elementnumbers[0] since
             // we require that all elements have the same total orientation.
-            densematrix myformfunctionvalue = val->tomatrix(totalorientation, interpolorder, whichderivative, formfunctioncomponent);
+            densemat myformfunctionvalue = val->tomatrix(totalorientation, interpolorder, whichderivative, formfunctioncomponent);
             
             mycoefs.transpose();
-            densematrix coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
+            densemat coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
 
             return {{},{coefstimesformfunctions}};
         }
         else
         {
-            std::vector<std::vector<densematrix>> coefstimesformfunctions(myharmonics.size());
+            std::vector<std::vector<densemat>> coefstimesformfunctions(myharmonics.size());
 
             for (int harm = 1; harm < myharmonics.size(); harm++)
             {

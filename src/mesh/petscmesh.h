@@ -12,7 +12,7 @@
 #include "nodes.h"
 #include "elements.h"
 #include "physicalregions.h"
-#include "densematrix.h" 
+#include "densemat.h" 
 #include "indexmat.h" 
 #include "petscdmplex.h"
 #include "petscviewer.h" 
