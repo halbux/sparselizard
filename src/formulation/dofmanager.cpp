@@ -532,7 +532,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     synchronize();
     
     // This will have an entry for every field and every disjoint node region that is conditionally constrained:
-    std::vector<intdensematrix> indexmat = {};
+    std::vector<intdensematrix> indmat = {};
     std::vector<densematrix> condvalvec = {};
     std::vector<densematrix> constrvalvec = {};
     
@@ -585,15 +585,15 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
 
             // Create a matrix with all indices:
-            intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
-            int* curindexmatptr = curindexmat.getvalues();
+            intdensematrix curindmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
+            int* curindmatptr = curindmat.getvalues();
             int index = 0;
             for (int i = 0; i < curdisjregs.size(); i++)
             {
                 // There is only a single shape function per node!
                 for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
                 {
-                    curindexmatptr[index] = ind;
+                    curindmatptr[index] = ind;
                     index++;
                 }
             }
@@ -601,7 +601,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             // Append to the vectors:
             condvalvec.push_back(condval[1][0]);
             constrvalvec.push_back(constrval[1][0]);
-            indexmat.push_back(curindexmat);
+            indmat.push_back(curindmat);
         }
     }
 
@@ -629,7 +629,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     {
         double* condvalptr = condvalvec[i].getvalues();
         double* constrvalptr = constrvalvec[i].getvalues();
-        int* indmatptr = indexmat[i].getvalues();
+        int* indmatptr = indmat[i].getvalues();
         for (int j = 0; j < condvalvec[i].count(); j++)
         {
             if (condvalptr[j] >= 0)
