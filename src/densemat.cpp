@@ -32,6 +32,12 @@ densemat::densemat(long long int numberofrows, long long int numberofcolumns, do
 
 densemat::densemat(long long int numberofrows, long long int numberofcolumns, std::vector<double> valvec)
 {
+    if (numberofrows*numberofcolumns != valvec.size())
+    {
+        std::cout << "Error in 'densemat' object: expected a value vector of size " << numberofrows*numberofcolumns << std::endl;
+        abort();
+    }
+    
     numrows = numberofrows;
     numcols = numberofcolumns;
     double* myvaluesptr = new double[numcols*numrows];
