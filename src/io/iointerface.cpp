@@ -122,7 +122,7 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
     {
         // All ints will be converted to doubles (doubles can exactly represent ints up to at least 2^52):
         int totalsize = intdata.size() + doubledata.size() + 2;
-        intdensematrix alladdresses(1,totalsize, 0,1);
+        indexmat alladdresses(1,totalsize, 0,1);
         densematrix alldata(1,totalsize);
 
         int* addsvals = alladdresses.getvalues();
@@ -212,7 +212,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         VecGetSize(datvec, &veclen);
         
         densematrix doublestoget(1, veclen);
-        intdensematrix addressestoget(1, veclen, 0, 1);
+        indexmat addressestoget(1, veclen, 0, 1);
         
         double* vals = doublestoget.getvalues();
         int* ads = addressestoget.getvalues();

@@ -19,7 +19,7 @@
 #include "universe.h"
 #include "memory.h"
 #include "densematrix.h"
-#include "intdensematrix.h"
+#include "indexmat.h"
 #include "rawvec.h"
 #include "rawmat.h"
 #include "integration.h"
@@ -96,7 +96,7 @@ class formulation
         
         // Compute the no-port term value for every port relation:
         densematrix getportrelationrhs(void);
-        std::tuple<intdensematrix, intdensematrix, densematrix> getportrelations(int KCM);
+        std::tuple<indexmat, indexmat, densematrix> getportrelations(int KCM);
         
         std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         
@@ -112,7 +112,7 @@ class formulation
         mat C(bool keepfragments = false);
         mat M(bool keepfragments = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
-        mat getmatrix(int KCM, bool keepfragments = false, std::vector<intdensematrix> additionalconstraints = {});
+        mat getmatrix(int KCM, bool keepfragments = false, std::vector<indexmat> additionalconstraints = {});
         
         
         // Generate, solve and save to fields:

@@ -10,7 +10,7 @@
 #include <vector>
 #include "disjointregions.h"
 #include "densematrix.h"
-#include "intdensematrix.h"
+#include "indexmat.h"
 #include "dofmanager.h"
 #include "field.h"
 #include "rawfield.h"
@@ -59,7 +59,7 @@ class dofinterpolate
         
         // One matrix per dof harmonic. Harmonic h is at mydofnums[h][0].
         // Value is -2 for non existing entries.
-        std::vector<std::vector<intdensematrix>> mydofnums = {};
+        std::vector<std::vector<indexmat>> mydofnums = {};
         
         
         // Create the matrix containers:
@@ -72,7 +72,7 @@ class dofinterpolate
         dofinterpolate(std::vector<double> refcoords, elementselector& elemselec, std::vector<std::shared_ptr<operation>> dofops, std::shared_ptr<dofmanager> dofmngr);
         
         densematrix getvalues(elementselector& elemselec, int dofopindex);
-        intdensematrix getaddresses(elementselector& elemselec, int harmnum);
+        indexmat getaddresses(elementselector& elemselec, int harmnum);
                                             
 };
 

@@ -75,7 +75,7 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     
     
     // Create the A matrix and b rhs:
-    intdensematrix Arows(3*len-2,1), Acols(3*len-2,1);
+    indexmat Arows(3*len-2,1), Acols(3*len-2,1);
     int* Arowvals = Arows.getvalues();
     int* Acolvals = Acols.getvalues();
     densematrix Av(3*len-2,1);
@@ -109,10 +109,10 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     
     // Solve problem Ak = b:
     mat A(len, Arows, Acols, Av);
-    vec b(len, intdensematrix(len,1,0,1), bv);
+    vec b(len, indexmat(len,1,0,1), bv);
     
     vec k = sl::solve(A,b);
-    densematrix kv = k.getvalues(intdensematrix(len,1,0,1));
+    densematrix kv = k.getvalues(indexmat(len,1,0,1));
     double* kvals = kv.getvalues();
     
     

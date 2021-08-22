@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include "dofmanager.h"
-#include "intdensematrix.h"
+#include "indexmat.h"
 #include "densematrix.h"
 #include "vectorfieldselect.h"
 #include "rawfield.h"
@@ -65,11 +65,11 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         void updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
-        void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+        void setvalues(indexmat addresses, densematrix valsmat, std::string op = "set");
         // Set value at a single index:
         void setvalue(int address, double value, std::string op = "set");
         
-        densematrix getvalues(intdensematrix addresses);
+        densematrix getvalues(indexmat addresses);
         // Get value at a single index:
         double getvalue(int address);
         

@@ -869,7 +869,7 @@ bool rawmesh::adapthp(int verbosity)
     double* hcritptr;
     std::vector<double*> pcritptrs(numpadaptfields), foptrs(numpadaptfields);
 
-    intdensematrix ads(totalnumelems, 1, 0, 1);
+    indexmat ads(totalnumelems, 1, 0, 1);
     
     if (ishadaptive)
     {
@@ -1263,7 +1263,7 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
             std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
             
             std::vector<int> catords = myalgorithm::concatenate(neworders[i]);
-            intdensematrix newordsmat(catords.size(),1, catords);
+            indexmat newordsmat(catords.size(),1, catords);
             std::vector<int> numineachorder = newordsmat.countalloccurences(newmaxorder);
 
             curraw->print();

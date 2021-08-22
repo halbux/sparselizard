@@ -58,8 +58,8 @@ class universe
         static std::vector<vec> ddmvecs;
         static std::vector<mat> ddmmats;
         static std::vector<formulation> ddmformuls;
-        static std::vector<intdensematrix> ddmsendinds;
-        static std::vector<intdensematrix> ddmrecvinds;
+        static std::vector<indexmat> ddmsendinds;
+        static std::vector<indexmat> ddmrecvinds;
         
         static void clearddmcontainers(void);
         
@@ -112,7 +112,7 @@ class universe
         static bool keeptrackofrhsassembly;
         // Every row in a given (int)densematrix corresponds to a shape function and every column to a given mesh element.
         // Do not forget to clear 'rhsterms' when you don't want to keep track anymore!
-        static std::vector<std::pair<intdensematrix, densematrix>> rhsterms;
+        static std::vector<std::pair<indexmat, densematrix>> rhsterms;
         
         // This stores the vec containing a solution x, its time derivative dtx and its second time derivative dtdtx
         // respectively at index 0, 1 and 2. If xdtxdtdtx[i] is an empty vector then that solution is not available.

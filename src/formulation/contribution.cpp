@@ -247,8 +247,8 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                     ///// Get the addresses corresponding to every form function of 
                     // the test function/dof field in the elements of 'elementlist':
-                    intdensematrix testfunaddresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg);
-                    intdensematrix dofaddresses;
+                    indexmat testfunaddresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg);
+                    indexmat dofaddresses;
                     if (doffield != NULL)
                     {
                         if (isdofinterpolate)
@@ -260,11 +260,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     ///// Duplicate the tf and dof addresses as needed by the rawmat object:
                     if (doffield != NULL)
                     {
-                        intdensematrix duplicateddofaddresses = dofaddresses;
+                        indexmat duplicateddofaddresses = dofaddresses;
                         if (isdofinterpolate)
                             duplicateddofaddresses = dofaddresses.duplicateallcolstogether(tfformfunctionvalue.countrows());
                             
-                        intdensematrix duplicatedtestfunaddresses = testfunaddresses;
+                        indexmat duplicatedtestfunaddresses = testfunaddresses;
                         if (isdofinterpolate)
                         {
                             duplicatedtestfunaddresses = testfunaddresses.gettranspose();

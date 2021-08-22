@@ -80,7 +80,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         abort();
     }
     
-    intdensematrix celltypmat(celltypes.size(), 1, celltypes);
+    indexmat celltypmat(celltypes.size(), 1, celltypes);
     std::vector<std::vector<int>> indexes = celltypmat.findalloccurences(8);
     
     for (int t = 0; t < indexes.size(); t++)

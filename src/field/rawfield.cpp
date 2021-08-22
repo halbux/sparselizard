@@ -205,11 +205,11 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     
     if (preallocsize > 0)
     {
-        intdensematrix blocksizes(numblocks,1);
+        indexmat blocksizes(numblocks,1);
         int* bsvals = blocksizes.getvalues();
 
         // Vector to reorder the mat and vec to bring together the parts of the diagonal blocks:
-        intdensematrix renumtodiagblocks(dm->countdofs(), 1);
+        indexmat renumtodiagblocks(dm->countdofs(), 1);
         int* renumptr = renumtodiagblocks.getvalues();
         int index = 0;
         for (int d = 0; d < alldrsindim.size(); d++)
@@ -268,7 +268,7 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         
         // Solve block-diagonal system:
         v.permute(renumtodiagblocks);
-        intdensematrix alladds(v.size(),1, 0,1);
+        indexmat alladds(v.size(),1, 0,1);
         densematrix vmat = v.getvalues(alladds);
         densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
 
@@ -958,8 +958,8 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         if (numffs == 0)
             continue;
         
-        intdensematrix csrrows(1, matsize+1, 0,numffs);
-        intdensematrix csrcols(numinselection, numffs*numffs);
+        indexmat csrrows(1, matsize+1, 0,numffs);
+        indexmat csrcols(numinselection, numffs*numffs);
         int* captr = csrcols.getvalues();
         
         int index = 0;
@@ -981,7 +981,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         MatAssemblyBegin(bdmat, MAT_FINAL_ASSEMBLY);
         MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
 
-        intdensematrix blocksizes(numinselection,1, numffs);
+        indexmat blocksizes(numinselection,1, numffs);
         densematrix blockvals(numinselection*numffs, numffs);
         MatInvertVariableBlockDiagonal(bdmat, numinselection, blocksizes.getvalues(), blockvals.getvalues());
         
@@ -1011,7 +1011,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     elemselect.selectdisjointregions({});
 }
 
-void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
+void rawfield::setnodalvalues(indexmat nodenumbers, densematrix values)
 {
     synchronize();
     
@@ -1059,7 +1059,7 @@ void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
     }
 }
 
-densematrix rawfield::getnodalvalues(intdensematrix nodenumbers)
+densematrix rawfield::getnodalvalues(indexmat nodenumbers)
 {
     synchronize();
     

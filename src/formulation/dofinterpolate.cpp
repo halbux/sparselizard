@@ -91,10 +91,10 @@ dofinterpolate::dofinterpolate(std::vector<double> refcoords, elementselector& e
         myvals[i] = densematrix(totalnumels, mymaxnumff*mynumrefcoords, 0);
     // Preallocate the adresses matrix for each harmonic:
     std::vector<int> dofharms = mydoffield->getharmonics();
-    mydofnums = std::vector<std::vector<intdensematrix>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<intdensematrix>(0));
+    mydofnums = std::vector<std::vector<indexmat>>(*std::max_element(dofharms.begin(), dofharms.end()) + 1, std::vector<indexmat>(0));
    
     for (int h = 0; h < dofharms.size(); h++)
-        mydofnums[dofharms[h]] = {intdensematrix(totalnumels, mymaxnumff*mynumrefcoords, -2)};
+        mydofnums[dofharms[h]] = {indexmat(totalnumels, mymaxnumff*mynumrefcoords, -2)};
            
 
     eval();
@@ -258,7 +258,7 @@ densematrix dofinterpolate::getvalues(elementselector& elemselec, int dofopindex
     return myvals[dofopindex].extractrows(oi);
 }
 
-intdensematrix dofinterpolate::getaddresses(elementselector& elemselec, int harmnum)
+indexmat dofinterpolate::getaddresses(elementselector& elemselec, int harmnum)
 {
     std::vector<int> oi = elemselec.getoriginalindexes();
     return mydofnums[harmnum][0].extractrows(oi);

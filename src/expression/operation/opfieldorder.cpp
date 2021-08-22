@@ -35,7 +35,7 @@ std::vector<std::vector<densematrix>> opfieldorder::interpolate(elementselector&
     
     if (myalpha != -1.0)
     {
-        intdensematrix fo(numelems, 1, fieldorders);
+        indexmat fo(numelems, 1, fieldorders);
         std::vector<std::vector<int>> splitorders = fo.findalloccurences(maxorder);
         
         for (int o = 0; o <= maxorder; o++)

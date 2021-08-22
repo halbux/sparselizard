@@ -79,8 +79,8 @@ std::vector<std::vector<int>> universe::ddmints = {};
 std::vector<vec> universe::ddmvecs = {};
 std::vector<mat> universe::ddmmats = {};
 std::vector<formulation> universe::ddmformuls = {};
-std::vector<intdensematrix> universe::ddmsendinds = {};
-std::vector<intdensematrix> universe::ddmrecvinds = {};
+std::vector<indexmat> universe::ddmsendinds = {};
+std::vector<indexmat> universe::ddmrecvinds = {};
 
 void universe::clearddmcontainers(void)
 {
@@ -295,7 +295,7 @@ void universe::setprecomputedfft(std::shared_ptr<operation> op, densematrix val)
 }
 
 bool universe::keeptrackofrhsassembly = false;
-std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 
+std::vector<std::pair<indexmat, densematrix>> universe::rhsterms = {}; 
         
 std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};        
 

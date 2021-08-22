@@ -20,7 +20,7 @@
 #include "vec.h"
 #include "rawvec.h"
 #include "formulation.h"
-#include "intdensematrix.h"
+#include "indexmat.h"
 #include "densematrix.h"
 
 class vec;
@@ -43,9 +43,9 @@ class mat
         mat(std::shared_ptr<rawmat> inputrawmat) { rawmatptr = inputrawmat; };
         
         // Create a pre-filled matrix:
-        mat(long long int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
+        mat(long long int matsize, indexmat rowadresses, indexmat coladresses, densematrix vals);
         // Create a matrix with structure based on a formulation and with initial values:
-        mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);
+        mat(formulation myformulation, indexmat rowadresses, indexmat coladresses, densematrix vals);
      
         bool isdefined(void) { return (rawmatptr != NULL); };
          
@@ -66,8 +66,8 @@ class mat
         // Return ba - D*bd:
         vec eliminate(vec b);
 
-        intdensematrix getainds(void);
-        intdensematrix getdinds(void);
+        indexmat getainds(void);
+        indexmat getdinds(void);
 
         Mat getapetsc(void);
         Mat getdpetsc(void);

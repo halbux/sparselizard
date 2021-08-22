@@ -629,7 +629,7 @@ void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindex
         selected[i] = vals[selectedindexes[i]];
 }
 
-void myalgorithm::select(std::vector<bool>& vals, intdensematrix selectedindexes, std::vector<bool>& selected)
+void myalgorithm::select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected)
 {
     int numselected = selectedindexes.count();
     selected.resize(numselected);
@@ -1759,15 +1759,15 @@ void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::str
     }
 }
 
-void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum)
+void myalgorithm::findtruefalse(std::vector<bool>& invec, indexmat& trueinds, indexmat& falseinds, std::vector<int>& renum)
 {
     int numtot = invec.size();
     int numtrue = counttrue(invec);
 
     renum = std::vector<int>(numtot);
 
-    trueinds = intdensematrix(numtrue, 1);
-    falseinds = intdensematrix(numtot-numtrue, 1);
+    trueinds = indexmat(numtrue, 1);
+    falseinds = indexmat(numtot-numtrue, 1);
     int* tiptr = trueinds.getvalues();
     int* fiptr = falseinds.getvalues();
 

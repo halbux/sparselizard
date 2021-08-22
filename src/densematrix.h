@@ -16,7 +16,7 @@
 #include <cmath>
 #include <memory>
 #include "petscmat.h"
-#include "intdensematrix.h"
+#include "indexmat.h"
 
 class densematrix
 {   
@@ -166,7 +166,7 @@ class densematrix
         densematrix extractcols(long long int rangebegin, long long int rangeend);
         
         // Multiply this block diagonal matrix (column major) by a vector:
-        densematrix blockdiagonaltimesvector(intdensematrix blocklens, densematrix v);
+        densematrix blockdiagonaltimesvector(indexmat blocklens, densematrix v);
 
 };
 

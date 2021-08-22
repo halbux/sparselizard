@@ -13,7 +13,7 @@
 #include "elements.h"
 #include "physicalregions.h"
 #include "densematrix.h" 
-#include "intdensematrix.h" 
+#include "indexmat.h" 
 #include "petscdmplex.h"
 #include "petscviewer.h" 
 

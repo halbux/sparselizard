@@ -42,19 +42,19 @@ class vec
         vec(std::shared_ptr<rawvec> inputrawvec) { rawvecptr = inputrawvec; };
      
         // Create a pre-filled vector:
-        vec(int vecsize, intdensematrix addresses, densematrix vals);
+        vec(int vecsize, indexmat addresses, densematrix vals);
      
         int size(void);
         
-        void permute(intdensematrix rowpermute, bool invertit = false);
+        void permute(indexmat rowpermute, bool invertit = false);
         
         // Update the Dirichlet constraints:
         void updateconstraints(void);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
-        void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+        void setvalues(indexmat addresses, densematrix valsmat, std::string op = "set");
         void setallvalues(densematrix valsmat, std::string op = "set");
-        densematrix getvalues(intdensematrix addresses);
+        densematrix getvalues(indexmat addresses);
         densematrix getallvalues(void);
         // Set and get value at a single index:
         void setvalue(int address, double value, std::string op = "set");
@@ -88,7 +88,7 @@ class vec
         
         vec copy(void);
         
-        vec extract(intdensematrix addresses);
+        vec extract(indexmat addresses);
         
         double norm(std::string type = "2");
         double sum(void);

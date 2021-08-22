@@ -285,7 +285,7 @@ densematrix formulation::getportrelationrhs(void)
     return rhsvals;
 }
 
-std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrelations(int KCM)
+std::tuple<indexmat, indexmat, densematrix> formulation::getportrelations(int KCM)
 {
     int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
     
@@ -321,8 +321,8 @@ std::tuple<intdensematrix, intdensematrix, densematrix> formulation::getportrela
     }
     
     // Concatenate all:
-    intdensematrix allrinds(portnnz, 1);
-    intdensematrix allcinds(portnnz, 1);
+    indexmat allrinds(portnnz, 1);
+    indexmat allcinds(portnnz, 1);
     densematrix allvals(portnnz, 1);
     
     int* arptr = allrinds.getvalues();
@@ -369,7 +369,7 @@ vec formulation::rhs(bool keepvector, bool dirichletandportupdate)
     if (dirichletandportupdate == true)
     {
         densematrix portrhsvals = getportrelationrhs();
-        output.setvalues(intdensematrix(portrhsvals.count(), 1, 0, 1), portrhsvals);
+        output.setvalues(indexmat(portrhsvals.count(), 1, 0, 1), portrhsvals);
     }
     
     return output; 
@@ -379,7 +379,7 @@ mat formulation::K(bool keepfragments) { return getmatrix(0, keepfragments); }
 mat formulation::C(bool keepfragments) { return getmatrix(1, keepfragments); }
 mat formulation::M(bool keepfragments) { return getmatrix(2, keepfragments); }
 
-mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematrix> additionalconstraints)
+mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<indexmat> additionalconstraints)
 {
     if (mymat[KCM] == NULL)
         mymat[KCM] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
@@ -404,10 +404,10 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
 
     if (KCM == 0)
     {
-        std::pair<intdensematrix, intdensematrix> assocports = mydofmanager->findassociatedports();
+        std::pair<indexmat, indexmat> assocports = mydofmanager->findassociatedports();
         rawout->accumulate(assocports.first, assocports.second, densematrix(assocports.first.count(), 1, 1.0));
     }
-    std::tuple<intdensematrix, intdensematrix, densematrix> portterms = getportrelations(KCM);
+    std::tuple<indexmat, indexmat, densematrix> portterms = getportrelations(KCM);
     rawout->accumulate(std::get<0>(portterms), std::get<1>(portterms), std::get<2>(portterms));
     
     rawout->process(isconstr); 
@@ -515,10 +515,10 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     std::vector<std::shared_ptr<rawfield>> rfs = mydofmanager->getfields();
     sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
     
-    std::vector<intdensematrix> interfaceinds = universe::ddmrecvinds;
+    std::vector<indexmat> interfaceinds = universe::ddmrecvinds;
     
     // Get all Dirichlet constraints set on the neighbours but not on this rank:
-    std::vector<std::vector<intdensematrix>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
+    std::vector<std::vector<indexmat>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
 
     // Unconstrained send and receive indexes:
     universe::ddmsendinds = dcdata[2];
@@ -681,7 +681,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
     
     // Get all Dirichlet constraints set on the neighbours but not on this rank:
-    std::vector<std::vector<intdensematrix>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
+    std::vector<std::vector<indexmat>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
 
     // Unconstrained send and receive indexes:
     universe::ddmsendinds = dcdata[2];
@@ -691,7 +691,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     generate(formulterms);
     for (int n = 0; n < numneighbours; n++)
         generatein(1, physicalterms[n]); // S term in A
-    mat A = getmatrix(0, false, {intdensematrix(dcdata[1])});
+    mat A = getmatrix(0, false, {indexmat(dcdata[1])});
     A.reusefactorization();
     universe::ddmmats = {A};
     

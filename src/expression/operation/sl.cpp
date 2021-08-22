@@ -572,7 +572,7 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
     {
         // totalforce = integral(fdensity*1) = integral(fdensity*sumi(Ni)) = sumi(integral(fdensity*Ni))
         // where Ni includes all 'h1' nodal shape functions (their sum equals one). 
-        densematrix vecvals = fv.getvalues(intdensematrix(siz, 1, c*siz, 1));
+        densematrix vecvals = fv.getvalues(indexmat(siz, 1, c*siz, 1));
         output[c] = vecvals.sum();
     }
     
@@ -1815,7 +1815,7 @@ std::vector<double> sl::gmres(densematrix (*mymatmult)(densematrix), densematrix
     return relresvec;
 }
 
-void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds)
+void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<indexmat>& sendinds, std::vector<indexmat>& recvinds)
 {
     std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     
@@ -1907,12 +1907,12 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     }
     
     // Preallocate the outputs:
-    sendinds = std::vector<intdensematrix>(numneighbours);
-    recvinds = std::vector<intdensematrix>(numneighbours);
+    sendinds = std::vector<indexmat>(numneighbours);
+    recvinds = std::vector<indexmat>(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
-        sendinds[n] = intdensematrix(myalgorithm::sum(numsenddofsperfield[n]), 1);
-        recvinds[n] = intdensematrix(myalgorithm::sum(numexpectedrecvdofsperfield[n]), 1);
+        sendinds[n] = indexmat(myalgorithm::sum(numsenddofsperfield[n]), 1);
+        recvinds[n] = indexmat(myalgorithm::sum(numexpectedrecvdofsperfield[n]), 1);
     }
     
     // Create the send range data and populate the send indexes:

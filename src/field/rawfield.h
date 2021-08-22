@@ -187,8 +187,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values);
         
         // Set/get value at nodes for 'h1' type fields:
-        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
-        densematrix getnodalvalues(intdensematrix nodenumbers);
+        void setnodalvalues(indexmat nodenumbers, densematrix values);
+        densematrix getnodalvalues(indexmat nodenumbers);
         
         void setdisjregconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:

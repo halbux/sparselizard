@@ -376,8 +376,8 @@ densematrix densematrix::getinverse(void)
     if (n == 0)
         return densematrix(0,0);
 
-    intdensematrix csrrows(1, n+1, 0,n);
-    intdensematrix csrcols(n,n);
+    indexmat csrrows(1, n+1, 0,n);
+    indexmat csrcols(n,n);
     int* captr = csrcols.getvalues();
     for (int r = 0; r < n; r++)
     {
@@ -391,7 +391,7 @@ densematrix densematrix::getinverse(void)
     MatAssemblyBegin(bdmat, MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
 
-    intdensematrix blocksizes(1,1, n);
+    indexmat blocksizes(1,1, n);
     densematrix output(n,n);
     MatInvertVariableBlockDiagonal(bdmat, 1, blocksizes.getvalues(), output.getvalues()); // output is column-major after the call
 
@@ -774,7 +774,7 @@ densematrix densematrix::extractcols(long long int rangebegin, long long int ran
     return extractcols(selected);
 }
 
-densematrix densematrix::blockdiagonaltimesvector(intdensematrix blocklens, densematrix v)
+densematrix densematrix::blockdiagonaltimesvector(indexmat blocklens, densematrix v)
 {
     long long int nb = blocklens.count();
     
