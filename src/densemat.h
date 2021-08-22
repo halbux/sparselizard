@@ -8,8 +8,8 @@
 // This object stores the ROW-MAJOR values of a dense matrix of doubles.
 // In other words the matrix is stored as [row1 row2 row3 ...].
 
-#ifndef DENSEMATRIX_H
-#define DENSEMATRIX_H
+#ifndef DENSEMAT_H
+#define DENSEMAT_H
 
 #include <iostream>
 #include <vector>
