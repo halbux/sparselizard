@@ -4,7 +4,6 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-
 #ifndef SPANNINGTREE_H
 #define SPANNINGTREE_H
 
@@ -16,7 +15,6 @@
 
 class spanningtree
 {
-
     private:
         
         std::vector<int> startphysregs;
@@ -25,9 +23,7 @@ class spanningtree
         disjointregions* mydisjointregions;
         
         // Vector whose ith entry tells whether the edge number i is in the tree or not:
-        std::shared_ptr<bool> isedgeintree = NULL;
-        // The pointer to which the shared pointer points:
-        bool* isedgeintreeptr;
+        std::vector<bool> isedgeintree;
         
         // Number of edges that are in the tree:
         int numberofedgesintree = 0;
@@ -92,7 +88,6 @@ class spanningtree
         
         // Write to file to visualize the tree:
         void write(std::string filename);
-    
 };
 
 #endif
