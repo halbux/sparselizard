@@ -1285,7 +1285,7 @@ void rawfield::setgauge(int physreg)
     }
 }
 
-void rawfield::setspanningtree(spanningtree spantree)
+void rawfield::setspanningtree(std::shared_ptr<rawspanningtree> spantree)
 {
     synchronize();
     
@@ -1300,15 +1300,15 @@ void rawfield::setspanningtree(spanningtree spantree)
     }
     
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
-        myspanningtree = {spantree};
+        myspanningtree = spantree;
 }
 
-spanningtree* rawfield::getspanningtree(void)
+std::shared_ptr<rawspanningtree> rawfield::getspanningtree(void)
 {
     synchronize();
     
-    if (myspanningtree.size() == 1)
-        return &myspanningtree[0];
+    if (myspanningtree != NULL)
+        return myspanningtree;
     else
     {
         std::cout << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;

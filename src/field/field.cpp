@@ -33,7 +33,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
 field::field(std::string fieldtypename, spanningtree spantree)
 {
     rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
-    rawfieldptr->setspanningtree(spantree);
+    rawfieldptr->setspanningtree(spantree.getpointer());
 }
 
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree)
@@ -54,7 +54,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, 
         std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
         abort();
     } 
-    rawfieldptr->setspanningtree(spantree);
+    rawfieldptr->setspanningtree(spantree.getpointer());
 }
 
 int field::countcomponents(void) { errorifpointerisnull(); return rawfieldptr->countcomponents(); }
