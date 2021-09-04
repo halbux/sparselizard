@@ -47,7 +47,7 @@
 #include "selector.h"
 #include "field.h"
 #include "vectorfieldselect.h"
-#include "spanningtree.h"
+#include "rawspanningtree.h"
 #include "rawmesh.h"
 #include "rawport.h"
 
@@ -57,7 +57,7 @@ class coefmanager;
 class rawvec;
 class expression;
 class elementselector;
-class spanningtree;
+class rawspanningtree;
 
 class rawfield : public std::enable_shared_from_this<rawfield>
 {
@@ -90,8 +90,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // on the NODAL disjoint region 'disjreg'. Empty means unconstrained.
         std::vector<std::vector<expression>> myconditionalconstraints = {};
     
-        // The spanning tree used for gauging fields (empty vector if none):
-        std::vector<spanningtree> myspanningtree = {};
+        // The spanning tree used for gauging fields (NULL if none):
+        std::shared_ptr<rawspanningtree> myspanningtree = NULL;
 
         // isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
         std::vector<bool> isitgauged = {};
@@ -200,9 +200,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set a gauge condition:
         void setgauge(int physreg);
 
-        void setspanningtree(spanningtree spantree);
+        void setspanningtree(std::shared_ptr<rawspanningtree> spantree);
         // This should only be called on a field without subfields or harmonics:
-        spanningtree* getspanningtree(void);
+        std::shared_ptr<rawspanningtree> getspanningtree(void);
         
         std::shared_ptr<rawfield> getpointer(void);
         std::shared_ptr<rawmesh> getrawmesh(void);

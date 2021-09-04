@@ -461,7 +461,7 @@ int dofmanager::countgaugeddofs(void)
         {
             if (myfields[fieldindex]->isgauged(disjreg))
             {
-                spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+                std::shared_ptr<rawspanningtree> myspantree = myfields[fieldindex]->getspanningtree();
 
                 int elementtype = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg);
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
@@ -500,7 +500,7 @@ indexmat dofmanager::getgaugedindexes(void)
         {
             if (myfields[fieldindex]->isgauged(disjreg))
             {
-                spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+                std::shared_ptr<rawspanningtree> myspantree = myfields[fieldindex]->getspanningtree();
 
                 int elementtype = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg);
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);

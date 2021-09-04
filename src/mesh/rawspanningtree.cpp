@@ -1,7 +1,8 @@
-#include "spanningtree.h"
+#include "rawspanningtree.h"
+#include "universe.h"
 
 
-void spanningtree::growsubtrees(void)
+void rawspanningtree::growsubtrees(void)
 {
     // Initialise:
     insubtree = std::vector<int>(myelements->count(1), -1);
@@ -29,7 +30,7 @@ void spanningtree::growsubtrees(void)
     }
 }
 
-void spanningtree::growsubtree(int nodenumber, int subtreenumber)
+void rawspanningtree::growsubtree(int nodenumber, int subtreenumber)
 {
     isnodeintree[nodenumber] = true;
 
@@ -63,7 +64,7 @@ void spanningtree::growsubtree(int nodenumber, int subtreenumber)
     }
 }
 
-void spanningtree::connectsubtrees(void)
+void rawspanningtree::connectsubtrees(void)
 {
     isnodeintree = std::vector<bool>(myelements->count(0),false);
     isedgeintree = std::vector<bool>(myelements->count(1));
@@ -120,7 +121,7 @@ void spanningtree::connectsubtrees(void)
 }
 
 
-void spanningtree::growtree(int nodenumber)
+void rawspanningtree::growtree(int nodenumber)
 {
     isnodeintree[nodenumber] = true;
 
@@ -186,7 +187,7 @@ void spanningtree::growtree(int nodenumber)
     }
 }
 
-void spanningtree::grow(void)
+void rawspanningtree::grow(void)
 {
     // Get a vector with all disjoint edge regions in the physical regions provided:
     isprioritydisjointregion = std::vector<bool>(mydisjointregions->count(), false);
@@ -206,7 +207,7 @@ void spanningtree::grow(void)
     connectsubtrees();
 }
 
-void spanningtree::synchronize(void)
+void rawspanningtree::synchronize(void)
 {
     if (issynchronizing || universe::getrawmesh()->getmeshnumber() == mymeshnumber)
         return;
@@ -233,16 +234,8 @@ void spanningtree::synchronize(void)
     issynchronizing = false;
 }
 
-spanningtree::spanningtree(std::vector<int> physregs)
+rawspanningtree::rawspanningtree(std::vector<int> physregs)
 {
-    if (universe::myrawmesh == NULL)
-    {
-        std::cout << "Error in 'spanningtree' object: cannot define a spanning tree before the mesh is loaded" << std::endl;
-        abort();
-    }
-    
-    universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);
-    
     startphysregs = physregs;
     
     myelements = universe::getrawmesh()->getelements();
@@ -253,7 +246,7 @@ spanningtree::spanningtree(std::vector<int> physregs)
     mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
-bool spanningtree::isintree(int index, int disjreg)
+bool rawspanningtree::isintree(int index, int disjreg)
 {
     synchronize();
     
@@ -264,7 +257,7 @@ bool spanningtree::isintree(int index, int disjreg)
     return output;
 }
 
-int spanningtree::countedgesintree(int disjreg)
+int rawspanningtree::countedgesintree(int disjreg)
 {
     synchronize();
     
@@ -284,14 +277,14 @@ int spanningtree::countedgesintree(int disjreg)
     return output;
 }
 
-int spanningtree::countedgesintree(void)
+int rawspanningtree::countedgesintree(void)
 {
     synchronize();
     
     return numberofedgesintree;
 }
 
-std::vector<int> spanningtree::getedgesintree(void)
+std::vector<int> rawspanningtree::getedgesintree(void)
 {
     synchronize();
     
@@ -310,7 +303,7 @@ std::vector<int> spanningtree::getedgesintree(void)
     return output;
 }
 
-void spanningtree::write(std::string filename)
+void rawspanningtree::write(std::string filename)
 {
     synchronize();
     

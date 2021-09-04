@@ -4,16 +4,15 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-#ifndef SPANNINGTREE_H
-#define SPANNINGTREE_H
+#ifndef RAWSPANNINGTREE_H
+#define RAWSPANNINGTREE_H
 
 #include <iostream>
 #include <vector>
-#include "mesh.h"
 #include "elements.h"
 #include <memory>
 
-class spanningtree
+class rawspanningtree
 {
     private:
         
@@ -73,7 +72,7 @@ class spanningtree
 
         // Create a spanning tree on the whole mesh.
         // The tree is first created on the physical regions provided.
-        spanningtree(std::vector<int> physregs);
+        rawspanningtree(std::vector<int> physregs);
         
         // Is the index th element of the disjoint region in the tree? Always false if not an edge.
         bool isintree(int index, int disjreg);
