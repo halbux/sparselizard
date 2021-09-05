@@ -66,12 +66,8 @@ void rawspanningtree::growsubtree(int nodenumber, int subtreenumber)
 
 void rawspanningtree::connectsubtrees(void)
 {
-    isnodeintree = std::vector<bool>(myelements->count(0),false);
-    isedgeintree = std::vector<bool>(myelements->count(1));
-
-    // Initialise to all false:
-    for (int i = 0; i < myelements->count(1); i++)
-        isedgeintree[i] = false;
+    isnodeintree = std::vector<bool>(myelements->count(0), false);
+    isedgeintree = std::vector<bool>(myelements->count(1), false);
 
 
     ///// Group the edges of each subtree in a vector:
