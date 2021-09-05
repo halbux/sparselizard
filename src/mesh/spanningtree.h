@@ -22,8 +22,7 @@ class spanningtree
 
     public:
 
-        // Create a spanning tree on the whole mesh. The tree flows from
-        // the highest (first) to the lowest (last) priority region.
+        // Create a spanning tree on the whole mesh:
         spanningtree(std::vector<int> physregs);
         
         // Count the number of edges in the tree:
