@@ -8,6 +8,7 @@ FIND_PATH(SLEPC_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
+    "/usr/lib/slepc/include"
     NO_DEFAULT_PATH
     )
 
@@ -20,11 +21,12 @@ endif()
 
 # Find slepc library:
 FIND_LIBRARY(SLEPC_LIBRARIES
-    NAMES slepc
+    NAMES slepc_real
     PATHS
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
+    "/usr/lib/slepc/lib"
     NO_DEFAULT_PATH
     )
 

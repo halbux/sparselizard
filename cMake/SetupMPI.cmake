@@ -12,6 +12,7 @@ FIND_PATH(MPI_INCLUDE_PATH
     NAMES mpi.h
     PATHS
     "${MPI_PATH}/include"
+    "/usr/lib/x86_64-linux-gnu/openmpi/include"
     NO_DEFAULT_PATH
     )
 
@@ -27,6 +28,7 @@ FIND_LIBRARY(MPI_LIBRARIES
     NAMES mpi
     PATHS
     "${MPI_PATH}/lib"
+    "/usr/lib/x86_64-linux-gnu/openmpi/lib"
     NO_DEFAULT_PATH
     )
 
