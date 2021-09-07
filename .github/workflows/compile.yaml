@@ -9,7 +9,7 @@ jobs:
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "The workflow is now ready to test the code on the runner."
       - name: Install mandatory packages
-        run: sudo apt-get install -y libopenblas-dev libmetis-dev libopenmpi-dev petsc-dev libmumps-dev slepc-dev
+        run: sudo apt-get install -y libopenblas-dev libmetis-dev libopenmpi-dev libmumps-dev petsc-dev slepc-dev libgmsh-dev
       - run: mkdir build
       - name: Prepare environment
         run: cmake -B build .

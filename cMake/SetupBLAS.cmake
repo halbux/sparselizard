@@ -1,6 +1,5 @@
 function(ConfigureBLAS TARGET)
 
-
 # Find blas headers:
 FIND_PATH(BLAS_INCLUDE_PATH
     NAMES cblas.h
@@ -8,16 +7,13 @@ FIND_PATH(BLAS_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
-    "/usr/include/x86_64-linux-gnu"
-    NO_DEFAULT_PATH
     )
 
 if(BLAS_INCLUDE_PATH)
     message(STATUS "Blas header cblas.h found at " ${BLAS_INCLUDE_PATH})
 else()
-    message(STATUS "BLAS HEADER CBLAS.H NOT FOUND")
+    message(STATUS "Blas header cblas.h not found")
 endif()
-
 
 # Find blas library:
 FIND_LIBRARY(BLAS_LIBRARIES
@@ -26,24 +22,19 @@ FIND_LIBRARY(BLAS_LIBRARIES
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
-    "/usr/lib/x86_64-linux-gnu"
-    NO_DEFAULT_PATH
     )
 
 if(BLAS_LIBRARIES)
     message(STATUS "Blas library found at " ${BLAS_LIBRARIES})
 else()
-    message(STATUS "BLAS LIBRARY NOT FOUND")
+    message(STATUS "Blas library not found")
 endif()
-
 
 if(BLAS_INCLUDE_PATH AND BLAS_LIBRARIES)
     SET(BLAS_FOUND YES PARENT_SCOPE)
-
     TARGET_INCLUDE_DIRECTORIES(${TARGET} PUBLIC ${BLAS_INCLUDE_PATH})
     TARGET_LINK_LIBRARIES(${TARGET} PUBLIC ${BLAS_LIBRARIES})
 endif()
-
 
 endfunction(ConfigureBLAS)
 
