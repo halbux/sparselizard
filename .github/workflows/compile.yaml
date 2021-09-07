@@ -1,4 +1,4 @@
-name: DyNaMol Compilation
+name: Sparselizard Compilation
 on: [push]
 jobs:
   Compilation-Actions:
@@ -7,8 +7,8 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "The workflow is now ready to test your code on the runner."
-      - name: Upgrade packages
+      - run: echo "The workflow is now ready to test the code on the runner."
+      - name: Install mandatory packages
         run: sudo apt-get install -y libopenblas-dev libmetis-dev libopenmpi-dev petsc-dev libmumps-dev slepc-dev
       - run: mkdir build
       - name: Prepare environment
