@@ -1,17 +1,22 @@
 # Build instructions
 
-Run the scripts in the 'install_external_libs' folder then:
+Sparselizard depends on mandatory and optional external libraries.
+
+On debian Linux, run
+```sudo apt-get install -y libopenblas-dev libmetis-dev libopenmpi-dev libmumps-dev petsc-dev slepc-dev libgmsh-dev```
+or
+run the scripts in the 'install_external_libs' folder to download and install these libraries locally.
+
+Then:
 ```bash
-mkdir build && cd build
-cmake ..
-cmake --build . -j$(nproc)
+mkdir build; cmake -B build .; cd build && make -j 4
 ```
 
 ---
 
 To provide a custom path to the petsc, gmsh (optional) or mpi (optional) folder use:
 ```bash
-cmake .. -DPETSC_PATH=/yourpath/petsc -DGMSH_PATH=/yourpath/gmsh -DMPI_PATH=/yourpath/mpi
+cmake -B build . -DPETSC_PATH=/yourpath/petsc -DGMSH_PATH=/yourpath/gmsh -DMPI_PATH=/yourpath/mpi
 ```
 
 It may be convenient to use the cmake GUI:
