@@ -16,5 +16,5 @@ jobs:
       - name: Make binaries
         run: |
          cd build
-         make
+         make -j 2
       - run: echo "🍏 This job's status is ${{ job.status }}."
