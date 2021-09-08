@@ -13,7 +13,7 @@ using namespace sl;
 
 int main(void)
 {	
-    // The domain regions as defined in 'twoconductors2d.geo':
+    // The domain regions as defined in 'magsat2d.geo':
     int conductor1 = 1, conductor2 = 2, insulator = 3, steel = 4, air = 5, bnd = 6;
     
     // Load the mesh while defining the domain boundary line:
