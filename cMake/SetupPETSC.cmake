@@ -31,7 +31,7 @@ endif()
 
 # Find petsc library:
 FIND_LIBRARY(PETSC_LIBRARIES
-    NAMES petsc_real
+    NAMES petsc
     HINTS
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
