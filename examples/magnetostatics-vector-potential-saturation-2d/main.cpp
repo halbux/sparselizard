@@ -22,7 +22,7 @@ int main(void)
     mymesh.load("magsat2d.msh");
     
     int wholedomain = selectall();
-    int notmagnetic = selectunion({air, conductor1, conductor2,insulator});
+    int notmagnetic = selectunion({air, conductor1, conductor2, insulator});
     
     // The magnetic vector potential needs only a z component in 2D:
     field az("h1");
