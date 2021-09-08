@@ -130,9 +130,9 @@ struct DataPack {
         int alpha = this->alpha;
         int ironAlpha = this->ironAlpha;
         
-        this->A.write(all, path + "/A/AField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+//        this->A.write(all, path + "/A/AField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
         this->B.write(all, path + "/B/BField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
-        this->H.write(all, path + "/H/HField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+//        this->H.write(all, path + "/H/HField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
         this->F.write(all, path + "/F/Force"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
         string data = "Bottom,Iron,Top,Bottom Magnets,Top Magnets\r\n" +
             to_string(this->TBottom) + "," + to_string(this->TIron) + "," + to_string(this->TTop) + "," + to_string(this->TBM) + "," + to_string(this->TTM);
@@ -149,7 +149,7 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
 {
     wallclock clk;
     // Magnet Power
-    double MagnetB = 1;
+    double MagnetB = 1.3; // N45 = [1.32-1.38]
 
     int bottomStator = 1,
         firstmagnetup = 2,
@@ -178,7 +178,7 @@ cout << "Calculating Spanning Tree" << endl;
     // Start growing the tree from the regions with constrained potential vector (here the contour): 
 //    spanningtree spantree({ bottomStator, topStator });
     // change the span tree to magnet areas
-    spanningtree spantree({ magnetsdown, magnetsup });
+    spanningtree spantree({ magnets });
 
 
     // Write it for illustration:
@@ -243,20 +243,23 @@ cout << "Setting field" << endl;
 // 1.740    55704.3
 
 // BH Curve first try
-std :: vector<double> Bcurve = {0.0, 0.2,   0.426, 0.761,  1.097, 1.233,  1.335,   1.460,   1.590,   1.690,   1.724,   1.740 , 2.0, 2.5};
-std :: vector<double> Hcurve = {0.0, 318.3, 477.5, 795.8, 1591.6, 2387.3, 3978.9, 7957.8, 15915.5, 31831.0, 44456.3, 55704.3 , 58000.0, 60000.0};
+std :: vector<double> Bcurve = {0.0, 0.2,   0.426, 0.761,  1.097, 1.233,  1.335,   1.460,   1.590,   1.690,   1.724,   1.740 , 2.0, 2.5, 10.0, 100.0};
+std :: vector<double> Hcurve = {0.0, 318.3, 477.5, 795.8, 1591.6, 2387.3, 3978.9, 7957.8, 15915.5, 31831.0, 44456.3, 55704.3 , 58000.0, 60000.0, 70000.0, 80000.0};
 spline spl(Bcurve, Hcurve);
-spl.write("BHCurve.txt", 5);
+//spl.write("BHCurve.txt", 5);
+
+    parameter mu;
+
+
 cout << "BH Curve..." << endl;
 expression BHCurve(spl.getderivative(), norm(curl(az)));
 cout << "BH Curve for iron..." << endl;
 expression mIron = BHCurve;
 
-    parameter mu;
     mu|all = mu0;
     // Overwrite on non-magnetic regions:
     mu|magnets = mu0;
-    mu|iron = mIron;//2000*mu0;
+    mu|iron = 2000*mu0;
 cout << "Formulation" << endl;
     formulation magnetostatics;
     // The strong form of the magnetostatic formulation is curl( 1/mu * curl(a) ) = j, with b = curl(a):
@@ -266,6 +269,9 @@ cout << "Formulation" << endl;
     magnetostatics += integral(magnetsdown, -1/mu* minusbremanent * curl(tf(az)));
     magnetostatics += integral(magnetsup, -1/mu* bremanent * curl(tf(az)));
     // magnetostatics += continuitycondition(IronTop, SecondMagnetBottom, az, az, 1, false);
+int numdofs = magnetostatics.countdofs();
+cout << "Unknowns in formulation: " << endl;
+cout << numdofs << endl;
 
     if(timeit) clk.print("Setup experiment:\t");
     if(autoload == true) {
@@ -347,9 +353,9 @@ cout << "Formulation" << endl;
     pack->TTM = TTM* scaleFactor;
 
     pack->F = (expression)magforce;
-    pack->A = (expression)az;
+//    pack->A = (expression)az;
     pack->B = curl(az);
-    pack->H = curl(az)/mu;
+//    pack->H = curl(az)/mu;
     pack->alpha = alpha;
     pack->ironAlpha = ironAlpha;
     pack->allRegion = selectall();
@@ -401,13 +407,13 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    int start = 0;
+    int start = 8;
     int end = 45;
     int alphaStep = atoi(getVar(argc, argv, 2));
     int pieces = (end-start)/alphaStep;
 
 
-    string folderName = "July";
+    string folderName = "September";
 
     createPath("cache");
 
@@ -415,6 +421,15 @@ int main(int argc, char *argv[])
     int ironend = 45;
     int ironStep = atoi(getVar(argc, argv, 3));
     int ironpieces = (ironend - ironstart)/ironStep;
+    cout << "ROT  Step set to: " << alphaStep << endl;
+    cout << "IRON Step set to: " << ironStep << endl;
+
+    if (argc >= 6) {
+        start = atoi(argv[4]);
+        cout << "START ROT  SET TO : " << start << endl;
+        ironstart = atoi(argv[5]);
+        cout << "START IRON SET TO : " << ironstart << endl;
+    }
 
     DataPack* pack;
     // make only one loop

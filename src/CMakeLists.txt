@@ -22,6 +22,8 @@ custom_add_library_from_dir(sparselizard "${SRC_DIR_LIST}")
 
 custom_copy_file(sparselizard "${SRC_DIR_LIST}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/include" "*.h")
 
+include_directories("/Users/macduck/SLlibs/petsc/arch-darwin-c-opt/include")
+include_directories("/Users/macduck/SLlibs/petsc/include")
 target_include_directories(sparselizard PUBLIC ${SRC_DIR_LIST})
 
 target_compile_features(sparselizard PRIVATE cxx_std_11)
