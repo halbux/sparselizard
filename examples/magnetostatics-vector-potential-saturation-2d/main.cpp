@@ -140,11 +140,11 @@ int main(void)
             x = 2.4/maxb * x;
         
         setdata(x);
-        
-        b.write(wholedomain, "b.vtu", 2);
-        
+                
         iter++;
     }
+    
+    b.write(wholedomain, "b.vtu", 2);
     
     // Code validation line. Can be removed.
     std::cout << (std::abs(maxb - 1.75957)/1.75957 < 1e-5);
