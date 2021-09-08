@@ -83,7 +83,7 @@ int main(void)
     // which is the strong form for this simulation. In the non-magnetic regions we
     // have h = 0 + nu * (b - 0) = nu * b and thus the classical linear magnetostatic
     // strong form curl(nu * curl(a)) = j is obtained.
-    
+    //
     magnetostatics += integral(notmagnetic, nu * curl(dof(a)) * curl(tf(a)));
     magnetostatics += integral(steel, (h + dhdb * (curl(dof(a)) - b)) * curl(tf(a)));
 
@@ -99,11 +99,11 @@ int main(void)
     
     // Nonlinear iteration:
     double relres = 1, maxb; int iter = 0;
-    while (relres > 1e-10)
+    while (relres > 1e-5)
     {
         magnetostatics.generate();
         
-        // Solve A*x = rhs:
+        // Get the A and rhs in A*x = rhs:
         mat A = magnetostatics.A();
         vec rhs = magnetostatics.b();
         
