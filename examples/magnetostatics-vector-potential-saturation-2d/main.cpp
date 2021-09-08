@@ -1,9 +1,6 @@
 // This code illustrates how to use a Newton iteration in the case of an anhysteretic magnetic
 // saturation simulation using the a-v formulation on a simple 2D example. The 3D case can be
 // obtained with minor adaptations to this code.
-// An explicit implementation of the Newton iteration is proposed by default. An alternative
-// implementation working with the fields instead of their increment is also mentionned. The
-// latter leads to a simple nonlinear resolution with a loop on a regular .solve() call. 
 
 
 #include "sparselizard.h"
@@ -87,15 +84,8 @@ int main(void)
     // have h = 0 + nu * (b - 0) = nu * b and thus the classical linear magnetostatic
     // strong form curl(nu * curl(a)) = j is obtained.
     
-    // The following two terms can be used to avoid working with a Newton increment:
-    // magnetostatics += integral(notmagnetic, nu * curl(dof(a)) * curl(tf(a)));
-    // magnetostatics += integral(steel, (h + dhdb * (curl(dof(a)) - b)) * curl(tf(a)));
-    
-    // This leads to a classical Newton iteration where the unknown is the da increment:
-    magnetostatics += integral(wholedomain, nu * curl(dof(a)) * curl(tf(a)));
-    // The contribution below has tag number 1 so it can be assembled individually.
-    // Dropping this line leads to a fixed point iteration.
-    magnetostatics += integral(steel, dhdb * curl(dof(a)) * curl(tf(a)), 0, 1);
+    magnetostatics += integral(notmagnetic, nu * curl(dof(a)) * curl(tf(a)));
+    magnetostatics += integral(steel, (h + dhdb * (curl(dof(a)) - b)) * curl(tf(a)));
 
     // Current density source. Use ports to set a total current flow condition instead.
     double js = 6e4;
@@ -107,31 +97,24 @@ int main(void)
     // Initial solution is a = 0 (thus b = 0):
     vec x(magnetostatics);
     
-    // Newton iteration to solve the nonlinear problem A(x)*x = rhs(x).
-    // At each iteration we solve J(x)*dx = rhs(x) - A(x)*x where J is the Jacobian matrix.
-    double normdx = 1, maxb; int iter = 0;
-    while (normdx > 1e-6)
+    // Nonlinear iteration:
+    double relres = 1, maxb; int iter = 0;
+    while (relres > 1e-10)
     {
-        // Generate the A and rhs terms (they all have tag 0 by default):
-        magnetostatics.generate(0);
-
-        // Get A and leave the generated terms in the formulation for reuse when getting J:
-        mat A = magnetostatics.A(true);
+        magnetostatics.generate();
+        
+        // Solve A*x = rhs:
+        mat A = magnetostatics.A();
         vec rhs = magnetostatics.b();
         
-        // Generate the extra contribution of tag 1 to get J (J = A + sensitivity terms):
-        magnetostatics.generate(1);
-        // Get J and clear the generated terms:
-        mat J = magnetostatics.A();
-
-        vec dx = solve(J, rhs - A*x);
-       
-        x = x + dx;
+        // Calculate the relative residual:
+        relres = (rhs - A*x).norm()/rhs.norm();
+        std::cout << "Relative residual @" << iter << " is " << relres;
+        
+        x = solve(A, rhs);
+        
+        // Update the field a with the solution x:
         setdata(x);
-
-        // The stopping criterion is a small enough increment:
-        normdx = dx.norm();
-        std::cout << "Increment norm @" << iter << " is " << normdx;
         
         // Do not allow b to go out of the provided [0, 2.4] T data range for the h(b) curve:
         maxb = norm(b).max(wholedomain, 5)[0];
@@ -147,6 +130,6 @@ int main(void)
     b.write(wholedomain, "b.vtu", 2);
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(maxb - 1.75957)/1.75957 < 1e-5);
+    std::cout << (std::abs(maxb - 1.75962)/1.75962 < 1e-5);
 }
 
