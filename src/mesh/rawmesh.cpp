@@ -668,9 +668,9 @@ void rawmesh::move(int physreg, expression u)
             universe::allowreuse();
 
             // Compute the expression at the evaluation points:
-            densematrix xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
-            densematrix yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
-            densematrix zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
 
             universe::forbidreuse();
 
@@ -822,9 +822,9 @@ bool rawmesh::adapthp(int verbosity)
 {
     int meshdim = getmeshdimension();
 
-    elements* elptr = universe::mymesh->getelements();
-    disjointregions* drptr = universe::mymesh->getdisjointregions();
-    physicalregions* prptr = universe::mymesh->getphysicalregions();
+    elements* elptr = universe::getrawmesh()->getelements();
+    disjointregions* drptr = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prptr = universe::getrawmesh()->getphysicalregions();
     
     int totalnumelems = elptr->countindim(meshdim);
 
@@ -862,14 +862,14 @@ bool rawmesh::adapthp(int verbosity)
     
     prptr->remove({wholedomain}, false);
     
-    // Move to densematrix container:
-    densematrix hcritmat;
-    std::vector<densematrix> pcritmats(numpadaptfields), fomats(numpadaptfields);
+    // Move to densemat container:
+    densemat hcritmat;
+    std::vector<densemat> pcritmats(numpadaptfields), fomats(numpadaptfields);
     
     double* hcritptr;
     std::vector<double*> pcritptrs(numpadaptfields), foptrs(numpadaptfields);
 
-    intdensematrix ads(totalnumelems, 1, 0, 1);
+    indexmat ads(totalnumelems, 1, 0, 1);
     
     if (ishadaptive)
     {
@@ -1021,7 +1021,7 @@ bool rawmesh::adapthp(int verbosity)
     if (washadapted)
     {
         for (int f = 0; f < numpadaptfields; f++)
-            getattarget(neworders[f], universe::mymesh);
+            getattarget(neworders[f], universe::getrawmesh());
     }
     
     
@@ -1029,7 +1029,7 @@ bool rawmesh::adapthp(int verbosity)
     
     bool waspadapted = false;
     if (not(isorderidentical) || washadapted)
-        waspadapted = universe::mymesh->adaptp(neworders, verbosity);
+        waspadapted = universe::getrawmesh()->adaptp(neworders, verbosity);
 
     if (ispadaptive && not(waspadapted) && verbosity > 0)
         std::cout << "Nothing to do for p-adaptation." << std::endl;
@@ -1263,7 +1263,7 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
             std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
             
             std::vector<int> catords = myalgorithm::concatenate(neworders[i]);
-            intdensematrix newordsmat(catords.size(),1, catords);
+            indexmat newordsmat(catords.size(),1, catords);
             std::vector<int> numineachorder = newordsmat.countalloccurences(newmaxorder);
 
             curraw->print();
@@ -1286,9 +1286,9 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
 
     int meshdim = getmeshdimension();
     
-    universe::mymesh = myhadaptedmesh;
+    universe::myrawmesh = myhadaptedmesh;
         
-    elements* elptr = universe::mymesh->getelements();
+    elements* elptr = universe::getrawmesh()->getelements();
     
     std::shared_ptr<htracker> newhtracker(new htracker);
     *newhtracker = *(myhadaptedmesh->myhtracker);
@@ -1581,12 +1581,12 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker(myhadaptedmesh->myelements.count()));
     myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
-    myhadaptedmesh->mypadaptdata = universe::mymesh->mypadaptdata;
-    universe::mymesh->mypadaptdata = {};
+    myhadaptedmesh->mypadaptdata = universe::getrawmesh()->mypadaptdata;
+    universe::getrawmesh()->mypadaptdata = {};
     
     
     ///// Send mesh to universe:
-    universe::mymesh = myhadaptedmesh;
+    universe::myrawmesh = myhadaptedmesh;
     
     
     return true;

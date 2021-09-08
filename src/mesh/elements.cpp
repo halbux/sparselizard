@@ -759,11 +759,11 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
     element myelem(elementtypenumber, mycurvatureorder);
     int ncn = myelem.countcurvednodes();
     
-    densematrix xcoords(numelems, ncn);
-    densematrix ycoords(numelems, ncn);
-    densematrix zcoords(numelems, ncn);
+    densemat xcoords(numelems, ncn);
+    densemat ycoords(numelems, ncn);
+    densemat zcoords(numelems, ncn);
     
-    densematrix vals(numelems, ncn);
+    densemat vals(numelems, ncn);
 
     double* xptr = xcoords.getvalues();
     double* yptr = ycoords.getvalues();
@@ -789,6 +789,78 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
     
     datatowrite.addcoordinates(elementtypenumber, xcoords, ycoords, zcoords);
     datatowrite.adddata(elementtypenumber, {vals});
+    
+    iointerface::writetofile(filename, datatowrite);
+}
+
+void elements::writeedgedirection(int physreg, std::string filename)
+{
+    std::vector<int> ders = myphysicalregions->get(physreg)->getdisjointregions(1);
+
+    int numedgesinpr = 0;
+    for (int i = 0; i < ders.size(); i++)
+        numedgesinpr += mydisjointregions->countelements(ders[i]);
+    
+    densemat xcoords(numedgesinpr, 1);
+    densemat ycoords(numedgesinpr, 1);
+    densemat zcoords(numedgesinpr, 1);
+    
+    densemat xvals(numedgesinpr, 1);
+    densemat yvals(numedgesinpr, 1);
+    densemat zvals(numedgesinpr, 1);
+    
+    double* xptr = xcoords.getvalues();
+    double* yptr = ycoords.getvalues();
+    double* zptr = zcoords.getvalues();
+    
+    double* vxptr = xvals.getvalues();
+    double* vyptr = yvals.getvalues();
+    double* vzptr = zvals.getvalues();
+    
+    double* nodecoords = mynodes->getcoordinates()->data();
+    
+    int index = 0;
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = mydisjointregions->getrangebegin(ders[i]);
+        int ne = mydisjointregions->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            int firstnode = getsubelement(0, 1, rb+j, 0);
+            int lastnode = getsubelement(0, 1, rb+j, 1);
+        
+            double xf = nodecoords[3*firstnode+0];
+            double yf = nodecoords[3*firstnode+1];
+            double zf = nodecoords[3*firstnode+2];
+            
+            double xl = nodecoords[3*lastnode+0];
+            double yl = nodecoords[3*lastnode+1];
+            double zl = nodecoords[3*lastnode+2];
+        
+            // Uncurved edge barycenter:
+            xptr[index] = 0.5*(xf+xl);
+            yptr[index] = 0.5*(yf+yl);
+            zptr[index] = 0.5*(zf+zl);
+
+            vxptr[index] = xl-xf;
+            vyptr[index] = yl-yf;
+            vzptr[index] = zl-zf;
+            
+            double nrm = std::sqrt(vxptr[index]*vxptr[index] + vyptr[index]*vyptr[index] + vzptr[index]*vzptr[index]);
+            
+            vxptr[index] /= nrm;
+            vyptr[index] /= nrm;
+            vzptr[index] /= nrm;
+            
+            index++;
+        }
+    }
+    
+    iodata datatowrite(mycurvatureorder, mycurvatureorder, false, {});
+    
+    datatowrite.addcoordinates(0, xcoords, ycoords, zcoords);
+    datatowrite.adddata(0, {xvals, yvals, zvals});
     
     iointerface::writetofile(filename, datatowrite);
 }

@@ -14,11 +14,11 @@ iodata::iodata(int interpolorder, int geointerpolorder, bool isitscalardata, std
     isscalardata = isitscalardata;
     mytimevals = timevals;
 
-     mycoords = std::vector<std::vector<std::vector<densematrix>>>(3, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
+     mycoords = std::vector<std::vector<std::vector<densemat>>>(3, std::vector<std::vector<densemat>>(8, std::vector<densemat>(0)));
      if (isscalardata)
-        mydata = std::vector<std::vector<std::vector<densematrix>>>(1, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
+        mydata = std::vector<std::vector<std::vector<densemat>>>(1, std::vector<std::vector<densemat>>(8, std::vector<densemat>(0)));
     else
-        mydata = std::vector<std::vector<std::vector<densematrix>>>(3, std::vector<std::vector<densematrix>>(8, std::vector<densematrix>(0)));
+        mydata = std::vector<std::vector<std::vector<densemat>>>(3, std::vector<std::vector<densemat>>(8, std::vector<densemat>(0)));
 }
 
 void iodata::combine(void)
@@ -31,9 +31,9 @@ void iodata::combine(void)
             continue;
     
         for (int s = 0; s < 3; s++)
-            mycoords[s][i] = {densematrix(mycoords[s][i])};
+            mycoords[s][i] = {densemat(mycoords[s][i])};
         for (int comp = 0; comp < mydata.size(); comp++)
-            mydata[comp][i] = {densematrix(mydata[comp][i])};
+            mydata[comp][i] = {densemat(mydata[comp][i])};
     }
 }
 
@@ -59,7 +59,7 @@ std::vector<int> iodata::getactiveelementtypes(void)
     return activeelementtypes;
 }
 
-void iodata::addcoordinates(int elemtypenum, densematrix xcoords, densematrix ycoords, densematrix zcoords)
+void iodata::addcoordinates(int elemtypenum, densemat xcoords, densemat ycoords, densemat zcoords)
 {
     element myelement(elemtypenum, mygeointerpolorder);
     int numgeonodes = myelement.countcurvednodes();
@@ -71,7 +71,7 @@ void iodata::addcoordinates(int elemtypenum, densematrix xcoords, densematrix yc
     mycoords[2][elemtypenum].push_back(zcoords);
 }
 
-void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
+void iodata::adddata(int elemtypenum, std::vector<densemat> vals)
 {
     element myelement(elemtypenum, myinterpolorder);
     int numdatanodes = myelement.countcurvednodes();
@@ -83,7 +83,7 @@ void iodata::adddata(int elemtypenum, std::vector<densematrix> vals)
     if (isscalardata == false && vallen < 3)
     {
         for (int i = vallen; i < 3; i++)
-            vals.push_back(densematrix(vals[0].countrows(), vals[0].countcolumns(), 0.0));
+            vals.push_back(densemat(vals[0].countrows(), vals[0].countcolumns(), 0.0));
     }
 
     for (int comp = 0; comp < vals.size(); comp++)
@@ -126,7 +126,7 @@ int iodata::countelements(void)
     return numelems;
 }
 
-std::vector<densematrix> iodata::getcoordinates(int elemtypenum, int timestepindex)
+std::vector<densemat> iodata::getcoordinates(int elemtypenum, int timestepindex)
 {
     combine();
     
@@ -141,7 +141,7 @@ std::vector<densematrix> iodata::getcoordinates(int elemtypenum, int timestepind
     }
 }
 
-std::vector<densematrix> iodata::getdata(int elemtypenum, int timestepindex)
+std::vector<densemat> iodata::getdata(int elemtypenum, int timestepindex)
 {
     combine();
     

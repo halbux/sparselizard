@@ -1,7 +1,7 @@
 #include "optime.h"
 
 
-std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     if (universe::fundamentalfrequency > 0)
     {
@@ -9,11 +9,11 @@ std::vector<std::vector<densematrix>> optime::interpolate(elementselector& elems
         abort();
     }
 
-    densematrix output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
+    densemat output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
     return {{},{output}};
 }
 
-densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat optime::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -23,7 +23,7 @@ densematrix optime::multiharmonicinterpolate(int numtimeevals, elementselector& 
     }
     
     int ncols = elemselect.countinselection() * evaluationcoordinates.size()/3;
-    densematrix output(numtimeevals, ncols);
+    densemat output(numtimeevals, ncols);
     double* outptr = output.getvalues();
     
     double period = 1.0/universe::getfundamentalfrequency();

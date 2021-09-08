@@ -37,7 +37,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         meshdeformationptr = &(mymeshdeformation[0]);
         
     // The integration will be performed on the following disjoint regions:
-    std::vector<int> selectedelemdisjregs = ((universe::mymesh->getphysicalregions())->get(integrationphysreg))->getdisjointregions();
+    std::vector<int> selectedelemdisjregs = ((universe::getrawmesh()->getphysicalregions())->get(integrationphysreg))->getdisjointregions();
   
     // Prepare to send the disjoint regions with same element type 
     // numbers and same dof and tf interpolation order together:
@@ -58,7 +58,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
     {
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
         
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);        
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);        
         
         // Get the interpolation order of the dof and tf fields:
         int tfinterpolationorder = tffield->getinterpolationorder(mydisjregs[0]);
@@ -121,11 +121,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             // for test function harmonic 'tf' and dof harmonic 'dof'. 
             // If stiffnesses[tf][dof].size() is zero then it is empty.
             // stiffnesses[tf][1][0] must be used in case there is no dof.
-            std::vector<std::vector<std::vector<densematrix>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densematrix>>(maxdofharm + 1, std::vector<densematrix>(0)));
+            std::vector<std::vector<std::vector<densemat>>> stiffnesses(maxtfharm + 1, std::vector<std::vector<densemat>>(maxdofharm + 1, std::vector<densemat>(0)));
 
             // Compute the Jacobian for the variable change to the reference element:
             std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeformationptr));
-            densematrix detjac = myjacobian->getdetjac();
+            densemat detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();
 
@@ -134,24 +134,24 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
             universe::allowreuse();
             
             // Compute all terms in the contribution sum:
-            densematrix tfformfunctionvalue, dofformfunctionvalue;
+            densemat tfformfunctionvalue, dofformfunctionvalue;
             for (int term = 0; term < mytfs.size(); term++)
             {
                 ///// Compute the coefficients:
                 // currentcoeff[i][0] holds the ith harmonic of the coefficient. 
                 // It is empty if currentcoeff[i].size() is zero.
-                std::vector<std::vector<densematrix>> currentcoeff;
+                std::vector<std::vector<densemat>> currentcoeff;
                 // Compute without or with FFT:
                 if (numfftcoeffs <= 0)
                     currentcoeff = mycoeffs[term]->interpolate(myselector, evaluationpoints, meshdeformationptr);
                 else
                 {
-                    densematrix timeevalinterpolated = mycoeffs[term]->multiharmonicinterpolate(numfftcoeffs, myselector, evaluationpoints, meshdeformationptr);
+                    densemat timeevalinterpolated = mycoeffs[term]->multiharmonicinterpolate(numfftcoeffs, myselector, evaluationpoints, meshdeformationptr);
                     currentcoeff = myfft::fft(timeevalinterpolated, myselector.countinselection(), evaluationpoints.size()/3);
                 }
                 
                 ///// Compute the dof*tf product (if any dof):
-                densematrix doftimestestfun;
+                densemat doftimestestfun;
                 tfformfunctionvalue = tfval.tomatrix(myselector.gettotalorientation(), tfinterpolationorder, mytfs[term]->getkietaphiderivative(), mytfs[term]->getformfunctioncomponent());
                 
                 // Multiply by the weights:
@@ -185,7 +185,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                         if (isdofinterpolate)
                         {
-                            densematrix dttf = doftimestestfun.copy();
+                            densemat dttf = doftimestestfun.copy();
                             dttf.multiplycolumns(currentcoeff[h][0]);
                             currentcoeff[h][0] = dttf;  
                         }
@@ -247,8 +247,8 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                         
                     ///// Get the addresses corresponding to every form function of 
                     // the test function/dof field in the elements of 'elementlist':
-                    intdensematrix testfunaddresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg);
-                    intdensematrix dofaddresses;
+                    indexmat testfunaddresses = mydofmanager->getaddresses(tffield->harmonic(currenttfharm), tfinterpolationorder, elementtypenumber, elementnumbers, tfphysreg);
+                    indexmat dofaddresses;
                     if (doffield != NULL)
                     {
                         if (isdofinterpolate)
@@ -260,11 +260,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                     ///// Duplicate the tf and dof addresses as needed by the rawmat object:
                     if (doffield != NULL)
                     {
-                        intdensematrix duplicateddofaddresses = dofaddresses;
+                        indexmat duplicateddofaddresses = dofaddresses;
                         if (isdofinterpolate)
                             duplicateddofaddresses = dofaddresses.duplicateallcolstogether(tfformfunctionvalue.countrows());
                             
-                        intdensematrix duplicatedtestfunaddresses = testfunaddresses;
+                        indexmat duplicatedtestfunaddresses = testfunaddresses;
                         if (isdofinterpolate)
                         {
                             duplicatedtestfunaddresses = testfunaddresses.gettranspose();

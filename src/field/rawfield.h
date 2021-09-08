@@ -33,7 +33,7 @@
 #include "integration.h"
 #include "sl.h"
 #include "harmonic.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "element.h"
 #include "elements.h"
 #include "nodes.h"
@@ -47,7 +47,7 @@
 #include "selector.h"
 #include "field.h"
 #include "vectorfieldselect.h"
-#include "spanningtree.h"
+#include "rawspanningtree.h"
 #include "rawmesh.h"
 #include "rawport.h"
 
@@ -57,7 +57,7 @@ class coefmanager;
 class rawvec;
 class expression;
 class elementselector;
-class spanningtree;
+class rawspanningtree;
 
 class rawfield : public std::enable_shared_from_this<rawfield>
 {
@@ -90,8 +90,8 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // on the NODAL disjoint region 'disjreg'. Empty means unconstrained.
         std::vector<std::vector<expression>> myconditionalconstraints = {};
     
-        // The spanning tree used for gauging fields (empty vector if none):
-        std::vector<spanningtree> myspanningtree = {};
+        // The spanning tree used for gauging fields (NULL if none):
+        std::shared_ptr<rawspanningtree> myspanningtree = NULL;
 
         // isitgauged[disjreg] is true if disjoint region 'disjreg' is gauged.
         std::vector<bool> isitgauged = {};
@@ -184,11 +184,11 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Selected elements can include multiple orientations and field orders.
         // 'gpcoordsin' must correspond to Gauss coordinates for the selected element type.
         // If reuse is allowed then all arguments must correspond to the reused data.
-        void setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values);
+        void setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densemat values);
         
         // Set/get value at nodes for 'h1' type fields:
-        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
-        densematrix getnodalvalues(intdensematrix nodenumbers);
+        void setnodalvalues(indexmat nodenumbers, densemat values);
+        densemat getnodalvalues(indexmat nodenumbers);
         
         void setdisjregconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
@@ -200,9 +200,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // Set a gauge condition:
         void setgauge(int physreg);
 
-        void setspanningtree(spanningtree spantree);
+        void setspanningtree(std::shared_ptr<rawspanningtree> spantree);
         // This should only be called on a field without subfields or harmonics:
-        spanningtree* getspanningtree(void);
+        std::shared_ptr<rawspanningtree> getspanningtree(void);
         
         std::shared_ptr<rawfield> getpointer(void);
         std::shared_ptr<rawmesh> getrawmesh(void);
@@ -216,6 +216,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         // Transfer data from the rawfield to a vectorfieldselect:
         void transferdata(int physreg, vectorfieldselect myvec, std::string op);
+        
+        // Set the source value at every cut:
+        void setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues);
         
         // Select a component.
         std::shared_ptr<rawfield> comp(int component);
@@ -266,19 +269,19 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
 
         // Return {dkix,dkiy,...,detax,detay,...}:
-        std::vector<densematrix> getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+        std::vector<densemat> getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates);
 
 
         // This interpolate is called in practice:
-        std::vector<std::vector<densematrix>> interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+        std::vector<std::vector<densemat>> interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
         
         // The function works only on fields that are not containers.
-        densematrix getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementnumbers);
+        densemat getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementnumbers);
         // 'interpolate' outputs the field value at the evaluation coordinates
         // provided as second argument for all elements in 'elementlist'.
         // Set 'whichderivative' to 0, 1, 2 or 3 to get respectively the 
         // no derivative, ki, eta or phi derivative of the field.
-        std::vector<std::vector<densematrix>> interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates);
+        std::vector<std::vector<densemat>> interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates);
 
 };
 

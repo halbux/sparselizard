@@ -365,8 +365,8 @@ void gmshinterface::writetofile(std::string name, iodata datatowrite)
         int elemtypenum = activeelementtypes[i];
         element myelement(elemtypenum);
         
-        std::vector<densematrix> curcoords = datatowrite.getcoordinates(elemtypenum);
-        std::vector<densematrix> curdata = datatowrite.getdata(elemtypenum);
+        std::vector<densemat> curcoords = datatowrite.getcoordinates(elemtypenum);
+        std::vector<densemat> curdata = datatowrite.getdata(elemtypenum);
         
         // Open the view (overwrite if first time):
         if (activeelementtypes.size() == 1)
@@ -426,7 +426,7 @@ void gmshinterface::openview(std::string name, std::string viewname, double time
     }
 }
 
-void gmshinterface::appendtoview(std::string name, int elementtypenumber, densematrix coordx, densematrix coordy, densematrix coordz, densematrix compxinterpolated)
+void gmshinterface::appendtoview(std::string name, int elementtypenumber, densemat coordx, densemat coordy, densemat coordz, densemat compxinterpolated)
 {    
     // 'file' cannot take a std::string argument --> name.c_str():
     std::ofstream posfile;
@@ -470,7 +470,7 @@ void gmshinterface::appendtoview(std::string name, int elementtypenumber, densem
     }
 }
 
-void gmshinterface::appendtoview(std::string name, int elementtypenumber, densematrix coordx, densematrix coordy, densematrix coordz, densematrix compxinterpolated, densematrix compyinterpolated, densematrix compzinterpolated)
+void gmshinterface::appendtoview(std::string name, int elementtypenumber, densemat coordx, densemat coordy, densemat coordz, densemat compxinterpolated, densemat compyinterpolated, densemat compzinterpolated)
 {    
     // 'file' cannot take a std::string argument --> name.c_str():
     std::ofstream posfile;

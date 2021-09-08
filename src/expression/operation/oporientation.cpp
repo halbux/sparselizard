@@ -1,7 +1,7 @@
 #include "oporientation.h"
 
 
-std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> oporientation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -13,8 +13,8 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     int numelems = elemselect.countinselection();
     int numevalpts = evaluationcoordinates.size()/3;
     
-    int problemdimension = universe::mymesh->getmeshdimension();
-    std::vector<bool> prdef = universe::mymesh->getphysicalregions()->get(myphysreg)->getdefinition();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
+    std::vector<bool> prdef = universe::getrawmesh()->getphysicalregions()->get(myphysreg)->getdefinition();
     int elemdim = elemselect.getelementdimension();
     int elemtypenum = elemselect.getelementtypenumber();
     std::vector<int> elemnums = elemselect.getelementnumbers();
@@ -29,13 +29,13 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         abort();
     }
     
-    densematrix output(numelems,1,1);
+    densemat output(numelems,1,1);
     double* outptr = output.getvalues();
     
 
     // Calculate the orientations:
-    std::vector<double>* nodecoords = universe::mymesh->getnodes()->getcoordinates();
-    elements* els = universe::mymesh->getelements();
+    std::vector<double>* nodecoords = universe::getrawmesh()->getnodes()->getcoordinates();
+    elements* els = universe::getrawmesh()->getelements();
     
     std::vector<int> celltypes(numelems), cellnums(numelems);
     
@@ -80,7 +80,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         abort();
     }
     
-    intdensematrix celltypmat(celltypes.size(), 1, celltypes);
+    indexmat celltypmat(celltypes.size(), 1, celltypes);
     std::vector<std::vector<int>> indexes = celltypmat.findalloccurences(8);
     
     for (int t = 0; t < indexes.size(); t++)
@@ -119,12 +119,12 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
         std::vector<bool> isflipped = els->isflipped(elemtypenum, subelemnums, t, cellnumsintype);
         
         // Check detjac sign of parent:
-        std::vector<int> disjregs = universe::mymesh->getphysicalregions()->get(myphysreg)->getdisjointregionsoftype(t);
+        std::vector<int> disjregs = universe::getrawmesh()->getphysicalregions()->get(myphysreg)->getdisjointregionsoftype(t);
         elementselector subselect(disjregs, cellnumsintype, false);
         
         gausspoints gp(t, 0);
         jacobian subjac(subselect, gp.getcoordinates(), NULL);
-        densematrix subdetjac = subjac.getdetjac();
+        densemat subdetjac = subjac.getdetjac();
         
         double* subdetjacptr = subdetjac.getvalues();
         
@@ -148,7 +148,7 @@ std::vector<std::vector<densematrix>> oporientation::interpolate(elementselector
     return {{},{output}};
 }
 
-densematrix oporientation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat oporientation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -157,7 +157,7 @@ densematrix oporientation::multiharmonicinterpolate(int numtimeevals, elementsel
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
+    densemat output = interpolate(elemselect, evaluationcoordinates, meshdeform)[1][0];
     
     output = output.getflattened();
     output = output.duplicatevertically(numtimeevals);

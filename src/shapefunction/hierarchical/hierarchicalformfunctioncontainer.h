@@ -10,7 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "densematrix.h"
+#include "densemat.h"
 #include "polynomial.h"
 #include "orientation.h"
 
@@ -66,12 +66,12 @@ class hierarchicalformfunctioncontainer
         void evaluate(std::vector<double> evaluationpoints);
 
         // 'tomatrix' puts all form function values corresponding to the 
-        // input arguments into a 'densematrix' object. The columns of the 
+        // input arguments into a 'densemat' object. The columns of the 
         // dense matrix correspond to the evaluation points while the rows 
         // correspond to all form functions. The form functions are ordered 
         // in the way defined in 'hierarchicalformfunctioniterator'.
-        densematrix tomatrix(int totalorientation, int order, int whichderivative, int component);
-        densematrix tomatrix(int h, int i, int j, int k, int l, int m, int n);
+        densemat tomatrix(int totalorientation, int order, int whichderivative, int component);
+        densemat tomatrix(int h, int i, int j, int k, int l, int m, int n);
 
         // Print all form function values for debug.
         void print(bool printallderivatives);

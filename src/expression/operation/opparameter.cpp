@@ -1,7 +1,7 @@
 #include "opparameter.h"
 
 
-std::vector<std::vector<densematrix>> opparameter::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opparameter::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -10,14 +10,14 @@ std::vector<std::vector<densematrix>> opparameter::interpolate(elementselector& 
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> output = myparameter->interpolate(myrow, mycolumn, elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> output = myparameter->interpolate(myrow, mycolumn, elemselect, evaluationcoordinates, meshdeform);
     
     if (universe::isreuseallowed)
         universe::setprecomputed(shared_from_this(), output);
     return output;
 }
 
-densematrix opparameter::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opparameter::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -26,7 +26,7 @@ densematrix opparameter::multiharmonicinterpolate(int numtimeevals, elementselec
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myparameter->multiharmonicinterpolate(myrow, mycolumn, numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = myparameter->multiharmonicinterpolate(myrow, mycolumn, numtimeevals, elemselect, evaluationcoordinates, meshdeform);
             
     if (universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);

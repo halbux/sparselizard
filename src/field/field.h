@@ -90,8 +90,8 @@ class field
         void setvalue(int physreg);
         
         // Set/get value at nodes for 'h1' type fields:
-        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
-        densematrix getnodalvalues(intdensematrix nodenumbers);
+        void setnodalvalues(indexmat nodenumbers, densemat values);
+        densemat getnodalvalues(indexmat nodenumbers);
 
         // Set an 'input' valued constraint on a physical region. 
         // Use the default order + 'extraintegrationdegree' to 
@@ -123,6 +123,9 @@ class field
         void setdata(int physreg, vectorfieldselect myvec, std::string op = "set");
         // Transfer data from and to the current field:
         void setdata(int physreg, vec myvec, std::string op = "set");
+        
+        // Set the source value at every cut:
+        void setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues);
 
         // Allow/forbid automatic updating of the field value during hp-adaptivity:
         void automaticupdate(bool updateit);

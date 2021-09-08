@@ -12,14 +12,14 @@ void mat::errorifpointerisnull(void)
 
 void mat::errorifinvalidated(void)
 {
-    if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::mymesh->getmeshnumber())
+    if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::getrawmesh()->getmeshnumber())
     {
         std::cout << "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" << std::endl;
         abort();
     }
 }
 
-mat::mat(long long int matsize, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
+mat::mat(long long int matsize, indexmat rowadresses, indexmat coladresses, densemat vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(std::shared_ptr<dofmanager>(new dofmanager(matsize))));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
@@ -28,7 +28,7 @@ mat::mat(long long int matsize, intdensematrix rowadresses, intdensematrix colad
     rawmatptr->clearfragments();
 }
 
-mat::mat(formulation myformulation, intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
+mat::mat(formulation myformulation, indexmat rowadresses, indexmat coladresses, densemat vals)
 {
     rawmatptr = std::shared_ptr<rawmat>(new rawmat(myformulation.getdofmanager()));
     rawmatptr->accumulate(rowadresses, coladresses, vals);
@@ -55,10 +55,10 @@ vec mat::xbmerge(vec x, vec b)
     errorifpointerisnull(); errorifinvalidated();
 
     vec output(std::shared_ptr<rawvec>(new rawvec(b.getpointer()->getdofmanager())));
-    intdensematrix ainds = getainds();
-    intdensematrix dinds = getdinds();
-    densematrix xvals = x.getallvalues();
-    densematrix bdvals = b.getvalues(dinds);
+    indexmat ainds = getainds();
+    indexmat dinds = getdinds();
+    densemat xvals = x.getallvalues();
+    densemat bdvals = b.getvalues(dinds);
     output.setvalues(ainds, xvals);
     output.setvalues(dinds, bdvals);
     return output;
@@ -77,8 +77,8 @@ vec mat::eliminate(vec b)
 {
     errorifpointerisnull(); errorifinvalidated();
     
-    intdensematrix ainds = getainds();
-    intdensematrix dinds = getdinds();
+    indexmat ainds = getainds();
+    indexmat dinds = getdinds();
 
     if (dinds.count() == 0)
         return b.copy();
@@ -100,8 +100,8 @@ vec mat::eliminate(vec b)
     return ba;
 }
         
-intdensematrix mat::getainds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getainds(); }
-intdensematrix mat::getdinds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdinds(); }
+indexmat mat::getainds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getainds(); }
+indexmat mat::getdinds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdinds(); }
 
 Mat mat::getapetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getapetsc(); }
 Mat mat::getdpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdpetsc(); }
@@ -181,8 +181,8 @@ vec mat::operator*(vec input)
 {
     errorifpointerisnull(); errorifinvalidated();
     
-    intdensematrix ainds = getainds();
-    intdensematrix dinds = getdinds();
+    indexmat ainds = getainds();
+    indexmat dinds = getdinds();
 
     vec ia = input.extract(ainds);
     vec id = input.extract(dinds);

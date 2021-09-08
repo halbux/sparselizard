@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include "densematrix.h"
+#include "densemat.h"
 #include "universe.h"
 #include "harmonic.h"
 #include "jacobian.h"
@@ -46,17 +46,17 @@ class operation : public std::enable_shared_from_this<operation>
         // This function can be used for non multiharmonic as well as
         // LINEAR multiharmonic operations. In the first case only 
         // harmonic 1 (cos0) can be used.
-        virtual std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        virtual std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         // 'multiharmonicinterpolate' works for general nonlinear 
         // multiharmonic operations. It returns a matrix in which each 
         // column corresponds to a data point (e.g. an operation evaluated 
         // at an evaluation point) and each of the 'numtimeevals' rows to 
         // a time value at which the multiharmonic operation was computed. 
         // 'myfft.h' can be used to get back the harmonics from that matrix.
-        virtual densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        virtual densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         // This 'interpolate' is used only in the Jacobian computation.
-        virtual std::vector<std::vector<densematrix>> interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+        virtual std::vector<std::vector<densemat>> interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
         
         virtual bool isdof(void) { return false; };
         virtual bool istf(void) { return false; };

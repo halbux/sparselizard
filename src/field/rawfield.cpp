@@ -20,7 +20,7 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
         return;
     }
         
-    if (issynchronizing || not(issynchronizingallowed) || myptracker == universe::mymesh->getptracker())
+    if (issynchronizing || not(issynchronizingallowed) || myptracker == universe::getrawmesh()->getptracker())
         return;
     issynchronizing = true; 
     
@@ -29,14 +29,14 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     *originalthis = *this;
     
     // Create a new coef manager:
-    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
+    mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::getrawmesh()->getdisjointregions()));
     
     // Flush the containers:
-    interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);
-    mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
-    myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
-    isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
-    isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    interpolationorder = std::vector<int>( (universe::getrawmesh()->getdisjointregions())->count(), -1);
+    mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::getrawmesh()->getdisjointregions())->count(), NULL);
+    myconditionalconstraints = std::vector<std::vector<expression>>( (universe::getrawmesh()->getdisjointregions())->count(), std::vector<expression>(0));
+    isitgauged = std::vector<bool>( (universe::getrawmesh()->getdisjointregions())->count(), false);
+    isitported = std::vector<bool>( (universe::getrawmesh()->getdisjointregions())->count(), false);
     
     // Rebuild the containers:
     if (disjregsfororder.size() == 0)
@@ -80,8 +80,8 @@ void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> d
     
         
     // Update the mesh tracker to the current one:
-    myptracker = universe::mymesh->getptracker();
-    myrawmesh = universe::mymesh;
+    myptracker = universe::getrawmesh()->getptracker();
+    myrawmesh = universe::getrawmesh();
     issynchronizing = false;
 }
 
@@ -93,10 +93,10 @@ void rawfield::updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool
     std::vector<bool> isitgaugedbkp = isitgauged;
     std::vector<bool> isitportedbkp = isitported;
     
-    mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
-    myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
-    isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
-    isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+    mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::getrawmesh()->getdisjointregions())->count(), NULL);
+    myconditionalconstraints = std::vector<std::vector<expression>>( (universe::getrawmesh()->getdisjointregions())->count(), std::vector<expression>(0));
+    isitgauged = std::vector<bool>( (universe::getrawmesh()->getdisjointregions())->count(), false);
+    isitported = std::vector<bool>( (universe::getrawmesh()->getdisjointregions())->count(), false);
         
 
     wallclock clkn;
@@ -135,8 +135,8 @@ void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
         return;
         
     // Create temporary physical regions:
-    std::vector<int> alldrsindim = universe::mymesh->getdisjointregions()->getindim(0);
-    int physreg = universe::mymesh->getphysicalregions()->createfromdisjointregionlist(alldrsindim);
+    std::vector<int> alldrsindim = universe::getrawmesh()->getdisjointregions()->getindim(0);
+    int physreg = universe::getrawmesh()->getphysicalregions()->createfromdisjointregionlist(alldrsindim);
     
     formulation evalatnodes;
     
@@ -149,20 +149,20 @@ void rawfield::updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis)
     vec vals = evalatnodes.rhs();
     
     setdata(physreg, vals|thisfield);
-    universe::mymesh->getphysicalregions()->remove({physreg}, false);
+    universe::getrawmesh()->getphysicalregions()->remove({physreg}, false);
 }
 
 void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis, int dim) // dim can be 1, 2 or 3
 {
-    int meshdim = universe::mymesh->getmeshdimension();
+    int meshdim = universe::getrawmesh()->getmeshdimension();
     if (dim > meshdim)
         return;
 
     std::string tn = gettypename();
     field thisfield = field(shared_from_this());
     
-    disjointregions* drs = universe::mymesh->getdisjointregions();
-    physicalregions* prs = universe::mymesh->getphysicalregions();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
     
     // Create temporary physical regions:
     int physreg = prs->createfromdisjointregionlist(drs->getindim(dim));
@@ -205,11 +205,11 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     
     if (preallocsize > 0)
     {
-        intdensematrix blocksizes(numblocks,1);
+        indexmat blocksizes(numblocks,1);
         int* bsvals = blocksizes.getvalues();
 
         // Vector to reorder the mat and vec to bring together the parts of the diagonal blocks:
-        intdensematrix renumtodiagblocks(dm->countdofs(), 1);
+        indexmat renumtodiagblocks(dm->countdofs(), 1);
         int* renumptr = renumtodiagblocks.getvalues();
         int index = 0;
         for (int d = 0; d < alldrsindim.size(); d++)
@@ -262,23 +262,23 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
         ISSetPermutation(permutis);
         MatPermute(A.getapetsc(), permutis, permutis, &permutedmat);
         
-        densematrix blockvals(preallocsize, 1);
+        densemat blockvals(preallocsize, 1);
         MatInvertVariableBlockDiagonal(permutedmat, blocksizes.count(), bsvals, blockvals.getvalues());
         MatDestroy(&permutedmat);
         
         // Solve block-diagonal system:
         v.permute(renumtodiagblocks);
-        intdensematrix alladds(v.size(),1, 0,1);
-        densematrix vmat = v.getvalues(alladds);
-        densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
+        indexmat alladds(v.size(),1, 0,1);
+        densemat vmat = v.getvalues(alladds);
+        densemat prod = blockvals.blockdiagonaltimesvector(blocksizes, vmat);
 
         v.setvalues(alladds, prod);
         v.permute(renumtodiagblocks, true);
 
         setdata(physreg, v|thisfield);
     }
-    universe::mymesh->getphysicalregions()->remove({dirichletphysreg}, false);
-    universe::mymesh->getphysicalregions()->remove({physreg}, false);
+    universe::getrawmesh()->getphysicalregions()->remove({dirichletphysreg}, false);
+    universe::getrawmesh()->getphysicalregions()->remove({physreg}, false);
 }
 
 void rawfield::allowsynchronizing(bool allowit)
@@ -339,7 +339,7 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     }
 
     // Make sure the mesh has been loaded before defining non-coordinate fields:
-    if (universe::mymesh == NULL)
+    if (universe::myrawmesh == NULL)
     {
         std::cout << "Error in 'rawfield' object: first load mesh before defining a field that is not the x, y or z coordinate" << std::endl;
         abort();
@@ -360,9 +360,9 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         
     // Translate to the actual type name:
     if (mytypename == "one")
-        mytypename = "one"+std::to_string(universe::mymesh->getmeshdimension());
+        mytypename = "one"+std::to_string(universe::getrawmesh()->getmeshdimension());
     if (mytypename == "h1d")
-        mytypename = "h1d"+std::to_string(universe::mymesh->getmeshdimension());
+        mytypename = "h1d"+std::to_string(universe::getrawmesh()->getmeshdimension());
 
     // Make sure the subfield type is scalar:
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(0, mytypename);
@@ -388,22 +388,22 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         }    
         else
         {
-            myrawmesh = universe::mymesh;
+            myrawmesh = universe::getrawmesh();
         
-            myptracker = universe::mymesh->getptracker();
+            myptracker = universe::getrawmesh()->getptracker();
         
             // Set a -1 undefined interpolation order by default:
-            interpolationorder = std::vector<int>( (universe::mymesh->getdisjointregions())->count(), -1);
+            interpolationorder = std::vector<int>( (universe::getrawmesh()->getdisjointregions())->count(), -1);
             // Set all unconstrained by default:
-            mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::mymesh->getdisjointregions())->count(), NULL);
+            mydisjregconstraints = std::vector<std::shared_ptr<integration>>( (universe::getrawmesh()->getdisjointregions())->count(), NULL);
             
-            myconditionalconstraints = std::vector<std::vector<expression>>( (universe::mymesh->getdisjointregions())->count(), std::vector<expression>(0));
+            myconditionalconstraints = std::vector<std::vector<expression>>( (universe::getrawmesh()->getdisjointregions())->count(), std::vector<expression>(0));
 
-            isitgauged = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+            isitgauged = std::vector<bool>( (universe::getrawmesh()->getdisjointregions())->count(), false);
             
-            isitported = std::vector<bool>( (universe::mymesh->getdisjointregions())->count(), false);
+            isitported = std::vector<bool>( (universe::getrawmesh()->getdisjointregions())->count(), false);
 
-            mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::mymesh->getdisjointregions()));
+            mycoefmanager = std::shared_ptr<coefmanager>(new coefmanager(mytypename, universe::getrawmesh()->getdisjointregions()));
         }
     }
     return;
@@ -441,8 +441,8 @@ rawfield::rawfield(dofmanager* dm, std::shared_ptr<rawmesh> rm, std::shared_ptr<
 
 rawfield::~rawfield(void)
 {
-    if (universe::mymesh != NULL && mysubfields.size() == 0 && myharmonics.size() == 0)
-        universe::mymesh->remove(this);
+    if (universe::myrawmesh != NULL && mysubfields.size() == 0 && myharmonics.size() == 0)
+        universe::getrawmesh()->remove(this);
 }
 
 int rawfield::countcomponents(void)
@@ -641,8 +641,8 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     }
     
     // Interpolation order can only be set on highest dimension regions:
-    int problemdimension = universe::mymesh->getmeshdimension();
-    int regdim = ((universe::mymesh->getphysicalregions())->get(physreg))->getelementdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
+    int regdim = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getelementdimension();
     if (iscalledbyuser && regdim >= 0 && problemdimension != regdim)
     {
         std::cout << "Error in 'rawfield' object: cannot set the interpolation order on a " << regdim << "D region in a " << problemdimension << "D problem (must be " << problemdimension << "D)" << std::endl;
@@ -679,7 +679,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
     {
         // Consider ALL disjoint regions in the physical region with (-1):
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+        std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
         
         hierarchicalformfunction myhff;
         int lowestfieldorder = myhff.getminorder(mytypename);
@@ -725,7 +725,7 @@ void rawfield::setorder(expression criterion, int loworder, int highorder, doubl
         
         criterion = sl::abs(criterion);
         
-        universe::mymesh->add(shared_from_this(), criterion, loworder, highorder, critrange);
+        universe::getrawmesh()->add(shared_from_this(), criterion, loworder, highorder, critrange);
     }
 }
 
@@ -760,7 +760,7 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
     hierarchicalformfunction myhff;
     int lowestfieldorder = myhff.getminorder(mytypename);
     
-    std::vector<bool> isddmdisjreg = universe::mymesh->getdtracker()->isddmdisjointregion();
+    std::vector<bool> isddmdisjreg = universe::getrawmesh()->getdtracker()->isddmdisjointregion();
     
     for (int h = 0; h < fieldharms.size(); h++)
     {
@@ -778,7 +778,7 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
         ph->associate(true, dh, physreg, fh);
         dh->associate(false, ph, physreg, fh);
         
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+        std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
         for (int i = 0; i < selecteddisjregs.size(); i++)
         {
             int cdr = selecteddisjregs[i];
@@ -866,7 +866,7 @@ void rawfield::setvalue(int physreg)
     }
 }
 
-void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densematrix values)
+void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoordsin, expression* meshdeform, densemat values)
 {
     synchronize();
     
@@ -883,7 +883,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     // Needs to be monoharmonic without FFT (the field cannot store the time vals).
     if (values.countrows() != numelems || 3*values.countcolumns() != gpcoordsin.size())
     {
-        std::cout << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densematrix (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
+        std::cout << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densemat (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
         abort();
     }
     
@@ -895,7 +895,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     
     // Manages reuse automatically:
     std::shared_ptr<opdetjac> dj(new opdetjac);
-    densematrix detjac = dj->interpolate(elemselect, gpcoords, meshdeform)[1][0];
+    densemat detjac = dj->interpolate(elemselect, gpcoords, meshdeform)[1][0];
     // The Jacobian determinant should be positive irrespective of the node numbering:
     detjac.abs();
 
@@ -924,8 +924,8 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         int fforder = getinterpolationorder(mydisjregs[0]);
         std::vector<int> elemindexes = elemselect.getelementindexes();
         
-        densematrix dj = detjac.extractrows(elemindexes);
-        densematrix vl = values.extractrows(elemindexes);
+        densemat dj = detjac.extractrows(elemindexes);
+        densemat vl = values.extractrows(elemindexes);
         
 
         ///// Projection formulation -> integral(dofv * tfv - vl * tfv) = 0
@@ -936,20 +936,20 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         // 1. Evaluate dofv and tfv * gpweights:
         
         hierarchicalformfunctioncontainer ffval = *(universe::gethff(mytypename, elementtypenumber, fforder, gpcoords));
-        densematrix testfunctionvalue = ffval.tomatrix(0, fforder, 0, 0); // total orientation is always 0 for h1d type
-        densematrix doffunctionvalue = testfunctionvalue.copy();
+        densemat testfunctionvalue = ffval.tomatrix(0, fforder, 0, 0); // total orientation is always 0 for h1d type
+        densemat doffunctionvalue = testfunctionvalue.copy();
         
         testfunctionvalue.multiplycolumns(gpweights);
             
         // 2. Compute the tf * dof product [tfrow1*dofrow1 tfrow1*dofrow2 ... tfrow2*dofrow1 ...]:
-        densematrix testfuntimesdof = testfunctionvalue.multiplyallrows(doffunctionvalue);
+        densemat testfuntimesdof = testfunctionvalue.multiplyallrows(doffunctionvalue);
         testfuntimesdof.transpose();
 
         // 3. Create matrix A terms:
-        densematrix Avals = dj.multiply(testfuntimesdof); // will be already row-col sorted
+        densemat Avals = dj.multiply(testfuntimesdof); // will be already row-col sorted
         
         // 4. Create right handside vector b terms:
-        densematrix bvals = testfunctionvalue.multiply(vl);
+        densemat bvals = testfunctionvalue.multiply(vl);
 
         // 5. Create A (block diagonal):
         int numffs = testfunctionvalue.countrows();
@@ -958,8 +958,8 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         if (numffs == 0)
             continue;
         
-        intdensematrix csrrows(1, matsize+1, 0,numffs);
-        intdensematrix csrcols(numinselection, numffs*numffs);
+        indexmat csrrows(1, matsize+1, 0,numffs);
+        indexmat csrcols(numinselection, numffs*numffs);
         int* captr = csrcols.getvalues();
         
         int index = 0;
@@ -981,20 +981,20 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
         MatAssemblyBegin(bdmat, MAT_FINAL_ASSEMBLY);
         MatAssemblyEnd(bdmat, MAT_FINAL_ASSEMBLY);
 
-        intdensematrix blocksizes(numinselection,1, numffs);
-        densematrix blockvals(numinselection*numffs, numffs);
+        indexmat blocksizes(numinselection,1, numffs);
+        densemat blockvals(numinselection*numffs, numffs);
         MatInvertVariableBlockDiagonal(bdmat, numinselection, blocksizes.getvalues(), blockvals.getvalues());
         
         MatDestroy(&bdmat);
         
         // 6. Solve block-diagonal system:
-        densematrix prod = blockvals.blockdiagonaltimesvector(blocksizes, bvals.gettranspose());
+        densemat prod = blockvals.blockdiagonaltimesvector(blocksizes, bvals.gettranspose());
         double* prodptr = prod.getvalues();
 
         // 7. Set coefs to coefmanager:
         
-        elements* els = universe::mymesh->getelements();
-        disjointregions* drs = universe::mymesh->getdisjointregions();
+        elements* els = universe::getrawmesh()->getelements();
+        disjointregions* drs = universe::getrawmesh()->getdisjointregions();
         for (int e = 0; e < numinselection; e++)
         {
             int curel = elemnums[elemindexes[e]];
@@ -1011,7 +1011,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     elemselect.selectdisjointregions({});
 }
 
-void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
+void rawfield::setnodalvalues(indexmat nodenumbers, densemat values)
 {
     synchronize();
     
@@ -1021,8 +1021,8 @@ void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
         return;
     }
     
-    elements* els = universe::mymesh->getelements();
-    disjointregions* drs = universe::mymesh->getdisjointregions(); 
+    elements* els = universe::getrawmesh()->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions(); 
 
     int numnodes = nodenumbers.count();
     int* nptr = nodenumbers.getvalues();
@@ -1059,20 +1059,20 @@ void rawfield::setnodalvalues(intdensematrix nodenumbers, densematrix values)
     }
 }
 
-densematrix rawfield::getnodalvalues(intdensematrix nodenumbers)
+densemat rawfield::getnodalvalues(indexmat nodenumbers)
 {
     synchronize();
     
     if (myharmonics.size() == 2 && myharmonics[1].size() == 1)
         return myharmonics[1][0]->getnodalvalues(nodenumbers);
     
-    elements* els = universe::mymesh->getelements();
-    disjointregions* drs = universe::mymesh->getdisjointregions(); 
+    elements* els = universe::getrawmesh()->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions(); 
     
     int numnodes = nodenumbers.count();
     int* nptr = nodenumbers.getvalues();
     
-    densematrix output(nodenumbers.countrows(), nodenumbers.countcolumns());
+    densemat output(nodenumbers.countrows(), nodenumbers.countcolumns());
     double* vptr = output.getvalues();
 
     // Only for 'h1' type fields:
@@ -1123,73 +1123,54 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
         abort();
     }
         
-    // Set the constraints on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setdisjregconstraint(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
-        
-    if (mysubfields.size() == 0)
+    // Set the constraints on the subfields:
+    if (mysubfields.size() > 0)
     {
-        // Consider ALL disjoint regions in the physical region with (-1):
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
-
-        field thisfield(getpointer());
-        std::shared_ptr<integration> disjregconstraintcomputation;
-        
-        if (meshdeform == NULL)
-            disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
-        else
-            disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
-        
-        if (input.iszero())
-            disjregconstraintcomputation->isprojectionofzero = true;
-            
-        if (myharmonics.size() == 0)
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->setdisjregconstraint(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
+        return;
+    }
+    // Set the constraints on the harmonics:
+    if (myharmonics.size() > 0)
+    {
+        for (int h = 0; h < myharmonics.size(); h++)
         {
-            if (issynchronizing == false)
-            {
-                std::vector<expression> mdv = {};
-                if (meshdeform != NULL)
-                    mdv = {*meshdeform};
-                mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
-            }
-        
-            for (int i = 0; i < selecteddisjregs.size(); i++)
-            {
-                // Ports have priority over the disjreg constraints!
-                if (isitported[selecteddisjregs[i]] == false)
-                {
-                    mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
-                    myconditionalconstraints[selecteddisjregs[i]] = {};
-                    isitgauged[selecteddisjregs[i]] = false;
-                }
-            }
+            if (myharmonics[h].size() > 0)
+                myharmonics[h][0]->setdisjregconstraint(physreg, numfftharms, meshdeform, sl::getharmonic(h, input, numfftharms), extraintegrationdegree);
         }
-        else
+        return;
+    }
+
+    if (issynchronizing == false)
+    {
+        std::vector<expression> mdv = {};
+        if (meshdeform != NULL)
+            mdv = {*meshdeform};
+        mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
+    }
+    
+    // Consider ALL disjoint regions in the physical region with (-1):
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+
+    field thisfield(getpointer());
+    std::shared_ptr<integration> disjregconstraintcomputation;
+    
+    if (meshdeform == NULL)
+        disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
+    else
+        disjregconstraintcomputation = std::shared_ptr<integration>(new integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree));
+    
+    if (input.iszero())
+        disjregconstraintcomputation->isprojectionofzero = true;
+
+    for (int i = 0; i < selecteddisjregs.size(); i++)
+    {
+        // Ports have priority over the disjreg constraints!
+        if (isitported[selecteddisjregs[i]] == false)
         {
-            for (int h = 0; h < myharmonics.size(); h++)
-            {
-                if (myharmonics[h].size() > 0)
-                {
-                    if (issynchronizing == false)
-                    {
-                        std::vector<expression> mdv = {};
-                        if (meshdeform != NULL)
-                            mdv = {*meshdeform};
-                        myharmonics[h][0]->mydisjregconstrainttracker.push_back(std::make_tuple(physreg, numfftharms, mdv, input, extraintegrationdegree));
-                    }
-                
-                    for (int i = 0; i < selecteddisjregs.size(); i++)
-                    {
-                        // Ports have priority over the disjreg constraints!
-                        if (myharmonics[h][0]->isitported[selecteddisjregs[i]] == false)
-                        {
-                            myharmonics[h][0]->mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
-                            myharmonics[h][0]->myconditionalconstraints[selecteddisjregs[i]] = {};
-                            myharmonics[h][0]->isitgauged[selecteddisjregs[i]] = false;
-                        }
-                    }
-                }
-            }
+            mydisjregconstraints[selecteddisjregs[i]] = disjregconstraintcomputation;
+            myconditionalconstraints[selecteddisjregs[i]] = {};
+            isitgauged[selecteddisjregs[i]] = false;
         }
     }
 }
@@ -1216,10 +1197,13 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
 {
     synchronize();
     
-    // Keep track of the calls to 'setconditionalconstraint':
-    if (issynchronizing == false && mysubfields.size() == 0 && myharmonics.size() == 0)
-        myconditionalconstrainttracker.push_back(std::make_tuple(physreg, condexpr, valexpr));
-    
+    // Multiharmonic expressions are not allowed.
+    std::vector<int> prdisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
+    if (not(condexpr.isharmonicone(prdisjregs)) || not(valexpr.isharmonicone(prdisjregs)))
+    {
+        std::cout << "Error in 'rawfield' object: cannot set a conditional constraint with multiharmonic arguments" << std::endl;
+        abort();
+    }
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
         std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
@@ -1235,28 +1219,37 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
         std::cout << "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" << std::endl;
         abort();
     }
-        
-    // Set the constraints on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setconditionalconstraint(physreg, condexpr, valexpr.at(i,0));
-    // Set the constraints on the harmonics:
-    for (int i = 0; i < myharmonics.size(); i++)
+    
+    // Set the conditional constraints on the subfields:
+    if (mysubfields.size() > 0)
     {
-        if (myharmonics[i].size() > 0)
-            myharmonics[i][0]->setconditionalconstraint(physreg, condexpr, valexpr);
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->setconditionalconstraint(physreg, condexpr, valexpr.at(i,0));
+        return;
+    }
+    if (myharmonics.size() == 2 && myharmonics[1].size() == 1)
+    {
+        myharmonics[1][0]->setconditionalconstraint(physreg, condexpr, valexpr);
+        return;
+    }
+    if (myharmonics.size() != 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set conditional constraints for fields with harmonics (select a single harmonic)" << std::endl;
+        abort();
     }
     
-    if (mysubfields.size() == 0 && myharmonics.size() == 0)
-    {
-        // Consider only the NODAL disjoint regions in the physical region with (0):
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(0);
+    // Keep track of the calls to 'setconditionalconstraint':
+    if (issynchronizing == false)
+        myconditionalconstrainttracker.push_back(std::make_tuple(physreg, condexpr, valexpr));
+        
+    // Consider only the NODAL disjoint regions in the physical region with (0):
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(0);
 
-        for (int i = 0; i < selecteddisjregs.size(); i++)
-        {
-            // Ports and disjreg constraints have priority over the conditional constraints!
-            if (isitported[selecteddisjregs[i]] == false && mydisjregconstraints[selecteddisjregs[i]] == NULL)
-                myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
-        }
+    for (int i = 0; i < selecteddisjregs.size(); i++)
+    {
+        // Ports and disjreg constraints have priority over the conditional constraints!
+        if (isitported[selecteddisjregs[i]] == false && mydisjregconstraints[selecteddisjregs[i]] == NULL)
+            myconditionalconstraints[selecteddisjregs[i]] = {condexpr, valexpr};
     }
 }
 
@@ -1281,7 +1274,7 @@ void rawfield::setgauge(int physreg)
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
     {
         // Get ALL disjoint regions in the physical region (not only ders, to remove grad type form functions).
-        std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+        std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
         for (int i = 0; i < selecteddisjregs.size(); i++)
         {
@@ -1292,7 +1285,7 @@ void rawfield::setgauge(int physreg)
     }
 }
 
-void rawfield::setspanningtree(spanningtree spantree)
+void rawfield::setspanningtree(std::shared_ptr<rawspanningtree> spantree)
 {
     synchronize();
     
@@ -1307,15 +1300,15 @@ void rawfield::setspanningtree(spanningtree spantree)
     }
     
     if (mysubfields.size() == 0 && myharmonics.size() == 0)
-        myspanningtree = {spantree};
+        myspanningtree = spantree;
 }
 
-spanningtree* rawfield::getspanningtree(void)
+std::shared_ptr<rawspanningtree> rawfield::getspanningtree(void)
 {
     synchronize();
     
-    if (myspanningtree.size() == 1)
-        return &myspanningtree[0];
+    if (myspanningtree != NULL)
+        return myspanningtree;
     else
     {
         std::cout << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;
@@ -1409,7 +1402,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
             // Get ALL disjoint regions in the physical region:
             std::vector<int> selecteddisjregs;
             if (physreg != -1)
-                selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+                selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
             else
             {
                 std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
@@ -1441,7 +1434,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
 
                 for (int ff = 0; ff < numformfunctionsperelement; ff++)
                 {
-                    densematrix values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
+                    densemat values = selectedvec->getvalues(selectedrawfield, disjreg, ff);
                     double* vals = values.getvalues();
                     
                     // Transfer nothing if 'values' is empty:
@@ -1519,7 +1512,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     // Get ALL disjoint regions in the physical region:
     std::vector<int> selecteddisjregs;
     if (physreg != -1)
-        selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+        selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
     else
     {
         std::shared_ptr<dofmanager> dofmngr = selectedvec->getdofmanager();
@@ -1531,9 +1524,9 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     {
         int disjreg = selecteddisjregs[i];
 
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjreg);
-        int elementdimension = (universe::mymesh->getdisjointregions())->getelementdimension(disjreg);
-        int numelem = (universe::mymesh->getdisjointregions())->countelements(disjreg);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(disjreg);
+        int elementdimension = (universe::getrawmesh()->getdisjointregions())->getelementdimension(disjreg);
+        int numelem = (universe::getrawmesh()->getdisjointregions())->countelements(disjreg);
 
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, mytypename);
         // The interpolation order for this field and the selected fields might be different.
@@ -1542,7 +1535,7 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
 
         for (int ff = 0; ff < numformfunctionsperelement; ff++)
         {
-            densematrix values(1,numelem,0.0);
+            densemat values(1,numelem,0.0);
             double* vals = values.getvalues();
             
             if (ff < numformfunctionsinoriginfield)
@@ -1552,6 +1545,79 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
             }
 
             selectedvec->setvalues(selectedrawfield, disjreg, ff, values, op);
+        }
+    }
+}
+
+void rawfield::setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues)
+{
+    synchronize();
+
+    // There is no subfield for hcurl. No subfield loop needed.
+    if (myharmonics.size() == 2 && myharmonics[1].size() > 0)
+    {
+        myharmonics[1][0]->setcohomologysources(cutphysregs, cutvalues);
+        return;
+    }
+    
+    if (myharmonics.size() > 0)
+    {
+        std::cout << "Error in 'rawfield' object: cannot set a cohomology source on a multiharmonic field (select harmonics one by one)" << std::endl;
+        abort();
+    }
+    
+    elements* els = universe::getrawmesh()->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+
+    // Reset all cut sources:
+    std::vector<std::vector<int>> ders(cutphysregs.size());
+    for (int i = 0; i < cutphysregs.size(); i++)
+    {
+        ders[i] = prs->get(cutphysregs[i])->getdisjointregions(1);
+        
+        for (int d = 0; d < ders[i].size(); d++)
+        {
+            int ne = drs->countelements(ders[i][d]);
+            int nff = mycoefmanager->countformfunctions(ders[i][d]);
+
+            for (int f = 0; f < nff; f++)       
+            {
+                for (int j = 0; j < ne; j++)
+                    mycoefmanager->setcoef(ders[i][d], f, j, 0.0);
+            }   
+        }
+    }
+    
+    // Set all cut sources:
+    std::vector<bool> flipit; std::vector<int> edgenums;
+    for (int i = 0; i < cutphysregs.size(); i++)
+    {
+        if (ders[i].size() == 0)
+            continue;
+    
+        myalgorithm::inoutorient(cutphysregs[i], flipit);
+
+        int index = 0;
+        for (int d = 0; d < ders[i].size(); d++)
+        {
+            int rb = drs->getrangebegin(ders[i][d]);
+            int ne = drs->countelements(ders[i][d]);
+            
+            for (int j = 0; j < ne; j++)
+            {
+                int curorient = 2 * els->gettotalorientation(1, rb+j) - 1;
+                
+                int signfix = curorient;
+                if (flipit[index])
+                    signfix *= -1;
+
+                // Add the source with correct sign:
+                double curval = mycoefmanager->getcoef(ders[i][d], 0, j);
+                mycoefmanager->setcoef(ders[i][d], 0, j, curval + signfix * cutvalues[i]);
+                
+                index++;
+            }
         }
     }
 }
@@ -1755,7 +1821,7 @@ int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& el
     int numelems = elementnumbers.size();
     fieldorders.resize(numelems);
     
-    elements* els = universe::mymesh->getelements();
+    elements* els = universe::getrawmesh()->getelements();
 
     int maxorder = -1;
     for (int i = 0; i < numelems; i++)
@@ -1835,8 +1901,8 @@ void rawfield::getweightsforeachorder(int elementtypenumber, int fieldorder, std
             weightsforeachorder[i*numorders+0] = std::abs(averagevals[i]);
     }
 
-    disjointregions* drs = universe::mymesh->getdisjointregions();
-    elements* els = universe::mymesh->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    elements* els = universe::getrawmesh()->getelements();
     
     element myelement(elementtypenumber);
     
@@ -1907,8 +1973,8 @@ void rawfield::getaverage(int elementtypenumber, std::vector<int>& elementnumber
     averagevals = std::vector<double>(numelems, 0.0); // init all zero
     element myelement(elementtypenumber);
     
-    disjointregions* drs = universe::mymesh->getdisjointregions();
-    elements* els = universe::mymesh->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    elements* els = universe::getrawmesh()->getelements();
     
     // Create a form function iterator to iterate through the form functions of the element type.
     hierarchicalformfunctioniterator myiterator(mytypename, elementtypenumber, maxorder);
@@ -2004,9 +2070,9 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
     int fieldtypenum = myhff.gettypenumber(mytypename);
 
     // Get all disjoint regions in the physical region:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
     int numdisjregs = selecteddisjregs.size();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
 
     // Get all sons:
     std::vector<std::pair<std::vector<int>, std::shared_ptr<rawfield>>> allsons = getallsons();
@@ -2128,7 +2194,7 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 {
     synchronize();
     
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
     
     
     ///// Load the data from disk:
@@ -2285,22 +2351,22 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 }
 
 
-std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<densemat> rawfield::getjacterms(elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     synchronize();
     
     int elementdimension = elemselect.getelementdimension();
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     int elementtypenumber = elemselect.getelementtypenumber();
     
-    std::vector<densematrix> output(elementdimension*problemdimension);
+    std::vector<densemat> output(elementdimension*problemdimension);
 
-    elements* myelements = universe::mymesh->getelements();
+    elements* myelements = universe::getrawmesh()->getelements();
 
     std::vector<int> elementlist = elemselect.getelementnumbers();
 
     // Get all node coordinates:
-    std::vector<double>* mynodecoordinates = universe::mymesh->getnodes()->getcoordinates();
+    std::vector<double>* mynodecoordinates = universe::getrawmesh()->getnodes()->getcoordinates();
 
     element myelement(elementtypenumber, myelements->getcurvatureorder());        
     int numcurvednodes = myelement.countcurvednodes();
@@ -2308,9 +2374,9 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
     int numrows = numcurvednodes;
     int numcols = elementlist.size();
 
-    std::vector<densematrix> coefmatrix(problemdimension);
+    std::vector<densemat> coefmatrix(problemdimension);
     for (int d = 0; d < problemdimension; d++)
-        coefmatrix[d] = densematrix(numrows, numcols);
+        coefmatrix[d] = densemat(numrows, numcols);
         
     std::vector<double*> coefs(problemdimension);
     for (int d = 0; d < problemdimension; d++)
@@ -2334,7 +2400,7 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
 
     // Compute the form functions evaluated at the evaluation points:
     lagrangeformfunction mylagrange(elementtypenumber, myelements->getcurvatureorder(), evaluationcoordinates);
-    std::vector<densematrix> myformfunctionvalue(elementdimension);
+    std::vector<densemat> myformfunctionvalue(elementdimension);
     for (int ed = 0; ed < elementdimension; ed++)
         myformfunctionvalue[ed] = mylagrange.getderivative(1+ed);
 
@@ -2348,14 +2414,14 @@ std::vector<densematrix> rawfield::getjacterms(elementselector& elemselect, std:
 }
         
 
-std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     synchronize();
     
     // Get all disjoint regions in the element selector:
     std::vector<int> alldisjregs = elemselect.getdisjointregions();
     
-    std::vector<std::vector<densematrix>> out = {};
+    std::vector<std::vector<densemat>> out = {};
 
     // Group disj. regs. with same interpolation order (and same element type number).
     std::vector<int> interpolorders(alldisjregs.size());
@@ -2370,8 +2436,8 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         if (elemselect.countinselection() == 0)
             continue;
         
-        int elementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjregs[0]);
-        std::vector<std::vector<densematrix>> currentinterp = interpolate(whichderivative, formfunctioncomponent, elementtypenumber, elemselect.gettotalorientation(), getinterpolationorder(mydisjregs[0]), elemselect.getelementnumbers(), evaluationcoordinates);
+        int elementtypenumber = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(mydisjregs[0]);
+        std::vector<std::vector<densemat>> currentinterp = interpolate(whichderivative, formfunctioncomponent, elementtypenumber, elemselect.gettotalorientation(), getinterpolationorder(mydisjregs[0]), elemselect.getelementnumbers(), evaluationcoordinates);
         
         // Preallocate the harmonics not in 'out':
         if (out.size() < currentinterp.size())
@@ -2379,7 +2445,7 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         for (int h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1 && out[h].size() == 0)
-                out[h] = {densematrix(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
+                out[h] = {densemat(elemselect.countincurrentorientation(), evaluationcoordinates.size()/3, 0)};
         }
         
         // Insert 'currentinterp' in 'out':
@@ -2395,12 +2461,12 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
     return out;
 }
 
-densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementlist)
+densemat rawfield::getcoefficients(int elementtypenumber, int interpolorder, std::vector<int> elementlist)
 {   
     synchronize();
     
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();  
-    elements* myelements = universe::mymesh->getelements();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();  
+    elements* myelements = universe::getrawmesh()->getelements();
     
     // In case the field is the x, y or z coordinate field:
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
@@ -2411,7 +2477,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
         if (mytypename == "z")
             mycoordinate = 2;
         
-        std::vector<double>* mynodecoordinates = universe::mymesh->getnodes()->getcoordinates();
+        std::vector<double>* mynodecoordinates = universe::getrawmesh()->getnodes()->getcoordinates();
      
         element myelement(elementtypenumber, myelements->getcurvatureorder());        
         int numcurvednodes = myelement.countcurvednodes();
@@ -2419,7 +2485,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
         int numrows = numcurvednodes;
         int numcols = elementlist.size();
         
-        densematrix coefmatrix(numrows, numcols);
+        densemat coefmatrix(numrows, numcols);
         double* coefs = coefmatrix.getvalues();
 
         for (int num = 0; num < numcurvednodes; num++)
@@ -2445,7 +2511,7 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
         int numrows = myiterator.count();
         int numcols = elementlist.size();
 
-        densematrix coefmatrix(numrows, numcols);
+        densemat coefmatrix(numrows, numcols);
         double* coefs = coefmatrix.getvalues();
 
         for (int ff = 0; ff < myiterator.count(); ff++)
@@ -2475,22 +2541,22 @@ densematrix rawfield::getcoefficients(int elementtypenumber, int interpolorder, 
     }
 }
 
-std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> rawfield::interpolate(int whichderivative, int formfunctioncomponent, int elementtypenumber, int totalorientation, int interpolorder, std::vector<int> elementnumbers, std::vector<double>& evaluationcoordinates)
 {   
     synchronize();
     
-    elements* myelements = universe::mymesh->getelements();
+    elements* myelements = universe::getrawmesh()->getelements();
 
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {        
         // Get the coefficients. The interpolation order is not used here.
-        densematrix mycoefs = getcoefficients(elementtypenumber, -1, elementnumbers);
+        densemat mycoefs = getcoefficients(elementtypenumber, -1, elementnumbers);
         // Compute the form functions evaluated at the evaluation points:
         lagrangeformfunction mylagrange(elementtypenumber, myelements->getcurvatureorder(), evaluationcoordinates);
-        densematrix myformfunctionvalue = mylagrange.getderivative(whichderivative);
+        densemat myformfunctionvalue = mylagrange.getderivative(whichderivative);
 
         mycoefs.transpose();
-        densematrix coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
+        densemat coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
 
         return {{},{coefstimesformfunctions}};
     }
@@ -2499,23 +2565,23 @@ std::vector<std::vector<densematrix>> rawfield::interpolate(int whichderivative,
         if (myharmonics.size() == 0)
         {
             // Get the coefficients:
-            densematrix mycoefs = getcoefficients(elementtypenumber, interpolorder, elementnumbers);
+            densemat mycoefs = getcoefficients(elementtypenumber, interpolorder, elementnumbers);
             // Compute the form functions evaluated at the evaluation points.
             // This reuses as much as possible what's already been computed:
             hierarchicalformfunctioncontainer* val = universe::gethff(mytypename, elementtypenumber, interpolorder, evaluationcoordinates);
             
             // We can get the total orientation from elementnumbers[0] since
             // we require that all elements have the same total orientation.
-            densematrix myformfunctionvalue = val->tomatrix(totalorientation, interpolorder, whichderivative, formfunctioncomponent);
+            densemat myformfunctionvalue = val->tomatrix(totalorientation, interpolorder, whichderivative, formfunctioncomponent);
             
             mycoefs.transpose();
-            densematrix coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
+            densemat coefstimesformfunctions = mycoefs.multiply(myformfunctionvalue);
 
             return {{},{coefstimesformfunctions}};
         }
         else
         {
-            std::vector<std::vector<densematrix>> coefstimesformfunctions(myharmonics.size());
+            std::vector<std::vector<densemat>> coefstimesformfunctions(myharmonics.size());
 
             for (int harm = 1; harm < myharmonics.size(); harm++)
             {

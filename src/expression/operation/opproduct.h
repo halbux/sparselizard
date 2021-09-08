@@ -37,8 +37,8 @@ class opproduct: public operation
         
         // Multiharmonic products are not allowed unless one of 
         // the two product arguments has only the cos0 harmonic.
-        std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::shared_ptr<operation> expand(void);
         // Group all productterms and the product terms they 

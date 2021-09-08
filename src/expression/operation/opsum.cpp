@@ -12,7 +12,7 @@ void opsum::subtractterm(std::shared_ptr<operation> term)
     sumterms.push_back(opprod);
 }
 
-std::vector<std::vector<densematrix>> opsum::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opsum::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -23,7 +23,7 @@ std::vector<std::vector<densematrix>> opsum::interpolate(elementselector& elemse
     
     // Compute first all the sum terms and get the max number of harmonics.
     int maxnumberofharmonics = 0;
-    std::vector< std::vector<std::vector<densematrix>> > computedterms(sumterms.size());
+    std::vector< std::vector<std::vector<densemat>> > computedterms(sumterms.size());
     for (int i = 0; i < sumterms.size(); i++)
     {
         computedterms[i] = sumterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
@@ -32,7 +32,7 @@ std::vector<std::vector<densematrix>> opsum::interpolate(elementselector& elemse
     }
     
     // Initialise the output vector holding the sum:
-    std::vector<std::vector<densematrix>> output(maxnumberofharmonics, std::vector<densematrix> {});
+    std::vector<std::vector<densemat>> output(maxnumberofharmonics, std::vector<densemat> {});
     
     // Sum all harmonics together (ignore harmonic sin0):
     for (int harm = 1; harm < maxnumberofharmonics; harm++)
@@ -57,7 +57,7 @@ std::vector<std::vector<densematrix>> opsum::interpolate(elementselector& elemse
     return output;
 }
 
-densematrix opsum::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opsum::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -66,7 +66,7 @@ densematrix opsum::multiharmonicinterpolate(int numtimeevals, elementselector& e
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = sumterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = sumterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
     for (int i = 1; i < sumterms.size(); i++)
         output.add(sumterms[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform));

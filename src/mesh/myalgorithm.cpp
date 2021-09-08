@@ -94,7 +94,7 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
     if (numpts == 0)
         return 0;
  
-    std::vector<double> noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
+    std::vector<double> noisethreshold = universe::getrawmesh()->getnodes()->getnoisethreshold();
     double ntx = noisethreshold[0], nty = noisethreshold[1], ntz = noisethreshold[2];
 
     coordinategroup coordgroup(coordinates);
@@ -472,10 +472,10 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
 
 void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     
-    disjointregions* mydisjregs = universe::mymesh->getdisjointregions();
-    elements* myelems = universe::mymesh->getelements();
+    disjointregions* mydisjregs = universe::getrawmesh()->getdisjointregions();
+    elements* myelems = universe::getrawmesh()->getelements();
     
     // Get information related to the disjoint region:
     int elemtypenum = mydisjregs->getelementtypenumber(disjreg);
@@ -629,7 +629,7 @@ void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindex
         selected[i] = vals[selectedindexes[i]];
 }
 
-void myalgorithm::select(std::vector<bool>& vals, intdensematrix selectedindexes, std::vector<bool>& selected)
+void myalgorithm::select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected)
 {
     int numselected = selectedindexes.count();
     selected.resize(numselected);
@@ -1171,29 +1171,29 @@ void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::v
     h[k+1] = 0.0;
 }
 
-std::vector<double> myalgorithm::arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k)
+std::vector<double> myalgorithm::arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k)
 {   
     // One Krylov vector on each row:
     int n = Q.countcolumns();
     double* Qptr = Q.getvalues();
     
     // Krylov vector fragment on each rank:
-    densematrix q = mymatmult(Q.extractrows(k,k).getresized(n,1));
+    densemat q = mymatmult(Q.extractrows(k,k).getresized(n,1));
     double* qptr = q.getvalues();
     
     if (q.countrows() != n || q.countcolumns() != 1)
     {
-        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densematrix of wrong size on rank " << slmpi::getrank() << std::endl;
+        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
         abort();
     }
     
     // Standard Gramm-Schmidt orthogonalization:
-    densematrix h = Q.getresized(k+1,n).multiply(q);
+    densemat h = Q.getresized(k+1,n).multiply(q);
     h = h.getresized(1,k+1);
     
     slmpi::sum(k+1, h.getvalues()); // reduce on all ranks
     
-    densematrix Qh = h.multiply(Q.getresized(k+1,n));
+    densemat Qh = h.multiply(Q.getresized(k+1,n));
     double* Qhptr = Qh.getvalues();
     
     // Subtract Qh and compute the norm of q:
@@ -1759,15 +1759,15 @@ void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::str
     }
 }
 
-void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum)
+void myalgorithm::findtruefalse(std::vector<bool>& invec, indexmat& trueinds, indexmat& falseinds, std::vector<int>& renum)
 {
     int numtot = invec.size();
     int numtrue = counttrue(invec);
 
     renum = std::vector<int>(numtot);
 
-    trueinds = intdensematrix(numtrue, 1);
-    falseinds = intdensematrix(numtot-numtrue, 1);
+    trueinds = indexmat(numtrue, 1);
+    falseinds = indexmat(numtot-numtrue, 1);
     int* tiptr = trueinds.getvalues();
     int* fiptr = falseinds.getvalues();
 
@@ -1785,6 +1785,114 @@ void myalgorithm::findtruefalse(std::vector<bool>& invec, intdensematrix& truein
             renum[i] = fi;
             fiptr[fi] = i;
             fi++;
+        }
+    }
+}
+
+void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
+{
+    elements* els = universe::getrawmesh()->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+    int totnumedges = els->count(1);
+    
+    std::vector<int> edgeinfo(totnumedges, 0);
+    
+    std::vector<int> ders = prs->get(physreg)->getdisjointregions(1);
+    
+    int numedgesinpr = 0;
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = drs->getrangebegin(ders[i]);
+        int ne = drs->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+            edgeinfo[rb+j] = 2;
+        
+        numedgesinpr += ne;
+    }
+    
+    // This loop on all edges is needed in case the physical region is made up of multiple disconnected islands:
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = drs->getrangebegin(ders[i]);
+        int ne = drs->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            int firstnode = els->getsubelement(0, 1, rb+j, 0);
+            // Process the whole island:
+            inoutorient(firstnode, edgeinfo, true, false);
+        }
+    }
+    
+    flipit = std::vector<bool>(numedgesinpr);
+        
+    int index = 0;
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = drs->getrangebegin(ders[i]);
+        int ne = drs->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            if (edgeinfo[rb+j] == 1)
+                flipit[index] = false;
+            else
+                flipit[index] = true;
+            index++;
+        }
+    }
+}
+
+// For edge number i value 'edgestatus[i]' is -1 if it is flipped, 1 if it is not flipped, 2 if
+// it is in the physical region but not yet processed and 0 if it is not in the physical region.
+void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall)
+{   
+    elements* els = universe::getrawmesh()->getelements();
+    
+    std::vector<int> eon = els->getedgesonnode(startnode);
+
+    for (int e = 0; e < eon.size(); e++)
+    {
+        int ce = eon[e];
+        int firstnode = els->getsubelement(0, 1, ce, 0);
+        int lastnode = els->getsubelement(0, 1, ce, 1);
+            
+        if (edgestatus[ce] == 2)
+        {
+            if (isoutward)
+            {
+                if (firstnode == startnode)
+                    edgestatus[ce] = 1;
+                else
+                    edgestatus[ce] = -1;
+            }
+            else
+            {
+                if (firstnode == startnode)
+                    edgestatus[ce] = -1;
+                else
+                    edgestatus[ce] = 1;
+            }
+            
+            if (firstnode == startnode)
+                inoutorient(lastnode, edgestatus, not(isoutward), true);
+            else
+                inoutorient(firstnode, edgestatus, not(isoutward), true);
+        }
+        else
+        {
+            if (isrecursivecall && edgestatus[ce] != 0)
+            {
+                bool isedgeoutward = (firstnode == startnode && edgestatus[ce] == 1 || lastnode == startnode && edgestatus[ce] == -1);
+
+                if (isoutward != isedgeoutward)
+                {
+                    std::cout << "Error in 'myalgorithm' namespace: reorienting the edges to have them all pointing either inwards or outwards at every node is impossible on the requested physical region for the mesh provided" << std::endl;
+                    abort();
+                }
+            }
         }
     }
 }

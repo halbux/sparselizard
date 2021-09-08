@@ -3,7 +3,7 @@
 
 parameter::parameter(void)
 { 
-    if (universe::mymesh == NULL)
+    if (universe::myrawmesh == NULL)
     {
         std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
         abort();
@@ -14,7 +14,7 @@ parameter::parameter(void)
 
 parameter::parameter(int numrows, int numcols)
 { 
-    if (universe::mymesh == NULL)
+    if (universe::myrawmesh == NULL)
     {
         std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
         abort();
@@ -35,7 +35,7 @@ int parameter::countcolumns(void)
 
 parameterselectedregion parameter::operator|(int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     return parameterselectedregion(rawparamptr, physreg);
 }

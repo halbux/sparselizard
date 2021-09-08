@@ -8,7 +8,7 @@ opcondition::opcondition(std::shared_ptr<operation> condarg, std::shared_ptr<ope
 }
 
 
-std::vector<std::vector<densematrix>> opcondition::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opcondition::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -17,9 +17,9 @@ std::vector<std::vector<densematrix>> opcondition::interpolate(elementselector& 
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> condargmat = mycond->interpolate(elemselect, evaluationcoordinates, meshdeform);
-    std::vector<std::vector<densematrix>> trueargmat = mytrue->interpolate(elemselect, evaluationcoordinates, meshdeform);
-    std::vector<std::vector<densematrix>> falseargmat = myfalse->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> condargmat = mycond->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> trueargmat = mytrue->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> falseargmat = myfalse->interpolate(elemselect, evaluationcoordinates, meshdeform);
 
     if (condargmat.size() == 2 && condargmat[1].size() == 1 && trueargmat.size() == 2 && trueargmat[1].size() == 1 && falseargmat.size() == 2 && falseargmat[1].size() == 1)
     {
@@ -43,7 +43,7 @@ std::vector<std::vector<densematrix>> opcondition::interpolate(elementselector& 
     abort();
 }
 
-densematrix opcondition::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opcondition::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -52,9 +52,9 @@ densematrix opcondition::multiharmonicinterpolate(int numtimeevals, elementselec
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix condargmat = mycond->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-    densematrix trueargmat = mytrue->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-    densematrix falseargmat = myfalse->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat condargmat = mycond->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat trueargmat = mytrue->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat falseargmat = myfalse->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
 
     double* condval = condargmat.getvalues();
     double* trueval = trueargmat.getvalues();
