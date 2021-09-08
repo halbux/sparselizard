@@ -27,6 +27,7 @@ int main(void)
     // The magnetic vector potential needs only a z component in 2D:
     field az("h1");
     az.setorder(wholedomain, 2);
+    az.setorder(air, 1);
     
     // Set a magnetic wall at the domain boundary:
     az.setconstraint(bnd);
@@ -109,7 +110,7 @@ int main(void)
     // Newton iteration to solve the nonlinear problem A(x)*x = rhs(x).
     // At each iteration we solve J(x)*dx = rhs(x) - A(x)*x where J is the Jacobian matrix.
     double normdx = 1, maxb; int iter = 0;
-    while (normdx > 1e-10)
+    while (normdx > 1e-6)
     {
         // Generate the A and rhs terms (they all have tag 0 by default):
         magnetostatics.generate(0);
@@ -146,6 +147,6 @@ int main(void)
     }
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(maxb - 1.8239373092)/1.8239373092 < 1e-10);
+    std::cout << (std::abs(maxb - 1.75957)/1.75957 < 1e-5);
 }
 

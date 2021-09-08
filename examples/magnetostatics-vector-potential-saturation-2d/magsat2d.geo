@@ -1,5 +1,5 @@
 // Choose the mesh size:
-Mesh.CharacteristicLengthFactor = 10;
+Mesh.CharacteristicLengthFactor = 8;
 Mesh.MeshSizeFromCurvature = 400;
 
 SetFactory("OpenCASCADE");
