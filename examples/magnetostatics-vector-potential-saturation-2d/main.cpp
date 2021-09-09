@@ -1,5 +1,5 @@
-// This code shows how to perform an anhysteretic magnetic saturation simulation using the a-v
-// formulation on a 2D example. The 3D case can be obtained with minor adaptations to this code.
+// This code shows how to perform a static anhysteretic magnetic saturation simulation using the a-v
+// formulation on a simple 2D example. The 3D case can be obtained with minor adaptations to this code.
 
 
 #include "sparselizard.h"
