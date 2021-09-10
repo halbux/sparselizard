@@ -1,20 +1,50 @@
 name: Sparselizard Compilation
+
 on: [push]
+
 jobs:
   Compilation-Actions:
     runs-on: ubuntu-latest
+
+    env:
+      CCACHE_COMPRESS: "true"
+      CCACHE_MAXSIZE: 500M
+      
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "The workflow is now ready to test the code on the runner."
+
+      - name: install ccache
+        run: sudo apt-get install ccache
+
+      - name: identify machine architecture
+        run: |
+          gcc -### -E -march=native - &> machine-type.txt
+          cat machine-type.txt
+
+      - name: restore cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: ccache-${{ hashFiles('machine-type.txt') }}-${{ github.sha }}
+          restore-keys: ccache-${{ hashFiles('machine-type.txt') }}-
+
       - name: Install mandatory packages
         run: sudo apt-get install -y libopenblas-dev libmetis-dev libopenmpi-dev libmumps-dev petsc-dev slepc-dev libgmsh-dev
-      - run: mkdir build
-      - name: Prepare environment
-        run: cmake -B build .
-      - name: Make binaries
+      
+      - name: build
         run: |
-         cd build
-         make -j 2
+          export PATH="/usr/lib/ccache:$PATH"
+          mkdir build
+          cmake -B build .
+          cd build
+          make -j $(getconf _NPROCESSORS_ONLN)
+
+      - name: show ccache stats
+        run: |
+          ccache --show-stats
+          ccache --zero-stats
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
