@@ -1,13 +1,16 @@
 // Gmsh project created on Mon Nov 09 14:34:02 2020
 SetFactory("OpenCASCADE");
 
+PREVIEW = 1;
+
+Mesh.Format = 1;
 Mesh.MshFileVersion = 2.2;
 //Mesh.CharacteristicLengthFactor = 1;
 Mesh.CharacteristicLengthMax = 0.005; // 0.005;
 
 // Field refinement params
 GlobalMeshSize = 0.1; // best 0.1
-AirgapMeshSize = 0.005; // best 0.001
+AirgapMeshSize = 0.002; // best 0.001
 
 // Construction Parameters
 BottomIron = 4/1000;
@@ -18,20 +21,35 @@ AirgapTop = 1/1000;
 TopMagnets = 10/1000;
 TopIron = 4/1000;
 
+CenterHole = 25/1000;
+
 // Iteration Parameters
 BarStart = 0;
 RotStart = 0;
-BarIntervals = 5;
+BarIntervals = 55;
 RotIntervals = 1;
 
 IronPolesCount = 8;
 
 // Main Parameters
-Radius = 7.5/100;
+Radius = 8/100;
+FirstLayerMagnetDistances1 = 4/100;
+FirstLayerMagnetDistances2 = 5.3/100;
+FirstLayerMagnetDistances3 = 6.6/100;
+
+ThirdLayerMagnetDistances1 = 4/100;
+ThirdLayerMagnetDistances2 = 5.3/100;
+ThirdLayerMagnetDistances3 = 6.6/100;
 
 // Magnet Parameters
 MagnetDiameter = 12/1000;
 MagnetRadius = MagnetDiameter/2;
+
+If (PREVIEW > 0)
+    BarIntervals = 10000;
+    RotIntervals = 10000;
+EndIf
+
 
 For barsAngle In {BarStart:45:BarIntervals}
   For rotAngle In {RotStart:45:RotIntervals}
@@ -72,7 +90,7 @@ Field[2].ZMin = BottomMagnets + AirgapBottom + Iron;
 
 // Field Top Stator
 Field[3] = Box;
-Field[3].Thickness = 0.012;
+Field[3].Thickness = 0.006;
 Field[3].VIn = 0.003;
 Field[3].VOut = GlobalMeshSize;
 Field[3].XMax = 0.1;
@@ -85,7 +103,7 @@ Field[3].ZMin = BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets;
 
 // Field Bottom Stator
 Field[4] = Box;
-Field[4].Thickness = 0.012;
+Field[4].Thickness = 0.006;
 Field[4].VIn = 0.003;
 Field[4].VOut = GlobalMeshSize;
 Field[4].XMax = 0.1;
@@ -111,11 +129,11 @@ Field[5].ZMax = BottomMagnets + AirgapBottom + Iron / 2 + 0.002;
 Field[5].ZMin = BottomMagnets + AirgapBottom + Iron / 2 - 0.002;
 
 
-//+
+
 Field[6] = Min;
-//+
+
 Field[6].FieldsList = {1, 2, 3, 4, 5};
-//+
+
 Background Field = 6;
 ////////////////////////////////////////////
 //////// END OF FIELDS SECTION /////////////
@@ -125,13 +143,13 @@ Background Field = 6;
     // Calculate thickness for these magnets https://www.kjmagnetics.com/thickness.calculator.asp
     // FIRST LAYER
     poles = 2;
-    pieces = {24, 16, 12};
+    pieces = {24, 20, 16};
     magnetR = MagnetRadius;
-    magnetD = {6.2/100, 4.6/100, 3/100};
+    magnetD = {FirstLayerMagnetDistances3, FirstLayerMagnetDistances2, FirstLayerMagnetDistances1};
     layerHeight = BottomMagnets;
 
     // create surface pieces
-    //+
+
     Disk(1) = {0, 0, 0, Radius, Radius};
     c = 0;
     For j In {0:#pieces[]-1}
@@ -144,9 +162,9 @@ Background Field = 6;
       EndFor 
     EndFor 
 
-    //+
+
     BooleanFragments{ Surface{1}; Delete; }{ Surface{101:100+c}; Delete; }
-    //+
+
     Extrude {0, 0, layerHeight} {
       Surface{101:101+c};
     }
@@ -162,7 +180,7 @@ Background Field = 6;
       EndFor
       cc = cc + pieces[j];
     EndFor
-    //+
+
     Physical Volume("FirstLayer",101) = {1:1+c};
     counter = 1 + c;
     
@@ -172,10 +190,10 @@ Background Field = 6;
     zpos = layerHeight + AirgapBottom;
     ironPoles = IronPolesCount;
     layerHeight = Iron;
-    ironS = 2/100;
-    ironE = 7/100;
+    ironS = 3/100;
+    ironE = 7.5/100;
 
-    //+
+
     Disk(1000) = {0, 0, zpos, Radius, Radius};
     For i In {1:ironPoles}
 
@@ -205,14 +223,14 @@ Background Field = 6;
         Curve Loop(1500 + i) = {1001 + 10*i : 1004+ 10*i};
 
         Plane Surface(1000+i) = {1500+i};
-    EndFor 
-    //+
+    EndFor
+
     BooleanFragments{ Surface{1000}; Delete; }{ Surface{1001:1000+ironPoles}; Delete; }
-    //+
+
         Extrude {0, 0, layerHeight/2} {
       Surface{1001:1001+ironPoles};
     }
-    //+
+
     Extrude {0, 0, layerHeight/2} {
       Surface{1001+ironPoles:1001+ironPoles+5*ironPoles:5};
       Surface{1001+ironPoles+5*ironPoles+2};
@@ -226,12 +244,12 @@ Background Field = 6;
     // Third LAYER
     zpos = zpos + layerHeight + AirgapTop;
     poles = 6;
-    pieces = {24, 12, 12};
+    pieces = {24, 24, 12};
     magnetR = { MagnetRadius, MagnetRadius, MagnetRadius};
-    // magnetD = {6.5/100, 4.6/100, 3/100};
+    // magnetD = { ThirdLayerMagnetDistances3, ThirdLayerMagnetDistances2, ThirdLayerMagnetDistances1 };
     layerHeight = TopMagnets;
 
-    //+
+
     Disk(3000) = {0, 0, zpos, Radius, Radius};
     c = 0;
     For j In {0:#pieces[]-1}
@@ -248,15 +266,15 @@ Background Field = 6;
         Disk(3000 + c) = {xangle, yangle, zpos, magnetR[j], magnetR[j]};
       EndFor
     EndFor
-    //+
+
     BooleanFragments{ Surface{3000}; Delete; }{ Surface{3001:3000+c}; Delete; }
-    //+
+
     Extrude {0, 0, layerHeight} {
       Surface{3001:3001+c};
     }
 
 
-    //+
+
     Physical Volume("ThirdLayerMagnetsU",6) = {};
     Physical Volume("ThirdLayerMagnetsD",7) = {};
     cc = counter;
@@ -268,7 +286,7 @@ Background Field = 6;
       EndFor
       cc = cc + pieces[j];
     EndFor
-    //+
+
     Physical Volume("ThirdLayer",103) = {counter+1:1+counter+c};
     counter = 1 + c;
 
@@ -276,15 +294,15 @@ Background Field = 6;
 
     zpos = zpos + layerHeight;
     backIronHeight = TopIron;
-    //+
+
     Cylinder(4000) = {0, 0, -backIronHeight, 0, 0, backIronHeight, Radius, 2*Pi};
-    //+
+
     Cylinder(4001) = {0, 0, zpos, 0, 0, backIronHeight, Radius, 2*Pi};
 
 
-    //+
+
     Cylinder(6666) = {0, 0, -backIronHeight, 0, 0, zpos+2*backIronHeight, Radius, 2*Pi};
-    //+
+
     BooleanFragments{
       Volume{6666}; Delete;
     } {
@@ -292,7 +310,7 @@ Background Field = 6;
     }
 
     Physical Volume("Air", 10) = {4003, 4004};
-    //+
+
     Recursive Delete {
       Volume{4000,4001};
     }
@@ -300,30 +318,17 @@ Background Field = 6;
     Physical Volume("BackIronBottom", 1) = {4005};
     Physical Volume("BackIronTop", 20) = {4002};
 
-    //points = 12;
-    //c=0;
-    //For d In {2/100:Radius:1/100}
-    //For j In {0:points}
-    //  For i In {1:points}
-    //    angle = 2 * Pi / points * i + rotAngle;
-    //    yangle = d * Cos(angle);
-    //    xangle = d * Sin(angle);
-    //    c = c+1;
-    //    Point(99000+c) = {xangle, yangle, 1.6/100, 0.001};
-    //  EndFor
-    //EndFor
-    //EndFor
+    // MAKE A BIG HOLE IN THE CENTER
+    Cylinder(7000) = {0, 0, -0.1, 0, 0, 1, CenterHole, 2*Pi};
+    // DO NOT use `Physical Volumes` here just `Volumes`
+    BooleanDifference { Volume{4002,4003,4004,4005,141,61,70,80};Delete; }{ Volume{7000}; Delete; }
 
-    //+
-    //Transfinite Curve {:} = 10 Using Progression 1;
-    //Transfinite Volume {61};
-    //Recombine Volume {61};
-    // HOW TO Transfinite IRON
-    // https://gitlab.onelab.info/gmsh/gmsh/-/issues/358
-    // CHECKL ?
-    Mesh 3;
-    Save Sprintf("parts/Parrot%02gA%02g.msh", rotAngle, barsAngle);
+    Coherence;
 
+
+    If (PREVIEW < 1)
+        Mesh 3;
+        Save Sprintf("parts/Parrot%02gA%02g.msh", rotAngle, barsAngle);
+    EndIf
   EndFor
 EndFor
-
