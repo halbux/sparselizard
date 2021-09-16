@@ -12,6 +12,7 @@ FIND_PATH(MPI_INCLUDE_PATH
     PATHS
     "${MPI_PATH}/include"
     "/usr/include/x86_64-linux-gnu/mpi"
+    "/usr/include/aarch64-linux-gnu/mpi"
     )
 
 if(MPI_INCLUDE_PATH)
