@@ -1,6 +1,6 @@
 # Build instructions
 
-Run the scripts in the 'install_external_libs' folder then:
+Run the scripts in the 'install_external_libs' folder then configure and build:
 ```bash
 mkdir build && cd build
 cmake ..
@@ -9,7 +9,7 @@ cmake --build . -j$(nproc)
 
 ---
 
-Configure, possibly with a custom path to the petsc, gmsh (optional) or mpi (optional) folder:
+Provide a custom path to the petsc, gmsh (optional) or mpi (optional) folder with:
 ```bash
 cmake .. -DPETSC_PATH=/yourpath/petsc -DGMSH_PATH=/yourpath/gmsh -DMPI_PATH=/yourpath/mpi
 ```
