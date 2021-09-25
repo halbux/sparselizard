@@ -9,7 +9,7 @@ cmake --build . -j$(nproc)
 
 ---
 
-Configure, possibly with a custom path to the petsc, gmsh (optional) or mpi (optional) folder use:
+Configure, possibly with a custom path to the petsc, gmsh (optional) or mpi (optional) folder:
 ```bash
 cmake .. -DPETSC_PATH=/yourpath/petsc -DGMSH_PATH=/yourpath/gmsh -DMPI_PATH=/yourpath/mpi
 ```
@@ -28,5 +28,5 @@ In order to create a new simulation:
    `simulations/newsim`
 1. Replace target name `default` with the new one in `simulations/newsim/CMakeLists.txt`
 1. Add line `add_subdirectory(newsim)` to `simulations/CMakeLists.txt`
-1. Build as usual. Executable file will be located in `build/simulations/newsim` folder
+1. Reconfigure and build. Executable file will be located in `build/simulations/newsim` folder
 
