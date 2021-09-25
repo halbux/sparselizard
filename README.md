@@ -9,7 +9,7 @@ cmake --build . -j$(nproc)
 
 ---
 
-To provide a custom path to the petsc, gmsh (optional) or mpi (optional) folder use:
+Configure, possibly with a custom path to the petsc, gmsh (optional) or mpi (optional) folder use:
 ```bash
 cmake .. -DPETSC_PATH=/yourpath/petsc -DGMSH_PATH=/yourpath/gmsh -DMPI_PATH=/yourpath/mpi
 ```
