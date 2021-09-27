@@ -1988,3 +1988,56 @@ void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
     }
 }
 
+void myalgorithm::getedgesinouterinterfaces(std::vector<std::vector<int>>& oiedgelists, std::vector<std::vector<int>>& iiedgelistspreallocated)
+{
+    elements* els = universe::getrawmesh()->getelements();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> myneighbours = dt->getneighbours();
+    
+    oiedgelists.resize(numneighbours);
+    iiedgelistspreallocated.resize(numneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+    
+        std::vector<int> outerinterfaces = {}, innerinterfaces = {};
+        if (dt->isoverlap())
+        {
+            outerinterfaces = dt->getouteroverlapinterface(cn);
+            innerinterfaces = dt->getinneroverlapinterface(cn);
+        }
+        else
+            outerinterfaces = dt->getnooverlapinterface(cn);
+            
+        std::vector< std::vector<std::vector<int>>* > outerellists(outerinterfaces.size()), innerellists(innerinterfaces.size());
+        for (int i = 0; i < outerinterfaces.size(); i++)
+            outerellists[i] = prs->get(outerinterfaces[i])->getelementlist();
+        for (int i = 0; i < innerinterfaces.size(); i++)
+            innerellists[i] = prs->get(innerinterfaces[i])->getelementlist();
+
+        std::vector<bool> isinoi, isinii;
+            
+        int numouteredges = els->istypeinelementlists(1, outerellists, isinoi, false);
+        int numinneredges = numouteredges;
+        if (dt->isoverlap())
+            numinneredges = els->istypeinelementlists(1, innerellists, isinii, false);
+        
+        oiedgelists[n] = std::vector<int>(2*numouteredges, -1);
+        iiedgelistspreallocated[n] = std::vector<int>(2*numinneredges, -1);
+        
+        int index = 0;
+        for (int e = 0; e < isinoi.size(); e++)
+        {
+            if (isinoi[e])
+            {
+                oiedgelists[n][2*index] = e;
+                index++;
+            }
+        }
+    }
+}
+

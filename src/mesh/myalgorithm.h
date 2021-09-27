@@ -258,6 +258,10 @@ namespace myalgorithm
     
     // The inner overlap cell values are decided by the owner of the inner overlap:
     void fixatoverlap(std::vector<std::vector<int>>& cellvalues);
+    
+    // Get the list of edges in the outer overlap interface with each neighbour and preallocate for the inner overlap interface.
+    // In case of no-overlap DDM the outer and inner overlap interfaces both equal the no-overlap interface.
+    void getedgesinouterinterfaces(std::vector<std::vector<int>>& oiedgelists, std::vector<std::vector<int>>& iiedgelistspreallocated);
 };
 
 #endif
