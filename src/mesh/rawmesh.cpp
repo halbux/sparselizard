@@ -924,7 +924,11 @@ bool rawmesh::adapthp(int verbosity)
         
         double hcrange = std::get<3>(getoriginalmeshpointer()->myhadaptdata[0]);
         if (hcrange == -1)
+        {
             hcrange = hcritmat.maxabs();
+            if (universe::getrawmesh()->getdtracker()->isdefined())
+                slmpi::max(1, &hcrange);
+        }
         
         int numintervals = highnumsplits-lownumsplits+1;
         hthresholds = myalgorithm::getintervaltics(0.0, hcrange, numintervals);
