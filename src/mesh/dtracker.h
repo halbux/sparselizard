@@ -90,6 +90,8 @@ class dtracker
 
     public:
 
+        bool isdefined(void);
+
         void errorundefined(void);
 
         dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numoverlaplayers);

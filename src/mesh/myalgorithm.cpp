@@ -920,9 +920,9 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         }
     }
     
-    if (slmpi::count() > 1)
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    if (dt->isdefined() && slmpi::count() > 1)
     {
-        std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
         int numneighbours = dt->countneighbours();
         std::vector<int> neighbours = dt->getneighbours();
         
@@ -1936,7 +1936,7 @@ void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
     int numneighbours = dt->countneighbours();
     std::vector<int> myneighbours = dt->getneighbours();
 
-    if (slmpi::count() == 1 || dt->isoverlap() == false)
+    if (dt->isdefined() == false || slmpi::count() == 1 || dt->isoverlap() == false)
         return;
 
     physicalregions* prs = universe::getrawmesh()->getphysicalregions();
