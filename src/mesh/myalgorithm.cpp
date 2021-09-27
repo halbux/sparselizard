@@ -920,6 +920,39 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         }
     }
     
+    if (slmpi::count() > 1)
+    {
+        std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+        int numneighbours = dt->countneighbours();
+        std::vector<int> neighbours = dt->getneighbours();
+        
+        std::vector<double> allcornercoords(3*numnodes);
+        int cind = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < cornercoords[i].size(); j++)
+                allcornercoords[cind+j] = cornercoords[i][j];
+            cind += cornercoords[i].size();
+        }
+        
+        std::vector<int> sendlens(numneighbours, 3*numnodes), receivelens(numneighbours);
+        slmpi::exchange(neighbours, sendlens, receivelens);
+        
+        std::vector<std::vector<double>> sndnc(numneighbours, allcornercoords);
+        std::vector<double*> sendbuffers(numneighbours), receivebuffers(numneighbours);
+        barys.resize(barys.size() + sum(receivelens));
+        
+        int index = 3*numedges + 3*numnodes;
+        for (int n = 0; n < numneighbours; n++)
+        {
+            sendbuffers[n] = sndnc[n].data();
+            receivebuffers[n] = barys.data() + index;
+
+            index += receivelens[n];
+        }
+        slmpi::exchange(neighbours, sendlens, sendbuffers, receivelens, receivebuffers);
+    }
+    
     // Remove duplicated barycenters:
     std::vector<int> renumberingvector;
     int numunique = removeduplicates(barys, renumberingvector);
