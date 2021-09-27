@@ -128,6 +128,10 @@ class dtracker
         int getouteroverlap(int neighbour);
         int getinneroverlapskin(int neighbour);
         int getouteroverlapskin(int neighbour);
+        
+        std::vector<int> getnooverlapinterface(int neighbour);
+        std::vector<int> getinneroverlapinterface(int neighbour);
+        std::vector<int> getouteroverlapinterface(int neighbour);
 
         std::vector<std::vector<std::vector<int>>>* getmap(void);
         
