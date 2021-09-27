@@ -51,6 +51,11 @@ std::shared_ptr<rawmesh> dtracker::getrawmesh(void)
     }
 }
 
+void dtracker::setrawmesh(std::shared_ptr<rawmesh> rm)
+{
+    myrawmesh = rm;
+}
+
 bool dtracker::isoverlap(void)
 {
     if (mynumoverlaplayers >= 0)

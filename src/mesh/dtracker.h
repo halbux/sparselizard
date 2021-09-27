@@ -96,6 +96,8 @@ class dtracker
 
         std::shared_ptr<rawmesh> getrawmesh(void);
         
+        void setrawmesh(std::shared_ptr<rawmesh> rm);
+        
         bool isoverlap(void);
         
         // Set manually the no-overlap connectivity of this rank.
