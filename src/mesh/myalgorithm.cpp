@@ -1930,3 +1930,61 @@ void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool 
     }
 }
 
+void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
+{
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> myneighbours = dt->getneighbours();
+
+    if (slmpi::count() == 1 || dt->isoverlap() == false)
+        return;
+
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+
+    std::vector<std::vector<int>> cellvalsforneighbours(numneighbours);
+    std::vector<std::vector<int>> cellvalsfromneighbours(numneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        physicalregion* iopr = prs->get(dt->getinneroverlap(cn));
+        physicalregion* oopr = prs->get(dt->getouteroverlap(cn));
+
+        cellvalsforneighbours[n].resize(iopr->countelements());
+        cellvalsfromneighbours[n].resize(oopr->countelements());
+
+        std::vector<std::vector<int>>* ellist = iopr->getelementlist();
+
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < ellist->at(i).size(); j++)
+            {
+                cellvalsforneighbours[n][index] = cellvalues[i][ellist->at(i)[j]];
+                index++;
+            }
+        }
+    }
+
+    slmpi::exchange(myneighbours, cellvalsforneighbours, cellvalsfromneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        std::vector<std::vector<int>>* ellist = prs->get(dt->getouteroverlap(cn))->getelementlist();
+
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < ellist->at(i).size(); j++)
+            {
+                // The owner of the inner overlap decides:
+                cellvalues[i][ellist->at(i)[j]] = cellvalsfromneighbours[n][index];
+                index++;
+            }
+        }
+    }
+}
+
