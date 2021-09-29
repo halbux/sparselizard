@@ -151,6 +151,9 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         bool adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosity);
         void setadaptivity(expression criterion, int lownumsplits, int highnumsplits, double critrange); // critrange -1 for automatic choice
 
+        // Guarantee same cell ordering between inner overlap and neighbour outer overlap:
+        void fixoverlapcellordering(void);
+
         // FOR DEBUG. The physical regions are replaced by disjoint regions + 1:
         void writewithdisjointregions(std::string);
         // Print the disjoint region list in every physical region:
