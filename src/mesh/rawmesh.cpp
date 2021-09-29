@@ -1328,7 +1328,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     // Container to store each outer interface edge number and split depth:
     std::vector<std::vector<int>> nsforneighbours, nsfromneighbours;
-    myalgorithm::getedgesinouterinterfaces(nsforneighbours, nsfromneighbours);
+    myalgorithm::getedgesininnerinterfaces(nsforneighbours, nsfromneighbours);
     
     std::vector<int> leavesnumsplits;
     newhtracker->countsplits(leavesnumsplits);

@@ -1988,7 +1988,7 @@ void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
     }
 }
 
-void myalgorithm::getedgesinouterinterfaces(std::vector<std::vector<int>>& oiedgelists, std::vector<std::vector<int>>& iiedgelistspreallocated)
+void myalgorithm::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated)
 {
     elements* els = universe::getrawmesh()->getelements();
     physicalregions* prs = universe::getrawmesh()->getphysicalregions();
@@ -1997,44 +1997,44 @@ void myalgorithm::getedgesinouterinterfaces(std::vector<std::vector<int>>& oiedg
     int numneighbours = dt->countneighbours();
     std::vector<int> myneighbours = dt->getneighbours();
     
-    oiedgelists.resize(numneighbours);
-    iiedgelistspreallocated.resize(numneighbours);
+    iiedgelists.resize(numneighbours);
+    oiedgelistspreallocated.resize(numneighbours);
 
     for (int n = 0; n < numneighbours; n++)
     {
         int cn = myneighbours[n];
     
-        std::vector<int> outerinterfaces = {}, innerinterfaces = {};
+        std::vector<int> innerinterfaces = {}, outerinterfaces = {};
         if (dt->isoverlap())
         {
-            outerinterfaces = dt->getouteroverlapinterface(cn);
             innerinterfaces = dt->getinneroverlapinterface(cn);
+            outerinterfaces = dt->getouteroverlapinterface(cn);
         }
         else
-            outerinterfaces = dt->getnooverlapinterface(cn);
+            innerinterfaces = dt->getnooverlapinterface(cn);
             
-        std::vector< std::vector<std::vector<int>>* > outerellists(outerinterfaces.size()), innerellists(innerinterfaces.size());
-        for (int i = 0; i < outerinterfaces.size(); i++)
-            outerellists[i] = prs->get(outerinterfaces[i])->getelementlist();
+        std::vector< std::vector<std::vector<int>>* > innerellists(innerinterfaces.size()), outerellists(outerinterfaces.size());
         for (int i = 0; i < innerinterfaces.size(); i++)
             innerellists[i] = prs->get(innerinterfaces[i])->getelementlist();
+        for (int i = 0; i < outerinterfaces.size(); i++)
+            outerellists[i] = prs->get(outerinterfaces[i])->getelementlist();
 
-        std::vector<bool> isinoi, isinii;
+        std::vector<bool> isinii, isinoi;
             
-        int numouteredges = els->istypeinelementlists(1, outerellists, isinoi, false);
-        int numinneredges = numouteredges;
+        int numinneredges = els->istypeinelementlists(1, innerellists, isinii, false);
+        int numouteredges = numinneredges;
         if (dt->isoverlap())
-            numinneredges = els->istypeinelementlists(1, innerellists, isinii, false);
+            numouteredges = els->istypeinelementlists(1, outerellists, isinoi, false);
         
-        oiedgelists[n] = std::vector<int>(2*numouteredges, -1);
-        iiedgelistspreallocated[n] = std::vector<int>(2*numinneredges, -1);
+        iiedgelists[n] = std::vector<int>(2*numinneredges, -1);
+        oiedgelistspreallocated[n] = std::vector<int>(2*numouteredges, -1);
         
         int index = 0;
-        for (int e = 0; e < isinoi.size(); e++)
+        for (int e = 0; e < isinii.size(); e++)
         {
-            if (isinoi[e])
+            if (isinii[e])
             {
-                oiedgelists[n][2*index] = e;
+                iiedgelists[n][2*index] = e;
                 index++;
             }
         }
