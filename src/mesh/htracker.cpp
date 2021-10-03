@@ -739,13 +739,13 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     }
 }
 
-void htracker::isininneroverlap(std::vector<bool>& isinio)
+void htracker::isownleaf(std::vector<bool>& iol)
 {
     elements* myelements = getoriginalmesh()->getelements();
     physicalregions* myphysicalregions = getoriginalmesh()->getphysicalregions();
     std::shared_ptr<dtracker> dt = getoriginalmesh()->getdtracker();
 
-    isinio = std::vector<bool>(numleaves, true);
+    iol = std::vector<bool>(numleaves, true);
     if (dt->isdefined() == false || dt->isoverlap() == false)
         return;
 
@@ -767,7 +767,7 @@ void htracker::isininneroverlap(std::vector<bool>& isinio)
     getoriginalelement(oet, oei);
     
     for (int i = 0; i < numleaves; i++)
-        isinio[i] = isinelemlist[oet[i]][oei[i]];
+        iol[i] = isinelemlist[oet[i]][oei[i]];
 }
 
 std::vector<int> htracker::countupperbound(void)
