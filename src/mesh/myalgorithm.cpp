@@ -870,7 +870,7 @@ int myalgorithm::factorial(int n)
     return out;
 }
 
-void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
+void myalgorithm::assignedgenumbers(std::vector<bool>& isownelement, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
 {
     std::vector<int> nn(8), ne(8);
     for (int i = 0; i < 8; i++)
@@ -887,9 +887,10 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         numnodes += cornercoords[i].size()/3;
         numedges += ne[i]*cornercoords[i].size()/nn[i]/3;
     }
+    std::vector<bool> isownbary(numedges, false);
     std::vector<double> barys(3*numedges + 3*numnodes);
 
-    int ce = 0, cn = 0;
+    int ce = 0, cn = 0, cc = 0;
     for (int i = 0; i < 8; i++)
     {
         element myelement(i);
@@ -900,6 +901,9 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         {
             for (int e = 0; e < ne[i]; e++)
             {
+                if (isownelement[cc])
+                    isownbary[ce] = true;
+                            
                 int na = edgenodedef[2*e+0];
                 int nb = edgenodedef[2*e+1];
                 
@@ -917,15 +921,16 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
                 
                 cn++;
             }
+            cc++;
         }
     }
     
     std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+        
     if (dt->isdefined() && slmpi::count() > 1)
     {
-        int numneighbours = dt->countneighbours();
-        std::vector<int> neighbours = dt->getneighbours();
-        
         std::vector<double> allcornercoords(3*numnodes);
         int cind = 0;
         for (int i = 0; i < 8; i++)

@@ -621,10 +621,13 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     std::vector<std::vector<double>> cornerarc, cornerapc;
     atleaves(cornerarc, cornerapc, true);    
     
+    std::vector<bool> iol;
+    isownleaf(iol);
+
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
     std::vector<bool> isedgesplit;
-    myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
+    myalgorithm::assignedgenumbers(iol, cornerapc, edgenumbers, isedgesplit);
     
 
     // Preallocate output containers to upper bound size:
