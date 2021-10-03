@@ -739,6 +739,37 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     }
 }
 
+void htracker::isininneroverlap(std::vector<bool>& isinio)
+{
+    elements* myelements = getoriginalmesh()->getelements();
+    physicalregions* myphysicalregions = getoriginalmesh()->getphysicalregions();
+    std::shared_ptr<dtracker> dt = getoriginalmesh()->getdtracker();
+
+    isinio = std::vector<bool>(numleaves, true);
+    if (dt->isdefined() == false || dt->isoverlap() == false)
+        return;
+
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+
+    std::vector<std::vector<std::vector<int>>*> ioelemlists(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        ioelemlists[n] = myphysicalregions->get(dt->getinneroverlap(neighbours[n]))->getelementlist();
+
+    std::vector<std::vector<bool>> isinelemlist(8);
+    for (int i = 0; i < 8; i++)
+    {
+        if (originalcount[i] > 0) // cells only
+            myelements->istypeinelementlists(i, ioelemlists, isinelemlist[i], false);
+    }
+
+    std::vector<int> oet, oei;
+    getoriginalelement(oet, oei);
+    
+    for (int i = 0; i < numleaves; i++)
+        isinio[i] = isinelemlist[oet[i]][oei[i]];
+}
+
 std::vector<int> htracker::countupperbound(void)
 {
     std::vector<int> nit = countintypes();

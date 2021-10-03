@@ -143,6 +143,9 @@ class htracker
         
         // Get the node coordinates 'ac' of all transition elements after adaptation.
         void getadaptedcoordinates(std::vector<std::vector<double>>& ac);
+        
+        // Check which leaves are in the inner overlap of this rank (all true for no overlap DDM):
+        void isininneroverlap(std::vector<bool>& isinio);
     
         // Get an upper bound of number of transition elements that can be created from all leaves:
         std::vector<int> countupperbound(void);
