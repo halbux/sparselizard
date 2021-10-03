@@ -640,6 +640,22 @@ void myalgorithm::select(std::vector<bool>& vals, indexmat selectedindexes, std:
         selected[i] = vals[selptr[i]];
 }
 
+void myalgorithm::select(std::vector<bool>& selection, std::vector<int>& vals, std::vector<int>& selected)
+{
+    int numselected = counttrue(selection);
+    selected.resize(numselected);
+
+    int index = 0;
+    for (int i = 0; i < selection.size(); i++)
+    {
+        if (selection[i])
+        {
+            selected[index] = vals[i];
+            index++;
+        }
+    }
+}
+
 bool myalgorithm::isflipped(std::vector<int>& a, std::vector<int>& b)
 {
     int num = a.size();

@@ -86,6 +86,7 @@ namespace myalgorithm
     // Select indexes of a vector:
     void select(std::vector<int>& vals, std::vector<int>& selectedindexes, std::vector<int>& selected);
     void select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected);
+    void select(std::vector<bool>& selection, std::vector<int>& vals, std::vector<int>& selected);
     
     // Compare the ordering of two vectors (vectors must be circularly or anti-circularly identical and not empty).
     // Length 1 is considered not flipped. Length 2 is considered flipped if not identical.
