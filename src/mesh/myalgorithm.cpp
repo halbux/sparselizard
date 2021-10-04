@@ -1955,3 +1955,56 @@ void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
     }
 }
 
+void myalgorithm::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated)
+{
+    elements* els = universe::getrawmesh()->getelements();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> myneighbours = dt->getneighbours();
+
+    iiedgelists = std::vector<std::vector<int>>(numneighbours, std::vector<int>(0));
+    oiedgelistspreallocated = std::vector<std::vector<int>>(numneighbours, std::vector<int>(0));
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        std::vector<int> innerinterfaces = {}, outerinterfaces = {};
+        if (dt->isoverlap())
+        {
+            innerinterfaces = dt->getinneroverlapinterface(cn);
+            outerinterfaces = dt->getouteroverlapinterface(cn);
+        }
+        else
+            innerinterfaces = dt->getnooverlapinterface(cn);
+
+        std::vector< std::vector<std::vector<int>>* > innerellists(innerinterfaces.size()), outerellists(outerinterfaces.size());
+        for (int i = 0; i < innerinterfaces.size(); i++)
+            innerellists[i] = prs->get(innerinterfaces[i])->getelementlist();
+        for (int i = 0; i < outerinterfaces.size(); i++)
+            outerellists[i] = prs->get(outerinterfaces[i])->getelementlist();
+
+        std::vector<bool> isinii, isinoi;
+
+        int numinneredges = els->istypeinelementlists(1, innerellists, isinii, false);
+        int numouteredges = numinneredges;
+        if (dt->isoverlap())
+            numouteredges = els->istypeinelementlists(1, outerellists, isinoi, false);
+
+        iiedgelists[n] = std::vector<int>(2*numinneredges, -1);
+        oiedgelistspreallocated[n] = std::vector<int>(2*numouteredges, -1);
+
+        int index = 0;
+        for (int e = 0; e < isinii.size(); e++)
+        {
+            if (isinii[e])
+            {
+                iiedgelists[n][2*index] = e;
+                index++;
+            }
+        }
+    }
+}
+
