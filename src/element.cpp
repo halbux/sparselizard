@@ -1568,15 +1568,18 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
     double l13 = geotools::getdistance(1,3, calced);
     double l25 = geotools::getdistance(2,5, calced);
 
+    // Noise threshold required for AMR with overlap DDM:
+    double nt = 0.999;
+
     // Select shortest edge:
-    if (l04 <= l13 && l04 <= l25)
+    if (l04 <= nt*l13 && l04 <= nt*l25)
         return 0;
-    if (l13 <= l04 && l13 <= l25)
+    if (l13 <= nt*l04 && l13 <= nt*l25)
         return 1;
-    if (l25 <= l04 && l25 <= l13)
+    if (l25 <= nt*l04 && l25 <= nt*l13)
         return 2;
         
-    abort(); // fix return warning
+    return 0;
 }
 
 std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers)
