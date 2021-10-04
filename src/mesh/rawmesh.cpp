@@ -1599,6 +1599,58 @@ void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnums
     myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits, critrange)};   
 }
 
+void rawmesh::fixoverlapcellordering(void)
+{
+    if (mydtracker->isdefined() == false || mydtracker->isoverlap() == false || slmpi::count() == 1)
+        return;
+
+    int numneighbours = mydtracker->countneighbours();
+    std::vector<int> neighbours = mydtracker->getneighbours();
+
+    std::vector<std::vector<double>> barysforneighbours(numneighbours), barysfromneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = neighbours[n];
+
+        physicalregion* iopr = myphysicalregions.get(mydtracker->getinneroverlap(cn));
+        physicalregion* oopr = myphysicalregions.get(mydtracker->getouteroverlap(cn));
+
+        myelements.getbarycenters(iopr->getelementlist(), barysforneighbours[n]);
+        barysfromneighbours[n] = std::vector<double>(3*oopr->countelements());
+    }
+
+    slmpi::exchange(neighbours, barysforneighbours, barysfromneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        physicalregion* oopr = myphysicalregions.get(mydtracker->getouteroverlap(neighbours[n]));
+        std::vector<std::vector<int>>* ellist = oopr->getelementlist();
+
+        std::vector<double> oobarys;
+        myelements.getbarycenters(ellist, oobarys);        
+
+        std::vector<int> posfound;
+        int numfound = myalgorithm::findcoordinates(barysfromneighbours[n], oobarys, posfound);
+
+        // Catch any mesh mismatch in the overlap:
+        if (numfound != oobarys.size()/3)
+        {
+            std::cout << "Error in 'rawmesh' object: could not match all cells across DDM overlap regions" << std::endl;
+            abort();
+        }
+
+        // Reorder the outer overlap cell list to match the neighbour inner overlap cell ordering:
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            std::vector<int> curellist = ellist->at(i);
+            for (int j = 0; j < curellist.size(); j++)
+                ellist->at(i)[posfound[index+j] - index] = curellist[j];
+            index += curellist.size();
+        }
+    }
+}
+
 void rawmesh::writewithdisjointregions(std::string name)
 {
     // Create a new 'physicalregions' object where the ith 
