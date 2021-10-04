@@ -256,6 +256,9 @@ namespace myalgorithm
     // Helper function to be called recursively.
     void inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall);
     
+    // The inner overlap cell values are decided by the owner of the inner overlap:
+    void fixatoverlap(std::vector<std::vector<int>>& cellvalues);
+    
 };
 
 #endif
