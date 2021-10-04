@@ -273,7 +273,7 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     
     // For DDM:
     mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), globalgeometryskin, numoverlaplayers));
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->discoverconnectivity(10, verbosity);
         mydtracker->overlap();
@@ -287,7 +287,7 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     
     // For DDM:
     long long int* orientrenum = NULL;
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->mapinterfaces();
         mydtracker->createglobalnodenumbers();
@@ -505,7 +505,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     
     // For DDM:
     mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), globalgeometryskin, numoverlaplayers));
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->discoverconnectivity(10, verbosity);
         mydtracker->overlap();
@@ -519,7 +519,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     
     // For DDM:
     long long int* orientrenum = NULL;
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->mapinterfaces();
         mydtracker->createglobalnodenumbers();

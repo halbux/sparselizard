@@ -4,6 +4,11 @@
 #include "physicalregions.h"
 
 
+bool dtracker::isdefined(void)
+{
+    return (mynumoverlaplayers >= 0);
+}
+
 void dtracker::errorundefined(void)
 {
     if (mynumoverlaplayers < 0)
