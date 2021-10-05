@@ -157,6 +157,7 @@ namespace myalgorithm
     
     // Concatenate vectors:
     std::vector<int> concatenate(std::vector<std::vector<int>> tocat);
+    void concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated);
     
     // Return -1 if a < b, 0 if a = b and +1 if a > b:
     int inequalitytoint(int a, int b);

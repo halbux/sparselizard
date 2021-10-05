@@ -1096,6 +1096,25 @@ std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
     return output;
 }
 
+void myalgorithm::concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated)
+{
+    // Get the total size:
+    int len = 0;
+    for (int i = 0; i < tocat.size(); i++)
+        len += tocat[i].size();
+
+    cated.resize(len);
+
+    int index = 0;
+    for (int i = 0; i < tocat.size(); i++)
+    {
+        for (int j = 0; j < tocat[i].size(); j++)
+            cated[index+j] = tocat[i][j];
+
+        index += tocat[i].size();
+    }
+}
+
 int myalgorithm::inequalitytoint(int a, int b)
 {
     if (a < b)
