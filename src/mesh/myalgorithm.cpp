@@ -2027,3 +2027,50 @@ void myalgorithm::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedg
     }
 }
 
+std::vector<int> myalgorithm::appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup)
+{
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+    
+    int origlen = toappendto.size();
+    
+    std::vector<int> grouped = {}, appendlens = {};
+    if (dt->isdefined() && slmpi::count() > 1)
+    {
+        std::vector<int> snds(2*numneighbours);
+        for (int n = 0; n < numneighbours; n++)
+        {
+            snds[2*n+0] = togroup;
+            snds[2*n+1] = toappend.size();
+        }
+        slmpi::exchange(neighbours, snds, appendlens);
+
+        grouped = extract(appendlens, 2, 0);
+    }
+    
+    toappendto.resize(origlen + toappend.size() + sum(appendlens));
+    
+    for (int i = 0; i < toappend.size(); i++)
+        toappendto[origlen+i] = toappend[i];
+
+    if (dt->isdefined() && slmpi::count() > 1)
+    {
+        std::vector<int> sendlens(numneighbours, toappend.size());
+        std::vector<std::vector<double>> snds(numneighbours, toappend);
+        std::vector<double*> sendbuffers(numneighbours), receivebuffers(numneighbours);
+
+        int index = origlen + toappend.size();
+        for (int n = 0; n < numneighbours; n++)
+        {
+            sendbuffers[n] = snds[n].data();
+            receivebuffers[n] = toappendto.data() + index;
+
+            index += appendlens[n];
+        }
+        slmpi::exchange(neighbours, sendlens, sendbuffers, appendlens, receivebuffers);
+    }
+
+    return grouped;
+}
+

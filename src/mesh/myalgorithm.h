@@ -263,6 +263,9 @@ namespace myalgorithm
     // Get the list of edges in the inner overlap interface with each neighbour and preallocate for the outer overlap interface.
     // In case of no-overlap DDM the inner and outer overlap interfaces both equal the no-overlap interface.
     void getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated);
+    
+    // Append the values of this rank and all neighbour ranks (in case of DDM). Also get the value 'togroup' on each neighbour rank.
+    std::vector<int> appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup);
 };
 
 #endif
