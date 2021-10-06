@@ -872,6 +872,14 @@ int myalgorithm::factorial(int n)
 
 void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
 {
+    int numranks = slmpi::count();
+    int rank = slmpi::getrank();
+    
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+    
+    
     std::vector<int> nn(8), ne(8);
     for (int i = 0; i < 8; i++)
     {
@@ -881,15 +889,13 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
     }
 
     // Compute the barycenter coordinates of all nodes and edges (first the edges then the nodes):
-    int numnodes = 0, numedges = 0;
+    int numedges = 0;
     for (int i = 0; i < 8; i++)
-    {
-        numnodes += cornercoords[i].size()/3;
         numedges += ne[i]*cornercoords[i].size()/nn[i]/3;
-    }
-    std::vector<double> barys(3*numedges + 3*numnodes);
+        
+    std::vector<double> barys(3*numedges);
 
-    int ce = 0, cn = 0;
+    int ce = 0;
     for (int i = 0; i < 8; i++)
     {
         element myelement(i);
@@ -909,16 +915,13 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
                 
                 ce++;
             }
-            for (int e = 0; e < nn[i]; e++)
-            {
-                barys[3*numedges+3*cn+0] = cornercoords[i][3*nn[i]*j+3*e+0];
-                barys[3*numedges+3*cn+1] = cornercoords[i][3*nn[i]*j+3*e+1];
-                barys[3*numedges+3*cn+2] = cornercoords[i][3*nn[i]*j+3*e+2];
-                
-                cn++;
-            }
         }
     }
+    
+    // Append the corner nodes to the barycenters:
+    std::vector<double> catcornercoords;
+    concatenate(cornercoords, catcornercoords);
+    appendneighbourvalues(barys, catcornercoords, -1);
     
     // Remove duplicated barycenters:
     std::vector<int> renumberingvector;
@@ -930,11 +933,11 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         edgenumbers[i] = renumberingvector[i];
     
     // Calculate which edges must be split:
-    std::vector<bool> isanodeatnum(numunique,false);
-    for (int i = 0; i < numnodes; i++)
+    std::vector<bool> isanodeatnum(numunique, false);
+    for (int i = 0; i < barys.size()/3-numedges; i++)
         isanodeatnum[renumberingvector[numedges+i]] = true;
 
-    isbarycenteronnode = std::vector<bool>(numedges,false);
+    isbarycenteronnode = std::vector<bool>(numedges, false);
     for (int i = 0; i < numedges; i++)
     {
         if (isanodeatnum[edgenumbers[i]])
