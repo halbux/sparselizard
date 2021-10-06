@@ -133,6 +133,25 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
     return numnonduplicates;
 }
 
+void myalgorithm::removeduplicates(std::vector<double>& coordinates)
+{
+    std::vector<int> renumberingvector;
+
+    int numuniques = removeduplicates(coordinates, renumberingvector);
+
+    std::vector<double> uniquecoords(3*numuniques);
+    for (int i = 0; i < renumberingvector.size(); i++)
+    {
+        int rn = renumberingvector[i];
+
+        uniquecoords[3*rn+0] = coordinates[3*i+0];
+        uniquecoords[3*rn+1] = coordinates[3*i+1];
+        uniquecoords[3*rn+2] = coordinates[3*i+2];
+    }
+
+    coordinates = uniquecoords;
+}
+
 void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector)
 {
     if (reorderingvector.size() != tosort.size())

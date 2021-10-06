@@ -38,6 +38,9 @@ namespace myalgorithm
     // The output gives the number of non-duplicated nodes.
     int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
     
+    // Remove duplicated coordinates:
+    void removeduplicates(std::vector<double>& coordinates);
+    
     // This is for a vector of ints:
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
     // This is for a vector of doubles:
