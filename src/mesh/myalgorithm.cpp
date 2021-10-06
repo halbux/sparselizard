@@ -973,6 +973,83 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
         if (isanodeatnum[edgenumbers[i]])
             isbarycenteronnode[i] = true;
     }
+    
+    // Harmonize the edges numbers across neighbour ranks:
+    if (dt->isdefined() == false || numranks == 1)
+        return;
+        
+    std::vector<int> ownedgesindexes;
+    find(isownedge, numownedges, ownedgesindexes);
+        
+    barys.resize(3*numedges);
+    
+    std::vector<double> ownbarys(3*numownedges);
+    selectcoordinates(isownedge, barys, ownbarys.data());
+    
+    // Get edges count on all ranks to create unique edge numbers:
+    std::vector<int> fragment = {numedges};
+    std::vector<int> allnumedges;
+    slmpi::allgather(fragment, allnumedges);
+    
+    // Use long long int to allow more edges in the mesh.
+    std::vector<int> edgenumshift(numranks, 0);
+    for (int i = 1; i < numranks; i++)
+        edgenumshift[i] = edgenumshift[i-1] + allnumedges[i-1];
+    
+    for (int i = 0; i < numedges; i++)
+        edgenumbers[i] += edgenumshift[rank];
+    
+    // Extract the own edges numbers:
+    std::vector<int> ownedgenumbers;
+    select(edgenumbers, ownedgesindexes, ownedgenumbers);
+    
+    std::vector<std::vector<double>> ownbaryssends(numneighbours, ownbarys);
+    std::vector<std::vector<double>> ownbarysrecvs(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        ownbarysrecvs[n].resize(3*neighboursnumownedges[n]);
+        
+    slmpi::exchange(neighbours, ownbaryssends, ownbarysrecvs);
+    
+    // Harmonize the no-overlap interface:
+    std::vector<std::vector<int>> ownedgenumberssends(numneighbours, ownedgenumbers);
+    std::vector<std::vector<int>> ownedgenumbersrecvs(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        ownedgenumbersrecvs[n].resize(neighboursnumownedges[n]);
+        
+    slmpi::exchange(neighbours, ownedgenumberssends, ownedgenumbersrecvs);
+
+    // Reused below:
+    std::vector<std::vector<int>> posfound(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        myalgorithm::findcoordinates(ownbarysrecvs[n], barys, posfound[n]);
+
+        for (int i = 0; i < posfound[n].size(); i++)
+        {
+            if (posfound[n][i] != -1 && isownedge[i])
+                edgenumbers[i] = std::min(edgenumbers[i], ownedgenumbersrecvs[n][posfound[n][i]]); // min rank decides
+        }
+    }
+
+    // Harmonize the outer overlap interface:
+    if (dt->isoverlap() == false)
+        return;
+
+    // Update the own edges numbers:
+    select(edgenumbers, ownedgesindexes, ownedgenumbers);
+
+    // Send the no-overlap harmonized edge numbers:
+    ownedgenumberssends = std::vector<std::vector<int>>(numneighbours, ownedgenumbers);
+    slmpi::exchange(neighbours, ownedgenumberssends, ownedgenumbersrecvs);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int i = 0; i < posfound[n].size(); i++)
+        {
+            if (posfound[n][i] != -1)
+                edgenumbers[i] = ownedgenumbersrecvs[n][posfound[n][i]];
+        }
+    }
 }
 
 std::vector<double> myalgorithm::separate(std::vector<double>& v, int blocklen, std::vector<int> sel)
