@@ -889,7 +889,7 @@ int myalgorithm::factorial(int n)
     return out;
 }
 
-void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
+void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
 {
     int numranks = slmpi::count();
     int rank = slmpi::getrank();
@@ -912,9 +912,11 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
     for (int i = 0; i < 8; i++)
         numedges += ne[i]*cornercoords[i].size()/nn[i]/3;
         
+    int numownedges = 0;
+    std::vector<bool> isownedge(numedges, false);
     std::vector<double> barys(3*numedges);
 
-    int ce = 0;
+    int ce = 0, cc = 0;
     for (int i = 0; i < 8; i++)
     {
         element myelement(i);
@@ -925,6 +927,12 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         {
             for (int e = 0; e < ne[i]; e++)
             {
+                if (isownelem[cc])
+                {
+                    numownedges++;
+                    isownedge[ce] = true;
+                }
+                
                 int na = edgenodedef[2*e+0];
                 int nb = edgenodedef[2*e+1];
                 
@@ -934,13 +942,16 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
                 
                 ce++;
             }
+            
+            cc++;
         }
     }
     
     // Append the corner nodes to the barycenters:
     std::vector<double> catcornercoords;
     concatenate(cornercoords, catcornercoords);
-    appendneighbourvalues(barys, catcornercoords, -1);
+    removeduplicates(catcornercoords);
+    std::vector<int> neighboursnumownedges = appendneighbourvalues(barys, catcornercoords, numownedges);
     
     // Remove duplicated barycenters:
     std::vector<int> renumberingvector;

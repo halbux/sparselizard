@@ -612,6 +612,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
 void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
 {
     elements* myelements = getoriginalmesh()->getelements();
+    std::shared_ptr<dtracker> mydtracker = getoriginalmesh()->getdtracker();
     
     std::vector<int> ne(8);
     for (int i = 0; i < 8; i++)
@@ -621,10 +622,14 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     std::vector<std::vector<double>> cornerarc, cornerapc;
     atleaves(cornerarc, cornerapc, true);    
     
+    std::vector<bool> iol(numleaves, true);
+    if (mydtracker->isdefined() && mydtracker->isoverlap())
+        isinneroverlapleaf(iol);
+    
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
     std::vector<bool> isedgesplit;
-    myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
+    myalgorithm::assignedgenumbers(iol, cornerapc, edgenumbers, isedgesplit);
     
 
     // Preallocate output containers to upper bound size:
