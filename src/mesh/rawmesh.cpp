@@ -1604,6 +1604,11 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
         currentphysicalregion->removeduplicatedelements();
     }
     
+    // Match the empty regions of the original mesh:
+    std::vector<int> allorigprs = getoriginalmeshpointer()->getphysicalregions()->getallnumbers();
+    for (int i = 0; i < allorigprs.size(); i++)
+        myhadaptedmesh->myphysicalregions.get(allorigprs[i]);
+    
     
     ///// Continue processing the mesh:
     
