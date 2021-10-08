@@ -4,6 +4,11 @@
 #include "physicalregions.h"
 
 
+bool dtracker::isdefined(void)
+{
+    return (mynumoverlaplayers >= 0);
+}
+
 void dtracker::errorundefined(void)
 {
     if (mynumoverlaplayers < 0)
@@ -49,6 +54,11 @@ std::shared_ptr<rawmesh> dtracker::getrawmesh(void)
         std::cout << "Error in 'dtracker' object: cannot get rawmesh object (weak pointer is expired)" << std::endl;
         abort();
     }
+}
+
+void dtracker::setrawmesh(std::shared_ptr<rawmesh> rm)
+{
+    myrawmesh = rm;
 }
 
 bool dtracker::isoverlap(void)
@@ -2002,6 +2012,66 @@ int dtracker::getouteroverlapskin(int neighbour)
     else
     {
         std::cout << "Error in 'dtracker' object: cannot provide the requested outer overlap skin region" << std::endl;
+        abort();
+    }
+}
+
+std::vector<int> dtracker::getnooverlapinterface(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myisneighbour.size())
+    {
+        std::vector<int> output = {};
+        for (int d = 0; d < 3; d++)
+        {
+            int cpr = mynooverlapinterfaces[3*neighbour+d];
+            if (cpr >= 0)
+                output.push_back(cpr);
+        }
+        return output;
+    }
+    else
+    {
+        std::cout << "Error in 'dtracker' object: requested on rank " << slmpi::getrank() << " the no-overlap interface to neighbour rank " << neighbour << " but there are only " << slmpi::count() << " ranks in total" << std::endl;
+        abort();
+    }
+}
+
+std::vector<int> dtracker::getinneroverlapinterface(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myisneighbour.size())
+    {
+        std::vector<int> output = {};
+        for (int d = 0; d < 3; d++)
+        {
+            int cpr = myinneroverlapinterfaces[3*neighbour+d];
+            if (cpr >= 0)
+                output.push_back(cpr);
+        }
+        return output;
+    }
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap interface region" << std::endl;
+        abort();
+    }
+}
+
+std::vector<int> dtracker::getouteroverlapinterface(int neighbour)
+{
+    if (neighbour >= 0 && neighbour < myisneighbour.size())
+    {
+        std::vector<int> output = {};
+        for (int d = 0; d < 3; d++)
+        {
+            int cpr = myouteroverlapinterfaces[3*neighbour+d];
+            if (cpr >= 0)
+                output.push_back(cpr);
+        }
+        return output;
+    }
+    else
+    {
+        std::cout << "Error in 'dtracker' object: cannot provide the requested outer overlap interface region" << std::endl;
         abort();
     }
 }

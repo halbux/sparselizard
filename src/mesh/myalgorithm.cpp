@@ -133,6 +133,25 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
     return numnonduplicates;
 }
 
+void myalgorithm::removeduplicates(std::vector<double>& coordinates)
+{
+    std::vector<int> renumberingvector;
+
+    int numuniques = removeduplicates(coordinates, renumberingvector);
+
+    std::vector<double> uniquecoords(3*numuniques);
+    for (int i = 0; i < renumberingvector.size(); i++)
+    {
+        int rn = renumberingvector[i];
+
+        uniquecoords[3*rn+0] = coordinates[3*i+0];
+        uniquecoords[3*rn+1] = coordinates[3*i+1];
+        uniquecoords[3*rn+2] = coordinates[3*i+2];
+    }
+
+    coordinates = uniquecoords;
+}
+
 void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector)
 {
     if (reorderingvector.size() != tosort.size())
@@ -870,8 +889,16 @@ int myalgorithm::factorial(int n)
     return out;
 }
 
-void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
+void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
 {
+    int numranks = slmpi::count();
+    int rank = slmpi::getrank();
+    
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+    
+    
     std::vector<int> nn(8), ne(8);
     for (int i = 0; i < 8; i++)
     {
@@ -881,15 +908,15 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
     }
 
     // Compute the barycenter coordinates of all nodes and edges (first the edges then the nodes):
-    int numnodes = 0, numedges = 0;
+    int numedges = 0;
     for (int i = 0; i < 8; i++)
-    {
-        numnodes += cornercoords[i].size()/3;
         numedges += ne[i]*cornercoords[i].size()/nn[i]/3;
-    }
-    std::vector<double> barys(3*numedges + 3*numnodes);
+        
+    int numownedges = 0;
+    std::vector<bool> isownedge(numedges, false);
+    std::vector<double> barys(3*numedges);
 
-    int ce = 0, cn = 0;
+    int ce = 0, cc = 0;
     for (int i = 0; i < 8; i++)
     {
         element myelement(i);
@@ -900,6 +927,12 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         {
             for (int e = 0; e < ne[i]; e++)
             {
+                if (isownelem[cc])
+                {
+                    numownedges++;
+                    isownedge[ce] = true;
+                }
+                
                 int na = edgenodedef[2*e+0];
                 int nb = edgenodedef[2*e+1];
                 
@@ -909,16 +942,16 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
                 
                 ce++;
             }
-            for (int e = 0; e < nn[i]; e++)
-            {
-                barys[3*numedges+3*cn+0] = cornercoords[i][3*nn[i]*j+3*e+0];
-                barys[3*numedges+3*cn+1] = cornercoords[i][3*nn[i]*j+3*e+1];
-                barys[3*numedges+3*cn+2] = cornercoords[i][3*nn[i]*j+3*e+2];
-                
-                cn++;
-            }
+            
+            cc++;
         }
     }
+    
+    // Append the corner nodes to the barycenters:
+    std::vector<double> catcornercoords;
+    concatenate(cornercoords, catcornercoords);
+    removeduplicates(catcornercoords);
+    std::vector<int> neighboursnumownedges = appendneighbourvalues(barys, catcornercoords, numownedges);
     
     // Remove duplicated barycenters:
     std::vector<int> renumberingvector;
@@ -930,15 +963,92 @@ void myalgorithm::assignedgenumbers(std::vector<std::vector<double>>& cornercoor
         edgenumbers[i] = renumberingvector[i];
     
     // Calculate which edges must be split:
-    std::vector<bool> isanodeatnum(numunique,false);
-    for (int i = 0; i < numnodes; i++)
+    std::vector<bool> isanodeatnum(numunique, false);
+    for (int i = 0; i < barys.size()/3-numedges; i++)
         isanodeatnum[renumberingvector[numedges+i]] = true;
 
-    isbarycenteronnode = std::vector<bool>(numedges,false);
+    isbarycenteronnode = std::vector<bool>(numedges, false);
     for (int i = 0; i < numedges; i++)
     {
         if (isanodeatnum[edgenumbers[i]])
             isbarycenteronnode[i] = true;
+    }
+    
+    // Harmonize the edges numbers across neighbour ranks:
+    if (dt->isdefined() == false || numranks == 1)
+        return;
+        
+    std::vector<int> ownedgesindexes;
+    find(isownedge, numownedges, ownedgesindexes);
+        
+    barys.resize(3*numedges);
+    
+    std::vector<double> ownbarys(3*numownedges);
+    selectcoordinates(isownedge, barys, ownbarys.data());
+    
+    // Get edges count on all ranks to create unique edge numbers:
+    std::vector<int> fragment = {numedges};
+    std::vector<int> allnumedges;
+    slmpi::allgather(fragment, allnumedges);
+    
+    // Use long long int to allow more edges in the mesh.
+    std::vector<int> edgenumshift(numranks, 0);
+    for (int i = 1; i < numranks; i++)
+        edgenumshift[i] = edgenumshift[i-1] + allnumedges[i-1];
+    
+    for (int i = 0; i < numedges; i++)
+        edgenumbers[i] += edgenumshift[rank];
+    
+    // Extract the own edges numbers:
+    std::vector<int> ownedgenumbers;
+    select(edgenumbers, ownedgesindexes, ownedgenumbers);
+    
+    std::vector<std::vector<double>> ownbaryssends(numneighbours, ownbarys);
+    std::vector<std::vector<double>> ownbarysrecvs(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        ownbarysrecvs[n].resize(3*neighboursnumownedges[n]);
+        
+    slmpi::exchange(neighbours, ownbaryssends, ownbarysrecvs);
+    
+    // Harmonize the no-overlap interface:
+    std::vector<std::vector<int>> ownedgenumberssends(numneighbours, ownedgenumbers);
+    std::vector<std::vector<int>> ownedgenumbersrecvs(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        ownedgenumbersrecvs[n].resize(neighboursnumownedges[n]);
+        
+    slmpi::exchange(neighbours, ownedgenumberssends, ownedgenumbersrecvs);
+
+    // Reused below:
+    std::vector<std::vector<int>> posfound(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        myalgorithm::findcoordinates(ownbarysrecvs[n], barys, posfound[n]);
+
+        for (int i = 0; i < posfound[n].size(); i++)
+        {
+            if (posfound[n][i] != -1 && isownedge[i])
+                edgenumbers[i] = std::min(edgenumbers[i], ownedgenumbersrecvs[n][posfound[n][i]]); // min rank decides
+        }
+    }
+
+    // Harmonize the outer overlap interface:
+    if (dt->isoverlap() == false)
+        return;
+
+    // Update the own edges numbers:
+    select(edgenumbers, ownedgesindexes, ownedgenumbers);
+
+    // Send the no-overlap harmonized edge numbers:
+    ownedgenumberssends = std::vector<std::vector<int>>(numneighbours, ownedgenumbers);
+    slmpi::exchange(neighbours, ownedgenumberssends, ownedgenumbersrecvs);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        for (int i = 0; i < posfound[n].size(); i++)
+        {
+            if (posfound[n][i] != -1)
+                edgenumbers[i] = ownedgenumbersrecvs[n][posfound[n][i]];
+        }
     }
 }
 
@@ -1094,6 +1204,25 @@ std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
     }
     
     return output;
+}
+
+void myalgorithm::concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated)
+{
+    // Get the total size:
+    int len = 0;
+    for (int i = 0; i < tocat.size(); i++)
+        len += tocat[i].size();
+
+    cated.resize(len);
+
+    int index = 0;
+    for (int i = 0; i < tocat.size(); i++)
+    {
+        for (int j = 0; j < tocat[i].size(); j++)
+            cated[index+j] = tocat[i][j];
+
+        index += tocat[i].size();
+    }
 }
 
 int myalgorithm::inequalitytoint(int a, int b)
@@ -1895,5 +2024,163 @@ void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool 
             }
         }
     }
+}
+
+void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
+{
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> myneighbours = dt->getneighbours();
+
+    if (dt->isdefined() == false || dt->isoverlap() == false || slmpi::count() == 1)
+        return;
+
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+
+    std::vector<std::vector<int>> cellvalsforneighbours(numneighbours);
+    std::vector<std::vector<int>> cellvalsfromneighbours(numneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        physicalregion* iopr = prs->get(dt->getinneroverlap(cn));
+        physicalregion* oopr = prs->get(dt->getouteroverlap(cn));
+
+        cellvalsforneighbours[n].resize(iopr->countelements());
+        cellvalsfromneighbours[n].resize(oopr->countelements());
+
+        std::vector<std::vector<int>>* ellist = iopr->getelementlist();
+
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < ellist->at(i).size(); j++)
+            {
+                cellvalsforneighbours[n][index] = cellvalues[i][ellist->at(i)[j]];
+                index++;
+            }
+        }
+    }
+
+    slmpi::exchange(myneighbours, cellvalsforneighbours, cellvalsfromneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        std::vector<std::vector<int>>* ellist = prs->get(dt->getouteroverlap(cn))->getelementlist();
+
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < ellist->at(i).size(); j++)
+            {
+                // The owner of the inner overlap decides:
+                cellvalues[i][ellist->at(i)[j]] = cellvalsfromneighbours[n][index];
+                index++;
+            }
+        }
+    }
+}
+
+void myalgorithm::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated)
+{
+    elements* els = universe::getrawmesh()->getelements();
+    physicalregions* prs = universe::getrawmesh()->getphysicalregions();
+
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> myneighbours = dt->getneighbours();
+
+    iiedgelists = std::vector<std::vector<int>>(numneighbours, std::vector<int>(0));
+    oiedgelistspreallocated = std::vector<std::vector<int>>(numneighbours, std::vector<int>(0));
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = myneighbours[n];
+
+        std::vector<int> innerinterfaces = {}, outerinterfaces = {};
+        if (dt->isoverlap())
+        {
+            innerinterfaces = dt->getinneroverlapinterface(cn);
+            outerinterfaces = dt->getouteroverlapinterface(cn);
+        }
+        else
+            innerinterfaces = dt->getnooverlapinterface(cn);
+
+        std::vector< std::vector<std::vector<int>>* > innerellists(innerinterfaces.size()), outerellists(outerinterfaces.size());
+        for (int i = 0; i < innerinterfaces.size(); i++)
+            innerellists[i] = prs->get(innerinterfaces[i])->getelementlist();
+        for (int i = 0; i < outerinterfaces.size(); i++)
+            outerellists[i] = prs->get(outerinterfaces[i])->getelementlist();
+
+        std::vector<bool> isinii, isinoi;
+
+        int numinneredges = els->istypeinelementlists(1, innerellists, isinii, false);
+        int numouteredges = numinneredges;
+        if (dt->isoverlap())
+            numouteredges = els->istypeinelementlists(1, outerellists, isinoi, false);
+
+        iiedgelists[n] = std::vector<int>(2*numinneredges, -1);
+        oiedgelistspreallocated[n] = std::vector<int>(2*numouteredges, -1);
+
+        int index = 0;
+        for (int e = 0; e < isinii.size(); e++)
+        {
+            if (isinii[e])
+            {
+                iiedgelists[n][2*index] = e;
+                index++;
+            }
+        }
+    }
+}
+
+std::vector<int> myalgorithm::appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup)
+{
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+    
+    int origlen = toappendto.size();
+    
+    std::vector<int> grouped = {}, appendlens = {};
+    if (dt->isdefined() && slmpi::count() > 1)
+    {
+        std::vector<int> snds(2*numneighbours);
+        for (int n = 0; n < numneighbours; n++)
+        {
+            snds[2*n+0] = togroup;
+            snds[2*n+1] = toappend.size();
+        }
+        slmpi::exchange(neighbours, snds, appendlens);
+
+        grouped = extract(appendlens, 2, 0);
+    }
+    
+    toappendto.resize(origlen + toappend.size() + sum(appendlens));
+    
+    for (int i = 0; i < toappend.size(); i++)
+        toappendto[origlen+i] = toappend[i];
+
+    if (dt->isdefined() && slmpi::count() > 1)
+    {
+        std::vector<int> sendlens(numneighbours, toappend.size());
+        std::vector<std::vector<double>> snds(numneighbours, toappend);
+        std::vector<double*> sendbuffers(numneighbours), receivebuffers(numneighbours);
+
+        int index = origlen + toappend.size();
+        for (int n = 0; n < numneighbours; n++)
+        {
+            sendbuffers[n] = snds[n].data();
+            receivebuffers[n] = toappendto.data() + index;
+
+            index += appendlens[n];
+        }
+        slmpi::exchange(neighbours, sendlens, sendbuffers, appendlens, receivebuffers);
+    }
+
+    return grouped;
 }
 

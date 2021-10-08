@@ -211,6 +211,7 @@ namespace sl
 
     // hp-adaptation:
     bool adapt(int verbosity = 0);
+    bool alladapt(int verbosity = 0);
     
     // Define a Zienkiewicz-Zhu type error indicator:
     expression zienkiewiczzhu(expression input);

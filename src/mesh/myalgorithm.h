@@ -38,6 +38,9 @@ namespace myalgorithm
     // The output gives the number of non-duplicated nodes.
     int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
     
+    // Remove duplicated coordinates:
+    void removeduplicates(std::vector<double>& coordinates);
+    
     // This is for a vector of ints:
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
     // This is for a vector of doubles:
@@ -135,7 +138,7 @@ namespace myalgorithm
     // This function returns (flattened from lowest type to highest) the edge number of
     // each edge in an element as well as a bool whose value is true if the edge barycenter
     // is close enough to any node in the corner coordinates.
-    void assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode);
+    void assignedgenumbers(std::vector<bool>& isownelem, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode);
     
     // For a vector 'vec' of repeating blocks [b0 b1 b2 ...] the output is [b0[sel[0]] b1[sel[0]] ... b0[sel[1]] b1[sel[1]] ...].
     std::vector<double> separate(std::vector<double>& v, int blocklen, std::vector<int> sel);
@@ -157,6 +160,7 @@ namespace myalgorithm
     
     // Concatenate vectors:
     std::vector<int> concatenate(std::vector<std::vector<int>> tocat);
+    void concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated);
     
     // Return -1 if a < b, 0 if a = b and +1 if a > b:
     int inequalitytoint(int a, int b);
@@ -256,6 +260,15 @@ namespace myalgorithm
     // Helper function to be called recursively.
     void inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall);
     
+    // The inner overlap cell values are decided by the owner of the inner overlap:
+    void fixatoverlap(std::vector<std::vector<int>>& cellvalues);
+    
+    // Get the list of edges in the inner overlap interface with each neighbour and preallocate for the outer overlap interface.
+    // In case of no-overlap DDM the inner and outer overlap interfaces both equal the no-overlap interface.
+    void getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated);
+    
+    // Append the values of this rank and all neighbour ranks (in case of DDM). Also get the value 'togroup' on each neighbour rank.
+    std::vector<int> appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup);
 };
 
 #endif

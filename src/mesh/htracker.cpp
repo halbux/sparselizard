@@ -612,6 +612,7 @@ void htracker::atleaves(std::vector<std::vector<double>>& arc, std::vector<std::
 void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
 {
     elements* myelements = getoriginalmesh()->getelements();
+    std::shared_ptr<dtracker> mydtracker = getoriginalmesh()->getdtracker();
     
     std::vector<int> ne(8);
     for (int i = 0; i < 8; i++)
@@ -621,10 +622,14 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     std::vector<std::vector<double>> cornerarc, cornerapc;
     atleaves(cornerarc, cornerapc, true);    
     
+    std::vector<bool> iol(numleaves, true);
+    if (mydtracker->isdefined() && mydtracker->isoverlap())
+        isinneroverlapleaf(iol);
+    
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
     std::vector<bool> isedgesplit;
-    myalgorithm::assignedgenumbers(cornerapc, edgenumbers, isedgesplit);
+    myalgorithm::assignedgenumbers(iol, cornerapc, edgenumbers, isedgesplit);
     
 
     // Preallocate output containers to upper bound size:
@@ -737,6 +742,37 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
         touser[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
         toht[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
     }
+}
+
+void htracker::isinneroverlapleaf(std::vector<bool>& isiol)
+{
+    elements* myelements = getoriginalmesh()->getelements();
+    physicalregions* myphysicalregions = getoriginalmesh()->getphysicalregions();
+    
+    std::shared_ptr<dtracker> dt = getoriginalmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+    std::vector<int> neighbours = dt->getneighbours();
+
+    isiol = std::vector<bool>(numleaves, false);
+    if (numneighbours == 0)
+        return;
+
+    std::vector<std::vector<std::vector<int>>*> ioelemlists(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        ioelemlists[n] = myphysicalregions->get(dt->getinneroverlap(neighbours[n]))->getelementlist();
+
+    std::vector<std::vector<bool>> isinelemlist(8);
+    for (int i = 0; i < 8; i++)
+    {
+        if (originalcount[i] > 0) // cells only
+            myelements->istypeinelementlists(i, ioelemlists, isinelemlist[i], false);
+    }
+
+    std::vector<int> oet, oei;
+    getoriginalelement(oet, oei);
+
+    for (int i = 0; i < numleaves; i++)
+        isiol[i] = isinelemlist[oet[i]][oei[i]];
 }
 
 std::vector<int> htracker::countupperbound(void)

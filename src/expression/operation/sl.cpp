@@ -13,7 +13,7 @@ int sl::getversion(void)
 
 int sl::getsubversion(void)
 {
-    return 9;
+    return 10;
 }
 
 std::string sl::getversionname(void)
@@ -1336,6 +1336,17 @@ expression sl::athp(expression expr, std::shared_ptr<rawmesh> rm, std::shared_pt
 }
 
 bool sl::adapt(int verbosity)
+{
+    if (universe::getrawmesh()->getdtracker()->isdefined() && slmpi::count() > 1)
+    {
+        std::cout << "Error in 'sl' namespace: call 'alladapt' instead of 'adapt' for multi-rank DDM" << std::endl;
+        abort();
+    }
+    
+    return universe::getrawmesh()->adapthp(verbosity);
+}
+
+bool sl::alladapt(int verbosity)
 {
     return universe::getrawmesh()->adapthp(verbosity);
 }
