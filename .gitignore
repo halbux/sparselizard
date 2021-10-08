@@ -36,3 +36,4 @@ build/
 
 # CCLS cache
 .ccls-cache/
+machine-type.txt
