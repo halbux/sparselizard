@@ -269,6 +269,9 @@ namespace myalgorithm
     
     // Append the values of this rank and all neighbour ranks (in case of DDM). Also get the value 'togroup' on each neighbour rank.
     std::vector<int> appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup);
+    
+    // Return the index of the min value. The lowest index is returned in case other values are closer than nt to the min value.
+    int findmin(std::vector<double> vals, double nt);
 };
 
 #endif
