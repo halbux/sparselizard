@@ -8,6 +8,7 @@ FIND_PATH(MUMPS_INCLUDE_PATH
     "${PETSC_PATH}/arch-linux-c-opt/include"
     "${PETSC_PATH}/arch-linux2-c-opt/include"
     "${PETSC_PATH}/arch-darwin-c-opt/include"
+    "/usr/include"
     NO_DEFAULT_PATH
     )
 
@@ -25,6 +26,7 @@ FIND_LIBRARY(MUMPS_LIBRARIES
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
     "${PETSC_PATH}/arch-darwin-c-opt/lib"
+    "/usr/lib/x86_64-linux-gnu"
     NO_DEFAULT_PATH
     )
 
