@@ -23,7 +23,7 @@ FIND_LIBRARY(GMSH_LIBRARIES
 if(GMSH_LIBRARIES)
     message(STATUS "Gmsh library found at " ${GMSH_LIBRARIES})
 else()
-    message(STATUS "GMSH LIBRARY NOT FOUND (OPTIONAL)")
+    message(STATUS "Gmsh library not found (optional)")
 endif()
 
 if(GMSH_INCLUDE_PATH AND GMSH_LIBRARIES)
