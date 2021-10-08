@@ -21,7 +21,7 @@ endif()
 
 # Find slepc library:
 FIND_LIBRARY(SLEPC_LIBRARIES
-    NAMES slepc_real
+    NAMES slepc slepc_real
     PATHS
     "${PETSC_PATH}/arch-linux-c-opt/lib"
     "${PETSC_PATH}/arch-linux2-c-opt/lib"
