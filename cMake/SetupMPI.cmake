@@ -13,7 +13,6 @@ FIND_PATH(MPI_INCLUDE_PATH
     "${MPI_PATH}/include"
     "/usr/include/x86_64-linux-gnu/mpi"
     "/usr/include/aarch64-linux-gnu/mpi"
-    NO_DEFAULT_PATH
     )
 
 if(MPI_INCLUDE_PATH)
@@ -29,7 +28,6 @@ FIND_LIBRARY(MPI_LIBRARIES
     "${MPI_PATH}/lib"
     "/usr/lib/x86_64-linux-gnu/openmpi/lib"
     "/usr/lib/aarch64-linux-gnu/openmpi/lib"
-    NO_DEFAULT_PATH
     )
 
 if(MPI_LIBRARIES)
