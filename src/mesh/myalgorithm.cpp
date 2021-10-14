@@ -907,7 +907,7 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
         ne[i] = myelement.countedges();
     }
 
-    // Compute the barycenter coordinates of all nodes and edges (first the edges then the nodes):
+    // Compute the barycenter coordinates of all edges:
     int numedges = 0;
     for (int i = 0; i < 8; i++)
         numedges += ne[i]*cornercoords[i].size()/nn[i]/3;
