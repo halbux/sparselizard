@@ -898,7 +898,6 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
     int numneighbours = dt->countneighbours();
     std::vector<int> neighbours = dt->getneighbours();
     
-    
     std::vector<int> nn(8), ne(8);
     for (int i = 0; i < 8; i++)
     {
@@ -955,14 +954,9 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
     removeduplicates(catcornercoords);
     std::vector<int> neighboursnumownedges = appendneighbourvalues(barys, catcornercoords, numownedges);
     
-    // Remove duplicated barycenters:
+    // Find duplicates:
     std::vector<int> renumberingvector;
     int numunique = removeduplicates(barys, renumberingvector);
-    
-    // Assign a unique edge number for each edge:
-    edgenumbers = std::vector<int>(numedges);
-    for (int i = 0; i < numedges; i++)
-        edgenumbers[i] = renumberingvector[i];
     
     // Calculate which edges must be split:
     std::vector<bool> isanodeatnum(numunique, false);
@@ -972,9 +966,20 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
     isbarycenteronnode = std::vector<bool>(numedges, false);
     for (int i = 0; i < numedges; i++)
     {
-        if (isanodeatnum[edgenumbers[i]])
+        if (isanodeatnum[renumberingvector[i]])
             isbarycenteronnode[i] = true;
     }
+    
+    // Assign a unique edge number for each edge:
+    edgenumbers = std::vector<int>(numedges);
+    for (int i = 0; i < numedges; i++)
+        edgenumbers[i] = renumberingvector[i];
+
+    // Make the edges numbers continuous:
+    std::vector<int> edgerenum;
+    int numuniqueedges = squeeze(edgenumbers, numunique, edgerenum);
+    for (int i = 0; i < numedges; i++)
+        edgenumbers[i] = edgerenum[edgenumbers[i]];
     
     // Harmonize the edges numbers across neighbour ranks:
     if (dt->isdefined() == false || numranks == 1)
@@ -988,15 +993,15 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
     std::vector<double> ownbarys(3*numownedges);
     selectcoordinates(isownedge, barys, ownbarys.data());
     
-    // Get edges count on all ranks to create unique edge numbers:
-    std::vector<int> fragment = {numedges};
-    std::vector<int> allnumedges;
-    slmpi::allgather(fragment, allnumedges);
+    // Get the edges count on all ranks to create unique global edge numbers:
+    std::vector<int> fragment = {numuniqueedges};
+    std::vector<int> allnumuniqueedges;
+    slmpi::allgather(fragment, allnumuniqueedges);
     
-    // Use long long int to allow more edges in the mesh.
+    // USE LONG LONG INT TO ALLOW MORE EDGES IN THE MESH.
     std::vector<int> edgenumshift(numranks, 0);
     for (int i = 1; i < numranks; i++)
-        edgenumshift[i] = edgenumshift[i-1] + allnumedges[i-1];
+        edgenumshift[i] = edgenumshift[i-1] + allnumuniqueedges[i-1];
     
     for (int i = 0; i < numedges; i++)
         edgenumbers[i] += edgenumshift[rank];
