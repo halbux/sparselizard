@@ -927,6 +927,8 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
         {
             for (int e = 0; e < ne[i]; e++)
             {
+                // FOR PYRAMIDS THIS IS INCORRECT SINCE FULLSPLIT PYRAMIDS CREATE TWO ELEMENT TYPES.
+                // THUS THE [i][j] ORDERING DOES NOT FOLLOW LEAVES FOR INCREASING J.
                 if (isownelem[cc])
                 {
                     numownedges++;
