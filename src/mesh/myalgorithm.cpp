@@ -2191,18 +2191,3 @@ std::vector<int> myalgorithm::appendneighbourvalues(std::vector<double>& toappen
     return grouped;
 }
 
-int myalgorithm::findmin(std::vector<double> vals, double nt)
-{
-    std::vector<int> reorderingvector;
-    stablesort(nt, vals, reorderingvector);
-
-    int ind = 0;
-    for (int i = 0; i < reorderingvector.size(); i++)
-    {
-        if (reorderingvector[i] == 0)
-            return i;
-    }
-
-    abort();
-}
-
