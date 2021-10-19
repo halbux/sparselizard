@@ -1349,6 +1349,8 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
                     int curedge = nsforneighbours[n][2*i+0];
                     std::vector<int> cellsonedge = elptr->getcellsontype(1, curedge);
 
+                    nsforneighbours[n][2*i+1] = -1;
+
                     for (int c = 0; c < cellsonedge.size()/2; c++)
                     {
                         int curcell = cellsonedge[2*c+1];
