@@ -41,6 +41,9 @@ namespace sl
     
     double getpi(void);
 
+    // Get a random value uniformly distributed between 0.0 and 1.0:
+    double getrandom(void);
+    
     // Perform operations (union, intersection) on physical regions:
     int selectunion(std::vector<int> physregs);
     int selectintersection(std::vector<int> physregs);

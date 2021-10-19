@@ -1,4 +1,5 @@
 #include "sl.h"
+#include <random>
 #include "rawpoint.h"
 #include "rawline.h"
 #include "rawsurface.h"
@@ -29,6 +30,17 @@ void sl::printversion(void)
 double sl::getpi(void)
 {
     return 3.1415926535897932384;
+}
+
+double sl::getrandom(void)
+{
+    // Will be used to obtain a seed for the random number engine:
+    std::random_device rd;
+    // Standard mersenne twister engine seeded with rd():
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
+    
+    return dis(gen);
 }
 
 int sl::selectunion(std::vector<int> physregs)
