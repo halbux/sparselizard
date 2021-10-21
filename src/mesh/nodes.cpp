@@ -70,25 +70,20 @@ void nodes::reorder(std::vector<int>& nodereordering)
     }
 }
 
-double nodes::getgeometrydimension(int coord)
+std::vector<double> nodes::getgeometrydimension(void)
 {
-    int numberofnodes = count();
-    
-    double maxcoord = mycoordinates[3*0+coord], mincoord = mycoordinates[3*0+coord];
-    for (int i = 1; i < numberofnodes; i++)
-    {
-        if (mycoordinates[3*i+coord] < mincoord)
-            mincoord = mycoordinates[3*i+coord];
-        if (mycoordinates[3*i+coord] > maxcoord)
-            maxcoord = mycoordinates[3*i+coord];
-    }
-    return std::abs(maxcoord-mincoord);
+    std::vector<double> bnds = myalgorithm::getcoordbounds(mycoordinates);
+
+    return {std::abs(bnds[0]-bnds[1]), std::abs(bnds[2]-bnds[3]), std::abs(bnds[4]-bnds[5])};
 }
 
 std::vector<double> nodes::getnoisethreshold(void)
 {
     double rons = universe::roundoffnoiselevel;
-    return std::vector<double> {rons*getgeometrydimension(0), rons*getgeometrydimension(1), rons*getgeometrydimension(2)};
+    
+    std::vector<double> gds = getgeometrydimension();
+    
+    return std::vector<double> {rons*gds[0], rons*gds[1], rons*gds[2]};
 }
 
 void nodes::fixifaxisymmetric(void)
@@ -96,7 +91,7 @@ void nodes::fixifaxisymmetric(void)
     if (universe::isaxisymmetric == false)
         return;
 
-    double xnoiselevel = getgeometrydimension(0) * universe::roundoffnoiselevel;
+    double xnoiselevel = getnoisethreshold()[0];
 
     int numberofnodes = count();
     for (int i = 0; i < numberofnodes; i++)

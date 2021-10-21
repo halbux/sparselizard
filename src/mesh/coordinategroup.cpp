@@ -7,9 +7,8 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     mynumcoords = coords.size()/3;
     
     noisethreshold = universe::getrawmesh()->getnodes()->getnoisethreshold();
-    double meshsize = 0.0;
-    for (int i = 0; i < 3; i++)
-        meshsize += universe::getrawmesh()->getnodes()->getgeometrydimension(i);
+    std::vector<double> geodims = universe::getrawmesh()->getnodes()->getgeometrydimension();
+    double meshsize = myalgorithm::sum(geodims);
     
     // Define the number of slices in the x, y and z direction:
     double powertouse = universe::getrawmesh()->getmeshdimension();
