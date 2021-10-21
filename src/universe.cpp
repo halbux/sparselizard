@@ -42,7 +42,7 @@ void universe::setmaxnumthreads(int mnt)
     maxnumthreads = mnt;
 }
 
-double universe::roundoffnoiselevel = 1e-12;
+double universe::roundoffnoiselevel = 1e-10;
 
 std::shared_ptr<rawmesh> universe::myrawmesh = NULL;
 
