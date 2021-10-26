@@ -69,11 +69,11 @@ class formulation
         formulation(void);
         
         // Add a port relation:
-        void operator+=(expression expr);
+        formulation& operator+=(expression expr);
         
         // The following adds the contribution defined in the integration object.
-        void operator+=(integration integrationobject);
-        void operator+=(std::vector<integration> integrationobject);
+        formulation& operator+=(integration integrationobject);
+        formulation& operator+=(std::vector<integration> integrationobject);
         
         int countdofs(void);
         long long int allcountdofs(void);

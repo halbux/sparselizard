@@ -60,7 +60,7 @@ class rawparameter
 
         // A parameter cannot store an expression with a dof or a tf.
         // It can also only store expression arrays of a same dimension. 
-        void set(int physreg, expression);
+        void set(int physreg, expression input);
 
         std::shared_ptr<operation> get(int disjreg, int row, int col);
 

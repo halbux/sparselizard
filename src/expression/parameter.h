@@ -37,6 +37,8 @@ class parameter
         int countcolumns(void);
 
         parameterselectedregion operator|(int physreg);
+        
+        void setvalue(int physreg, expression input);
 
         void print(void);
 

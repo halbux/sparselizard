@@ -12,7 +12,7 @@ formulation::formulation(void)
     mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
 }
 
-void formulation::operator+=(expression expr)
+formulation& formulation::operator+=(expression expr)
 {
     if (isstructurelocked)
     {
@@ -33,15 +33,19 @@ void formulation::operator+=(expression expr)
     std::vector<std::shared_ptr<rawport>> rps = pr->getrawports();
     for (int p = 0; p < rps.size(); p++)
         mydofmanager->addtostructure(rps[p]);
+        
+    return *this;
 }
 
-void formulation::operator+=(std::vector<integration> integrationobject)
+formulation& formulation::operator+=(std::vector<integration> integrationobject)
 {
     for (int i = 0; i < integrationobject.size(); i++)
         *this += integrationobject[i];
+        
+    return *this;
 }
 
-void formulation::operator+=(integration integrationobject)
+formulation& formulation::operator+=(integration integrationobject)
 {
     if (isstructurelocked)
     {
@@ -53,7 +57,7 @@ void formulation::operator+=(integration integrationobject)
     int elementdimension = universe::getrawmesh()->getphysicalregions()->get(integrationphysreg)->getelementdimension();
     // Return on empty integration region:
     if (elementdimension < 0)
-        return;
+        return *this;
     
     int integrationorderdelta = integrationobject.getintegrationorderdelta();
     expression myexpression = integrationobject.getexpression();
@@ -140,6 +144,8 @@ void formulation::operator+=(integration integrationobject)
             mycontributions[contribindex].resize(blocknumber+1);
         mycontributions[contribindex][blocknumber].push_back(mycontribution);
     }
+    
+    return *this;
 }
 
 int formulation::countdofs(void)

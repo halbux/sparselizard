@@ -40,6 +40,13 @@ parameterselectedregion parameter::operator|(int physreg)
     return parameterselectedregion(rawparamptr, physreg);
 }
 
+void parameter::setvalue(int physreg, expression input)
+{
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+    
+    rawparamptr->set(physreg, input);
+}
+
 void parameter::print(void)
 {
     rawparamptr->print();
