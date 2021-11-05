@@ -756,7 +756,8 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
     std::vector<indexmat> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
     
     // Get all types of constraints:
-    std::vector<bool> isdofconstrained = isconstrained(); 
+    std::vector<bool> isdofconstrained = isconstrained();
+    std::vector<bool> wasdofconstrained = isdofconstrained;
     
     // Exchange the constrained indexes:
     std::vector<std::vector<int>> isconstrainedforneighbours(numneighbours), isconstrainedfromneighbours(numneighbours);
@@ -784,7 +785,7 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
         for (int i = 0; i < isconstrainedinneighbour.size(); i++)
         {
             int recvind = recvindsptr[i];
-            if (isconstrainedinneighbour[i] == true && isdofconstrained[recvind] == false)
+            if (isconstrainedinneighbour[i] == true && wasdofconstrained[recvind] == false)
             {
                 isdofconstrained[recvind] = true;
                 isnewlyconstrained[i] = true;
