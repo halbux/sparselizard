@@ -512,6 +512,12 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
         return {};
     }
     
+    if (universe::getrawmesh()->getdtracker()->isoverlap() == false)
+    {
+        std::cout << "Error in 'formulation' object: cannot solve using Dirichlet interface conditions for no-overlap DDM (does not converge)" << std::endl;
+        abort();  
+    }
+    
     universe::ddmformuls = {*this};
 
     std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
