@@ -55,7 +55,6 @@ out="${out:$((${#out}-1)):1}"
 if [ $out == "1" ]
 then
 echo 'SUCCESS AT' $i;
-sleep 2;
 else
 echo 'FAILED AT' $i;
 echo '';
