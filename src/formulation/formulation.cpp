@@ -481,7 +481,7 @@ densemat Fgmultdirichlet(densemat gprev)
     
     densemat Ag(Agmatsrecv);
     
-    // Calculate I - A*g:
+    // Calculate (I - A)*g:
     double* Agptr = Ag.getvalues();
     densemat Fg(Ag.count(), 1);
     double* Fgptr = Fg.getvalues();
@@ -651,7 +651,7 @@ densemat Fgmultrobin(densemat gprev)
     
     densemat Ag(Agmatsrecv);
     
-    // Calculate I - A*g:
+    // Calculate (I - A)*g:
     double* Agptr = Ag.getvalues();
     densemat Fg(Ag.count(), 1);
     double* Fgptr = Fg.getvalues();
