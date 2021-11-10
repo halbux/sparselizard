@@ -83,15 +83,15 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     
     std::vector<double> trialbarys(3*numtrialelements, 0.0); // must have this size in any case, barycenters for not alive ranks will be removed below
     if (numelementsininterface > 0)
-        myalgorithm::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique
+        gentools::pickcandidates(numtrialelements, interfaceelembarys, trialbarys); // ok if not unique
     
     // Push this in the mpi call:
-    trialbarys.push_back(myalgorithm::exactinttodouble(std::min(numelementsininterface,1)));
+    trialbarys.push_back(gentools::exactinttodouble(std::min(numelementsininterface,1)));
     
     std::vector<double> alltrialbarys;
     slmpi::allgather(trialbarys, alltrialbarys);
     
-    std::vector<double> allisalive = myalgorithm::extract(alltrialbarys, 3*numtrialelements+1, 3*numtrialelements);
+    std::vector<double> allisalive = gentools::extract(alltrialbarys, 3*numtrialelements+1, 3*numtrialelements);
     
     // Remove the barycenters of this rank and ranks that are no alive anymore (to avoid removing duplicates with arbitrary all 0 coordinates):
     int numalive = 0;
@@ -118,7 +118,7 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     // Find trial elements coordinates on the interface:  
     std::vector<int> isfound;
     if (numelementsininterface > 0)
-        myalgorithm::findcoordinates(interfaceelembarys, alltrialbarys, isfound);
+        gentools::findcoordinates(interfaceelembarys, alltrialbarys, isfound);
         
     // Deduce which are neighbours. To avoid additional mpi length exchange steps the number of neighbours is limited.
     std::vector<int> neighbourlist(numtrialelements, -1);
@@ -151,7 +151,7 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     std::vector<int> allneighbourlist;
     slmpi::allgather(neighbourlist, allneighbourlist);
     
-    std::vector<int> allnumelementsininterface = myalgorithm::extract(allneighbourlist, numtrialelements+1, numtrialelements);
+    std::vector<int> allnumelementsininterface = gentools::extract(allneighbourlist, numtrialelements+1, numtrialelements);
     
     // Deduce the neighbours for the current rank:
     if (numelementsininterface > 0)
@@ -200,7 +200,7 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
         
     // Split neighbours into lower ranks and higher ranks:
     std::vector<int> lowerranks, higherranks;
-    myalgorithm::split(neighbours, rank, lowerranks, higherranks);
+    gentools::split(neighbours, rank, lowerranks, higherranks);
     
     // Send all interface barycenter coordinates to the higher ranks and receive from the lower ranks in a vector:
     int totnumcand = 0;
@@ -238,7 +238,7 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
     
     // Find matches:
     std::vector<int> posfound;
-    myalgorithm::findcoordinates(interfaceelembarys, candidatebarys, posfound);
+    gentools::findcoordinates(interfaceelembarys, candidatebarys, posfound);
     
     std::vector<std::vector<bool>> isfound(lowerranks.size());
     
@@ -264,18 +264,18 @@ void dtracker::discoverinterfaces(std::vector<int> neighbours, std::vector<doubl
     // Send match information to every neighbour of lower rank:
     std::vector<std::vector<int>> tosend(numneighbours, std::vector<int>(0));
     for (int n = 0; n < lowerranks.size(); n++)
-        myalgorithm::pack(isfound[n], tosend[n]);
+        gentools::pack(isfound[n], tosend[n]);
 
     std::vector<std::vector<int>> toreceive(numneighbours, std::vector<int>(0));
     for (int n = 0; n < higherranks.size(); n++)
-        toreceive[lowerranks.size()+n].resize(myalgorithm::getpackedsize(numelementsininterface));
+        toreceive[lowerranks.size()+n].resize(gentools::getpackedsize(numelementsininterface));
 
     slmpi::exchange(neighbours, tosend, toreceive);
 
     for (int n = lowerranks.size(); n < numneighbours; n++)
     {
         std::vector<bool> wasfound;
-        myalgorithm::unpack(numelementsininterface, toreceive[n], wasfound);
+        gentools::unpack(numelementsininterface, toreceive[n], wasfound);
     
         for (int i = 0; i < numelementsininterface; i++)
         {
@@ -362,16 +362,16 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
         if (totnumtosend > 0)
         {
             packaged[i] = std::vector<double>(3*totnumtosend+2);
-            packaged[i][0] = 3*myalgorithm::exactinttodouble(numnodesinneighbourpair[i]);
-            packaged[i][1] = 3*myalgorithm::exactinttodouble(numedgesinneighbourpair[i]);
+            packaged[i][0] = 3*gentools::exactinttodouble(numnodesinneighbourpair[i]);
+            packaged[i][1] = 3*gentools::exactinttodouble(numedgesinneighbourpair[i]);
             
-            myalgorithm::selectcoordinates(nodesinneighbourpair[i], *ncs, &(packaged[i][2]));
-            myalgorithm::selectcoordinates(edgesinneighbourpair[i], *edgebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
+            gentools::selectcoordinates(nodesinneighbourpair[i], *ncs, &(packaged[i][2]));
+            gentools::selectcoordinates(edgesinneighbourpair[i], *edgebarys, &(packaged[i][2+3*numnodesinneighbourpair[i]]));
         }
     }
     
     std::vector<std::vector<double>> dataforeachneighbour;
-    myalgorithm::pack(neighbours, packaged, dataforeachneighbour);
+    gentools::pack(neighbours, packaged, dataforeachneighbour);
     
     // Exchange all interface barycenter coordinates with every neighbour:
     std::vector<int> sendlens(numneighbours);
@@ -400,11 +400,11 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     std::vector< std::vector<std::vector<double>> > unpackedcoords(numneighbours);
     std::vector<std::vector<int>> candidateneighbours(numneighbours);
     for (int n = 0; n < numneighbours; n++)
-        candidateneighbours[n] = myalgorithm::unpack(datafromeachneighbour[n], unpackedcoords[n]);
+        candidateneighbours[n] = gentools::unpack(datafromeachneighbour[n], unpackedcoords[n]);
     
     std::vector<double> allreceivednodecoords, allreceivededgecoords;
     std::vector<std::vector<int>> lennodedataingroup, lenedgedataingroup;
-    myalgorithm::split(unpackedcoords, allreceivednodecoords, allreceivededgecoords, lennodedataingroup, lenedgedataingroup);
+    gentools::split(unpackedcoords, allreceivednodecoords, allreceivededgecoords, lennodedataingroup, lenedgedataingroup);
     
     std::vector<double> interfacenodesbarys;
     els->getbarycenters(0, interfacenodelist, interfacenodesbarys);
@@ -412,9 +412,9 @@ bool dtracker::discovercrossinterfaces(std::vector<int>& interfacenodelist, std:
     els->getbarycenters(1, interfaceedgelist, interfaceedgesbarys);
     
     std::vector<int> posnodefound;
-    int nnf = myalgorithm::findcoordinates(interfacenodesbarys, allreceivednodecoords, posnodefound);
+    int nnf = gentools::findcoordinates(interfacenodesbarys, allreceivednodecoords, posnodefound);
     std::vector<int> posedgefound;
-    int nef = myalgorithm::findcoordinates(interfaceedgesbarys, allreceivededgecoords, posedgefound);
+    int nef = gentools::findcoordinates(interfaceedgesbarys, allreceivededgecoords, posedgefound);
 
     // All nodes and edges must have been found or something went wrong:
     if (nnf != posnodefound.size() || nef != posedgefound.size())
@@ -562,7 +562,7 @@ void dtracker::exchangeoverlaps(void)
         
         // Get the renumbering to make the node numbers consecutive:
         std::vector<int> renumvec;
-        int numuniques = myalgorithm::squeeze(nodenumsforeachneighbour[n], nds->count(), renumvec);
+        int numuniques = gentools::squeeze(nodenumsforeachneighbour[n], nds->count(), renumvec);
         
         // Make the nodes consecutive and gather all coordinates to send:
         coordsforeachneighbour[n] = std::vector<double>(3*numuniques);
@@ -788,7 +788,7 @@ void dtracker::exchangephysicalregions(void)
         }
         physreglistsforeachneighbour[n].resize(pi);
         
-        myalgorithm::compresszeros(physreglistsforeachneighbour[n]);
+        gentools::compresszeros(physreglistsforeachneighbour[n]);
         
         sendlens[n] = physreglistsforeachneighbour[n].size();
     }
@@ -805,7 +805,7 @@ void dtracker::exchangephysicalregions(void)
     std::vector<physicalregion*> allprs(prs->getmaxphysicalregionnumber()+1, NULL);
     for (int n = 0; n < numneighbours; n++)
     {
-        myalgorithm::decompresszeros(physreglistsfromeachneighbour[n]);
+        gentools::decompresszeros(physreglistsfromeachneighbour[n]);
         
         int pi = 0;
         for (int i = 0; i < 8; i++)
@@ -1019,11 +1019,11 @@ void dtracker::defineinneroverlapinterfaces(void)
             pos += ne;
         }
         
-        myalgorithm::pack(isininterface, dataforneighbours[n]);
+        gentools::pack(isininterface, dataforneighbours[n]);
         
         for (int i = 0; i < numinterfacetype; i++)
             iosnumbits[n] += elemsininneroverlapskins[n][i].size();
-        datafromneighbours[n].resize(myalgorithm::getpackedsize(iosnumbits[n]));
+        datafromneighbours[n].resize(gentools::getpackedsize(iosnumbits[n]));
     }
     
     slmpi::exchange(myneighbours, dataforneighbours, datafromneighbours);
@@ -1033,7 +1033,7 @@ void dtracker::defineinneroverlapinterfaces(void)
         int cn = myneighbours[n];
         
         std::vector<bool> isininterface;
-        myalgorithm::unpack(iosnumbits[n], datafromneighbours[n], isininterface);
+        gentools::unpack(iosnumbits[n], datafromneighbours[n], isininterface);
     
         std::vector<physicalregion*> dimprs(3, NULL);
         
@@ -1089,7 +1089,7 @@ void dtracker::mapnooverlapinterfaces(void)
             }
             std::vector<bool> isininterface;
             int numininterface = els->istypeinelementlists(i, interfaceelems, isininterface, false); // no curvature nodes
-            myalgorithm::find(isininterface, numininterface, subsininterfaces[n][i]);
+            gentools::find(isininterface, numininterface, subsininterfaces[n][i]);
             
             numsubsoneachneighbour[n] += numininterface;
         }
@@ -1097,7 +1097,7 @@ void dtracker::mapnooverlapinterfaces(void)
     
     // Split neighbours into lower ranks and higher ranks (neighbours are sorted ascendingly):
     std::vector<int> lowerranks, higherranks;
-    myalgorithm::split(myneighbours, rank, lowerranks, higherranks);
+    gentools::split(myneighbours, rank, lowerranks, higherranks);
     
     // Prepare all barycenters to send to the higher ranks:
     std::vector<std::vector<double>> barysforeachneighbour(numneighbours, std::vector<double>(0));
@@ -1138,7 +1138,7 @@ void dtracker::mapnooverlapinterfaces(void)
             std::vector<double> targetbarys;
             els->getbarycenters(i, subsininterfaces[n][i], targetbarys);
             
-            int numfound = myalgorithm::findcoordinates(targetbarys, recbarys, posfounds[n][i]);
+            int numfound = gentools::findcoordinates(targetbarys, recbarys, posfounds[n][i]);
             if (numfound != num)
             {
                 std::cout << "Error in 'dtracker' object: no-overlap mapping failed because some interface elements could not be matched" << std::endl;
@@ -1247,7 +1247,7 @@ void dtracker::mapoverlapinterfaces(void)
         
             els->follow(inneroverlapelems, i, sublists[i], inneroverlapinterfaceelemlists);
         }
-        sublistforneighbours[n] = myalgorithm::concatenate(sublists);
+        sublistforneighbours[n] = gentools::concatenate(sublists);
         sublistforneighbours[n].resize(sublistforneighbours[n].size() + numinterfacetype);
         for (int i = 0; i < numinterfacetype; i++)
             sublistforneighbours[n][sublistforneighbours[n].size()-numinterfacetype+i] = els->count(i);
@@ -1310,7 +1310,7 @@ void dtracker::createglobalnodenumbersnooverlap(void)
     
     // Curvature nodes have a -1 global numbering:
     std::vector<bool> isitacornernode = els->iscornernode();
-    int numcornernodes = myalgorithm::counttrue(isitacornernode);
+    int numcornernodes = gentools::counttrue(isitacornernode);
     
     // Number of own nodes (nodes shared with lower ranks are not own nodes):
     int numownnodes = numcornernodes;
@@ -1332,7 +1332,7 @@ void dtracker::createglobalnodenumbersnooverlap(void)
         
         std::vector<bool> isinelemlists;
         int numinellist = els->istypeinelementlists(0, noielems, isinelemlists, false);
-        myalgorithm::find(isinelemlists, numinellist, nodesinnoi[n]);
+        gentools::find(isinelemlists, numinellist, nodesinnoi[n]);
         
         for (int i = 0; i < numinellist; i++)
         {
@@ -1436,11 +1436,11 @@ void dtracker::createglobalnodenumbersoverlap(void)
     
     // Split neighbours into lower ranks and higher ranks (neighbours are sorted ascendingly):
     std::vector<int> lowerranks, higherranks;
-    myalgorithm::split(myneighbours, rank, lowerranks, higherranks);
+    gentools::split(myneighbours, rank, lowerranks, higherranks);
     
     // Curvature nodes have a -1 global numbering:
     std::vector<bool> isitacornernode = els->iscornernode();
-    int numcornernodes = myalgorithm::counttrue(isitacornernode);
+    int numcornernodes = gentools::counttrue(isitacornernode);
     
     // Number of own nodes (nodes shared with lower ranks are not own nodes):
     int numownnodes = numcornernodes;
@@ -1720,8 +1720,8 @@ void dtracker::discoverconnectivity(int numtrialelements, int verbosity)
     int numnodesininterface = els->istypeinelementlists(0, {&interfaceelems}, isnodeininterface, false);
     int numedgesininterface = els->istypeinelementlists(1, {&interfaceelems}, isedgeininterface, false);
     std::vector<int> interfacenodelist, interfaceedgelist;
-    myalgorithm::find(isnodeininterface, numnodesininterface, interfacenodelist);
-    myalgorithm::find(isedgeininterface, numedgesininterface, interfaceedgelist);
+    gentools::find(isnodeininterface, numnodesininterface, interfacenodelist);
+    gentools::find(isedgeininterface, numedgesininterface, interfaceedgelist);
 
     std::vector<physicalregion*> physregsvec(3*numranks, NULL);
 
@@ -1875,7 +1875,7 @@ void dtracker::discoverconnectivity(int numtrialelements, int verbosity)
     }
     
     if (verbosity > 0)
-        std::cout << "Found all neighbours with " << numits << " set" << myalgorithm::getplurals(numits) << " of " << numtrialelements << " trial element" << myalgorithm::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << myalgorithm::getplurals(numcrossits) << std::endl;
+        std::cout << "Found all neighbours with " << numits << " set" << gentools::getplurals(numits) << " of " << numtrialelements << " trial element" << gentools::getplurals(numtrialelements) << " and " << numcrossits << " propagation step" << gentools::getplurals(numcrossits) << std::endl;
 }
 
 void dtracker::overlap(void)
@@ -2098,7 +2098,7 @@ void dtracker::writeglobalnodenumbers(std::string filename)
     for (int i = 0; i < numnodes; i++)
         nodenums[i] = myglobalnodenumbers[i];
 
-    els->write(filename, 0, myalgorithm::getequallyspaced(0, 1, numnodes), nodenums);
+    els->write(filename, 0, gentools::getequallyspaced(0, 1, numnodes), nodenums);
 }
 
 std::vector<int> dtracker::listddmregions(void)

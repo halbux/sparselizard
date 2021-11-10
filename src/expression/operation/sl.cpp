@@ -184,14 +184,14 @@ std::vector<double> sl::loadvector(std::string filename, char delimiter, bool si
         if (sizeincluded)
         {
             std::getline(name, currentline, delimiter);
-            myalgorithm::osclean(currentline);
+            gentools::osclean(currentline);
             output.resize(std::stoi(currentline));
         }
 
         int index = 0;
         while (std::getline(name, currentline, delimiter))
         {
-            myalgorithm::osclean(currentline);
+            gentools::osclean(currentline);
             if (sizeincluded)
                 output[index] = std::stod(currentline);
             else
@@ -743,7 +743,7 @@ std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
     std::shared_ptr<rawmesh> loadedmesh(new rawmesh());
     
     std::string tool, source;
-    myalgorithm::splitatcolon(meshfile, tool, source);
+    gentools::splitatcolon(meshfile, tool, source);
     if (tool.size() == 0)
         tool = "native";
         
@@ -1808,14 +1808,14 @@ std::vector<double> sl::gmres(densemat (*mymatmult)(densemat), densemat b, dense
             break;
             
         // Run Arnoldi:
-        std::vector<double> h = myalgorithm::arnoldi(mymatmult, Q, k);
+        std::vector<double> h = gentools::arnoldi(mymatmult, Q, k);
         
         // Write h to H (can exceed by 1 the reduced Hessenberg matrix size):
         for (int i = 0; i < h.size(); i++)
             Hptr[((1+k)*k)/2 + i] = h[i];
 
         // Eliminate the last element in the kth column of H and update the rotation matrix:
-        myalgorithm::applygivensrotation(Hptr+((1+k)*k)/2, cs, sn, k);
+        gentools::applygivensrotation(Hptr+((1+k)*k)/2, cs, sn, k);
         
         // Update the residual vector:
         beta[k+1] = -sn[k] * beta[k];
@@ -1828,7 +1828,7 @@ std::vector<double> sl::gmres(densemat (*mymatmult)(densemat), densemat b, dense
     {
         // Calculate the solution:
         densemat y(1,k);
-        myalgorithm::solveuppertriangular(k, Hptr, &beta[0], y.getvalues());
+        gentools::solveuppertriangular(k, Hptr, &beta[0], y.getvalues());
         densemat Qy = y.multiply(Q.getresized(k,n));
         x.add(Qy);
     }
@@ -1934,8 +1934,8 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     recvinds = std::vector<indexmat>(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
-        sendinds[n] = indexmat(myalgorithm::sum(numsenddofsperfield[n]), 1);
-        recvinds[n] = indexmat(myalgorithm::sum(numexpectedrecvdofsperfield[n]), 1);
+        sendinds[n] = indexmat(gentools::sum(numsenddofsperfield[n]), 1);
+        recvinds[n] = indexmat(gentools::sum(numexpectedrecvdofsperfield[n]), 1);
     }
     
     // Create the send range data and populate the send indexes:
@@ -1944,7 +1944,7 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
     {
         int index = 0;
         int* sivals = sendinds[n].getvalues();
-        int totnumsendranges = myalgorithm::sum(numsendrangesperfield[n]);
+        int totnumsendranges = gentools::sum(numsendrangesperfield[n]);
         
         // Format is {numrfs, numsenddofsrf0,...,numsenddofsrfn, numrangesrf0,...,numrangesrfn, type0,rbe0,ree0,nff0, type1,...}:    
         dofrangesforneighbours[n] = std::vector<int>(1 + 2*numrawfields + 4*totnumsendranges);

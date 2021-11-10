@@ -1,6 +1,6 @@
 #include "nodes.h"
 #include "universe.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 
 
 nodes::nodes(void) {}
@@ -39,7 +39,7 @@ std::vector<int> nodes::removeduplicates(void)
 {
     // 'noderenumbering' will give the renumbering corresponding to removed duplicates:
     std::vector<int> noderenumbering;
-    int numberofnonduplicates = myalgorithm::removeduplicates(mycoordinates, noderenumbering);
+    int numberofnonduplicates = gentools::removeduplicates(mycoordinates, noderenumbering);
 
     for (int i = 0; i < noderenumbering.size(); i++)
     {
@@ -72,7 +72,7 @@ void nodes::reorder(std::vector<int>& nodereordering)
 
 std::vector<double> nodes::getgeometrydimension(void)
 {
-    std::vector<double> bnds = myalgorithm::getcoordbounds(mycoordinates);
+    std::vector<double> bnds = gentools::getcoordbounds(mycoordinates);
 
     return {std::abs(bnds[0]-bnds[1]), std::abs(bnds[2]-bnds[3]), std::abs(bnds[4]-bnds[5])};
 }

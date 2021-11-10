@@ -1704,7 +1704,7 @@ std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
 
 std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers)
 {
-    std::vector<bool> isedgecut = myalgorithm::inttobinary(6, splitnum);
+    std::vector<bool> isedgecut = gentools::inttobinary(6, splitnum);
 
     // The triangle element object can be straight or curved (no impact here):
     element mytri(2);
@@ -1720,7 +1720,7 @@ std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vecto
 
         std::vector<bool> iec = {isedgecut[ea], isedgecut[eb], isedgecut[ec]};
         std::vector<int> triedgenums = {edgenumbers[ea], edgenumbers[eb], edgenumbers[ec]};
-        std::vector<std::vector<int>> trisplitdefinition = mytri.split(myalgorithm::binarytoint(iec), triedgenums);
+        std::vector<std::vector<int>> trisplitdefinition = mytri.split(gentools::binarytoint(iec), triedgenums);
         mytri.getsplitconnectivity(faceconnectivity[i], trisplitdefinition);
     }
     // Compute the tetrahedron node connectivity:

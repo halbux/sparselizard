@@ -2,7 +2,7 @@
 #include "sl.h"
 #include "mat.h"
 #include "vec.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 
 
 spline::spline(std::string filename, char delimiter)
@@ -55,7 +55,7 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     
     // First sort ascendingly according to x:
     std::vector<int> reorderingvector;
-    myalgorithm::stablesort(0, xin, reorderingvector);
+    gentools::stablesort(0, xin, reorderingvector);
     for (int i = 0; i < len; i++)
     {
         xvals[i] = xin[reorderingvector[i]];
@@ -164,7 +164,7 @@ densemat spline::evalat(densemat input)
     
     // Sort the input data ascendingly:
     std::vector<int> reorderingvector;
-    myalgorithm::stablesort(0, invals, reorderingvector);
+    gentools::stablesort(0, invals, reorderingvector);
     for (int i = 0; i < numin; i++)
         inputvals[i] = invals[reorderingvector[i]];
     double inmin = inputvals[0]; double inmax = inputvals[numin-1];

@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include "disjointregions.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "elements.h"
 #include "universe.h"
 #include <vector>

@@ -1,5 +1,5 @@
 #include "htracker.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "lagrangeformfunction.h"
 
 
@@ -61,17 +61,17 @@ htracker::htracker(std::shared_ptr<rawmesh> origmesh, int curvatureorder, std::v
     for (int i = 0; i < 8; i++)
     {
         int num = originalcount[i];
-        transitionsrefcoords[i] = myalgorithm::duplicate(straightrefcoords[i], num);
+        transitionsrefcoords[i] = gentools::duplicate(straightrefcoords[i], num);
         // Leaves equal originals here:
-        leavesoftransitions[i] = myalgorithm::getequallyspaced(ind, 1, num);
+        leavesoftransitions[i] = gentools::getequallyspaced(ind, 1, num);
         originalsoftransitions[i] = std::vector<int>(2*num);
         for (int j = 0; j < num; j++)
         {
             originalsoftransitions[i][2*j+0] = i;
             originalsoftransitions[i][2*j+1] = j;
         }
-        touser[i] = myalgorithm::getequallyspaced(0, 1, num);
-        toht[i] = myalgorithm::getequallyspaced(0, 1, num);
+        touser[i] = gentools::getequallyspaced(0, 1, num);
+        toht[i] = gentools::getequallyspaced(0, 1, num);
         
         ind += num;
     }
@@ -629,7 +629,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
     // Assign unique edge numbers and deduce edge splits:
     std::vector<int> edgenumbers;
     std::vector<bool> isedgesplit;
-    myalgorithm::assignedgenumbers(iol, cornerapc, edgenumbers, isedgesplit);
+    gentools::assignedgenumbers(iol, cornerapc, edgenumbers, isedgesplit);
     
 
     // Preallocate output containers to upper bound size:
@@ -678,7 +678,7 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
             curisedgesplit[i] = isedgesplit[firstedge[t]+i];
         }
         
-        int splitnum = myalgorithm::binarytoint(curisedgesplit);
+        int splitnum = gentools::binarytoint(curisedgesplit);
         std::vector<std::vector<int>> splitrefnums = myelems[t].split(splitnum, curedgenums);
       
         // Loop on all transition elements:
@@ -739,8 +739,8 @@ void htracker::getadaptedcoordinates(std::vector<std::vector<double>>& ac)
         leavesoftransitions[i].resize(ite[i]);
         originalsoftransitions[i].resize(2*ite[i]);
         
-        touser[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
-        toht[i] = myalgorithm::getequallyspaced(0, 1, ite[i]);
+        touser[i] = gentools::getequallyspaced(0, 1, ite[i]);
+        toht[i] = gentools::getequallyspaced(0, 1, ite[i]);
     }
 }
 
@@ -795,8 +795,8 @@ void htracker::renumbertransitions(std::vector<std::vector<int>>& renumbering)
 {
     for (int i = 0; i < 8; i++)
     {
-        touser[i] = myalgorithm::chainrenumbering(touser[i], renumbering[i]);
-        toht[i] = myalgorithm::invertrenumbering(touser[i]);
+        touser[i] = gentools::chainrenumbering(touser[i], renumbering[i]);
+        toht[i] = gentools::invertrenumbering(touser[i]);
     }
 }
 
@@ -907,7 +907,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             origelem++;
             // Set all to active:
             int numrefsinorig = (oad[origelem+1]-oad[origelem])/3;
-            actives[0] = myalgorithm::getequallyspaced(oad[origelem]/3, 1, numrefsinorig);
+            actives[0] = gentools::getequallyspaced(oad[origelem]/3, 1, numrefsinorig);
         }
         else
         {
@@ -929,7 +929,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
             std::vector<bool> isinside;
             myelems[t].isinsideelement(parcoords, refcoords, isinside, 1e-10);
             
-            myalgorithm::splitvector(par, isinside, actives[ns-1], actives[ns]);
+            gentools::splitvector(par, isinside, actives[ns-1], actives[ns]);
         }
     
         if (isatleaf())
@@ -962,7 +962,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     myelems[i].isinsideelement(activecoords, currefcoords, isintrans, 1e-10);
                     // Actives in the current transition element:
                     std::vector<int> activesintrans;
-                    myalgorithm::splitvector(activesinleaf, isintrans, actives[ns], activesintrans);
+                    gentools::splitvector(activesinleaf, isintrans, actives[ns], activesintrans);
             
                     // Populate 'ad':
                     ad[i][ti[i]+1] = ad[i][ti[i]]+3*activesintrans.size();
@@ -971,7 +971,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                     {
                         // Find the corresponding reference coordinate in the transition element's own reference.
                         // First create the polynomials for the system to solve.
-                        std::vector<double> xyz = myalgorithm::separate(currefcoords, 3, myalgorithm::getequallyspaced(0,1,elemdim));
+                        std::vector<double> xyz = gentools::separate(currefcoords, 3, gentools::getequallyspaced(0,1,elemdim));
                         polynomials syspolys = polys[i].sum(xyz);
                 
                         // Loop on all actives:
@@ -980,7 +980,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                             std::vector<double> kietaphi = {0.0,0.0,0.0};
                             std::vector<double> rhs = {orc[3*activesintrans[j]+0], orc[3*activesintrans[j]+1], orc[3*activesintrans[j]+2]};
                             
-                            if (myalgorithm::getroot(syspolys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
+                            if (gentools::getroot(syspolys, rhs, kietaphi) == 1 && myelems[i].isinsideelement(kietaphi[0], kietaphi[1], kietaphi[2]))
                             {
                                 rc[i][ad[i][ti[i]]+3*j+0] = kietaphi[0];
                                 rc[i][ad[i][ti[i]]+3*j+1] = kietaphi[1];
@@ -1034,7 +1034,7 @@ void htracker::getattarget(std::vector<std::vector<int>>& userad, std::vector<st
     for (int i = 0; i < 8; i++)
     {
         if (userrc[i].size() > 0)
-            myalgorithm::reorder(userad[i], userrc[i], toht[i], ad[i], rc[i]);
+            gentools::reorder(userad[i], userrc[i], toht[i], ad[i], rc[i]);
     }
 
 

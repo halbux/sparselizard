@@ -384,7 +384,7 @@ indexmat dofmanager::getconstrainedindexes(void)
 {
     std::vector<bool> isconstr = isconstrained();
 
-    int numconstr = myalgorithm::counttrue(isconstr);
+    int numconstr = gentools::counttrue(isconstr);
     indexmat out(numconstr, 1);
     int* outptr = out.getvalues();
     
@@ -764,10 +764,10 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
     for (int n = 0; n < numneighbours; n++)
     {
         std::vector<bool> ic;
-        myalgorithm::select(isdofconstrained, senddofinds[n], ic);
+        gentools::select(isdofconstrained, senddofinds[n], ic);
 
-        myalgorithm::pack(ic, isconstrainedforneighbours[n]);
-        isconstrainedfromneighbours[n].resize(myalgorithm::getpackedsize(recvdofinds[n].count()));
+        gentools::pack(ic, isconstrainedforneighbours[n]);
+        isconstrainedfromneighbours[n].resize(gentools::getpackedsize(recvdofinds[n].count()));
     }
     
     slmpi::exchange(neighbours, isconstrainedforneighbours, isconstrainedfromneighbours);
@@ -778,7 +778,7 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
         int* recvindsptr = recvdofinds[n].getvalues();
                 
         std::vector<bool> isconstrainedinneighbour;
-        myalgorithm::unpack(recvdofinds[n].count(), isconstrainedfromneighbours[n], isconstrainedinneighbour);
+        gentools::unpack(recvdofinds[n].count(), isconstrainedfromneighbours[n], isconstrainedinneighbour);
         
         std::vector<bool> isnewlyconstrained(recvdofinds[n].count(), false);
         
@@ -793,8 +793,8 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
         }
         recvnewconstrainedinds[n] = recvdofinds[n].select(isnewlyconstrained, true);
         
-        myalgorithm::pack(isnewlyconstrained, isnewlyconstrainedforneighbours[n]);
-        isnewlyconstrainedfromneighbours[n].resize(myalgorithm::getpackedsize(senddofinds[n].count()));
+        gentools::pack(isnewlyconstrained, isnewlyconstrainedforneighbours[n]);
+        isnewlyconstrainedfromneighbours[n].resize(gentools::getpackedsize(senddofinds[n].count()));
     }
     slmpi::exchange(neighbours, isnewlyconstrainedforneighbours, isnewlyconstrainedfromneighbours);
     
@@ -802,7 +802,7 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
     for (int n = 0; n < numneighbours; n++)
     {
         std::vector<bool> isnewlyconstrainedinneighbour;
-        myalgorithm::unpack(senddofinds[n].count(), isnewlyconstrainedfromneighbours[n], isnewlyconstrainedinneighbour);
+        gentools::unpack(senddofinds[n].count(), isnewlyconstrainedfromneighbours[n], isnewlyconstrainedinneighbour);
         sendnewconstrainedinds[n] = senddofinds[n].select(isnewlyconstrainedinneighbour, true);
     }
     
@@ -810,9 +810,9 @@ std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vecto
     for (int n = 0; n < numneighbours; n++)
     {
         std::vector<bool> si, ri;
-        myalgorithm::select(isdofconstrained, senddofinds[n], si);
+        gentools::select(isdofconstrained, senddofinds[n], si);
         sendunconstrainedinds[n] = senddofinds[n].select(si, false);
-        myalgorithm::select(isdofconstrained, recvdofinds[n], ri);
+        gentools::select(isdofconstrained, recvdofinds[n], ri);
         recvunconstrainedinds[n] = recvdofinds[n].select(ri, false);
     }
     

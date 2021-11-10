@@ -30,7 +30,7 @@
 #include "mystring.h"
 #include "wallclock.h"
 #include "shape.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "iointerface.h"
 #include "spline.h"
 #include "referencecoordinategroup.h"

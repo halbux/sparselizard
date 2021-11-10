@@ -239,7 +239,7 @@ shape shape::extrude(int physreg, double height, int numlayers, std::vector<doub
         abort();
     }
     
-    myalgorithm::normvector(extrudedirection);
+    gentools::normvector(extrudedirection);
     
     return shape(rawshapeptr->duplicate()->extrude(physreg, height, numlayers, extrudedirection));
 }
@@ -252,7 +252,7 @@ std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> 
         abort();
     }
  
-    myalgorithm::normvector(extrudedirection);
+    gentools::normvector(extrudedirection);
     
     int num = physreg.size();
     std::vector<shape> output(num);

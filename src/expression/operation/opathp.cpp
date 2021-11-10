@@ -1,5 +1,5 @@
 #include "opathp.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 
 
 opathp::opathp(std::shared_ptr<operation> arg, std::shared_ptr<rawmesh> rm, std::shared_ptr<ptracker> pt)
@@ -48,7 +48,7 @@ std::vector<std::vector<densemat>> opathp::interpolate(elementselector& elemsele
         std::vector<std::vector<int>> ads;
         std::vector<std::vector<double>> rcs;
         std::vector<int> indexinrcsoforigin;
-        myalgorithm::toaddressdata(elemnumshere, evalcoordshere, universe::getrawmesh()->getelements()->count(), ads, rcs, indexinrcsoforigin);
+        gentools::toaddressdata(elemnumshere, evalcoordshere, universe::getrawmesh()->getelements()->count(), ads, rcs, indexinrcsoforigin);
         
         // Find at target:
         std::vector<std::vector<int>> tel;

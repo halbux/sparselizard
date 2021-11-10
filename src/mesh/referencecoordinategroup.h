@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "coordinategroup.h"
 
 class referencecoordinategroup

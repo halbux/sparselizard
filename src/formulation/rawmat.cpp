@@ -130,7 +130,7 @@ void rawmat::process(std::vector<bool>& isconstrained)
     
     // Create Ainds and Dinds:
     std::vector<int> renumtolocalindex;
-    myalgorithm::findtruefalse(isconstrained, Dinds, Ainds, renumtolocalindex);
+    gentools::findtruefalse(isconstrained, Dinds, Ainds, renumtolocalindex);
     
     // Get an upper bound on the number of nonzeros in each row:
     long long int maxnnz = 0;
@@ -235,8 +235,8 @@ void rawmat::process(std::vector<bool>& isconstrained)
     else
         processrows(0, ndofs-1, maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[0], &nnzDparts[0]);
 
-    nnzA = myalgorithm::sum(nnzAparts);
-    nnzD = myalgorithm::sum(nnzDparts);
+    nnzA = gentools::sum(nnzAparts);
+    nnzD = gentools::sum(nnzDparts);
 
     // Create A and D:
     Arows = indexmat(Ainds.count()+1,1);

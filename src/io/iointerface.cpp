@@ -166,18 +166,18 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         {
             // First integer is the intdata size, second is the doubledata size:
             std::getline(name, currentline);
-            myalgorithm::osclean(currentline);
+            gentools::osclean(currentline);
             intdata.resize(std::stoi(currentline));
             
             std::getline(name, currentline);
-            myalgorithm::osclean(currentline);
+            gentools::osclean(currentline);
             doubledata.resize(std::stoi(currentline));
 
             // Load the intdata:
             for (int i = 0; i < intdata.size(); i++)
             {
                 std::getline(name, currentline);
-                myalgorithm::osclean(currentline);
+                gentools::osclean(currentline);
                 intdata[i] = std::stoi(currentline);
             }
             
@@ -185,7 +185,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             for (int i = 0; i < doubledata.size(); i++)
             {
                 std::getline(name, currentline);
-                myalgorithm::osclean(currentline);
+                gentools::osclean(currentline);
                 doubledata[i] = std::stod(currentline);
             }
 

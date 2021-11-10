@@ -1,4 +1,4 @@
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "sl.h"
 #include "universe.h"
 #include "disjointregions.h"
@@ -9,7 +9,7 @@
 #include <parallel/algorithm>
 #endif
 
-void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
+void gentools::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
 {
     // There is a x, y and z coordinate for every node:
     int numberofnodes = coordinates.size()/3;
@@ -47,7 +47,7 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
         });
 }
 
-void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<int>& elems, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
+void gentools::stablecoordinatesort(std::vector<double> noisethreshold, std::vector<int>& elems, std::vector<double>& coordinates, std::vector<int>& reorderingvector)
 {
     int numberofnodes = elems.size();
     
@@ -86,7 +86,7 @@ void myalgorithm::stablecoordinatesort(std::vector<double> noisethreshold, std::
         });
 }
 
-int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector)
+int gentools::removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector)
 {
     int numpts = coordinates.size()/3;
     renumberingvector = std::vector<int>(numpts, -1);
@@ -133,7 +133,7 @@ int myalgorithm::removeduplicates(std::vector<double>& coordinates, std::vector<
     return numnonduplicates;
 }
 
-void myalgorithm::removeduplicates(std::vector<double>& coordinates)
+void gentools::removeduplicates(std::vector<double>& coordinates)
 {
     std::vector<int> renumberingvector;
 
@@ -152,7 +152,7 @@ void myalgorithm::removeduplicates(std::vector<double>& coordinates)
     coordinates = uniquecoords;
 }
 
-void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector)
+void gentools::stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector)
 {
     if (reorderingvector.size() != tosort.size())
         reorderingvector.resize(tosort.size());
@@ -176,7 +176,7 @@ void myalgorithm::stablesort(std::vector<int>& tosort, std::vector<int>& reorder
         });
 }
 
-void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector)
+void gentools::stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector)
 {
     if (reorderingvector.size() != tosort.size())
         reorderingvector.resize(tosort.size());
@@ -196,7 +196,7 @@ void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort,
         });
 }
 
-void myalgorithm::stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector, int blocklen)
+void gentools::stablesort(double noisethreshold, std::vector<double>& tosort, std::vector<int>& reorderingvector, int blocklen)
 {
     if (reorderingvector.size() != tosort.size()/blocklen)
         reorderingvector.resize(tosort.size()/blocklen);
@@ -234,7 +234,7 @@ bool sortfun(const std::tuple<int,int,double>& elem1, const std::tuple<int,int,d
     abort(); // fix return warning
 }
     
-void myalgorithm::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
+void gentools::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
 {
     // Parallel sort on Linux only for now:
     #if defined(__linux__)
@@ -244,7 +244,7 @@ void myalgorithm::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
     #endif
 }
 
-void myalgorithm::slicecoordinates(std::vector<double>& toslice, double minx, double miny, double minz, double dx, double dy, double dz, int nsx, int nsy, int nsz, std::vector<int>& ga, int* pn, double* pc)
+void gentools::slicecoordinates(std::vector<double>& toslice, double minx, double miny, double minz, double dx, double dy, double dz, int nsx, int nsy, int nsz, std::vector<int>& ga, int* pn, double* pc)
 {
     int numpoints = toslice.size()/3;
     int numgroups = nsx*nsy*nsz;
@@ -297,7 +297,7 @@ void myalgorithm::slicecoordinates(std::vector<double>& toslice, double minx, do
     }
 }
 
-std::vector<double> myalgorithm::getcoordbounds(std::vector<double>& coords)
+std::vector<double> gentools::getcoordbounds(std::vector<double>& coords)
 {
     int numcoords = coords.size()/3;
     
@@ -324,7 +324,7 @@ std::vector<double> myalgorithm::getcoordbounds(std::vector<double>& coords)
     return output;
 }
 
-std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
+std::vector<int> gentools::intersect(std::vector<int> a, std::vector<int> b)
 {
     // Sort both vectors:
     std::sort(a.begin(), a.end()); 
@@ -340,7 +340,7 @@ std::vector<int> myalgorithm::intersect(std::vector<int> a, std::vector<int> b)
     return output;
 }
 
-void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
+void gentools::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
 {
     // Loop on all rows:
     int index = 0;
@@ -355,7 +355,7 @@ void myalgorithm::csrtoijk(int numberofrows, int* csrrows, int* ijkrows)
     }
 }
 
-int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vector<double>& guess, double boxsize, double tol, int maxit)
+int gentools::getroot(polynomials& polys, std::vector<double>& rhs, std::vector<double>& guess, double boxsize, double tol, int maxit)
 {
     int it = 0;
     double deltaki = 1.0, deltaeta = 1.0, deltaphi = 1.0;
@@ -489,7 +489,7 @@ int myalgorithm::getroot(polynomials& polys, std::vector<double>& rhs, std::vect
     return 1;
 }
 
-void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
+void gentools::getreferencecoordinates(coordinategroup& coordgroup, int disjreg, std::vector<int>& elems, std::vector<double>& kietaphis)
 {
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     
@@ -573,7 +573,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
                     
                         std::vector<double> curcoords = myelems->getnodecoordinates(elemtypenum, curelem);
                         
-                        std::vector<double> xyz = myalgorithm::separate(curcoords, 3, trimmedcr);
+                        std::vector<double> xyz = gentools::separate(curcoords, 3, trimmedcr);
                         syspolys = polys.sum(xyz);
                     }
                     rhs = {rhs[coordranking[0]],rhs[coordranking[1]],rhs[coordranking[2]]};
@@ -596,7 +596,7 @@ void myalgorithm::getreferencecoordinates(coordinategroup& coordgroup, int disjr
     }
 }
 
-std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& tosplit, int blocklen)
+std::vector<std::vector<double>> gentools::splitvector(std::vector<double>& tosplit, int blocklen)
 {
     int numdata = tosplit.size()/blocklen;
 
@@ -611,7 +611,7 @@ std::vector<std::vector<double>> myalgorithm::splitvector(std::vector<double>& t
     return output;
 }
 
-void myalgorithm::splitvector(std::vector<int>& vec, std::vector<bool>& select, std::vector<int>& falses, std::vector<int>& trues)
+void gentools::splitvector(std::vector<int>& vec, std::vector<bool>& select, std::vector<int>& falses, std::vector<int>& trues)
 {
     int numtrue = 0;
     for (int i = 0; i < select.size(); i++)
@@ -639,7 +639,7 @@ void myalgorithm::splitvector(std::vector<int>& vec, std::vector<bool>& select, 
     }
 }
 
-void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindexes, std::vector<int>& selected)
+void gentools::select(std::vector<int>& vals, std::vector<int>& selectedindexes, std::vector<int>& selected)
 {
     int numselected = selectedindexes.size();
     selected.resize(numselected);
@@ -648,7 +648,7 @@ void myalgorithm::select(std::vector<int>& vals, std::vector<int>& selectedindex
         selected[i] = vals[selectedindexes[i]];
 }
 
-void myalgorithm::select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected)
+void gentools::select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected)
 {
     int numselected = selectedindexes.count();
     selected.resize(numselected);
@@ -659,7 +659,7 @@ void myalgorithm::select(std::vector<bool>& vals, indexmat selectedindexes, std:
         selected[i] = vals[selptr[i]];
 }
 
-bool myalgorithm::isflipped(std::vector<int>& a, std::vector<int>& b)
+bool gentools::isflipped(std::vector<int>& a, std::vector<int>& b)
 {
     int num = a.size();
     if (num == 1)
@@ -685,7 +685,7 @@ bool myalgorithm::isflipped(std::vector<int>& a, std::vector<int>& b)
         return true;
 }
 
-std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blocklen)
+std::vector<double> gentools::normblocks(std::vector<double>& tonorm, int blocklen)
 {
     int numblocks = tonorm.size()/blocklen;
 
@@ -708,7 +708,7 @@ std::vector<double> myalgorithm::normblocks(std::vector<double>& tonorm, int blo
     return output;
 }
 
-int myalgorithm::findinterval(double val, std::vector<double>& tics)
+int gentools::findinterval(double val, std::vector<double>& tics)
 {
     int numintervals = tics.size()-1;
     // In first interval?
@@ -726,7 +726,7 @@ int myalgorithm::findinterval(double val, std::vector<double>& tics)
     abort(); // fix return warning
 }
 
-std::vector<double> myalgorithm::getintervaltics(double minval, double maxval, int numintervals)
+std::vector<double> gentools::getintervaltics(double minval, double maxval, int numintervals)
 {
     double range = maxval - minval;
     double step = range/((double)numintervals);
@@ -738,7 +738,7 @@ std::vector<double> myalgorithm::getintervaltics(double minval, double maxval, i
     return output;
 }
 
-std::string myalgorithm::getfileextension(std::string filename)
+std::string gentools::getfileextension(std::string filename)
 {
     int index = -1;
     for (int i = filename.length()-1; i >= 0; i--)
@@ -755,7 +755,7 @@ std::string myalgorithm::getfileextension(std::string filename)
         return "";
 }
 
-std::string myalgorithm::getfilename(std::string filename)
+std::string gentools::getfilename(std::string filename)
 {
     int startindex = -2, endindex = -2;
     for (int i = filename.length()-1; i >= 0; i--)
@@ -776,7 +776,7 @@ std::string myalgorithm::getfilename(std::string filename)
         return filename.substr(startindex, endindex-startindex+1);
 }
 
-std::string myalgorithm::getplurals(int count)
+std::string gentools::getplurals(int count)
 {
     if (count > 1)
         return "s";
@@ -784,7 +784,7 @@ std::string myalgorithm::getplurals(int count)
         return "";
 }
 
-std::vector<int> myalgorithm::getequallyspaced(int start, int space, int amount)
+std::vector<int> gentools::getequallyspaced(int start, int space, int amount)
 {
     std::vector<int> output(amount);
     for (int i = 0; i < amount; i++)
@@ -793,7 +793,7 @@ std::vector<int> myalgorithm::getequallyspaced(int start, int space, int amount)
     return output;
 }
 
-std::vector<double> myalgorithm::duplicate(std::vector<double> invec, int n)
+std::vector<double> gentools::duplicate(std::vector<double> invec, int n)
 {
     int len = invec.size();
     std::vector<double> out(len*n);
@@ -805,14 +805,14 @@ std::vector<double> myalgorithm::duplicate(std::vector<double> invec, int n)
     return out;
 }
 
-void myalgorithm::osclean(std::string& line)
+void gentools::osclean(std::string& line)
 {
     int siz = line.size();
     if (siz > 0 && line[siz-1] == '\r')
         line.resize(siz-1);
 }
 
-std::vector<bool> myalgorithm::inttobinary(int numbits, int num)
+std::vector<bool> gentools::inttobinary(int numbits, int num)
 {
     std::vector<bool> output(numbits, false);
 
@@ -832,7 +832,7 @@ std::vector<bool> myalgorithm::inttobinary(int numbits, int num)
     return output;
 }
 
-int myalgorithm::binarytoint(std::vector<bool> num)
+int gentools::binarytoint(std::vector<bool> num)
 {
     int output = 0;
 
@@ -847,19 +847,19 @@ int myalgorithm::binarytoint(std::vector<bool> num)
     return output;
 }
 
-double myalgorithm::exactinttodouble(long long int num)
+double gentools::exactinttodouble(long long int num)
 {
     // All integers of absolute value < 2^53 can be exactly represented in IEEE double format:
     if (std::abs(num) < 9007199254740992)
         return (double)num;
     else
     {
-        std::cout << "Error in 'myalgorithm' namespace: integer " << num << " is too large to be exactly represented in double format" << std::endl;
+        std::cout << "Error in 'gentools' namespace: integer " << num << " is too large to be exactly represented in double format" << std::endl;
         abort();
     }
 }
 
-int myalgorithm::identifyrelations(std::vector<int> numbers)
+int gentools::identifyrelations(std::vector<int> numbers)
 {
     if (numbers.size() <= 1)
         return 0;
@@ -880,7 +880,7 @@ int myalgorithm::identifyrelations(std::vector<int> numbers)
     return (maxpos * fact + identifyrelations(numbers));
 }
 
-int myalgorithm::factorial(int n)
+int gentools::factorial(int n)
 {
     int out = 1;
     for (int i = 2; i <= n; i++)
@@ -889,7 +889,7 @@ int myalgorithm::factorial(int n)
     return out;
 }
 
-void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
+void gentools::assignedgenumbers(std::vector<bool>& isownelem, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode)
 {
     int numranks = slmpi::count();
     int rank = slmpi::getrank();
@@ -1029,7 +1029,7 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
     std::vector<std::vector<int>> posfound(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
-        myalgorithm::findcoordinates(ownbarysrecvs[n], barys, posfound[n]);
+        gentools::findcoordinates(ownbarysrecvs[n], barys, posfound[n]);
 
         for (int i = 0; i < posfound[n].size(); i++)
         {
@@ -1059,7 +1059,7 @@ void myalgorithm::assignedgenumbers(std::vector<bool>& isownelem, std::vector<st
     }
 }
 
-std::vector<double> myalgorithm::separate(std::vector<double>& v, int blocklen, std::vector<int> sel)
+std::vector<double> gentools::separate(std::vector<double>& v, int blocklen, std::vector<int> sel)
 {
     int numblocks = v.size()/blocklen;
     
@@ -1074,7 +1074,7 @@ std::vector<double> myalgorithm::separate(std::vector<double>& v, int blocklen, 
     return output;
 }
 
-std::vector<int> myalgorithm::chainrenumbering(std::vector<int>& originalrenum, std::vector<int>& newrenum)
+std::vector<int> gentools::chainrenumbering(std::vector<int>& originalrenum, std::vector<int>& newrenum)
 {
     std::vector<int> output(originalrenum.size());
 
@@ -1084,7 +1084,7 @@ std::vector<int> myalgorithm::chainrenumbering(std::vector<int>& originalrenum, 
     return output;
 }
 
-std::vector<int> myalgorithm::invertrenumbering(std::vector<int>& renum)
+std::vector<int> gentools::invertrenumbering(std::vector<int>& renum)
 {
     std::vector<int> output(renum.size());
 
@@ -1094,7 +1094,7 @@ std::vector<int> myalgorithm::invertrenumbering(std::vector<int>& renum)
     return output;
 }
 
-std::vector<int> myalgorithm::getreordering(std::vector<int>& renum)
+std::vector<int> gentools::getreordering(std::vector<int>& renum)
 {
     std::vector<int> out(renum.size());
     
@@ -1104,7 +1104,7 @@ std::vector<int> myalgorithm::getreordering(std::vector<int>& renum)
     return out;
 }
 
-void myalgorithm::reorder(std::vector<int>& inad, std::vector<double>& indat, std::vector<int>& renumbering, std::vector<int>& outad, std::vector<double>& outdat)
+void gentools::reorder(std::vector<int>& inad, std::vector<double>& indat, std::vector<int>& renumbering, std::vector<int>& outad, std::vector<double>& outdat)
 {
     if (indat.size() == 0)
     {
@@ -1133,7 +1133,7 @@ void myalgorithm::reorder(std::vector<int>& inad, std::vector<double>& indat, st
     }
 }
 
-void myalgorithm::toaddressdata(std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> totalnumelems, std::vector<std::vector<int>>& ads, std::vector<std::vector<double>>& rcs, std::vector<int>& indexinrcsoforigin)
+void gentools::toaddressdata(std::vector<int>& elems, std::vector<double>& refcoords, std::vector<int> totalnumelems, std::vector<std::vector<int>>& ads, std::vector<std::vector<double>>& rcs, std::vector<int>& indexinrcsoforigin)
 {
     int ne = elems.size()/2;
 
@@ -1192,7 +1192,7 @@ void myalgorithm::toaddressdata(std::vector<int>& elems, std::vector<double>& re
     }
 }
 
-std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
+std::vector<int> gentools::concatenate(std::vector<std::vector<int>> tocat)
 {
     // Get the total size:
     int len = 0;
@@ -1213,7 +1213,7 @@ std::vector<int> myalgorithm::concatenate(std::vector<std::vector<int>> tocat)
     return output;
 }
 
-void myalgorithm::concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated)
+void gentools::concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated)
 {
     // Get the total size:
     int len = 0;
@@ -1232,7 +1232,7 @@ void myalgorithm::concatenate(std::vector<std::vector<double>>& tocat, std::vect
     }
 }
 
-int myalgorithm::inequalitytoint(int a, int b)
+int gentools::inequalitytoint(int a, int b)
 {
     if (a < b)
         return -1;
@@ -1245,7 +1245,7 @@ int myalgorithm::inequalitytoint(int a, int b)
     }
 }
 
-void myalgorithm::normvector(std::vector<double>& tonorm)
+void gentools::normvector(std::vector<double>& tonorm)
 {
     // Compute the norm:
     double nrm = 0.0;
@@ -1258,7 +1258,7 @@ void myalgorithm::normvector(std::vector<double>& tonorm)
         tonorm[i] = invnrm * tonorm[i];
 }
 
-void myalgorithm::solveuppertriangular(int len, double* U, double* b, double* x)
+void gentools::solveuppertriangular(int len, double* U, double* b, double* x)
 {
     // Init x to all zero:
     for (int i = 0; i < len; i++)
@@ -1281,7 +1281,7 @@ void myalgorithm::solveuppertriangular(int len, double* U, double* b, double* x)
     }
 }
 
-void myalgorithm::givensrotation(double a, double b, double& c, double& s, double& r)
+void gentools::givensrotation(double a, double b, double& c, double& s, double& r)
 {
     // As in www.netlib.org/eispack/comqr.f
     r = std::sqrt(a*a + b*b);
@@ -1289,7 +1289,7 @@ void myalgorithm::givensrotation(double a, double b, double& c, double& s, doubl
     s = b/r;
 }
 
-void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k)
+void gentools::applygivensrotation(double* h, std::vector<double>& cs, std::vector<double>& sn, int k)
 {
     for (int i = 0; i < k; i++)
     {
@@ -1307,7 +1307,7 @@ void myalgorithm::applygivensrotation(double* h, std::vector<double>& cs, std::v
     h[k+1] = 0.0;
 }
 
-std::vector<double> myalgorithm::arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k)
+std::vector<double> gentools::arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k)
 {   
     // One Krylov vector on each row:
     int n = Q.countcolumns();
@@ -1319,7 +1319,7 @@ std::vector<double> myalgorithm::arnoldi(densemat (*mymatmult)(densemat), densem
     
     if (q.countrows() != n || q.countcolumns() != 1)
     {
-        std::cout << "Error in 'myalgorithm' namespace: in function arnoldi the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
+        std::cout << "Error in 'gentools' namespace: in function arnoldi the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
         abort();
     }
     
@@ -1356,7 +1356,7 @@ std::vector<double> myalgorithm::arnoldi(densemat (*mymatmult)(densemat), densem
     return hvec;
 }
 
-int myalgorithm::squeeze(std::vector<int>& nums, int maxval, std::vector<int>& renumbering)
+int gentools::squeeze(std::vector<int>& nums, int maxval, std::vector<int>& renumbering)
 {
     std::vector<bool> isactive(maxval+1, false);
     for (int i = 0; i < nums.size(); i++)
@@ -1376,7 +1376,7 @@ int myalgorithm::squeeze(std::vector<int>& nums, int maxval, std::vector<int>& r
     return index;
 }
 
-void myalgorithm::find(std::vector<bool>& invec, int numtrue, std::vector<int>& trueindexes)
+void gentools::find(std::vector<bool>& invec, int numtrue, std::vector<int>& trueindexes)
 {
     if (numtrue == -1)
     {
@@ -1401,7 +1401,7 @@ void myalgorithm::find(std::vector<bool>& invec, int numtrue, std::vector<int>& 
     }
 }
 
-int myalgorithm::findcoordinates(std::vector<double>& targetcoords, std::vector<double>& tofindintarget, std::vector<int>& posfound)
+int gentools::findcoordinates(std::vector<double>& targetcoords, std::vector<double>& tofindintarget, std::vector<int>& posfound)
 {
     int nct = targetcoords.size()/3;
     int ncf = tofindintarget.size()/3;
@@ -1414,7 +1414,7 @@ int myalgorithm::findcoordinates(std::vector<double>& targetcoords, std::vector<
         allcoords[targetcoords.size()+i] = tofindintarget[i];
 
     std::vector<int> renumberingvector;
-    myalgorithm::removeduplicates(allcoords, renumberingvector);
+    gentools::removeduplicates(allcoords, renumberingvector);
 
     // This is needed for general renumbering vectors (also allows duplicates in the target):
     std::vector<int> targetpositions(nct+ncf, -1);
@@ -1436,7 +1436,7 @@ int myalgorithm::findcoordinates(std::vector<double>& targetcoords, std::vector<
     return numfound;
 }
 
-void myalgorithm::selectcoordinates(std::vector<bool>& selection, std::vector<double>& coords, double* selectedcoords)
+void gentools::selectcoordinates(std::vector<bool>& selection, std::vector<double>& coords, double* selectedcoords)
 {
     int index = 0;
     for (int i = 0; i < selection.size(); i++)
@@ -1452,7 +1452,7 @@ void myalgorithm::selectcoordinates(std::vector<bool>& selection, std::vector<do
     }
 }
 
-void myalgorithm::pickcandidates(int numbertopick, std::vector<double>& candidatecoordinates, std::vector<double>& picked)
+void gentools::pickcandidates(int numbertopick, std::vector<double>& candidatecoordinates, std::vector<double>& picked)
 {
     picked = {};
     
@@ -1478,7 +1478,7 @@ void myalgorithm::pickcandidates(int numbertopick, std::vector<double>& candidat
     }
 }
 
-void myalgorithm::split(std::vector< std::vector<std::vector<double>> >& data, std::vector<double>& dataa, std::vector<double>& datab, std::vector<std::vector<int>>& sizesa, std::vector<std::vector<int>>& sizesb)
+void gentools::split(std::vector< std::vector<std::vector<double>> >& data, std::vector<double>& dataa, std::vector<double>& datab, std::vector<std::vector<int>>& sizesa, std::vector<std::vector<int>>& sizesb)
 {
     int sizea = 0;
     int sizeb = 0;
@@ -1535,7 +1535,7 @@ void myalgorithm::split(std::vector< std::vector<std::vector<double>> >& data, s
     }
 }
 
-void myalgorithm::pack(std::vector<int> tags, std::vector<std::vector<double>>& topack, std::vector<std::vector<double>>& packed)
+void gentools::pack(std::vector<int> tags, std::vector<std::vector<double>>& topack, std::vector<std::vector<double>>& packed)
 {
     int numtags = tags.size();
 
@@ -1593,7 +1593,7 @@ void myalgorithm::pack(std::vector<int> tags, std::vector<std::vector<double>>& 
     }
 }
 
-std::vector<int> myalgorithm::unpack(std::vector<double>& packed, std::vector<std::vector<double>>& unpacked)
+std::vector<int> gentools::unpack(std::vector<double>& packed, std::vector<std::vector<double>>& unpacked)
 {
     // Get the number of datasets:
     int numdatasets = 0;
@@ -1630,7 +1630,7 @@ std::vector<int> myalgorithm::unpack(std::vector<double>& packed, std::vector<st
     return output;
 }
 
-std::vector<int> myalgorithm::extract(std::vector<int>& data, int period, int shift)
+std::vector<int> gentools::extract(std::vector<int>& data, int period, int shift)
 {
     int numperiods = data.size()/period;
     
@@ -1655,7 +1655,7 @@ std::vector<int> myalgorithm::extract(std::vector<int>& data, int period, int sh
     return output;
 }
 
-std::vector<double> myalgorithm::extract(std::vector<double>& data, int period, int shift)
+std::vector<double> gentools::extract(std::vector<double>& data, int period, int shift)
 {
     int numperiods = data.size()/period;
     
@@ -1680,7 +1680,7 @@ std::vector<double> myalgorithm::extract(std::vector<double>& data, int period, 
     return output;
 }
 
-int myalgorithm::ceildiv(int a, int b)
+int gentools::ceildiv(int a, int b)
 {
     int r = a%b;
     if (r == 0)
@@ -1689,7 +1689,7 @@ int myalgorithm::ceildiv(int a, int b)
         return (a-r)/b+1;
 }
 
-int myalgorithm::getpackedsize(int numbits)
+int gentools::getpackedsize(int numbits)
 {
     int numbitsinint = 8 * sizeof(int); // to be os independent
     numbitsinint--; // sign bit is not used to avoid issues on 0 int value
@@ -1697,7 +1697,7 @@ int myalgorithm::getpackedsize(int numbits)
     return ceildiv(numbits, numbitsinint);
 }
 
-void myalgorithm::pack(std::vector<bool>& topack, std::vector<int>& packed)
+void gentools::pack(std::vector<bool>& topack, std::vector<int>& packed)
 {   
     int numbitsinint = 8 * sizeof(int); // to be os independent
     numbitsinint--; // sign bit is not used to avoid issues on 0 int value
@@ -1723,7 +1723,7 @@ void myalgorithm::pack(std::vector<bool>& topack, std::vector<int>& packed)
     }
 }
 
-void myalgorithm::unpack(int orignumbools, std::vector<int>& packed, std::vector<bool>& unpacked)
+void gentools::unpack(int orignumbools, std::vector<int>& packed, std::vector<bool>& unpacked)
 {
     unpacked = std::vector<bool>(orignumbools, false);
 
@@ -1750,7 +1750,7 @@ void myalgorithm::unpack(int orignumbools, std::vector<int>& packed, std::vector
     }
 }
 
-void myalgorithm::split(std::vector<int>& vals, int val, std::vector<int>& lowervals, std::vector<int>& highervals)
+void gentools::split(std::vector<int>& vals, int val, std::vector<int>& lowervals, std::vector<int>& highervals)
 {
     int nl = 0, nh = 0;
     for (int i = 0; i < vals.size(); i++)
@@ -1780,7 +1780,7 @@ void myalgorithm::split(std::vector<int>& vals, int val, std::vector<int>& lower
     }
 }
 
-int myalgorithm::counttrue(std::vector<bool>& tocount)
+int gentools::counttrue(std::vector<bool>& tocount)
 {
     int cnt = 0;
     for (int i = 0; i < tocount.size(); i++)
@@ -1791,7 +1791,7 @@ int myalgorithm::counttrue(std::vector<bool>& tocount)
     return cnt;
 }
 
-void myalgorithm::compresszeros(std::vector<int>& tocompress)
+void gentools::compresszeros(std::vector<int>& tocompress)
 {
     int len = tocompress.size();
     
@@ -1820,7 +1820,7 @@ void myalgorithm::compresszeros(std::vector<int>& tocompress)
     tocompress[ci] = len;
 }
 
-void myalgorithm::decompresszeros(std::vector<int>& todecompress)
+void gentools::decompresszeros(std::vector<int>& todecompress)
 {
     std::vector<int> tdc = todecompress;
     
@@ -1842,7 +1842,7 @@ void myalgorithm::decompresszeros(std::vector<int>& todecompress)
     }
 }
 
-int myalgorithm::getmaxdim(std::vector<std::vector<int>>* elementlist)
+int gentools::getmaxdim(std::vector<std::vector<int>>* elementlist)
 {
     int highestdim = -1;
     for (int i = 0; i < 8; i++)
@@ -1855,7 +1855,7 @@ int myalgorithm::getmaxdim(std::vector<std::vector<int>>* elementlist)
     return highestdim;
 }
 
-int myalgorithm::sum(std::vector<int>& tosum)
+int gentools::sum(std::vector<int>& tosum)
 {
     int out = 0;
     for (int i = 0; i < tosum.size(); i++)
@@ -1863,7 +1863,7 @@ int myalgorithm::sum(std::vector<int>& tosum)
     return out;
 }
 
-double myalgorithm::sum(std::vector<double>& tosum)
+double gentools::sum(std::vector<double>& tosum)
 {
     double out = 0;
     for (int i = 0; i < tosum.size(); i++)
@@ -1871,7 +1871,7 @@ double myalgorithm::sum(std::vector<double>& tosum)
     return out;
 }
 
-void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::string& last)
+void gentools::splitatcolon(std::string tosplit, std::string& first, std::string& last)
 {
     int colonpos = -1;
     for (int i = 0; i < tosplit.size(); i++)
@@ -1895,7 +1895,7 @@ void myalgorithm::splitatcolon(std::string tosplit, std::string& first, std::str
     }
 }
 
-void myalgorithm::findtruefalse(std::vector<bool>& invec, indexmat& trueinds, indexmat& falseinds, std::vector<int>& renum)
+void gentools::findtruefalse(std::vector<bool>& invec, indexmat& trueinds, indexmat& falseinds, std::vector<int>& renum)
 {
     int numtot = invec.size();
     int numtrue = counttrue(invec);
@@ -1925,7 +1925,7 @@ void myalgorithm::findtruefalse(std::vector<bool>& invec, indexmat& trueinds, in
     }
 }
 
-void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
+void gentools::inoutorient(int physreg, std::vector<bool>& flipit)
 {
     elements* els = universe::getrawmesh()->getelements();
     disjointregions* drs = universe::getrawmesh()->getdisjointregions();
@@ -1983,7 +1983,7 @@ void myalgorithm::inoutorient(int physreg, std::vector<bool>& flipit)
 
 // For edge number i value 'edgestatus[i]' is -1 if it is flipped, 1 if it is not flipped, 2 if
 // it is in the physical region but not yet processed and 0 if it is not in the physical region.
-void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall)
+void gentools::inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall)
 {   
     elements* els = universe::getrawmesh()->getelements();
     
@@ -2025,7 +2025,7 @@ void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool 
 
                 if (isoutward != isedgeoutward)
                 {
-                    std::cout << "Error in 'myalgorithm' namespace: reorienting the edges to have them all pointing either inwards or outwards at every node is impossible on the requested physical region for the mesh provided" << std::endl;
+                    std::cout << "Error in 'gentools' namespace: reorienting the edges to have them all pointing either inwards or outwards at every node is impossible on the requested physical region for the mesh provided" << std::endl;
                     abort();
                 }
             }
@@ -2033,7 +2033,7 @@ void myalgorithm::inoutorient(int startnode, std::vector<int>& edgestatus, bool 
     }
 }
 
-void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
+void gentools::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
 {
     std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
@@ -2091,7 +2091,7 @@ void myalgorithm::fixatoverlap(std::vector<std::vector<int>>& cellvalues)
     }
 }
 
-void myalgorithm::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated)
+void gentools::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated)
 {
     elements* els = universe::getrawmesh()->getelements();
     physicalregions* prs = universe::getrawmesh()->getphysicalregions();
@@ -2144,7 +2144,7 @@ void myalgorithm::getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedg
     }
 }
 
-std::vector<int> myalgorithm::appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup)
+std::vector<int> gentools::appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup)
 {
     std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();

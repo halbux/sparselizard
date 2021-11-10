@@ -92,7 +92,7 @@ void rawmesh::splitmesh(void)
             int ne = splitcoords[p][i].size()/3/ncn[i];
             for (int e = 0; e < ne; e++)
             {
-                std::vector<int> nodelist = myalgorithm::getequallyspaced(nindex, 1, ncn[i]);
+                std::vector<int> nodelist = gentools::getequallyspaced(nindex, 1, ncn[i]);
                 int curelemindex = myelements.add(i, co, nodelist);
                 curpr->addelement(i,curelemindex);
                 // Add node coordinates:
@@ -253,7 +253,7 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     // Do not call this when the mesh is already loaded!
 
     std::string tool, source;
-    myalgorithm::splitatcolon(name, tool, source);
+    gentools::splitatcolon(name, tool, source);
     if (tool.size() == 0)
         tool = "native";
 
@@ -379,7 +379,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
         if (mergeduplicates == false)
         {
             std::vector<double> coords = curunion.getcoords();
-            std::vector<double> curcoordbounds = myalgorithm::getcoordbounds(coords);
+            std::vector<double> curcoordbounds = gentools::getcoordbounds(coords);
             if (i > 0)
                 shiftvec[i] = shiftvec[i-1] + prevcoordbounds[1]-curcoordbounds[0] + 0.1*(prevcoordbounds[1]-prevcoordbounds[0]);
             prevcoordbounds = curcoordbounds;
@@ -426,7 +426,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     // Do not call this when the mesh is already loaded!
 
     if (verbosity > 0)
-        std::cout << "Loading mesh from " << inputshapes.size() << " shape" << myalgorithm::getplurals(inputshapes.size()) << std::endl;
+        std::cout << "Loading mesh from " << inputshapes.size() << " shape" << gentools::getplurals(inputshapes.size()) << std::endl;
     
     wallclock loadtime;
     
@@ -931,7 +931,7 @@ bool rawmesh::adapthp(int verbosity)
         }
         
         int numintervals = highnumsplits-lownumsplits+1;
-        hthresholds = myalgorithm::getintervaltics(0.0, hcrange, numintervals);
+        hthresholds = gentools::getintervaltics(0.0, hcrange, numintervals);
     }
     
     // Parameters for p-adaptivity:
@@ -948,7 +948,7 @@ bool rawmesh::adapthp(int verbosity)
             pcrange = pcritmats[i].maxabs();
         
         int numintervals = highorders[i]-loworders[i]+1;
-        pthresholds[i] = myalgorithm::getintervaltics(0.0, pcrange, numintervals);
+        pthresholds[i] = gentools::getintervaltics(0.0, pcrange, numintervals);
     }
     
     
@@ -978,10 +978,10 @@ bool rawmesh::adapthp(int verbosity)
             
                 double hcurcrit = hcritptr[rb+e];
 
-                int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
+                int hinterv = gentools::findinterval(hcurcrit, hthresholds);
                 int newnumsplits = lownumsplits + hinterv;
                 
-                groupkeepsplit[typenum][elem] = myalgorithm::inequalitytoint(newnumsplits, oldnumsplits);
+                groupkeepsplit[typenum][elem] = gentools::inequalitytoint(newnumsplits, oldnumsplits);
             }
             
             for (int i = 0; i < numpadaptfields; i++)
@@ -989,7 +989,7 @@ bool rawmesh::adapthp(int verbosity)
                 int oldorder = foptrs[i][rb+e];
                 double pcurcrit = pcritptrs[i][rb+e];
                 
-                int pinterv = myalgorithm::findinterval(pcurcrit, pthresholds[i]);
+                int pinterv = gentools::findinterval(pcurcrit, pthresholds[i]);
                 int neworder = loworders[i] + pinterv;
             
                 // Smoother mesh coarsening:
@@ -1259,14 +1259,14 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     ///// Print p-adaptation summary:
     
     if (verbosity > 0)
-        std::cout << "Adapted order of " << num << " field" << myalgorithm::getplurals(num) << "." << std::endl;
+        std::cout << "Adapted order of " << num << " field" << gentools::getplurals(num) << "." << std::endl;
     if (verbosity > 1)
     {
         for (int i = 0; i < num; i++)
         {
             std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
             
-            std::vector<int> catords = myalgorithm::concatenate(neworders[i]);
+            std::vector<int> catords = gentools::concatenate(neworders[i]);
             indexmat newordsmat(catords.size(),1, catords);
             std::vector<int> numineachorder = newordsmat.countalloccurences(newmaxorder);
 
@@ -1296,7 +1296,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     std::shared_ptr<dtracker> dtptr = universe::getrawmesh()->getdtracker();
     int numneighbours = dtptr->countneighbours();
     
-    myalgorithm::fixatoverlap(groupkeepsplit);
+    gentools::fixatoverlap(groupkeepsplit);
     
     std::shared_ptr<htracker> newhtracker(new htracker);
     *newhtracker = *(myhadaptedmesh->myhtracker);
@@ -1328,7 +1328,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
 
     // Container to store each inner interface edge number and split depth:
     std::vector<std::vector<int>> nsforneighbours, nsfromneighbours;
-    myalgorithm::getedgesininnerinterfaces(nsforneighbours, nsfromneighbours);
+    gentools::getedgesininnerinterfaces(nsforneighbours, nsfromneighbours);
     
     
     std::vector<int> leavesnumsplits;
@@ -1507,7 +1507,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
                 nc->at(3*ni+j) = ac[i][3*ncn*e+j];
                 
             // Add element:
-            std::vector<int> nodes = myalgorithm::getequallyspaced(ni, 1, ncn);
+            std::vector<int> nodes = gentools::getequallyspaced(ni, 1, ncn);
             int elementindexincurrenttype = myhadaptedmesh->myelements.add(i, co, nodes);
             
             // Add the element to all required physical regions:
@@ -1719,7 +1719,7 @@ void rawmesh::fixoverlapcellordering(void)
         myelements.getbarycenters(ellist, oobarys);        
 
         std::vector<int> posfound;
-        int numfound = myalgorithm::findcoordinates(barysfromneighbours[n], oobarys, posfound);
+        int numfound = gentools::findcoordinates(barysfromneighbours[n], oobarys, posfound);
 
         // Catch any mesh mismatch in the overlap:
         if (numfound != oobarys.size()/3)
@@ -1791,7 +1791,7 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
 {
     int numphysregs = myphysicalregions.count();
     
-    std::cout << "Extracted " << numphysregs << " physical region"+myalgorithm::getplurals(numphysregs)+":" << std::endl;
+    std::cout << "Extracted " << numphysregs << " physical region"+gentools::getplurals(numphysregs)+":" << std::endl;
     for (int physregindex = 0; physregindex < numphysregs; physregindex++)
     {
         physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
@@ -1799,7 +1799,7 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
         if (isdebug == false)
         {
             int numelems = currentphysicalregion->countelements();
-            std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+myalgorithm::getplurals(numelems)+")";
+            std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+gentools::getplurals(numelems)+")";
         }
         else
         {
@@ -1850,7 +1850,7 @@ void rawmesh::errorondisconnecteddisjointregion(void)
         if (isinmaxdim == false)
         {
             // Write problematic elements to file:
-            std::vector<int> problematicelements = myalgorithm::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d));
+            std::vector<int> problematicelements = gentools::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d));
             myelements.write("info_not_connected.pos", mydisjointregions.getelementtypenumber(d), problematicelements, problematicelements);
             
             std::vector<std::string> typnm = {"node", "line", "face", "volume"};

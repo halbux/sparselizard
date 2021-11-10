@@ -89,10 +89,10 @@ std::vector<std::vector<densemat>> oporientation::interpolate(elementselector& e
             continue;
             
         std::vector<int> cellnumsintype;
-        myalgorithm::select(cellnums, indexes[t], cellnumsintype);
+        gentools::select(cellnums, indexes[t], cellnumsintype);
         
         std::vector<int> subelemnums;
-        myalgorithm::select(elemnums, indexes[t], subelemnums);
+        gentools::select(elemnums, indexes[t], subelemnums);
         
         // 1D must be treated differently:
         if (problemdimension == 1)

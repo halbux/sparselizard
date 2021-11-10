@@ -17,7 +17,7 @@
 #include <cmath>
 #include <algorithm>
 #include "orientation.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "ptracker.h"
 
 class nodes;

@@ -1,5 +1,5 @@
 #include "indexmat.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 
 
 void indexmat::errorifempty(void)
@@ -403,7 +403,7 @@ indexmat indexmat::extractcols(std::vector<int>& selected)
     
 indexmat indexmat::select(std::vector<bool>& sel, bool selectif)
 {
-    int numtrue = myalgorithm::counttrue(sel);
+    int numtrue = gentools::counttrue(sel);
     int num = numtrue;
     if (selectif == false)
         num = sel.size() - numtrue;

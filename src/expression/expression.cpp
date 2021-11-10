@@ -1128,22 +1128,22 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     {
         // Calculate the Runge-Kutta parameters k1, k2, k3 and k4:
         interpolate(physreg, NULL, curcoords, k1, isfound);
-        k1scaled = myalgorithm::normblocks(k1,3);
+        k1scaled = gentools::normblocks(k1,3);
         std::vector<double> ynplushk1over2 = curcoords;
         for (int i = 0; i < curcoords.size(); i++)
             ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1scaled[i];
         interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
-        k2scaled = myalgorithm::normblocks(k2,3);
+        k2scaled = gentools::normblocks(k2,3);
         std::vector<double> ynplushk2over2 = curcoords;
         for (int i = 0; i < curcoords.size(); i++)
             ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2scaled[i];
         interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
-        k3scaled = myalgorithm::normblocks(k3,3);
+        k3scaled = gentools::normblocks(k3,3);
         std::vector<double> ynplushk3 = curcoords;
         for (int i = 0; i < curcoords.size(); i++)
             ynplushk3[i] += h[(i-i%3)/3]*k3scaled[i];
         interpolate(physreg, NULL, ynplushk3, k4, isfound);
-        k4scaled = myalgorithm::normblocks(k4,3);
+        k4scaled = gentools::normblocks(k4,3);
 
 
         isdone = true;

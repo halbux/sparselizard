@@ -170,9 +170,9 @@ void rawfield::updateothershapefunctions(std::shared_ptr<rawfield> originalthis,
     if (dim == 1)
         dirichletphysreg = prs->createfromdisjointregionlist(drs->getindim(0));
     if (dim == 2)
-        dirichletphysreg = prs->createfromdisjointregionlist(myalgorithm::concatenate({drs->getindim(0),drs->getindim(1)}));
+        dirichletphysreg = prs->createfromdisjointregionlist(gentools::concatenate({drs->getindim(0),drs->getindim(1)}));
     if (dim == 3)
-        dirichletphysreg = prs->createfromdisjointregionlist(myalgorithm::concatenate({drs->getindim(0),drs->getindim(1),drs->getindim(2)}));
+        dirichletphysreg = prs->createfromdisjointregionlist(gentools::concatenate({drs->getindim(0),drs->getindim(1),drs->getindim(2)}));
     
     // The Dirichlet constraints (if any) are added to the rhs of the projection.
     //
@@ -1596,7 +1596,7 @@ void rawfield::setcohomologysources(std::vector<int> cutphysregs, std::vector<do
         if (ders[i].size() == 0)
             continue;
     
-        myalgorithm::inoutorient(cutphysregs[i], flipit);
+        gentools::inoutorient(cutphysregs[i], flipit);
 
         int index = 0;
         for (int d = 0; d < ders[i].size(); d++)

@@ -607,7 +607,7 @@ void regiondefiner::defineregions(void)
     if (isanycoordinatedependentregiondefined())
     {
         std::vector<double> nt = mynodes->getnoisethreshold();
-        noisethreshold = myalgorithm::sum(nt);
+        noisethreshold = gentools::sum(nt);
     }
 
     for (int i = 0; i < mypriority.size(); i++)

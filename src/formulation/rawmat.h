@@ -12,7 +12,7 @@
 #include <vector>
 #include "dofmanager.h"
 #include <cmath>
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "indexmat.h"
 #include "densemat.h"
 #include "memory.h"

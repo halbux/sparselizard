@@ -10,7 +10,7 @@ void elementselector::prepare(bool isorientationdependent)
     if (isorientationdependent == true)
     {
         std::vector<int> renumberingvector;
-        myalgorithm::stablesort(totalorientations, renumberingvector);
+        gentools::stablesort(totalorientations, renumberingvector);
 
         std::vector<int> totalorientationsbackup = totalorientations;
         std::vector<int> disjointregionsbackup = disjointregions;

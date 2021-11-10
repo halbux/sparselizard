@@ -25,7 +25,7 @@ petscmesh::petscmesh(std::string filename)
  
     bool isvalidext = false;
     
-    std::string curfileext = myalgorithm::getfileextension(filename);
+    std::string curfileext = gentools::getfileextension(filename);
     for (int i = 0; i < supportedextensions.size(); i++)
     {
         if (supportedextensions[i] == curfileext)

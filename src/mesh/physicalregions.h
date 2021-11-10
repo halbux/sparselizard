@@ -13,7 +13,7 @@
 #include "physicalregion.h"
 #include "disjointregions.h"
 #include <algorithm>
-#include "myalgorithm.h"
+#include "gentools.h"
 
 class physicalregion;
 

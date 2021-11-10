@@ -4,8 +4,8 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-#ifndef MYALGORITHM_H
-#define MYALGORITHM_H
+#ifndef GENTOOLS_H
+#define GENTOOLS_H
 
 #include <vector>
 #include <iostream>
@@ -19,7 +19,7 @@
 #include "coordinategroup.h"
 #include "densemat.h"
 
-namespace myalgorithm
+namespace gentools
 {
     // 'stablecoordinatesort' takes as input a vector of node coordinates 
     // in the format [coord1x coord1y coord1z coord2x ...] and provides a
