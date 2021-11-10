@@ -1,7 +1,7 @@
-#include "myfft.h"
+#include "fourier.h"
 
 
-std::vector<std::vector<densemat>> myfft::fft(densemat input, int mym, int myn)
+std::vector<std::vector<densemat>> fourier::fft(densemat input, int mym, int myn)
 {
     // Number of time evaluations.
     int numtimeevals = input.countrows();
@@ -54,7 +54,7 @@ std::vector<std::vector<densemat>> myfft::fft(densemat input, int mym, int myn)
     return output;
 }
 
-void myfft::removeroundoffnoise(std::vector<std::vector<densemat>>& input, double threshold)
+void fourier::removeroundoffnoise(std::vector<std::vector<densemat>>& input, double threshold)
 {    
     // First compute the max(abs()) of all harmonics:
     std::vector<double> maxabs(input.size(), 0);
@@ -81,7 +81,7 @@ void myfft::removeroundoffnoise(std::vector<std::vector<densemat>>& input, doubl
     }
 }
 
-densemat myfft::inversefft(std::vector<std::vector<densemat>>& input, int numtimevals, int mym, int myn)
+densemat fourier::inversefft(std::vector<std::vector<densemat>>& input, int numtimevals, int mym, int myn)
 {
     double pi = 3.141592653589793238;
     double phasestep = 2.0*pi / ((double)(numtimevals));
@@ -117,7 +117,7 @@ densemat myfft::inversefft(std::vector<std::vector<densemat>>& input, int numtim
     return output;
 }
 
-densemat myfft::toelementrowformat(densemat timestepsinrows, int numberofelements)
+densemat fourier::toelementrowformat(densemat timestepsinrows, int numberofelements)
 {
     int numberoftimesteps = timestepsinrows.countrows();
     int numberofevaluationpoints = timestepsinrows.countcolumns()/numberofelements;
@@ -137,7 +137,7 @@ densemat myfft::toelementrowformat(densemat timestepsinrows, int numberofelement
     return output;
 }
 
-void myfft::sameharmonics(std::vector<std::vector<std::vector<densemat>>>& notsame)
+void fourier::sameharmonics(std::vector<std::vector<std::vector<densemat>>>& notsame)
 {
     if (notsame.size() <= 1)
         return;

@@ -3,8 +3,8 @@
 // See the LICENSE file for license information. Please report all
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
-#ifndef MYFFT_H
-#define MYFFT_H
+#ifndef FOURIER_H
+#define FOURIER_H
 
 #include <iostream>
 #include <cmath>
@@ -12,7 +12,7 @@
 #include <vector>
 #include "harmonic.h"
 
-namespace myfft
+namespace fourier
 {
     // The fft is computed on every column of the input matrix.
     // Every input matrix row corresponds to a time evaluation 

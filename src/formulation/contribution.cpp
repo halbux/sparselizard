@@ -147,7 +147,7 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
                 else
                 {
                     densemat timeevalinterpolated = mycoeffs[term]->multiharmonicinterpolate(numfftcoeffs, myselector, evaluationpoints, meshdeformationptr);
-                    currentcoeff = myfft::fft(timeevalinterpolated, myselector.countinselection(), evaluationpoints.size()/3);
+                    currentcoeff = fourier::fft(timeevalinterpolated, myselector.countinselection(), evaluationpoints.size()/3);
                 }
                 
                 ///// Compute the dof*tf product (if any dof):

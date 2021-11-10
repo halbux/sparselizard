@@ -978,16 +978,16 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     if (numfftharms <= 0)
                         expr[i] = myoperations[i]->interpolate(myselector, lagrangecoords, meshdeform);
                     else
-                        expr[i] = myfft::fft(myoperations[i]->multiharmonicinterpolate(numfftharms, myselector, lagrangecoords, meshdeform), myselector.countinselection(), lagrangecoords.size()/3);
+                        expr[i] = fourier::fft(myoperations[i]->multiharmonicinterpolate(numfftharms, myselector, lagrangecoords, meshdeform), myselector.countinselection(), lagrangecoords.size()/3);
                 }
                 else
-                    fftexpr[i] = myfft::toelementrowformat(myoperations[i]->multiharmonicinterpolate(numtimesteps, myselector, lagrangecoords, meshdeform), myselector.countinselection());
+                    fftexpr[i] = fourier::toelementrowformat(myoperations[i]->multiharmonicinterpolate(numtimesteps, myselector, lagrangecoords, meshdeform), myselector.countinselection());
             }
             universe::forbidreuse();
 
             // Make sure the harmonic content is the same for every component:
             if (numtimesteps <= 0)
-                myfft::sameharmonics(expr);
+                fourier::sameharmonics(expr);
 
             // Get a vector containing all harmonic numbers in 'expr' on the current disjoint regions:
             if (numtimesteps <= 0)

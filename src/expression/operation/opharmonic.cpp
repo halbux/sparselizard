@@ -26,7 +26,7 @@ std::vector<std::vector<densemat>> opharmonic::interpolate(elementselector& elem
     else
     {
         densemat timevals = myarg->multiharmonicinterpolate(mynumfftharms, elemselect, evaluationcoordinates, meshdeform);
-        argmat = myfft::fft(timevals, numelems, evaluationcoordinates.size()/3);
+        argmat = fourier::fft(timevals, numelems, evaluationcoordinates.size()/3);
     }
     
     int maxdestharm = *std::max_element(mydestharms.begin(), mydestharms.end());
@@ -68,7 +68,7 @@ densemat opharmonic::multiharmonicinterpolate(int numtimeevals, elementselector&
     
     std::vector<std::vector<densemat>> interpolated = interpolate(elemselect, evaluationcoordinates, meshdeform);
     // Compute at 'numtimevals' instants in time the multiharmonic data:
-    densemat output = myfft::inversefft(interpolated, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
+    densemat output = fourier::inversefft(interpolated, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
 
     if (reuse && universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);

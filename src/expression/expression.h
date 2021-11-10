@@ -24,7 +24,7 @@
 #include <memory>
 #include "parameter.h"
 #include "polynomial.h"
-#include "myfft.h"
+#include "fourier.h"
 #include <cmath>
 #include "rawfield.h"
 #include "mystring.h"

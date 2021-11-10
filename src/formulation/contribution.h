@@ -24,7 +24,7 @@
 #include "disjointregionselector.h"
 #include "expression.h"
 #include "harmonic.h"
-#include "myfft.h"
+#include "fourier.h"
 #include "selector.h"
 #include "math.h"
 #include "rawvec.h"

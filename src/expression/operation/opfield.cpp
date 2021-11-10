@@ -165,7 +165,7 @@ densemat opfield::multiharmonicinterpolate(int numtimeevals, elementselector& el
 
     std::vector<std::vector<densemat>> interpolatedfield = interpolate(elemselect, evaluationcoordinates, meshdeform);
     // Compute at 'numtimevals' instants in time the multiharmonic field:
-    densemat output = myfft::inversefft(interpolatedfield, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
+    densemat output = fourier::inversefft(interpolatedfield, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
 
     if (universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);

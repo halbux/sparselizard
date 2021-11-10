@@ -52,7 +52,7 @@ class operation : public std::enable_shared_from_this<operation>
         // column corresponds to a data point (e.g. an operation evaluated 
         // at an evaluation point) and each of the 'numtimeevals' rows to 
         // a time value at which the multiharmonic operation was computed. 
-        // 'myfft.h' can be used to get back the harmonics from that matrix.
+        // 'fourier.h' can be used to get back the harmonics from that matrix.
         virtual densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         // This 'interpolate' is used only in the Jacobian computation.

@@ -9,7 +9,7 @@
 
 #include "operation.h"
 #include "harmonic.h"
-#include "myfft.h"
+#include "fourier.h"
 
 class opproduct: public operation
 {
