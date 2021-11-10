@@ -502,8 +502,3 @@ densemat jacobian::getinvjac(int row, int column)
 
     return invjac[3*row+column];
 }
-
-
-
-
-
