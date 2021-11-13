@@ -218,10 +218,28 @@ void mesh::scale(double x, double y, double z)
     rawmeshptr->gethadaptedpointer()->scale(-1, x, y, z);
 }
 
-int mesh::getmeshdimension(void)
+int mesh::getdimension(void)
 {
     errorifnotloaded();
     return rawmeshptr->getmeshdimension();
+}
+
+std::vector<double> mesh::getdimensions(void)
+{
+    errorifnotloaded();
+    return rawmeshptr->getnodes()->getgeometrydimension();
+}
+
+std::vector<double> mesh::printdimensions(void)
+{
+    std::vector<double> dims = getdimensions();
+    
+    std::cout << "Mesh dimensions:" << std::endl;
+    std::cout << "x: " << dims[0] << " m" << std::endl;
+    std::cout << "y: " << dims[1] << " m" << std::endl;
+    std::cout << "z: " << dims[2] << " m" << std::endl;
+    
+    return dims;
 }
 
 std::vector<int> mesh::getphysicalregionnumbers(int dim)

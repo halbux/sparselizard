@@ -80,8 +80,12 @@ class mesh
         void scale(int physreg, double x, double y, double z);
         void scale(double x, double y, double z);
         
-        // 'getmeshdimension' gives n for a mesh whose highest element dimension is n.
-        int getmeshdimension(void);
+        // 'getdimension' gives n for a mesh whose highest element dimension is n.
+        int getdimension(void);
+        
+        // Get the x, y and z mesh dimensions:
+        std::vector<double> getdimensions(void);
+        std::vector<double> printdimensions(void);
         
         // Get the physical regions of a given dimension (use -1 for all).
         std::vector<int> getphysicalregionnumbers(int dim = -1);
