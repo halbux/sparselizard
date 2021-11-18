@@ -63,8 +63,7 @@ int main(void)
     // Also ground v on face 'vout':
     v.setconstraint(vout);
     // Set v to 1V on face 'vin' for the in-phase component and to 0 for the quadrature component:
-    v.harmonic(2).setconstraint(vin, 1);
-    v.harmonic(3).setconstraint(vin);
+    v.setconstraint(vin, {1,0});
     
     // Define the weak magnetodynamic formulation:
     formulation magdyn;

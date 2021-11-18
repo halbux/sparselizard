@@ -99,6 +99,9 @@ class field
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
         // The 'input' expression is evaluated on the mesh deformed by 'meshdeform':
         void setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree = 0);
+        // Set a constraint on each harmonic:
+        void setconstraint(int physreg, std::vector<expression> input, int extraintegrationdegree = 0);
+        void setconstraint(int physreg, expression meshdeform, std::vector<expression> input, int extraintegrationdegree = 0);
         // An FFT is used to project the 'input' expression:
         void setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree = 0);
         void setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree = 0);

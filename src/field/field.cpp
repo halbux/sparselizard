@@ -269,6 +269,38 @@ void field::setconstraint(int physreg, expression meshdeform, expression input, 
     rawfieldptr->setdisjregconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
+void field::setconstraint(int physreg, std::vector<expression> input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+    
+    std::vector<int> harms = rawfieldptr->getharmonics();
+    if (input.size() != harms.size())
+    {
+        std::cout << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
+        abort(); 
+    }
+
+    for (int i = 0; i < harms.size(); i++)
+        rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, NULL, input[i], extraintegrationdegree);
+}
+
+void field::setconstraint(int physreg, expression meshdeform, std::vector<expression> input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+    
+    std::vector<int> harms = rawfieldptr->getharmonics();
+    if (input.size() != harms.size())
+    {
+        std::cout << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
+        abort(); 
+    }
+
+    for (int i = 0; i < harms.size(); i++)
+        rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, &meshdeform, input[i], extraintegrationdegree);
+}
+
 void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
