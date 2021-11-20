@@ -282,7 +282,15 @@ void field::setconstraint(int physreg, std::vector<expression> input, int extrai
     }
 
     for (int i = 0; i < harms.size(); i++)
+    {
+        if (input[i].isharmonicone({}) == false)
+        {
+            std::cout << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
+            abort();
+        }
+    
         rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, NULL, input[i], extraintegrationdegree);
+    }
 }
 
 void field::setconstraint(int physreg, expression meshdeform, std::vector<expression> input, int extraintegrationdegree)
@@ -298,7 +306,15 @@ void field::setconstraint(int physreg, expression meshdeform, std::vector<expres
     }
 
     for (int i = 0; i < harms.size(); i++)
+    {
+        if (input[i].isharmonicone({}) == false)
+        {
+            std::cout << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
+            abort();
+        }
+        
         rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, &meshdeform, input[i], extraintegrationdegree);
+    }
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree)
