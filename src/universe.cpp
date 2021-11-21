@@ -1,6 +1,7 @@
 #include "universe.h"
 #include "slepc.h"
 #include <thread>
+#include <omp.h>
 
 
 int universe::mynumrawmeshes = 0;
@@ -39,6 +40,7 @@ int universe::getmaxnumthreads(void)
 
 void universe::setmaxnumthreads(int mnt)
 {
+    omp_set_num_threads(mnt);
     maxnumthreads = mnt;
 }
 
