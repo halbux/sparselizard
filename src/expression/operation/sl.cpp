@@ -27,6 +27,22 @@ void sl::printversion(void)
     std::cout << "sparselizard " << std::to_string(getversion()) << "." << std::to_string(getsubversion()) << " ('" << getversionname() << "')." << std::endl;
 }
 
+void sl::setmaxnumthreads(int mnt)
+{
+    if (mnt <= 0)
+    {
+        std::cout << "Error in 'sl' namespace: cannot set a negative or zero max num threads" << std::endl;
+        abort();
+    }
+
+    universe::setmaxnumthreads(mnt);
+}
+
+int sl::getmaxnumthreads(void)
+{
+    return universe::getmaxnumthreads();
+}
+
 double sl::getpi(void)
 {
     return 3.1415926535897932384;

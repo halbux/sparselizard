@@ -39,6 +39,9 @@ namespace sl
     int getsubversion(void);
     std::string getversionname(void);
     
+    void setmaxnumthreads(int mnt);
+    int getmaxnumthreads(void);
+    
     double getpi(void);
 
     // Get a random value uniformly distributed between 0.0 and 1.0:
