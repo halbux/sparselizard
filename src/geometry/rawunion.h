@@ -22,6 +22,8 @@ class rawunion: public rawshape
     private:
 
         int myphysicalregion = -1;
+        
+        int mycurvatureorder = 1;
 
         // Shapes that have been united:
         std::vector<std::shared_ptr<rawshape>> sons = {};
@@ -43,6 +45,8 @@ class rawunion: public rawshape
         std::shared_ptr<rawshape> duplicate(void);
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
     
         int getdimension(void);
 

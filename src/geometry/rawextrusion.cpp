@@ -36,6 +36,11 @@ void rawextrusion::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawextrusion::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawextrusion::getdimension(void)
 {
     return mybaseshape->getdimension() + 1;

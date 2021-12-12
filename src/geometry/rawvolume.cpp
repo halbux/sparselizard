@@ -28,6 +28,11 @@ void rawvolume::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawvolume::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawvolume::getdimension(void)
 {
     return 3;

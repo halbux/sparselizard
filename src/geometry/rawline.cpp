@@ -92,6 +92,11 @@ void rawline::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawline::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawline::getdimension(void)
 {
     return 1;

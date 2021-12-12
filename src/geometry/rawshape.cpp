@@ -128,6 +128,12 @@ void rawshape::setphysicalregion(int physreg)
     abort(); 
 }
 
+int rawshape::getcurvatureorder(void)
+{
+    std::cout << "Error in 'rawshape' object: 'getcurvatureorder' has not been defined for this shape" << std::endl;
+    abort(); 
+}
+
 int rawshape::getdimension(void)
 {
     std::cout << "Error in 'rawshape' object: 'getdimension' has not been defined for this shape" << std::endl;

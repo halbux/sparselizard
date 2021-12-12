@@ -33,6 +33,11 @@ void rawsurface::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawsurface::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawsurface::getdimension(void)
 {
     return 2;

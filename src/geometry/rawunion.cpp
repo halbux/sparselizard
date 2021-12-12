@@ -52,6 +52,11 @@ void rawunion::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawunion::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawunion::getdimension(void)
 {
     return sons[0]->getdimension();

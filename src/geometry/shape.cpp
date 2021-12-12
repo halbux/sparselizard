@@ -194,6 +194,12 @@ void shape::setphysicalregion(int physreg)
     rawshapeptr->setphysicalregion(physreg); 
 }
 
+int shape::getcurvatureorder(void)
+{
+    errornullpointer();
+    return rawshapeptr->getcurvatureorder();
+}
+
 void shape::move(expression u)
 {
     errornullpointer();

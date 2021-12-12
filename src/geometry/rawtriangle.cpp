@@ -67,6 +67,11 @@ void rawtriangle::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawtriangle::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawtriangle::getdimension(void)
 {
     return 2;

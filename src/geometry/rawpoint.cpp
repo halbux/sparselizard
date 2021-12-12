@@ -47,6 +47,11 @@ void rawpoint::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawpoint::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawpoint::getdimension(void)
 {
     return 0;

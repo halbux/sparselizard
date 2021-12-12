@@ -60,6 +60,8 @@ class shape
 
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
 
         // Move the shape in the x, y and z direction by a value given in the expression.
         // Only the x, y and z coordinate field are allowed in the expression.
