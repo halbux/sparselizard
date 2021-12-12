@@ -40,7 +40,7 @@ class rawsurface: public rawshape
         rawsurface(void) {};
 
         // Provide to this constructor the coordinates of all mesh nodes and elements in the surface:
-        rawsurface(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
+        rawsurface(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder);
 
         std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 

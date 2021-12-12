@@ -54,12 +54,14 @@ rawline::rawline(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints
     mesh();
 }
 
-rawline::rawline(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+rawline::rawline(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder)
 {
     myphysicalregion = physreg;
 
     mycoords = allcoords;
     myelems = allelems;
+    
+    mycurvatureorder = curvatureorder;
 }
  
 

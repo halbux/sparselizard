@@ -16,12 +16,14 @@ rawpoint::rawpoint(int physreg, std::vector<double> coords)
     }
 }
 
-rawpoint::rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+rawpoint::rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder)
 {
     myphysicalregion = physreg;
 
     mycoords = allcoords;
     myelems = allelems;
+    
+    mycurvatureorder = curvatureorder;
 }
 
 

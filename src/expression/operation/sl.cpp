@@ -772,11 +772,6 @@ std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
     physicalregions* loadedphysregs = loadedmesh->getphysicalregions();
 
     int curvatureorder = loadedelems->getcurvatureorder();
-    if (curvatureorder > 1)
-    {
-        std::cout << "Error in 'sl' namespace: loadshape does not accept curved meshes" << std::endl;
-        abort();
-    }
     
     std::vector<int> physregnums = loadedphysregs->getallnumbers();
     int numphysregs = physregnums.size();
@@ -796,7 +791,7 @@ std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
         for (int j = 0; j < 8; j++)
         {
             int numelems = curelemlist->at(j).size();
-            element myelem(j,curvatureorder);
+            element myelem(j, curvatureorder);
             int numnodes = myelem.countcurvednodes();
             nodesinelements[j].resize(numnodes*numelems);
             for (int k = 0; k < numelems; k++)
@@ -836,13 +831,13 @@ std::vector<std::vector<shape>> sl::loadshape(std::string meshfile)
         
         shape curshape;
         if (physregdim == 0)
-            curshape = shape(std::shared_ptr<rawpoint>(new rawpoint(curphysreg, nodecoordinates, nodesinelements)));
+            curshape = shape(std::shared_ptr<rawpoint>(new rawpoint(curphysreg, nodecoordinates, nodesinelements, curvatureorder)));
         if (physregdim == 1)
-            curshape = shape(std::shared_ptr<rawline>(new rawline(curphysreg, nodecoordinates, nodesinelements)));
+            curshape = shape(std::shared_ptr<rawline>(new rawline(curphysreg, nodecoordinates, nodesinelements, curvatureorder)));
         if (physregdim == 2)
-            curshape = shape(std::shared_ptr<rawsurface>(new rawsurface(curphysreg, nodecoordinates, nodesinelements)));
+            curshape = shape(std::shared_ptr<rawsurface>(new rawsurface(curphysreg, nodecoordinates, nodesinelements, curvatureorder)));
         if (physregdim == 3)
-            curshape = shape(std::shared_ptr<rawvolume>(new rawvolume(curphysreg, nodecoordinates, nodesinelements)));
+            curshape = shape(std::shared_ptr<rawvolume>(new rawvolume(curphysreg, nodecoordinates, nodesinelements, curvatureorder)));
     
         output[physregdim].push_back(curshape);
     }

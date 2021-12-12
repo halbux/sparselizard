@@ -39,7 +39,7 @@ class rawvolume: public rawshape
         rawvolume(void) {};
 
         // Provide to this constructor the coordinates of all mesh nodes and elements in the volume:
-        rawvolume(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
+        rawvolume(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder);
 
         std::shared_ptr<rawshape> duplicate(void);
 

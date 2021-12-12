@@ -1,12 +1,14 @@
 #include "rawsurface.h"
 
 
-rawsurface::rawsurface(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+rawsurface::rawsurface(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder)
 {
     myphysicalregion = physreg;
 
     mycoords = allcoords;
     myelems = allelems;
+    
+    mycurvatureorder = curvatureorder;
 }
 
 

@@ -1,12 +1,14 @@
 #include "rawvolume.h"
 
 
-rawvolume::rawvolume(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+rawvolume::rawvolume(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder)
 {
     myphysicalregion = physreg;
 
     mycoords = allcoords;
     myelems = allelems;
+    
+    mycurvatureorder = curvatureorder;
 }
 
 
