@@ -433,8 +433,6 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
 
     ///// Transfer the mesh from every shape to the corresponding objects:
 
-    int curvatureorder = geotools::getcurvatureorder(geotools::getrawshapes(inputshapes));
-
     if (inputshapes.size() == 0)
     {
         std::cout << "Error in 'mesh' object: provided an empty vector of shapes" << std::endl;
@@ -450,6 +448,8 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
             abort();
         }
     }
+    
+    int curvatureorder = geotools::getcurvatureorder(geotools::getrawshapes(inputshapes));
 
     // Get the number of nodes for preallocation:
     int numberofnodes = 0;
