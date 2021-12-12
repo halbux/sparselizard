@@ -432,8 +432,8 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     
 
     ///// Transfer the mesh from every shape to the corresponding objects:
-    // Curvature order for shapes is 1 for now:
-    int curvatureorder = 1;
+
+    int curvatureorder = geotools::getcurvatureorder(geotools::getrawshapes(inputshapes));
 
     if (inputshapes.size() == 0)
     {
