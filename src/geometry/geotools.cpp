@@ -374,5 +374,23 @@ std::vector<std::vector<int>> geotools::appendelems(std::vector<std::shared_ptr<
     return output;
 }
 
-
+int geotools::getcurvatureorder(std::vector< std::shared_ptr<rawshape> > rawshapes)
+{
+    if (rawshapes.size() == 0)
+        return -1;
+        
+    int co = rawshapes[0]->getcurvatureorder();
+    
+    for (int i = 1; i < rawshapes.size(); i++)
+    {
+        int curco = rawshapes[i]->getcurvatureorder();
+        if (curco != co)
+        {
+            std::cout << "Error in 'geotool' namespace: expected a unique curvature order for all shapes provided" << std::endl;
+            abort();
+        }
+    }
+    
+    return co;
+}
 
