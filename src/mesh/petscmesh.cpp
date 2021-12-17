@@ -37,7 +37,7 @@ petscmesh::petscmesh(std::string filename)
     
     if (isvalidext)
     {
-        DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), PETSC_TRUE, &mypetscmesh);
+        DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), gentools::getfilename(filename).c_str(), PETSC_TRUE, &mypetscmesh);
         DMGetDimension(mypetscmesh, &meshdim);
         return;
     }
