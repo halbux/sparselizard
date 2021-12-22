@@ -250,8 +250,10 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                             if (i != order-1 && j != order-1)
                                 continue;
 
-                            // Define ui and wj:
+                            // Define u and w:
                             polynomial ui = Ls[i+2];
+                            polynomial uj = Ls[j+2];
+                            polynomial wi = L[i+2];
                             polynomial wj = L[j+2];
                         
                             int ffindexbackup = ffindex;
@@ -274,7 +276,11 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                 // "Type 3":
                                 if (i == 0)
                                 {
-                                    formfunc = (lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wj;
+                                    if (f2 == f2star)
+                                        formfunc = (lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wj;
+                                    else
+                                        formfunc = (2*mu[f1]-1).derivative(comp)*uj;
+                                        
                                     val.set(order,2,face,orientation,ffindex,comp,formfunc);
 
                                     ffindex = ffindex + 1;
@@ -282,9 +288,10 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                 if (j == 0)
                                 {
                                     if (f2 == f2star)
-                                        formfunc = (mu[f1]-mu[f4]).derivative(comp)*ui;
+                                        formfunc = (2*mu[f1]-1).derivative(comp)*ui;
                                     else
-                                        formfunc = (mu[f1]-mu[f2]).derivative(comp)*ui;
+                                        formfunc = (lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wi;
+                                        
                                     val.set(order,2,face,orientation,ffindex,comp,formfunc);
                                     
                                     ffindex = ffindex + 1;
