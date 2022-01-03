@@ -262,13 +262,22 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                 ffindex = ffindexbackup;
 
                                 // "Type 1":
-                                polynomial formfunc = (ui*wj).derivative(comp);
+                                polynomial formfunc;
+                                if (f2 == f2star)
+                                    formfunc = (ui*wj).derivative(comp);
+                                else
+                                    formfunc = (uj*wi).derivative(comp);
+                                
                                 val.set(order,2,face,orientation,ffindex,comp,formfunc);
 
                                 ffindex = ffindex + 1;
 
                                 // "Type 2":
-                                formfunc = alpha*(ui.derivative(comp)*wj-ui*wj.derivative(comp));
+                                if (f2 == f2star)
+                                    formfunc = alpha*(ui.derivative(comp)*wj-ui*wj.derivative(comp));
+                                else
+                                    formfunc = alpha*(uj.derivative(comp)*wi-uj*wi.derivative(comp));
+                                    
                                 val.set(order,2,face,orientation,ffindex,comp,formfunc);
 
                                 ffindex = ffindex + 1;
