@@ -286,7 +286,7 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                 if (i == 0)
                                 {
                                     if (f2 == f2star)
-                                        formfunc = (lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wj;
+                                        formfunc = 2*(lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wj;
                                     else
                                         formfunc = (2*mu[f1]-1).derivative(comp)*uj;
                                         
@@ -299,7 +299,7 @@ hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder)
                                     if (f2 == f2star)
                                         formfunc = (2*mu[f1]-1).derivative(comp)*ui;
                                     else
-                                        formfunc = (lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wi;
+                                        formfunc = 2*(lambda[f1].derivative(comp)*lambda[f2star]-lambda[f1]*lambda[f2star].derivative(comp))*wi;
                                         
                                     val.set(order,2,face,orientation,ffindex,comp,formfunc);
                                     
