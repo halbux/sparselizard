@@ -335,5 +335,3 @@ std::vector<bool> hcurlhexahedron::isgradienttype(int maxorder)
 
     return output;
 }
-
-
