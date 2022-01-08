@@ -556,6 +556,15 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
     return maxval;
 }
 
+void expression::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<int8_t>& isfound)
+{
+    std::vector<bool> isfoundBool;
+    interpolate(physreg, xyzcoord, interpolated, isfoundBool);
+    isfound = std::vector<int8_t>(isfoundBool.size());
+    for (size_t i = 0; i < isfound.size(); ++i)
+        isfound[i] = isfoundBool[i];
+}
+
 void expression::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
     universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
