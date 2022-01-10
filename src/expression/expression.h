@@ -122,7 +122,6 @@ class expression
         // Only the highest dimension elements in physical region 'physreg' are considered. 
         // In case the ith coordinate is not in the physical region or there was any other 
         // issue then 'isfound[i]' is false. 
-        void interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<int8_t>& isfound);
         void interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
         void interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound);
         // These two functions are added for convenience and work only to interpolate at a single (x,y,z) coordinate.
