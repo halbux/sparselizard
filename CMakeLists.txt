@@ -1,6 +1,6 @@
 # Thanks to S. Matsievskiy for bringing cmake to the project.
 
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 project(Sparselizard LANGUAGES CXX)
 
