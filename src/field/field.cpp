@@ -64,6 +64,7 @@ void field::printharmonics(void) { errorifpointerisnull(); rawfieldptr->printhar
 
 void field::setname(std::string name) { errorifpointerisnull(); rawfieldptr->setname(name); }
 void field::print(void) { errorifpointerisnull(); rawfieldptr->print(); }
+void field::printvalues(bool databoundsonly) { errorifpointerisnull(); rawfieldptr->printvalues(databoundsonly); }
 
 void field::setorder(int physreg, int interpolorder) 
 { 

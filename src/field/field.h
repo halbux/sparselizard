@@ -68,6 +68,8 @@ class field
         void setname(std::string name);
         // Print the field name.
         void print(void);
+        // Print the fields values.
+        void printvalues(bool databoundsonly);
 
         // Set the interpolation order on a physical region.
         void setorder(int physreg, int interpolorder);
