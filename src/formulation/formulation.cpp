@@ -524,7 +524,6 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     int numneighbours = dt->countneighbours();
 
     // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
-    std::vector<std::shared_ptr<rawfield>> rfs = mydofmanager->getfields();
     sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
     
     std::vector<indexmat> interfaceinds = universe::ddmrecvinds;
@@ -689,7 +688,6 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     int numneighbours = dt->countneighbours();
 
     // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
-    std::vector<std::shared_ptr<rawfield>> rfs = mydofmanager->getfields();
     sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
     
     // Get all Dirichlet constraints set on the neighbours but not on this rank:
