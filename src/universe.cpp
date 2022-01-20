@@ -4,6 +4,8 @@
 #include <omp.h>
 
 
+MatSolverType universe::solvertype = "mumps";
+
 int universe::mynumrawmeshes = 0;
 
 void universe::addtorawmeshcounter(int val)

@@ -30,6 +30,8 @@ class universe
     
     public:
 
+        static MatSolverType solvertype;
+
         static int mynumrawmeshes;
         static void addtorawmeshcounter(int val);
         
