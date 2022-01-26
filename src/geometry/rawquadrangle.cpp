@@ -67,6 +67,11 @@ void rawquadrangle::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawquadrangle::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawquadrangle::getdimension(void)
 {
     return 2;

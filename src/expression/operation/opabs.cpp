@@ -1,7 +1,7 @@
 #include "opabs.h"
 
 
-std::vector<std::vector<densematrix>> opabs::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opabs::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> opabs::interpolate(elementselector& elemse
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
     
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
@@ -26,7 +26,7 @@ std::vector<std::vector<densematrix>> opabs::interpolate(elementselector& elemse
     abort();
 }
 
-densematrix opabs::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opabs::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -35,7 +35,7 @@ densematrix opabs::multiharmonicinterpolate(int numtimeevals, elementselector& e
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     output.abs();
             
     if (reuse && universe::isreuseallowed)
@@ -60,6 +60,11 @@ std::shared_ptr<operation> opabs::copy(void)
     *op = *this;
     op->reuse = false;
     return op;
+}
+
+double opabs::evaluate(void)
+{
+    return std::abs(myarg->evaluate());
 }
 
 std::vector<double> opabs::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)

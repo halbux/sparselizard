@@ -122,8 +122,8 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
     {
         // All ints will be converted to doubles (doubles can exactly represent ints up to at least 2^52):
         int totalsize = intdata.size() + doubledata.size() + 2;
-        intdensematrix alladdresses(1,totalsize, 0,1);
-        densematrix alldata(1,totalsize);
+        indexmat alladdresses(1,totalsize, 0,1);
+        densemat alldata(1,totalsize);
 
         int* addsvals = alladdresses.getvalues();
         double* datavals = alldata.getvalues();
@@ -166,18 +166,18 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         {
             // First integer is the intdata size, second is the doubledata size:
             std::getline(name, currentline);
-            myalgorithm::osclean(currentline);
+            gentools::osclean(currentline);
             intdata.resize(std::stoi(currentline));
             
             std::getline(name, currentline);
-            myalgorithm::osclean(currentline);
+            gentools::osclean(currentline);
             doubledata.resize(std::stoi(currentline));
 
             // Load the intdata:
             for (int i = 0; i < intdata.size(); i++)
             {
                 std::getline(name, currentline);
-                myalgorithm::osclean(currentline);
+                gentools::osclean(currentline);
                 intdata[i] = std::stoi(currentline);
             }
             
@@ -185,7 +185,7 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
             for (int i = 0; i < doubledata.size(); i++)
             {
                 std::getline(name, currentline);
-                myalgorithm::osclean(currentline);
+                gentools::osclean(currentline);
                 doubledata[i] = std::stod(currentline);
             }
 
@@ -211,8 +211,8 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         int veclen;
         VecGetSize(datvec, &veclen);
         
-        densematrix doublestoget(1, veclen);
-        intdensematrix addressestoget(1, veclen, 0, 1);
+        densemat doublestoget(1, veclen);
+        indexmat addressestoget(1, veclen, 0, 1);
         
         double* vals = doublestoget.getvalues();
         int* ads = addressestoget.getvalues();

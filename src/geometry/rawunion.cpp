@@ -22,6 +22,8 @@ rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
     }
 
     myphysicalregion = physreg;
+    
+    mycurvatureorder = geotools::getcurvatureorder(input);
         
     mesh();
 }
@@ -50,6 +52,11 @@ std::shared_ptr<rawshape> rawunion::duplicate(void)
 void rawunion::setphysicalregion(int physreg)
 {
     myphysicalregion = physreg;
+}
+
+int rawunion::getcurvatureorder(void)
+{
+    return mycurvatureorder;
 }
 
 int rawunion::getdimension(void)

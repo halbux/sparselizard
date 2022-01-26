@@ -12,7 +12,7 @@ void vec::errorifpointerisnull(void)
     }
 }
 
-vec::vec(int vecsize, intdensematrix addresses, densematrix vals)
+vec::vec(int vecsize, indexmat addresses, densemat vals)
 {
     rawvecptr = std::shared_ptr<rawvec>(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(vecsize))));
     rawvecptr->setvalues(addresses, vals, "set");
@@ -20,7 +20,7 @@ vec::vec(int vecsize, intdensematrix addresses, densematrix vals)
 
 int vec::size(void) { errorifpointerisnull(); return rawvecptr->size(); }
 
-void vec::permute(intdensematrix rowpermute, bool invertit)
+void vec::permute(indexmat rowpermute, bool invertit)
 {
     if (rowpermute.count() != size())
     {
@@ -44,7 +44,7 @@ void vec::updateconstraints(void)
     
     std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
     // Get all disjoint regions:
-    std::vector<int> disjregs((universe::mymesh->getdisjointregions())->count());
+    std::vector<int> disjregs((universe::getrawmesh()->getdisjointregions())->count());
     std::iota(disjregs.begin(), disjregs.end(), 0);
     
     // Update the disjoint region constraints:
@@ -53,32 +53,32 @@ void vec::updateconstraints(void)
         rawvecptr->updatedisjregconstraints(fieldsindofmanager[i], disjregs);
         
     // Update the conditional constraints:
-    std::pair<intdensematrix, densematrix> condconstrdata = mydofmanager->getconditionalconstraintdata();
+    std::pair<indexmat, densemat> condconstrdata = mydofmanager->getconditionalconstraintdata();
     rawvecptr->setvalues(condconstrdata.first, condconstrdata.second);
     
     // Set the gauged indexes to zero:
-    intdensematrix gaugedindexes = mydofmanager->getgaugedindexes();
-    rawvecptr->setvalues(gaugedindexes, densematrix(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
+    indexmat gaugedindexes = mydofmanager->getgaugedindexes();
+    rawvecptr->setvalues(gaugedindexes, densemat(gaugedindexes.countrows(), gaugedindexes.countcolumns(), 0.0));
 }
 
-void vec::setvalues(intdensematrix addresses, densematrix valsmat, std::string op) 
+void vec::setvalues(indexmat addresses, densemat valsmat, std::string op) 
 { 
     errorifpointerisnull(); rawvecptr->setvalues(addresses, valsmat, op); 
 }
 
-void vec::setallvalues(densematrix valsmat, std::string op)
+void vec::setallvalues(densemat valsmat, std::string op)
 { 
     errorifpointerisnull();
-    intdensematrix ads(size(),1,0,1);
+    indexmat ads(size(),1,0,1);
     rawvecptr->setvalues(ads, valsmat, op); 
 }
 
-densematrix vec::getvalues(intdensematrix addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
+densemat vec::getvalues(indexmat addresses) { errorifpointerisnull(); return rawvecptr->getvalues(addresses); }
 
-densematrix vec::getallvalues(void)
+densemat vec::getallvalues(void)
 {
     errorifpointerisnull();
-    intdensematrix ads(size(),1,0,1);
+    indexmat ads(size(),1,0,1);
     return rawvecptr->getvalues(ads);
 }
 
@@ -90,6 +90,38 @@ void vec::setvalue(int address, double value, std::string op)
 double vec::getvalue(int address)
 {
     errorifpointerisnull(); return rawvecptr->getvalue(address); 
+}
+
+void vec::setvalue(port prt, double value, std::string op)
+{
+    errorifpointerisnull();
+    
+    if (prt.getpointer()->isharmonicone())
+    {
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1).get());
+        setvalue(address, value, op);
+    }
+    else
+    {
+        std::cout << "Error in 'vec' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+        abort();
+    }
+}
+
+double vec::getvalue(port prt)
+{
+    errorifpointerisnull();
+    
+    if (prt.getpointer()->isharmonicone())
+    {
+        int address = rawvecptr->getdofmanager()->getaddress(prt.getpointer()->harmonic(1).get());
+        return getvalue(address);
+    }
+    else
+    {
+        std::cout << "Error in 'vec' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+        abort();
+    }
 }
 
 vectorfieldselect vec::operator|(field selectedfield) { errorifpointerisnull(); return vectorfieldselect(rawvecptr, selectedfield.getpointer()); }
@@ -107,6 +139,8 @@ void vec::setdata(void)
     std::vector<std::shared_ptr<rawfield>> rfs = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < rfs.size(); i++)
         rfs[i]->transferdata(-1, vectorfieldselect(rawvecptr, rfs[i]), "set");
+        
+    rawvecptr->setvaluesfromports();
 }
 
 void vec::automaticupdate(bool updateit)
@@ -146,11 +180,11 @@ vec vec::copy(void)
     return vec(std::shared_ptr<rawvec>(new rawvec(  rawvecptr->getdofmanager(), output  )));
 }
 
-vec vec::extract(intdensematrix addresses)
+vec vec::extract(indexmat addresses)
 {
-    densematrix extractedvals = getvalues(addresses);
+    densemat extractedvals = getvalues(addresses);
     std::shared_ptr<rawvec> newrawvecptr(new rawvec(std::shared_ptr<dofmanager>(new dofmanager(addresses.count()))));
-    newrawvecptr->setvalues(intdensematrix(addresses.count(), 1, 0, 1), extractedvals, "set");
+    newrawvecptr->setvalues(indexmat(addresses.count(), 1, 0, 1), extractedvals, "set");
     return vec(newrawvecptr);
 }
 

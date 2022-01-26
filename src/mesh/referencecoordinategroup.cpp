@@ -22,7 +22,7 @@ void referencecoordinategroup::evalat(std::vector<int> inputdisjregs)
     std::vector<double> kietaphis(3*numcoords,0.0);
     
     for (int d = 0; d < inputdisjregs.size(); d++)
-        myalgorithm::getreferencecoordinates(mycoordgroup, inputdisjregs[d], elems, kietaphis);
+        gentools::getreferencecoordinates(mycoordgroup, inputdisjregs[d], elems, kietaphis);
         
     evalat(elems, kietaphis, coordnums);  
 }
@@ -91,7 +91,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
     
     // Sort according to the element numbers:
     std::vector<int> reorderingvector;
-    myalgorithm::stablesort(elems, reorderingvector);
+    gentools::stablesort(elems, reorderingvector);
     std::vector<int> elemscp = elems;
     std::vector<int> coordnumscp = coordnums;
     std::vector<double> kietaphiscp = kietaphis;
@@ -176,7 +176,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
     {
         // Sort the reference coordinates in each element:
         std::vector<int> reordvec;
-        myalgorithm::stablecoordinatesort({noisethreshold,noisethreshold,noisethreshold}, myelems[n], mykietaphis[n], reordvec);
+        gentools::stablecoordinatesort({noisethreshold,noisethreshold,noisethreshold}, myelems[n], mykietaphis[n], reordvec);
 
         std::vector<int> myelemsreordered(myelems[n].size());
         std::vector<int> mycoordnumsreordered(myelems[n].size());
@@ -190,7 +190,7 @@ void referencecoordinategroup::evalat(std::vector<int>& elems, std::vector<doubl
             mykietaphisreordered[3*i+2] = mykietaphis[n][3*reordvec[i]+2];
         }
         // Sort by blocks of n coordinates:
-        myalgorithm::stablesort(noisethreshold, mykietaphisreordered, reordvec, 3*n);
+        gentools::stablesort(noisethreshold, mykietaphisreordered, reordvec, 3*n);
     
         for (int i = 0; i < reordvec.size(); i++)
         {

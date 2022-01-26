@@ -61,7 +61,7 @@ int main(void)
 
     // Add the periodic condition between gamma1 and gamma2.
     // Region gamma2 is obtained from gamma1 by a 60 degrees rotation around z (rotation center is the origin).
-    elasticity += periodicitycondition(gamma1, gamma2, u, {0,0,0}, {0,0,60});
+    elasticity += periodicitycondition(gamma1, gamma2, u, {0,0,0}, {0,0,60}, 1.0, 1);
 
 
     // Generate, solve and store the solution to field u:
@@ -105,10 +105,10 @@ void processmesh(void)
 
     mesh mymesh2;
 
-    mymesh2.selectbox(elecc, 4001, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
-    mymesh2.selectbox(eleco, 4006, 2, {-10,10,-10,10,0.3e-6-1e-10,0.3e-6+1e-10});
-    mymesh2.selectbox(clamp, all, 2, {-10,10,-10,10,-1e-10,1e-10});
-    mymesh2.selectbox(gamma1, all, 2, {-10,10,-1e-10,1e-10,-10,10});
+    mymesh2.selectbox(elecc, 4001, 2, {-10,10,-10,10,0.3e-6,0.3e-6});
+    mymesh2.selectbox(eleco, 4006, 2, {-10,10,-10,10,0.3e-6,0.3e-6});
+    mymesh2.selectbox(clamp, all, 2, {-10,10,-10,10,0,0});
+    mymesh2.selectbox(gamma1, all, 2, {-10,10,0,0,-10,10});
 
     mymesh2.load("cmutperiodic.msh", 0);
 
@@ -118,7 +118,7 @@ void processmesh(void)
 
     mesh mymesh3;
 
-    mymesh3.selectbox(gamma2, all, 2, {-10,10,-1e-10,1e-10,-10,10});
+    mymesh3.selectbox(gamma2, all, 2, {-10,10,0,0,-10,10});
 
     mymesh3.load("cmutperiodic.msh", 0);
 

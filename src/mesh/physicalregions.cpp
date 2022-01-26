@@ -42,7 +42,7 @@ int physicalregions::createintersection(std::vector<int> input, bool createifexi
         std::vector<int> disjregsinthisphysreg = get(input[i])->getdisjointregions(-1);
         
         if (i > 0)
-            disjregs = myalgorithm::intersect(disjregs, disjregsinthisphysreg);
+            disjregs = gentools::intersect(disjregs, disjregsinthisphysreg);
         else
             disjregs = disjregsinthisphysreg;
     }
@@ -64,7 +64,7 @@ int physicalregions::createintersection(std::vector<int> input, bool createifexi
 
 int physicalregions::createunionofall(bool createifexisting)
 {
-    std::vector<int> disjregs = myalgorithm::getequallyspaced(0, 1, mydisjointregions->count());
+    std::vector<int> disjregs = gentools::getequallyspaced(0, 1, mydisjointregions->count());
 
     if (createifexisting == false)
     {

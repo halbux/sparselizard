@@ -22,51 +22,51 @@ void mesh::errorifnotloaded(void)
 mesh::mesh(void)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
+    universe::myrawmesh = rawmeshptr;
 }
 
 mesh::mesh(std::string filename, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
+    universe::myrawmesh = rawmeshptr;
     rawmeshptr->load(filename, -1, -1, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 mesh::mesh(std::string filename, int globalgeometryskin, int numoverlaplayers, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
+    universe::myrawmesh = rawmeshptr;
     rawmeshptr->load(filename, globalgeometryskin, numoverlaplayers, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 mesh::mesh(bool mergeduplicates, std::vector<std::string> meshfiles, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
+    universe::myrawmesh = rawmeshptr;
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 mesh::mesh(std::vector<shape> inputshapes, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
+    universe::myrawmesh = rawmeshptr;
     rawmeshptr->load(inputshapes, -1, -1, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
 mesh::mesh(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity)
 {
     rawmeshptr = std::shared_ptr<rawmesh>(new rawmesh());
-    universe::mymesh = rawmeshptr;
+    universe::myrawmesh = rawmeshptr;
     rawmeshptr->load(inputshapes, globalgeometryskin, numoverlaplayers, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -79,7 +79,7 @@ void mesh::load(std::string name, int globalgeometryskin, int numoverlaplayers, 
 {
     errorifloaded();
     rawmeshptr->load(name, globalgeometryskin, numoverlaplayers, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -87,7 +87,7 @@ void mesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int ve
 {
     errorifloaded();
     rawmeshptr->load(mergeduplicates, meshfiles, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -100,7 +100,7 @@ void mesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int numo
 {
     errorifloaded();
     rawmeshptr->load(inputshapes, globalgeometryskin, numoverlaplayers, verbosity);
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
     isloaded = true;
 }
 
@@ -120,7 +120,7 @@ void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumspli
         abort();   
     }
     // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs(universe::mymesh->getdisjointregions()->count());
+    std::vector<int> alldisjregs(universe::getrawmesh()->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
@@ -218,10 +218,28 @@ void mesh::scale(double x, double y, double z)
     rawmeshptr->gethadaptedpointer()->scale(-1, x, y, z);
 }
 
-int mesh::getmeshdimension(void)
+int mesh::getdimension(void)
 {
     errorifnotloaded();
     return rawmeshptr->getmeshdimension();
+}
+
+std::vector<double> mesh::getdimensions(void)
+{
+    errorifnotloaded();
+    return rawmeshptr->getnodes()->getgeometrydimension();
+}
+
+std::vector<double> mesh::printdimensions(void)
+{
+    std::vector<double> dims = getdimensions();
+    
+    std::cout << "Mesh dimensions:" << std::endl;
+    std::cout << "x: " << dims[0] << " m" << std::endl;
+    std::cout << "y: " << dims[1] << " m" << std::endl;
+    std::cout << "z: " << dims[2] << " m" << std::endl;
+    
+    return dims;
 }
 
 std::vector<int> mesh::getphysicalregionnumbers(int dim)
@@ -341,6 +359,6 @@ void mesh::selectanynode(int newphysreg)
 void mesh::use(void)
 {
     errorifnotloaded();
-    universe::mymesh = rawmeshptr->gethadaptedpointer();
+    universe::myrawmesh = rawmeshptr->gethadaptedpointer();
 }
 

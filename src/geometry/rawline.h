@@ -24,6 +24,8 @@ class rawline: public rawshape
         
         int myphysicalregion = -1;
         
+        int mycurvatureorder = 1;
+        
         int mynummeshpoints;
 
         // Son shapes:
@@ -45,7 +47,7 @@ class rawline: public rawshape
         rawline(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, int nummeshpoints);
 
         // Provide to this constructor the coordinates of all mesh nodes and elements in the line:
-        rawline(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
+        rawline(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder);
 
         std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
@@ -55,6 +57,8 @@ class rawline: public rawshape
         void flip(void);
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
     
         int getdimension(void);
 

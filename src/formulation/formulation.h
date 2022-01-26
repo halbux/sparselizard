@@ -18,14 +18,18 @@
 #include "sl.h"
 #include "universe.h"
 #include "memory.h"
-#include "densematrix.h"
-#include "intdensematrix.h"
+#include "densemat.h"
+#include "indexmat.h"
 #include "rawvec.h"
 #include "rawmat.h"
 #include "integration.h"
+#include "port.h"
+#include "portrelation.h"
 
 class integration;
 class contribution;
+class port;
+class portrelation;
 
 class formulation
 {
@@ -41,7 +45,10 @@ class formulation
         std::vector<std::shared_ptr<rawmat>> mymat = {NULL, NULL, NULL};
         
         // The link between the dof number and its row and column in the matrix:
-        std::shared_ptr<dofmanager> mydofmanager;
+        std::shared_ptr<dofmanager> mydofmanager = NULL;
+        
+        // The port relations:
+        std::vector<std::shared_ptr<portrelation>> myportrelations = {};
         
         // mycontributions[m][i][j] gives the jth contribution of block number i for:
         // - the right handside if     m = 0
@@ -61,9 +68,12 @@ class formulation
         
         formulation(void);
         
+        // Add a port relation:
+        formulation& operator+=(expression expr);
+        
         // The following adds the contribution defined in the integration object.
-        void operator+=(integration integrationobject);
-        void operator+=(std::vector<integration> integrationobject);
+        formulation& operator+=(integration integrationobject);
+        formulation& operator+=(std::vector<integration> integrationobject);
         
         int countdofs(void);
         long long int allcountdofs(void);
@@ -84,27 +94,32 @@ class formulation
         void generate(std::vector<int> contributionnumbers);
         void generate(int contributionnumber);
         
+        // Compute the no-port term value for every port relation:
+        densemat getportrelationrhs(void);
+        std::tuple<indexmat, indexmat, densemat> getportrelations(int KCM);
+        
         std::shared_ptr<dofmanager> getdofmanager(void) { return mydofmanager; };
         
         // Get the assembled matrices or get the right hanside vector.
         // Choose to discard or not all values after getting the vector/matrix.
         
         // b() is an alias for rhs() and A() for K():
-        vec b(bool keepvector = false, bool dirichletupdate = true);
+        vec b(bool keepvector = false, bool dirichletandportupdate = true);
         mat A(bool keepfragments = false);
         
-        vec rhs(bool keepvector = false, bool dirichletupdate = true);
+        vec rhs(bool keepvector = false, bool dirichletandportupdate = true);
         mat K(bool keepfragments = false);
         mat C(bool keepfragments = false);
         mat M(bool keepfragments = false);
         // KCM set to 0 gives K, 1 gives C and 2 gives M.
-        mat getmatrix(int KCM, bool keepfragments = false, std::vector<intdensematrix> additionalconstraints = {});
+        mat getmatrix(int KCM, bool keepfragments = false, std::vector<indexmat> additionalconstraints = {});
         
         
         // Generate, solve and save to fields:
         void solve(std::string soltype = "lu", bool diagscaling = false, std::vector<int> blockstoconsider = {-1});
 
-        // DDM resolution with mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
+        // DDM resolution with Dirichlet / mixed interface conditions. The initial solution is taken from the fields state. The relative residual history is returned.
+        std::vector<double> allsolve(double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
         std::vector<double> allsolve(std::vector<int> formulterms, std::vector<std::vector<int>> physicalterms, std::vector<std::vector<int>> artificialterms, double relrestol, int maxnumit, std::string soltype = "lu", int verbosity = 1);
 
 };

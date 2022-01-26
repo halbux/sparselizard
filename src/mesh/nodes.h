@@ -41,9 +41,8 @@ class nodes
         // 'mycoordinates' based on the input vector. The reordering must be bijective.
         void reorder(std::vector<int>& nodereordering);
         
-        // 'getgeometrydimension' gives the max length of the geometry in 
-        // the x, y and z dimension for input 0, 1 and 2 respectively.
-        double getgeometrydimension(int coord);    
+        // 'getgeometrydimension' gives the max length of the geometry in the x, y and z dimension.
+        std::vector<double> getgeometrydimension(void);    
         // Get a round off noise threshold for each coordinate.
         std::vector<double> getnoisethreshold(void);
         

@@ -24,22 +24,24 @@
 #include <memory>
 #include "parameter.h"
 #include "polynomial.h"
-#include "myfft.h"
+#include "fourier.h"
 #include <cmath>
 #include "rawfield.h"
 #include "mystring.h"
 #include "wallclock.h"
 #include "shape.h"
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "iointerface.h"
 #include "spline.h"
 #include "referencecoordinategroup.h"
+#include "port.h"
 
 
 class vec;
 class operation;
 class parameter;
 class field;
+class port;
 class shape;
 
 class expression
@@ -73,6 +75,7 @@ class expression
         expression(field);
         expression(double);
         expression(parameter);
+        expression(port);
         expression(int numrows, int numcols, std::vector<expression>);
         // Concatenate expressions to create a new one:
         expression(const std::vector<std::vector<expression>> input);
@@ -85,9 +88,9 @@ class expression
         // Piecewise expression definition:
         expression(std::vector<double> pos, std::vector<expression> exprs, expression tocompare);
         // Custom expression based on a user-defined function:
-        expression(int m, int n, std::vector<densematrix> customfct(std::vector<densematrix>), std::vector<expression> exprs);
+        expression(int m, int n, std::vector<densemat> customfct(std::vector<densemat>), std::vector<expression> exprs);
         // Advanced custom function:
-        expression(int m, int n, std::vector<densematrix> advancedcustomfct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields);
+        expression(int m, int n, std::vector<densemat> advancedcustomfct(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields);
         
         // Define a 1x1 expression from an operation:
         expression(std::shared_ptr<operation>);
@@ -130,11 +133,11 @@ class expression
         double integrate(int physreg, expression meshdeform, int integrationorder);
         
         // Compute an FFT transform of the expression and save all the 'numfftharms' harmonics:
-        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder = 1);
-        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder = 1);
+        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder);
+        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder);
         // Save at 'numtimesteps' timesteps. Set -1 to save the harmonics for linear expressions.
-        void write(int physreg, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
-        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
+        void write(int physreg, std::string filename, int lagrangeorder, int numtimesteps = -1);
+        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps = -1);
         
         // Save to disk the part of the stream lines that lie on physical region 'physreg'.
         // The stream lines are grown (upstream and downstream) starting from 'startcoords'.
@@ -163,7 +166,9 @@ class expression
         
         expression at(int row, int col);
         
-        // Evaluate a scalar expression that only contains x, y and/or z fields without derivatives.
+        // Evaluate a space-independent scalar expression:
+        double evaluate(void);
+        // Same but allow x, y and/or z fields without derivatives:
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
         // Output the resized expression (filled with zero if larger):
@@ -234,9 +239,16 @@ class expression
         // output[0], output[1] and output[2] may have multiple slices 
         // output[0][s] each corresponding to a unique dof field*-tf field* 
         // pair (with a unique combination of applied time derivatives). 
-        //
-        // The expression must be scalar!
-        std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftfpolynomial(int elementdimension);
+        // The expression must be scalar.
+        std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > extractdoftf(int elementdimension);
+        
+        // Extract the ports, their time derivative orders as well as their 
+        // coefficients from an expanded expression that can be rewritten
+        // as coefs[0]*ports[0] + ... + noportcoef where the coefficients
+        // are space-independent numerical values that do not include ports.
+        // The expression must be scalar. The ports extracted might contain
+        // duplicates. The no-port term is optional (empty vector if none).
+        void extractport(std::vector<port>& ports, std::vector<int>& dtorders, std::vector<expression>& coefs, std::vector<expression>& noportcoef);
         
         
         // Defining the +, -, * and / operators:
@@ -262,6 +274,11 @@ class expression
         expression operator-(parameter);
         expression operator*(parameter);
         expression operator/(parameter);
+        
+        expression operator+(port);
+        expression operator-(port);
+        expression operator*(port);
+        expression operator/(port);
 };
 
 // Define the left version of the operators based on the right one.
@@ -280,7 +297,10 @@ expression operator-(parameter, expression);
 expression operator*(parameter, expression);
 expression operator/(parameter, expression);
 
+expression operator+(port, expression);
+expression operator-(port, expression);
+expression operator*(port, expression);
+expression operator/(port, expression);
+
 #endif
-
-
 

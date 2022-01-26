@@ -1,7 +1,7 @@
 #include "opdetjac.h"
 
 
-std::vector<std::vector<densematrix>> opdetjac::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opdetjac::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Compute the Jacobian terms or reuse if available in the universe.
     std::shared_ptr<jacobian> myjac;
@@ -17,7 +17,7 @@ std::vector<std::vector<densematrix>> opdetjac::interpolate(elementselector& ele
     return {{},{myjac->getdetjac().copy()}};
 }
 
-densematrix opdetjac::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opdetjac::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Compute the Jacobian terms or reuse if available in the universe.
     std::shared_ptr<jacobian> myjac;
@@ -29,7 +29,7 @@ densematrix opdetjac::multiharmonicinterpolate(int numtimeevals, elementselector
     if (universe::isreuseallowed)
         universe::computedjacobian = myjac;
     
-    densematrix computeddetjac = (myjac->getdetjac().copy());
+    densemat computeddetjac = (myjac->getdetjac().copy());
     
     computeddetjac = computeddetjac.getflattened();
     return computeddetjac.duplicatevertically(numtimeevals);

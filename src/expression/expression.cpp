@@ -50,6 +50,14 @@ expression::expression(parameter input)
     }
 }
 
+expression::expression(port input)
+{
+    mynumrows = 1;
+    mynumcols = 1;
+
+    myoperations = {std::shared_ptr<opport>(new opport(input.getpointer()))};
+}
+
 expression::expression(int numrows, int numcols, std::vector<expression> input)
 {
     mynumrows = numrows;
@@ -267,7 +275,7 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
     myoperations = expr.myoperations;
 }
 
-expression::expression(int m, int n, std::vector<densematrix> customfct(std::vector<densematrix>), std::vector<expression> exprs)
+expression::expression(int m, int n, std::vector<densemat> customfct(std::vector<densemat>), std::vector<expression> exprs)
 {
     mynumrows = m; mynumcols = n;
 
@@ -304,7 +312,7 @@ expression::expression(int m, int n, std::vector<densematrix> customfct(std::vec
         (weakops[i].lock())->setfamily(weakops);
 }
 
-expression::expression(int m, int n, std::vector<densematrix> advancedcustomfct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields)
+expression::expression(int m, int n, std::vector<densemat> advancedcustomfct(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<expression> exprs, std::vector<field> infields)
 {
     mynumrows = m; mynumcols = n;
 
@@ -427,19 +435,19 @@ void expression::reordercolumns(std::vector<int> neworder)
 
 std::vector<double> expression::max(int physreg, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return max(physreg, NULL, refinement, xyzrange);
 }
 
 std::vector<double> expression::max(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return max(physreg, &meshdeform, refinement, xyzrange);
 }
 
 std::vector<double> expression::min(int physreg, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, NULL, refinement, xyzrange);
@@ -450,7 +458,7 @@ std::vector<double> expression::min(int physreg, int refinement, std::vector<dou
 
 std::vector<double> expression::min(int physreg, expression meshdeform, int refinement, std::vector<double> xyzrange)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, &meshdeform, refinement, xyzrange);
@@ -474,7 +482,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         std::cout << "Error in 'expression' object: cannot get the max/min of a nonscalar expression" << std::endl;
         abort();
     }
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -482,7 +490,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
     }
 
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
@@ -508,7 +516,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
 
         // Get the node coordinates in the refined element:
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         element myelement(elementtypenumber, refinement);
         std::vector<double> evaluationpoints = myelement.listnodecoordinates();
 
@@ -520,11 +528,11 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
             universe::allowreuse();
 
             // Compute the expression at the evaluation points:
-            densematrix compxval = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat compxval = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
             // Get the coordinates corresponding to the interpolated values:
-            densematrix xval = expression(x).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
-            densematrix yval = expression(y).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
-            densematrix zval = expression(z).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat xval = expression(x).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat yval = expression(y).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat zval = expression(z).myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
 
             universe::forbidreuse();
 
@@ -552,19 +560,19 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
 
 void expression::interpolate(int physreg, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     interpolate(physreg, NULL, xyzcoord, interpolated, isfound);
 }
 
 void expression::interpolate(int physreg, expression meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     interpolate(physreg, &meshdeform, xyzcoord, interpolated, isfound);
 }
 
 std::vector<double> expression::interpolate(int physreg, const std::vector<double> xyzcoord)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     std::vector<double> xyz = xyzcoord;
 
@@ -587,7 +595,7 @@ std::vector<double> expression::interpolate(int physreg, const std::vector<doubl
 
 std::vector<double> expression::interpolate(int physreg, expression meshdeform, const std::vector<double> xyzcoord)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     std::vector<double> xyz = xyzcoord;
 
@@ -611,7 +619,7 @@ std::vector<double> expression::interpolate(int physreg, expression meshdeform, 
 void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<double>& interpolated, std::vector<bool>& isfound)
 {
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(disjregs)))
@@ -644,7 +652,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 void expression::interpolate(int physreg, expression* meshdeform, std::vector<double>& xyzcoord, std::vector<std::vector<double>>& interpolated, std::vector<bool>& isfound, int numtimeevals)
 {
     // Make sure the mesh deformation expression has the right size.
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -652,7 +660,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     }
 
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
     if (meshdeform != NULL && not(meshdeform->isharmonicone(disjregs)))
     {
         std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
@@ -706,7 +714,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     // Clean storage before allowing reuse:
                     universe::forbidreuse();
                     universe::allowreuse();
-                    std::vector<std::vector<densematrix>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
+                    std::vector<std::vector<densemat>> interp = myoperations[0]->interpolate(myselector, kietaphi, meshdeform);
                     universe::forbidreuse();
 
                     if (interpolated.size() < interp.size())
@@ -732,7 +740,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
                     // Clean storage before allowing reuse:
                     universe::forbidreuse();
                     universe::allowreuse();
-                    densematrix interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
+                    densemat interp = myoperations[0]->multiharmonicinterpolate(numtimeevals, myselector, kietaphi, meshdeform);
                     universe::forbidreuse();
 
                     for (int tim = 0; tim < numtimeevals; tim++)
@@ -759,12 +767,12 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
 
 double expression::integrate(int physreg, int integrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integrate(physreg, NULL, integrationorder);
 }
 double expression::integrate(int physreg, expression meshdeform, int integrationorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     return integrate(physreg, &meshdeform, integrationorder);
 }
 
@@ -777,7 +785,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         std::cout << "Error in 'expression' object: cannot integrate a nonscalar expression" << std::endl;
         abort();
     }
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -785,7 +793,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
     }
 
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
@@ -809,7 +817,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         std::vector<int> mydisjregs = mydisjregselector.getgroup(i);
 
         // Get the Gauss points:
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         gausspoints mygausspoints(elementtypenumber, integrationorder);
         std::vector<double> evaluationpoints = mygausspoints.getcoordinates();
         std::vector<double> weights = mygausspoints.getweights();
@@ -821,7 +829,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
         {
             std::shared_ptr<jacobian> myjacobian(new jacobian(myselector, evaluationpoints, meshdeform));
 
-            densematrix detjac = myjacobian->getdetjac();
+            densemat detjac = myjacobian->getdetjac();
             // The Jacobian determinant should be positive irrespective of the node numbering:
             detjac.abs();
 
@@ -829,12 +837,12 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
             universe::computedjacobian = myjacobian;
             universe::allowreuse();
 
-            densematrix compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
+            densemat compxinterpolated = myoperations[0]->interpolate(myselector, evaluationpoints, meshdeform)[1][0];
             compxinterpolated.multiplyelementwise(detjac);
 
             universe::forbidreuse();
 
-            densematrix weightsmat(mygausspoints.count(), 1, weights);
+            densemat weightsmat(mygausspoints.count(), 1, weights);
             compxinterpolated = compxinterpolated.multiply(weightsmat);
 
             integralvalue += compxinterpolated.sum();
@@ -849,25 +857,25 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
 
 void expression::write(int physreg, int numfftharms, std::string filename, int lagrangeorder)
 {   
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, numfftharms, NULL, filename, lagrangeorder, -1);
 }
 
 void expression::write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, numfftharms, &meshdeform, filename, lagrangeorder, -1);
 }
 
 void expression::write(int physreg, std::string filename, int lagrangeorder, int numtimesteps)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, -1, NULL, filename, lagrangeorder, numtimesteps);
 }
 
 void expression::write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     write(physreg, -1, &meshdeform, filename, lagrangeorder, numtimesteps);
 }
 
@@ -881,14 +889,14 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
         std::cout << "Error in 'expression' object: can not write a " << mynumrows << "x" << mynumcols << " expression to file (only scalars or 2x1 or 3x1 column vectors)" << std::endl;
         abort();
     }
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
         abort();
     }
     
-    if (universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
+    if (universe::getrawmesh()->getphysicalregions()->get(physreg)->countelements() == 0)
         return;
 
     // Minimum lagrange order is 1!
@@ -899,7 +907,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     expression xyz(3,1, {x,y,z});
 
     // Loop on all disjoint regions:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     // Make sure the 'meshdeform' expression is constant in time:
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
@@ -911,7 +919,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Get the geometry interpolation order (1 if the element is not curved):
     int geolagrangeorder = lagrangeorder;
     if (iointerface::isonlyisoparametric(filename) == false && meshdeform == NULL)
-        geolagrangeorder = universe::mymesh->getelements()->getcurvatureorder();
+        geolagrangeorder = universe::getrawmesh()->getelements()->getcurvatureorder();
 
     // These are the time tags that will be used:
     std::vector<double> timetags = {};
@@ -932,7 +940,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     {
         std::vector<int> mydisjregs = mydisjregselector.getgroup(g);
 
-        int elementtype = (universe::mymesh->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
+        int elementtype = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(mydisjregs[0]);
         element myelement(elementtype);
 
         // The expression will be interpolated at the following Lagrange nodes:
@@ -951,7 +959,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
             std::vector<int> harms = {};
 
             // Compute the mesh coordinates. Initialise all coordinates to zero.
-            std::vector<densematrix> coords(3,densematrix(myselector.countinselection(), geolagrangecoords.size()/3,0));
+            std::vector<densemat> coords(3,densemat(myselector.countinselection(), geolagrangecoords.size()/3,0));
             for (int i = 0; i < problemdimension; i++)
             {
                 coords[i] = (xyz.myoperations[i]->interpolate(myselector, geolagrangecoords, NULL))[1][0];
@@ -959,8 +967,8 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     coords[i].add((meshdeform->myoperations[i]->interpolate(myselector, geolagrangecoords, NULL))[1][0]);
             }
             // Interpolate the current expression:
-            std::vector<  std::vector<std::vector<densematrix>>  > expr(countrows());
-            std::vector<densematrix> fftexpr(countrows());
+            std::vector<  std::vector<std::vector<densemat>>  > expr(countrows());
+            std::vector<densemat> fftexpr(countrows());
             // Reuse what's possible to reuse during the interpolation:
             universe::allowreuse();
             for (int i = 0; i < countrows(); i++)
@@ -970,16 +978,16 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                     if (numfftharms <= 0)
                         expr[i] = myoperations[i]->interpolate(myselector, lagrangecoords, meshdeform);
                     else
-                        expr[i] = myfft::fft(myoperations[i]->multiharmonicinterpolate(numfftharms, myselector, lagrangecoords, meshdeform), myselector.countinselection(), lagrangecoords.size()/3);
+                        expr[i] = fourier::fft(myoperations[i]->multiharmonicinterpolate(numfftharms, myselector, lagrangecoords, meshdeform), myselector.countinselection(), lagrangecoords.size()/3);
                 }
                 else
-                    fftexpr[i] = myfft::toelementrowformat(myoperations[i]->multiharmonicinterpolate(numtimesteps, myselector, lagrangecoords, meshdeform), myselector.countinselection());
+                    fftexpr[i] = fourier::toelementrowformat(myoperations[i]->multiharmonicinterpolate(numtimesteps, myselector, lagrangecoords, meshdeform), myselector.countinselection());
             }
             universe::forbidreuse();
 
             // Make sure the harmonic content is the same for every component:
             if (numtimesteps <= 0)
-                myfft::sameharmonics(expr);
+                fourier::sameharmonics(expr);
 
             // Get a vector containing all harmonic numbers in 'expr' on the current disjoint regions:
             if (numtimesteps <= 0)
@@ -1002,7 +1010,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
                 for (int h = 0; h < harms.size(); h++)
                 {
                     datatowrite[harms[h]][0].addcoordinates(elementtype, coords[0], coords[1], coords[2]);
-                    std::vector<densematrix> curdata(countrows());
+                    std::vector<densemat> curdata(countrows());
                     for (int comp = 0; comp < countrows(); comp++)
                         curdata[comp] = expr[comp][harms[h]][0];
                     datatowrite[harms[h]][0].adddata(elementtype, curdata);
@@ -1039,9 +1047,9 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
 
 void expression::streamline(int physreg, std::string filename, const std::vector<double>& startcoords, double stepsize, bool downstreamonly)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
-    if (startcoords.size() == 0 || universe::mymesh->getphysicalregions()->get(physreg)->countelements() == 0)
+    if (startcoords.size() == 0 || universe::getrawmesh()->getphysicalregions()->get(physreg)->countelements() == 0)
         return;
     
     // This can happen with int divisions:
@@ -1052,7 +1060,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     }
 
     // Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (mynumrows < problemdimension || mynumrows > 3 || mynumcols != 1)
     {
         std::cout << "Error in 'expression' object: expected a column vector expression with " << problemdimension << " to 3 components to get the stream lines" << std::endl;
@@ -1120,22 +1128,22 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     {
         // Calculate the Runge-Kutta parameters k1, k2, k3 and k4:
         interpolate(physreg, NULL, curcoords, k1, isfound);
-        k1scaled = myalgorithm::normblocks(k1,3);
+        k1scaled = gentools::normblocks(k1,3);
         std::vector<double> ynplushk1over2 = curcoords;
         for (int i = 0; i < curcoords.size(); i++)
             ynplushk1over2[i] += h[(i-i%3)/3]*0.5*k1scaled[i];
         interpolate(physreg, NULL, ynplushk1over2, k2, isfound);
-        k2scaled = myalgorithm::normblocks(k2,3);
+        k2scaled = gentools::normblocks(k2,3);
         std::vector<double> ynplushk2over2 = curcoords;
         for (int i = 0; i < curcoords.size(); i++)
             ynplushk2over2[i] += h[(i-i%3)/3]*0.5*k2scaled[i];
         interpolate(physreg, NULL, ynplushk2over2, k3, isfound);
-        k3scaled = myalgorithm::normblocks(k3,3);
+        k3scaled = gentools::normblocks(k3,3);
         std::vector<double> ynplushk3 = curcoords;
         for (int i = 0; i < curcoords.size(); i++)
             ynplushk3[i] += h[(i-i%3)/3]*k3scaled[i];
         interpolate(physreg, NULL, ynplushk3, k4, isfound);
-        k4scaled = myalgorithm::normblocks(k4,3);
+        k4scaled = gentools::normblocks(k4,3);
 
 
         isdone = true;
@@ -1176,7 +1184,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
         if (numlines == 0)
             continue;
 
-        densematrix xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
+        densemat xcoordsmat(numlines-1,2, 0), ycoordsmat(numlines-1,2, 0), zcoordsmat(numlines-1,2, 0), flowspeedmat(numlines-1,2, 0);
         double* xptr = xcoordsmat.getvalues(); double* yptr = ycoordsmat.getvalues(); double* zptr = zcoordsmat.getvalues();
         double* fsptr = flowspeedmat.getvalues();
 
@@ -1236,7 +1244,7 @@ bool expression::iszero(void)
 
 vec expression::atbarycenter(int physreg, field onefield)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     // The field must be a "one" type:
     std::string ft = onefield.getpointer()->gettypename();
@@ -1388,8 +1396,23 @@ expression expression::at(int row, int col)
     return arrayentry;
 }
 
+double expression::evaluate(void)
+{
+    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
+    
+    if (isscalar())
+        return myoperations[0]->evaluate();
+    else
+    {
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
+        abort();
+    }
+}
+
 std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
+    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
+    
     if (isscalar())
     {
         if (xcoords.size() == ycoords.size() && xcoords.size() == zcoords.size())
@@ -1407,7 +1430,7 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
     }
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on a scalar expression" << std::endl;
+        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
         abort();
     }
 }
@@ -1439,7 +1462,7 @@ expression expression::spacederivative(int whichderivative)
         abort();
     }
 
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
 
     expression derivated = this->getcopy();
 
@@ -1821,7 +1844,7 @@ expression expression::mod(double modval)
 
 expression expression::on(int physreg, expression* coordshift, bool errorifnotfound)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (coordshift != NULL && (coordshift->countcolumns() != 1 || coordshift->countrows() < problemdimension))
     {
         std::cout << "Error in 'expression' object: coordinate shift argument in 'on' has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
@@ -1841,13 +1864,13 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
             onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, onexpr.myoperations[i], errorifnotfound));
         else
         {
-            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftfpolynomial').
+            // Isolate the dofs (multiply by a dummy scalar test function for the call to 'extractdoftf').
             field dummy("h1");
             expression curexpr = expression(onexpr.myoperations[i]) * sl::tf(dummy);
             curexpr.expand();
         
-            int elementdimension = universe::mymesh->getphysicalregions()->get(physreg)->getelementdimension();
-            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftfpolynomial(elementdimension);
+            int elementdimension = universe::getrawmesh()->getphysicalregions()->get(physreg)->getelementdimension();
+            std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = curexpr.extractdoftf(elementdimension);
             // Do not retrieve the info for the tf:
             std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
             std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
@@ -1927,7 +1950,7 @@ expression expression::detjac(void)
 
 expression expression::invjac(void)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     switch (problemdimension)
     {
         case 1:
@@ -1948,7 +1971,7 @@ expression expression::invjac(void)
 
 expression expression::jac(void)
 {
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     switch (problemdimension)
     {
         case 1:
@@ -1992,12 +2015,12 @@ void expression::expand(void)
     else
     {
         std::cout << "Error in 'expression' object: expand is only defined for scalar expressions" << std::endl;
-        std::cout << "Did you try to define a nonscalar formulation?" << std::endl;
+        std::cout << "Did you try to define a nonscalar formulation term?" << std::endl;
         abort();
     }
 }
 
-std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftfpolynomial(int elementdimension)
+std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::extractdoftf(int elementdimension)
 {
     // Simplify the operation:
     myoperations[0] = myoperations[0]->simplify({});
@@ -2026,13 +2049,11 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     // Loop on all elementary sum terms in the formulation:
     for (int i = 0; i < sumterms.size(); i++)
     {
-        // Deal with the very specific case of a tf() term without
-        // coefficient by multiplying it by a constant 1 to get a product:
+        // Deal with the very specific case of a tf() term without coefficient:
         if (sumterms[i]->istf())
         {
             std::shared_ptr<opproduct> op(new opproduct);
             op->multiplybyterm(sumterms[i]);
-            op->multiplybyterm(std::shared_ptr<operation>(new opconstant(1)));
             sumterms[i] = op;
         }
         // In a valid formulation term sumterms[i] must now always be a product:
@@ -2199,6 +2220,88 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
     return {coeffs, dofs, tfs};
 }
 
+void expression::extractport(std::vector<port>& ports, std::vector<int>& dtorders, std::vector<expression>& coefs, std::vector<expression>& noportcoef)
+{
+    ports = {}; dtorders = {}; coefs = {}; noportcoef = {};
+
+    // Simplify the operation:
+    myoperations[0] = myoperations[0]->simplify({});
+
+    bool isformatok = true;
+
+    // Extract the sum terms from the operation:
+    std::vector<std::shared_ptr<operation>> sumterms;
+    if (myoperations[0]->issum())
+        sumterms = myoperations[0]->getarguments();
+    else
+        sumterms = {myoperations[0]};
+
+    // Loop on all elementary sum terms in the formulation:
+    for (int i = 0; i < sumterms.size(); i++)
+    {
+        // If needed make a product out of it:
+        if (sumterms[i]->isproduct() == false)
+        {
+            std::shared_ptr<opproduct> op(new opproduct);
+            op->multiplybyterm(sumterms[i]);
+            sumterms[i] = op;
+        }
+
+        std::shared_ptr<rawport> currentport = NULL;
+        int currentdtorder = -1;
+
+        // The coef is what remains after port removal.
+        // We thus remove the port term.
+        std::shared_ptr<operation> currentcoef = sumterms[i]->copy();
+
+        std::vector<std::shared_ptr<operation>> productterms = sumterms[i]->getarguments();
+
+        for (int j = productterms.size()-1; j >= 0; j--)
+        {
+            // Remove the port term to get the coefficient:
+            if (currentport == NULL && productterms[j]->isport())
+            {
+                currentport = productterms[j]->getportpointer();
+                currentdtorder = productterms[j]->gettimederivative();
+                currentcoef->removeterm(j);
+            }
+        }
+
+        // A coef without factors actually has value 1:
+        if (currentcoef->count() == 0)
+            currentcoef = std::shared_ptr<opconstant>(new opconstant(1));
+
+        // Do some error checking.
+        // Make sure there is no port in the coef.
+        if (currentcoef->isportincluded())
+            isformatok = false;
+
+        if (currentport != NULL)
+        {
+            ports.push_back(port(currentport));
+            dtorders.push_back(currentdtorder);
+            coefs.push_back(expression(currentcoef));
+        }
+        else
+        {
+            if (noportcoef.size() == 0)
+                noportcoef = {expression(currentcoef)};
+            else
+                noportcoef[0] = noportcoef[0] + expression(currentcoef);
+        }
+    }
+
+    if (not(isformatok))
+    {
+        std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
+        std::cout << "The expression should be rewritable into a sum of products of the form coef*port (time derivatives allowed)" << std::endl;
+        std::cout << "Expression was:" << std::endl;
+        myoperations[0]->print();
+        std::cout << std::endl;
+        abort();
+    }
+}
+
 
 expression expression::operator+(void) { return this->getcopy(); }
 expression expression::operator-(void) { return (this->getcopy() * -1.0); }
@@ -2319,18 +2422,29 @@ expression expression::operator-(parameter param) { return this->getcopy() - (ex
 expression expression::operator*(parameter param) { return this->getcopy() * (expression)param; }
 expression expression::operator/(parameter param) { return this->getcopy() / (expression)param; }
 
+expression expression::operator+(port prt) { return this->getcopy() + (expression)prt; }
+expression expression::operator-(port prt) { return this->getcopy() - (expression)prt; }
+expression expression::operator*(port prt) { return this->getcopy() * (expression)prt; }
+expression expression::operator/(port prt) { return this->getcopy() / (expression)prt; }
 
-expression operator+(double val, expression expr) { return expr+val; }
-expression operator-(double val, expression expr) { return -expr+val; }
-expression operator*(double val, expression expr) { return expr*val; }
-expression operator/(double val, expression expr) { return ( (expression)val ) / expr; }
 
-expression operator+(field inputfield, expression expr) { return expr+inputfield; }
-expression operator-(field inputfield, expression expr) { return -expr+inputfield; }
-expression operator*(field inputfield, expression expr) { return expr*inputfield; }
-expression operator/(field inputfield, expression expr) { return ( (expression)inputfield ) / expr; }
+expression operator+(double val, expression expr) { return (expression)val + expr; }
+expression operator-(double val, expression expr) { return (expression)val - expr; }
+expression operator*(double val, expression expr) { return (expression)val * expr; }
+expression operator/(double val, expression expr) { return (expression)val / expr; }
 
-expression operator+(parameter param, expression expr) { return expr+param; }
-expression operator-(parameter param, expression expr) { return -expr+param; }
-expression operator*(parameter param, expression expr) { return expr*param; }
-expression operator/(parameter param, expression expr) { return ( (expression)param ) / expr; }
+expression operator+(field inputfield, expression expr) { return (expression)inputfield + expr; }
+expression operator-(field inputfield, expression expr) { return (expression)inputfield - expr; }
+expression operator*(field inputfield, expression expr) { return (expression)inputfield * expr; }
+expression operator/(field inputfield, expression expr) { return (expression)inputfield / expr; }
+
+expression operator+(parameter param, expression expr) { return (expression)param + expr; }
+expression operator-(parameter param, expression expr) { return (expression)param - expr; }
+expression operator*(parameter param, expression expr) { return (expression)param * expr; }
+expression operator/(parameter param, expression expr) { return (expression)param / expr; }
+
+expression operator+(port prt, expression expr) { return (expression)prt + expr; }
+expression operator-(port prt, expression expr) { return (expression)prt - expr; }
+expression operator*(port prt, expression expr) { return (expression)prt * expr; }
+expression operator/(port prt, expression expr) { return (expression)prt / expr; }
+

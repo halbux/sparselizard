@@ -25,6 +25,8 @@ class rawarc: public rawshape
         
         int myphysicalregion = -1;
         
+        int mycurvatureorder = 1;
+        
         int mynummeshpoints;
 
         // Son shapes:
@@ -53,6 +55,8 @@ class rawarc: public rawshape
         void flip(void);
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
     
         int getdimension(void);
 

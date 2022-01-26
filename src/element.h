@@ -11,7 +11,7 @@
 #include <vector>
 #include <math.h>
 #include <algorithm>
-#include "myalgorithm.h"
+#include "gentools.h"
 #include "polynomials.h"
 
 // Element type numbers are as follows:

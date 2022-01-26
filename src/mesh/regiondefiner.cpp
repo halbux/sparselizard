@@ -94,6 +94,10 @@ void regiondefiner::defineboxregion(int regnum)
     std::vector<double>* nodecoords = mynodes->getcoordinates();
 
     std::vector<double> boxlimit = boxlimits[regnum];
+    
+    // Make the box limit slightly larger to remove the roundoff noise issues:
+    boxlimit[0] -= noisethreshold; boxlimit[2] -= noisethreshold; boxlimit[4] -= noisethreshold;
+    boxlimit[1] += noisethreshold; boxlimit[3] += noisethreshold; boxlimit[5] += noisethreshold;
 
     physicalregion* newphysreg = myphysicalregions->get(boxed[regnum]);
     physicalregion* curphysreg;
@@ -178,6 +182,9 @@ void regiondefiner::definesphereregion(int regnum)
 
     std::vector<double> spherecenter = spherecenters[regnum];
     double sphereradius = sphereradii[regnum];
+    
+    // Make the sphere radius slightly larger to remove the roundoff noise issues:
+    sphereradius += noisethreshold;
 
     physicalregion* newphysreg = myphysicalregions->get(sphered[regnum]);
     physicalregion* curphysreg;
@@ -511,10 +518,6 @@ void regiondefiner::regionbox(int newphysreg, int selecteddim, std::vector<doubl
     tobox.push_back(physregtobox);
     boxelemdims.push_back(selecteddim);
 
-    // Make the box limit slightly larger to remove the roundoff noise issues:
-    boxlimit[0] -= boxlimit[0]*roundoffnoise; boxlimit[2] -= boxlimit[2]*roundoffnoise; boxlimit[4] -= boxlimit[4]*roundoffnoise;
-    boxlimit[1] += boxlimit[1]*roundoffnoise; boxlimit[3] += boxlimit[3]*roundoffnoise; boxlimit[5] += boxlimit[5]*roundoffnoise;
-
     boxlimits.push_back(boxlimit);
 }
 
@@ -538,9 +541,6 @@ void regiondefiner::regionsphere(int newphysreg, int selecteddim, std::vector<do
     sphered.push_back(newphysreg);
     tosphere.push_back(physregtosphere);
     sphereelemdims.push_back(selecteddim);
-
-    // Make the sphere radius slightly larger to remove the roundoff noise issues:
-    radius += radius*roundoffnoise;
 
     spherecenters.push_back(centercoords);
     sphereradii.push_back(radius);
@@ -604,6 +604,12 @@ bool regiondefiner::isanycoordinatedependentregiondefined(void)
 
 void regiondefiner::defineregions(void)
 {
+    if (isanycoordinatedependentregiondefined())
+    {
+        std::vector<double> nt = mynodes->getnoisethreshold();
+        noisethreshold = gentools::sum(nt);
+    }
+
     for (int i = 0; i < mypriority.size(); i++)
     {
         if (mypriority[i][0] == 0)
@@ -619,6 +625,8 @@ void regiondefiner::defineregions(void)
         if (mypriority[i][0] == 5)
             defineanynoderegion(mypriority[i][1]);
     }
+    
+    noisethreshold = -1;
 }
 
 regiondefiner regiondefiner::copy(nodes* nds, elements* els, physicalregions* prs)

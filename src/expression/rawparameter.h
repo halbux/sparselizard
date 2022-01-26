@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include "operation.h"
-#include "densematrix.h"
+#include "densemat.h"
 #include "universe.h"
 #include "elementselector.h"
 #include "expression.h"
@@ -60,15 +60,15 @@ class rawparameter
 
         // A parameter cannot store an expression with a dof or a tf.
         // It can also only store expression arrays of a same dimension. 
-        void set(int physreg, expression);
+        void set(int physreg, expression input);
 
         std::shared_ptr<operation> get(int disjreg, int row, int col);
 
         int countrows(void);
         int countcolumns(void);
 
-        std::vector<std::vector<densematrix>> interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         void simplify(int row, int col, int disjreg);
 

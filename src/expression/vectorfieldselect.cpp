@@ -3,7 +3,7 @@
 
 void vectorfieldselect::setdata(int physreg, field myfield, std::string op)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (op != "set" && op != "add")
     {

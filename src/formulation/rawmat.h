@@ -12,13 +12,12 @@
 #include <vector>
 #include "dofmanager.h"
 #include <cmath>
-#include "myalgorithm.h"
-#include "intdensematrix.h"
-#include "densematrix.h"
+#include "gentools.h"
+#include "indexmat.h"
+#include "densemat.h"
 #include "memory.h"
 #include "petsc.h"
 #include "petscmat.h"
-#include <thread>
 
 class dofmanager;
 
@@ -27,19 +26,19 @@ class rawmat
     private:
         
         // Combining all accumulated fragments below gives the overall matrix.
-        std::vector<intdensematrix> accumulatedrowindices = {};
-        std::vector<intdensematrix> accumulatedcolindices = {};
-        std::vector<densematrix> accumulatedvals = {};
+        std::vector<indexmat> accumulatedrowindices = {};
+        std::vector<indexmat> accumulatedcolindices = {};
+        std::vector<densemat> accumulatedvals = {};
         
 
         long long int nnzA = -1, nnzD = -1;
         
         // The sparse matrix is stored in csr format. Dirichlet constraints are eliminated using A and D in Atotal = [A D; 0 1].
         // The rows and columns in A and D are renumbered consecutively from zero.
-        intdensematrix Arows, Acols, Drows, Dcols;
-        densematrix Avals, Dvals;
+        indexmat Arows, Acols, Drows, Dcols;
+        densemat Avals, Dvals;
         // Ainds[i] is the index in Atotal of the ith index in A:
-        intdensematrix Ainds, Dinds;
+        indexmat Ainds, Dinds;
         
         Mat Amat = PETSC_NULL, Dmat = PETSC_NULL;
         
@@ -55,7 +54,7 @@ class rawmat
     public:
                     
         rawmat(std::shared_ptr<dofmanager> dofmngr);
-        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensematrix inAinds, intdensematrix inDinds);
+        rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, indexmat inAinds, indexmat inDinds);
 
         ~rawmat(void);
      
@@ -71,12 +70,10 @@ class rawmat
         bool isfactored(void) { return isitfactored; };
         void isfactored(bool isfact) { isitfactored = isfact; };
     
-        // Add a fragment to the matrix:
-        void accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals);   
+        // Add a fragment to the matrix (empty fragments are ignored):
+        void accumulate(indexmat rowadresses, indexmat coladresses, densemat vals);   
         // Create the petsc matrices:
         void process(std::vector<bool>& isconstrained);
-        // Remove the last added fragment:
-        void removelastfragment(void);
         // Clear all the fragments:
         void clearfragments(void);
         
@@ -85,8 +82,8 @@ class rawmat
         // Extract a new initialized rawmat that has all accumulated data:
         std::shared_ptr<rawmat> extractaccumulated(void);
         
-        intdensematrix getainds(void);
-        intdensematrix getdinds(void);
+        indexmat getainds(void);
+        indexmat getdinds(void);
 
         Mat getapetsc(void);
         Mat getdpetsc(void);

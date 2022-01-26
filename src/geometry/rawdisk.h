@@ -29,6 +29,8 @@ class rawdisk: public rawshape
     private:
 
         int myphysicalregion = -1;
+        
+        int mycurvatureorder = 1;
 
         int mynummeshpoints;
 
@@ -55,6 +57,8 @@ class rawdisk: public rawshape
         std::shared_ptr<rawshape> duplicate(void);
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
     
         int getdimension(void);
 

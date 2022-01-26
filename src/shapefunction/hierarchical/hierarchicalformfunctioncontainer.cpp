@@ -72,7 +72,7 @@ void hierarchicalformfunctioncontainer::evaluate(std::vector<double> evaluationp
     }
 }
 
-densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, int order, int whichderivative, int component)
+densemat hierarchicalformfunctioncontainer::tomatrix(int totalorientation, int order, int whichderivative, int component)
 {
     std::vector<int> edgesorientations = orientation::getedgesorientationsfromtotalorientation(totalorientation, myelementtypenumber);
     std::vector<int> facesorientations = orientation::getfacesorientationsfromtotalorientation(totalorientation, myelementtypenumber);
@@ -81,7 +81,7 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, in
     hierarchicalformfunctioniterator myiterator(myformfunctiontypename, myelementtypenumber, order);
 
     // Create the numformfunc x numevalpoints dense matrix to output:
-    densematrix valmat(myiterator.count(), myevaluationpoints.size()/3);
+    densemat valmat(myiterator.count(), myevaluationpoints.size()/3);
     
     for (int ff = 0; ff < myiterator.count(); ff++)
     {
@@ -109,9 +109,9 @@ densematrix hierarchicalformfunctioncontainer::tomatrix(int totalorientation, in
     return valmat;
 }
 
-densematrix hierarchicalformfunctioncontainer::tomatrix(int h, int i, int j, int k, int l, int m, int n)
+densemat hierarchicalformfunctioncontainer::tomatrix(int h, int i, int j, int k, int l, int m, int n)
 {
-    return densematrix(1, myevaluationpoints.size()/3, val[h][i][j][k][l][m][n]);
+    return densemat(1, myevaluationpoints.size()/3, val[h][i][j][k][l][m][n]);
 }
 
 void hierarchicalformfunctioncontainer::print(bool printallderivatives)

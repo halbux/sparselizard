@@ -18,7 +18,7 @@ class regiondefiner
 {
     private:
     
-        double roundoffnoise = 1e-10;
+        double noisethreshold = -1;
 
         nodes* mynodes;
         elements* myelements;

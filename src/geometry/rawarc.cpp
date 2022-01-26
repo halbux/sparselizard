@@ -56,6 +56,11 @@ void rawarc::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawarc::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawarc::getdimension(void)
 {
     return 1;

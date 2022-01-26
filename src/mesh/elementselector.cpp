@@ -10,7 +10,7 @@ void elementselector::prepare(bool isorientationdependent)
     if (isorientationdependent == true)
     {
         std::vector<int> renumberingvector;
-        myalgorithm::stablesort(totalorientations, renumberingvector);
+        gentools::stablesort(totalorientations, renumberingvector);
 
         std::vector<int> totalorientationsbackup = totalorientations;
         std::vector<int> disjointregionsbackup = disjointregions;
@@ -50,7 +50,7 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
     // Get the total number of elements in all disjoint regions for preallocation.
     int totalnumberofelements = 0;
     for (int i = 0; i < mydisjointregionnumbers.size(); i++)
-        totalnumberofelements += universe::mymesh->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
+        totalnumberofelements += universe::getrawmesh()->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
     
     // Create 'disjointregions', 'totalorientations' and 'elems':
     disjointregions.resize(totalnumberofelements);
@@ -60,12 +60,12 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, bool is
     std::iota(originalindexes.begin(), originalindexes.end(), 0);
     
     int currentindex = 0;
-    elements* myelements = universe::mymesh->getelements();
+    elements* myelements = universe::getrawmesh()->getelements();
     for (int i = 0; i < mydisjointregionnumbers.size(); i++)
     {
-        int numelemindisjreg = universe::mymesh->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
-        int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[i]);
-        int rangebegin = universe::mymesh->getdisjointregions()->getrangebegin(mydisjointregionnumbers[i]);
+        int numelemindisjreg = universe::getrawmesh()->getdisjointregions()->countelements(mydisjointregionnumbers[i]);
+        int myelementtypenumber = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[i]);
+        int rangebegin = universe::getrawmesh()->getdisjointregions()->getrangebegin(mydisjointregionnumbers[i]);
         for (int j = 0; j < numelemindisjreg; j++)
         {
             disjointregions[currentindex+j] = mydisjointregionnumbers[i];
@@ -92,9 +92,9 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, std::ve
     originalindexes.resize(elemnums.size());
     std::iota(originalindexes.begin(), originalindexes.end(), 0);
     
-    int myelementtypenumber = universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
+    int myelementtypenumber = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
     
-    elements* myelements = universe::mymesh->getelements();
+    elements* myelements = universe::getrawmesh()->getelements();
     for (int i = 0; i < elemnums.size(); i++)
     {
         disjointregions[i] = myelements->getdisjointregion(myelementtypenumber, elemnums[i]);
@@ -107,12 +107,12 @@ elementselector::elementselector(std::vector<int> disjointregionnumbers, std::ve
 
 int elementselector::getelementdimension(void)
 {
-    return universe::mymesh->getdisjointregions()->getelementdimension(mydisjointregionnumbers[0]);
+    return universe::getrawmesh()->getdisjointregions()->getelementdimension(mydisjointregionnumbers[0]);
 }
 
 int elementselector::getelementtypenumber(void)
 {
-    return universe::mymesh->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
+    return universe::getrawmesh()->getdisjointregions()->getelementtypenumber(mydisjointregionnumbers[0]);
 }
 
 bool elementselector::next(void)

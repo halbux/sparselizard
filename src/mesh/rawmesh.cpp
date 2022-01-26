@@ -92,7 +92,7 @@ void rawmesh::splitmesh(void)
             int ne = splitcoords[p][i].size()/3/ncn[i];
             for (int e = 0; e < ne; e++)
             {
-                std::vector<int> nodelist = myalgorithm::getequallyspaced(nindex, 1, ncn[i]);
+                std::vector<int> nodelist = gentools::getequallyspaced(nindex, 1, ncn[i]);
                 int curelemindex = myelements.add(i, co, nodelist);
                 curpr->addelement(i,curelemindex);
                 // Add node coordinates:
@@ -253,7 +253,7 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     // Do not call this when the mesh is already loaded!
 
     std::string tool, source;
-    myalgorithm::splitatcolon(name, tool, source);
+    gentools::splitatcolon(name, tool, source);
     if (tool.size() == 0)
         tool = "native";
 
@@ -273,7 +273,7 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     
     // For DDM:
     mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), globalgeometryskin, numoverlaplayers));
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->discoverconnectivity(10, verbosity);
         mydtracker->overlap();
@@ -287,7 +287,7 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     
     // For DDM:
     long long int* orientrenum = NULL;
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->mapinterfaces();
         mydtracker->createglobalnodenumbers();
@@ -379,7 +379,7 @@ void rawmesh::load(bool mergeduplicates, std::vector<std::string> meshfiles, int
         if (mergeduplicates == false)
         {
             std::vector<double> coords = curunion.getcoords();
-            std::vector<double> curcoordbounds = myalgorithm::getcoordbounds(coords);
+            std::vector<double> curcoordbounds = gentools::getcoordbounds(coords);
             if (i > 0)
                 shiftvec[i] = shiftvec[i-1] + prevcoordbounds[1]-curcoordbounds[0] + 0.1*(prevcoordbounds[1]-prevcoordbounds[0]);
             prevcoordbounds = curcoordbounds;
@@ -426,14 +426,12 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     // Do not call this when the mesh is already loaded!
 
     if (verbosity > 0)
-        std::cout << "Loading mesh from " << inputshapes.size() << " shape" << myalgorithm::getplurals(inputshapes.size()) << std::endl;
+        std::cout << "Loading mesh from " << inputshapes.size() << " shape" << gentools::getplurals(inputshapes.size()) << std::endl;
     
     wallclock loadtime;
     
 
     ///// Transfer the mesh from every shape to the corresponding objects:
-    // Curvature order for shapes is 1 for now:
-    int curvatureorder = 1;
 
     if (inputshapes.size() == 0)
     {
@@ -450,6 +448,8 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
             abort();
         }
     }
+    
+    int curvatureorder = geotools::getcurvatureorder(geotools::getrawshapes(inputshapes));
 
     // Get the number of nodes for preallocation:
     int numberofnodes = 0;
@@ -505,7 +505,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     
     // For DDM:
     mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), globalgeometryskin, numoverlaplayers));
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->discoverconnectivity(10, verbosity);
         mydtracker->overlap();
@@ -519,7 +519,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     
     // For DDM:
     long long int* orientrenum = NULL;
-    if (numoverlaplayers >= 0)
+    if (mydtracker->isdefined())
     {
         mydtracker->mapinterfaces();
         mydtracker->createglobalnodenumbers();
@@ -668,9 +668,9 @@ void rawmesh::move(int physreg, expression u)
             universe::allowreuse();
 
             // Compute the expression at the evaluation points:
-            densematrix xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
-            densematrix yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
-            densematrix zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat xval = u.getoperationinarray(0,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat yval = u.getoperationinarray(1,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
+            densemat zval = u.getoperationinarray(2,0)->interpolate(myselector, evaluationpoints, NULL)[1][0];
 
             universe::forbidreuse();
 
@@ -822,9 +822,9 @@ bool rawmesh::adapthp(int verbosity)
 {
     int meshdim = getmeshdimension();
 
-    elements* elptr = universe::mymesh->getelements();
-    disjointregions* drptr = universe::mymesh->getdisjointregions();
-    physicalregions* prptr = universe::mymesh->getphysicalregions();
+    elements* elptr = universe::getrawmesh()->getelements();
+    disjointregions* drptr = universe::getrawmesh()->getdisjointregions();
+    physicalregions* prptr = universe::getrawmesh()->getphysicalregions();
     
     int totalnumelems = elptr->countindim(meshdim);
 
@@ -862,14 +862,14 @@ bool rawmesh::adapthp(int verbosity)
     
     prptr->remove({wholedomain}, false);
     
-    // Move to densematrix container:
-    densematrix hcritmat;
-    std::vector<densematrix> pcritmats(numpadaptfields), fomats(numpadaptfields);
+    // Move to densemat container:
+    densemat hcritmat;
+    std::vector<densemat> pcritmats(numpadaptfields), fomats(numpadaptfields);
     
     double* hcritptr;
     std::vector<double*> pcritptrs(numpadaptfields), foptrs(numpadaptfields);
 
-    intdensematrix ads(totalnumelems, 1, 0, 1);
+    indexmat ads(totalnumelems, 1, 0, 1);
     
     if (ishadaptive)
     {
@@ -924,10 +924,14 @@ bool rawmesh::adapthp(int verbosity)
         
         double hcrange = std::get<3>(getoriginalmeshpointer()->myhadaptdata[0]);
         if (hcrange == -1)
+        {
             hcrange = hcritmat.maxabs();
+            if (getoriginalmeshpointer()->getdtracker()->isdefined())
+                slmpi::max(1, &hcrange);
+        }
         
         int numintervals = highnumsplits-lownumsplits+1;
-        hthresholds = myalgorithm::getintervaltics(0.0, hcrange, numintervals);
+        hthresholds = gentools::getintervaltics(0.0, hcrange, numintervals);
     }
     
     // Parameters for p-adaptivity:
@@ -944,7 +948,7 @@ bool rawmesh::adapthp(int verbosity)
             pcrange = pcritmats[i].maxabs();
         
         int numintervals = highorders[i]-loworders[i]+1;
-        pthresholds[i] = myalgorithm::getintervaltics(0.0, pcrange, numintervals);
+        pthresholds[i] = gentools::getintervaltics(0.0, pcrange, numintervals);
     }
     
     
@@ -974,10 +978,10 @@ bool rawmesh::adapthp(int verbosity)
             
                 double hcurcrit = hcritptr[rb+e];
 
-                int hinterv = myalgorithm::findinterval(hcurcrit, hthresholds);
+                int hinterv = gentools::findinterval(hcurcrit, hthresholds);
                 int newnumsplits = lownumsplits + hinterv;
                 
-                groupkeepsplit[typenum][elem] = myalgorithm::inequalitytoint(newnumsplits, oldnumsplits);
+                groupkeepsplit[typenum][elem] = gentools::inequalitytoint(newnumsplits, oldnumsplits);
             }
             
             for (int i = 0; i < numpadaptfields; i++)
@@ -985,7 +989,7 @@ bool rawmesh::adapthp(int verbosity)
                 int oldorder = foptrs[i][rb+e];
                 double pcurcrit = pcritptrs[i][rb+e];
                 
-                int pinterv = myalgorithm::findinterval(pcurcrit, pthresholds[i]);
+                int pinterv = gentools::findinterval(pcurcrit, pthresholds[i]);
                 int neworder = loworders[i] + pinterv;
             
                 // Smoother mesh coarsening:
@@ -1021,7 +1025,7 @@ bool rawmesh::adapthp(int verbosity)
     if (washadapted)
     {
         for (int f = 0; f < numpadaptfields; f++)
-            getattarget(neworders[f], universe::mymesh);
+            getattarget(neworders[f], universe::getrawmesh());
     }
     
     
@@ -1029,7 +1033,7 @@ bool rawmesh::adapthp(int verbosity)
     
     bool waspadapted = false;
     if (not(isorderidentical) || washadapted)
-        waspadapted = universe::mymesh->adaptp(neworders, verbosity);
+        waspadapted = universe::getrawmesh()->adaptp(neworders, verbosity);
 
     if (ispadaptive && not(waspadapted) && verbosity > 0)
         std::cout << "Nothing to do for p-adaptation." << std::endl;
@@ -1183,6 +1187,8 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     
     ///// Update the mesh:
     
+    mydtracker = std::shared_ptr<dtracker>(new dtracker(shared_from_this(), -1, -1));
+    
     // The previous mesh tracker should not be touched:
     std::shared_ptr<ptracker> newptracker(new ptracker(myelements.count()));
     *newptracker = *myptracker;
@@ -1253,15 +1259,15 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     ///// Print p-adaptation summary:
     
     if (verbosity > 0)
-        std::cout << "Adapted order of " << num << " field" << myalgorithm::getplurals(num) << "." << std::endl;
+        std::cout << "Adapted order of " << num << " field" << gentools::getplurals(num) << "." << std::endl;
     if (verbosity > 1)
     {
         for (int i = 0; i < num; i++)
         {
             std::shared_ptr<rawfield> curraw = (std::get<0>(mypadaptdata[i])).lock();
             
-            std::vector<int> catords = myalgorithm::concatenate(neworders[i]);
-            intdensematrix newordsmat(catords.size(),1, catords);
+            std::vector<int> catords = gentools::concatenate(neworders[i]);
+            indexmat newordsmat(catords.size(),1, catords);
             std::vector<int> numineachorder = newordsmat.countalloccurences(newmaxorder);
 
             curraw->print();
@@ -1284,9 +1290,13 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
 
     int meshdim = getmeshdimension();
     
-    universe::mymesh = myhadaptedmesh;
+    universe::myrawmesh = myhadaptedmesh;
         
-    elements* elptr = universe::mymesh->getelements();
+    elements* elptr = universe::getrawmesh()->getelements();
+    std::shared_ptr<dtracker> dtptr = universe::getrawmesh()->getdtracker();
+    int numneighbours = dtptr->countneighbours();
+    
+    gentools::fixatoverlap(groupkeepsplit);
     
     std::shared_ptr<htracker> newhtracker(new htracker);
     *newhtracker = *(myhadaptedmesh->myhtracker);
@@ -1313,6 +1323,13 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     ///// Propagate the splits to guarantee at most a one delta between neighbouring elements:
 
     int maxnumsplits = newhtracker->getmaxdepth() + 1; // includes any new split request
+    if (dtptr->isdefined())
+        slmpi::max(1, &maxnumsplits);
+
+    // Container to store each inner interface edge number and split depth:
+    std::vector<std::vector<int>> nsforneighbours, nsfromneighbours;
+    gentools::getedgesininnerinterfaces(nsforneighbours, nsfromneighbours);
+    
     
     std::vector<int> leavesnumsplits;
     newhtracker->countsplits(leavesnumsplits);
@@ -1321,6 +1338,62 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     {
         // Update to how it will be actually treated:
         newhtracker->fix(vadapt);
+        
+        // Take DDM neighbours into account:
+        if (dtptr->isdefined() && slmpi::count() > 1)
+        {
+            for (int n = 0; n < numneighbours; n++)
+            {
+                for (int i = 0; i < nsforneighbours[n].size()/2; i++)
+                {
+                    int curedge = nsforneighbours[n][2*i+0];
+                    std::vector<int> cellsonedge = elptr->getcellsontype(1, curedge);
+
+                    nsforneighbours[n][2*i+1] = -1;
+
+                    for (int c = 0; c < cellsonedge.size()/2; c++)
+                    {
+                        int curcell = cellsonedge[2*c+1];
+                        int celltype = cellsonedge[2*c+0];
+
+                        int curln = newhtracker->getleafnumber(celltype, curcell);
+                        int curnumsplits = leavesnumsplits[curln] + vadapt[curln];
+
+                        nsforneighbours[n][2*i+1] = std::max(nsforneighbours[n][2*i+1], curnumsplits);
+                    }
+                }   
+            }
+
+            slmpi::exchange(dtptr->getneighbours(), nsforneighbours, nsfromneighbours);
+
+            // Update vadapt accordingly:
+            for (int n = 0; n < numneighbours; n++)
+            {
+                for (int i = 0; i < nsfromneighbours[n].size()/2; i++)
+                {
+                    int recvedge = nsfromneighbours[n][2*i+0];
+                    int numsplits = nsfromneighbours[n][2*i+1];
+
+                    if (numsplits != ns)
+                        continue;
+
+                    int curedge = dtptr->getmap()->at(n)[1][recvedge];
+                    std::vector<int> cellsonedge = elptr->getcellsontype(1, curedge);
+
+                    for (int c = 0; c < cellsonedge.size()/2; c++)
+                    {
+                        int curcell = cellsonedge[2*c+1];
+                        int celltype = cellsonedge[2*c+0];
+
+                        int curln = newhtracker->getleafnumber(celltype, curcell);
+                        int neighbournumsplits = leavesnumsplits[curln] + vadapt[curln];
+
+                        if (numsplits > neighbournumsplits+1)
+                            vadapt[curln] += numsplits-neighbournumsplits-1;  
+                    }
+                }
+            }
+        }
 
         for (int i = 0; i < 8; i++)
         {
@@ -1364,16 +1437,18 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
         
     // Nothing to do if all new number of splits are identical to the old ones:
     newhtracker->fix(vadapt);
-    bool isidentical = true;
+    int isidentical = -1;
     for (int i = 0; i < vadapt.size(); i++)
     {
         if (vadapt[i] != 0)
         {
-            isidentical = false;
+            isidentical = 0;
             break;
         }
     }
-    if (isidentical)
+    if (dtptr->isdefined())
+        slmpi::max(1, &isidentical);
+    if (isidentical == -1)
     {
         if (verbosity > 0)
             std::cout << "Nothing to do for h-adaptation." << std::endl;
@@ -1432,7 +1507,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
                 nc->at(3*ni+j) = ac[i][3*ncn*e+j];
                 
             // Add element:
-            std::vector<int> nodes = myalgorithm::getequallyspaced(ni, 1, ncn);
+            std::vector<int> nodes = gentools::getequallyspaced(ni, 1, ncn);
             int elementindexincurrenttype = myhadaptedmesh->myelements.add(i, co, nodes);
             
             // Add the element to all required physical regions:
@@ -1531,9 +1606,17 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
         currentphysicalregion->removeduplicatedelements();
     }
     
+    // Match the empty regions of the original mesh:
+    std::vector<int> allorigprs = getoriginalmeshpointer()->getphysicalregions()->getallnumbers();
+    for (int i = 0; i < allorigprs.size(); i++)
+        myhadaptedmesh->myphysicalregions.get(allorigprs[i]);
+    
     
     ///// Continue processing the mesh:
     
+    myhadaptedmesh->mydtracker = mydtracker;
+    myhadaptedmesh->mydtracker->setrawmesh(myhadaptedmesh);
+
     myhadaptedmesh->myelements.definedisjointregions();
     
     std::vector<std::vector<int>> renumbydr;
@@ -1542,6 +1625,16 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     myhadaptedmesh->myelements.definedisjointregionsranges();
     
+    // For DDM:
+    long long int* orientrenum = NULL;
+    if (dtptr->isdefined())
+    {
+        myhadaptedmesh->fixoverlapcellordering(); // required for dtracker
+        myhadaptedmesh->mydtracker->mapinterfaces();
+        myhadaptedmesh->mydtracker->createglobalnodenumbers();
+        orientrenum = myhadaptedmesh->mydtracker->getglobalnodenumbers();
+    }
+    
     // Define the physical regions based on the disjoint regions they contain:
     for (int physregindex = 0; physregindex < myhadaptedmesh->myphysicalregions.count(); physregindex++)
     {
@@ -1549,7 +1642,7 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
         currentphysicalregion->definewithdisjointregions();
     }
     
-    myhadaptedmesh->myelements.orient();
+    myhadaptedmesh->myelements.orient(orientrenum);
     myhadaptedmesh->errorondisconnecteddisjointregion();
 
     
@@ -1577,12 +1670,12 @@ bool rawmesh::adapth(std::vector<std::vector<int>>& groupkeepsplit, int verbosit
     
     myhadaptedmesh->myptracker = std::shared_ptr<ptracker>(new ptracker(myhadaptedmesh->myelements.count()));
     myhadaptedmesh->myptracker->updatedisjointregions(&(myhadaptedmesh->mydisjointregions));
-    myhadaptedmesh->mypadaptdata = universe::mymesh->mypadaptdata;
-    universe::mymesh->mypadaptdata = {};
+    myhadaptedmesh->mypadaptdata = universe::getrawmesh()->mypadaptdata;
+    universe::getrawmesh()->mypadaptdata = {};
     
     
     ///// Send mesh to universe:
-    universe::mymesh = myhadaptedmesh;
+    universe::myrawmesh = myhadaptedmesh;
     
     
     return true;
@@ -1593,6 +1686,58 @@ void rawmesh::setadaptivity(expression criterion, int lownumsplits, int highnums
     criterion = sl::abs(criterion);
     
     myhadaptdata = {std::make_tuple(criterion, lownumsplits, highnumsplits, critrange)};   
+}
+
+void rawmesh::fixoverlapcellordering(void)
+{
+    if (mydtracker->isdefined() == false || mydtracker->isoverlap() == false || slmpi::count() == 1)
+        return;
+
+    int numneighbours = mydtracker->countneighbours();
+    std::vector<int> neighbours = mydtracker->getneighbours();
+
+    std::vector<std::vector<double>> barysforneighbours(numneighbours), barysfromneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int cn = neighbours[n];
+
+        physicalregion* iopr = myphysicalregions.get(mydtracker->getinneroverlap(cn));
+        physicalregion* oopr = myphysicalregions.get(mydtracker->getouteroverlap(cn));
+
+        myelements.getbarycenters(iopr->getelementlist(), barysforneighbours[n]);
+        barysfromneighbours[n] = std::vector<double>(3*oopr->countelements());
+    }
+
+    slmpi::exchange(neighbours, barysforneighbours, barysfromneighbours);
+
+    for (int n = 0; n < numneighbours; n++)
+    {
+        physicalregion* oopr = myphysicalregions.get(mydtracker->getouteroverlap(neighbours[n]));
+        std::vector<std::vector<int>>* ellist = oopr->getelementlist();
+
+        std::vector<double> oobarys;
+        myelements.getbarycenters(ellist, oobarys);        
+
+        std::vector<int> posfound;
+        int numfound = gentools::findcoordinates(barysfromneighbours[n], oobarys, posfound);
+
+        // Catch any mesh mismatch in the overlap:
+        if (numfound != oobarys.size()/3)
+        {
+            std::cout << "Error in 'rawmesh' object: could not match all cells across DDM overlap regions" << std::endl;
+            abort();
+        }
+
+        // Reorder the outer overlap cell list to match the neighbour inner overlap cell ordering:
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            std::vector<int> curellist = ellist->at(i);
+            for (int j = 0; j < curellist.size(); j++)
+                ellist->at(i)[posfound[index+j] - index] = curellist[j];
+            index += curellist.size();
+        }
+    }
 }
 
 void rawmesh::writewithdisjointregions(std::string name)
@@ -1646,7 +1791,7 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
 {
     int numphysregs = myphysicalregions.count();
     
-    std::cout << "Extracted " << numphysregs << " physical region"+myalgorithm::getplurals(numphysregs)+":" << std::endl;
+    std::cout << "Extracted " << numphysregs << " physical region"+gentools::getplurals(numphysregs)+":" << std::endl;
     for (int physregindex = 0; physregindex < numphysregs; physregindex++)
     {
         physicalregion* currentphysicalregion = myphysicalregions.getatindex(physregindex);
@@ -1654,7 +1799,7 @@ void rawmesh::printelementsinphysicalregions(bool isdebug)
         if (isdebug == false)
         {
             int numelems = currentphysicalregion->countelements();
-            std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+myalgorithm::getplurals(numelems)+")";
+            std::cout << myphysicalregions.getnumber(physregindex) << " (" << numelems << " " << currentphysicalregion->getelementdimension() << "D element"+gentools::getplurals(numelems)+")";
         }
         else
         {
@@ -1705,7 +1850,7 @@ void rawmesh::errorondisconnecteddisjointregion(void)
         if (isinmaxdim == false)
         {
             // Write problematic elements to file:
-            std::vector<int> problematicelements = myalgorithm::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d));
+            std::vector<int> problematicelements = gentools::getequallyspaced(mydisjointregions.getrangebegin(d), 1, mydisjointregions.countelements(d));
             myelements.write("info_not_connected.pos", mydisjointregions.getelementtypenumber(d), problematicelements, problematicelements);
             
             std::vector<std::string> typnm = {"node", "line", "face", "volume"};

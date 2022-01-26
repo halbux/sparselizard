@@ -5,22 +5,22 @@
 
 void rawparameter::synchronize(void)
 {
-    if (issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+    if (issynchronizing || universe::getrawmesh()->getmeshnumber() == mymeshnumber)
         return;
     issynchronizing = true;    
 
 
     // Flush the structure:
-    myoperations = std::vector<std::vector<std::shared_ptr<operation>>>(universe::mymesh->getdisjointregions()->count(), std::vector<std::shared_ptr<operation>>(1, NULL));
+    myoperations = std::vector<std::vector<std::shared_ptr<operation>>>(universe::getrawmesh()->getdisjointregions()->count(), std::vector<std::shared_ptr<operation>>(1, NULL));
     maxopnum = -1;
-    opnums = std::vector<int>(universe::mymesh->getdisjointregions()->count(),-1);
+    opnums = std::vector<int>(universe::getrawmesh()->getdisjointregions()->count(),-1);
 
     // Rebuild the structure:
     for (int i = 0; i < mystructuretracker.size(); i++)
         set(mystructuretracker[i].first, mystructuretracker[i].second);
     
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
     issynchronizing = false;
 }
 
@@ -48,12 +48,12 @@ std::vector<int> rawparameter::getopnums(std::vector<int> disjregs)
     return output;
 }
 
-rawparameter::rawparameter(int numrows, int numcols) : myoperations((universe::mymesh->getdisjointregions())->count(), std::vector<std::shared_ptr<operation>>(numrows*numcols, NULL)), opnums((universe::mymesh->getdisjointregions())->count(),-1)
+rawparameter::rawparameter(int numrows, int numcols) : myoperations((universe::getrawmesh()->getdisjointregions())->count(), std::vector<std::shared_ptr<operation>>(numrows*numcols, NULL)), opnums((universe::getrawmesh()->getdisjointregions())->count(),-1)
 { 
     mynumrows = numrows; 
     mynumcols = numcols; 
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
 void rawparameter::set(int physreg, expression input)
@@ -73,7 +73,7 @@ void rawparameter::set(int physreg, expression input)
     maxopnum++;
     
     // Consider ALL disjoint regions in the physical region with (-1):
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
 
     for (int i = 0; i < selecteddisjregs.size(); i++)
     {
@@ -113,7 +113,7 @@ int rawparameter::countcolumns(void)
     return mynumcols;
 }
 
-std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> rawparameter::interpolate(int row, int col, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     synchronize();
     
@@ -126,7 +126,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
     // Make sure the parameter has been defined:
     errorifundefined(alldisjregs);
     
-    std::vector<std::vector<densematrix>> out = {};
+    std::vector<std::vector<densemat>> out = {};
     
     // Group disj. regs. with same operation number (and same element type number).
     disjointregionselector mydisjregselector(alldisjregs, {getopnums(alldisjregs)});
@@ -143,7 +143,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         
         auto allstorage = universe::selectsubset(numevalpts, selectedelementindexes);
         // IMPORTANT: Harmonic numbers can be different from one disj. reg. to the other:
-        std::vector<std::vector<densematrix>> currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->interpolate(myselection, evaluationcoordinates, meshdeform);
+        std::vector<std::vector<densemat>> currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->interpolate(myselection, evaluationcoordinates, meshdeform);
         universe::restore(allstorage);
         
         // Preallocate the harmonics not yet in 'out':
@@ -152,7 +152,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
         for (int h = 0; h < currentinterp.size(); h++)
         {
             if (currentinterp[h].size() == 1 && out[h].size() == 0)
-                out[h] = {densematrix(numelems, numevalpts, 0)};
+                out[h] = {densemat(numelems, numevalpts, 0)};
         }
         
         // Insert 'currentinterp' in 'out':
@@ -168,7 +168,7 @@ std::vector<std::vector<densematrix>> rawparameter::interpolate(int row, int col
     return out;
 }
 
-densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat rawparameter::multiharmonicinterpolate(int row, int col, int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     synchronize();
     
@@ -182,7 +182,7 @@ densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtime
     errorifundefined(alldisjregs);
     
     // Preallocate the output matrix:
-    densematrix out(numtimeevals, numelems * numevalpts);
+    densemat out(numtimeevals, numelems * numevalpts);
     
     // Group disj. regs. with same operation number (and same element type number).
     disjointregionselector mydisjregselector(alldisjregs, {getopnums(alldisjregs)});
@@ -205,7 +205,7 @@ densematrix rawparameter::multiharmonicinterpolate(int row, int col, int numtime
         }
         
         auto allstorage = universe::selectsubset(numevalpts, selectedelementindexes);
-        densematrix currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->multiharmonicinterpolate(numtimeevals, myselection, evaluationcoordinates, meshdeform);
+        densemat currentinterp = myoperations[mydisjregs[0]][row*mynumcols+col]->multiharmonicinterpolate(numtimeevals, myselection, evaluationcoordinates, meshdeform);
         universe::restore(allstorage);
         
         out.insertatcolumns(selectedcolumns, currentinterp);

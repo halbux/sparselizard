@@ -89,7 +89,7 @@ int main(void)
     // Write the magnetic scalar potential and the magnetic field with an order 2 interpolation.
     phi.write(wholedomain, "phi.pos", 2);
     norm(-grad(phi)).write(wholedomain, "hnorm.pos", 2);
-    (-grad(phi)).write(wholedomain, "h.pos");
+    (-grad(phi)).write(wholedomain, "h.pos", 2);
 
     // Evaluate the magnetic field 1.5cm above the center of the magnet array:
     std::vector<double> magfieldnorm = norm(-grad(phi)).interpolate(wholedomain, {0,0.02,0});

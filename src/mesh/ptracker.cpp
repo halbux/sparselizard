@@ -5,7 +5,7 @@ ptracker::ptracker(std::vector<int> numelemspertype)
 {
     elementrenumbering.resize(8);
     for (int i = 0; i < 8; i++)
-        elementrenumbering[i] = myalgorithm::getequallyspaced(0, 1, numelemspertype[i]);
+        elementrenumbering[i] = gentools::getequallyspaced(0, 1, numelemspertype[i]);
 }
 
 void ptracker::updatedisjointregions(disjointregions* input)

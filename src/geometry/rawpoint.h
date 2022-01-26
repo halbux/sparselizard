@@ -23,6 +23,8 @@ class rawpoint: public rawshape
     private:
         
         int myphysicalregion = -1;
+        
+        int mycurvatureorder = 1;
 
         // Son shapes:
         std::vector<std::shared_ptr<rawshape>> sons = {};
@@ -39,13 +41,15 @@ class rawpoint: public rawshape
         rawpoint(int physreg, std::vector<double> coords);
       
         // Provide to this constructor the coordinates of all mesh nodes and elements in the point cloud:
-        rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems);
+        rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder);
         
         std::shared_ptr<rawshape> extrude(int physreg, double height, int numlayers, std::vector<double> extrudedirection);
 
         std::shared_ptr<rawshape> duplicate(void);
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
     
         int getdimension(void);
 

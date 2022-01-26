@@ -1,7 +1,7 @@
 #include "opsin.h"
 
 
-std::vector<std::vector<densematrix>> opsin::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opsin::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> opsin::interpolate(elementselector& elemse
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> argmat = myarg->interpolate(elemselect, evaluationcoordinates, meshdeform);
     
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
@@ -26,7 +26,7 @@ std::vector<std::vector<densematrix>> opsin::interpolate(elementselector& elemse
     abort();
 }
 
-densematrix opsin::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opsin::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -35,7 +35,7 @@ densematrix opsin::multiharmonicinterpolate(int numtimeevals, elementselector& e
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     output.sin();
             
     if (reuse && universe::isreuseallowed)
@@ -60,6 +60,11 @@ std::shared_ptr<operation> opsin::copy(void)
     *op = *this;
     op->reuse = false;
     return op;
+}
+
+double opsin::evaluate(void)
+{
+    return std::sin(myarg->evaluate());
 }
 
 std::vector<double> opsin::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)

@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include "densematrix.h"
+#include "densemat.h"
 #include "universe.h"
 #include "harmonic.h"
 #include "jacobian.h"
@@ -21,11 +21,13 @@
 #include "elementselector.h"
 #include "hierarchicalformfunction.h"
 #include "oncontext.h"
+#include "rawport.h"
 
 // ALL SON-OPERATIONS ARE INCLUDED AT THE END OF THIS HEADER.
 
 class rawfield;
 class rawparameter;
+class rawport;
 class oncontext;
 
 class operation : public std::enable_shared_from_this<operation>
@@ -44,17 +46,17 @@ class operation : public std::enable_shared_from_this<operation>
         // This function can be used for non multiharmonic as well as
         // LINEAR multiharmonic operations. In the first case only 
         // harmonic 1 (cos0) can be used.
-        virtual std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        virtual std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         // 'multiharmonicinterpolate' works for general nonlinear 
         // multiharmonic operations. It returns a matrix in which each 
         // column corresponds to a data point (e.g. an operation evaluated 
         // at an evaluation point) and each of the 'numtimeevals' rows to 
         // a time value at which the multiharmonic operation was computed. 
-        // 'myfft.h' can be used to get back the harmonics from that matrix.
-        virtual densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        // 'fourier.h' can be used to get back the harmonics from that matrix.
+        virtual densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         // This 'interpolate' is used only in the Jacobian computation.
-        virtual std::vector<std::vector<densematrix>> interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
+        virtual std::vector<std::vector<densemat>> interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates);
         
         virtual bool isdof(void) { return false; };
         virtual bool istf(void) { return false; };
@@ -63,6 +65,7 @@ class operation : public std::enable_shared_from_this<operation>
         virtual bool isfield(void) { return false; };
         virtual bool isconstant(void) { return false; };
         virtual bool isparameter(void) { return false; };
+        virtual bool isport(void) { return false; };
         
         // True if the expression is a constant 0:
         bool iszero(void);
@@ -70,6 +73,8 @@ class operation : public std::enable_shared_from_this<operation>
         // True if the expression includes or is a dof/tf:
         virtual bool isdofincluded(void);
         virtual bool istfincluded(void);
+        
+        virtual bool isportincluded(void);
         
         // True if the operation only includes harmonic 1:
         virtual bool isharmonicone(std::vector<int> disjregs);
@@ -83,6 +88,9 @@ class operation : public std::enable_shared_from_this<operation>
         // Get the selected row/column of a parameter operation:
         virtual int getselectedrow(void) { abort(); }; // fix return warning
         virtual int getselectedcol(void) { abort(); }; // fix return warning
+        
+        // Get the rawport of a port operation:
+        virtual std::shared_ptr<rawport> getportpointer(void);
         
         // Get the field pointer of expressions including a field:
         virtual std::shared_ptr<rawfield> getfieldpointer(void);
@@ -137,7 +145,9 @@ class operation : public std::enable_shared_from_this<operation>
         // Simplify the operation as it is on the disjoint regions:
         virtual std::shared_ptr<operation> simplify(std::vector<int> disjregs) { return shared_from_this(); };
      
-        // Evaluate an operation that only contains x, y and/or z fields without derivatives.
+        // Evaluate a space-independent scalar operation:
+        virtual double evaluate(void);
+        // Same but allow x, y and/or z fields without derivatives:
         virtual std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
         // For dof interpolation:
@@ -170,6 +180,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opon.h"
 #include "oporientation.h"
 #include "opparameter.h"
+#include "opport.h"
 #include "oppower.h"
 #include "opproduct.h"
 #include "opsin.h"

@@ -65,9 +65,11 @@ int main(void)
     // Transfer the data from the solution vector to the v field:
     v.setdata(wholedomain, solv);
     // Write the electric potential:
-    v.write(wholedomain, "v.pos");
+    v.write(wholedomain, "v.pos", 1);
     
-    // Compute the total current flowing trough the electrode face.
+    // Compute the total current flowing through the electrode face
+    // in an alternative (but less accurate) way to using ports.
+    //
     // Since the computation involves a gradient that has to be 
     // calculated in the volume (and not on the electrode face) 
     // one can not simply call (normal(conductor)*J).integrate(electrode,4)

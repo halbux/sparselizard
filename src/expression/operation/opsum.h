@@ -33,8 +33,8 @@ class opsum: public operation
         std::shared_ptr<operation> getargument(int argnum) { return sumterms[argnum]; };
         void replaceargument(int argnum, std::shared_ptr<operation> newarg) { sumterms[argnum] = newarg; };
 
-        std::vector<std::vector<densematrix>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
-        densematrix multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
+        densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
 
         std::shared_ptr<operation> expand(void);
         // Group all sumterms and the sum terms they 
@@ -47,6 +47,7 @@ class opsum: public operation
         void reuseit(bool istobereused) { reuse = istobereused; };
         bool isreused(void) { return reuse; };
         
+        double evaluate(void);
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);

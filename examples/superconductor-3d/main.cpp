@@ -129,7 +129,7 @@ int main(void)
         eul.next(timestep, 25);
         
         // Write b = curl(a) to disk:
-        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtk"); 
+        norm(curl(a) + bsource).write(wholedomain, "normbtotal" + std::to_string(i+1000) + ".vtk", 1); 
         
         // Output the b induction field [T] at the tube center to assess the shielding effectiveness.
         bcenter[i] = norm(curl(a) + bsource).interpolate(wholedomain, {1e-10,0,0})[0];
@@ -221,7 +221,7 @@ mesh createmesh(double thtube, double htube, double rintube, double linf, int nh
     
     mymesh.selectskin(tubeskin, tube);
     mymesh.selectskin(domainskin, wholedomain);
-    mymesh.selectbox(ground, wholedomain, 0, {rintube+thtube-1e-10,rintube+thtube+1e-10, -1e-10,1e-10, -1e-10,1e-10});
+    mymesh.selectbox(ground, wholedomain, 0, {rintube+thtube,rintube+thtube, 0,0, 0,0});
     
     mymesh.load({voltube, voltubeinside, wholevol});
     

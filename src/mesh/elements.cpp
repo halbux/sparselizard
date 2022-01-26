@@ -141,7 +141,7 @@ std::vector<bool> elements::isflipped(int subelementtypenumber, std::vector<int>
             subcornersinparent[i] = subelementsinelements[elementtypenumber][0][curparent*numcurvednodesinparent + cornernodesinparent[firstcorner+i]];
 
         // Compare orientation between sub and sub in parent:
-        output[e] = myalgorithm::isflipped(subcorners, subcornersinparent);
+        output[e] = gentools::isflipped(subcorners, subcornersinparent);
     }
 
     return output;
@@ -759,11 +759,11 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
     element myelem(elementtypenumber, mycurvatureorder);
     int ncn = myelem.countcurvednodes();
     
-    densematrix xcoords(numelems, ncn);
-    densematrix ycoords(numelems, ncn);
-    densematrix zcoords(numelems, ncn);
+    densemat xcoords(numelems, ncn);
+    densemat ycoords(numelems, ncn);
+    densemat zcoords(numelems, ncn);
     
-    densematrix vals(numelems, ncn);
+    densemat vals(numelems, ncn);
 
     double* xptr = xcoords.getvalues();
     double* yptr = ycoords.getvalues();
@@ -789,6 +789,78 @@ void elements::write(std::string filename, int elementtypenumber, std::vector<in
     
     datatowrite.addcoordinates(elementtypenumber, xcoords, ycoords, zcoords);
     datatowrite.adddata(elementtypenumber, {vals});
+    
+    iointerface::writetofile(filename, datatowrite);
+}
+
+void elements::writeedgedirection(int physreg, std::string filename)
+{
+    std::vector<int> ders = myphysicalregions->get(physreg)->getdisjointregions(1);
+
+    int numedgesinpr = 0;
+    for (int i = 0; i < ders.size(); i++)
+        numedgesinpr += mydisjointregions->countelements(ders[i]);
+    
+    densemat xcoords(numedgesinpr, 1);
+    densemat ycoords(numedgesinpr, 1);
+    densemat zcoords(numedgesinpr, 1);
+    
+    densemat xvals(numedgesinpr, 1);
+    densemat yvals(numedgesinpr, 1);
+    densemat zvals(numedgesinpr, 1);
+    
+    double* xptr = xcoords.getvalues();
+    double* yptr = ycoords.getvalues();
+    double* zptr = zcoords.getvalues();
+    
+    double* vxptr = xvals.getvalues();
+    double* vyptr = yvals.getvalues();
+    double* vzptr = zvals.getvalues();
+    
+    double* nodecoords = mynodes->getcoordinates()->data();
+    
+    int index = 0;
+    for (int i = 0; i < ders.size(); i++)
+    {
+        int rb = mydisjointregions->getrangebegin(ders[i]);
+        int ne = mydisjointregions->countelements(ders[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            int firstnode = getsubelement(0, 1, rb+j, 0);
+            int lastnode = getsubelement(0, 1, rb+j, 1);
+        
+            double xf = nodecoords[3*firstnode+0];
+            double yf = nodecoords[3*firstnode+1];
+            double zf = nodecoords[3*firstnode+2];
+            
+            double xl = nodecoords[3*lastnode+0];
+            double yl = nodecoords[3*lastnode+1];
+            double zl = nodecoords[3*lastnode+2];
+        
+            // Uncurved edge barycenter:
+            xptr[index] = 0.5*(xf+xl);
+            yptr[index] = 0.5*(yf+yl);
+            zptr[index] = 0.5*(zf+zl);
+
+            vxptr[index] = xl-xf;
+            vyptr[index] = yl-yf;
+            vzptr[index] = zl-zf;
+            
+            double nrm = std::sqrt(vxptr[index]*vxptr[index] + vyptr[index]*vyptr[index] + vzptr[index]*vzptr[index]);
+            
+            vxptr[index] /= nrm;
+            vyptr[index] /= nrm;
+            vzptr[index] /= nrm;
+            
+            index++;
+        }
+    }
+    
+    iodata datatowrite(mycurvatureorder, mycurvatureorder, false, {});
+    
+    datatowrite.addcoordinates(0, xcoords, ycoords, zcoords);
+    datatowrite.adddata(0, {xvals, yvals, zvals});
     
     iointerface::writetofile(filename, datatowrite);
 }
@@ -846,7 +918,7 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
     
     // 'elementrenumbering' will give the renumbering corresponding to removed duplicates:
     std::vector<int> elementrenumbering;
-    int numberofnonduplicates = myalgorithm::removeduplicates(barycentercoordinates, elementrenumbering);
+    int numberofnonduplicates = gentools::removeduplicates(barycentercoordinates, elementrenumbering);
     
     for (int i = 0; i < elementrenumbering.size(); i++)
     {
@@ -1019,7 +1091,7 @@ void elements::explode(void)
         std::vector<int> currentnodes(curvednumberofnodes,0);
         
         // Get all line/triangle/quadrangle definitions:
-        std::vector<int> consecutives = myalgorithm::getequallyspaced(0,1,curvednumberofnodes);
+        std::vector<int> consecutives = gentools::getequallyspaced(0,1,curvednumberofnodes);
         myelement.setnodes(consecutives);
         // Extract line node indexes:
         std::vector<std::vector<int>> indexesinlines(numberofedges);
@@ -1093,7 +1165,7 @@ void elements::explode(void)
 
 void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, std::vector<int>& sublist, std::vector<std::vector<std::vector<int>>*> mustbeinelementlists)
 {
-    int highestdim = myalgorithm::getmaxdim(elementlist);
+    int highestdim = gentools::getmaxdim(elementlist);
 
     int numsubs = count(subtype);
     
@@ -1276,7 +1348,7 @@ void elements::reorderbydisjointregions(std::vector<std::vector<int>>& elementre
     for (int typenum = 0; typenum <= 7; typenum++)
     {
         std::vector<int> elementreordering;
-        myalgorithm::stablesort(indisjointregion[typenum], elementreordering);
+        gentools::stablesort(indisjointregion[typenum], elementreordering);
         
         elementrenumbering[typenum] = std::vector<int>(count(typenum));
         for (int i = 0; i < count(typenum); i++)
@@ -1386,7 +1458,7 @@ void elements::toptracker(std::shared_ptr<ptracker> originpt, std::shared_ptr<pt
         if (renumbering[i].size() == 0)
             continue;
     
-        reordering[i] = myalgorithm::getreordering(renumbering[i]);    
+        reordering[i] = gentools::getreordering(renumbering[i]);    
         // Renumber and reorder the elements in all containers:
         renumber(i, renumbering[i]);
         reorder(i, reordering[i]);  
@@ -1480,7 +1552,7 @@ void elements::merge(std::vector<int> intersectionphysregs, elements* elstomerge
         // No duplicate check for cells:
         if (eldim >= meshdim)
         {
-            renumberings[i] = myalgorithm::getequallyspaced(numineachtype[i], 1, numelstomerge);
+            renumberings[i] = gentools::getequallyspaced(numineachtype[i], 1, numelstomerge);
             continue;
         }
 
@@ -1488,7 +1560,7 @@ void elements::merge(std::vector<int> intersectionphysregs, elements* elstomerge
         std::vector<bool> isinelementlist;
         int cnt = istypeinelementlists(i, elementlists, isinelementlist, true);
         std::vector<int> targetelemnums;
-        myalgorithm::find(isinelementlist, cnt, targetelemnums);
+        gentools::find(isinelementlist, cnt, targetelemnums);
         
         int numtargetels = targetelemnums.size();
         
@@ -1496,12 +1568,12 @@ void elements::merge(std::vector<int> intersectionphysregs, elements* elstomerge
         std::vector<double> allcoords(3*(numtargetels+numelstomerge));
 
         getbarycenters(i, targetelemnums, allcoords.data());
-        std::vector<int> allelems = myalgorithm::getequallyspaced(0, 1, numelstomerge);
+        std::vector<int> allelems = gentools::getequallyspaced(0, 1, numelstomerge);
         elstomerge->getbarycenters(i, allelems, &allcoords[3*numtargetels]);
         
         // Create the renumbering of the elements to merge:
         std::vector<int> rv;
-        int numnondupltomerge = myalgorithm::removeduplicates(allcoords, rv) - numtargetels;
+        int numnondupltomerge = gentools::removeduplicates(allcoords, rv) - numtargetels;
         numduplicates[i] = numelstomerge - numnondupltomerge;
         std::vector<int> assignednum(numtargetels+numelstomerge, -1);
         for (int j = 0; j < numtargetels; j++)

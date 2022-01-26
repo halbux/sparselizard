@@ -1,7 +1,7 @@
-#include "myfft.h"
+#include "fourier.h"
 
 
-std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int myn)
+std::vector<std::vector<densemat>> fourier::fft(densemat input, int mym, int myn)
 {
     // Number of time evaluations.
     int numtimeevals = input.countrows();
@@ -14,7 +14,7 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
     double* inputvals = input.getvalues();
     
     // Create the output. There are numtimeevals harmonics + the sin0 entry at the begining.
-    std::vector<std::vector<densematrix>> output(numtimeevals + 1, std::vector<densematrix> {});
+    std::vector<std::vector<densemat>> output(numtimeevals + 1, std::vector<densemat> {});
 
     // Loop on all output harmonics:
     for (int h = 0; h < numtimeevals; h++)
@@ -26,7 +26,7 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
         int currentfreq = harmonic::getfrequency(harm);
         
         // Initialise to all zero:
-        densematrix currentmat(mym, myn, 0);
+        densemat currentmat(mym, myn, 0);
         double* currentvals = currentmat.getvalues();
         
         // Loop on every time step in the input matrix:
@@ -54,7 +54,7 @@ std::vector<std::vector<densematrix>> myfft::fft(densematrix input, int mym, int
     return output;
 }
 
-void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, double threshold)
+void fourier::removeroundoffnoise(std::vector<std::vector<densemat>>& input, double threshold)
 {    
     // First compute the max(abs()) of all harmonics:
     std::vector<double> maxabs(input.size(), 0);
@@ -81,16 +81,16 @@ void myfft::removeroundoffnoise(std::vector<std::vector<densematrix>>& input, do
     }
 }
 
-densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int numtimevals, int mym, int myn)
+densemat fourier::inversefft(std::vector<std::vector<densemat>>& input, int numtimevals, int mym, int myn)
 {
     double pi = 3.141592653589793238;
     double phasestep = 2.0*pi / ((double)(numtimevals));
 
     // The end result goes here. Initial value is 0.
-    densematrix output(numtimevals, mym*myn, 0);
+    densemat output(numtimevals, mym*myn, 0);
     
     // Loop on all non zero harmonics:
-    densematrix sincoseval(numtimevals,1);
+    densemat sincoseval(numtimevals,1);
     double* valvec = sincoseval.getvalues();
     
     for (int harm = 1; harm < input.size(); harm++)
@@ -117,11 +117,11 @@ densematrix myfft::inversefft(std::vector<std::vector<densematrix>>& input, int 
     return output;
 }
 
-densematrix myfft::toelementrowformat(densematrix timestepsinrows, int numberofelements)
+densemat fourier::toelementrowformat(densemat timestepsinrows, int numberofelements)
 {
     int numberoftimesteps = timestepsinrows.countrows();
     int numberofevaluationpoints = timestepsinrows.countcolumns()/numberofelements;
-    densematrix output(numberofelements, numberoftimesteps*numberofevaluationpoints);
+    densemat output(numberofelements, numberoftimesteps*numberofevaluationpoints);
     
     double* in = timestepsinrows.getvalues();
     double* out = output.getvalues();
@@ -137,7 +137,7 @@ densematrix myfft::toelementrowformat(densematrix timestepsinrows, int numberofe
     return output;
 }
 
-void myfft::sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& notsame)
+void fourier::sameharmonics(std::vector<std::vector<std::vector<densemat>>>& notsame)
 {
     if (notsame.size() <= 1)
         return;
@@ -171,7 +171,7 @@ void myfft::sameharmonics(std::vector<std::vector<std::vector<densematrix>>>& no
         for (int i = 0; i < notsame.size(); i++)
         {
             if (notsame[i][h].size() == 0)
-                notsame[i][h] = {densematrix(curnumrows, curnumcols, 0.0)};
+                notsame[i][h] = {densemat(curnumrows, curnumcols, 0.0)};
         }
     }
 }

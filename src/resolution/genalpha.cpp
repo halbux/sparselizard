@@ -19,9 +19,14 @@ genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int 
 
 void genalpha::setparameter(double rinf)
 {
-    if (rinf < 0)
+    if (rinf < -1e-8)
     {
         std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be negative" << std::endl;
+        abort();  
+    }
+    if (rinf > 1+1e-8)
+    {
+        std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be larger than one" << std::endl;
         abort();  
     }
     
@@ -130,7 +135,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
     vec unext, vnext, anext;
     while (true)
     {
-        // Print the time:
+        // Update and print the time:
+        universe::currenttimestep = inittime+dt;
+
         if (myverbosity > 1 && istadapt)
             std::cout << "@" << inittime << "+" << dt << "s " << std::flush;
         if (myverbosity > 1 && not(istadapt))
@@ -144,9 +151,6 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
         unext = u; vnext = v; anext = a;
         while (relchange > nltol && (maxnumnlit <= 0 || nlit < maxnumnlit))
         {
-            double t = inittime+dt;
-            universe::currenttimestep = t;
-            
             // Solve all formulations that must be solved at the beginning of the nonlinear loop:
             for (int i = 0; i < tosolvebefore.size(); i++)
                 tosolvebefore[i].solve();
@@ -155,18 +159,13 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             
             // Reassemble only the non-constant matrices:
             bool isfirstcall = not(K.isdefined());
-            
-            universe::currenttimestep = t-alphaf*dt;
             if (isconstant[0] == false || isfirstcall)
             {
                 myformulation.generaterhs();
-                rhs = myformulation.rhs(false, false);
+                rhs = myformulation.rhs();
             }
-                
-            universe::currenttimestep = t;
-            
-            rhs.updateconstraints();
-                
+            else
+                rhs.updateconstraints();
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
@@ -201,8 +200,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             // to the exact constrained displacement at the next time step:
             vec anextdirichlet = 1.0/(beta*dt*dt)*( rhs-u - dt*v - dt*dt*(0.5-beta)*a );
             // Here are the constrained values of the next acceleration:
-            intdensematrix constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-            densematrix anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);    
+            indexmat constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
+            densemat anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);    
             vec rightvec = matu*u + matv*v + mata*a + rhs;
             // Force the acceleration on the constrained dofs:
             rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);

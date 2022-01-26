@@ -3,7 +3,7 @@
 
 void dofmanager::synchronize(void)
 {
-    if (isitmanaged == false || issynchronizing || universe::mymesh->getmeshnumber() == mymeshnumber)
+    if (isitmanaged == false || issynchronizing || universe::getrawmesh()->getmeshnumber() == mymeshnumber)
         return;
     issynchronizing = true;    
 
@@ -14,17 +14,21 @@ void dofmanager::synchronize(void)
     int selectedfieldnumberbkp = selectedfieldnumber;
     selectedfieldnumber = -1;
     myfieldorders = {};
+    myrawportmap.clear();
+    primalondisjreg = {};
     rangebegin = {};
     rangeend = {};
 
     // Rebuild the structure:
+    for (int i = 0; i < myportstructuretracker.size(); i++)
+        addtostructure(myportstructuretracker[i]);
     for (int i = 0; i < mystructuretracker.size(); i++)
         addtostructure(mystructuretracker[i].first, mystructuretracker[i].second);
     
     // Select the same field again:
     selectedfieldnumber = selectedfieldnumberbkp;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
     issynchronizing = false;
 }
 
@@ -32,7 +36,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
 {  
     synchronize();
     
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
 
     // Find the field index of 'fieldtoadd' (if present):
     int fieldindex = -1;
@@ -52,6 +56,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         myfields.push_back(fieldtoadd);
         myfieldorders.push_back(fieldtoadd->getinterpolationorders());
         int numberofdisjointregions = mydisjointregions->count();
+        primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
         std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
         rangebegin.push_back(temp);
         rangeend.push_back(temp);
@@ -92,9 +97,27 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
                 
             for (int ff = numffdefinedbeforeresize; ff < numberofformfunctions; ff++)
             {
-                rangebegin[fieldindex][disjreg][ff] = numberofdofs;
-                rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
-                numberofdofs += currentnumberofdofs;
+                std::shared_ptr<rawport> pdr = primalondisjreg[fieldindex][disjreg];
+                if (pdr != NULL)
+                {
+                    // Add the primal to the hashmap if not already there:
+                    bool isprimalnotthere = (myrawportmap.find(pdr.get()) == myrawportmap.end());
+                    if (isprimalnotthere)
+                    {
+                        myrawportmap[pdr.get()] = numberofdofs;
+                        numberofdofs++;
+                    }
+                    int primaladdress = myrawportmap[pdr.get()];
+
+                    rangebegin[fieldindex][disjreg][ff] = primaladdress;
+                    rangeend[fieldindex][disjreg][ff] = primaladdress;
+                }
+                else
+                {
+                    rangebegin[fieldindex][disjreg][ff] = numberofdofs;
+                    rangeend[fieldindex][disjreg][ff] = numberofdofs + currentnumberofdofs - 1;
+                    numberofdofs += currentnumberofdofs;
+                }
             }
         }
     }
@@ -102,7 +125,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
 
 dofmanager::dofmanager(void)
 {
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
 dofmanager::dofmanager(int numdofs)
@@ -117,6 +140,74 @@ void dofmanager::donotsynchronize(void)
     issynchronizing = true;
 }
 
+void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
+{
+    synchronize();
+    
+    // Keep track of the calls to 'addtostructure':
+    if (issynchronizing == false)
+        myportstructuretracker.push_back(porttoadd);
+        
+    if (porttoadd->isassociated())
+    {
+        std::shared_ptr<rawfield> associatedfield = porttoadd->getrawfield();
+
+        disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
+        physicalregions* myphysicalregions = universe::getrawmesh()->getphysicalregions();
+
+        // Find the field index of 'associatedfield' (if present):
+        int fieldindex = -1;
+        for (int i = 0; i < myfields.size(); i++)
+        {
+            if (myfields[i].get() == associatedfield.get())
+            {
+                fieldindex = i;
+                break;
+            }
+        }
+        // Add the field to the structure if not existing.
+        // Add an entry for every disjoint region at the same time.
+        if (fieldindex == -1)
+        {
+            fieldindex = myfields.size();
+            myfields.push_back(associatedfield);
+            myfieldorders.push_back(associatedfield->getinterpolationorders());
+            int numberofdisjointregions = mydisjointregions->count();
+            primalondisjreg.push_back(std::vector<std::shared_ptr<rawport>>(numberofdisjointregions, NULL));
+            std::vector<std::vector< int >> temp(numberofdisjointregions, std::vector< int >(0));
+            rangebegin.push_back(temp);
+            rangeend.push_back(temp);
+        }
+        else
+        {
+            // Make sure the field order has not changed between two calls:
+            if (associatedfield->getinterpolationorders() != myfieldorders[fieldindex])
+            {
+                std::cout << "Error in 'dofmanager' object: ";
+                associatedfield->print();
+                std::cout << " order was changed and does not match dof structure anymore" << std::endl;
+                abort();
+            }
+        }
+
+        std::vector<int> disjregs = myphysicalregions->get(porttoadd->getphysicalregion())->getdisjointregions(-1);
+
+        for (int i = 0; i < disjregs.size(); i++)
+            primalondisjreg[fieldindex][disjregs[i]] = porttoadd->getprimal();
+
+        // Port to add below to the hashmap:
+        porttoadd = porttoadd->getdual();
+    }
+
+    // Add the dual to the hashmap (the primal will be added during a regular 'addtostructure' call):
+    bool isnotthere = (myrawportmap.find(porttoadd.get()) == myrawportmap.end());
+    if (isnotthere)
+    {
+        myrawportmap[porttoadd.get()] = numberofdofs;
+        numberofdofs++;
+    }
+}
+
 void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber)
 {
     synchronize();
@@ -126,7 +217,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physic
         mystructuretracker.push_back(std::make_pair(fieldtoadd, physicalregionnumber));
 
     // Get all disjoint regions in the physical region with (-1):
-    std::vector<int> disjregs = ((universe::mymesh->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
+    std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physicalregionnumber))->getdisjointregions(-1);
     
     addtostructure(fieldtoadd, disjregs);
 }
@@ -191,11 +282,84 @@ int dofmanager::getrangeend(int disjreg, int formfunc)
     return rangeend[selectedfieldnumber][disjreg][formfunc];
 }
 
+int dofmanager::getaddress(rawport* prt)
+{
+    synchronize();
+    
+    bool isnotthere = (myrawportmap.find(prt) == myrawportmap.end());
+    if (isnotthere == false)
+        return myrawportmap[prt];
+    else
+    {
+        std::string pn = prt->getname();
+        if (pn.size() > 0)
+            pn = "'"+pn+"' ";
+        std::cout << "Error in 'dofmanager' object: requested port " << pn << "could not be found in the dof structure" << std::endl;
+        abort();
+    }
+}
+
+void dofmanager::getportsinds(std::vector<rawport*>& rps, indexmat& inds)
+{
+    synchronize();
+    
+    int numports = myrawportmap.size();
+    
+    rps.resize(numports);
+    inds = indexmat(numports, 1);
+    int* iptr = inds.getvalues();
+
+    int index = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rps[index] = it->first;
+        iptr[index] = it->second;
+        
+        index++;
+    }
+}
+
+std::pair<indexmat, indexmat> dofmanager::findassociatedports(void)
+{
+    synchronize();
+
+    indexmat primalads(countports(), 1);
+    indexmat dualads(countports(), 1);
+
+    int* paptr = primalads.getvalues();
+    int* daptr = dualads.getvalues();
+
+    int index = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+        {
+            paptr[index] = it->second;
+            daptr[index] = myrawportmap[rp->getdual().get()];
+
+            index++;
+        }
+    }
+
+    primalads = primalads.getresized(index, 1);
+    dualads = dualads.getresized(index, 1);
+
+    return std::make_pair(primalads, dualads);
+}
+
 bool dofmanager::isdefined(int disjreg, int formfunc)
 {
     synchronize();
     
     return (formfunc < rangebegin[selectedfieldnumber][disjreg].size()); 
+}
+
+bool dofmanager::isported(int disjreg)
+{
+    synchronize();
+    
+    return (primalondisjreg[selectedfieldnumber][disjreg] != NULL); 
 }
 
 std::vector<bool> dofmanager::isconstrained(void)
@@ -204,7 +368,7 @@ std::vector<bool> dofmanager::isconstrained(void)
     
     std::vector<bool> output(numberofdofs, false);
     
-    std::vector<intdensematrix> allconstrinds = {getdisjregconstrainedindexes(), getgaugedindexes(), getconditionalconstraintdata().first};
+    std::vector<indexmat> allconstrinds = {getdisjregconstrainedindexes(), getgaugedindexes(), getconditionalconstraintdata().first};
     
     for (int i = 0; i < allconstrinds.size(); i++)
     {
@@ -216,12 +380,12 @@ std::vector<bool> dofmanager::isconstrained(void)
     return output;
 }
 
-intdensematrix dofmanager::getconstrainedindexes(void)
+indexmat dofmanager::getconstrainedindexes(void)
 {
     std::vector<bool> isconstr = isconstrained();
 
-    int numconstr = myalgorithm::counttrue(isconstr);
-    intdensematrix out(numconstr, 1);
+    int numconstr = gentools::counttrue(isconstr);
+    indexmat out(numconstr, 1);
     int* outptr = out.getvalues();
     
     int index = 0;
@@ -255,11 +419,11 @@ int dofmanager::countdisjregconstraineddofs(void)
     return numdisjregconstraineddofs;
 }
 
-intdensematrix dofmanager::getdisjregconstrainedindexes(void)
+indexmat dofmanager::getdisjregconstrainedindexes(void)
 {
     synchronize();
     
-    intdensematrix output(1,countdisjregconstraineddofs());
+    indexmat output(1,countdisjregconstraineddofs());
     int* myval = output.getvalues();
     
     int currentindex = 0;
@@ -295,12 +459,11 @@ int dofmanager::countgaugeddofs(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Disjreg constraints have priority over the gauge!
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            if (myfields[fieldindex]->isgauged(disjreg))
             {
-                spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+                std::shared_ptr<rawspanningtree> myspantree = myfields[fieldindex]->getspanningtree();
 
-                int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+                int elementtype = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg);
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
                 std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
                 std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
@@ -323,11 +486,11 @@ int dofmanager::countgaugeddofs(void)
     return numgaugeddofs;
 }
 
-intdensematrix dofmanager::getgaugedindexes(void)
+indexmat dofmanager::getgaugedindexes(void)
 {
     synchronize();
     
-    intdensematrix output(1,countgaugeddofs());
+    indexmat output(1,countgaugeddofs());
     int* myval = output.getvalues();
     
     int currentindex = 0;
@@ -335,12 +498,11 @@ intdensematrix dofmanager::getgaugedindexes(void)
     {
         for (int disjreg = 0; disjreg < rangebegin[fieldindex].size(); disjreg++)
         {
-            // Disjreg constraints have priority over the gauge!
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isgauged(disjreg))
+            if (myfields[fieldindex]->isgauged(disjreg))
             {
-                spanningtree* myspantree = myfields[fieldindex]->getspanningtree();
+                std::shared_ptr<rawspanningtree> myspantree = myfields[fieldindex]->getspanningtree();
 
-                int elementtype = universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg);
+                int elementtype = universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg);
                 int fieldorder = myfields[fieldindex]->getinterpolationorder(disjreg);
                 std::shared_ptr<hierarchicalformfunction> formfunc = selector::select(elementtype, myfields[fieldindex]->gettypename());
                 std::vector<bool> isitgradienttype = formfunc->isgradienttype(fieldorder);
@@ -365,14 +527,14 @@ intdensematrix dofmanager::getgaugedindexes(void)
     return output;
 }
 
-std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(void)
+std::pair<indexmat, densemat> dofmanager::getconditionalconstraintdata(void)
 {
     synchronize();
     
     // This will have an entry for every field and every disjoint node region that is conditionally constrained:
-    std::vector<intdensematrix> indexmat = {};
-    std::vector<densematrix> condvalvec = {};
-    std::vector<densematrix> constrvalvec = {};
+    std::vector<indexmat> indmat = {};
+    std::vector<densemat> condvalvec = {};
+    std::vector<densemat> constrvalvec = {};
     
     
     for (int fieldindex = 0; fieldindex < rangebegin.size(); fieldindex++)
@@ -382,11 +544,10 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
         for (int disjreg = 0; disjreg < isdisjregactive.size(); disjreg++)
         {
             // Only the nodes are constrained:
-            if (rangebegin[fieldindex][disjreg].size() == 0 || universe::mymesh->getdisjointregions()->getelementtypenumber(disjreg) != 0)
+            if (rangebegin[fieldindex][disjreg].size() == 0 || universe::getrawmesh()->getdisjointregions()->getelementtypenumber(disjreg) != 0)
                 continue;
                 
-            // Disjreg constraints have priority over the conditional constraints!
-            if (myfields[fieldindex]->isdisjregconstrained(disjreg) == false && myfields[fieldindex]->isconditionallyconstrained(disjreg))
+            if (myfields[fieldindex]->isconditionallyconstrained(disjreg))
                 isdisjregactive[disjreg] = true;
         }
             
@@ -417,22 +578,22 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             std::vector<double> evaluationcoordinates = {0,0,0};
             elementselector myelemselect(curdisjregs, condop->isvalueorientationdependent(curdisjregs) || constrop->isvalueorientationdependent(curdisjregs));
 
-            std::vector<std::vector<densematrix>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            std::vector<std::vector<densemat>> condval = condop->interpolate(myelemselect, evaluationcoordinates, NULL);
             // Skip if no conditional constraint is active:
             if (condval[1][0].max() < 0)
                 continue;
-            std::vector<std::vector<densematrix>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
+            std::vector<std::vector<densemat>> constrval = constrop->interpolate(myelemselect, evaluationcoordinates, NULL);
 
             // Create a matrix with all indices:
-            intdensematrix curindexmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
-            int* curindexmatptr = curindexmat.getvalues();
+            indexmat curindmat(condval[1][0].countrows(), condval[1][0].countcolumns(),0);
+            int* curindmatptr = curindmat.getvalues();
             int index = 0;
             for (int i = 0; i < curdisjregs.size(); i++)
             {
                 // There is only a single shape function per node!
                 for (int ind = rangebegin[fieldindex][curdisjregs[i]][0]; ind <= rangeend[fieldindex][curdisjregs[i]][0]; ind++)
                 {
-                    curindexmatptr[index] = ind;
+                    curindmatptr[index] = ind;
                     index++;
                 }
             }
@@ -440,7 +601,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
             // Append to the vectors:
             condvalvec.push_back(condval[1][0]);
             constrvalvec.push_back(constrval[1][0]);
-            indexmat.push_back(curindexmat);
+            indmat.push_back(curindmat);
         }
     }
 
@@ -457,8 +618,8 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     }
     
     // Combine all active conditional constraints together:
-    intdensematrix condconstrindices(numactive,1);
-    densematrix condconstrval(numactive,1);
+    indexmat condconstrindices(numactive,1);
+    densemat condconstrval(numactive,1);
     
     int* indptr = condconstrindices.getvalues();
     double* valptr = condconstrval.getvalues();
@@ -468,7 +629,7 @@ std::pair<intdensematrix, densematrix> dofmanager::getconditionalconstraintdata(
     {
         double* condvalptr = condvalvec[i].getvalues();
         double* constrvalptr = constrvalvec[i].getvalues();
-        int* indmatptr = indexmat[i].getvalues();
+        int* indmatptr = indmat[i].getvalues();
         for (int j = 0; j < condvalvec[i].count(); j++)
         {
             if (condvalptr[j] >= 0)
@@ -515,6 +676,28 @@ std::vector<int> dofmanager::getselectedfieldorders(void)
     return myfieldorders[selectedfieldnumber];
 }
 
+int dofmanager::countports(void)
+{
+    synchronize();
+
+    return myrawportmap.size();
+}
+
+int dofmanager::countassociatedprimalports(void)
+{
+    synchronize();
+
+    int cnt = 0;
+    for (auto it = myrawportmap.begin(); it != myrawportmap.end(); it++)
+    {
+        rawport* rp = it->first;
+        if (rp->isassociated() && rp->isprimal())
+            cnt++;
+    }
+
+    return cnt;
+}
+
 int dofmanager::countdofs(void)
 {
     synchronize();
@@ -529,8 +712,8 @@ long long int dofmanager::allcountdofs(void)
     if (slmpi::count() == 1)
         return countdofs();
     
-    std::shared_ptr<dtracker> mydtracker = universe::mymesh->getdtracker();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    std::shared_ptr<dtracker> mydtracker = universe::getrawmesh()->getdtracker();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
     
     mydtracker->errorundefined();
     
@@ -562,7 +745,7 @@ int dofmanager::countformfunctions(int disjointregion)
     return rangebegin[selectedfieldnumber][disjointregion].size();
 }
 
-std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std::vector<int> neighbours, std::vector<intdensematrix> senddofinds, std::vector<intdensematrix> recvdofinds)
+std::vector<std::vector<indexmat>> dofmanager::discovernewconstraints(std::vector<int> neighbours, std::vector<indexmat> senddofinds, std::vector<indexmat> recvdofinds)
 {
     // New constraints can only appear at the outer overlap/no-overlap interfaces.
 
@@ -570,20 +753,21 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
     
     int numneighbours = neighbours.size();
     
-    std::vector<intdensematrix> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
+    std::vector<indexmat> sendnewconstrainedinds(numneighbours), recvnewconstrainedinds(numneighbours), sendunconstrainedinds(numneighbours), recvunconstrainedinds(numneighbours);
     
     // Get all types of constraints:
-    std::vector<bool> isdofconstrained = isconstrained(); 
+    std::vector<bool> isdofconstrained = isconstrained();
+    std::vector<bool> wasdofconstrained = isdofconstrained;
     
     // Exchange the constrained indexes:
     std::vector<std::vector<int>> isconstrainedforneighbours(numneighbours), isconstrainedfromneighbours(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         std::vector<bool> ic;
-        myalgorithm::select(isdofconstrained, senddofinds[n], ic);
+        gentools::select(isdofconstrained, senddofinds[n], ic);
 
-        myalgorithm::pack(ic, isconstrainedforneighbours[n]);
-        isconstrainedfromneighbours[n].resize(myalgorithm::getpackedsize(recvdofinds[n].count()));
+        gentools::pack(ic, isconstrainedforneighbours[n]);
+        isconstrainedfromneighbours[n].resize(gentools::getpackedsize(recvdofinds[n].count()));
     }
     
     slmpi::exchange(neighbours, isconstrainedforneighbours, isconstrainedfromneighbours);
@@ -594,14 +778,14 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
         int* recvindsptr = recvdofinds[n].getvalues();
                 
         std::vector<bool> isconstrainedinneighbour;
-        myalgorithm::unpack(recvdofinds[n].count(), isconstrainedfromneighbours[n], isconstrainedinneighbour);
+        gentools::unpack(recvdofinds[n].count(), isconstrainedfromneighbours[n], isconstrainedinneighbour);
         
         std::vector<bool> isnewlyconstrained(recvdofinds[n].count(), false);
         
         for (int i = 0; i < isconstrainedinneighbour.size(); i++)
         {
             int recvind = recvindsptr[i];
-            if (isconstrainedinneighbour[i] == true && isdofconstrained[recvind] == false)
+            if (isconstrainedinneighbour[i] == true && wasdofconstrained[recvind] == false)
             {
                 isdofconstrained[recvind] = true;
                 isnewlyconstrained[i] = true;
@@ -609,8 +793,8 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
         }
         recvnewconstrainedinds[n] = recvdofinds[n].select(isnewlyconstrained, true);
         
-        myalgorithm::pack(isnewlyconstrained, isnewlyconstrainedforneighbours[n]);
-        isnewlyconstrainedfromneighbours[n].resize(myalgorithm::getpackedsize(senddofinds[n].count()));
+        gentools::pack(isnewlyconstrained, isnewlyconstrainedforneighbours[n]);
+        isnewlyconstrainedfromneighbours[n].resize(gentools::getpackedsize(senddofinds[n].count()));
     }
     slmpi::exchange(neighbours, isnewlyconstrainedforneighbours, isnewlyconstrainedfromneighbours);
     
@@ -618,7 +802,7 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
     for (int n = 0; n < numneighbours; n++)
     {
         std::vector<bool> isnewlyconstrainedinneighbour;
-        myalgorithm::unpack(senddofinds[n].count(), isnewlyconstrainedfromneighbours[n], isnewlyconstrainedinneighbour);
+        gentools::unpack(senddofinds[n].count(), isnewlyconstrainedfromneighbours[n], isnewlyconstrainedinneighbour);
         sendnewconstrainedinds[n] = senddofinds[n].select(isnewlyconstrainedinneighbour, true);
     }
     
@@ -626,9 +810,9 @@ std::vector<std::vector<intdensematrix>> dofmanager::discovernewconstraints(std:
     for (int n = 0; n < numneighbours; n++)
     {
         std::vector<bool> si, ri;
-        myalgorithm::select(isdofconstrained, senddofinds[n], si);
+        gentools::select(isdofconstrained, senddofinds[n], si);
         sendunconstrainedinds[n] = senddofinds[n].select(si, false);
-        myalgorithm::select(isdofconstrained, recvdofinds[n], ri);
+        gentools::select(isdofconstrained, recvdofinds[n], ri);
         recvunconstrainedinds[n] = recvdofinds[n].select(ri, false);
     }
     
@@ -658,16 +842,16 @@ void dofmanager::print(void)
 }
 
 
-intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg)
+indexmat dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg)
 {
     synchronize();
     
-    elements* myelements = universe::mymesh->getelements();
-    disjointregions* mydisjointregions = universe::mymesh->getdisjointregions();
+    elements* myelements = universe::getrawmesh()->getelements();
+    disjointregions* mydisjointregions = universe::getrawmesh()->getdisjointregions();
 
     // Create a vector whose ith index is true if the field is defined 
     // on the disjoint region number i and false otherwise.
-    std::vector<int> fielddisjregs = ((universe::mymesh->getphysicalregions())->get(fieldphysreg))->getdisjointregions(-1); // Get all disj regs with (-1)
+    std::vector<int> fielddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(fieldphysreg))->getdisjointregions(-1); // Get all disj regs with (-1)
     std::vector<bool> isfielddefinedondisjointregion(mydisjointregions->count(),false);
     for (int i = 0; i < fielddisjregs.size(); i++)
         isfielddefinedondisjointregion[fielddisjregs[i]] = true;
@@ -680,7 +864,7 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
     int numrows = myiterator.count();
     int numcols = elementlist.size();
     
-    intdensematrix output(numrows, numcols);
+    indexmat output(numrows, numcols);
     int* adresses = output.getvalues();
 
     selectfield(inputfield);
@@ -717,7 +901,11 @@ intdensematrix dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, in
             {
                 // Use it to get the subelem index in the disjoint region:
                 currentsubelem -= mydisjointregions->getrangebegin(currentdisjointregion);
-                adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
+                
+                if (primalondisjreg[selectedfieldnumber][currentdisjointregion] == NULL)
+                    adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + currentsubelem;
+                else
+                    adresses[ff*numcols+i] = rangebegin[selectedfieldnumber][currentdisjointregion][formfunctionindex] + 0;
             }
             else
                 adresses[ff*numcols+i] = -1;

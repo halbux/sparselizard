@@ -12,7 +12,7 @@ integration::integration(int physreg, expression tointegrate, int integrationord
 integration::integration(int physreg, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     if (not(meshdeform.isharmonicone(selecteddisjregs)))
     {
@@ -39,7 +39,7 @@ integration::integration(int physreg, int numcoefharms, expression tointegrate, 
 integration::integration(int physreg, int numcoefharms, expression meshdeform, expression tointegrate, int integrationorderdelta, int blocknumber)
 {
     // Get only the disjoint regions with highest dimension elements:
-    std::vector<int> selecteddisjregs = ((universe::mymesh->getphysicalregions())->get(physreg))->getdisjointregions();
+    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
 
     if (not(meshdeform.isharmonicone(selecteddisjregs)))
     {

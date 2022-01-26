@@ -37,6 +37,8 @@ class parameter
         int countcolumns(void);
 
         parameterselectedregion operator|(int physreg);
+        
+        void setvalue(int physreg, expression input);
 
         void print(void);
 
@@ -59,11 +61,11 @@ class parameter
         double integrate(int physreg, expression meshdeform, int integrationorder);
         double integrate(int physreg, int integrationorder);
 
-        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder = 1);
-        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder = 1);
+        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder);
+        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder);
 
-        void write(int physreg, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
-        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
+        void write(int physreg, std::string filename, int lagrangeorder, int numtimesteps = -1);
+        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps = -1);
 
 
         // Defining the +, -, * and / operators:

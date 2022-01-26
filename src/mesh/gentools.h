@@ -4,8 +4,8 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-#ifndef MYALGORITHM_H
-#define MYALGORITHM_H
+#ifndef GENTOOLS_H
+#define GENTOOLS_H
 
 #include <vector>
 #include <iostream>
@@ -17,9 +17,9 @@
 #include "polynomial.h"
 #include "polynomials.h"
 #include "coordinategroup.h"
-#include "densematrix.h"
+#include "densemat.h"
 
-namespace myalgorithm
+namespace gentools
 {
     // 'stablecoordinatesort' takes as input a vector of node coordinates 
     // in the format [coord1x coord1y coord1z coord2x ...] and provides a
@@ -37,6 +37,9 @@ namespace myalgorithm
     // coordinateswithoutduplicates(renumberingvector,:) = coordinates.
     // The output gives the number of non-duplicated nodes.
     int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
+    
+    // Remove duplicated coordinates:
+    void removeduplicates(std::vector<double>& coordinates);
     
     // This is for a vector of ints:
     void stablesort(std::vector<int>& tosort, std::vector<int>& reorderingvector);
@@ -85,7 +88,7 @@ namespace myalgorithm
     
     // Select indexes of a vector:
     void select(std::vector<int>& vals, std::vector<int>& selectedindexes, std::vector<int>& selected);
-    void select(std::vector<bool>& vals, intdensematrix selectedindexes, std::vector<bool>& selected);
+    void select(std::vector<bool>& vals, indexmat selectedindexes, std::vector<bool>& selected);
     
     // Compare the ordering of two vectors (vectors must be circularly or anti-circularly identical and not empty).
     // Length 1 is considered not flipped. Length 2 is considered flipped if not identical.
@@ -134,8 +137,9 @@ namespace myalgorithm
     // Provide the corner coordinates of each element concatenated in each element type.
     // This function returns (flattened from lowest type to highest) the edge number of
     // each edge in an element as well as a bool whose value is true if the edge barycenter
-    // is close enough to any node in the corner coordinates.
-    void assignedgenumbers(std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode);
+    // is close enough to any node in the corner coordinates. In the DDM framework the own
+    // elements must include all / the inner overlap elements for no-overlap / overlap DDM.
+    void assignedgenumbers(std::vector<bool>& isownelem, std::vector<std::vector<double>>& cornercoords, std::vector<int>& edgenumbers, std::vector<bool>& isbarycenteronnode);
     
     // For a vector 'vec' of repeating blocks [b0 b1 b2 ...] the output is [b0[sel[0]] b1[sel[0]] ... b0[sel[1]] b1[sel[1]] ...].
     std::vector<double> separate(std::vector<double>& v, int blocklen, std::vector<int> sel);
@@ -157,6 +161,7 @@ namespace myalgorithm
     
     // Concatenate vectors:
     std::vector<int> concatenate(std::vector<std::vector<int>> tocat);
+    void concatenate(std::vector<std::vector<double>>& tocat, std::vector<double>& cated);
     
     // Return -1 if a < b, 0 if a = b and +1 if a > b:
     int inequalitytoint(int a, int b);
@@ -175,7 +180,7 @@ namespace myalgorithm
     
     // Q has one row per Krylov vector (at least k+2 rows must be preallocated).
     // Column k of the unreduced upper Hessenberg matrix is returned (length k+2):
-    std::vector<double> arnoldi(densematrix (*mymatmult)(densematrix), densematrix Q, int k);
+    std::vector<double> arnoldi(densemat (*mymatmult)(densemat), densemat Q, int k);
     
     // Create a vector to renumber integer values with gaps to values without gap.
     // Integers must all be positive or zero. The number of unique integers is returned.
@@ -248,8 +253,23 @@ namespace myalgorithm
     void splitatcolon(std::string tosplit, std::string& first, std::string& last);
     
     // Find the true and false indexes in the argument vector and provide the renumbering of each vector entry to its true/false index:
-    void findtruefalse(std::vector<bool>& invec, intdensematrix& trueinds, intdensematrix& falseinds, std::vector<int>& renum);
+    void findtruefalse(std::vector<bool>& invec, indexmat& trueinds, indexmat& falseinds, std::vector<int>& renum);
     
+    // For every edge in 'physreg' (in the 'der' order) return a flag telling if its direction has to be flipped
+    // to fullfill the condition that at every node the touching edges point together either inwards or outwards.
+    void inoutorient(int physreg, std::vector<bool>& flipit);
+    // Helper function to be called recursively.
+    void inoutorient(int startnode, std::vector<int>& edgestatus, bool isoutward, bool isrecursivecall);
+    
+    // The inner overlap cell values are decided by the owner of the inner overlap:
+    void fixatoverlap(std::vector<std::vector<int>>& cellvalues);
+    
+    // Get the list of edges in the inner overlap interface with each neighbour and preallocate for the outer overlap interface.
+    // In case of no-overlap DDM the inner and outer overlap interfaces both equal the no-overlap interface.
+    void getedgesininnerinterfaces(std::vector<std::vector<int>>& iiedgelists, std::vector<std::vector<int>>& oiedgelistspreallocated);
+    
+    // Append the values of this rank and all neighbour ranks (in case of DDM). Also get the value 'togroup' on each neighbour rank.
+    std::vector<int> appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup);
 };
 
 #endif

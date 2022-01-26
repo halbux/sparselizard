@@ -37,6 +37,8 @@ namespace slmpi
     void sum(std::vector<double>& data);
     
     // Take the max of the values from all ranks and distribute the result back to all ranks:
+    void max(int len, int* data);
+    void max(int len, double* data);
     void max(std::vector<int>& data);
     void max(std::vector<double>& data);
     

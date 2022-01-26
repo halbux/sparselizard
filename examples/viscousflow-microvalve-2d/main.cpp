@@ -56,8 +56,8 @@ int main(void)
     // Generate, solve and save:
     viscousflow.solve();
     
-    // Write the p and v fields to file. Write v with an order 2 interpolation.
-    p.write(fluid, "p.vtk");
+    // Write the p and v fields to file:
+    p.write(fluid, "p.vtk", 1);
     v.write(fluid, "v.vtk", 2);
     
     // Output the flowrate for a unit width:

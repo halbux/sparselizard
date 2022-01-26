@@ -1,7 +1,7 @@
 #include "oppower.h"
 
 
-std::vector<std::vector<densematrix>> oppower::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> oppower::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,8 +10,8 @@ std::vector<std::vector<densematrix>> oppower::interpolate(elementselector& elem
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> computedbase = mybase->interpolate(elemselect, evaluationcoordinates, meshdeform);
-    std::vector<std::vector<densematrix>> computedexponent = myexponent->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> computedbase = mybase->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> computedexponent = myexponent->interpolate(elemselect, evaluationcoordinates, meshdeform);
 
     if (computedbase.size() == 2 && computedbase[1].size() == 1 && computedexponent.size() == 2 && computedexponent[1].size() == 1)
     {
@@ -27,7 +27,7 @@ std::vector<std::vector<densematrix>> oppower::interpolate(elementselector& elem
     abort();
 }
 
-densematrix oppower::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat oppower::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -36,8 +36,8 @@ densematrix oppower::multiharmonicinterpolate(int numtimeevals, elementselector&
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix computedbase = mybase->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-    densematrix computedexponent = myexponent->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat computedbase = mybase->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat computedexponent = myexponent->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
 
     computedbase.power(computedexponent);
             
@@ -64,6 +64,11 @@ std::shared_ptr<operation> oppower::copy(void)
     *op = *this;
     op->reuse = false;
     return op;
+}
+
+double oppower::evaluate(void)
+{
+    return std::pow(mybase->evaluate(), myexponent->evaluate());
 }
 
 std::vector<double> oppower::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)

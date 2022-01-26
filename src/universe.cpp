@@ -1,6 +1,10 @@
 #include "universe.h"
 #include "slepc.h"
+#include <thread>
+#include <omp.h>
 
+
+MatSolverType universe::solvertype = "mumps";
 
 int universe::mynumrawmeshes = 0;
 
@@ -38,12 +42,24 @@ int universe::getmaxnumthreads(void)
 
 void universe::setmaxnumthreads(int mnt)
 {
+    omp_set_num_threads(mnt);
     maxnumthreads = mnt;
 }
 
-double universe::roundoffnoiselevel = 1e-12;
+double universe::roundoffnoiselevel = 1e-10;
 
-std::shared_ptr<rawmesh> universe::mymesh = NULL;
+std::shared_ptr<rawmesh> universe::myrawmesh = NULL;
+
+std::shared_ptr<rawmesh> universe::getrawmesh(void)
+{
+    if (myrawmesh != NULL)
+        return myrawmesh;
+    else
+    {
+        std::cout << "Error in 'universe' namespace: an operation tried to access the mesh object but it is not available" << std::endl;
+        abort();
+    }
+}
 
 bool universe::isaxisymmetric = false;
 
@@ -67,8 +83,8 @@ std::vector<std::vector<int>> universe::ddmints = {};
 std::vector<vec> universe::ddmvecs = {};
 std::vector<mat> universe::ddmmats = {};
 std::vector<formulation> universe::ddmformuls = {};
-std::vector<intdensematrix> universe::ddmsendinds = {};
-std::vector<intdensematrix> universe::ddmrecvinds = {};
+std::vector<indexmat> universe::ddmsendinds = {};
+std::vector<indexmat> universe::ddmrecvinds = {};
 
 void universe::clearddmcontainers(void)
 {
@@ -122,7 +138,7 @@ void universe::forbidreuse(void)
     opcomputedfft = {};
 }
 
-std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> universe::selectsubset(int numevalpts, std::vector<int>& selectedelementindexes)
+std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densemat>> >,std::vector< densemat >> universe::selectsubset(int numevalpts, std::vector<int>& selectedelementindexes)
 {
     int numselected = selectedelementindexes.size();
 
@@ -163,14 +179,14 @@ std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,st
     return output;
 }
 
-std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> universe::backup(void)
+std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densemat>> >,std::vector< densemat >> universe::backup(void)
 {
     auto output = std::make_tuple(computedjacobian, oppointers, oppointersfft, opcomputed, opcomputedfft);
     
     return output;
 }
 
-void universe::restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densematrix>> >,std::vector< densematrix >> input)
+void universe::restore(std::tuple<std::shared_ptr<jacobian>, std::vector<std::shared_ptr<operation>>,std::vector<std::shared_ptr<operation>>, std::vector< std::vector<std::vector<densemat>> >,std::vector< densemat >> input)
 {
     computedjacobian = std::get<0>(input);
     
@@ -186,8 +202,8 @@ std::shared_ptr<jacobian> universe::computedjacobian = NULL;
 
 std::vector<std::shared_ptr<operation>> universe::oppointers = {};
 std::vector<std::shared_ptr<operation>> universe::oppointersfft = {};
-std::vector< std::vector<std::vector<densematrix>> > universe::opcomputed = {};
-std::vector< densematrix > universe::opcomputedfft = {};
+std::vector< std::vector<std::vector<densemat>> > universe::opcomputed = {};
+std::vector< densemat > universe::opcomputedfft = {};
 
 int universe::getindexofprecomputedvalue(std::shared_ptr<operation> op)
 {
@@ -249,9 +265,9 @@ int universe::getindexofprecomputedvaluefft(std::shared_ptr<rawfield> rf, int td
     return -1;
 }
 
-std::vector<std::vector<densematrix>> universe::getprecomputed(int index)
+std::vector<std::vector<densemat>> universe::getprecomputed(int index)
 {
-    std::vector<std::vector<densematrix>> output = opcomputed[index];
+    std::vector<std::vector<densemat>> output = opcomputed[index];
     for (int h = 0; h < output.size(); h++)
     {
         if (output[h].size() == 1)
@@ -260,12 +276,12 @@ std::vector<std::vector<densematrix>> universe::getprecomputed(int index)
     return output;
 }
 
-densematrix universe::getprecomputedfft(int index)
+densemat universe::getprecomputedfft(int index)
 {
     return (opcomputedfft[index]).copy();
 }
 
-void universe::setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densematrix>> val)
+void universe::setprecomputed(std::shared_ptr<operation> op, std::vector<std::vector<densemat>> val)
 {
     oppointers.push_back(op);
     opcomputed.push_back(val);
@@ -276,14 +292,14 @@ void universe::setprecomputed(std::shared_ptr<operation> op, std::vector<std::ve
     }
 }
 
-void universe::setprecomputedfft(std::shared_ptr<operation> op, densematrix val)
+void universe::setprecomputedfft(std::shared_ptr<operation> op, densemat val)
 {
     oppointersfft.push_back(op);
     opcomputedfft.push_back(val.copy());
 }
 
 bool universe::keeptrackofrhsassembly = false;
-std::vector<std::pair<intdensematrix, densematrix>> universe::rhsterms = {}; 
+std::vector<std::pair<indexmat, densemat>> universe::rhsterms = {}; 
         
 std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};        
 
@@ -359,8 +375,8 @@ std::vector<std::vector<std::vector<std::vector<int>>>> universe::splitdefinitio
 bool universe::getsplitdefinition(std::vector<std::vector<int>>& splitdef, int elementtypenumber, int splitnum, std::vector<int>& edgenumbers)
 {
     int ne = edgenumbers.size();
-    int numrel = myalgorithm::factorial(ne);
-    int rel = myalgorithm::identifyrelations(edgenumbers);
+    int numrel = gentools::factorial(ne);
+    int rel = gentools::identifyrelations(edgenumbers);
     
     if (splitdefinition[elementtypenumber].size() == 0 || splitdefinition[elementtypenumber][splitnum*numrel+rel].size() == 0)
         return false;
@@ -372,8 +388,8 @@ bool universe::getsplitdefinition(std::vector<std::vector<int>>& splitdef, int e
 void universe::setsplitdefinition(std::vector<std::vector<int>>& splitdef, int elementtypenumber, int splitnum, std::vector<int>& edgenumbers)
 {
     int ne = edgenumbers.size();
-    int numrel = myalgorithm::factorial(ne);
-    int rel = myalgorithm::identifyrelations(edgenumbers);
+    int numrel = gentools::factorial(ne);
+    int rel = gentools::identifyrelations(edgenumbers);
     
     if (splitdefinition[elementtypenumber].size() == 0)
         splitdefinition[elementtypenumber] = std::vector<std::vector<std::vector<int>>>(std::pow(2,ne)*numrel, std::vector<std::vector<int>>(0));

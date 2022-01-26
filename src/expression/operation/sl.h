@@ -36,10 +36,17 @@ namespace sl
     // Get the code version number and name:
     void printversion(void);
     int getversion(void);
+    int getsubversion(void);
     std::string getversionname(void);
+    
+    void setmaxnumthreads(int mnt);
+    int getmaxnumthreads(void);
     
     double getpi(void);
 
+    // Get a random value uniformly distributed between 0.0 and 1.0:
+    double getrandom(void);
+    
     // Perform operations (union, intersection) on physical regions:
     int selectunion(std::vector<int> physregs);
     int selectintersection(std::vector<int> physregs);
@@ -210,6 +217,7 @@ namespace sl
 
     // hp-adaptation:
     bool adapt(int verbosity = 0);
+    bool alladapt(int verbosity = 0);
     
     // Define a Zienkiewicz-Zhu type error indicator:
     expression zienkiewiczzhu(expression input);
@@ -231,21 +239,21 @@ namespace sl
     // Multi-rhs direct resolution:
     std::vector<vec> solve(mat A, std::vector<vec> b, std::string soltype = "lu");
     // Densematrix 'b' has size #rhs x #dofs:
-    densematrix solve(mat A, densematrix b, std::string soltype);
+    densemat solve(mat A, densemat b, std::string soltype);
     
     // Iterative resolution (with or without diagonal scaling):
     void solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::string soltype = "bicgstab", std::string precondtype = "sor", int verbosity = 1, bool diagscaling = false);
     
     
-    // Exchange densematrix data with MPI:
-    void exchange(std::vector<int> targetranks, std::vector<densematrix> sends, std::vector<densematrix> receives);
+    // Exchange densemat data with MPI:
+    void exchange(std::vector<int> targetranks, std::vector<densemat> sends, std::vector<densemat> receives);
     
     // MPI based gmres with custom matrix free product (no restart). Initial guess and solution are in x.
     // Relative residual at each iteration is returned. Length is number of iterations + 1 (first is initial residual).
-    std::vector<double> gmres(densematrix (*mymatmult)(densematrix), densematrix b, densematrix x, double relrestol, int maxnumit, int verbosity = 1);
+    std::vector<double> gmres(densemat (*mymatmult)(densemat), densemat b, densemat x, double relrestol, int maxnumit, int verbosity = 1);
     
     // Know which dofs to send and at which dofs to receive for the DDM. Choose the rawfields and the domain interface dimensions (length 3) to consider.
-    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<intdensematrix>& sendinds, std::vector<intdensematrix>& recvinds);
+    void mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<rawfield>> rfs, std::vector<bool> isdimactive, std::vector<indexmat>& sendinds, std::vector<indexmat>& recvinds);
     
     std::vector<double> linspace(double a, double b, int num);
     std::vector<double> logspace(double a, double b, int num, double basis = 10.0);
@@ -254,7 +262,7 @@ namespace sl
     expression dbtoneper(expression toconvert);
     
     
-    // Set the data on all regions of all fields defined in the vec object:
+    // Set all fields and ports to the values available in the vec object:
     void setdata(vec invec);
 
 
@@ -277,9 +285,9 @@ namespace sl
 
     ////////// PREDEFINED FORMULATIONS
     
-    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder = 1, bool errorifnotfound = true);
-    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor = 1.0, int lagmultorder = 1);
-    std::vector<integration> periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor = 1.0, int lagmultorder = 1);
+    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, int lagmultorder, bool errorifnotfound = true);
+    std::vector<integration> continuitycondition(int gamma1, int gamma2, field u1, field u2, std::vector<double> rotcent, double rotangz, double angzmod, double factor, int lagmultorder);
+    std::vector<integration> periodicitycondition(int gamma1, int gamma2, field u, std::vector<double> dat1, std::vector<double> dat2, double factor, int lagmultorder);
 
     // Isotropic linear elasticity:
     expression predefinedelasticity(expression dofu, expression tfu, expression Eyoung, expression nupoisson, std::string myoption = "");
@@ -291,10 +299,8 @@ namespace sl
     // General anisotropic elasticity with geometrical nonlinearity and prestress (ignored if zero):
     expression predefinedelasticity(expression dofu, expression tfu, field u, expression elasticitymatrix, expression prestress, std::string myoption = "");
 
-    expression predefinedelectrostaticforce(expression tfu, expression E, expression epsilon);
-    expression predefinedelectrostaticforce(std::vector<expression> dxyztfu, expression E, expression epsilon);
-    expression predefinedmagnetostaticforce(expression tfu, expression H, expression mu);
-    expression predefinedmagnetostaticforce(std::vector<expression> dxyztfu, expression H, expression mu);
+    expression predefinedelectrostaticforce(expression input, expression E, expression epsilon);
+    expression predefinedmagnetostaticforce(expression input, expression H, expression mu);
 
     expression predefinedacoustics(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
     expression predefinedacousticradiation(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);

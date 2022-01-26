@@ -15,11 +15,14 @@
 #include "universe.h"
 #include <vector>
 #include "disjointregions.h"
-#include "intdensematrix.h"
+#include "indexmat.h"
 #include <memory>
+#include <unordered_map>
 #include "selector.h"
+#include "rawport.h"
 
 class rawfield;
+class rawport;
 
 class dofmanager
 {
@@ -35,6 +38,13 @@ class dofmanager
         
         // Order of each field on each disjoint region:
         std::vector<std::vector<int>> myfieldorders = {};
+        
+        // Map every added port to its dof index:
+        std::unordered_map<rawport*, int> myrawportmap;
+        
+        // 'primalondisjreg[selectedfieldnumber][disjreg]' gives
+        // the primal rawport on the disjoint region (NULL if none):
+        std::vector<std::vector< std::shared_ptr<rawport> >> primalondisjreg = {};
         
         // 'rangebegin[selectedfieldnumber][12][2]' gives the index of 
         // the first row/column in the matrix at which the data for 
@@ -56,6 +66,7 @@ class dofmanager
         int mymeshnumber = 0;
         
         // Track the calls to 'addtostructure'.
+        std::vector<std::shared_ptr<rawport>> myportstructuretracker = {};
         std::vector<std::pair<std::shared_ptr<rawfield>, int>> mystructuretracker = {};
         
         // Synchronize with the hp-adapted mesh:
@@ -77,9 +88,13 @@ class dofmanager
         
         void donotsynchronize(void);
         
+        // Add a rawport to the structure:
+        void addtostructure(std::shared_ptr<rawport> porttoadd);
+        
         // 'addtostructure' defines dofs for a field on the disjoint 
         // regions. Only fields with a single component are accepted.
         void addtostructure(std::shared_ptr<rawfield> fieldtoadd, int physicalregionnumber);
+        
         // Always select the field before accessing the dof structure.
         void selectfield(std::shared_ptr<rawfield> selectedfield);
         
@@ -89,20 +104,31 @@ class dofmanager
         int getrangebegin(int disjreg, int formfunc);
         int getrangeend(int disjreg, int formfunc);
         
+        // Get the port dof index:
+        int getaddress(rawport* prt);
+        
+        // Get the pointer and dof index of every port defined in this object:
+        void getportsinds(std::vector<rawport*>& rps, indexmat& inds);
+        
+        // Return the primal and dual addresses for all associated ports: 
+        std::pair<indexmat, indexmat> findassociatedports(void);
+        
         bool isdefined(int disjreg, int formfunc);
+        
+        bool isported(int disjreg);
         
         // For all types of constraints:
         std::vector<bool> isconstrained(void);
-        intdensematrix getconstrainedindexes(void);
+        indexmat getconstrainedindexes(void);
         
         int countdisjregconstraineddofs(void);
-        intdensematrix getdisjregconstrainedindexes(void);
+        indexmat getdisjregconstrainedindexes(void);
         
         int countgaugeddofs(void);
-        intdensematrix getgaugedindexes(void);
+        indexmat getgaugedindexes(void);
         
         // Get the conditionally constrained adresses as well as the constraint values:
-        std::pair<intdensematrix, densematrix> getconditionalconstraintdata(void);
+        std::pair<indexmat, densemat> getconditionalconstraintdata(void);
         
         std::shared_ptr<rawfield> getselectedfield(void);
         std::vector<std::shared_ptr<rawfield>> getfields(void);
@@ -110,6 +136,10 @@ class dofmanager
         void replaceselectedfield(std::shared_ptr<rawfield> rf);
         
         std::vector<int> getselectedfieldorders(void);
+        
+        // Count the total number of ports (primal, dual and not-associated):
+        int countports(void);
+        int countassociatedprimalports(void);
         
         int countdofs(void);
         long long int allcountdofs(void);
@@ -122,18 +152,18 @@ class dofmanager
         // - sendunconstrainedinds[n] are all unconstrained indexes in senddofinds (same ordering)
         // - recvunconstrainedinds[n] are all unconstrained indexes in recvdofinds (same ordering)
         //
-        std::vector<std::vector<intdensematrix>> discovernewconstraints(std::vector<int> neighbours, std::vector<intdensematrix> senddofinds, std::vector<intdensematrix> recvdofinds);
+        std::vector<std::vector<indexmat>> discovernewconstraints(std::vector<int> neighbours, std::vector<indexmat> senddofinds, std::vector<indexmat> recvdofinds);
         
         void print(void);
         
         // 'getaddresses' is required in the matrix generation step.
-        // It returns an intdensematrix representing a numberofformfunctions
+        // It returns an indexmat representing a numberofformfunctions
         // by elementlist.size() matrix (row-major). The matrix gives 
         // the addresses in the formulation matrix at which the dofs of field 
         // 'inputfield' defined on the elements in elementlist can be found. 
         // Address -1 is used for field dofs not in 'fieldphysreg'.
         //
-        intdensematrix getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg);
+        indexmat getaddresses(std::shared_ptr<rawfield> inputfield, int fieldinterpolationorder, int elementtypenumber, std::vector<int> &elementlist, int fieldphysreg);
                                                         
 };
 

@@ -40,7 +40,7 @@ bool opfield::isharmonicone(std::vector<int> disjregs)
     return (myharms.size() == 1 && myharms[0] == 1);
 }
 
-std::vector<std::vector<densematrix>> opfield::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> opfield::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     if (timederivativeorder == 0 && spacederivative == 0)
         return myfield->interpolate(kietaphiderivative, formfunctioncomponent, elemselect, evaluationcoordinates);
@@ -53,7 +53,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(int kietaphiderivativ
     }
 }
 
-std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opfield::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -81,7 +81,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
         myfield->setdata(-1, (universe::xdtxdtdtx)[timederivativeorder][0]|field(myfield));
     }
 
-    std::vector<std::vector<densematrix>> output;
+    std::vector<std::vector<densemat>> output;
 
     // In case there is no space derivative applied:
     if (spacederivative == 0 && kietaphiderivative == 0)
@@ -106,7 +106,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
                 universe::computedjacobian = myjac;
 
             // Compute the required ki, eta and phi derivatives:
-            std::vector<std::vector<densematrix>> dkiargmat, detaargmat, dphiargmat;
+            std::vector<std::vector<densemat>> dkiargmat, detaargmat, dphiargmat;
 
             // Get the element dimension in the selected elements:
             int elementdimension = elemselect.getelementdimension();
@@ -154,7 +154,7 @@ std::vector<std::vector<densematrix>> opfield::interpolate(elementselector& elem
     return output;
 }
 
-densematrix opfield::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opfield::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -163,9 +163,9 @@ densematrix opfield::multiharmonicinterpolate(int numtimeevals, elementselector&
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
 
-    std::vector<std::vector<densematrix>> interpolatedfield = interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> interpolatedfield = interpolate(elemselect, evaluationcoordinates, meshdeform);
     // Compute at 'numtimevals' instants in time the multiharmonic field:
-    densematrix output = myfft::inversefft(interpolatedfield, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
+    densemat output = fourier::inversefft(interpolatedfield, numtimeevals, elemselect.countinselection(), evaluationcoordinates.size()/3);
 
     if (universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);
@@ -179,7 +179,7 @@ bool opfield::isvalueorientationdependent(std::vector<int> disjregs)
 
     for (int i = 0; i < disjregs.size(); i++)
     {
-        int elementtypenumber = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjregs[i]);
+        int elementtypenumber = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(disjregs[i]);
         std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(elementtypenumber, myfield->gettypename());
         if ( myformfunction->isorientationdependent(myfield->getinterpolationorder(disjregs[i])) )
             return true;

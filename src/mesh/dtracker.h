@@ -90,11 +90,14 @@ class dtracker
 
     public:
 
+        bool isdefined(void);    
         void errorundefined(void);
 
         dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numoverlaplayers);
 
         std::shared_ptr<rawmesh> getrawmesh(void);
+        
+        void setrawmesh(std::shared_ptr<rawmesh> rm);
         
         bool isoverlap(void);
         
@@ -128,6 +131,10 @@ class dtracker
         int getouteroverlap(int neighbour);
         int getinneroverlapskin(int neighbour);
         int getouteroverlapskin(int neighbour);
+        
+        std::vector<int> getnooverlapinterface(int neighbour);
+        std::vector<int> getinneroverlapinterface(int neighbour);
+        std::vector<int> getouteroverlapinterface(int neighbour);
 
         std::vector<std::vector<std::vector<int>>>* getmap(void);
         
@@ -136,6 +143,7 @@ class dtracker
 
         // Return the list of all ddm-specific regions:
         std::vector<int> listddmregions(void);
+        std::vector<bool> isddmdisjointregion(void);
         
         // Know which disjoint region is in the no-overlap region/is owned by this rank:
         std::vector<bool> isdisjointregioninnooverlap(void);

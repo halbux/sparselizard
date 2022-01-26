@@ -25,11 +25,13 @@
 #include "rawfield.h"
 #include "vectorfieldselect.h"
 #include "spanningtree.h"
+#include "port.h"
 
 class spanningtree;
 class vectorfieldselect;
 class parameter;
 class rawfield;
+class port;
 
 class field
 {
@@ -71,6 +73,9 @@ class field
         void setorder(int physreg, int interpolorder);
         void setorder(expression criterion, int loworder, int highorder);
         void setorder(double targeterror, int loworder, int highorder, double absthres);
+        
+        // Associate the primal and dual port to the field.
+        void setport(int physreg, port primal, port dual);
 
         // Set a value for the field on a given geometrical region.
         // Use the default order + 'extraintegrationdegree' to 
@@ -85,8 +90,8 @@ class field
         void setvalue(int physreg);
         
         // Set/get value at nodes for 'h1' type fields:
-        void setnodalvalues(intdensematrix nodenumbers, densematrix values);
-        densematrix getnodalvalues(intdensematrix nodenumbers);
+        void setnodalvalues(indexmat nodenumbers, densemat values);
+        densemat getnodalvalues(indexmat nodenumbers);
 
         // Set an 'input' valued constraint on a physical region. 
         // Use the default order + 'extraintegrationdegree' to 
@@ -94,6 +99,9 @@ class field
         void setconstraint(int physreg, expression input, int extraintegrationdegree = 0);
         // The 'input' expression is evaluated on the mesh deformed by 'meshdeform':
         void setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree = 0);
+        // Set a constraint on each harmonic:
+        void setconstraint(int physreg, std::vector<expression> input, int extraintegrationdegree = 0);
+        void setconstraint(int physreg, expression meshdeform, std::vector<expression> input, int extraintegrationdegree = 0);
         // An FFT is used to project the 'input' expression:
         void setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree = 0);
         void setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree = 0);
@@ -118,6 +126,9 @@ class field
         void setdata(int physreg, vectorfieldselect myvec, std::string op = "set");
         // Transfer data from and to the current field:
         void setdata(int physreg, vec myvec, std::string op = "set");
+        
+        // Set the source value at every cut:
+        void setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues);
 
         // Allow/forbid automatic updating of the field value during hp-adaptivity:
         void automaticupdate(bool updateit);
@@ -158,11 +169,11 @@ class field
         double integrate(int physreg, expression meshdeform, int integrationorder);
         double integrate(int physreg, int integrationorder);
 
-        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder = 1);
-        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder = 1);
+        void write(int physreg, int numfftharms, std::string filename, int lagrangeorder);
+        void write(int physreg, int numfftharms, expression meshdeform, std::string filename, int lagrangeorder);
 
-        void write(int physreg, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
-        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder = 1, int numtimesteps = -1);
+        void write(int physreg, std::string filename, int lagrangeorder, int numtimesteps = -1);
+        void write(int physreg, expression meshdeform, std::string filename, int lagrangeorder, int numtimesteps = -1);
         
         // Write/load the raw field data to/from compact sparselizard format:
         void writeraw(int physreg, std::string filename, bool isbinary = false, std::vector<double> extradata = {});
@@ -202,3 +213,4 @@ expression operator*(parameter, field);
 expression operator/(parameter, field);
 
 #endif
+

@@ -29,7 +29,7 @@ std::vector<std::shared_ptr<rawshape>> geotools::coordstopoints(std::vector<doub
     }
     else
     {
-        std::cout << "Error in 'geotool' namespace: length of coordinate vector should be a multiple of three" << std::endl;
+        std::cout << "Error in 'geotools' namespace: length of coordinate vector should be a multiple of three" << std::endl;
         abort();
     }
 }
@@ -216,7 +216,7 @@ std::vector< std::shared_ptr<rawshape> > geotools::getrawshapes(std::vector<shap
             rawshapes[i] = currentrawshapeptr;
         else
         {
-            std::cout << "Error in 'geotool' namespace: encountered an undefined shape (NULL rawshape pointer)" << std::endl;
+            std::cout << "Error in 'geotools' namespace: encountered an undefined shape (NULL rawshape pointer)" << std::endl;
             abort();
         }
     }
@@ -374,5 +374,23 @@ std::vector<std::vector<int>> geotools::appendelems(std::vector<std::shared_ptr<
     return output;
 }
 
-
+int geotools::getcurvatureorder(std::vector< std::shared_ptr<rawshape> > rawshapes)
+{
+    if (rawshapes.size() == 0)
+        return -1;
+        
+    int co = rawshapes[0]->getcurvatureorder();
+    
+    for (int i = 1; i < rawshapes.size(); i++)
+    {
+        int curco = rawshapes[i]->getcurvatureorder();
+        if (curco != co)
+        {
+            std::cout << "Error in 'geotools' namespace: expected a unique curvature order for all shapes provided" << std::endl;
+            abort();
+        }
+    }
+    
+    return co;
+}
 

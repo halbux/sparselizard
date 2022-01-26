@@ -40,6 +40,8 @@ class rawshape : public std::enable_shared_from_this<rawshape>
         virtual void flip(void);
 
         virtual void setphysicalregion(int physreg);
+        
+        virtual int getcurvatureorder(void);
 
         virtual int getdimension(void);
 

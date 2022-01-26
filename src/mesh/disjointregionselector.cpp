@@ -6,7 +6,7 @@ disjointregionselector::disjointregionselector(std::vector<int> disjointregionnu
     // Get the element type number in every disjoint region:
     std::vector<int> typenums(disjointregionnumbers.size());
     for (int i = 0; i < disjointregionnumbers.size(); i++)
-        typenums[i] = (universe::mymesh->getdisjointregions())->getelementtypenumber(disjointregionnumbers[i]);
+        typenums[i] = (universe::getrawmesh()->getdisjointregions())->getelementtypenumber(disjointregionnumbers[i]);
     criteria.push_back(typenums);
     
     std::vector<int> renumberingvector(disjointregionnumbers.size());

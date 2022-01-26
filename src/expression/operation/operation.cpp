@@ -1,7 +1,7 @@
 #include "operation.h"
 
 
-std::vector<std::vector<densematrix>> operation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> operation::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     std::cout << "Error in 'operation' object: cannot interpolate the operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -10,7 +10,7 @@ std::vector<std::vector<densematrix>> operation::interpolate(elementselector& el
     abort();
 }
 
-densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat operation::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     std::cout << "Error in 'operation' object: cannot interpolate the multiharmonic operation" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -19,7 +19,7 @@ densematrix operation::multiharmonicinterpolate(int numtimeevals, elementselecto
     abort();
 }
 
-std::vector<std::vector<densematrix>> operation::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
+std::vector<std::vector<densemat>> operation::interpolate(int kietaphiderivative, elementselector& elemselect, std::vector<double>& evaluationcoordinates)
 {
     std::cout << "Error in 'operation' object: expression provided for mesh deformation is invalid" << std::endl;
     std::cout << "Operation was:" << std::endl;
@@ -54,6 +54,18 @@ bool operation::istfincluded(void)
     return istf();
 }
 
+bool operation::isportincluded(void)
+{ 
+    std::vector<std::shared_ptr<operation>> arguments = getarguments();
+
+    for (int i = 0; i < arguments.size(); i++)
+    {
+        if (arguments[i]->isportincluded())
+            return true;
+    }
+    return isport();
+}
+
 bool operation::isharmonicone(std::vector<int> disjregs)
 {
     std::vector<std::shared_ptr<operation>> arguments = getarguments();
@@ -69,6 +81,15 @@ bool operation::isharmonicone(std::vector<int> disjregs)
 std::shared_ptr<rawparameter> operation::getparameterpointer(void)
 {
     std::cout << "Error in 'operation' object: cannot get the rawparameter pointer" << std::endl;
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    std::cout << std::endl;
+    abort();
+}
+
+std::shared_ptr<rawport> operation::getportpointer(void)
+{
+    std::cout << "Error in 'operation' object: cannot get the rawport pointer" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     std::cout << std::endl;
@@ -113,7 +134,7 @@ void operation::setkietaphiderivative(int whichderivative)
 
 void operation::increasetimederivativeorder(int derivativeorder)
 {
-    std::cout << "Error in 'operation' object: can only apply time derivatives to fields, dof() and tf()" << std::endl;
+    std::cout << "Error in 'operation' object: can only apply time derivatives to ports, fields, dof() and tf()" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     std::cout << std::endl;
@@ -144,6 +165,15 @@ std::shared_ptr<operation> operation::copy(void)
     abort();
 }
 
+double operation::evaluate(void)
+{
+    std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;
+    std::cout << "Operation was:" << std::endl;
+    this->print();
+    std::cout << std::endl;
+    abort();
+}
+
 std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;
@@ -152,5 +182,4 @@ std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vecto
     std::cout << std::endl;
     abort();
 }
-        
 

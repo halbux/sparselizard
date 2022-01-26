@@ -58,6 +58,11 @@ void rawdisk::setphysicalregion(int physreg)
     myphysicalregion = physreg;
 }
 
+int rawdisk::getcurvatureorder(void)
+{
+    return mycurvatureorder;
+}
+
 int rawdisk::getdimension(void)
 {
     return 2;

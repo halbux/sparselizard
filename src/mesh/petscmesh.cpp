@@ -25,7 +25,7 @@ petscmesh::petscmesh(std::string filename)
  
     bool isvalidext = false;
     
-    std::string curfileext = myalgorithm::getfileextension(filename);
+    std::string curfileext = gentools::getfileextension(filename);
     for (int i = 0; i < supportedextensions.size(); i++)
     {
         if (supportedextensions[i] == curfileext)
@@ -37,7 +37,7 @@ petscmesh::petscmesh(std::string filename)
     
     if (isvalidext)
     {
-        DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), PETSC_TRUE, &mypetscmesh);
+        DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), gentools::getfilename(filename).c_str(), PETSC_TRUE, &mypetscmesh);
         DMGetDimension(mypetscmesh, &meshdim);
         return;
     }
@@ -68,8 +68,8 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
     
     mynodes.setnumber(numberofnodes);
     // Transfer from Vec to the node object:
-    intdensematrix addresses(meshdim*numberofnodes,1, 0,1);
-    densematrix coordmat(meshdim*numberofnodes,1);
+    indexmat addresses(meshdim*numberofnodes,1, 0,1);
+    densemat coordmat(meshdim*numberofnodes,1);
     VecGetValues(coordvec, meshdim*numberofnodes, addresses.getvalues(), coordmat.getvalues());
     
     double* coordmatval = coordmat.getvalues();

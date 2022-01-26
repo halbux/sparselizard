@@ -1,12 +1,14 @@
 #include "rawvolume.h"
 
 
-rawvolume::rawvolume(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+rawvolume::rawvolume(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder)
 {
     myphysicalregion = physreg;
 
     mycoords = allcoords;
     myelems = allelems;
+    
+    mycurvatureorder = curvatureorder;
 }
 
 
@@ -26,6 +28,11 @@ std::shared_ptr<rawshape> rawvolume::duplicate(void)
 void rawvolume::setphysicalregion(int physreg)
 {
     myphysicalregion = physreg;
+}
+
+int rawvolume::getcurvatureorder(void)
+{
+    return mycurvatureorder;
 }
 
 int rawvolume::getdimension(void)

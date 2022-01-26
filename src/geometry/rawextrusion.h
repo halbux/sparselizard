@@ -28,6 +28,8 @@ class rawextrusion: public rawshape
 
         int myphysicalregion = -1;
         
+        int mycurvatureorder = 1;
+        
         // Son shapes:
         std::vector<std::shared_ptr<rawshape>> sons = {};
 
@@ -58,6 +60,8 @@ class rawextrusion: public rawshape
         std::shared_ptr<rawshape> duplicate(void);
 
         void setphysicalregion(int physreg);
+        
+        int getcurvatureorder(void);
     
         int getdimension(void);
 

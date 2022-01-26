@@ -6,19 +6,18 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
 {
     mynumcoords = coords.size()/3;
     
-    noisethreshold = universe::mymesh->getnodes()->getnoisethreshold();
-    double meshsize = 0.0;
-    for (int i = 0; i < 3; i++)
-        meshsize += universe::mymesh->getnodes()->getgeometrydimension(i);
+    noisethreshold = universe::getrawmesh()->getnodes()->getnoisethreshold();
+    std::vector<double> geodims = universe::getrawmesh()->getnodes()->getgeometrydimension();
+    double meshsize = gentools::sum(geodims);
     
     // Define the number of slices in the x, y and z direction:
-    double powertouse = universe::mymesh->getmeshdimension();
+    double powertouse = universe::getrawmesh()->getmeshdimension();
     int ns = std::pow(mynumcoords, 1.0/powertouse);
     ns = std::max(ns, 1);
     numslices = {ns,ns,ns};
     
     // Get the coordinate x, y and z bounds as well as the distance between slices:
-    bounds = myalgorithm::getcoordbounds(coords);
+    bounds = gentools::getcoordbounds(coords);
     delta = {std::abs(bounds[1]-bounds[0])/numslices[0], std::abs(bounds[3]-bounds[2])/numslices[1], std::abs(bounds[5]-bounds[4])/numslices[2]};
     
     // This solves the non-existing dimension issues:
@@ -34,7 +33,7 @@ coordinategroup::coordinategroup(std::vector<double>& coords)
     mygroups = std::shared_ptr<int>(new int[mynumcoords]);
     mygroupcoords = std::shared_ptr<double>(new double[3*mynumcoords]);
 
-    myalgorithm::slicecoordinates(coords, bounds[0], bounds[2], bounds[4], delta[0], delta[1], delta[2], numslices[0], numslices[1], numslices[2], mygroupads, mygroups.get(), mygroupcoords.get());
+    gentools::slicecoordinates(coords, bounds[0], bounds[2], bounds[4], delta[0], delta[1], delta[2], numslices[0], numslices[1], numslices[2], mygroupads, mygroups.get(), mygroupcoords.get());
 }
 
 int coordinategroup::countcoordinates(void)

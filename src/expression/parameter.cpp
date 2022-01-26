@@ -3,7 +3,7 @@
 
 parameter::parameter(void)
 { 
-    if (universe::mymesh == NULL)
+    if (universe::myrawmesh == NULL)
     {
         std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
         abort();
@@ -14,7 +14,7 @@ parameter::parameter(void)
 
 parameter::parameter(int numrows, int numcols)
 { 
-    if (universe::mymesh == NULL)
+    if (universe::myrawmesh == NULL)
     {
         std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
         abort();
@@ -35,9 +35,16 @@ int parameter::countcolumns(void)
 
 parameterselectedregion parameter::operator|(int physreg)
 {
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     return parameterselectedregion(rawparamptr, physreg);
+}
+
+void parameter::setvalue(int physreg, expression input)
+{
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+    
+    rawparamptr->set(physreg, input);
 }
 
 void parameter::print(void)
@@ -92,12 +99,8 @@ expression parameter::operator*(double val) { return (expression)*this * val; }
 expression parameter::operator/(double val) { return (expression)*this / val; }
 
 
-expression operator+(double val, parameter inputparameter) { return inputparameter+val; }
-expression operator-(double val, parameter inputparameter) { return -inputparameter+val; }
-expression operator*(double val, parameter inputparameter) { return inputparameter*val; }
-expression operator/(double val, parameter inputparameter) { return ( (expression)val )/( (expression)inputparameter ); }
-
-
-
-
+expression operator+(double val, parameter inputparameter) { return (expression)val + inputparameter; }
+expression operator-(double val, parameter inputparameter) { return (expression)val - inputparameter; }
+expression operator*(double val, parameter inputparameter) { return (expression)val * inputparameter; }
+expression operator/(double val, parameter inputparameter) { return (expression)val / inputparameter; }
 

@@ -33,7 +33,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
 field::field(std::string fieldtypename, spanningtree spantree)
 {
     rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, {1}, false));
-    rawfieldptr->setspanningtree(spantree);
+    rawfieldptr->setspanningtree(spantree.getpointer());
 }
 
 field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, spanningtree spantree)
@@ -54,7 +54,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, 
         std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
         abort();
     } 
-    rawfieldptr->setspanningtree(spantree);
+    rawfieldptr->setspanningtree(spantree.getpointer());
 }
 
 int field::countcomponents(void) { errorifpointerisnull(); return rawfieldptr->countcomponents(); }
@@ -68,7 +68,7 @@ void field::print(void) { errorifpointerisnull(); rawfieldptr->print(); }
 void field::setorder(int physreg, int interpolorder) 
 { 
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (interpolorder < 0)
     {
@@ -96,7 +96,7 @@ void field::setorder(expression criterion, int loworder, int highorder)
         abort();   
     }
     // The criterion cannot be multiharmonic:
-    std::vector<int> alldisjregs((universe::mymesh->getdisjointregions())->count());
+    std::vector<int> alldisjregs((universe::getrawmesh()->getdisjointregions())->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
@@ -154,42 +154,56 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
     rawfieldptr->setorder(crit, loworder, highorder, highorder-loworder+1);
 }
 
+void field::setport(int physreg, port primal, port dual)
+{
+    errorifpointerisnull();
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+ 
+    if (primal.getpointer() == dual.getpointer())
+    {
+        std::cout << "Error in 'field' object: cannot use the same port for the primal and the dual" << std::endl;
+        abort();
+    }
+    
+    rawfieldptr->setport(physreg, primal.getpointer(), dual.getpointer());
+}
+
 void field::setvalue(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, -1, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setvalue(int physreg)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setvalue(physreg);
 }
 
-void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
+void field::setnodalvalues(indexmat nodenumbers, densemat values)
 {
     errorifpointerisnull();
     
@@ -201,7 +215,7 @@ void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
     
     if (nodenumbers.count() > 0)
     {
-        int numnodes = universe::mymesh->getelements()->count(0);
+        int numnodes = universe::getrawmesh()->getelements()->count(0);
         std::vector<int> minmax = nodenumbers.minmax();
         if (minmax[0] < 0)
         {
@@ -218,13 +232,13 @@ void field::setnodalvalues(intdensematrix nodenumbers, densematrix values)
     rawfieldptr->setnodalvalues(nodenumbers, values);
 }
 
-densematrix field::getnodalvalues(intdensematrix nodenumbers)
+densemat field::getnodalvalues(indexmat nodenumbers)
 {
     errorifpointerisnull();
     
     if (nodenumbers.count() > 0)
     {
-        int numnodes = universe::mymesh->getelements()->count(0);
+        int numnodes = universe::getrawmesh()->getelements()->count(0);
         std::vector<int> minmax = nodenumbers.minmax();
         if (minmax[0] < 0)
         {
@@ -244,49 +258,97 @@ densematrix field::getnodalvalues(intdensematrix nodenumbers)
 void field::setconstraint(int physreg, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, -1, NULL, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, -1, &meshdeform, input, extraintegrationdegree);
+}
+
+void field::setconstraint(int physreg, std::vector<expression> input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+    
+    std::vector<int> harms = rawfieldptr->getharmonics();
+    if (input.size() != harms.size())
+    {
+        std::cout << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
+        abort(); 
+    }
+
+    for (int i = 0; i < harms.size(); i++)
+    {
+        if (input[i].isharmonicone({}) == false)
+        {
+            std::cout << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
+            abort();
+        }
+    
+        rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, NULL, input[i], extraintegrationdegree);
+    }
+}
+
+void field::setconstraint(int physreg, expression meshdeform, std::vector<expression> input, int extraintegrationdegree)
+{
+    errorifpointerisnull(); 
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
+    
+    std::vector<int> harms = rawfieldptr->getharmonics();
+    if (input.size() != harms.size())
+    {
+        std::cout << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
+        abort(); 
+    }
+
+    for (int i = 0; i < harms.size(); i++)
+    {
+        if (input[i].isharmonicone({}) == false)
+        {
+            std::cout << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
+            abort();
+        }
+        
+        rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, &meshdeform, input[i], extraintegrationdegree);
+    }
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, numfftharms, NULL, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg, int numfftharms, expression meshdeform, expression input, int extraintegrationdegree)
 {
     errorifpointerisnull(); 
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg, numfftharms, &meshdeform, input, extraintegrationdegree);
 }
 
 void field::setconstraint(int physreg)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setdisjregconstraint(physreg);
 }
 
 void field::setconditionalconstraint(int physreg, expression condexpr, expression valexpr)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     rawfieldptr->setconditionalconstraint(physreg, condexpr, valexpr);
 }
 
 void field::setgauge(int physreg) 
 { 
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (rawfieldptr->gettypename() != "hcurl")
     {
@@ -300,7 +362,7 @@ void field::setgauge(int physreg)
 void field::setdata(int physreg, vectorfieldselect myvec, std::string op) 
 { 
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
     if (op != "set" && op != "add")
     {
@@ -315,6 +377,36 @@ void field::setdata(int physreg, vec myvec, std::string op)
 {  
     field thisfield = *this;
     setdata(physreg, myvec|thisfield, op);
+}
+
+void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<double> cutvalues)
+{
+    errorifpointerisnull();
+    universe::getrawmesh()->getphysicalregions()->errorundefined(cutphysregs);
+
+    if (cutphysregs.size() != cutvalues.size())
+    {
+        std::cout << "Error in 'field' object: provided " << cutvalues.size() << " values for " << cutphysregs.size() << " cohomology regions" << std::endl;
+        abort();
+    }
+    
+    if (rawfieldptr->gettypename() != "hcurl")
+    {
+        std::cout << "Error in 'field' object: cannot set a cohomology source to '" << rawfieldptr->gettypename() << "' type fields (use 'hcurl')" << std::endl;
+        abort();
+    }
+    for (int i = 0; i < cutphysregs.size(); i++)
+    {
+        int prdim = universe::getrawmesh()->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
+        if (prdim != -1 && prdim != 1) // -1 for empty is ok
+        {
+            std::cout << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
+            abort();
+        }
+    }
+
+    if (cutphysregs.size() > 0)
+        rawfieldptr->setcohomologysources(cutphysregs, cutvalues);
 }
 
 void field::automaticupdate(bool updateit)
@@ -403,7 +495,7 @@ void field::write(int physreg, expression meshdeform, std::string filename, int 
 void field::writeraw(int physreg, std::string filename, bool isbinary, std::vector<double> extradata)
 {
     errorifpointerisnull();
-    universe::mymesh->getphysicalregions()->errorundefined({physreg});
+    universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
 
     if (isbinary == true && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz" || filename.size() >= 8 && filename.substr(filename.size()-7,7) == ".slz.gz"))
     {
@@ -455,14 +547,13 @@ expression field::operator*(parameter param) { return (expression)*this * param;
 expression field::operator/(parameter param) { return (expression)*this / param; }       
  
 
-expression operator+(double val, field inputfield) { return inputfield+val; }
-expression operator-(double val, field inputfield) { return -inputfield+val; }
-expression operator*(double val, field inputfield) { return inputfield*val; }
-expression operator/(double val, field inputfield) { return ( (expression)val )/( (expression)inputfield ); }
+expression operator+(double val, field inputfield) { return (expression)val + inputfield; }
+expression operator-(double val, field inputfield) { return (expression)val - inputfield; }
+expression operator*(double val, field inputfield) { return (expression)val * inputfield; }
+expression operator/(double val, field inputfield) { return (expression)val / inputfield; }
 
-expression operator+(parameter param, field inputfield) { return inputfield+param; }
-expression operator-(parameter param, field inputfield) { return -inputfield+param; }
-expression operator*(parameter param, field inputfield) { return inputfield*param; }
-expression operator/(parameter param, field inputfield) { return ( (expression)param ) / ( (expression)inputfield ); }
-
+expression operator+(parameter param, field inputfield) { return (expression)param + inputfield; }
+expression operator-(parameter param, field inputfield) { return (expression)param - inputfield; }
+expression operator*(parameter param, field inputfield) { return (expression)param * inputfield; }
+expression operator/(parameter param, field inputfield) { return (expression)param / inputfield; }
 

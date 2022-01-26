@@ -1,14 +1,14 @@
 #include "opcustom.h"
 
 
-opcustom::opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>), std::vector<std::shared_ptr<operation>> args)
+opcustom::opcustom(int outindex, std::vector<densemat> fct(std::vector<densemat>), std::vector<std::shared_ptr<operation>> args)
 {
     myoutindex = outindex;
     myargs = args;
     myfunction = fct;
 }
 
-opcustom::opcustom(int outindex, std::vector<densematrix> fct(std::vector<densematrix>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<std::shared_ptr<operation>> args, std::vector<field> infields)
+opcustom::opcustom(int outindex, std::vector<densemat> fct(std::vector<densemat>, std::vector<field>, elementselector&, std::vector<double>&, expression*), std::vector<std::shared_ptr<operation>> args, std::vector<field> infields)
 {
     myoutindex = outindex;
     myargs = args;
@@ -16,7 +16,7 @@ opcustom::opcustom(int outindex, std::vector<densematrix> fct(std::vector<densem
     myfields = infields;
 }
         
-std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opcustom::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -28,10 +28,10 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
     int numels = elemselect.countinselection();
     int numevalpts = evaluationcoordinates.size()/3;
     
-    std::vector<densematrix> fctargs(myargs.size());
+    std::vector<densemat> fctargs(myargs.size());
     for (int i = 0; i < myargs.size(); i++)
     {
-        std::vector<std::vector<densematrix>> argmat = myargs[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
+        std::vector<std::vector<densemat>> argmat = myargs[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
         if (argmat.size() != 2 || argmat[1].size() != 1)
         {
             std::cout << "Error in 'opcustom' object: without FFT the custom operation can only be computed for constant (harmonic 1) operations" << std::endl;
@@ -40,7 +40,7 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
         fctargs[i] = argmat[1][0];
     }
     
-    std::vector<densematrix> output;
+    std::vector<densemat> output;
     if (myfunction != NULL)
     {
         bool wasreuseallowed = universe::isreuseallowed;
@@ -60,19 +60,19 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
     // Make sure the user provided function returns something valid:
     if (output.size() != myfamily.size())
     {
-        std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densematrix objects (expected " << myfamily.size() <<  ")" << std::endl;
+        std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densemat objects (expected " << myfamily.size() <<  ")" << std::endl;
         abort();
     }
     for (int i = 0; i < output.size(); i++)
     {
         if (output[i].isdefined() == false)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned an undefined densematrix object" << std::endl;
+            std::cout << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
             abort();
         }
         if (output[i].countrows() != numels || output[i].countcolumns() != numevalpts)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densematrix (expected " << numels << "x" << numevalpts << ")" << std::endl;
+            std::cout << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densemat (expected " << numels << "x" << numevalpts << ")" << std::endl;
             abort();
         }
     }
@@ -89,7 +89,7 @@ std::vector<std::vector<densematrix>> opcustom::interpolate(elementselector& ele
     return {{},{output[myoutindex]}};
 }
 
-densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opcustom::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available:
     if (universe::isreuseallowed)
@@ -101,11 +101,11 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
     int numels = elemselect.countinselection();
     int numevalpts = evaluationcoordinates.size()/3;
     
-    std::vector<densematrix> fctargs(myargs.size());
+    std::vector<densemat> fctargs(myargs.size());
     for (int i = 0; i < myargs.size(); i++)
         fctargs[i] = myargs[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
-    std::vector<densematrix> output;
+    std::vector<densemat> output;
     if (myfunction != NULL)
     {
         bool wasreuseallowed = universe::isreuseallowed;
@@ -125,19 +125,19 @@ densematrix opcustom::multiharmonicinterpolate(int numtimeevals, elementselector
     // Make sure the user provided function returns something valid:
     if (output.size() != myfamily.size())
     {
-        std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densematrix objects (expected " << myfamily.size() <<  ")" << std::endl;
+        std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densemat objects (expected " << myfamily.size() <<  ")" << std::endl;
         abort();
     }
     for (int i = 0; i < output.size(); i++)
     {
         if (output[i].isdefined() == false)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned an undefined densematrix object" << std::endl;
+            std::cout << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
             abort();
         }
         if (output[i].countrows() != numtimeevals || output[i].countcolumns() != numels*numevalpts)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densematrix (expected " << numtimeevals << "x" << numels*numevalpts << ")" << std::endl;
+            std::cout << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densemat (expected " << numtimeevals << "x" << numels*numevalpts << ")" << std::endl;
             abort();
         }
     }

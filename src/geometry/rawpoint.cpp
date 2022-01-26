@@ -16,12 +16,14 @@ rawpoint::rawpoint(int physreg, std::vector<double> coords)
     }
 }
 
-rawpoint::rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems)
+rawpoint::rawpoint(int physreg, std::vector<double>& allcoords, std::vector<std::vector<int>>& allelems, int curvatureorder)
 {
     myphysicalregion = physreg;
 
     mycoords = allcoords;
     myelems = allelems;
+    
+    mycurvatureorder = curvatureorder;
 }
 
 
@@ -45,6 +47,11 @@ std::shared_ptr<rawshape> rawpoint::duplicate(void)
 void rawpoint::setphysicalregion(int physreg)
 {
     myphysicalregion = physreg;
+}
+
+int rawpoint::getcurvatureorder(void)
+{
+    return mycurvatureorder;
 }
 
 int rawpoint::getdimension(void)

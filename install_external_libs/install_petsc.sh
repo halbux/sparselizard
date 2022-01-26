@@ -34,18 +34,8 @@ PETSC_DIR=$(pwd);
 PETSC_ARCH=arch-darwin-c-opt;
 fi
 
-# The configuration below does not add support for additional mesh formats but does not require mpi.
 # Metis is recommended but not mandatory. It can provide a major speedup for MUMPS during resolution.
-./configure --with-openmp --with-mpi=0 --with-shared-libraries=1 --with-mumps-serial=1 --download-mumps --download-openblas --download-metis --download-slepc --with-debugging=0 --with-scalar-type=real --with-x=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
-
-# The configuration below adds support for .exo and .med mesh formats (mpi is needed and it is therefore added to the configuration options).
-# Support for cgns can be added by manually installing cgns then providing the cgns folder to petsc.
-#
-# ADDITIONAL STEPS TO PERFORM FOR THIS CONFIGURATION OF PETSC:
-# --> INSTALL CMAKE, AUTOTOOLS AND AUTOCONF BEFORE RUNNING THE CONFIGURE COMMAND BELOW  (on Ubuntu type: sudo apt-get install cmake autotools-dev autoconf)
-# --> IN THE MAKEFILE REMOVE '-I ~/SLlibs/petsc/include/petsc/mpiuni' (otherwise the wrong mpi.h header is selected during make) 
-#
-#./configure --with-openmp --download-mpich --download-mumps --download-scalapack --download-openblas --download-slepc --download-med --download-hdf5 --download-zlib --download-netcdf --download-pnetcdf --download-exodusii --with-scalar-type=real --with-debugging=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
+./configure --with-openmp --with-mpi=0 --with-shared-libraries=1 --with-mumps-serial=1 --download-mumps --download-openblas --download-openblas-commit=origin/develop --download-metis --download-slepc --with-debugging=0 --with-scalar-type=real --with-x=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
 
 
 ########## COMPILE PETSC :
@@ -60,5 +50,3 @@ echo 'COMPILING PETSC';
 make $PETSC_DIR $PETSC_ARCH all;
 
 cd ..;
-
-

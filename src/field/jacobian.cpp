@@ -4,13 +4,13 @@
 jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationcoordinates, expression* meshdeform)
 {
     rawfield rf;
-    std::vector<densematrix> calced = rf.getjacterms(elemselect, evaluationcoordinates);
+    std::vector<densemat> calced = rf.getjacterms(elemselect, evaluationcoordinates);
     
     field x("x");
 
     int elementdimension = elemselect.getelementdimension();
     int numberofelements = elemselect.countinselection();
-    int problemdimension = universe::mymesh->getmeshdimension();
+    int problemdimension = universe::getrawmesh()->getmeshdimension();
     int numberofgausspoints = evaluationcoordinates.size()/3;
 
     double *jac11, *jac12, *jac13, *jac21, *jac22, *jac23, *jac31, *jac32, *jac33, *detjacval;
@@ -26,15 +26,15 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 // This case corresponds to point elements, for which the reference and physical 
                 // elements are always the same. The Jacobian determinant must be 1.
 
-                jac[3*0+0] = densematrix(numberofelements,numberofgausspoints,1);
-                jac[3*0+1] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*0+2] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*1+0] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*1+1] = densematrix(numberofelements,numberofgausspoints,1);
-                jac[3*1+2] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*2+0] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*2+1] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*2+2] = densematrix(numberofelements,numberofgausspoints,1);
+                jac[3*0+0] = densemat(numberofelements,numberofgausspoints,1);
+                jac[3*0+1] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*0+2] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*1+0] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*1+1] = densemat(numberofelements,numberofgausspoints,1);
+                jac[3*1+2] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*2+0] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*2+1] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*2+2] = densemat(numberofelements,numberofgausspoints,1);
                 break;
         }
     }
@@ -49,10 +49,10 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 // This case corresponds to point elements, for which the reference and physical 
                 // elements are always the same. The Jacobian determinant must be 1.
 
-                jac[3*0+0] = densematrix(numberofelements,numberofgausspoints,1);
-                jac[3*0+1] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*1+0] = densematrix(numberofelements,numberofgausspoints,0);
-                jac[3*1+1] = densematrix(numberofelements,numberofgausspoints,1);
+                jac[3*0+0] = densemat(numberofelements,numberofgausspoints,1);
+                jac[3*0+1] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*1+0] = densemat(numberofelements,numberofgausspoints,0);
+                jac[3*1+1] = densemat(numberofelements,numberofgausspoints,1);
                 break;
 
             case 3:
@@ -71,12 +71,12 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 jac[3*0+0] = calced[0]; 
                 jac[3*0+1] = calced[1];
                 jac[3*0+2] = calced[2];
-                jac[3*1+0] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*1+1] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*1+2] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*2+0] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*2+1] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*2+2] = densematrix(numberofelements,numberofgausspoints);
+                jac[3*1+0] = densemat(numberofelements,numberofgausspoints);
+                jac[3*1+1] = densemat(numberofelements,numberofgausspoints);
+                jac[3*1+2] = densemat(numberofelements,numberofgausspoints);
+                jac[3*2+0] = densemat(numberofelements,numberofgausspoints);
+                jac[3*2+1] = densemat(numberofelements,numberofgausspoints);
+                jac[3*2+2] = densemat(numberofelements,numberofgausspoints);
                 
                 if (meshdeform != NULL)
                 {
@@ -143,7 +143,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
 
                 // This case corresponds to point elements, for which the reference and physical 
                 // elements are always the same. The Jacobian determinant must be 1.
-                jac[3*0+0] = densematrix(numberofelements,numberofgausspoints,1);
+                jac[3*0+0] = densemat(numberofelements,numberofgausspoints,1);
                 break;
 
             case 2:
@@ -160,8 +160,8 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                     
                 jac[3*0+0] = calced[0]; 
                 jac[3*0+1] = calced[1];
-                jac[3*1+0] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*1+1] = densematrix(numberofelements,numberofgausspoints);
+                jac[3*1+0] = densemat(numberofelements,numberofgausspoints);
+                jac[3*1+1] = densemat(numberofelements,numberofgausspoints);
 
                 if (meshdeform != NULL)
                 {
@@ -205,9 +205,9 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
                 jac[3*1+0] = calced[3];
                 jac[3*1+1] = calced[4];
                 jac[3*1+2] = calced[5];
-                jac[3*2+0] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*2+1] = densematrix(numberofelements,numberofgausspoints);
-                jac[3*2+2] = densematrix(numberofelements,numberofgausspoints);
+                jac[3*2+0] = densemat(numberofelements,numberofgausspoints);
+                jac[3*2+1] = densemat(numberofelements,numberofgausspoints);
+                jac[3*2+2] = densemat(numberofelements,numberofgausspoints);
                 
                 if (meshdeform != NULL)
                 {
@@ -306,7 +306,7 @@ jacobian::jacobian(elementselector& elemselect, std::vector<double> evaluationco
     
     
     // Compute the determinant:
-    detjac = densematrix(numberofelements,numberofgausspoints);
+    detjac = densemat(numberofelements,numberofgausspoints);
 
     switch (problemdimension)
     {
@@ -371,7 +371,7 @@ jacobian jacobian::extractsubset(std::vector<int>& selectedelementindexes)
             subjac.jac[i] = jac[i].extractrows(selectedelementindexes);
     }
 
-    subjac.invjac = std::vector<densematrix>(invjac.size());
+    subjac.invjac = std::vector<densemat>(invjac.size());
     for (int i = 0; i < invjac.size(); i++)
     {
         if (invjac[i].isdefined())
@@ -381,9 +381,9 @@ jacobian jacobian::extractsubset(std::vector<int>& selectedelementindexes)
     return subjac;
 }
 
-densematrix jacobian::getdetjac(void)
+densemat jacobian::getdetjac(void)
 { 
-    densematrix detj = detjac.copy();
+    densemat detj = detjac.copy();
 
     if (universe::isaxisymmetric)
         detj.multiplyelementwise(xcoord);
@@ -391,14 +391,14 @@ densematrix jacobian::getdetjac(void)
     return detj;
 }    
 
-densematrix jacobian::getjac(int row, int column) { return jac[3*row+column]; }
+densemat jacobian::getjac(int row, int column) { return jac[3*row+column]; }
 
-densematrix jacobian::getinvjac(int row, int column)
+densemat jacobian::getinvjac(int row, int column)
 {
     // If the Jacobian inverse has not been computed yet compute it:
     if (invjac.size() == 0)
     {
-        invjac = std::vector<densematrix>(3*3);
+        invjac = std::vector<densemat>(3*3);
 
         int numberofelements = detjac.countrows();
         int numberofgausspoints = detjac.countcolumns();
@@ -406,12 +406,12 @@ densematrix jacobian::getinvjac(int row, int column)
         double* jac11, *jac12, *jac13, *jac21, *jac22, *jac23, *jac31, *jac32, *jac33, *detjacval;
         double* invjac11, *invjac12, *invjac13, *invjac21, *invjac22, *invjac23, *invjac31, *invjac32, *invjac33;
 
-        int problemdimension = universe::mymesh->getmeshdimension();
+        int problemdimension = universe::getrawmesh()->getmeshdimension();
         
         switch (problemdimension)
         {
             case 1:
-                invjac[3*0+0] = densematrix(numberofelements,numberofgausspoints);
+                invjac[3*0+0] = densemat(numberofelements,numberofgausspoints);
 
                 jac11 = jac[3*0+0].getvalues();
                 invjac11 = invjac[3*0+0].getvalues();
@@ -420,10 +420,10 @@ densematrix jacobian::getinvjac(int row, int column)
                     invjac11[i] = 1.0/jac11[i];
                 break;
             case 2:
-                invjac[3*0+0] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*0+1] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*1+0] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*1+1] = densematrix(numberofelements,numberofgausspoints);
+                invjac[3*0+0] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*0+1] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*1+0] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*1+1] = densemat(numberofelements,numberofgausspoints);
 
                 jac11 = jac[3*0+0].getvalues();
                 jac12 = jac[3*0+1].getvalues();
@@ -446,15 +446,15 @@ densematrix jacobian::getinvjac(int row, int column)
                 }
                 break;
             case 3:
-                invjac[3*0+0] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*0+1] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*0+2] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*1+0] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*1+1] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*1+2] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*2+0] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*2+1] = densematrix(numberofelements,numberofgausspoints);
-                invjac[3*2+2] = densematrix(numberofelements,numberofgausspoints);
+                invjac[3*0+0] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*0+1] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*0+2] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*1+0] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*1+1] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*1+2] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*2+0] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*2+1] = densemat(numberofelements,numberofgausspoints);
+                invjac[3*2+2] = densemat(numberofelements,numberofgausspoints);
 
                 jac11 = jac[3*0+0].getvalues();
                 jac12 = jac[3*0+1].getvalues();
@@ -502,8 +502,3 @@ densematrix jacobian::getinvjac(int row, int column)
 
     return invjac[3*row+column];
 }
-
-
-
-
-

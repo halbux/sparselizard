@@ -1,7 +1,7 @@
 #include "opproduct.h"
 
 
-std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> opproduct::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -10,13 +10,13 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
         if (precomputedindex >= 0) { return universe::getprecomputed(precomputedindex); }
     }
     
-    std::vector<std::vector<densematrix>> product = productterms[0]->interpolate(elemselect, evaluationcoordinates, meshdeform);
+    std::vector<std::vector<densemat>> product = productterms[0]->interpolate(elemselect, evaluationcoordinates, meshdeform);
     bool isonlycos0 = (product.size() == 2 && product[1].size() == 1);
     
     // Multiply 'product' by all remaining terms:
     for (int i = 1; i < productterms.size(); i++)
     {
-        std::vector<std::vector<densematrix>> currentterm = productterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);        
+        std::vector<std::vector<densemat>> currentterm = productterms[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);        
         bool iscurrenttermonlycos0 = (currentterm.size() == 2 && currentterm[1].size() == 1);
 
         // Shortcut for cos0 * cos0:
@@ -49,7 +49,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
         // General case:
         if (not(isonlycos0) && not(iscurrenttermonlycos0))
         {
-            std::vector<std::vector<densematrix>> tempproduct = {};
+            std::vector<std::vector<densemat>> tempproduct = {};
         
             // Loop on all product harmonics:
             for (int pharm = 0; pharm < product.size(); pharm++)
@@ -64,7 +64,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
                         continue;
                     
                     // Precompute the product of the current set of harmonics:
-                    densematrix curprod = product[pharm][0].copy();
+                    densemat curprod = product[pharm][0].copy();
                     curprod.multiplyelementwise(currentterm[charm][0]);
                 
                     std::vector<std::pair<int, double>> harmsofproduct = harmonic::getproduct(pharm, charm);
@@ -98,7 +98,7 @@ std::vector<std::vector<densematrix>> opproduct::interpolate(elementselector& el
     return product;
 }
 
-densematrix opproduct::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat opproduct::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -107,7 +107,7 @@ densematrix opproduct::multiharmonicinterpolate(int numtimeevals, elementselecto
         if (precomputedindex >= 0) { return universe::getprecomputedfft(precomputedindex); }
     }
     
-    densematrix output = productterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
+    densemat output = productterms[0]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
     
     for (int i = 1; i < productterms.size(); i++)
         output.multiplyelementwise(productterms[i]->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform));
@@ -124,8 +124,8 @@ std::shared_ptr<operation> opproduct::expand(void)
     // to expand the other ones for the formulations.
     for (int i = 0; i < productterms.size(); i++)
     {
-        // We only want to expand operations that include a dof() or tf().
-        if (productterms[i]->isdofincluded() || productterms[i]->istfincluded())
+        // We only want to expand operations that include a dof(), tf() or port.
+        if (productterms[i]->isdofincluded() || productterms[i]->istfincluded() || productterms[i]->isportincluded())
             productterms[i] = productterms[i]->expand();
     }
     
@@ -133,12 +133,12 @@ std::shared_ptr<operation> opproduct::expand(void)
     group();
         
     // Everything is first put in form of a sum, possibly with a single sum term.
-    // If there is no dof or tf this leads to treating a sum as a monolithic block.
+    // If there is no dof, tf or port this leads to treating a sum as a monolithic block.
     std::vector<std::shared_ptr<operation>> prodtrms(productterms.size());
     for (int i = 0; i < productterms.size(); i++)
     {
         prodtrms[i] = productterms[i];
-        if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()))
+        if (not(productterms[i]->issum()) || not(productterms[i]->isdofincluded()) && not(productterms[i]->istfincluded()) && not(productterms[i]->isportincluded()))
         {
             std::shared_ptr<opsum> op(new opsum);
             op->addterm(productterms[i]);
@@ -245,6 +245,14 @@ std::shared_ptr<operation> opproduct::copy(void)
     *op = *this;
     op->reuse = false;
     return op;
+}
+
+double opproduct::evaluate(void)
+{
+    double evaluated = 1;
+    for (int i = 0; i < productterms.size(); i++)
+        evaluated *= productterms[i]->evaluate();
+    return evaluated;
 }
 
 std::vector<double> opproduct::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)

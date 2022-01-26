@@ -76,7 +76,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         PC pc;
         KSPGetPC(ksp, &pc);
         PCSetType(pc, PCLU);
-        PCFactorSetMatSolverType(pc, MATSOLVERMUMPS);
+        PCFactorSetMatSolverType(pc, universe::solvertype);
         
         // DO THE ACTUAL RESOLUTION:
         EPSSolve( eps );
@@ -151,7 +151,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         PEPSTOARSetDetectZeros(pep,PETSC_TRUE);
         PEPSetScale(pep, PEP_SCALE_SCALAR, PETSC_DECIDE, PETSC_NULL, PETSC_NULL, PETSC_DECIDE, PETSC_DECIDE);
 
-        PCFactorSetMatSolverType(pc, MATSOLVERMUMPS);
+        PCFactorSetMatSolverType(pc, universe::solvertype);
         PEPSetFromOptions(pep);
         PEPSetUp(pep);
 

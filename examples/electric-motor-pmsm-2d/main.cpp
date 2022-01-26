@@ -98,9 +98,9 @@ double sparselizard(double alpha)
     magnetostatics += integral(windings, -array3x1(0,0,jsz) * tf(a));
 
     // Rotor-stator continuity condition (including antiperiodicity settings with factor '-1'):
-    magnetostatics += continuitycondition(gammastat, gammarot, az, az, {0,0,0}, alpha, 45.0, -1.0);
+    magnetostatics += continuitycondition(gammastat, gammarot, az, az, {0,0,0}, alpha, 45.0, -1.0, 1);
     // Rotor and stator antiperiodicity condition:
-    magnetostatics += periodicitycondition(gamma1, gamma2, az, {0,0,0}, {0,0,45.0}, -1.0);
+    magnetostatics += periodicitycondition(gamma1, gamma2, az, {0,0,0}, {0,0,45.0}, -1.0, 1);
 
 
     magnetostatics.solve();
@@ -161,6 +161,6 @@ int main(void)
     clk.print("Total run time:");
     
     // Code validation line. Can be removed:
-    std::cout << (torque < 3.58709 && torque > 3.58707);
+    std::cout << (torque < 3.59543 && torque > 3.59539);
 }
 

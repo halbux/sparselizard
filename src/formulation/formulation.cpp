@@ -1,15 +1,51 @@
 #include "formulation.h"
 
 
-formulation::formulation(void) { mydofmanager = std::shared_ptr<dofmanager>(new dofmanager); }
+formulation::formulation(void)
+{
+    if (universe::myrawmesh == NULL)
+    {
+        std::cout << "Error in 'formulation' object: cannot define a formulation before the mesh is loaded" << std::endl;
+        abort();
+    }
+    
+    mydofmanager = std::shared_ptr<dofmanager>(new dofmanager);
+}
 
-void formulation::operator+=(std::vector<integration> integrationobject)
+formulation& formulation::operator+=(expression expr)
+{
+    if (isstructurelocked)
+    {
+        std::cout << "Error in 'formulation' object: cannot add port relations after a generation step" << std::endl;
+        abort();
+    }
+    if (mycontributions[0].size() != 0 || mycontributions[1].size() != 0 || mycontributions[2].size() != 0 || mycontributions[3].size() != 0)
+    {
+        std::cout << "Error in 'formulation' object: port relations must be added before integral terms" << std::endl;
+        abort();
+    }
+
+    // Add the port relation:
+    std::shared_ptr<portrelation> pr(new portrelation(expr));
+    myportrelations.push_back(pr);
+
+    // Add all ports to the dofmanager:
+    std::vector<std::shared_ptr<rawport>> rps = pr->getrawports();
+    for (int p = 0; p < rps.size(); p++)
+        mydofmanager->addtostructure(rps[p]);
+        
+    return *this;
+}
+
+formulation& formulation::operator+=(std::vector<integration> integrationobject)
 {
     for (int i = 0; i < integrationobject.size(); i++)
         *this += integrationobject[i];
+        
+    return *this;
 }
 
-void formulation::operator+=(integration integrationobject)
+formulation& formulation::operator+=(integration integrationobject)
 {
     if (isstructurelocked)
     {
@@ -18,10 +54,10 @@ void formulation::operator+=(integration integrationobject)
     }
 
     int integrationphysreg = integrationobject.getphysicalregion();
-    int elementdimension = universe::mymesh->getphysicalregions()->get(integrationphysreg)->getelementdimension();
+    int elementdimension = universe::getrawmesh()->getphysicalregions()->get(integrationphysreg)->getelementdimension();
     // Return on empty integration region:
     if (elementdimension < 0)
-        return;
+        return *this;
     
     int integrationorderdelta = integrationobject.getintegrationorderdelta();
     expression myexpression = integrationobject.getexpression();
@@ -30,7 +66,7 @@ void formulation::operator+=(integration integrationobject)
     
     // The element dimension is required to decompose space derivatives 
     // into the ki, eta and phi derivatives in the reference element.
-    std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = myexpression.extractdoftfpolynomial(elementdimension);
+    std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > coeffdoftf = myexpression.extractdoftf(elementdimension);
 
     std::vector<std::vector<std::shared_ptr<operation>>> coeffs = coeffdoftf[0]; 
     std::vector<std::vector<std::shared_ptr<operation>>> dofs = coeffdoftf[1];
@@ -108,6 +144,8 @@ void formulation::operator+=(integration integrationobject)
             mycontributions[contribindex].resize(blocknumber+1);
         mycontributions[contribindex][blocknumber].push_back(mycontribution);
     }
+    
+    return *this;
 }
 
 int formulation::countdofs(void)
@@ -228,11 +266,96 @@ void formulation::generate(int contributionnumber)
             generate(i, contributionnumber);
 }
 
+densemat formulation::getportrelationrhs(void)
+{
+    int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
 
-vec formulation::b(bool keepvector, bool dirichletupdate) { return rhs(keepvector, dirichletupdate); }
+    densemat rhsvals(expectednumrelations, 1, 0.0);
+    double* vptr = rhsvals.getvalues();
+
+    int actualnumrelations = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+    {
+        if (myportrelations[i]->hasnoportterm())
+            vptr[actualnumrelations] = -myportrelations[i]->evalnoportterm();
+        
+        actualnumrelations += myportrelations[i]->count();
+    }
+
+    if (expectednumrelations != actualnumrelations)
+    {
+        std::cout << "Error in 'formulation' object: expected " << expectednumrelations << " port relations to match the number of unknown ports provided but found " << actualnumrelations << std::endl;
+        abort();
+    }
+
+    return rhsvals;
+}
+
+std::tuple<indexmat, indexmat, densemat> formulation::getportrelations(int KCM)
+{
+    int expectednumrelations = mydofmanager->countports() - mydofmanager->countassociatedprimalports();
+    
+    std::vector< std::vector<int> > rinds(myportrelations.size());
+    std::vector< std::vector<int> > cinds(myportrelations.size());
+    std::vector< std::vector<double> > vals(myportrelations.size());
+
+    int portnnz = 0;
+    
+    int actualnumrelations = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+    {
+        std::vector<std::shared_ptr<rawport>> rps;
+        myportrelations[i]->evalrelations(KCM, rps, rinds[i], vals[i]);
+    
+        int len = rps.size();
+        cinds[i].resize(len);
+    
+        for (int j = 0; j < len; j++)
+        {
+            rinds[i][j] += actualnumrelations;
+            cinds[i][j] = mydofmanager->getaddress(rps[j].get());
+        }
+    
+        portnnz += len;
+        actualnumrelations += myportrelations[i]->count();
+    }
+    
+    if (expectednumrelations != actualnumrelations)
+    {
+        std::cout << "Error in 'formulation' object: expected " << expectednumrelations << " port relations to match the number of unknown ports provided but found " << actualnumrelations << std::endl;
+        abort();
+    }
+    
+    // Concatenate all:
+    indexmat allrinds(portnnz, 1);
+    indexmat allcinds(portnnz, 1);
+    densemat allvals(portnnz, 1);
+    
+    int* arptr = allrinds.getvalues();
+    int* acptr = allcinds.getvalues();
+    double* avptr = allvals.getvalues();
+    
+    int index = 0;
+    for (int i = 0; i < myportrelations.size(); i++)
+    {
+        for (int j = 0; j < rinds[i].size(); j++)
+        {
+            arptr[index] = rinds[i][j];
+            acptr[index] = cinds[i][j];
+            avptr[index] = vals[i][j];
+        
+            index++;
+        }
+    }
+    
+    return std::make_tuple(allrinds, allcinds, allvals);
+}
+
+
+vec formulation::b(bool keepvector, bool dirichletandportupdate) { return rhs(keepvector, dirichletandportupdate); }
 mat formulation::A(bool keepfragments) { return K(keepfragments); }
 
-vec formulation::rhs(bool keepvector, bool dirichletupdate)
+vec formulation::rhs(bool keepvector, bool dirichletandportupdate)
 {
     if (myvec == NULL)
         myvec = std::shared_ptr<rawvec>(new rawvec(mydofmanager));
@@ -246,8 +369,14 @@ vec formulation::rhs(bool keepvector, bool dirichletupdate)
     else
         output = vec(myvec).copy();
     
-    if (dirichletupdate == true && isconstraintcomputation == false)
+    if (dirichletandportupdate == true && isconstraintcomputation == false)
         output.updateconstraints(); 
+        
+    if (dirichletandportupdate == true)
+    {
+        densemat portrhsvals = getportrelationrhs();
+        output.setvalues(indexmat(portrhsvals.count(), 1, 0, 1), portrhsvals);
+    }
     
     return output; 
 }
@@ -256,7 +385,7 @@ mat formulation::K(bool keepfragments) { return getmatrix(0, keepfragments); }
 mat formulation::C(bool keepfragments) { return getmatrix(1, keepfragments); }
 mat formulation::M(bool keepfragments) { return getmatrix(2, keepfragments); }
 
-mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematrix> additionalconstraints)
+mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<indexmat> additionalconstraints)
 {
     if (mymat[KCM] == NULL)
         mymat[KCM] = std::shared_ptr<rawmat>(new rawmat(mydofmanager));
@@ -279,6 +408,14 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<intdensematr
             isconstr[acptr[j]] = true;
     }
 
+    if (KCM == 0)
+    {
+        std::pair<indexmat, indexmat> assocports = mydofmanager->findassociatedports();
+        rawout->accumulate(assocports.first, assocports.second, densemat(assocports.first.count(), 1, 1.0));
+    }
+    std::tuple<indexmat, indexmat, densemat> portterms = getportrelations(KCM);
+    rawout->accumulate(std::get<0>(portterms), std::get<1>(portterms), std::get<2>(portterms));
+    
     rawout->process(isconstr); 
     rawout->clearfragments();
     
@@ -309,7 +446,171 @@ void formulation::solve(std::string soltype, bool diagscaling, std::vector<int> 
     sl::setdata(sol);
 }
 
-densematrix Fgmultrobin(densematrix gprev)
+densemat Fgmultdirichlet(densemat gprev)
+{
+    mat A = universe::ddmmats[0];
+    formulation formul = universe::ddmformuls[0];
+    
+    vec rhs(formul);
+
+    double* gprevptr = gprev.getvalues();
+
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+
+    // Compute Ag:
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = universe::ddmrecvinds[n].count();
+        densemat Bm = gprev.extractrows(pos, pos+len-1);
+        rhs.setvalues(universe::ddmrecvinds[n], Bm);
+        pos += len;
+    }
+        
+    vec sol = sl::solve(A, rhs);
+
+    // Create the artificial sources solution on the inner interface:
+    std::vector<densemat> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        Agmatssend[n] = sol.getvalues(universe::ddmsendinds[n]);
+        Agmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
+    
+    densemat Ag(Agmatsrecv);
+    
+    // Calculate (I - A)*g:
+    double* Agptr = Ag.getvalues();
+    densemat Fg(Ag.count(), 1);
+    double* Fgptr = Fg.getvalues();
+    
+    for (int i = 0; i < Ag.count(); i++)
+        Fgptr[i] = gprevptr[i] - Agptr[i];
+
+    return Fg;
+}
+
+std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::string soltype, int verbosity)
+{
+    // Make sure the problem is of the form Ax = b:
+    if (isdampingmatrixdefined() || ismassmatrixdefined())
+    {
+        std::cout << "Error in 'formulation' object: cannot solve with a damping/mass matrix (use a time resolution algorithm)" << std::endl;
+        abort();  
+    }
+    
+    wallclock clktot;
+
+    int rank = slmpi::getrank();
+    int numranks = slmpi::count();
+    
+    if (numranks == 1)
+    {
+        solve(soltype, false);
+        return {};
+    }
+    
+    if (universe::getrawmesh()->getdtracker()->isoverlap() == false)
+    {
+        std::cout << "Error in 'formulation' object: cannot solve using Dirichlet interface conditions for no-overlap DDM (does not converge)" << std::endl;
+        abort();  
+    }
+    
+    universe::ddmformuls = {*this};
+
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
+    int numneighbours = dt->countneighbours();
+
+    // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
+    sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
+    
+    std::vector<indexmat> interfaceinds = universe::ddmrecvinds;
+    
+    // Get all Dirichlet constraints set on the neighbours but not on this rank:
+    std::vector<std::vector<indexmat>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
+
+    // Unconstrained send and receive indexes:
+    universe::ddmsendinds = dcdata[2];
+    universe::ddmrecvinds = dcdata[3];
+    
+    // Get A and allow to reuse its factorization:
+    generate();
+    mat A = getmatrix(0, false, interfaceinds);
+    A.reusefactorization();
+    universe::ddmmats = {A};
+    
+    // Get the rhs of the physical sources contribution:
+    vec bphysical = b();
+    for (int n = 0; n < numneighbours; n++)
+        bphysical.setvalues(dcdata[3][n], densemat(dcdata[3][n].count(), 1, 0.0));
+    
+    // Set the value from the neighbour Dirichlet conditions:
+    std::vector<densemat> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
+        dirichletvalsfromneighbours[n] = densemat(dcdata[1][n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
+    for (int n = 0; n < numneighbours; n++)
+        bphysical.setvalues(dcdata[1][n], dirichletvalsfromneighbours[n]);
+
+    // Get the physical sources solution:
+    vec w = sl::solve(A, bphysical, soltype);
+    
+    // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
+    std::vector<densemat> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
+    for (int n = 0; n < numneighbours; n++)
+    {
+        Bmatssend[n] = w.getvalues(universe::ddmsendinds[n]);
+        Bmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
+    }
+    sl::exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
+    
+    densemat B(Bmatsrecv);
+    
+    // Initial value of the artificial sources solution:
+    densemat vi(B.countrows(), B.countcolumns(), 0.0);
+    
+    // Gmres iteration:
+    std::vector<double> resvec = sl::gmres(Fgmultdirichlet, B, vi, relrestol, maxnumit, verbosity*(rank == 0));
+    int numits = resvec.size()-1;
+    if (verbosity > 0 && rank == 0)
+    {
+        if (numits < maxnumit)
+            std::cout << "gmres converged after " << numits << " iterations" << std::endl;
+        else
+            std::cout << "gmres could not converge to the requested " << relrestol << " relative tolerance (could only reach " << resvec[numits] << ")" << std::endl;
+    }
+
+    // Compute the total solution (physical + artificial):
+    int pos = 0;
+    for (int n = 0; n < numneighbours; n++)
+    {
+        int len = Bmatsrecv[n].count();
+        densemat Bm = vi.extractrows(pos, pos+len-1);
+        bphysical.setvalues(universe::ddmrecvinds[n], Bm);
+        pos += len;
+    }
+
+    vec totalsol = sl::solve(A, bphysical);
+    sl::setdata(totalsol);
+    
+    if (verbosity > 0)
+    {
+        long long int allndfs = allcountdofs();
+        if (rank == 0)
+            clktot.print("DDM solve for "+std::to_string(allndfs)+" dofs took");
+    }
+    
+    universe::clearddmcontainers();
+    
+    return resvec;
+}
+
+densemat Fgmultrobin(densemat gprev)
 {
     mat A = universe::ddmmats[0];
     formulation formul = universe::ddmformuls[0];
@@ -319,7 +620,7 @@ densematrix Fgmultrobin(densematrix gprev)
 
     double* gprevptr = gprev.getvalues();
 
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
 
     // Compute Ag:
@@ -327,7 +628,7 @@ densematrix Fgmultrobin(densematrix gprev)
     for (int n = 0; n < numneighbours; n++)
     {
         int len = universe::ddmrecvinds[n].count();
-        densematrix Bm = gprev.extractrows(pos, pos+len-1);
+        densemat Bm = gprev.extractrows(pos, pos+len-1);
         rhs.setvalues(universe::ddmrecvinds[n], Bm, "add");
         pos += len;
     }
@@ -336,22 +637,22 @@ densematrix Fgmultrobin(densematrix gprev)
     sl::setdata(sol);
 
     // Create the artificial sources solution on the inner interface:
-    std::vector<densematrix> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
+    std::vector<densemat> Agmatssend(numneighbours), Agmatsrecv(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         formul.generatein(0, artificialterms[n]);
         vec gartificial = formul.b(false, false);
     
         Agmatssend[n] = gartificial.getvalues(universe::ddmsendinds[n]);
-        Agmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+        Agmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), Agmatssend, Agmatsrecv);
     
-    densematrix Ag(Agmatsrecv);
+    densemat Ag(Agmatsrecv);
     
-    // Calculate I - A*g:
+    // Calculate (I - A)*g:
     double* Agptr = Ag.getvalues();
-    densematrix Fg(Ag.count(), 1);
+    densemat Fg(Ag.count(), 1);
     double* Fgptr = Fg.getvalues();
     
     for (int i = 0; i < Ag.count(); i++)
@@ -383,15 +684,14 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     universe::ddmints = artificialterms;
     universe::ddmformuls = {*this};
 
-    std::shared_ptr<dtracker> dt = universe::mymesh->getdtracker();
+    std::shared_ptr<dtracker> dt = universe::getrawmesh()->getdtracker();
     int numneighbours = dt->countneighbours();
 
     // Get the rows from which to take the dofs to send as well as the rows at which to place the received dofs:
-    std::vector<std::shared_ptr<rawfield>> rfs = mydofmanager->getfields();
     sl::mapdofs(mydofmanager, mydofmanager->getfields(), {true, true, true}, universe::ddmsendinds, universe::ddmrecvinds);
     
     // Get all Dirichlet constraints set on the neighbours but not on this rank:
-    std::vector<std::vector<intdensematrix>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
+    std::vector<std::vector<indexmat>> dcdata = mydofmanager->discovernewconstraints(dt->getneighbours(), universe::ddmsendinds, universe::ddmrecvinds);
 
     // Unconstrained send and receive indexes:
     universe::ddmsendinds = dcdata[2];
@@ -401,7 +701,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     generate(formulterms);
     for (int n = 0; n < numneighbours; n++)
         generatein(1, physicalterms[n]); // S term in A
-    mat A = getmatrix(0, false, {intdensematrix(dcdata[1])});
+    mat A = getmatrix(0, false, {indexmat(dcdata[1])});
     A.reusefactorization();
     universe::ddmmats = {A};
     
@@ -409,11 +709,11 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     vec bphysical = b();
     
     // Set the value from the neighbour Dirichlet conditions:
-    std::vector<densematrix> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
+    std::vector<densemat> dirichletvalsforneighbours(numneighbours), dirichletvalsfromneighbours(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         dirichletvalsforneighbours[n] = bphysical.getvalues(dcdata[0][n]);
-        dirichletvalsfromneighbours[n] = densematrix(dcdata[1][n].count(), 1);
+        dirichletvalsfromneighbours[n] = densemat(dcdata[1][n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), dirichletvalsforneighbours, dirichletvalsfromneighbours);
     for (int n = 0; n < numneighbours; n++)
@@ -424,21 +724,21 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     sl::setdata(w);
     
     // Create the gmres rhs 'B' from the physical sources solution on the inner interface:
-    std::vector<densematrix> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
+    std::vector<densemat> Bmatssend(numneighbours), Bmatsrecv(numneighbours);
     for (int n = 0; n < numneighbours; n++)
     {
         generatein(0, physicalterms[n]);
         vec gphysical = b(false, false);
     
         Bmatssend[n] = gphysical.getvalues(universe::ddmsendinds[n]);
-        Bmatsrecv[n] = densematrix(universe::ddmrecvinds[n].count(), 1);
+        Bmatsrecv[n] = densemat(universe::ddmrecvinds[n].count(), 1);
     }
     sl::exchange(dt->getneighbours(), Bmatssend, Bmatsrecv);
     
-    densematrix B(Bmatsrecv);
+    densemat B(Bmatsrecv);
     
     // Initial value of the artificial sources solution:
-    densematrix vi(B.countrows(), B.countcolumns(), 0.0);
+    densemat vi(B.countrows(), B.countcolumns(), 0.0);
     
     // Gmres iteration:
     std::vector<double> resvec = sl::gmres(Fgmultrobin, B, vi, relrestol, maxnumit, verbosity*(rank == 0));
@@ -456,7 +756,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     for (int n = 0; n < numneighbours; n++)
     {
         int len = Bmatsrecv[n].count();
-        densematrix Bm = vi.extractrows(pos, pos+len-1);
+        densemat Bm = vi.extractrows(pos, pos+len-1);
         bphysical.setvalues(universe::ddmrecvinds[n], Bm, "add");
         pos += len;
     }

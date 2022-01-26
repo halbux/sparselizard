@@ -1,14 +1,15 @@
 #include "rawmat.h"
+#include <thread>
 
 
 rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr)
 {
     mydofmanager = dofmngr;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
 
-rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensematrix inAinds, intdensematrix inDinds)
+rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, indexmat inAinds, indexmat inDinds)
 {
     mydofmanager = dofmngr;
     
@@ -17,7 +18,7 @@ rawmat::rawmat(std::shared_ptr<dofmanager> dofmngr, Mat inA, Mat inD, intdensema
     Ainds = inAinds;
     Dinds = inDinds;
     
-    mymeshnumber = universe::mymesh->getmeshnumber();
+    mymeshnumber = universe::getrawmesh()->getmeshnumber();
 }
         
 rawmat::~rawmat(void) 
@@ -53,11 +54,14 @@ long long int rawmat::countcolumns(void)
         return mydofmanager->countdofs();
 }
 
-void rawmat::accumulate(intdensematrix rowadresses, intdensematrix coladresses, densematrix vals)
+void rawmat::accumulate(indexmat rowadresses, indexmat coladresses, densemat vals)
 {
-    accumulatedrowindices.push_back(rowadresses);
-    accumulatedcolindices.push_back(coladresses);
-    accumulatedvals.push_back(vals);
+    if (vals.count() > 0)
+    {
+        accumulatedrowindices.push_back(rowadresses);
+        accumulatedcolindices.push_back(coladresses);
+        accumulatedvals.push_back(vals);
+    }
 }
 
 void processrows(int firstrow, int lastrow, int* maxnnzinrows, long long int* adsofrows, std::pair<int, double>* valsptr, std::vector<bool>* isconstrained, int* nnzApart, int* nnzDpart)
@@ -126,7 +130,7 @@ void rawmat::process(std::vector<bool>& isconstrained)
     
     // Create Ainds and Dinds:
     std::vector<int> renumtolocalindex;
-    myalgorithm::findtruefalse(isconstrained, Dinds, Ainds, renumtolocalindex);
+    gentools::findtruefalse(isconstrained, Dinds, Ainds, renumtolocalindex);
     
     // Get an upper bound on the number of nonzeros in each row:
     long long int maxnnz = 0;
@@ -231,20 +235,20 @@ void rawmat::process(std::vector<bool>& isconstrained)
     else
         processrows(0, ndofs-1, maxnnzinrows.data(), adsofrows.data(), valsptr, &isconstrained, &nnzAparts[0], &nnzDparts[0]);
 
-    nnzA = myalgorithm::sum(nnzAparts);
-    nnzD = myalgorithm::sum(nnzDparts);
+    nnzA = gentools::sum(nnzAparts);
+    nnzD = gentools::sum(nnzDparts);
 
     // Create A and D:
-    Arows = intdensematrix(Ainds.count()+1,1);
-    Acols = intdensematrix(nnzA, 1);
-    Avals = densematrix(nnzA, 1);
+    Arows = indexmat(Ainds.count()+1,1);
+    Acols = indexmat(nnzA, 1);
+    Avals = densemat(nnzA, 1);
     int* Arowsptr = Arows.getvalues();
     int* Acolsptr = Acols.getvalues();
     double* Avalsptr = Avals.getvalues();
     
-    Drows = intdensematrix(Ainds.count()+1,1);
-    Dcols = intdensematrix(nnzD, 1);
-    Dvals = densematrix(nnzD, 1);
+    Drows = indexmat(Ainds.count()+1,1);
+    Dcols = indexmat(nnzD, 1);
+    Dvals = densemat(nnzD, 1);
     int* Drowsptr = Drows.getvalues();
     int* Dcolsptr = Dcols.getvalues();
     double* Dvalsptr = Dvals.getvalues();
@@ -294,13 +298,6 @@ void rawmat::process(std::vector<bool>& isconstrained)
     MatAssemblyEnd(Dmat, MAT_FINAL_ASSEMBLY);
 }
 
-void rawmat::removelastfragment(void)
-{
-    accumulatedrowindices.pop_back();
-    accumulatedcolindices.pop_back();
-    accumulatedvals.pop_back();
-}
-
 void rawmat::clearfragments(void)
 {
     accumulatedrowindices = {};
@@ -339,12 +336,12 @@ std::shared_ptr<rawmat> rawmat::extractaccumulated(void)
     return output;
 }
 
-intdensematrix rawmat::getainds(void)
+indexmat rawmat::getainds(void)
 {
     return Ainds;
 }
 
-intdensematrix rawmat::getdinds(void)
+indexmat rawmat::getdinds(void)
 {
     return Dinds;
 }

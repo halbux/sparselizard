@@ -11,8 +11,8 @@
 #include <iostream>
 #include <string>
 #include "dofmanager.h"
-#include "intdensematrix.h"
-#include "densematrix.h"
+#include "indexmat.h"
+#include "densemat.h"
 #include "vectorfieldselect.h"
 #include "rawfield.h"
 #include "memory.h"
@@ -65,16 +65,19 @@ class rawvec : public std::enable_shared_from_this<rawvec>
         void updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs);
         
         // Negative addresses are ignored. 'op' can be 'add' or 'set'. 
-        void setvalues(intdensematrix addresses, densematrix valsmat, std::string op = "set");
+        void setvalues(indexmat addresses, densemat valsmat, std::string op = "set");
         // Set value at a single index:
         void setvalue(int address, double value, std::string op = "set");
         
-        densematrix getvalues(intdensematrix addresses);
+        densemat getvalues(indexmat addresses);
         // Get value at a single index:
         double getvalue(int address);
         
-        void setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densematrix vals, std::string op);
-        densematrix getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
+        void setvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex, densemat vals, std::string op);
+        densemat getvalues(std::shared_ptr<rawfield> selectedfield, int disjointregionnumber, int formfunctionindex);
+        
+        void setvaluestoports(void);
+        void setvaluesfromports(void);
         
         // Write and load raw vec data:
         void write(std::string filename);

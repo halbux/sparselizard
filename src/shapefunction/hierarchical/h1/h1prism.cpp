@@ -150,7 +150,7 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                 if (prism.ishorizontaledge(edge))
                     formfunc = Ls[i+2]*mu[e1];
                 else
-                    formfunc = L[i+2]*(lambda[e1]+lambda[e2])*0.5; // A factor 0.5 was missing (lambda[e1] = lambda[e2] for horizontal edges)
+                    formfunc = L[i+2]*lambda[e1];
                 
                 if (targetdim == -1)
                     val.set(i+2,1,edge,orientation,0,0,formfunc);
@@ -250,7 +250,12 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
                             if (i != order-2 && j != order-2)
                                 continue;
 
-                            polynomial formfunc = Ls[i+2]*L[j+2];
+                            polynomial formfunc;
+                            if (f2 == f2star)
+                                formfunc = Ls[i+2]*L[j+2];
+                            else
+                                formfunc = L[i+2]*Ls[j+2];
+
                             if (targetdim == -1)
                                 val.set(order,2,face,orientation,ffindex,0,formfunc);
                             else
