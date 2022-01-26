@@ -2,8 +2,8 @@ Source: sparselizard
 Section: libs
 Priority: optional
 Maintainer: Jean-Samuel Reynaud <js.reynaud@gmail.com>
-Build-Depends: debhelper (>= 10.0.0), cmake, libopenmpi-dev, libblas-dev, libmetis-dev,libpetsc-real-dev,
- libslepc-real3.12-dev, libmumps-dev
+Build-Depends: debhelper (>= 10.0.0), cmake, libopenmpi-dev, libblas-dev, libmetis-dev,libpetsc-real-dev| libpetsc3.7.7-dev,
+ libslepc-real3.12-dev | libslepc-real3.10-dev |libslepc3.7.4-dev, libmumps-dev
 Standards-Version: 3.6.1.1
 
 
