@@ -18,7 +18,7 @@ Sparselizard is packaged in a PPA.
 ```bash
 sudo add-apt-repository ppa:js-reynaud/sparselizard-v0
 sudo apt-get update
-sudo apt-get install sparslizard
+sudo apt-get install sparselizard
 ```
 
 ### Build instructions
