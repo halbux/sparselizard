@@ -42,6 +42,12 @@ namespace slmpi
     void max(std::vector<int>& data);
     void max(std::vector<double>& data);
     
+    // Take the min of the values from all ranks and distribute the result back to all ranks:
+    void min(int len, int* data);
+    void min(int len, double* data);
+    void min(std::vector<int>& data);
+    void min(std::vector<double>& data);
+    
     // Broadcast from the broadcaster rank and receive in 'data' on all ranks.
     // Data vector must be preallocated to the correct size:
     void broadcast(int broadcaster, std::vector<int>& data);

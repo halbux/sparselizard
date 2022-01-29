@@ -29,6 +29,10 @@ void slmpi::max(int len, int* data) {}
 void slmpi::max(int len, double* data) {}
 void slmpi::max(std::vector<int>& data) {}
 void slmpi::max(std::vector<double>& data) {}
+void slmpi::min(int len, int* data) {}
+void slmpi::min(int len, double* data) {}
+void slmpi::min(std::vector<int>& data) {}
+void slmpi::min(std::vector<double>& data) {}
 void slmpi::broadcast(int broadcaster, std::vector<int>& data) { errornompi(); }
 void slmpi::broadcast(int broadcaster, std::vector<double>& data) { errornompi(); }
 void slmpi::gather(int gatherer, std::vector<int>& fragment, std::vector<int>& gathered) { errornompi(); }
@@ -155,6 +159,27 @@ void slmpi::max(std::vector<int>& data)
 void slmpi::max(std::vector<double>& data)
 {
     MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+}
+
+
+void slmpi::min(int len, int* data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data, len, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+}
+
+void slmpi::min(int len, double* data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data, len, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+}
+
+void slmpi::min(std::vector<int>& data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+}
+
+void slmpi::min(std::vector<double>& data)
+{
+    MPI_Allreduce(MPI_IN_PLACE, data.data(), data.size(), MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 }
 
 
