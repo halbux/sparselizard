@@ -37,7 +37,11 @@ petscmesh::petscmesh(std::string filename)
     
     if (isvalidext)
     {
+#if PETSC_VERSION_GE(3, 16, 3)
         DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), gentools::getfilename(filename).c_str(), PETSC_TRUE, &mypetscmesh);
+#else
+        DMPlexCreateFromFile(PETSC_COMM_SELF, filename.c_str(), PETSC_TRUE, &mypetscmesh);
+#endif
         DMGetDimension(mypetscmesh, &meshdim);
         return;
     }
