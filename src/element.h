@@ -275,6 +275,8 @@
 // in the name, everything refers to the straight 
 // version of the actual curved element 
 
+namespace sl {
+
 class element
 {
 
@@ -419,4 +421,7 @@ class element
         
 };
 
+}
+
+using namespace sl;
 #endif

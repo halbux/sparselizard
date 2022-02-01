@@ -3,6 +3,8 @@
 #include "lagrangeformfunction.h"
 
 
+namespace sl {
+
 element::element(std::string elementname)
 {
     curvedtypenumber = -1;
@@ -2016,5 +2018,7 @@ void element::write(std::string filename, std::vector<double> coords)
     datatowrite.adddata(gettypenumber(), {vals});
     
     iointerface::writetofile(filename, datatowrite);
+}
+
 }
 
