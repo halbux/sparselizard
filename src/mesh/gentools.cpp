@@ -2191,3 +2191,44 @@ std::vector<int> gentools::appendneighbourvalues(std::vector<double>& toappendto
     return grouped;
 }
 
+std::vector<int> gentools::getactiveelements(std::vector<int> disjregs, std::vector<bool>& isnodeactive)
+{
+    elements* els = universe::getrawmesh()->getelements();
+    disjointregions* drs = universe::getrawmesh()->getdisjointregions();
+    
+    std::vector<int> nns = {1,2,3,4,4,8,6,5};
+
+    int cnt = 0;
+    for (int i = 0; i < disjregs.size(); i++)
+        cnt += drs->countelements(disjregs[i]);
+    
+    std::vector<int> elemnums(cnt);
+    
+    int index = 0;
+    for (int i = 0; i < disjregs.size(); i++)
+    {
+        int tn = drs->getelementtypenumber(disjregs[i]);
+        int ne = drs->countelements(disjregs[i]);
+        int rb = drs->getrangebegin(disjregs[i]);
+        
+        for (int j = 0; j < ne; j++)
+        {
+            for (int n = 0; n < nns[tn]; n++)
+            {
+                int nd = els->getsubelement(0, tn, rb+j, n);
+                if (isnodeactive[nd])
+                {
+                    elemnums[index] = rb+j;
+                    index++;
+                    
+                    break;
+                }
+            }
+        }
+    }
+    
+    elemnums.resize(index);
+    
+    return elemnums;
+}
+

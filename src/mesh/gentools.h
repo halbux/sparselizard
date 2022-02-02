@@ -270,6 +270,9 @@ namespace gentools
     
     // Append the values of this rank and all neighbour ranks (in case of DDM). Also get the value 'togroup' on each neighbour rank.
     std::vector<int> appendneighbourvalues(std::vector<double>& toappendto, std::vector<double>& toappend, int togroup);
+    
+    // From the provided disjoint regions (with same element type) return the elements with at least one active corner node:
+    std::vector<int> getactiveelements(std::vector<int> disjregs, std::vector<bool>& isnodeactive);
 };
 
 #endif
