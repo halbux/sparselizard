@@ -177,11 +177,11 @@ int element::countcurvednodes(void)
         // Triangle:
         case 2:
             // (#on quad + #on diagonal) / 2:
-            curvednumberofnodes = ( pow(order+1,2) + (order+1) )/2;
+            curvednumberofnodes = ( std::pow(order+1,2) + (order+1) )/2;
             break;
         // Quadrangle:
         case 3:
-            curvednumberofnodes = pow(order + 1,2);
+            curvednumberofnodes = std::pow(order + 1,2);
             break;
         // Tetrahedron:
         case 4:
@@ -189,18 +189,18 @@ int element::countcurvednodes(void)
             break;
         // Hexahedron:
         case 5:
-            curvednumberofnodes = pow(order + 1,3);
+            curvednumberofnodes = std::pow(order + 1,3);
             break;
         // Prism:
         case 6:
-            curvednumberofnodes = ( (order + 1)*( pow(order+1,2) + (order+1) ) )/2;
+            curvednumberofnodes = ( (order + 1)*( std::pow(order+1,2) + (order+1) ) )/2;
             break;
         // Pyramid:
         case 7:
             // sum of all parallel quadrangles:
             curvednumberofnodes = 0;
             for (int i = 0; i < order + 1; i++)
-                curvednumberofnodes = curvednumberofnodes + pow(i + 1,2);
+                curvednumberofnodes = curvednumberofnodes + std::pow(i + 1,2);
             break;
     }
 
