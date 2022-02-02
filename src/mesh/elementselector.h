@@ -17,11 +17,9 @@
 class elementselector
 {
     private:
-        
-        elementselector(void) {};
     
         // The disjoint regions from which the elements originate.
-        std::vector<int> mydisjointregionnumbers;
+        std::vector<int> mydisjointregionnumbers = {};
     
         // The current selected total orientation:
         int currenttotalorientation;
@@ -38,13 +36,13 @@ class elementselector
         // their disjoint regions in the 'mydisjointregionnumbers' order.
         
         // All element numbers:
-        std::vector<int> elems;
+        std::vector<int> elems = {};
         // Their total orientation:
-        std::vector<int> totalorientations;
+        std::vector<int> totalorientations = {};
         // Their disjoint region:
-        std::vector<int> disjointregions;
+        std::vector<int> disjointregions = {};
         // Their original indexes:
-        std::vector<int> originalindexes;
+        std::vector<int> originalindexes = {};
         
         
         // Prepare the containers:
@@ -52,6 +50,8 @@ class elementselector
         
     public:
     
+        elementselector(void) {};
+        
         // All disjoint region numbers must correspond to a same element type.
         elementselector(std::vector<int> disjointregionnumbers, bool isorientationdependent = true);
         // Select a set of elements of same type:
