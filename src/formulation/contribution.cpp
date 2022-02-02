@@ -36,6 +36,11 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
     if (mymeshdeformation.size() == 1)
         meshdeformationptr = &(mymeshdeformation[0]);
         
+    // Check which node is in the tf physical region:
+    std::vector<bool> isnodeintfphysreg;
+    if (tfphysreg != integrationphysreg)
+        universe::getrawmesh()->getelements()->istypeinelementlists(0, {universe::getrawmesh()->getphysicalregions()->get(tfphysreg)->getelementlist(false)}, isnodeintfphysreg, false);
+        
     // The integration will be performed on the following disjoint regions:
     std::vector<int> selectedelemdisjregs = ((universe::getrawmesh()->getphysicalregions())->get(integrationphysreg))->getdisjointregions();
   
@@ -109,7 +114,18 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
         }
         
         // Loop on all total orientations (if required):
-        elementselector myselector(mydisjregs, isorientationdependent);
+        elementselector myselector;
+        if (tfphysreg == integrationphysreg)
+            myselector = elementselector(mydisjregs, isorientationdependent);
+        else
+        {
+            std::vector<int> activeelems = gentools::getactiveelements(mydisjregs, isnodeintfphysreg);
+            if (activeelems.size() > 0)
+                myselector = elementselector(mydisjregs, activeelems, isorientationdependent);
+        }
+        if (myselector.count() == 0)
+            continue;
+        
         dofinterpolate mydofinterp;
         if (isdofinterpolate)
             mydofinterp = dofinterpolate(evaluationpoints, myselector, mydofs, mydofmanager);
