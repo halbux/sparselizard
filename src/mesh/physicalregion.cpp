@@ -145,7 +145,7 @@ void physicalregion::removeduplicatedelements(void)
     }
 }
 
-std::vector<std::vector<int>>* physicalregion::getelementlist(void)
+std::vector<std::vector<int>>* physicalregion::getelementlist(bool prdimonly)
 {
     // Populate the element list if empty.
     
@@ -165,7 +165,7 @@ std::vector<std::vector<int>>* physicalregion::getelementlist(void)
         std::vector<int> sizes(8,0);
         for (int d = 0; d < includesdisjointregion.size(); d++)
         {
-            if (includesdisjointregion[d] && mydisjointregions->getelementdimension(d) == myelementdimension)
+            if (includesdisjointregion[d] && (not(prdimonly) || mydisjointregions->getelementdimension(d) == myelementdimension))
                 sizes[mydisjointregions->getelementtypenumber(d)] += mydisjointregions->countelements(d);
         }
         for (int i = 0; i < 8; i++)
@@ -175,7 +175,7 @@ std::vector<std::vector<int>>* physicalregion::getelementlist(void)
         std::vector<int> curindexes(8,0);
         for (int d = 0; d < includesdisjointregion.size(); d++)
         {
-            if (includesdisjointregion[d] && mydisjointregions->getelementdimension(d) == myelementdimension)
+            if (includesdisjointregion[d] && (not(prdimonly) || mydisjointregions->getelementdimension(d) == myelementdimension))
             {
                 int typenum = mydisjointregions->getelementtypenumber(d);
                 int numelems = mydisjointregions->countelements(d);
