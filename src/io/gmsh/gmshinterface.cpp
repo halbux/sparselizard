@@ -140,6 +140,8 @@ void gmshinterface::readwithapi(std::string name, nodes& mynodes, elements& myel
 {
     gmsh::initialize();
     gmsh::open(name);
+    if (gentools::getfileextension(name) == ".geo")
+        gmsh::model::mesh::generate(gmsh::model::getDimension());
     readfromapi(mynodes, myelements, myphysicalregions);
     gmsh::finalize();
 }
