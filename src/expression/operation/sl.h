@@ -302,7 +302,7 @@ namespace sl
     expression predefinedelectrostaticforce(expression input, expression E, expression epsilon);
     expression predefinedmagnetostaticforce(expression input, expression H, expression mu);
 
-    expression predefinedacoustics(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
+    expression predefinedacousticwave(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
     expression predefinedacousticradiation(expression dofp, expression tfp, expression soundspeed, expression neperattenuation);
     expression predefinedacousticstructureinteraction(expression dofp, expression tfp, expression dofu, expression tfu, expression soundspeed, expression fluiddensity, expression normal, expression neperattenuation, double scaling = 1.0);
 

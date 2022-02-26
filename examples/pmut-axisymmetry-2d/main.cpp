@@ -147,7 +147,7 @@ int main(void)
     pmutmodel += integral(piezo, ( transpose(C)*strain(dof(u)) )*grad(tf(v)) - ( K*grad(dof(v)) )*grad(tf(v)) );
 
     // The wave equation is solved in the fluid:
-    pmutmodel += integral(fluid, predefinedacoustics(dof(p), tf(p), c, alpha));
+    pmutmodel += integral(fluid, predefinedacousticwave(dof(p), tf(p), c, alpha));
     // A Sommerfeld condition is used on the fluid boundary to have outgoing waves:
     pmutmodel += integral(fluidboundary, predefinedacousticradiation(dof(p), tf(p), c, alpha));
 

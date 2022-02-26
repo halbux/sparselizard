@@ -2810,13 +2810,13 @@ expression sl::predefinedmagnetostaticforce(expression input, expression H, expr
     return predefinedelectrostaticforce(input, H, mu);
 }
 
-expression sl::predefinedacoustics(expression dofp, expression tfp, expression c, expression alpha)
+expression sl::predefinedacousticwave(expression dofp, expression tfp, expression c, expression alpha)
 {
     c.reuseit(); alpha.reuseit();
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacoustics'" << std::endl;
+        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticwave'" << std::endl;
         abort();
     }
 
