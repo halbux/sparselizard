@@ -1,17 +1,20 @@
 // This code shows how to perfom a magnetostatic analysis on a 2D cross-section of a
-// rotating PMSM (permanent magnet synchronous) electric motor. The motor torque is 
+// rotating PMSM (permanent magnet synchronous) electric motor. The motor torque is
 // calculated based on the virtual work principle for an increasing mechanical angle.
 //
-// Antiperiodicity is used to reduce the computational domain to only 45 degrees of 
+// Antiperiodicity is used to reduce the computational domain to only 45 degrees of
 // the total geometry (the motor has 4 pairs of poles). In order to link the rotor and
 // stator domains at their interface a general mortar-based continuity condition is used.
-// This allows to work with the non-matching mesh at the interface when the rotor moves.  
+// This allows to work with the non-matching mesh at the interface when the rotor moves.
 
 #include <fstream>
 #include <experimental/filesystem>
 #include <iostream>
 #include "sparselizard.h"
 #include <vector>
+
+
+#define WRITE_B false
 
 using namespace std;
 using namespace sl;
@@ -125,15 +128,18 @@ struct DataPack {
         createPath(path + "/F");
         createPath(path + "/T");
         createPath(path + "/H");
+        createPath(path + "/Iterations");
 
         int all = this->allRegion;
         int alpha = this->alpha;
         int ironAlpha = this->ironAlpha;
-        
+
 //        this->A.write(all, path + "/A/AField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
-        this->B.write(all, path + "/B/BField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+        if(WRITE_B) {
+            this->B.write(all, path + "/B/BField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+        }
 //        this->H.write(all, path + "/H/HField"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
-        this->F.write(all, path + "/F/Force"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
+//        this->F.write(all, path + "/F/Force"+twodigits(ironAlpha)+twodigits(alpha)+".vtu", 2);
         string data = "Bottom,Iron,Top,Bottom Magnets,Top Magnets\r\n" +
             to_string(this->TBottom) + "," + to_string(this->TIron) + "," + to_string(this->TTop) + "," + to_string(this->TBM) + "," + to_string(this->TTM);
         writeFile(path + "/T/torgues"+twodigits(alpha)+twodigits(ironAlpha)+".csv", data);
@@ -158,171 +164,182 @@ DataPack* sparselizard(mesh mymesh, double alpha = 0, double ironAlpha = 0, bool
         secondmagnetup = 6,
         secondmagnetdown = 7,
         air = 10,
-        topStator = 20;
+        topStator = 20,
+        bottomSurface = 201,
+        topSurface = 202,
+        nonmagnetic = 300,
+        environment = 301,
+        boundary = 400;
+
 
     // Define new physical regions for convenience:
+    int all = selectall();
     int magnetsdown = selectunion({secondmagnetdown, firstmagnetdown});
     int magnetsup = selectunion({secondmagnetup, firstmagnetup});
     int magnets = selectunion({firstmagnetdown, firstmagnetup, secondmagnetdown, secondmagnetup});
     int iron = selectunion({ironbars, bottomStator, topStator});
+
+    int noniron = selectunion({ nonmagnetic, magnets });
+    int magnetic = selectunion({magnets, iron});
+    // parts
     int topPart = selectunion({ secondmagnetup, secondmagnetdown, topStator });
     int bottomPart = selectunion({ firstmagnetup, firstmagnetdown, bottomStator });
     int rotor = selectunion({secondmagnetup, secondmagnetdown});
-    int all = selectall();
+    // sections
     int bottommagnets = selectunion({firstmagnetup, firstmagnetdown});
     int topmagnets = selectunion({secondmagnetup, secondmagnetdown});
     int middlesection = selectunion({ironbars});
 
-cout << "Calculating Spanning Tree" << endl;
+    cout << "Calculating Spanning Tree" << endl;
     // Define a spanning tree to gauge the magnetic vector potential (otherwise the matrix is singular).
-    // Start growing the tree from the regions with constrained potential vector (here the contour): 
-//    spanningtree spantree({ bottomStator, topStator });
-    // change the span tree to magnet areas
-    spanningtree spantree({ magnets });
+    // Start growing the tree from the regions with constrained potential vector (here the contour):
+    spanningtree spantree({ boundary });
 
-
-    // Write it for illustration:
-    // spantree.write("results/spantree.pos");
-cout << "Setting field" << endl;
-    // Nodal shape functions 'h1' for the z component of the vector potential.
-    field az("hcurl", spantree),
+    field A("hcurl", spantree),
          x("x"), y("y"), z("z");
-
-
-    // maybe  ? 
-    az.setgauge(all);
-    // Use interpolation order 2:
-    az.setorder(all, 2);
-//    az.setorder(iron, 3);
+    // gauge the macnetic vector potential
+    A.setgauge(all);
+    A.setorder(all, 2); // Use interpolation order 2:
     // Put a magnetic wall
-    // az.setconstraint(topStator);
-    // az.setconstraint(bottomStator);
+    //A.setconstraint(topSurface);
 
+    expression B = curl(A);
     // The remanent induction field in the magnet is 0.5 Tesla perpendicular to the magnet:
     expression normedradialdirection = array3x1(0,0,1);
     expression bremanent = MagnetB * normedradialdirection;
     expression minusnormedradialdirection = array3x1(0,0,-1);
     expression minusbremanent = MagnetB * minusnormedradialdirection;
 
-    // Vacuum magnetic permeability [H/m]: 
-    double mu0 = 4.0*getpi()*1e-7;
     // Define the permeability in all regions.
-    //
     // Taking into account saturation and measured B-H curves can be easily done
     // by defining an expression based on a 'spline' object (see documentation).
-    //
+    // BH Curve first try
+//    std :: vector<double> Bcurve = {0.0, 0.2,   0.426, 0.761,  1.097, 1.233,  1.335,   1.460,   1.590,   1.690,   1.724,   1.740 , 2.0, 2.5, 10.0, 100.0};
+//    std :: vector<double> Hcurve = {0.0, 318.3, 477.5, 795.8, 1591.6, 2387.3, 3978.9, 7957.8, 15915.5, 31831.0, 44456.3, 55704.3 , 58000.0, 60000.0, 70000.0, 80000.0};
+    std::vector<double> Hcurve = {
+    0.0000e+00, 5.5023e+00, 1.1018e+01, 1.6562e+01, 2.2149e+01, 2.7798e+01, 3.3528e+01,
+    3.9363e+01, 4.5335e+01, 5.1479e+01, 5.7842e+01, 6.4481e+01, 7.1470e+01, 7.8906e+01,
+    8.6910e+01, 9.5644e+01, 1.0532e+02, 1.1620e+02, 1.2868e+02, 1.4322e+02, 1.6050e+02,
+    1.8139e+02, 2.0711e+02, 2.3932e+02, 2.8028e+02, 3.3314e+02, 4.0231e+02, 4.9395e+02,
+    6.1678e+02, 7.8320e+02, 1.0110e+03, 1.3257e+03, 1.7645e+03, 2.3819e+03, 3.2578e+03,
+    4.5110e+03, 6.3187e+03, 8.9478e+03, 1.2802e+04, 1.8500e+04, 2.6989e+04, 3.9739e+04,
+    5.9047e+04, 8.8520e+04, 1.3388e+05, 2.0425e+05, 3.1434e+05, 4.8796e+05, 7.6403e+05};
+    std::vector<double> Bcurve = {
+    0.0000e+00, 5.0000e-02, 1.0000e-01, 1.5000e-01, 2.0000e-01, 2.5000e-01, 3.0000e-01,
+    3.5000e-01, 4.0000e-01, 4.5000e-01, 5.0000e-01, 5.5000e-01, 6.0000e-01, 6.5000e-01,
+    7.0000e-01, 7.5000e-01, 8.0000e-01, 8.5000e-01, 9.0000e-01, 9.5000e-01, 1.0000e+00,
+    1.0500e+00, 1.1000e+00, 1.1500e+00, 1.2000e+00, 1.2500e+00, 1.3000e+00, 1.3500e+00,
+    1.4000e+00, 1.4500e+00, 1.5000e+00, 1.5500e+00, 1.6000e+00, 1.6500e+00, 1.7000e+00,
+    1.7500e+00, 1.8000e+00, 1.8500e+00, 1.9000e+00, 1.9500e+00, 2.0000e+00, 2.0500e+00,
+    2.1000e+00, 2.1500e+00, 2.2000e+00, 2.2500e+00, 2.3000e+00, 2.3500e+00, 2.4000e+00};
+    spline hbcurve(Bcurve, Hcurve);
+    // Define nu as h = nu * b and fix the 0/0 division for the first entry:
+    std::vector<double> nudata(Hcurve.size());
+    for (int i = 1; i < Hcurve.size(); i++) {
+        nudata[i] = Hcurve[i]/Bcurve[i];
+    }
+    nudata[0] = nudata[1];
+    // Use a cubic spline interpolation for nu(b):
+    spline nucurve(Bcurve, nudata);
 
-// Β-H curve can be performed like below
-//std :: vector<double> temperature = {273,300,320,340};
-//std :: vector<double> youngsmodulus = {5e9,4e9,2.5e9,1e9};
-//spline spl(temperature, youngsmodulus);
-//// The spline object can also be created from a measurement data file:
-//// spline spl ("smoothedmeasurements.txt");
-//// Temperature field:
-//field T("h1");
-//// Young’s modulus as a cubic (natural) spline interpolation of the experimental data:
-//expression E(spl, T);
-//This creates a continuous expression based on discrete data samples. As an application example, if
-//measurements of a material stiffness (Young’s modulus E) have been performed for a set of temperatures T (as illustrated in the example above) then this constructor allows to define expression E
-//that provides a 3rd order (natural) spline interpolation of Young’s modulus in the measured discrete
-//temperature range. Field T can contain any space-dependent temperature profile as long as it is in
-//the temperature data range provided.
-// Stainless steel 416 BH Curve
-// B  - - - H
-// 0.000    0.0
-// 0.200    318.3
-// 0.426    477.5
-// 0.761    795.8
-// 1.097    1591.6
-// 1.233    2387.3
-// 1.335    3978.9
-// 1.460    7957.8
-// 1.590    15915.5
-// 1.690    31831.0
-// 1.724    44456.3
-// 1.740    55704.3
-
-// BH Curve first try
-std :: vector<double> Bcurve = {0.0, 0.2,   0.426, 0.761,  1.097, 1.233,  1.335,   1.460,   1.590,   1.690,   1.724,   1.740 , 2.0, 2.5, 10.0, 100.0};
-std :: vector<double> Hcurve = {0.0, 318.3, 477.5, 795.8, 1591.6, 2387.3, 3978.9, 7957.8, 15915.5, 31831.0, 44456.3, 55704.3 , 58000.0, 60000.0, 70000.0, 80000.0};
-spline spl(Bcurve, Hcurve);
-//spl.write("BHCurve.txt", 5);
-
+    // Vacuum magnetic permeability [H/m]:
+    double mu0 = 4.0*getpi()*1e-7;
     parameter mu;
-
-
-cout << "BH Curve..." << endl;
-expression BHCurve(spl.getderivative(), norm(curl(az)));
-cout << "BH Curve for iron..." << endl;
-expression mIron = BHCurve;
-
+    expression BHCurve(nucurve, norm(B));
+    expression mIron = 1/BHCurve;
     mu|all = mu0;
-    // Overwrite on non-magnetic regions:
     mu|magnets = mu0;
-    mu|iron = 2000*mu0;
-cout << "Formulation" << endl;
+    mu|iron = 100*mu0; // mIron
+
+    // dhdb expression based on H-B spline
+    expression H = B / mu;
+    expression dhdb(hbcurve.getderivative(), norm(B));
+
+    cout << "Formulation" << endl;
     formulation magnetostatics;
     // The strong form of the magnetostatic formulation is curl( 1/mu * curl(a) ) = j, with b = curl(a):
-    magnetostatics += integral(all, 1/mu* curl(dof(az)) * curl(tf(az)) );
+    magnetostatics += integral(all, 1/mu* curl(dof(A)) * curl(tf(A)) );
 
-    // Add the remanent magnetization of the rotor magnet:
-    magnetostatics += integral(magnetsdown, -1/mu* minusbremanent * curl(tf(az)));
-    magnetostatics += integral(magnetsup, -1/mu* bremanent * curl(tf(az)));
-    // magnetostatics += continuitycondition(IronTop, SecondMagnetBottom, az, az, 1, false);
-int numdofs = magnetostatics.countdofs();
-cout << "Unknowns in formulation: " << endl;
-cout << numdofs << endl;
+    // Steel - this term is used for iron saturation
+    // magnetostatics += integral(iron, (H + dhdb * (curl(dof(A)) - B)) * curl(tf(A)));
+    // Magnets - the magnetization of the magnets (up and down)
+    magnetostatics += integral(magnetsdown, -1/mu* minusbremanent * curl(tf(A)));
+    magnetostatics += integral(magnetsup, -1/mu* bremanent * curl(tf(A)));
+
+    int numdofs = magnetostatics.countdofs();
+    cout << "Unknowns in formulation: " << endl;
+    cout << numdofs << endl;
 
     if(timeit) clk.print("Setup experiment:\t");
     if(autoload == true) {
         cout << "Autoloading cache..." << endl;
-        az.loadraw("cache/aaz"+twodigits(alpha)+twodigits(ironAlpha)+".slz.gz", true);
+        A.loadraw("cache/aaz"+twodigits(alpha)+twodigits(ironAlpha)+".slz.gz", true);
         cout << "Cache loaded" << endl;
         if(timeit) clk.print("CacheLoaded:\t");
     } else {
         cout << "Solving..." << endl;
+
+/*
+///////////////////////////////////////////////
+// NON LINEAR SOLUTION
+///////////////////////////////////////////////
+    // Initial solution is a = 0 (thus b = 0):
+    vec x(magnetostatics);
+
+    // Nonlinear iteration:
+    double relres = 1, maxb; int iter = 0;
+    // disable
+    while (relres > 1e-5)
+    {
+        magnetostatics.generate();
+
+        // Get the A and rhs in A*x = rhs:
+        mat Amat = magnetostatics.A();
+        vec rhs = magnetostatics.b();
+
+        // Calculate the relative residual:
+        relres = (rhs - Amat*x).norm()/rhs.norm();
+        std::cout << "Relative residual @" << iter << " is " << relres;
+
+        // Relaxation = including progressively the new solution using:
+        // xnew = a*xold + (1-a)*solve(A, b)
+        double relaxation = 0.;
+        x = solve(Amat, rhs);
+
+        // Update the field a with the solution x:
+        setdata(x);
+
+        // Do not allow b to go out of the provided [0, 2.4] T data range for the h(b) curve:
+        maxb = norm(B).max(all, 5)[0];
+        std::cout << " (max b is " << maxb << " T)" << std::endl;
+        if (maxb > 2.4)
+            x = 2.4/maxb * x;
+
+        setdata(x);
+
+        iter++;
+    }
+*/
+        // Linear Solution
         magnetostatics.solve();
-        az.writeraw(all, "cache/aaz"+twodigits(alpha)+twodigits(ironAlpha)+".slz.gz", true);
+        //az.writeraw(all, "cache/aaz"+twodigits(alpha)+twodigits(ironAlpha)+".slz.gz", true);
         cout << "Solved!" << endl;
         if(timeit) clk.print("Solving time:\t");
     }
 
-    // phiProjection.setdata(all, )
-
-
-    // expression polito = polarscalar(curl(az));
-    // double integration = polito.integrate(firstmagnetup, 4);
-    // double integrationdown = polito.integrate(firstmagnetdown, 4);
-
-    // polito.write(bottommagnets, "results/bottommagnets"+twodigits(alpha)+".vtu");
-    // cout << "First row INTEGRATION  UP : " << polito.integrate(firstmagnetup, 4) << endl;
-    // cout << "First row INTEGRATION DOWN: " << polito.integrate(firstmagnetdown, 4) << endl;
-    // cout << " ---------------------------------------------------------------- " << integration << endl;
-    // cout << " INTEGRATION  IRON : " << polito.integrate(ironbars, 4) << endl;
-    // // cout << " INTEGRATION : " << integrationdown << endl;
-    // cout << " ---------------------------------------------------------------- " << integration << endl;
-    // cout << " Second row INTEGRATION  UP : " << polito.integrate(secondmagnetup, 4) << endl;
-    // cout << " Second row INTEGRATION DOWN: " << polito.integrate(secondmagnetdown, 4) << endl;
-
-
-    // The magnetostatic force acting on the motor is computed below.
     field magforce("h1xyz");
     magforce.setorder(all, 2);
 
     // The magnetic force is projected on field 'magforce' on the solid stator region.
     // This is done with a formulation of the type dof*tf - force calculation = 0.
     formulation forceprojection;
-
     forceprojection += integral(all, dof(magforce)*tf(magforce));
-    forceprojection += integral(all, -predefinedmagnetostaticforce(tf(magforce, all), 1/mu*curl(az), mu));
-
+    forceprojection += integral(all, -predefinedmagnetostaticforce(tf(magforce, all), 1/mu*B, mu));
     forceprojection.solve();
 
     if(timeit) clk.print("Forces calc time:\t");
-
-    expression magforcescalar = polarscalar((expression)magforce);
+    // expression magforcescalar = polarscalar((expression)magforce);
     // magforcescalar.write(bottomPart, "results/bottomMagForce"+twodigits(alpha)+".vtu");
-
 
     // Calculate the torque:
     expression leverarm = array3x1(x,y,0);
@@ -337,9 +354,9 @@ cout << numdofs << endl;
 
     double scaleFactor = 1.;
     cout << "--------------------------------------------------------" << endl;
-    cout << "TorgueBottom: " << TBottom   * scaleFactor << endl;
-    cout << "TorgueIron: " << TIron   * scaleFactor << endl;
-    cout << "TorgueTop: " << TTop   * scaleFactor << endl;
+    cout << "TorgueBottom: " << TBottom * scaleFactor << endl;
+    cout << "TorgueIron: " << TIron * scaleFactor << endl;
+    cout << "TorgueTop: " << TTop * scaleFactor << endl;
     cout << "--------------------------------------------------------" << endl;
     cout << "--------------------------------------------------------" << endl;
     cout << "--------------------------------------------------------" << endl;
@@ -354,14 +371,13 @@ cout << numdofs << endl;
 
     pack->F = (expression)magforce;
 //    pack->A = (expression)az;
-    pack->B = curl(az);
+    pack->B = curl(A);
 //    pack->H = curl(az)/mu;
     pack->alpha = alpha;
     pack->ironAlpha = ironAlpha;
     pack->allRegion = selectall();
 
     // pack->saveData();
-
     if(timeit) clk.print("Pack Ready:\t");
     return pack;
 }
@@ -407,17 +423,18 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    int start = 8;
+
+    int start = 7; // last 7
     int end = 45;
     int alphaStep = atoi(getVar(argc, argv, 2));
     int pieces = (end-start)/alphaStep;
 
 
-    string folderName = "September";
+    string folderName = "October";
 
     createPath("cache");
 
-    int ironstart = 0;
+    int ironstart = 15; // last 15
     int ironend = 45;
     int ironStep = atoi(getVar(argc, argv, 3));
     int ironpieces = (ironend - ironstart)/ironStep;
@@ -442,10 +459,10 @@ int main(int argc, char *argv[])
         {
             cout << "Iron Angle\t" << ironAlpha << "\t Rotor Angle:\t" << alpha << endl;
             string filename = getFilename(alpha, ironAlpha, argc, argv, true);
-            mesh mymesh(filename);
+            mesh mymesh;
+            mymesh.selectskin(400); // 400 = boundary
+            mymesh.load(filename);
             pack = sparselizard(mymesh, alpha, ironAlpha, false, folderName, true);
-//            clk.print("Calculations:");
-//            cout << "--------------------------------------" << endl << endl;
             pack->saveData();
             torguesB->add(pack->TBottom);
             torguesI->add(pack->TIron);
@@ -456,108 +473,13 @@ int main(int argc, char *argv[])
         torguesI->save("TIron" + twodigits(ironAlpha));
         torguesT->save("TTop" + twodigits(ironAlpha));
         delete torguesB, torguesI, torguesT;
+        start = 0;
     }
 
     clk.print("Total run time:");
     PetscFinalize();
     return 0;
 }
-
-int oldmain(int argc, char *argv[])
-{   
-    PetscInitialize(0,{},0,0);
-
-    wallclock clk;
-
-    int realIronAngle = 3;
-    int realAngle = 5;
-
-    int start = 0;
-    int pieces = 0;
-    int alphaStep = 5;
-    
-    int ironstart = 0;
-    int ironpieces = 0;
-    int ironStep = 5;
-
-    string folderName = "December";
-
-    if(argc > 3) {
-        alphaStep = atoi(argv[2]);
-        ironStep = atoi(argv[3]);
-        pieces = atoi(argv[4]);
-        ironpieces = atoi(argv[5]);
-        folderName = argv[6];
-    } else if(argc == 3) {
-        folderName = argv[2];
-    } else if(argc == 1) {
-        cout
-        << "Use this software as follows:" << endl
-        << "Example command to load only one mesh file" << endl << endl
-        << "./loadem.sh FilenameToLoad" << endl << endl
-        << "Example command to load only one mesh file save to folderName (default:December)" << endl << endl
-        << "./loadem.sh FilenameToLoad FolderName" << endl << endl
-        << "Example command to load only multiple mesh file of the name convention: FilenameToLoad{alpha}A{ironAlpha}.msh" << endl << endl << endl
-        << "./loadem.sh FilenameToLoad alphaStep ironStep pieces ironpieces" << endl << endl << endl;
-        return 0;
-    }
-    cout << "Settings" << endl
-    << "FolderName: " << folderName << endl 
-    << "AlphaStep: " << alphaStep << endl 
-    << "IronStep: " << ironStep << endl
-    << "Pieces: " << pieces << endl
-    << "IronPieces: " << ironpieces << endl;
-
-    DataPack* pack;
-    // vector<double> torgues;
-    // vector<double> torguesBM;
-    // vector<double> torguesTM;
-    // vector<double> torguesIron;
-
-
-    // make only one loop 
-    for (double ironAlpha = ironstart; ironAlpha <= ironstart+(ironpieces*ironStep); ironAlpha += ironStep){
-        for (double alpha = start; alpha <= start+(pieces*alphaStep); alpha += alphaStep)
-        {
-        // double alpha = 0 - ironAlpha;
-        if (alpha < 0) alpha += 18;
-        if (alpha < 0) alpha += 18;
-            // settime(alpha - start+0.0001);
-            string filename = getFilename(alpha, ironAlpha, argc, argv);
-            mesh mymesh(filename);
-            // mymesh.scale(regionall(), 0.01,0.01,0.01);
-            pack = sparselizard(mymesh, alpha, ironAlpha, false, folderName);
-            pack->saveData();
-            
-            // torgues.push_back(pack->T);
-            // torguesBM.push_back(pack->TBottom);
-            // torguesIron.push_back(pack->TIron);
-            // torguesTM.push_back(pack->TTop);
-
-            // cout << "Iron Angle\t| Mechanical angle [degrees] and torque [Nm]:" << endl;
-            // cout << ironAlpha << "\t\t|" << alpha << "\t\t\t\t\t|" << pack->T << endl;
-            
-            delete pack;
-        }
-
-        // writeVec(torguesBM, "results/IronB"+ to_string((int)(ironAlpha))+"A"+ to_string((int)(alphaStep))+"torguesTBottom.csv");
-        // writeVec(torguesTM, "results/IronB"+ to_string((int)(ironAlpha))+"A"+ to_string((int)(alphaStep))+"torguesTTop.csv");
-        // writeVec(torguesIron, "results/IronB"+ to_string((int)(ironAlpha))+"A"+ to_string((int)(alphaStep))+"torguesTIron.csv");
-        
-        // torgues.clear();
-        // torguesBM.clear();
-        // torguesTM.clear();
-        // torguesIron.clear();
-    }
-
-    clk.print("Total run time:");
-
-    PetscFinalize();
-    
-    return 0;
-}
-
-
 
 expression normalize(expression e)
 {

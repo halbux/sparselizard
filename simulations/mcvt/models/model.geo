@@ -2,15 +2,18 @@
 SetFactory("OpenCASCADE");
 
 PREVIEW = 1;
+// TODO
+////////////////
+// Extrude First and Third layer half way like iron to make better lighter mesh
 
 Mesh.Format = 1;
 Mesh.MshFileVersion = 2.2;
 //Mesh.CharacteristicLengthFactor = 1;
-Mesh.CharacteristicLengthMax = 0.005; // 0.005;
+//Mesh.CharacteristicLengthMax = 0.01; // 0.005;
 
 // Field refinement params
-GlobalMeshSize = 0.1; // best 0.1
-AirgapMeshSize = 0.002; // best 0.001
+GlobalMeshSize = 0.05; // best 0.1
+AirgapMeshSize = 0.001; // best 0.001
 
 // Construction Parameters
 BottomIron = 4/1000;
@@ -24,9 +27,9 @@ TopIron = 4/1000;
 CenterHole = 25/1000;
 
 // Iteration Parameters
-BarStart = 0;
+BarStart = 3;
 RotStart = 0;
-BarIntervals = 55;
+BarIntervals = 3;
 RotIntervals = 1;
 
 IronPolesCount = 8;
@@ -58,86 +61,102 @@ For barsAngle In {BarStart:45:BarIntervals}
     //Deletes all physical groups.
     Delete Physicals;
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-// FIELDS SECTION FOR MESH REFINEMENT ( if mesh dimensions change these must change as well) //
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Field Air Gap Bottom
-Field[1] = Box;
-Field[1].Thickness = 0.001;
-Field[1].VIn = AirgapMeshSize;
-Field[1].VOut = GlobalMeshSize;
-Field[1].XMax = 0.1;
-Field[1].XMin = -0.1;
-Field[1].YMax = 0.1;
-Field[1].YMin = -0.1;
-// bottom airgap position
-Field[1].ZMax = BottomMagnets + AirgapBottom;
-Field[1].ZMin = BottomMagnets;
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // FIELDS SECTION FOR MESH REFINEMENT ( if mesh dimensions change these must change as well) //
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Field Air Gap Bottom
+    Field[1] = Box;
+    Field[1].Thickness = 0.001;
+    Field[1].VIn = AirgapMeshSize;
+    Field[1].VOut = GlobalMeshSize;
+    Field[1].XMax = 0.09;
+    Field[1].XMin = -0.09;
+    Field[1].YMax = 0.09;
+    Field[1].YMin = -0.09;
+    // bottom airgap position
+    Field[1].ZMax = BottomMagnets + AirgapBottom;
+    Field[1].ZMin = BottomMagnets;
 
 
-// Field Air Gap Top
-Field[2] = Box;
-Field[2].Thickness = 0.001;
-Field[2].VIn = AirgapMeshSize;
-Field[2].VOut = GlobalMeshSize;
-Field[2].XMax = 0.1;
-Field[2].XMin = -0.1;
-Field[2].YMax = 0.1;
-Field[2].YMin = -0.1;
-// top airgap position
-Field[2].ZMax = BottomMagnets + AirgapBottom + Iron + AirgapTop;
-Field[2].ZMin = BottomMagnets + AirgapBottom + Iron;
+    // Field Air Gap Top
+    Field[2] = Box;
+    Field[2].Thickness = 0.001;
+    Field[2].VIn = AirgapMeshSize;
+    Field[2].VOut = GlobalMeshSize;
+    Field[2].XMax = 0.09;
+    Field[2].XMin = -0.09;
+    Field[2].YMax = 0.09;
+    Field[2].YMin = -0.09;
+    // top airgap position
+    Field[2].ZMax = BottomMagnets + AirgapBottom + Iron + AirgapTop;
+    Field[2].ZMin = BottomMagnets + AirgapBottom + Iron;
 
-// Field Top Stator
-Field[3] = Box;
-Field[3].Thickness = 0.006;
-Field[3].VIn = 0.003;
-Field[3].VOut = GlobalMeshSize;
-Field[3].XMax = 0.1;
-Field[3].XMin = -0.1;
-Field[3].YMax = 0.1;
-Field[3].YMin = -0.1;
-// top stator position
-Field[3].ZMax = BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets + 0.002;
-Field[3].ZMin = BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets;
+    // Field Top Stator
+    Field[3] = Box;
+    Field[3].Thickness = 0.006;
+    Field[3].VIn = 0.005;
+    Field[3].VOut = GlobalMeshSize;
+    Field[3].XMax = 0.09;
+    Field[3].XMin = -0.09;
+    Field[3].YMax = 0.09;
+    Field[3].YMin = -0.09;
+    // top stator position
+    Field[3].ZMax = BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets + 0.003;
+    Field[3].ZMin = BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets;
 
-// Field Bottom Stator
-Field[4] = Box;
-Field[4].Thickness = 0.006;
-Field[4].VIn = 0.003;
-Field[4].VOut = GlobalMeshSize;
-Field[4].XMax = 0.1;
-Field[4].XMin = -0.1;
-Field[4].YMax = 0.1;
-Field[4].YMin = -0.1;
-// top stator position
-Field[4].ZMax = 0.00;
-Field[4].ZMin = -0.003;
-
-
-// Field IronBars
-Field[5] = Box;
-Field[5].Thickness = 0.001;
-Field[5].VIn = 0.003;
-Field[5].VOut = GlobalMeshSize;
-Field[5].XMax = 0.1;
-Field[5].XMin = -0.1;
-Field[5].YMax = 0.1;
-Field[5].YMin = -0.1;
-// 2mm distance from ironbars middle point
-Field[5].ZMax = BottomMagnets + AirgapBottom + Iron / 2 + 0.002;
-Field[5].ZMin = BottomMagnets + AirgapBottom + Iron / 2 - 0.002;
+    // Field Bottom Stator
+    Field[4] = Box;
+    Field[4].Thickness = 0.006;
+    Field[4].VIn = 0.005;
+    Field[4].VOut = GlobalMeshSize;
+    Field[4].XMax = 0.09;
+    Field[4].XMin = -0.09;
+    Field[4].YMax = 0.09;
+    Field[4].YMin = -0.09;
+    // top stator position
+    Field[4].ZMax = 0.00;
+    Field[4].ZMin = -0.003;
 
 
+    // Field IronBars
+    Field[5] = Box;
+    Field[5].Thickness = 0.001;
+    Field[5].VIn = 0.003;
+    Field[5].VOut = GlobalMeshSize;
+    Field[5].XMax = 0.09;
+    Field[5].XMin = -0.09;
+    Field[5].YMax = 0.09;
+    Field[5].YMin = -0.09;
+    // 2mm distance from ironbars middle point
+    Field[5].ZMax = BottomMagnets + AirgapBottom + Iron / 2 + 0.002;
+    Field[5].ZMin = BottomMagnets + AirgapBottom + Iron / 2 - 0.002;
 
-Field[6] = Min;
+    Field[6] = Min;
+    Field[6].FieldsList = {1, 2, 3, 4, 5};
 
-Field[6].FieldsList = {1, 2, 3, 4, 5};
+    Field[7] = Cylinder;
+    Field[7].Radius = 0.9;
+    Field[7].VIn = 0.0001;
+    Field[7].VOut = GlobalMeshSize;
 
-Background Field = 6;
-////////////////////////////////////////////
-//////// END OF FIELDS SECTION /////////////
-////////////////////////////////////////////
+    Field[8] = Max;
+    Field[8].FieldsList = {7, 1};
+    Field[9] = Max;
+    Field[9].FieldsList = {7, 2};
+    Field[10] = Max;
+    Field[10].FieldsList = {7, 3};
+    Field[11] = Max;
+    Field[11].FieldsList = {7, 4};
+    Field[12] = Max;
+    Field[12].FieldsList = {7, 5};
+
+    Field[13] = Min;
+    Field[13].FieldsList = {8,9,10,11,12};
+
+    Background Field = 13;
+    ////////////////////////////////////////////
+    //////// END OF FIELDS SECTION /////////////
+    ////////////////////////////////////////////
 
     counter = 0;
     // Calculate thickness for these magnets https://www.kjmagnetics.com/thickness.calculator.asp
@@ -227,7 +246,7 @@ Background Field = 6;
 
     BooleanFragments{ Surface{1000}; Delete; }{ Surface{1001:1000+ironPoles}; Delete; }
 
-        Extrude {0, 0, layerHeight/2} {
+    Extrude {0, 0, layerHeight/2} {
       Surface{1001:1001+ironPoles};
     }
 
@@ -323,12 +342,42 @@ Background Field = 6;
     // DO NOT use `Physical Volumes` here just `Volumes`
     BooleanDifference { Volume{4002,4003,4004,4005,141,61,70,80};Delete; }{ Volume{7000}; Delete; }
 
-    Coherence;
+    // Add top/bottom boundary Physical Surfaces
+    Physical Surface("BottomSurface", 201) = {3302};
+    Physical Surface("TopSurface", 202) = {3290};
 
+    Physical Volume("NonMagnetic", 300) = { Physical Volume {101,102,103} };
+    Physical Volume("NonMagnetic", 300) -= { Physical Volume { 2,3,4,6,7 } };
+
+    ZCenter = (BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets) / 2;
+    TotalHeight = BottomIron + BottomMagnets + AirgapBottom + Iron + AirgapTop + TopMagnets + TopIron;
+    //Sphere(8000) = {0, 0, ZCenter, 0.12, -Pi/2, Pi/2, 2*Pi};
+    //+ Environment
+    //Cylinder(8000) = {0, 0, -2*TotalHeight, 0, 0, 4*TotalHeight, 2*Radius, 2*Pi};
+    //Coherence;
+    //Physical Volume("Environment", 301) = {4006};
+
+    //Sleep 1;
+    // Keep whatever needed
+    //Recursive Delete {
+    //  Physical Volume{300, 20, 103};
+    //}
 
     If (PREVIEW < 1)
         Mesh 3;
         Save Sprintf("parts/Parrot%02gA%02g.msh", rotAngle, barsAngle);
+    Else
+        Mesh 2;
     EndIf
   EndFor
 EndFor
+
+// Select a single Surface
+// First Holder
+//BooleanIntersection{ Physical Volume{1:4,6,7,10,20,101,102,103}; Delete; }{ Surface{3298}; Delete; }
+// Third Holder
+//BooleanIntersection{ Physical Volume{1:4,6,7,10,20,101,102,103}; Delete; }{ Surface{3289}; Delete; }
+//+
+Background Field = -1;
+//+
+Background Field = 13;
