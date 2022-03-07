@@ -2329,7 +2329,7 @@ expression expression::operator*(expression input)
     // Products by scalars are always allowed:
     if (isscalar())
     {
-        output = input;
+        output = input.getcopy();
 
         for (int i = 0; i < input.mynumrows*input.mynumcols; i++)
             output.myoperations[i] = std::shared_ptr<opproduct>(new opproduct( {myoperations[0], input.myoperations[i]} ));
