@@ -84,6 +84,8 @@ class rawmat
         
         indexmat getainds(void);
         indexmat getdinds(void);
+        densemat getavals(void);
+        densemat getdvals(void);        
 
         Mat getapetsc(void);
         Mat getdpetsc(void);
