@@ -346,6 +346,16 @@ indexmat rawmat::getdinds(void)
     return Dinds;
 }
 
+densemat rawmat::getavals(void)
+{
+    return Avals;
+}
+
+densemat rawmat::getdvals(void)
+{
+    return Dvals;
+}
+
 Mat rawmat::getapetsc(void)
 {
     return Amat;
