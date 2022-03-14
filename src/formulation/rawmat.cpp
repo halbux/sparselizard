@@ -346,6 +346,26 @@ indexmat rawmat::getdinds(void)
     return Dinds;
 }
 
+indexmat rawmat::getarows(void)
+{
+    return Arows;
+}
+
+indexmat rawmat::getdrows(void)
+{
+    return Drows;
+}
+
+indexmat rawmat::getacols(void)
+{
+    return Acols;
+}
+
+indexmat rawmat::getdcols(void)
+{
+    return Dcols;
+}
+
 densemat rawmat::getavals(void)
 {
     return Avals;
