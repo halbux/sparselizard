@@ -167,7 +167,8 @@ std::shared_ptr<operation> operation::copy(void)
 
 double operation::evaluate(void)
 {
-    std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;
+    std::cout << "Error in 'operation' object: cannot evaluate the operation to a double" << std::endl;
+    std::cout << "Did you try to evaluate a space-dependent operation?" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     std::cout << std::endl;
@@ -176,7 +177,8 @@ double operation::evaluate(void)
 
 std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
-    std::cout << "Error in 'operation' object: cannot evaluate the operation" << std::endl;
+    std::cout << "Error in 'operation' object: cannot evaluate the operation to a double" << std::endl;
+    std::cout << "Did you try to evaluate a space-dependent operation?" << std::endl;
     std::cout << "Operation was:" << std::endl;
     this->print();
     std::cout << std::endl;
