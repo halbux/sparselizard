@@ -134,6 +134,12 @@ namespace sl
     expression dtdt(expression input);
     expression dtdtdt(expression input);
     expression dtdtdtdt(expression input);
+    
+    // Transient approximation of dt and dtdt:
+    expression dt(expression input, double initdt, double initdtdt);
+    expression dtdt(expression input, double initdt, double initdtdt);
+    
+    expression transientdtapprox(int dtorder, expression input, double initdt, double initdtdt);
 
     expression sin(expression input);
     expression cos(expression input);

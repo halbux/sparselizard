@@ -117,6 +117,11 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
     {
         // Update and print the time:
         universe::currenttimestep = inittime+dt;
+        
+        // Update all opdtapproxes:
+        std::vector<std::shared_ptr<operation>> dtapproxes = universe::getdtapproxes();
+        for (int i = 0; i < dtapproxes.size(); i++)
+            dtapproxes[i]->nextimpliciteuler(inittime, dt);
 
         if (myverbosity > 1 && istadapt)
             std::cout << "@" << inittime << "+" << dt << "s " << std::flush;

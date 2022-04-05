@@ -303,6 +303,30 @@ std::vector<std::pair<indexmat, densemat>> universe::rhsterms = {};
         
 std::vector<std::vector<vec>> universe::xdtxdtdtx = {{},{},{}};        
 
+std::vector< std::weak_ptr<operation> > universe::opdtapproxes = {};
+
+std::vector< std::shared_ptr<operation> > universe::getdtapproxes(void)
+{
+    std::vector<std::shared_ptr<operation>> output(opdtapproxes.size());
+
+    int index = 0;
+    for (int i = 0; i < opdtapproxes.size(); i++)
+    {
+        if (opdtapproxes[i].expired() == false)
+        {
+            output[index] = opdtapproxes[i].lock();
+            opdtapproxes[index] = opdtapproxes[i];
+            
+            index++;
+        }
+    }
+    
+    opdtapproxes.resize(index);
+    output.resize(index);
+    
+    return output;
+}
+
 
 
 std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> universe::formfuncpolys = {};     

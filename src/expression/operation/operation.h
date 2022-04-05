@@ -150,10 +150,16 @@ class operation : public std::enable_shared_from_this<operation>
         // Same but allow x, y and/or z fields without derivatives:
         virtual std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         
+        virtual double evaluateattime(double tm);
+        
         // For dof interpolation:
         virtual bool ison(void) { abort(); }; // fix return warning
         virtual void setoncontext(oncontext& cntxt) {};
         virtual oncontext* getoncontext(void) { abort(); }; // fix return warning
+        
+        virtual void nextimpliciteuler(double tinit, double dt) {};
+        virtual void nextgenalpha(double beta, double gamma, double alphaf, double alpham, double tinit, double dt) {};
+        virtual void approvetimestep(void) {};
 };
 
 #include "opabs.h"
@@ -167,6 +173,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opcustom.h"
 #include "opdetjac.h"
 #include "opdof.h"
+#include "opdtapprox.h"
 #include "opestimator.h"
 #include "opfield.h"
 #include "opfieldorder.h"

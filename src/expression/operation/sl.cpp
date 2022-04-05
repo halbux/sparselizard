@@ -864,6 +864,36 @@ expression sl::dtdt(expression input) { return input.timederivative(2); }
 expression sl::dtdtdt(expression input) { return input.timederivative(3); }
 expression sl::dtdtdtdt(expression input) { return input.timederivative(4); }
 
+expression sl::dt(expression input, double initdt, double initdtdt)
+{
+    return transientdtapprox(1, input, initdt, initdtdt);
+}
+
+expression sl::dtdt(expression input, double initdt, double initdtdt)
+{
+    return transientdtapprox(2, input, initdt, initdtdt);
+}
+    
+expression sl::transientdtapprox(int dtorder, expression input, double initdt, double initdtdt)
+{
+    int m = input.countrows(), n = input.countcolumns();
+    std::vector<expression> exprs(m*n);
+    
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            std::shared_ptr<opdtapprox> op(new opdtapprox(dtorder, input.getoperationinarray(i, j), initdt, initdtdt));
+            
+            universe::opdtapproxes.push_back(op);
+            
+            exprs[i*n+j] = expression(op);
+        }
+    }
+    
+    return expression(m, n, exprs);
+}
+
 expression sl::sin(expression input) { return input.sin(); }
 expression sl::cos(expression input) { return input.cos(); }
 expression sl::tan(expression input) { return input.tan(); }

@@ -185,3 +185,14 @@ std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vecto
     abort();
 }
 
+double operation::evaluateattime(double tm)
+{
+    double tmbkp = universe::currenttimestep;
+    
+    universe::currenttimestep = tm;
+    double evaled = evaluate();
+    universe::currenttimestep = tmbkp;
+    
+    return evaled;    
+}
+

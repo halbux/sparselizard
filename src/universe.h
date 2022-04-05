@@ -120,6 +120,11 @@ class universe
         // respectively at index 0, 1 and 2. If xdtxdtdtx[i] is an empty vector then that solution is not available.
         static std::vector<std::vector<vec>> xdtxdtdtx;
         
+        // All dt approxes to be updated by the timesteppers:
+        static std::vector< std::weak_ptr<operation> > opdtapproxes;
+        // Get all alive dt approxes:
+        static std::vector< std::shared_ptr<operation> > getdtapproxes(void);
+        
         
         
         // Store all !HIERARCHICAL! form function polynomials (can always be reused) and evaluated values.
