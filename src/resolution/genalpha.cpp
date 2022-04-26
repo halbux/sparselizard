@@ -197,7 +197,7 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             }
             
             vec vm = ((alpham-1.0)/(beta*dt*dt))*u + ((alpham-1.0)/(beta*dt))*v + ((alpham-1.0)*(0.5-beta)/beta + alpham)*a;
-            vec vc = ((alphaf-1.0)*gamma/(beta*dt))*u + (1.0+(alphaf-1.0)*gamma/beta)*v + ((1-alphaf)*dt*(1.0-gamma)+(alphaf-1.0)*gamma*dt*(0.5-beta)/beta)*a;
+            vec vc = ((alphaf-1.0)*gamma/(beta*dt))*u + (1.0+(alphaf-1.0)*gamma/beta)*v + ((1.0-alphaf)*dt*(1.0-gamma)+(alphaf-1.0)*gamma*dt*(0.5-beta)/beta)*a;
             vec vk = alphaf*u;
             
             // Here are the constrained values of the next solution:
