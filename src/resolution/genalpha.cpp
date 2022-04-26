@@ -190,31 +190,28 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             // Reuse matrices when possible (including the factorization):
             if (isconstant[1] == false || isconstant[2] == false || isconstant[3] == false || isfirstcall || defdt != dt || defbeta != beta || defgamma != gamma || defalphaf != alphaf || defalpham != alpham)
             {
-                leftmat = (1.0-alpham)*M + ((1.0-alphaf)*gamma*dt)*C + ((1.0-alphaf)*beta*dt*dt)*K;
+                leftmat = ((1.0-alpham)/(beta*dt*dt))*M + ((1.0-alphaf)*gamma/(beta*dt))*C + (1.0-alphaf)*K;
                 leftmat.reusefactorization();
-                
-                matu = -K;
-                matv = ((alphaf-1.0)*dt)*K-C;
-                mata = ((1.0-alphaf)*(gamma-1.0)*dt)*C+((1.0-alphaf)*(beta-0.5)*dt*dt)*K - alpham*M;
                 
                 defdt = dt; defbeta = beta; defgamma = gamma; defalphaf = alphaf; defalpham = alpham;
             }
             
-            // Update the acceleration. The acceleration is imposed on the Dirichlet constrained dofs.
-            // The displacement update relation is used to make sure the acceleration constraint leads
-            // to the exact constrained displacement at the next time step:
-            vec anextdirichlet = 1.0/(beta*dt*dt)*( rhs-u - dt*v - dt*dt*(0.5-beta)*a );
-            // Here are the constrained values of the next acceleration:
-            indexmat constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
-            densemat anextdirichletval = anextdirichlet.getpointer()->getvalues(constraintindexes);    
-            vec rightvec = matu*u + matv*v + mata*a + rhs;
-            // Force the acceleration on the constrained dofs:
-            rightvec.getpointer()->setvalues(constraintindexes, anextdirichletval);
+            vec vm = ((alpham-1.0)/(beta*dt*dt))*u + ((alpham-1.0)/(beta*dt))*v + ((alpham-1.0)*(0.5-beta)/beta + alpham)*a;
+            vec vc = ((alphaf-1.0)*gamma/(beta*dt))*u + (1.0+(alphaf-1.0)*gamma/beta)*v + ((1-alphaf)*dt*(1.0-gamma)+(alphaf-1.0)*gamma*dt*(0.5-beta)/beta)*a;
+            vec vk = alphaf*u;
             
-            anext = sl::solve(leftmat, rightvec);
-
-            // Update unext and vnext:
-            unext = u + dt*v + ((0.5-beta)*dt*dt)*a + (beta*dt*dt)*anext;
+            // Here are the constrained values of the next solution:
+            indexmat constraintindexes = myformulation.getdofmanager()->getconstrainedindexes();
+            densemat unextdirichletval = rhs.getpointer()->getvalues(constraintindexes);
+            vec rightvec = rhs - (M*vm + C*vc + K*vk);
+            // Force the solution on the constrained dofs:
+            rightvec.getpointer()->setvalues(constraintindexes, unextdirichletval);
+            
+            // Update the solution unext.
+            unext = relaxationfactor * sl::solve(leftmat, rightvec) + (1.0-relaxationfactor)*unext;
+            
+            // Update anext and vnext:
+            anext = 1.0/(beta*dt*dt)*( unext-u - dt*v - dt*dt*(0.5-beta)*a );
             vnext = v + (dt*(1-gamma))*a + (gamma*dt)*anext;
             
             // Update all fields in the formulation:

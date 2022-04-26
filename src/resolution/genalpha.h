@@ -35,6 +35,9 @@ class genalpha
         // The convergence tolerance for the fixed-point nonlinear iteration:
         double nltol = 1e-3;
         
+        // The relaxation factor for the nonlinear iteration:
+        double relaxationfactor = 1.0;
+        
         // Set 'isconstant[i]' to true and the corresponding matrix/vector is 
         // supposed constant in time and will only be generated once then reused.
         //
@@ -64,7 +67,7 @@ class genalpha
         vec v, a;
         
         // Objects required at every timestep (possibly reused):
-        vec rhs; mat K, C, M, leftmat, matu, matv, mata;
+        vec rhs; mat K, C, M, leftmat;
         // Parameters for which these objects are defined:
         double defbeta = -1, defgamma = -1, defalphaf = -1, defalpham = -1, defdt = -1;
         
@@ -83,6 +86,9 @@ class genalpha
         
         // Set the tolerance for the inner nonlinear fixed-point iteration:
         void settolerance(double tol) { nltol = tol; };
+        
+        // Set the relaxation factor for the inner nonlinear fixed-point iteration:
+        void setrelaxationfactor(double relaxfact) { relaxationfactor = relaxfact; };
         
         std::vector<vec> gettimederivative(void) { return {v, a}; };
         void settimederivative(std::vector<vec> sol);
