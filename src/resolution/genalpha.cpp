@@ -164,6 +164,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             
             // Reassemble only the non-constant matrices:
             bool isfirstcall = not(K.isdefined());
+            
+            universe::currenttimestep = inittime+(1.0-alphaf)*dt;
             if (isconstant[0] == false || isfirstcall)
             {
                 myformulation.generaterhs();
@@ -171,6 +173,8 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
             }
             else
                 rhs.updateconstraints();
+            universe::currenttimestep = inittime+dt;
+            
             if (isconstant[1] == false || isfirstcall)
             {
                 myformulation.generatestiffnessmatrix();
