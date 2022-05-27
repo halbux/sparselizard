@@ -13,8 +13,8 @@ int main(void)
     // The domain regions as defined in 'truss2d.geo':
     int solid = 1, clamp = 2, load = 3;
 
-    // Load the GMSH 4 format mesh with petsc:
-    mesh mymesh("petsc:truss2d.msh", 1);
+    // Load the GMSH 4 format mesh with gmsh:
+    mesh mymesh("gmsh:truss2d.msh", 1);
 
     // Nodal shape functions 'h1' with 2 components for the mechanical displacement:
     field u("h1xy");
