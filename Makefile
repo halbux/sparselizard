@@ -3,8 +3,8 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
 # With or without the GMSH API:
 ifneq ("$(wildcard ~/SLlibs/gmsh)","")
-    LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc -L ~/SLlibs/gmsh/lib -l gmsh -D HAVE_GMSH
-    INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux-c-opt/include/ -I ~/SLlibs/gmsh/include
+    LIBS = -L ~/SLlibs/gmsh/lib -l gmsh -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc -D HAVE_GMSH
+    INCL = -I ~/SLlibs/gmsh/include -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux-c-opt/include/
 else
     LIBS = -L ~/SLlibs/petsc/arch-linux-c-opt/lib -l openblas -l petsc -l slepc
     INCL = -I ~/SLlibs/petsc/include/petsc/mpiuni -I ~/SLlibs/petsc/arch-linux-c-opt/externalpackages/git.openblas -I ~/SLlibs/petsc/include/ -I ~/SLlibs/petsc/arch-linux-c-opt/include/

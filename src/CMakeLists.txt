@@ -29,10 +29,10 @@ target_compile_options(sparselizard PUBLIC -fPIC -no-pie -O3)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
-ConfigureBLAS(sparselizard)
-ConfigureGMSH(sparselizard)
-ConfigureMETIS(sparselizard)
 ConfigureMPI(sparselizard)
+ConfigureGMSH(sparselizard)
+ConfigureBLAS(sparselizard)
+ConfigureMETIS(sparselizard)
 ConfigureMUMPS(sparselizard)
 ConfigurePETSC(sparselizard)
 ConfigureSLEPC(sparselizard)
