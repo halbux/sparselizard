@@ -1,8 +1,8 @@
 // This code simulates the AC magnetic field and induced currents created
 // by three conducting wires, each with a prescribed total current flow.
 //
-// The so-called h-v (a.k.a. h-phi or t-w) formulation is used. The 'main' section
-// of this code can be (and has been) used as it is for 3D h-v simulations. 
+// The so-called h-phi (a.k.a. t-w) formulation is used. The 'main' section
+// of this code can be (and has been) used as it is for 3D h-phi simulations. 
 //
 // Credits: J. Ruuskanen
 
@@ -72,50 +72,52 @@ int main(void)
     // the source field 'hs.pos' to determine which cohomology source coefficients must be
     // used to get the desired total current in each conductor. 
     //
-    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {1, -2, 2});
+    hs.harmonic(2).setcohomologysources({cohomcut1, cohomcut2, cohomcut3}, {3, 1, -2});
 
     hs.write(cohomcuts, "hs.pos", 1);
 
-    // Scalar potential of the h-v formulation:
-    field v("h1", harms);
+    // Scalar potential of the h-phi formulation:
+    field phi("h1", harms);
 
-    v.setorder(all, 2);   
+    phi.setorder(all, 2);   
     // Fix the potential to 0 at a point in space:
-    v.setconstraint(point);
+    phi.setconstraint(point);
 
     // The gradient has only two components in 2D but 'hcurl' fields have three.
     // Add a 0-valued component to have a three component gradient.
     // 
-    // In the formulation below the contribution of v to the conductor region elements
-    // should be taken into account but there should be no v unknown associated to the
+    // In the formulation below the contribution of phi to the conductor region elements
+    // should be taken into account but there should be no phi unknown associated to the
     // conductor except for its skin region. To achieve this an extra argument is
     // provided to the dof() and tf() functions to define them only on the air region.
     //
-    expression graddofv = grad(dof(v, air)).resize(3,1);
-    expression gradtfv = grad(tf(v, air)).resize(3,1);
+    expression graddofphi = grad(dof(phi, air)).resize(3,1);
+    expression gradtfphi = grad(tf(phi, air)).resize(3,1);
 
     formulation magdyn;
 
-    // The strong form of the magnetodynamic h-v formulation is
+    // The strong form of the magnetodynamic h-phi formulation is
     //
     // curl( 1/sigma * curl(h) ) + dt(b) = 0
     //
-    // with hair = hs + grad(v) and hconductor = hc + hs + grad(v)
+    // with hair = hs + grad(phi) and hconductor = hc + hs + grad(phi)
     //
     magdyn += integral(conductor, 1/sigma * (curl(dof(hc)) + curl(hs)) * curl(tf(hc)));
 
-    magdyn += integral(conductor, mu * (dt(dof(hc)) + dt(hs) + dt(graddofv)) * (tf(hc) + gradtfv));
-    magdyn += integral(air, mu * (dt(hs) + dt(graddofv)) * gradtfv);
+    magdyn += integral(conductor, mu * (dt(dof(hc)) + dt(hs) + dt(graddofphi)) * (tf(hc) + gradtfphi));
+    magdyn += integral(air, mu * (dt(hs) + dt(graddofphi)) * gradtfphi);
+    // Avoid 0 diagonal entries in the assembled matrix:
+    magdyn += integral(air, 1e-50 * graddofphi * gradtfphi);
 
     magdyn.solve();
 
-    expression gradv = grad(v).resize(3,1);
+    expression gradphi = grad(phi).resize(3,1);
 
     // Current density:
     expression j = curl(hc) + curl(hs);
     // Air and conductor magnetic field:
-    expression hair = hs + gradv;
-    expression hcond = hc + hs + gradv;
+    expression hair = hs + gradphi;
+    expression hcond = hc + hs + gradphi;
 
     j.write(conductor, "j.pos", 2);
 
@@ -128,7 +130,7 @@ int main(void)
     
     std::cout << "Total current in wire 1/2/3 is " << I1 << "/" << I2 << "/" << I3 << " A" << std::endl;
 
-    // It can be seen below that the h-v formulation gives a better accuracy on b than on j.
+    // It can be seen below that the h-phi formulation gives a better accuracy on b than on j.
     double B2max = norm(getharmonic(2, mu*hcond)).max(conductor, 5)[0];
     double B3max = norm(getharmonic(3, mu*hcond)).max(conductor, 5)[0];
     std::cout << "B in-phase/quadrature max is " << B2max << " / " << B3max << " T" << std::endl;
@@ -138,7 +140,7 @@ int main(void)
     std::cout << "J in-phase/quadrature max is " << jz2max << " / " << jz3max << " A/m2" << std::endl;
     
     // Code validation line. Can be removed.
-    std::cout << (std::abs(I1-3)/3 < 1e-12 && std::abs(I2+4)/4 < 1e-12 && std::abs(I3-2)/2 < 1e-12 && std::abs(B2max-0.430244)/0.430244 < 3e-4 && std::abs(B3max-0.153331)/0.153331 < 8e-5 && std::abs(jz2max-688904)/688904 < 3e-3 && std::abs(jz3max-576794)/576794 < 6e-4);
+    std::cout << (std::abs(I1-3)/3 < 1e-12 && std::abs(I2+4)/4 < 1e-12 && std::abs(I3-2)/2 < 1e-12 && std::abs(B2max-0.4303)/0.4303 < 1e-3 && std::abs(B3max-0.1533)/0.1533 < 1e-3 && std::abs(jz2max-690000)/690000 < 1e-3 && std::abs(jz3max-576000)/576000 < 1e-3);
 }
 
 mesh createmesh(void)
@@ -197,7 +199,7 @@ mesh createmesh(void)
     gmsh::model::mesh::setSize(condbnd, mscond);
 
     // Compute the cohomology basis:
-    gmsh::model::mesh::computeCohomology({air}, {}, {1});
+    gmsh::model::mesh::addHomologyRequest("Cohomology", {air}, {}, {1});
 
     // Mesh in 2D:
     gmsh::model::mesh::generate(2);
