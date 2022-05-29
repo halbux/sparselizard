@@ -190,7 +190,7 @@ mesh createmesh(void)
 
     gmsh::finalize();
 
-    mymesh.write("wires2d.msh", 0);
+    mymesh.write("wires2d.msh");
     
     std::cout << "Mesh refinement factor is " << refinefact << "." << std::endl;
 
