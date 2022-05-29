@@ -61,7 +61,10 @@ namespace gentools
     // Return {xmin,xmax,ymin,ymax,zmin,zmax} for the coordinates {x1,y1,z1,x2,...}:
     std::vector<double> getcoordbounds(std::vector<double>& coordinates);
     
+    std::vector<int> unique(std::vector<int> a);
+    
     std::vector<int> intersect(std::vector<int> a, std::vector<int> b);
+    std::vector<int> exclude(std::vector<int> a, std::vector<int> b);
     
     // Compressed sparse row to ijk format converter for sparse matrices.
     // 'csrrows' is in CSR format. The ijk row format is output in 'ijkrows'.

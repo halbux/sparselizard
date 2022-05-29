@@ -324,6 +324,16 @@ std::vector<double> gentools::getcoordbounds(std::vector<double>& coords)
     return output;
 }
 
+std::vector<int> gentools::unique(std::vector<int> a)
+{
+    std::sort(a.begin(), a.end());
+    std::vector<int>::iterator it;
+    it = std::unique(a.begin(), a.end());
+    a.resize(std::distance(a.begin(), it));
+    
+    return a;
+}
+
 std::vector<int> gentools::intersect(std::vector<int> a, std::vector<int> b)
 {
     // Sort both vectors:
@@ -335,6 +345,22 @@ std::vector<int> gentools::intersect(std::vector<int> a, std::vector<int> b)
     
     // Intersect:
     it = std::set_intersection(a.begin(), a.end(), b.begin(), b.end(), output.begin());
+    output.resize(it-output.begin()); 
+    
+    return output;
+}
+
+std::vector<int> gentools::exclude(std::vector<int> a, std::vector<int> b)
+{
+    // Sort both vectors:
+    std::sort(a.begin(), a.end()); 
+    std::sort(b.begin(), b.end());
+    
+    std::vector<int> output(a.size()+b.size());
+    std::vector<int>::iterator it;
+    
+    // Exclude:
+    it = std::set_difference(a.begin(), a.end(), b.begin(), b.end(), output.begin());
     output.resize(it-output.begin()); 
     
     return output;
