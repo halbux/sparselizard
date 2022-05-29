@@ -104,10 +104,17 @@ void mesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int numo
     isloaded = true;
 }
 
-void mesh::write(std::string name, int verbosity)
+void mesh::write(std::string name, std::vector<int> physregs, int option)
 {
     errorifnotloaded();
-    rawmeshptr->gethadaptedpointer()->write(name, verbosity);
+    
+    if (std::abs(option) != 1)
+    {
+        std::cout << "Error in 'mesh' object: write option must be -1 or +1" << std::endl;
+        abort();   
+    }
+    
+    rawmeshptr->gethadaptedpointer()->write(name, physregs, option);
 }
 
 void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumsplits)

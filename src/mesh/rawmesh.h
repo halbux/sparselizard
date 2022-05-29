@@ -70,7 +70,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // 'readfromfile' hands over to the function reading the format of the mesh file.
         void readfromfile(std::string tool, std::string source);
         // 'writetofile' hands over to the function writing the format of the mesh file.
-        void writetofile(std::string);
+        void writetofile(std::string name, std::vector<int> physregstowrite);
 
         // 'removeduplicates' removes the duplicated elements (and nodes).
         void removeduplicates(int lasttypetoprocess = 7);
@@ -105,7 +105,7 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         void load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity);
 
         // Write to file name:
-        void write(std::string name, int verbosity);     
+        void write(std::string name, std::vector<int> physregs, int option);     
         
         // Split each element in the mesh n times:
         void split(int n);

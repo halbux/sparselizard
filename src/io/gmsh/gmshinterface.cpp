@@ -290,8 +290,18 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
     }
 }
 
-void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions, disjointregions& mydisjointregions)
+void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions, disjointregions& mydisjointregions, std::vector<int> physicalregionstowrite)
 {    
+    // Check which nodes should be written:
+    std::vector< std::vector<std::vector<int>>* > elementlists(physicalregionstowrite.size());
+    for (int p = 0; p < physicalregionstowrite.size(); p++)
+        elementlists[p] = myphysicalregions.get(physicalregionstowrite[p])->getelementlist();
+    std::vector<bool> isnodeinphysicalregions;
+    int numnodesinphysregs = myelements.istypeinelementlists(0, elementlists, isnodeinphysicalregions, true);
+    
+    if (numnodesinphysregs == 0)
+        return;
+        
     // 'file' cannot take a std::string argument --> name.c_str():
     std::ofstream meshfile (name.c_str());
     if (meshfile.is_open())
@@ -306,12 +316,22 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
         
         // Write the node section:
         meshfile << "$Nodes\n";
-        meshfile << mynodes.count() << "\n";
+        meshfile << numnodesinphysregs << "\n";
         // Write the node coordinates:        
         std::vector<double>* nodecoordinates = mynodes.getcoordinates();
         
+        int index = 0;
+        std::vector<int> noderenumbering(mynodes.count(), -1);
         for (int i = 0; i < mynodes.count(); i++)
-            meshfile << i+1 << " " << nodecoordinates->at(3*i+0) << " " << nodecoordinates->at(3*i+1) << " " << nodecoordinates->at(3*i+2) << "\n";
+        {
+            if (isnodeinphysicalregions[i])
+            {
+                meshfile << index+1 << " " << nodecoordinates->at(3*i+0) << " " << nodecoordinates->at(3*i+1) << " " << nodecoordinates->at(3*i+2) << "\n";
+                
+                noderenumbering[i] = index;
+                index++;
+            }
+        }
         meshfile << "$EndNodes\n";
         
         // Write the element section:
@@ -321,18 +341,18 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
         // The number of elements is equal to the total number of elements in the physical regions.
         // Elements that are in several physical regions at the same time are counted 
         // multiple times, which is ok in the .msh format.
-        int numberofelements = myphysicalregions.countelements();
+        int numberofelements = 0;
+        for (int p = 0; p < physicalregionstowrite.size(); p++)
+            numberofelements += myphysicalregions.get(physicalregionstowrite[p])->countelements();
         meshfile << numberofelements << "\n";
         
         // Write all element lines to the file.
         int elementnumberinfile = 1;
         // Iterate through all physical regions:
-        for (int i = 0; i < myphysicalregions.count(); i++)
+        for (int p = 0; p < physicalregionstowrite.size(); p++)
         {
-            // Get the physical region number corresponding to index i:
-            int physicalregionnumber = myphysicalregions.getnumber(i);
             // Get the physical region object:
-            physicalregion* physicalregionobject = myphysicalregions.getatindex(i);
+            physicalregion* physicalregionobject = myphysicalregions.get(physicalregionstowrite[p]);
             // Get all disjoint regions inside the physical region:
             std::vector<int> alldisjointregions = physicalregionobject->getdisjointregions();
 
@@ -356,10 +376,10 @@ void gmshinterface::writetofile(std::string name, nodes& mynodes, elements& myel
                     // Write [element number in file, type number, number of parameters (2 here), physical region number, physical region number]:
                     // Note: physical region number appears twice. If a single parameter is provided the
                     // physical regions will not be displayable separately when the .msh file is opened in GMSH.
-                    meshfile << elementnumberinfile << " " << converttogmshelementtypenumber(curvedtypenumber) << " 2 " << physicalregionnumber << " " << physicalregionnumber;
+                    meshfile << elementnumberinfile << " " << converttogmshelementtypenumber(curvedtypenumber) << " 2 " << physicalregionstowrite[p] << " " << physicalregionstowrite[p];
                     // Write all nodes in the element.
                     for (int nodeindex = 0; nodeindex < numberofcurvednodes; nodeindex++)
-                        meshfile << " " << myelements.getsubelement(0, typenumber, i, nodeindex) + 1; // +1 to start numbering nodes at 1
+                        meshfile << " " << noderenumbering[myelements.getsubelement(0, typenumber, i, nodeindex)] + 1; // +1 to start numbering nodes at 1
                     
                     elementnumberinfile = elementnumberinfile + 1;
                     meshfile << "\n";

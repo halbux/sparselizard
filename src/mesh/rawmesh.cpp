@@ -143,10 +143,10 @@ void rawmesh::readfromfile(std::string tool, std::string source)
     abort();
 }
 
-void rawmesh::writetofile(std::string name)
+void rawmesh::writetofile(std::string name, std::vector<int> physregstowrite)
 {
     if (name.length() >= 5 && name.compare(name.size()-4,4,".msh") == 0)
-        gmshinterface::writetofile(name, mynodes, myelements, myphysicalregions, mydisjointregions);
+        gmshinterface::writetofile(name, mynodes, myelements, myphysicalregions, mydisjointregions, physregstowrite);
     else
     {
         std::cout << "Error: file '" << name << "' has either no extension or it is not supported." << std::endl << "Currently supported: GMSH .msh" << std::endl;
@@ -560,17 +560,23 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
 }
 
 
-void rawmesh::write(std::string name, int verbosity)
+void rawmesh::write(std::string name, std::vector<int> physregs, int option)
 {
-    if (verbosity > 0)
-        std::cout << "Writing mesh to file '" << name << "'" << std::endl;
+    std::vector<int> physregstowrite = myphysicalregions.getallnumbers();
     
-    wallclock writetime;
-    
-    writetofile(name);
+    if (physregs != std::vector<int>(1, -1))
+    {
+        physregs = gentools::unique(physregs);
+     
+        myphysicalregions.errorundefined(physregs);
+        
+        if (option == 1)
+            physregstowrite = physregs;
+        else
+            physregstowrite = gentools::exclude(physregstowrite, physregs);
+    }
 
-    if (verbosity > 0)
-        writetime.print("Time to write the mesh: ");
+    writetofile(name, physregstowrite);
 }
 
 void rawmesh::split(int n)
@@ -1751,7 +1757,7 @@ void rawmesh::writewithdisjointregions(std::string name)
         currentphysicalregion->setdisjointregions({disjreg});
     }
     // Save to GMSH format:
-    gmshinterface::writetofile(name, mynodes, myelements, tempphysicalregions, mydisjointregions);
+    gmshinterface::writetofile(name, mynodes, myelements, tempphysicalregions, mydisjointregions, tempphysicalregions.getallnumbers());
 }
 
 void rawmesh::printphysicalregions(void)

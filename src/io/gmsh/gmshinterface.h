@@ -35,7 +35,7 @@ namespace gmshinterface
     // Load the .msh mesh to the 'nodes', 'elements' and 'physicalregions' objects.
     void readfromfile(std::string name, nodes&, elements&, physicalregions&);
     // Write to .msh mesh format:
-    void writetofile(std::string name, nodes&, elements&, physicalregions&, disjointregions&);
+    void writetofile(std::string name, nodes&, elements&, physicalregions&, disjointregions&, std::vector<int> physicalregionstowrite);
     
     // Write to .pos format:
     void writetofile(std::string name, iodata datatowrite);
