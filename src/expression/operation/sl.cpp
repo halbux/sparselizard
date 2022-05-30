@@ -9,17 +9,17 @@
 
 int sl::getversion(void)
 {
-    return 202111;
+    return 202205;
 }
 
 int sl::getsubversion(void)
 {
-    return 15;
+    return 0;
 }
 
 std::string sl::getversionname(void)
 {
-    return "elegant elk";
+    return "friendly fox";
 }
 
 void sl::printversion(void)
