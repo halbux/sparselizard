@@ -42,7 +42,15 @@ namespace sl
     void setmaxnumthreads(int mnt);
     int getmaxnumthreads(void);
     
+    field getx(void);
+    field gety(void);
+    field getz(void);
+    
     double getpi(void);
+    
+    // Vacuum permeability/permittivity:
+    double getmu0(void);
+    double getepsilon0(void);
 
     // Get a random value uniformly distributed between 0.0 and 1.0:
     double getrandom(void);
