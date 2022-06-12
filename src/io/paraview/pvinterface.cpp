@@ -442,13 +442,13 @@ std::vector<int> pvinterface::getnodereordering(int ourtypenumber)
             case 1:
                 return {0,1};
             case 2:
-                return {0,2,1};
+                return {0,1,2};
             case 3:
-                return {0,2,3,1};
+                return {0,1,2,3};
             case 4:
-                return {0,2,3,4,1};
+                return {0,1,2,3,4};
             case 5:
-                return {0,2,3,4,5,1};
+                return {0,1,2,3,4,5};
         }
     }
 
