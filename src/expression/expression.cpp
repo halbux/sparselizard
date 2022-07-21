@@ -449,7 +449,6 @@ std::vector<double> expression::min(int physreg, int refinement, std::vector<dou
 {
     universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
-    // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, NULL, refinement, xyzrange);
     if (output.size() > 0)
         output[0] = -output[0];
@@ -460,7 +459,6 @@ std::vector<double> expression::min(int physreg, expression meshdeform, int refi
 {
     universe::getrawmesh()->getphysicalregions()->errorundefined({physreg});
     
-    // The actual min value is minus the max value found:
     std::vector<double> output = (-this->getcopy()).max(physreg, &meshdeform, refinement, xyzrange);
     if (output.size() > 0)
         output[0] = -output[0];
