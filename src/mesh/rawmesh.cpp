@@ -280,8 +280,6 @@ void rawmesh::load(std::string name, int globalgeometryskin, int numoverlaplayer
     }
     
     myelements.definedisjointregions();
-    // The reordering is stable and the elements are thus still ordered 
-    // by barycenter coordinates in every disjoint region!
     myelements.reorderbydisjointregions();
     myelements.definedisjointregionsranges();
     
@@ -512,8 +510,6 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     }
     
     myelements.definedisjointregions();
-    // The reordering is stable and the elements are thus still ordered 
-    // by barycenter coordinates in every disjoint region!
     myelements.reorderbydisjointregions();
     myelements.definedisjointregionsranges();
     
