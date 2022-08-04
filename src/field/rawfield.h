@@ -131,9 +131,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // If provided, 'physregsfororder' must be {physreg1,orderpr1,physreg2,orderpr2,...} with ORDERS SORTED ASCENDINGLY.
         void synchronize(std::vector<int> physregsfororder = {}, std::vector<int> disjregsfororder = {});
         
-        void updateshapefunctions(std::shared_ptr<rawfield> originalthis, bool withtiming = false);
-        void updatenodalshapefunctions(std::shared_ptr<rawfield> originalthis);
-        void updateothershapefunctions(std::shared_ptr<rawfield> originalthis, int dim);
+        void updateshapefunctions(expression updateexpr, expression* meshdeform, std::vector<std::vector<int>> drsindims, int updateaccuracy, bool withtiming = false);
+        void updatenodalshapefunctions(expression updateexpr, expression* meshdeform, std::vector<std::vector<int>> drsindims);
+        void updateothershapefunctions(int dim, expression updateexpr, expression* meshdeform, std::vector<std::vector<int>> drsindims, int updateaccuracy);
         
         void allowsynchronizing(bool allowit);
         void allowvaluesynchronizing(bool allowit);
