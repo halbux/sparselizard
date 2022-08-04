@@ -34,7 +34,12 @@ int main(void)
     // delimited by [0,0.25] for x and [0.4,0.6] for y:
     expression cinit = ifpositive(x-0.25, 0.0, ifpositive(abs(y-0.5)-0.1, 0.0, 1.0) );
 
-    c.setvalue(sur, cinit);
+    // Initialize c to a smooth concentration profile:
+    formulation initsmooth;
+    initsmooth += integral(sur, dof(c)*tf(c) - cinit*tf(c));
+    initsmooth.solve();
+    
+    initsmooth.solve();
     c.write(sur, "cinit.vtu", 2);
 
     // Tuning factor for the stabilization:
@@ -49,7 +54,7 @@ int main(void)
 
     adnostab += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     
-    c.setvalue(sur, cinit);
+    initsmooth.solve();
     genalpha genanostab(adnostab, vec(adnostab), vec(adnostab), 1, {true,true,true,true});
     genanostab.setparameter(0.75);
     settime(0);
@@ -64,7 +69,7 @@ int main(void)
     adiso += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     adiso += integral(sur, predefinedstabilization("iso", delta, c, v, 0.0, 0.0));
 
-    c.setvalue(sur, cinit);
+    initsmooth.solve();
     genalpha genaiso(adiso, vec(adiso), vec(adiso), 1, {true,true,true,true});
     genaiso.setparameter(0.75);
     settime(0);
@@ -79,7 +84,7 @@ int main(void)
     adaniso += integral(sur, predefinedadvectiondiffusion(dof(c), tf(c), v, 1e-6, 1.0, 1.0, true));
     adaniso += integral(sur, predefinedstabilization("aniso", delta, c, v, 0.0, 0.0));
 
-    c.setvalue(sur, cinit);
+    initsmooth.solve();
     genalpha genaaniso(adaniso, vec(adaniso), vec(adaniso), 1, {true,true,true,true});
     genaaniso.setparameter(0.75);
     settime(0);
@@ -102,7 +107,7 @@ int main(void)
     adcomb += integral(sur, predefinedstabilization("supg", deltas, c, v, 1e-6, dofres));
     adcomb += integral(sur, predefinedstabilization("cws", deltac, c, v, 1e-6, res));
     
-    c.setvalue(sur, cinit);
+    initsmooth.solve();
     genalpha genacomb(adcomb, vec(adcomb), vec(adcomb), 1, {true,true,true,true});
     genacomb.setparameter(0.75);
     settime(0);

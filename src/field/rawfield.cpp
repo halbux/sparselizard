@@ -818,7 +818,7 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
     }
 }
 
-void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
+void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, expression input, int eio)
 {
     synchronize();
     
@@ -832,33 +832,31 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
         std::cout << "Error in 'rawfield' object: the rawfield value must be set with a " << countcomponents() << "x1 expression" << std::endl;
         abort();
     }
-    
-    // Set the values on the sub fields:
-    for (int i = 0; i < mysubfields.size(); i++)
-        mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), extraintegrationdegree);
 
-    if (mysubfields.size() == 0)
+    // Set the values on the subfields:
+    if (mysubfields.size() > 0)
     {
-        field thisfield(getpointer());
-    
-        // Compute the projection of the expression (skip for a zero expression):
-        formulation projectedvalue;
-        if (meshdeform == NULL)
-            projectedvalue += integration(physreg, numfftharms, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree);
-        else
-            projectedvalue += integration(physreg, numfftharms, *meshdeform, sl::dof(thisfield)*sl::tf(thisfield) - sl::tf(thisfield)*input, extraintegrationdegree);
-        // Define an all-zero vector:
-        vec solvec(projectedvalue);
-        if (input.iszero() == false)
-        {
-            projectedvalue.generate();
-            solvec = sl::solve(projectedvalue.A(), projectedvalue.b());
-        }
-        else
-            solvec.updateconstraints();
-        
-        setdata(physreg, solvec|thisfield, "set");
+        for (int i = 0; i < mysubfields.size(); i++)
+            mysubfields[i][0]->setvalue(physreg, numfftharms, meshdeform, input.at(i,0), eio);
+        return;
     }
+    // Set the values on the harmonics:
+    if (myharmonics.size() > 0)
+    {
+        for (int h = 0; h < myharmonics.size(); h++)
+        {
+            if (myharmonics[h].size() > 0)
+                myharmonics[h][0]->setvalue(physreg, numfftharms, meshdeform, sl::getharmonic(h, input, numfftharms), eio);
+        }
+        return;
+    }
+    
+    physicalregion* curpr = getrawmesh()->getphysicalregions()->get(physreg);
+    
+    if (input.iszero())
+        getpointer()->setzerovalue(physreg);
+    else
+        getpointer()->updateshapefunctions(input, meshdeform, {curpr->getdisjointregions(0), curpr->getdisjointregions(1), curpr->getdisjointregions(2), curpr->getdisjointregions(3)}, eio);
 }
 
 void rawfield::setvalue(int physreg)
