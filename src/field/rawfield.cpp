@@ -1108,6 +1108,25 @@ densemat rawfield::getnodalvalues(indexmat nodenumbers)
     return output;
 }
 
+void rawfield::setzerovalue(int physreg)
+{
+    synchronize();
+
+    // Get all disjoint regions in the physical region:
+    std::vector<int> disjregs = universe::getrawmesh()->getphysicalregions()->get(physreg)->getdisjointregions(-1);
+
+    for (int i = 0; i < disjregs.size(); i++)
+    {
+        int numelems = universe::getrawmesh()->getdisjointregions()->countelements(disjregs[i]);
+
+        for (int ff = 0; ff < mycoefmanager->countformfunctions(disjregs[i]); ff++)
+        {
+            for (int elem = 0; elem < numelems; elem++)
+                mycoefmanager->setcoef(disjregs[i], ff, elem, 0);
+        }
+    }
+}
+
 void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree)
 {
     synchronize();

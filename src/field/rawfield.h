@@ -190,6 +190,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         void setnodalvalues(indexmat nodenumbers, densemat values);
         densemat getnodalvalues(indexmat nodenumbers);
         
+        // Zero all dofs on the requested physical region:
+        void setzerovalue(int physreg);
+        
         void setdisjregconstraint(int physreg, int numfftharms, expression* meshdeform, expression input, int extraintegrationdegree = 0);
         // Set homogeneous Dirichlet constraints:
         void setdisjregconstraint(int physreg);
