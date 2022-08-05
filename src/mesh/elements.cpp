@@ -1212,8 +1212,7 @@ void elements::follow(std::vector<std::vector<int>>* elementlist, int subtype, s
 
 void elements::definedisjointregions(void)
 {
-    
-    int numberofphysicalregions = myphysicalregions->count();
+    long long int numberofphysicalregions = myphysicalregions->count();
     
     // Define 'isinphysicalregion[elementtypenumber]' to hold a vector
     // whose (elem*numphysreg+i)th entry is true if the element 'elem' 
