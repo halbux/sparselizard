@@ -55,10 +55,6 @@ formulation& formulation::operator+=(integration integrationobject)
 
     int integrationphysreg = integrationobject.getphysicalregion();
     int elementdimension = universe::getrawmesh()->getphysicalregions()->get(integrationphysreg)->getelementdimension();
-    // Return on empty integration region:
-    if (elementdimension < 0)
-        return *this;
-    
     int integrationorderdelta = integrationobject.getintegrationorderdelta();
     expression myexpression = integrationobject.getexpression();
 

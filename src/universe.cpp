@@ -21,8 +21,8 @@ void universe::addtorawmeshcounter(int val)
     
     if (mynumrawmeshes == 0 && val > 0 && ispetscinitialized == PETSC_FALSE)
         SlepcInitialize(0,{},0,0);
-    if (mynumrawmeshes > 0 && mynumrawmeshes+val == 0 && ispetscinitialized == PETSC_TRUE)
-        SlepcFinalize();
+    //if (mynumrawmeshes > 0 && mynumrawmeshes+val == 0 && ispetscinitialized == PETSC_TRUE)
+    //    SlepcFinalize();
 
     mynumrawmeshes += val;
 }

@@ -43,14 +43,11 @@ void vec::updateconstraints(void)
     errorifpointerisnull();
     
     std::shared_ptr<dofmanager> mydofmanager = rawvecptr->getdofmanager();
-    // Get all disjoint regions:
-    std::vector<int> disjregs((universe::getrawmesh()->getdisjointregions())->count());
-    std::iota(disjregs.begin(), disjregs.end(), 0);
-    
+
     // Update the disjoint region constraints:
     std::vector<std::shared_ptr<rawfield>> fieldsindofmanager = rawvecptr->getdofmanager()->getfields();
     for (int i = 0; i < fieldsindofmanager.size(); i++)
-        rawvecptr->updatedisjregconstraints(fieldsindofmanager[i], disjregs);
+        rawvecptr->updatedisjregconstraints(fieldsindofmanager[i]);
         
     // Update the conditional constraints:
     std::pair<indexmat, densemat> condconstrdata = mydofmanager->getconditionalconstraintdata();

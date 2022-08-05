@@ -139,49 +139,78 @@ int rawvec::size(void)
         return mydofmanager->countdofs(); 
 }
 
-void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield, std::vector<int> disjregs)
+void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield)
 {    
     synchronize();
     
+    std::vector<std::shared_ptr<std::tuple<int, int, std::vector<expression>, expression, int, int>>> drct = constrainedfield->getdisjregconstraints();
+    
     mydofmanager->selectfield(constrainedfield);
-    std::vector<std::shared_ptr<integration>> fieldconstraints = constrainedfield->getdisjregconstraints();
-
-    // Loop on all disjoint regions:
-    for (int d = 0; d < disjregs.size(); d++)
+    
+    // Active constrained disjregs:
+    std::vector<int> constrdisjregs = {};
+    for (int d = 0; d < drct.size(); d++)
     {
-        int disjreg = disjregs[d];
+        if (drct[d] != NULL && mydofmanager->isdefined(d, 0))
+            constrdisjregs.push_back(d);
+    }
+    
+    physicalregions* prs = getrawmesh()->getphysicalregions();
+    
+    // Backup the rawfield values:
+    std::shared_ptr<coefmanager> cmbkp = constrainedfield->resetcoefmanager();
 
-        // Make sure the disjoint region is in the dof structure and is constrained:
-        if (mydofmanager->isdefined(disjreg, 0) && fieldconstraints[disjreg] != NULL)
+    while (true)
+    {
+        std::shared_ptr<std::tuple<int, int, std::vector<expression>, expression, int, int>> curdrct = NULL;
+     
+        // Find the lowest active tag:
+        for (int d = 0; d < drct.size(); d++)
         {
-            // Compute the constraint projection:
-            formulation projectconstraint;
-            projectconstraint += *fieldconstraints[disjreg];
-            projectconstraint.isconstraintcomputation = true;                
-
-            // Get an all zero vector:
-            vec constraintvalvec(projectconstraint);
-            // Zero valued constraints need not be computed:
-            if (fieldconstraints[disjreg]->isprojectionofzero == false)
+            if (drct[d] != NULL && mydofmanager->isdefined(d, 0))
             {
-                projectconstraint.generate();
-                constraintvalvec = sl::solve(projectconstraint.A(), projectconstraint.b());
-            }
-
-            // Loop on all disjoint regions who share the same constraint-computation-formulation:
-            std::shared_ptr<integration> currentconstraint = fieldconstraints[disjreg];
-            for (int i = d; i < disjregs.size(); i++)
-            {
-                if (mydofmanager->isdefined(disjregs[i], 0) && fieldconstraints[disjregs[i]] == currentconstraint)
-                {
-                    // Transfer the data from 'constraintvalvec' to 'myvec' on disjoint region disjregs[i]:
-                    setdata(constraintvalvec.getpointer(), disjregs[i], constrainedfield);
-                    // Clear the fieldconstraints pointer since it was treated:
-                    fieldconstraints[disjregs[i]] = NULL;
-                }
+                if (curdrct == NULL || std::get<5>(*curdrct) > std::get<5>(*drct[d]))
+                    curdrct = drct[d];
             }
         }
+        
+        if (curdrct == NULL)
+            break;
+            
+        // Erase all same pointers:
+        for (int d = 0; d < drct.size(); d++)
+        {
+            if (curdrct.get() == drct[d].get())
+                drct[d] = NULL;
+        }
+    
+        int physreg = std::get<0>(*curdrct);
+        
+        expression* meshdeform = NULL;
+        if (std::get<2>(*curdrct).size() > 0)
+            meshdeform = &(std::get<2>(*curdrct)[0]);
+            
+        expression expr = std::get<3>(*curdrct);
+        
+        int eio = std::get<4>(*curdrct); // extra integration order
+        
+        physicalregion* curpr = prs->get(physreg);
+        
+        if (expr.iszero())
+            constrainedfield->setzerovalue(physreg);
+        else
+            constrainedfield->updateshapefunctions(expr, meshdeform, {curpr->getdisjointregions(0), curpr->getdisjointregions(1), curpr->getdisjointregions(2), curpr->getdisjointregions(3)}, eio);
     }
+    
+    // Transfer the field values to the vector:
+    int constrphysreg = prs->createfromdisjointregionlist(constrdisjregs);
+    
+    constrainedfield->transferdata(constrphysreg, vec(getpointer())|field(constrainedfield), "set");
+    
+    prs->remove({constrphysreg}, false);
+    
+    // Restore the rawfield values:
+    constrainedfield->setcoefmanager(cmbkp);
 }
 
 void rawvec::setvalues(indexmat addresses, densemat valsmat, std::string op)

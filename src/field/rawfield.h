@@ -30,7 +30,6 @@
 #include "coefmanager.h"
 #include "universe.h"
 #include "expression.h"
-#include "integration.h"
 #include "sl.h"
 #include "harmonic.h"
 #include "densemat.h"
@@ -83,9 +82,9 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         // interpolationorder[disjreg] gives the interpolation 
         // order of the field on disjoint region 'disjreg'.
         std::vector<int> interpolationorder = {};
-        // mydisjregconstraints[disjreg] gives the integration object to compute the 
+        // mydisjregconstraints[disjreg] gives the information to compute the 
         // constraint value on the disjoint region. NULL means unconstrained.
-        std::vector<std::shared_ptr<integration>> mydisjregconstraints = {};
+        std::vector<std::shared_ptr<std::tuple<int, int, std::vector<expression>, expression, int, int>>> mydisjregconstraints = {};
         // myconditionalconstraints[disjreg] gives the {conditional expression, constraint value} 
         // on the NODAL disjoint region 'disjreg'. Empty means unconstrained.
         std::vector<std::vector<expression>> myconditionalconstraints = {};
@@ -235,7 +234,7 @@ class rawfield : public std::enable_shared_from_this<rawfield>
         
         // Only valid for fields without subfields.
         bool isdisjregconstrained(int disjreg);
-        std::vector<std::shared_ptr<integration>> getdisjregconstraints(void);
+        std::vector<std::shared_ptr<std::tuple<int, int, std::vector<expression>, expression, int, int>>> getdisjregconstraints(void);
         
         bool isconditionallyconstrained(int disjreg);
         std::vector<std::vector<expression>> getconditionalconstraints(void);

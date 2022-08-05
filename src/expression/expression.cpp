@@ -2128,16 +2128,10 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
             // products of invjac terms and ki, eta and phi derivatives.
             int numdofterms = 1, numtfterms = 1;
             if (currentdof->getspacederivative() > 0)
-                numdofterms = elementdimension;
+                numdofterms = std::max(1, elementdimension);
             if (currenttf->getspacederivative() > 0)
-                numtfterms = elementdimension;
+                numtfterms = std::max(1, elementdimension);
                 
-            if (numdofterms < 0 || numtfterms < 0)
-            {
-                std::cout << "Error in 'expression' object: cannot process the term for " << elementdimension << "D elements" << std::endl;
-                std::cout << "Are you working with an empty physical region?" << std::endl;
-                abort();
-            }
 
             std::vector<std::shared_ptr<operation>> currentdofsplit(numdofterms*numtfterms);
             std::vector<std::shared_ptr<operation>> currenttfsplit(numdofterms*numtfterms);
@@ -2167,7 +2161,10 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                     }
                     currentdofsplit[i*numtfterms+j] = copieddof;
                     currenttfsplit[i*numtfterms+j] = copiedtf;
-                    currentcoefsplit[i*numtfterms+j] = newcoef;
+                    if (elementdimension > 0 || (currentdof->getspacederivative() == 0 && currenttf->getspacederivative() == 0))
+                        currentcoefsplit[i*numtfterms+j] = newcoef;
+                    else
+                        currentcoefsplit[i*numtfterms+j] = std::shared_ptr<operation>(new opconstant(0));
                 }
             }
 

@@ -37,7 +37,6 @@ int main(void)
     // Initialize c to a smooth concentration profile:
     formulation initsmooth;
     initsmooth += integral(sur, dof(c)*tf(c) - cinit*tf(c));
-    initsmooth.solve();
     
     initsmooth.solve();
     c.write(sur, "cinit.vtu", 2);
