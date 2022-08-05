@@ -91,6 +91,12 @@ int physicalregions::createfromdisjointregionlist(std::vector<int> drs)
     return newphysregnum;
 }
 
+void physicalregions::definewithdisjointregions(void)
+{
+    for (int i = 0; i < myphysicalregionnumbers.size(); i++)
+        myphysicalregions[i]->definewithdisjointregions();
+}
+
 int physicalregions::getmaxphysicalregionnumber(void)
 {
     return *std::max_element(myphysicalregionnumbers.begin(), myphysicalregionnumbers.end());

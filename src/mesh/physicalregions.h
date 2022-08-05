@@ -39,6 +39,9 @@ class physicalregions
         // Create a physical region from a list of disjoint regions:
         int createfromdisjointregionlist(std::vector<int> drs);
         
+        // Define the physical regions based on the disjoint regions they contain:
+        void definewithdisjointregions(void);
+        
         int getmaxphysicalregionnumber(void);
         
         // 'get' creates any non-existent physical region object:

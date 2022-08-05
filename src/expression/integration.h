@@ -30,10 +30,6 @@ class integration
 
     public:
         
-        // This is used to accelerate all zero constraint computations.
-        // Set it true if this object corresponds to project zero.
-        bool isprojectionofzero = false;
-        
         // Barycenter eval mode for a rhs term:
         bool isbarycentereval = false;
         
