@@ -30,7 +30,7 @@ int main(void)
     // Define the region for the electric problem:
     int electricdomain = selectunion({insulator, pillars, membrane, vacuumgap});
     // Define the membrane top line:
-    int membranetop = selectintersection({membrane, fluid});
+    int membranetop = selectintersection({membrane, fluid}, 1);
     
     // Nodal shape functions 'h1' for the electric potential field v, acoustic pressure
     // field p and membrane deflection u (u has components x and y).

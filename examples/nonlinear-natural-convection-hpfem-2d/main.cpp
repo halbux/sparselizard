@@ -25,7 +25,7 @@ int main(void)
     int fluid = 1, disk = 2, inlet = 3, outlet = 4, sides = 5;
 	
 	int all = selectunion({fluid, disk});
-	int diskskin = selectintersection({fluid, disk});
+	int diskskin = selectintersection({fluid, disk}, 1);
 	
 	int zflux = selectunion({sides, outlet});
 	int noslip = selectunion({sides, diskskin});

@@ -50,7 +50,7 @@ int main(void)
     mymesh.write("geometry.msh");
     // Define additional regions:
     int fluid = selectunion({cavity,outair});
-    int mechacoucoupl = selectintersection({fluid,membrane});
+    int mechacoucoupl = selectintersection({fluid,membrane}, 1);
     int slip = selectunion({botcoupl,wall});
 
 

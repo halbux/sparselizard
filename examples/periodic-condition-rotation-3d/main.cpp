@@ -24,8 +24,8 @@ int main(void)
     mesh mymesh("cmutperiodic.msh");
 
     // The periodic condition is only applied to the solid region:
-    gamma1 = selectintersection({gamma1, solid});
-    gamma2 = selectintersection({gamma2, solid});
+    gamma1 = selectintersection({gamma1, solid}, 2);
+    gamma2 = selectintersection({gamma2, solid}, 2);
 
 
     wallclock clk;

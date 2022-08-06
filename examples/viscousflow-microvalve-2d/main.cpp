@@ -27,7 +27,7 @@ int main(void)
 
     // Define the fluid boundary as the intersection between the solid and the fluid regions:
     int solid = selectunion({pillar,support,membrane});
-    int fluidboundary = selectintersection({fluid,solid});
+    int fluidboundary = selectintersection({fluid,solid}, 1);
     
     // Dynamic viscosity of water [Pa.s] and density [kg/m3]:
     double mu = 8.9e-4, rho = 1000;

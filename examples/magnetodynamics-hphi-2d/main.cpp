@@ -46,7 +46,7 @@ int main(void)
     // Set the working frequency to 50 Hz:
     setfundamentalfrequency(50);
 
-    int condskin = selectintersection({air, conductor});
+    int condskin = selectintersection({air, conductor}, 1);
 
     // Since the solution has a component in phase with the actuation
     // and a quadrature component we need 2 harmonics at 50Hz 

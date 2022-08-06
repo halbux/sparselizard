@@ -25,7 +25,7 @@ int main(void)
     mesh mymesh("channel.msh");
     
     // Define the cylinder skin region:
-    int cylskin = selectintersection({fluid,cylinder});
+    int cylskin = selectintersection({fluid,cylinder}, 1);
     
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components in 2D.
     // Field p is the relative pressure.

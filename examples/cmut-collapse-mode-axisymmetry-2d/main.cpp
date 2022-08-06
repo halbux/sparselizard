@@ -42,7 +42,7 @@ int main(void)
     mymesh.write("cmutaxisym.msh");
     
     // Define additional regions:
-    int contact = selectintersection({membrane, cavity});
+    int contact = selectintersection({membrane, cavity}, 1);
     int solid = selectunion({membrane, pillar, insulator});
     int wholedomain = selectunion({solid,cavity});
     

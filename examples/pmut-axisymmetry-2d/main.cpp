@@ -62,10 +62,10 @@ int main(void)
     mymesh.write("pmutaxisym.msh");
 
     // Define additional regions:
-    int ground = selectintersection({piezo, botelec});
+    int ground = selectintersection({piezo, botelec}, 1);
     int solid = selectunion({pillar, membrane, botelec, piezo, topelec});
     int isotropicsolid = selectunion({pillar, membrane, botelec, topelec});
-    int pmuttop = selectintersection({topelec,fluid});
+    int pmuttop = selectintersection({topelec,fluid}, 1);
 
     // Harmonic analysis. Set the fundamental frequency [Hz]:
     setfundamentalfrequency(f0);

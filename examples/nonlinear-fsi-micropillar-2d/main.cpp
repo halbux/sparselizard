@@ -39,7 +39,7 @@ int main(void)
     mesh mymesh("fsimicropillar.msh");
 
     // Define the fluid-structure interface:
-    int fsinterface = selectintersection({fluid, solid});
+    int fsinterface = selectintersection({fluid, solid}, 1);
 
     // Field v is the flow velocity. It uses nodal shape functions "h1" with two components in 2D.
     // Field p is the relative pressure. Field u is the mechanical deflection. Field umesh stores
