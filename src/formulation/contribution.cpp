@@ -39,10 +39,10 @@ void contribution::generate(std::shared_ptr<rawvec> myvec, std::shared_ptr<rawma
     // Check which node is in the tf physical region:
     std::vector<bool> isnodeintfphysreg;
     if (tfphysreg != integrationphysreg)
-        universe::getrawmesh()->getelements()->istypeinelementlists(0, {universe::getrawmesh()->getphysicalregions()->get(tfphysreg)->getelementlist(false)}, isnodeintfphysreg, false);
+        universe::getrawmesh()->getelements()->istypeindisjointregions(0, universe::getrawmesh()->getphysicalregions()->get(tfphysreg)->getdefinition(), isnodeintfphysreg, false);
         
     // The integration will be performed on the following disjoint regions:
-    std::vector<int> selectedelemdisjregs = ((universe::getrawmesh()->getphysicalregions())->get(integrationphysreg))->getdisjointregions();
+    std::vector<int> selectedelemdisjregs = universe::getrawmesh()->getphysicalregions()->get(integrationphysreg)->getdisjointregions();
   
     // Prepare to send the disjoint regions with same element type 
     // numbers and same dof and tf interpolation order together:

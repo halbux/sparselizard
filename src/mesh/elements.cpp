@@ -188,6 +188,46 @@ int elements::istypeinelementlists(int elementtypenumber, std::vector<std::vecto
     return numinlists;
 }
 
+int elements::istypeindisjointregions(int elementtypenumber, std::vector<bool> isdisjregselected, std::vector<bool>& isinelementlists, bool considercurvaturenodes)
+{
+    isinelementlists = std::vector<bool>(count(elementtypenumber), false);
+
+    int numinlists = 0;
+    for (int d = 0; d < isdisjregselected.size(); d++)
+    {
+        if (isdisjregselected[d] == false)
+            continue;
+            
+        int tn = mydisjointregions->getelementtypenumber(d);
+        int rb = mydisjointregions->getrangebegin(d);
+        int ne = mydisjointregions->countelements(d);
+    
+        element el(tn, mycurvatureorder);
+        int ns;
+        if (elementtypenumber == 0 && considercurvaturenodes)
+            ns = el.countcurvednodes();
+        else
+            ns = el.counttype(elementtypenumber);
+            
+        if (ns == 0)
+            continue;
+
+        for (int e = 0; e < ne; e++)
+        {
+            for (int k = 0; k < ns; k++)
+            {
+                int cursub = getsubelement(elementtypenumber,tn,rb+e,k);
+                if (isinelementlists[cursub] == false)
+                {
+                    isinelementlists[cursub] = true;
+                    numinlists++;
+                }
+            }
+        }
+    }
+
+    return numinlists;
+}
 
 int elements::count(int elementtypenumber)
 {

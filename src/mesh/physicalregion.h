@@ -69,7 +69,8 @@ class physicalregion
         // 'removeduplicatedelements' removes all duplicated elements in 'elementlist' (this call SORTS THE ELEMENTS).
         void removeduplicatedelements(void);
         
-        std::vector<std::vector<int>>* getelementlist(bool prdimonly = true);
+        // Get the elements in the physical region that have the region dimension:
+        std::vector<std::vector<int>>* getelementlist(void);
         
         // Make a full copy of this object (linking objects used are the arguments):
         std::shared_ptr<physicalregion> copy(physicalregions* prs, disjointregions* drs);
