@@ -851,7 +851,7 @@ indexmat dofmanager::getaddresses(std::shared_ptr<rawfield> inputfield, int fiel
 
     // Create a vector whose ith index is true if the field is defined 
     // on the disjoint region number i and false otherwise.
-    std::vector<int> fielddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(fieldphysreg))->getdisjointregions(-1); // Get all disj regs with (-1)
+    std::vector<int> fielddisjregs = universe::getrawmesh()->getphysicalregions()->get(fieldphysreg)->getdisjointregions(-1); // Get all disj regs with (-1)
     std::vector<bool> isfielddefinedondisjointregion(mydisjointregions->count(),false);
     for (int i = 0; i < fielddisjregs.size(); i++)
         isfielddefinedondisjointregion[fielddisjregs[i]] = true;

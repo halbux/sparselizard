@@ -9,18 +9,23 @@ physicalregions::physicalregions(disjointregions& inputdisjointregions)
 
 int physicalregions::createunion(std::vector<int> input, bool createifexisting)
 {
+    int physregdim = -1;
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
     {
+        physicalregion* curpr = get(input[i]);
+        
+        physregdim = std::max(physregdim, curpr->getelementdimension());
+        
         // Get all disjoint regions with -1:
-        std::vector<int> disjregsinthisphysreg = get(input[i])->getdisjointregions(-1);
+        std::vector<int> disjregsinthisphysreg = curpr->getdisjointregions(-1);
         for (int j = 0; j < disjregsinthisphysreg.size(); j++)
             disjregs.push_back(disjregsinthisphysreg[j]);
     }
 
     if (createifexisting == false)
     {
-        int existingnumber = find(disjregs);
+        int existingnumber = find(physregdim, disjregs);
         if (existingnumber >= 0)
             return existingnumber;
     }
@@ -28,12 +33,12 @@ int physicalregions::createunion(std::vector<int> input, bool createifexisting)
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
     physicalregion* newphysreg = get(newphysregnum);
-    newphysreg->setdisjointregions(disjregs);
+    newphysreg->definewithdisjointregions(physregdim, disjregs);
     
     return newphysregnum;
 }
 
-int physicalregions::createintersection(std::vector<int> input, bool createifexisting)
+int physicalregions::createintersection(std::vector<int> input, int physregdim, bool createifexisting)
 {
     std::vector<int> disjregs = {};
     for (int i = 0; i < input.size(); i++)
@@ -49,7 +54,7 @@ int physicalregions::createintersection(std::vector<int> input, bool createifexi
     
     if (createifexisting == false)
     {
-        int existingnumber = find(disjregs);
+        int existingnumber = find(physregdim, disjregs);
         if (existingnumber >= 0)
             return existingnumber;
     }
@@ -57,18 +62,20 @@ int physicalregions::createintersection(std::vector<int> input, bool createifexi
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
     physicalregion* newphysreg = get(newphysregnum);
-    newphysreg->setdisjointregions(disjregs);
+    newphysreg->definewithdisjointregions(physregdim, disjregs);
     
     return newphysregnum;
 }
 
 int physicalregions::createunionofall(bool createifexisting)
 {
+    int meshdim = universe::getrawmesh()->getmeshdimension();
+    
     std::vector<int> disjregs = gentools::getequallyspaced(0, 1, mydisjointregions->count());
 
     if (createifexisting == false)
     {
-        int existingnumber = find(disjregs);
+        int existingnumber = find(meshdim, disjregs);
         if (existingnumber >= 0)
             return existingnumber;
     }
@@ -76,17 +83,17 @@ int physicalregions::createunionofall(bool createifexisting)
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
     physicalregion* newphysreg = get(newphysregnum);
-    newphysreg->setdisjointregions(disjregs);
+    newphysreg->definewithdisjointregions(meshdim, disjregs);
     
     return newphysregnum;
 }
 
-int physicalregions::createfromdisjointregionlist(std::vector<int> drs)
+int physicalregions::createfromdisjointregionlist(int physregdim, std::vector<int> drs)
 {
     int newphysregnum = getmaxphysicalregionnumber() + 1;
     
     physicalregion* newphysreg = get(newphysregnum);
-    newphysreg->setdisjointregions(drs);
+    newphysreg->definewithdisjointregions(physregdim, drs);
     
     return newphysregnum;
 }
@@ -94,7 +101,7 @@ int physicalregions::createfromdisjointregionlist(std::vector<int> drs)
 void physicalregions::definewithdisjointregions(void)
 {
     for (int i = 0; i < myphysicalregionnumbers.size(); i++)
-        myphysicalregions[i]->definewithdisjointregions();
+        myphysicalregions[i]->definewithdisjointregions(-1, {}, true);
 }
 
 int physicalregions::getmaxphysicalregionnumber(void)
@@ -184,7 +191,7 @@ int physicalregions::getindex(int physicalregionnumber)
     return -1;
 }
 
-int physicalregions::find(std::vector<int>& disjregsinphysreg)
+int physicalregions::find(int physregdim, std::vector<int> disjregsinphysreg)
 {
     std::vector<bool> argdef(mydisjointregions->count(), false);
     for (int i = 0; i < disjregsinphysreg.size(); i++)
@@ -192,7 +199,7 @@ int physicalregions::find(std::vector<int>& disjregsinphysreg)
 
     for (int i = 0; i < myphysicalregionnumbers.size(); i++)
     {
-        if (myphysicalregions[i]->getdefinition() == argdef)
+        if (myphysicalregions[i]->getelementdimension() == physregdim && myphysicalregions[i]->getdefinition() == argdef)
             return myphysicalregionnumbers[i];
     }
     return -1;

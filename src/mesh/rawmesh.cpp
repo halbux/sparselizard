@@ -1730,7 +1730,7 @@ void rawmesh::writewithdisjointregions(std::string name)
     for (int disjreg = 0; disjreg < mydisjointregions.count(); disjreg++)
     {
         physicalregion* currentphysicalregion = tempphysicalregions.get(disjreg+1); // +1 because GMSH does not accept 0 as physical region number
-        currentphysicalregion->setdisjointregions({disjreg});
+        currentphysicalregion->definewithdisjointregions(mydisjointregions.getelementdimension(disjreg), {disjreg});
     }
     // Save to GMSH format:
     gmshinterface::writetofile(name, mynodes, myelements, tempphysicalregions, mydisjointregions, tempphysicalregions.getallnumbers());

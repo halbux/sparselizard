@@ -53,26 +53,25 @@ int physicalregion::getelementdimension(void)
     return myelementdimension;
 }
 
-void physicalregion::definewithdisjointregions(void)
-{   
-    includesdisjointregion = std::vector<bool>(mydisjointregions->count(), false);
-
-    int prindex = myphysicalregions->getindex(myphysicalregionnumber);
-    
-    for (int i = 0; i < mydisjointregions->count(); i++)
-        includesdisjointregion[i] = mydisjointregions->isinphysicalregion(i, prindex);
-}
-
-void physicalregion::setdisjointregions(std::vector<int> disjointregionlist)
+void physicalregion::definewithdisjointregions(int physregdim, std::vector<int> disjointregionlist, bool ismeshloading)
 {
-    myelementdimension = -1;
     includesdisjointregion = std::vector<bool>(mydisjointregions->count(), false);
     
-    for (int i = 0; i < disjointregionlist.size(); i++)
+    if (ismeshloading)
     {
-        includesdisjointregion[disjointregionlist[i]] = true;
-        if (myelementdimension < mydisjointregions->getelementdimension(disjointregionlist[i]))
-            myelementdimension = mydisjointregions->getelementdimension(disjointregionlist[i]);
+        int prindex = myphysicalregions->getindex(myphysicalregionnumber);
+        
+        for (int i = 0; i < mydisjointregions->count(); i++)
+            includesdisjointregion[i] = mydisjointregions->isinphysicalregion(i, prindex);
+    }
+    else
+    {
+        myelementdimension = physregdim;
+        
+        for (int i = 0; i < disjointregionlist.size(); i++)
+            includesdisjointregion[disjointregionlist[i]] = true;
+        
+        elementlist = std::vector<std::vector<int>>(8, std::vector<int>(0));
     }
 }
 

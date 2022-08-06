@@ -57,7 +57,7 @@ namespace sl
     
     // Perform operations (union, intersection) on physical regions:
     int selectunion(std::vector<int> physregs);
-    int selectintersection(std::vector<int> physregs);
+    int selectintersection(std::vector<int> physregs, int intersectdim);
     int selectall(void);
     
     // Check if a region is defined/empty/fully included in another region/touches another region:

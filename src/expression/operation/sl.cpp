@@ -92,12 +92,12 @@ int sl::selectunion(std::vector<int> physregs)
     return (universe::getrawmesh()->getphysicalregions())->createunion(physregs, false);
 }
 
-int sl::selectintersection(std::vector<int> physregs)
+int sl::selectintersection(std::vector<int> physregs, int intersectdim)
 {
     universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);
     
-    universe::getrawmesh()->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs, false);
-    return (universe::getrawmesh()->getphysicalregions())->createintersection(physregs, false);
+    universe::getrawmesh()->getoriginalmeshpointer()->getphysicalregions()->createintersection(physregs, intersectdim, false);
+    return (universe::getrawmesh()->getphysicalregions())->createintersection(physregs, intersectdim, false);
 }
 
 int sl::selectall(void)

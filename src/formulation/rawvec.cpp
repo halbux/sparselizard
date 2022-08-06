@@ -203,7 +203,7 @@ void rawvec::updatedisjregconstraints(std::shared_ptr<rawfield> constrainedfield
     }
     
     // Transfer the field values to the vector:
-    int constrphysreg = prs->createfromdisjointregionlist(constrdisjregs);
+    int constrphysreg = prs->createfromdisjointregionlist(getrawmesh()->getmeshdimension(), constrdisjregs);
     
     constrainedfield->transferdata(constrphysreg, vec(getpointer())|field(constrainedfield), "set");
     

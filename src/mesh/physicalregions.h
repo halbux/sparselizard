@@ -33,11 +33,11 @@ class physicalregions
                 
         // Create a new physical region that is the union of all regions:
         int createunion(std::vector<int> input, bool createifexisting = true);
-        int createintersection(std::vector<int> input, bool createifexisting = true);
+        int createintersection(std::vector<int> input, int physregdim, bool createifexisting = true);
         int createunionofall(bool createifexisting = true);
         
         // Create a physical region from a list of disjoint regions:
-        int createfromdisjointregionlist(std::vector<int> drs);
+        int createfromdisjointregionlist(int physregdim, std::vector<int> drs);
         
         // Define the physical regions based on the disjoint regions they contain:
         void definewithdisjointregions(void);
@@ -59,8 +59,8 @@ class physicalregions
         // Get the index of the physical region number (-1 if undefined):
         int getindex(int physicalregionnumber);
         
-        // Get the number of the physical region made exactly of the argument disjoint regions (-1 if not found):
-        int find(std::vector<int>& disjregsinphysreg);
+        // Find the physical region of given dimension and disjoint regions (-1 if not found):
+        int find(int physregdim, std::vector<int> disjregsinphysreg);
         
         // Get the list of physical regions in which each element of a given type is.
         // 'addresses[i]' gives the first index in 'prs' where to find the physical

@@ -141,7 +141,7 @@ void rawfield::updatenodalshapefunctions(expression updateexpr, expression* mesh
     physicalregions* prs = universe::getrawmesh()->getphysicalregions();
         
     // Create temporary physical regions:
-    int physreg = prs->createfromdisjointregionlist(drsindims[0]);
+    int physreg = prs->createfromdisjointregionlist(0, drsindims[0]);
     
     formulation evalatnodes;
     
@@ -173,14 +173,14 @@ void rawfield::updateothershapefunctions(int dim, expression updateexpr, express
     physicalregions* prs = universe::getrawmesh()->getphysicalregions();
     
     // Create temporary physical regions:
-    int physreg = prs->createfromdisjointregionlist(drsindims[dim]);
+    int physreg = prs->createfromdisjointregionlist(dim, drsindims[dim]);
     int dirichletphysreg;
     if (dim == 1)
-        dirichletphysreg = prs->createfromdisjointregionlist(drsindims[0]);
+        dirichletphysreg = prs->createfromdisjointregionlist(0, drsindims[0]);
     if (dim == 2)
-        dirichletphysreg = prs->createfromdisjointregionlist(gentools::concatenate({drsindims[0],drsindims[1]}));
+        dirichletphysreg = prs->createfromdisjointregionlist(1, gentools::concatenate({drsindims[0],drsindims[1]}));
     if (dim == 3)
-        dirichletphysreg = prs->createfromdisjointregionlist(gentools::concatenate({drsindims[0],drsindims[1],drsindims[2]}));
+        dirichletphysreg = prs->createfromdisjointregionlist(2, gentools::concatenate({drsindims[0],drsindims[1],drsindims[2]}));
     
     // The Dirichlet constraints (if any) are added to the rhs of the projection.
     //

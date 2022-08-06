@@ -46,11 +46,8 @@ class physicalregion
         int countelements(void);
         int getelementdimension(void);
         
-        // 'definewithdisjointregions' defines the physical region in terms of the disjoint regions it contains.
-        void definewithdisjointregions(void);  
-        // Set manually the list of disjoint regions in the physical region.
-        // Duplicates are removed. 'myelementdimension' is updated to the max dim of the disj regs.
-        void setdisjointregions(std::vector<int> disjointregionlist);
+        // Define the physical region in terms of the disjoint regions it contains:
+        void definewithdisjointregions(int physregdim, std::vector<int> disjointregionlist, bool ismeshloading = false);
 
         // Get the definition of this physical region based on the disjoint regions it contains:
         std::vector<bool> getdefinition(void);
