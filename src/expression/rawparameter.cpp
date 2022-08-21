@@ -73,22 +73,23 @@ void rawparameter::set(int physreg, expression input)
     maxopnum++;
     
     // Consider ALL disjoint regions in the physical region with (-1):
-    std::vector<int> selecteddisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions(-1);
+    std::vector<int> selecteddisjregs = universe::getrawmesh()->getphysicalregions()->get(physreg)->getdisjointregions(-1);
 
-    for (int i = 0; i < selecteddisjregs.size(); i++)
+    for (int row = 0; row < mynumrows; row++)
     {
-        opnums[selecteddisjregs[i]] = maxopnum;
-        for (int row = 0; row < mynumrows; row++)
+        for (int col = 0; col < mynumcols; col++)
         {
-            for (int col = 0; col < mynumcols; col++)
+            std::shared_ptr<operation> op = input.getoperationinarray(row, col);
+            // Make sure there is no dof or tf in the operation:
+            if (op->isdofincluded() || op->istfincluded())
             {
-                std::shared_ptr<operation> op = input.getoperationinarray(row, col);
-                // Make sure there is no dof or tf in the operation:
-                if (op->isdofincluded() || op->istfincluded())
-                {
-                    std::cout << "Error in 'parameter' object: cannot set an expression containing a dof or a tf" << std::endl;
-                    abort();
-                }
+                std::cout << "Error in 'parameter' object: cannot set an expression containing a dof or a tf" << std::endl;
+                abort();
+            }
+            
+            for (int i = 0; i < selecteddisjregs.size(); i++)
+            {
+                opnums[selecteddisjregs[i]] = maxopnum;
                 myoperations[selecteddisjregs[i]][row*mynumcols+col] = op;
             }
         }
