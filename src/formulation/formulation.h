@@ -62,10 +62,6 @@ class formulation
         
     public:
         
-        // Has this formulation been called to compute a constraint?
-        bool isconstraintcomputation = false;
-        
-        
         formulation(void);
         
         // Add a port relation:

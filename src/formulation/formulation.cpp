@@ -365,7 +365,7 @@ vec formulation::rhs(bool keepvector, bool dirichletandportupdate)
     else
         output = vec(myvec).copy();
     
-    if (dirichletandportupdate == true && isconstraintcomputation == false)
+    if (dirichletandportupdate == true)
         output.updateconstraints(); 
         
     if (dirichletandportupdate == true)
@@ -391,11 +391,7 @@ mat formulation::getmatrix(int KCM, bool keepfragments, std::vector<indexmat> ad
     if (keepfragments == false)
         mymat[KCM] = NULL;
         
-    std::vector<bool> isconstr;
-    if (isconstraintcomputation)
-        isconstr = std::vector<bool>(mydofmanager->countdofs(), false);
-    else
-        isconstr = mydofmanager->isconstrained();
+    std::vector<bool> isconstr = mydofmanager->isconstrained();
         
     for (int i = 0; i < additionalconstraints.size(); i++)
     {
