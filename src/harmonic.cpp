@@ -108,6 +108,9 @@ double harmonic::getderivationfactor(int timederivativeorder, int harm)
 {
     if (timederivativeorder > 0)
     {
+        if (harm < 2)
+            return 0;
+    
         double pi = 3.141592653589793;
         double f0 = universe::getfundamentalfrequency();
 
