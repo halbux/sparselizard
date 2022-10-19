@@ -22,9 +22,17 @@ void universe::addtorawmeshcounter(int val)
     PetscInitialized(&ispetscinitialized);
     
     if (mynumrawmeshes == 0 && val > 0 && ispetscinitialized == PETSC_FALSE)
+    {
+        slmpi::initialize();
+        slmpi::barrier();
         SlepcInitialize(0,{},0,0);
+    }
     //if (mynumrawmeshes > 0 && mynumrawmeshes+val == 0 && ispetscinitialized == PETSC_TRUE)
+    //{
     //    SlepcFinalize();
+    //    slmpi::barrier();
+    //    slmpi::finalize();
+    //}
 
     mynumrawmeshes += val;
 }
