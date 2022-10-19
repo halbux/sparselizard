@@ -30,6 +30,8 @@ class universe
     
     public:
 
+        static wallclock globalclock;
+
         static MatSolverType solvertype;
 
         static int mynumrawmeshes;

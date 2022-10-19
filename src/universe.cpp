@@ -4,6 +4,8 @@
 #include <omp.h>
 
 
+wallclock universe::globalclock = wallclock();
+
 MatSolverType universe::solvertype = "mumps";
 
 int universe::mynumrawmeshes = 0;
