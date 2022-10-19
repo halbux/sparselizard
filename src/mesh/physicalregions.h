@@ -44,8 +44,8 @@ class physicalregions
         
         int getmaxphysicalregionnumber(void);
         
-        // 'get' creates any non-existent physical region object:
-        physicalregion* get(int physicalregionnumber);
+        // 'get' creates any non-existent physical region object of requested dimension:
+        physicalregion* get(int physicalregionnumber, int elementdimension = -1);
         // 'getatindex' does not create non-existent physical region objects.
         physicalregion* getatindex(int physicalregionindex);
         // Get the number of physical regions of a given dimension (use -1 for all):

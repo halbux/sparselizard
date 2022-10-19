@@ -1,11 +1,12 @@
 #include "physicalregion.h"
 
 
-physicalregion::physicalregion(disjointregions& inputdisjointregions, physicalregions& inputphysicalregions, int physicalregionnumber)
+physicalregion::physicalregion(disjointregions& inputdisjointregions, physicalregions& inputphysicalregions, int physicalregionnumber, int elementdimension)
 {
     mydisjointregions = &inputdisjointregions;
     myphysicalregions = &inputphysicalregions;
     myphysicalregionnumber = physicalregionnumber;
+    myelementdimension = elementdimension;
 }
 
 int physicalregion::getnumber(void)

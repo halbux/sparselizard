@@ -109,7 +109,7 @@ int physicalregions::getmaxphysicalregionnumber(void)
     return *std::max_element(myphysicalregionnumbers.begin(), myphysicalregionnumbers.end());
 }
 
-physicalregion* physicalregions::get(int physicalregionnumber)
+physicalregion* physicalregions::get(int physicalregionnumber, int elementdimension)
 {        
     // Try to find the physical region number in 'myphysicalregionnumbers':
     for (int i = 0; i < myphysicalregionnumbers.size(); i++)
@@ -119,7 +119,7 @@ physicalregion* physicalregions::get(int physicalregionnumber)
     }
     
     // If it could not be found append it:
-    std::shared_ptr<physicalregion> newphysicalregion(new physicalregion(*mydisjointregions, *this, physicalregionnumber));
+    std::shared_ptr<physicalregion> newphysicalregion(new physicalregion(*mydisjointregions, *this, physicalregionnumber, elementdimension));
     myphysicalregions.push_back(newphysicalregion);
     myphysicalregionnumbers.push_back(physicalregionnumber);
     

@@ -37,7 +37,7 @@ class physicalregion
     public:
         
         physicalregion(void) {};
-        physicalregion(disjointregions&, physicalregions&, int physicalregionnumber);
+        physicalregion(disjointregions&, physicalregions&, int physicalregionnumber, int elementdimension);
         
         int getnumber(void);
         // Add an element of uncurved type 'elementtypenumber' to the physical region:
