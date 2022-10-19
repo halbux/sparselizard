@@ -4,12 +4,12 @@
 // bugs and problems to <alexandre.halbach at gmail.com>.
 
 
-#ifndef OPLOG10_H
-#define OPLOG10_H
+#ifndef OPLOG_H
+#define OPLOG_H
 
 #include "operation.h"
 
-class oplog10: public operation
+class oplog: public operation
 {
 
     private:
@@ -19,7 +19,7 @@ class oplog10: public operation
         
     public:
         
-        oplog10(std::shared_ptr<operation> arg) { myarg = arg; };
+        oplog(std::shared_ptr<operation> arg) { myarg = arg; };
         
         std::vector<std::vector<densemat>> interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);
         densemat multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform);

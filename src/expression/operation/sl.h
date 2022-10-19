@@ -157,7 +157,7 @@ namespace sl
     expression atan(expression input);
     expression abs(expression input);
     expression sqrt(expression input);
-    expression log10(expression input);
+    expression log(expression input);
     expression pow(expression base, expression exponent);
     expression exp(expression input);
     expression mod(expression input, double modval);

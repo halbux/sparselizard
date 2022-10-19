@@ -1820,14 +1820,14 @@ expression expression::abs(void)
     return absexpr;
 }
 
-expression expression::log10(void)
+expression expression::log(void)
 {
-    expression log10expr = this->getcopy();
+    expression logexpr = this->getcopy();
 
     for (int i = 0; i < mynumrows*mynumcols; i++)
-        log10expr.myoperations[i] = std::shared_ptr<oplog10>(new oplog10(myoperations[i]));
+        logexpr.myoperations[i] = std::shared_ptr<oplog>(new oplog(myoperations[i]));
 
-    return log10expr;
+    return logexpr;
 }
 
 expression expression::mod(double modval)

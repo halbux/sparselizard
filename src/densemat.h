@@ -126,7 +126,7 @@ class densemat
         void asin(void);
         void acos(void);
         void atan(void);
-        void log10(void);
+        void log(void);
         void mod(double modval);
 
         // Get the min and max values in out[0] and out[1] respectively:

@@ -181,7 +181,7 @@ class operation : public std::enable_shared_from_this<operation>
 #include "opinversion.h"
 #include "opinvjac.h"
 #include "opjac.h"
-#include "oplog10.h"
+#include "oplog.h"
 #include "opmeshsize.h"
 #include "opmod.h"
 #include "opon.h"

@@ -1,7 +1,7 @@
-#include "oplog10.h"
+#include "oplog.h"
 
 
-std::vector<std::vector<densemat>> oplog10::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+std::vector<std::vector<densemat>> oplog::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -14,7 +14,7 @@ std::vector<std::vector<densemat>> oplog10::interpolate(elementselector& elemsel
     
     if (argmat.size() == 2 && argmat[1].size() == 1)
     {
-        argmat[1][0].log10();
+        argmat[1][0].log();
         
         if (reuse && universe::isreuseallowed)
             universe::setprecomputed(shared_from_this(), argmat);
@@ -22,11 +22,11 @@ std::vector<std::vector<densemat>> oplog10::interpolate(elementselector& elemsel
         return argmat;
     }
 
-    std::cout << "Error in 'oplog10' object: without FFT log10() can only be computed for constant (harmonic 1) operations" << std::endl;
+    std::cout << "Error in 'oplog' object: without FFT log() can only be computed for constant (harmonic 1) operations" << std::endl;
     abort();
 }
 
-densemat oplog10::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
+densemat oplog::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
     // Get the value from the universe if available and reuse is enabled:
     if (reuse && universe::isreuseallowed)
@@ -36,7 +36,7 @@ densemat oplog10::multiharmonicinterpolate(int numtimeevals, elementselector& el
     }
     
     densemat output = myarg->multiharmonicinterpolate(numtimeevals, elemselect, evaluationcoordinates, meshdeform);
-    output.log10();
+    output.log();
 
     if (reuse && universe::isreuseallowed)
         universe::setprecomputedfft(shared_from_this(), output);
@@ -44,40 +44,40 @@ densemat oplog10::multiharmonicinterpolate(int numtimeevals, elementselector& el
     return output;
 }
 
-std::shared_ptr<operation> oplog10::simplify(std::vector<int> disjregs)
+std::shared_ptr<operation> oplog::simplify(std::vector<int> disjregs)
 {
     myarg = myarg->simplify(disjregs);
     
     if (myarg->isconstant())
-        return std::shared_ptr<operation>(new opconstant(std::log10(myarg->getvalue())));
+        return std::shared_ptr<operation>(new opconstant(std::log(myarg->getvalue())));
     else
         return shared_from_this();
 }
 
-std::shared_ptr<operation> oplog10::copy(void)
+std::shared_ptr<operation> oplog::copy(void)
 {
-    std::shared_ptr<oplog10> op(new oplog10(myarg));
+    std::shared_ptr<oplog> op(new oplog(myarg));
     *op = *this;
     op->reuse = false;
     return op;
 }
 
-double oplog10::evaluate(void)
+double oplog::evaluate(void)
 {
-    return std::log10(myarg->evaluate());
+    return std::log(myarg->evaluate());
 }
 
-std::vector<double> oplog10::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
+std::vector<double> oplog::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);
     for (int i = 0; i < evaluated.size(); i++)
-        evaluated[i] = std::log10(evaluated[i]);
+        evaluated[i] = std::log(evaluated[i]);
     return evaluated;
 }
 
-void oplog10::print(void)
+void oplog::print(void)
 {
-    std::cout << "log10(";
+    std::cout << "log(";
     myarg->print();
     std::cout << ")";
 }

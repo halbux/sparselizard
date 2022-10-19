@@ -523,12 +523,12 @@ void densemat::atan(void)
         myvaluesptr[i] = std::atan(myvaluesptr[i]);
 }
 
-void densemat::log10(void)
+void densemat::log(void)
 {
     double* myvaluesptr = myvalues.get();
 
     for (long long int i = 0; i < numrows*numcols; i++)
-        myvaluesptr[i] = std::log10(myvaluesptr[i]);
+        myvaluesptr[i] = std::log(myvaluesptr[i]);
 }
 
 void densemat::mod(double modval)

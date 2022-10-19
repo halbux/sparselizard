@@ -927,7 +927,7 @@ expression sl::acos(expression input) { return input.acos(); }
 expression sl::atan(expression input) { return input.atan(); }
 expression sl::abs(expression input) { return input.abs(); }
 expression sl::sqrt(expression input) { return pow(input, 0.5); }
-expression sl::log10(expression input) { return input.log10(); }
+expression sl::log(expression input) { return input.log(); }
 expression sl::pow(expression base, expression exponent) { return base.pow(exponent); }
 expression sl::exp(expression input) { return pow(2.7182818284590452353, input); }
 expression sl::mod(expression input, double modval) { return input.mod(modval); }
