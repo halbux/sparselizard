@@ -1239,6 +1239,25 @@ expression sl::doubledotproduct(expression a, expression b)
     return output;
 }
 
+expression sl::elementwiseproduct(expression a, expression b)
+{
+    if (a.countrows() != b.countrows() || a.countcolumns() != b.countcolumns())
+    {
+        std::cout << "Error in 'sl' namespace: element-wise product requires arguments of same dimensions" << std::endl;
+        abort();
+    }
+    
+    std::vector<expression> axb(a.countrows() * a.countcolumns());
+    
+    for (int i = 0; i < a.countrows(); i++)
+    {
+        for (int j = 0; j < a.countcolumns(); j++)
+            axb[i*a.countcolumns()+j] = a.at(i,j) * b.at(i,j);
+    }
+
+    return expression(a.countrows(), a.countcolumns(), axb);
+}
+
 expression sl::trace(expression a)
 {
     if (a.countcolumns() != a.countrows())

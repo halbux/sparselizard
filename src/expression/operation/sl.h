@@ -203,6 +203,9 @@ namespace sl
 
     // Double dot a:b product:
     expression doubledotproduct(expression a, expression b);
+    
+    // Element-wise product:
+    expression elementwiseproduct(expression a, expression b);
 
     // Get the trace of a square matrix:
     expression trace(expression a);
