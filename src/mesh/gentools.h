@@ -32,11 +32,14 @@ namespace gentools
     // Same as above but first sort according to a vector of integers:
     void stablecoordinatesort(std::vector<double> noisethreshold, std::vector<int>& elems, std::vector<double>& coordinates, std::vector<int>& reorderingvector);
     
-    // 'removeduplicates' outputs a vector that can be used to 
-    // renumber the nodes so that all duplicates are removed:
-    // coordinateswithoutduplicates(renumberingvector,:) = coordinates.
-    // The output gives the number of non-duplicated nodes.
+    // Provide a renumbering vector to remove duplicated coordinates.
+    // Entry renumberingvector[i] is guaranteed lower or equal to i.
+    // The output gives the number of non-duplicated coordinates.
     int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
+    // Provide a renumbering vector to remove duplicated blocks (and empty 'toremove').
+    // Entry renumberingvector[i] is guaranteed lower or equal to i.
+    // The output gives the number of non-duplicated blocks.
+    int removeduplicates(std::vector<int>& toremove, std::vector<int>& renumberingvector, int blocklen);
     
     // Remove duplicated coordinates:
     void removeduplicates(std::vector<double>& coordinates);

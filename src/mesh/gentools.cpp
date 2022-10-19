@@ -133,6 +133,121 @@ int gentools::removeduplicates(std::vector<double>& coordinates, std::vector<int
     return numnonduplicates;
 }
 
+int gentools::removeduplicates(std::vector<int>& toremove, std::vector<int>& renumberingvector, int blocklen)
+{
+    int numblocks = toremove.size()/blocklen;
+    renumberingvector = {};
+    
+    if (numblocks == 0)
+        return 0;
+
+    int numvals = *std::max_element(toremove.begin(), toremove.end()) + 1;
+    
+    std::vector<int> countatval(numvals, 0);
+    
+    for (int i = 0; i < numblocks; i++)
+    {
+        std::sort(&toremove[i*blocklen], &toremove[(i+1)*blocklen]);
+        countatval[toremove[i*blocklen+0]]++;
+    }
+    
+    std::vector<int> adsatval(numvals+1, 0);
+    for (int i = 1; i <= numvals; i++)
+        adsatval[i] = adsatval[i-1]+countatval[i-1];
+
+    // Reorder according to the first node only:
+    std::vector<int> indexinval(numvals, 0);
+    std::vector<int> inverserenum(numblocks);
+    std::vector<int> sorted(numblocks*blocklen);
+    
+    for (int i = 0; i < numblocks; i++)
+    {
+        int firstnode = toremove[i*blocklen+0];
+        int curad = adsatval[firstnode]+indexinval[firstnode];
+        
+        for (int j = 0; j < blocklen; j++)
+            sorted[curad*blocklen+j] = toremove[i*blocklen+j];
+            
+        inverserenum[curad] = i;
+            
+        indexinval[firstnode]++;
+    }
+    toremove = {};
+
+    std::vector<int> sameblockas(numblocks, -1);
+    
+    for (int i = 0; i < numvals; i++)
+    {
+        int* data = &sorted[adsatval[i]*blocklen];
+        int numdata = adsatval[i+1]-adsatval[i];
+    
+        std::vector<int> temp(numdata*(blocklen-1));
+        for (int j = 0; j < numdata; j++)
+        {
+            for (int k = 0; k < blocklen-1; k++)
+                temp[j*(blocklen-1)+k] = data[j*blocklen+1+k];
+        }
+    
+        // Reorder the elements sharing the same first node:
+        std::vector<int> subreordervec(numdata);
+        std::iota(subreordervec.begin(), subreordervec.end(), 0);
+        std::sort(subreordervec.begin(), subreordervec.end(), [&](int elem1, int elem2)
+        { 
+            for (int k = 0; k < blocklen-1; k++)
+            {
+                if (temp[elem1*(blocklen-1)+k] < temp[elem2*(blocklen-1)+k])
+                    return true;
+                if (temp[elem1*(blocklen-1)+k] > temp[elem2*(blocklen-1)+k])
+                    return false;
+            }
+            return elem1 < elem2;
+        });
+        
+        // Sort the elements:
+        for (int j = 0; j < numdata; j++)
+        {
+            int reordind = subreordervec[j];
+            for (int k = 0; k < blocklen-1; k++)
+                data[j*blocklen+1+k] = temp[reordind*(blocklen-1)+k];
+        }
+        
+        std::vector<int> invrenumbkp(numdata);
+        for (int j = 0; j < numdata; j++)
+            invrenumbkp[j] = inverserenum[adsatval[i]+j];
+            
+        // Update the inverse renumbering to the sorted data:
+        for (int j = 0; j < numdata; j++)
+            inverserenum[adsatval[i]+j] = invrenumbkp[subreordervec[j]];
+        
+        for (int j = 0; j < numdata; j++)
+        {
+            if (i+j > 0)
+            {
+                if (std::equal(data+(j-1)*blocklen, data+j*blocklen, data+j*blocklen))
+                    sameblockas[adsatval[i]+j] = adsatval[i]+j-1;
+            }
+        }   
+    }
+    
+    renumberingvector = invertrenumbering(inverserenum);
+    
+    int numnonduplicates = 0;
+    for (int i = 0; i < numblocks; i++)
+    {
+        int ri = renumberingvector[i];
+        
+        if (sameblockas[ri] >= 0)
+            renumberingvector[i] = renumberingvector[inverserenum[sameblockas[ri]]];
+        else
+        {
+            renumberingvector[i] = numnonduplicates;
+            numnonduplicates++;
+        }
+    }
+    
+    return numnonduplicates;
+}
+
 void gentools::removeduplicates(std::vector<double>& coordinates)
 {
     std::vector<int> renumberingvector;

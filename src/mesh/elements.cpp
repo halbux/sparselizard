@@ -949,16 +949,24 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
         return renumberingvector;
     }
     
-    int numberofcurvednodes = numberofsubelementsineveryelement[elementtypenumber][0];
-    int numberoflines = numberofsubelementsineveryelement[elementtypenumber][1];
-    int numberoftriangles = numberofsubelementsineveryelement[elementtypenumber][2];
-    int numberofquadrangles = numberofsubelementsineveryelement[elementtypenumber][3];
+    element elobj(elementtypenumber, mycurvatureorder);
     
-    std::vector<double> barycentercoordinates = computebarycenters(elementtypenumber);
+    int numberofelements = count(elementtypenumber);
+    int numberofnodes = elobj.countnodes();
+    int numberofcurvednodes = elobj.countcurvednodes();
+    int numberoflines = elobj.countedges();
+    int numberoftriangles = elobj.counttriangularfaces();
+    int numberofquadrangles = elobj.countquadrangularfaces();
     
-    // 'elementrenumbering' will give the renumbering corresponding to removed duplicates:
+    std::vector<int> cornernodes(numberofelements*numberofnodes);
+    for (int i = 0; i < numberofelements; i++)
+    {
+        for (int j = 0; j < numberofnodes; j++)
+            cornernodes[i*numberofnodes+j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
+    }
+
     std::vector<int> elementrenumbering;
-    int numberofnonduplicates = gentools::removeduplicates(barycentercoordinates, elementrenumbering);
+    int numberofnonduplicates = gentools::removeduplicates(cornernodes, elementrenumbering, numberofnodes);
     
     for (int i = 0; i < elementrenumbering.size(); i++)
     {
