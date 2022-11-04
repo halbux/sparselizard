@@ -36,10 +36,10 @@ namespace gentools
     // Entry renumberingvector[i] is guaranteed lower or equal to i.
     // The output gives the number of non-duplicated coordinates.
     int removeduplicates(std::vector<double>& coordinates, std::vector<int>& renumberingvector);
-    // Provide a renumbering vector to remove duplicated blocks (and empty 'toremove').
+    // Provide a renumbering vector to remove duplicated blocks.
     // Entry renumberingvector[i] is guaranteed lower or equal to i.
     // The output gives the number of non-duplicated blocks.
-    int removeduplicates(std::vector<int>& toremove, std::vector<int>& renumberingvector, int blocklen);
+    int removeduplicates(std::vector<int> toremove, std::vector<int>& renumberingvector, int blocklen);
     
     // Remove duplicated coordinates:
     void removeduplicates(std::vector<double>& coordinates);

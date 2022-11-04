@@ -951,22 +951,13 @@ std::vector<int> elements::removeduplicates(int elementtypenumber)
     
     element elobj(elementtypenumber, mycurvatureorder);
     
-    int numberofelements = count(elementtypenumber);
-    int numberofnodes = elobj.countnodes();
     int numberofcurvednodes = elobj.countcurvednodes();
     int numberoflines = elobj.countedges();
     int numberoftriangles = elobj.counttriangularfaces();
     int numberofquadrangles = elobj.countquadrangularfaces();
     
-    std::vector<int> cornernodes(numberofelements*numberofnodes);
-    for (int i = 0; i < numberofelements; i++)
-    {
-        for (int j = 0; j < numberofnodes; j++)
-            cornernodes[i*numberofnodes+j] = subelementsinelements[elementtypenumber][0][i*numberofcurvednodes+j];
-    }
-
     std::vector<int> elementrenumbering;
-    int numberofnonduplicates = gentools::removeduplicates(cornernodes, elementrenumbering, numberofnodes);
+    int numberofnonduplicates = gentools::removeduplicates(subelementsinelements[elementtypenumber][0], elementrenumbering, numberofcurvednodes);
     
     for (int i = 0; i < elementrenumbering.size(); i++)
     {

@@ -133,7 +133,7 @@ int gentools::removeduplicates(std::vector<double>& coordinates, std::vector<int
     return numnonduplicates;
 }
 
-int gentools::removeduplicates(std::vector<int>& toremove, std::vector<int>& renumberingvector, int blocklen)
+int gentools::removeduplicates(std::vector<int> toremove, std::vector<int>& renumberingvector, int blocklen)
 {
     int numblocks = toremove.size()/blocklen;
     renumberingvector = {};
