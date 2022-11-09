@@ -139,6 +139,7 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
 void gmshinterface::readwithapi(std::string name, nodes& mynodes, elements& myelements, physicalregions& myphysicalregions)
 {
     gmsh::initialize();
+    gmsh::option::setNumber("General.Verbosity", 3);
     gmsh::open(name);
     if (gentools::getfileextension(name) == ".geo")
         gmsh::model::mesh::generate(gmsh::model::getDimension());
