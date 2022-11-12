@@ -58,7 +58,8 @@ class mesh
         void load(std::vector<shape> inputshapes, int verbosity = 1);
         void load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity = 1);
 
-        // Write to file name:
+        // Write to file:
+        void write(int physreg, std::string name);
         void write(std::string name, std::vector<int> physregs = {-1}, int option = 1);
         
         // H-adaptivity:

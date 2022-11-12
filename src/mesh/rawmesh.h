@@ -104,7 +104,8 @@ class rawmesh : public std::enable_shared_from_this<rawmesh>
         // Load from shape vector:
         void load(std::vector<shape> inputshapes, int globalgeometryskin, int numoverlaplayers, int verbosity);
 
-        // Write to file name:
+        // Write to file:
+        void write(int physreg, std::string name);
         void write(std::string name, std::vector<int> physregs, int option);     
         
         // Split each element in the mesh n times:

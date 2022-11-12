@@ -22,10 +22,10 @@ class physicalregions
 
     private:
 
-        std::vector<std::shared_ptr<physicalregion>> myphysicalregions;
-        std::vector<int> myphysicalregionnumbers;
+        std::vector<std::shared_ptr<physicalregion>> myphysicalregions = {};
+        std::vector<int> myphysicalregionnumbers = {};
         
-        disjointregions* mydisjointregions;
+        disjointregions* mydisjointregions = NULL;
         
     public:
         
@@ -69,6 +69,9 @@ class physicalregions
         
         // Remove physical regions (do not call this yourself).
         void remove(std::vector<int> toremove, bool ispartofdisjregstructure);
+        
+        // Extract the positively renumbered physical regions:
+        physicalregions extract(std::vector<int>& renumbering);
         
         // Give an error if any of the physical regions is not defined:
         void errorundefined(std::vector<int> physregs);

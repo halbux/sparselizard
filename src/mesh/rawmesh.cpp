@@ -546,6 +546,37 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
 }
 
 
+void rawmesh::write(int physreg, std::string name)
+{
+    myphysicalregions.errorundefined({physreg});
+
+    int numprs = myphysicalregions.count();
+
+    std::vector<int> physregsnums = myphysicalregions.getallnumbers();
+
+    std::vector<int> newnums(numprs);
+    std::vector<int> renums(2*numprs, -1);
+
+    for (int i = 0; i < numprs; i++)
+    {
+        int prnum = physregsnums[i];
+        int prdim = myphysicalregions.getatindex(i)->getelementdimension();
+
+        renums[numprs+i] = prnum;
+        newnums[i] = myphysicalregions.createintersection({prnum, physreg}, prdim, true);
+    }
+
+    physicalregions physregsbkp = myphysicalregions;
+
+    myphysicalregions = physregsbkp.extract(renums);
+
+    write(name, {-1}, 1);
+
+    myphysicalregions = physregsbkp;
+
+    myphysicalregions.remove(newnums, false);
+}
+
 void rawmesh::write(std::string name, std::vector<int> physregs, int option)
 {
     std::vector<int> physregstowrite = myphysicalregions.getallnumbers();

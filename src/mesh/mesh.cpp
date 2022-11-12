@@ -104,6 +104,13 @@ void mesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int numo
     isloaded = true;
 }
 
+void mesh::write(int physreg, std::string name)
+{
+    errorifnotloaded();
+    
+    rawmeshptr->gethadaptedpointer()->write(physreg, name);
+}
+
 void mesh::write(std::string name, std::vector<int> physregs, int option)
 {
     errorifnotloaded();

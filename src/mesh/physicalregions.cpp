@@ -272,6 +272,22 @@ void physicalregions::remove(std::vector<int> toremove, bool ispartofdisjregstru
         mydisjointregions->removephysicalregions(istoremove);
 }
 
+physicalregions physicalregions::extract(std::vector<int>& renumbering)
+{
+    physicalregions output(*mydisjointregions);
+    
+    for (int i = 0; i < renumbering.size(); i++)
+    {
+        if (renumbering[i] >= 0)
+        {
+            output.myphysicalregions.push_back(myphysicalregions[i]);
+            output.myphysicalregionnumbers.push_back(renumbering[i]);
+        }
+    }
+    
+    return output;
+}
+
 void physicalregions::errorundefined(std::vector<int> physregs)
 {
     for (int i = 0; i < physregs.size(); i++)
