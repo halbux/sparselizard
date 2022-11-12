@@ -11,7 +11,7 @@ void rawparameter::synchronize(void)
 
 
     // Flush the structure:
-    myoperations = std::vector<std::vector<std::shared_ptr<operation>>>(universe::getrawmesh()->getdisjointregions()->count(), std::vector<std::shared_ptr<operation>>(1, NULL));
+    myoperations = std::vector<std::vector<std::shared_ptr<operation>>>(universe::getrawmesh()->getdisjointregions()->count(), std::vector<std::shared_ptr<operation>>(mynumrows*mynumcols, NULL));
     maxopnum = -1;
     opnums = std::vector<int>(universe::getrawmesh()->getdisjointregions()->count(),-1);
 
@@ -30,7 +30,7 @@ void rawparameter::errorifundefined(std::vector<int> disjregs)
 
     for (int i = 0; i < disjregs.size(); i++)
     {
-        if (myoperations[disjregs[i]].size() == 1 && myoperations[disjregs[i]][0] == NULL)
+        if (myoperations[disjregs[i]].size() == 0 || myoperations[disjregs[i]][0] == NULL)
         {
             std::cout << "Error in 'parameter' object: the parameter has not been defined on the requested region" << std::endl;
             abort();
@@ -48,7 +48,7 @@ std::vector<int> rawparameter::getopnums(std::vector<int> disjregs)
     return output;
 }
 
-rawparameter::rawparameter(int numrows, int numcols) : myoperations((universe::getrawmesh()->getdisjointregions())->count(), std::vector<std::shared_ptr<operation>>(numrows*numcols, NULL)), opnums((universe::getrawmesh()->getdisjointregions())->count(),-1)
+rawparameter::rawparameter(int numrows, int numcols) : myoperations(universe::getrawmesh()->getdisjointregions()->count(), std::vector<std::shared_ptr<operation>>(numrows*numcols, NULL)), opnums((universe::getrawmesh()->getdisjointregions())->count(),-1)
 { 
     mynumrows = numrows; 
     mynumcols = numcols; 
