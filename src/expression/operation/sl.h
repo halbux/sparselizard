@@ -251,7 +251,6 @@ namespace sl
     expression array3x3(expression term11, expression term12, expression term13, expression term21, expression term22, expression term23, expression term31, expression term32, expression term33);
 
 
-    std::vector<double> solve(std::vector<int> idxptr, std::vector<int> indices, std::vector<double> data, std::vector<double> b);
     // Direct resolution (with or without diagonal scaling):
     vec solve(mat A, vec b, std::string soltype = "lu", bool diagscaling = false);
     // Multi-rhs direct resolution:
