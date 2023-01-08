@@ -48,6 +48,9 @@ void hierarchicalformfunctioncontainer::set(int h, int i, int j, int k, int l, i
 
 void hierarchicalformfunctioncontainer::evaluate(std::vector<double> evaluationpoints)
 {
+    if (myevaluationpoints == evaluationpoints)
+        return;
+        
     myevaluationpoints = evaluationpoints;
 
     for (int h = 0; h < val.size(); h++)
@@ -146,7 +149,4 @@ void hierarchicalformfunctioncontainer::print(bool printallderivatives)
         }
     }
 }
-
-
-
 

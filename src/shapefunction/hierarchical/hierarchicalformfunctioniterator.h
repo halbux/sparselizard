@@ -35,7 +35,8 @@ class hierarchicalformfunctioniterator
 
     private:
     
-        std::string myformfunctiontypename;
+        std::shared_ptr<hierarchicalformfunction> myformfunction;
+        
         int myelementtypenumber;
         int myorder;
         

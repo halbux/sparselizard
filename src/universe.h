@@ -135,12 +135,8 @@ class universe
         // 'formfuncpolys[i].second[elemtypenum][interpolorder][0]' gives the polynomials.
         static std::vector<std::pair< std::string, std::vector<std::vector< std::vector<hierarchicalformfunctioncontainer> >> >> formfuncpolys;
 
-        // This function returns the requested form function values and reuses any already computed value if 'isreuseallowed' is true.
-        // In case 'isreuseallowed' is false a pointer to the evaluated form function polynomial storage is returned for speed reasons.
-        // When multiple calls follow each other and 'isreuseallowed' is false the latter storage might be modified!
+        // This function returns the requested form function values:
         static hierarchicalformfunctioncontainer* gethff(std::string fftypename, int elementtypenumber, int interpolorder, std::vector<double> evaluationcoordinates);
-        // Keep the polynomials but reset the values:
-        static void resethff(void);
         
         
         // Store element split definitions. splitdefinition[elementtypenumber][splitidentifier].

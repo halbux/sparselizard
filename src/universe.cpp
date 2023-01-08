@@ -138,8 +138,6 @@ void universe::forbidreuse(void)
 {
     isreuseallowed = false;
     
-    resethff();
-    
     computedjacobian = NULL;
     
     oppointers = {};
@@ -357,15 +355,8 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
     // In case the form function polynomials are available:
     if (typenameindex != -1 && formfuncpolys[typenameindex].second[elementtypenumber].size() > interpolorder && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
     {
-        if (isreuseallowed && formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].isvalueready())
-            return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
-        else
-        {
-            formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].evaluate(evaluationcoordinates);
-            if (isreuseallowed)
-                formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(true);
-            return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
-        }
+        formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].evaluate(evaluationcoordinates);
+        return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
     }
     
     // Otherwise compute the form function polynomials and store them:
@@ -382,25 +373,7 @@ hierarchicalformfunctioncontainer* universe::gethff(std::string fftypename, int 
     formfuncpolys[typenameindex].second[elementtypenumber][interpolorder] = {myformfunction->evalat(interpolorder)};
     formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].evaluate(evaluationcoordinates);
     
-    if (isreuseallowed)
-        formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(true);
-    
     return &(formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0]);
-}
-
-void universe::resethff(void)
-{
-    for (int typenameindex = 0; typenameindex < formfuncpolys.size(); typenameindex++)
-    {
-        for (int elementtypenumber = 0; elementtypenumber < (formfuncpolys[typenameindex].second).size(); elementtypenumber++)
-        {
-            for (int interpolorder = 0; interpolorder < formfuncpolys[typenameindex].second[elementtypenumber].size(); interpolorder++)
-            {
-                if (formfuncpolys[typenameindex].second[elementtypenumber][interpolorder].size() > 0)
-                    formfuncpolys[typenameindex].second[elementtypenumber][interpolorder][0].setvaluestatus(false);
-            }
-        }
-    }
 }
 
 

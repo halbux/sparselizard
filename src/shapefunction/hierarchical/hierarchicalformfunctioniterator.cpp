@@ -3,7 +3,8 @@
 
 hierarchicalformfunctioniterator::hierarchicalformfunctioniterator(std::string formfunctiontypename, int elementtypenumber, int order)
 {
-    myformfunctiontypename = formfunctiontypename;
+    myformfunction = selector::select(elementtypenumber, formfunctiontypename);
+
     myelementtypenumber = elementtypenumber;
     myorder = order;
     
@@ -13,14 +14,11 @@ hierarchicalformfunctioniterator::hierarchicalformfunctioniterator(std::string f
 
 int hierarchicalformfunctioniterator::count(void)
 {
-    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(myelementtypenumber, myformfunctiontypename);
     return myformfunction->count(myorder);
 }
 
 void hierarchicalformfunctioniterator::next()
 {
-    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(myelementtypenumber, myformfunctiontypename);
-
     // Check if there is any other form function on the current node/edge/face/volume.
     // In case 'next' is called for the first time currentformfunctionindexinnodeedgefacevolume is at -1.
     if (currentformfunctionindexinnodeedgefacevolume == -1 || currentformfunctionindexinnodeedgefacevolume < myformfunction->count(myorder, currentdimension, currentnodeedgefacevolumeindex) - 1)
@@ -61,15 +59,11 @@ int hierarchicalformfunctioniterator::getformfunctionindexincurrentorderinnodeed
 {
     int currentorder = getformfunctionorder();
     
-    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(myelementtypenumber, myformfunctiontypename);
-
     return currentformfunctionindexinnodeedgefacevolume - myformfunction->count(currentorder - 1, currentdimension, currentnodeedgefacevolumeindex);
 }
 
 int hierarchicalformfunctioniterator::getformfunctionorder(void)
 {
-    std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(myelementtypenumber, myformfunctiontypename);
-    
     for (int i = 0; i <= myorder; i++)
     {
         if (currentformfunctionindexinnodeedgefacevolume < myformfunction->count(i, currentdimension, currentnodeedgefacevolumeindex) )
