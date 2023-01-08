@@ -1525,50 +1525,6 @@ expression sl::array3x3(expression term11, expression term12, expression term13,
     return expression(3,3, {term11, term12, term13, term21, term22, term23, term31, term32, term33});
 }
 
-std::vector<double> sl::solve(std::vector<int> idxptr, std::vector<int> indices, std::vector<double> data, std::vector<double> b)
-{
-    Mat Apetsc = PETSC_NULL;
-    MatCreateSeqAIJWithArrays(PETSC_COMM_SELF, b.size(), b.size(), idxptr.data(), indices.data(), data.data(), &Apetsc);
-    MatAssemblyBegin(Apetsc, MAT_FINAL_ASSEMBLY);
-    MatAssemblyEnd(Apetsc, MAT_FINAL_ASSEMBLY);
-
-    Vec bpetsc = PETSC_NULL;
-    VecCreate(PETSC_COMM_SELF, &bpetsc);
-    VecSetSizes(bpetsc, PETSC_DECIDE, b.size());
-    VecSetFromOptions(bpetsc);
-    std::vector<int> addr(b.size(), 0);
-    for (int i = 0; i < b.size(); i++)
-        addr[i] = i;
-    VecSetValues(bpetsc, b.size(), addr.data(), b.data(), INSERT_VALUES);
-    VecAssemblyBegin(bpetsc);
-    VecAssemblyEnd(bpetsc);
-    
-    Vec solpetsc = PETSC_NULL;
-    VecCreate(PETSC_COMM_SELF, &solpetsc);
-    VecSetSizes(solpetsc, PETSC_DECIDE, idxptr.size()-1);
-    VecSetFromOptions(solpetsc);
-    VecSet(solpetsc, 0.0);
-    VecAssemblyBegin(solpetsc);
-    VecAssemblyEnd(solpetsc);
-    
-    KSP myksp = PETSC_NULL;
-    KSP* ksp = &myksp;
-    KSPCreate(PETSC_COMM_SELF, ksp);
-    KSPSetOperators(*ksp, Apetsc, Apetsc);
-    KSPSetFromOptions(*ksp);
-
-    PC pc;
-    KSPGetPC(*ksp,&pc);
-    PCSetType(pc,PCLU);
-    PCFactorSetMatSolverType(pc,MATSOLVERMUMPS);
-
-    KSPSolve(*ksp, bpetsc, solpetsc);
-    
-    std::vector<double> sol(b.size(), 0);
-    VecGetValues(solpetsc, b.size(), addr.data(), sol.data());
-    return sol;
-}
-
 vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
     if (soltype != "lu" && soltype != "cholesky")

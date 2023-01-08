@@ -37,6 +37,7 @@ fi
 # Metis is recommended but not mandatory. It can provide a major speedup for MUMPS during resolution.
 ./configure --with-openmp --with-mpi=0 --with-shared-libraries=1 --with-mumps-serial=1 --download-mumps --download-openblas --download-metis --download-slepc --with-debugging=0 --with-scalar-type=real --with-x=0 COPTFLAGS='-O3' CXXOPTFLAGS='-O3' FOPTFLAGS='-O3';
 
+
 ########## COMPILE PETSC :
 
 # In case petsc appends a 2 make a link:
