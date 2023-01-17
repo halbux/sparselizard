@@ -169,15 +169,6 @@ densemat spline::evalat(densemat input)
         inputvals[i] = invals[reorderingvector[i]];
     double inmin = inputvals[0]; double inmax = inputvals[numin-1];
     
-    // Error if request is out of range:
-    double absnoise = noisethreshold*std::abs(xmax-xmin);
-    if (inmin < xmin-absnoise || inmax > xmax+absnoise)
-    {
-        std::cout << "Error in 'spline' object: data requested in interval (" << inmin << "," << inmax << ") is out of the provided data range (" << xmin << "," << xmax << ")" << std::endl;
-        abort();
-    }
-    
-    
     std::vector<double> outvec(numin);
     
     // Get the corresponding data via spline interpolation.
@@ -190,18 +181,28 @@ densemat spline::evalat(densemat input)
     {
         double cur = inputvals[i];
         // Find the spline:
-        while (xvals[curspline] < cur-absnoise)
+        while (curspline < myx.count()-1 && xvals[curspline] < cur)
             curspline++;
         // Interpolate on the spline:
         double dx = xvals[curspline]-xvals[curspline-1];
         double tx = (cur-xvals[curspline-1])/dx;
+        tx = std::max(0.0, std::min(1.0, tx));
         double a = avals[curspline];
         double b = bvals[curspline];
         
+        double y = (1.0-tx)*yvals[curspline-1] + tx*yvals[curspline] + tx*(1.0-tx)*((1.0-tx)*a+tx*b);
+        double dydx = 1.0/dx * (yvals[curspline]-yvals[curspline-1] + (1.0-2.0*tx)*(a*(1.0-tx)+b*tx) + tx*(1.0-tx)*(b-a));
+        
+        // The spline turns into a straight line at xmin and xmax:
+        if (cur < xmin)
+            y = dydx*cur + y - dydx*xmin;
+        if (cur > xmax)
+            y = dydx*cur + y - dydx*xmax;
+        
         if (derivativeorder == 0)
-            outvec[i] = (1.0-tx)*yvals[curspline-1] + tx*yvals[curspline] + tx*(1.0-tx)*((1.0-tx)*a+tx*b);
+            outvec[i] = y;
         if (derivativeorder == 1)
-            outvec[i] = 1.0/dx * (yvals[curspline]-yvals[curspline-1] + (1.0-2.0*tx)*(a*(1.0-tx)+b*tx) + tx*(1.0-tx)*(b-a));
+            outvec[i] = dydx;
         if (derivativeorder == 2)
             outvec[i] = 2.0/(dx*dx) * (b-2.0*a + (a-b)*3.0*tx);
         if (derivativeorder == 3)
