@@ -1285,26 +1285,30 @@ void elements::definedisjointregions(void)
 
         for (int elem = 0; elem < subelementsinelements[typenum][0].size()/numberofcurvednodes; elem++)
         {
-            for (int i = 0; i < numberofcurvednodes; i++)
+            for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
             {
-                int subelem = subelementsinelements[typenum][0][elem*numberofcurvednodes+i];
-                for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
+                if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
                 {
-                    if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
+                    for (int i = 0; i < numberofcurvednodes; i++)
+                    {
+                        int subelem = subelementsinelements[typenum][0][elem*numberofcurvednodes+i];
                         isinphysicalregion[0][subelem*numberofphysicalregions+physregindex] = true;
+                    }
                 }
             }
         }
         
         for (int elem = 0; elem < subelementsinelements[typenum][1].size()/numberoflines; elem++)
         {
-            for (int i = 0; i < numberoflines; i++)
+            for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
             {
-                int subelem = subelementsinelements[typenum][1][elem*numberoflines+i];
-                for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
+                if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
                 {
-                    if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
+                    for (int i = 0; i < numberoflines; i++)
+                    {
+                        int subelem = subelementsinelements[typenum][1][elem*numberoflines+i];
                         isinphysicalregion[1][subelem*numberofphysicalregions+physregindex] = true;
+                    }
                 }
             }
         }
@@ -1313,13 +1317,15 @@ void elements::definedisjointregions(void)
         {
             for (int elem = 0; elem < subelementsinelements[typenum][2].size()/numberoftriangles; elem++)
             {
-                for (int i = 0; i < numberoftriangles; i++)
+                for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
                 {
-                    int subelem = subelementsinelements[typenum][2][elem*numberoftriangles+i];
-                    for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
+                    if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
                     {
-                        if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
+                        for (int i = 0; i < numberoftriangles; i++)
+                        {
+                            int subelem = subelementsinelements[typenum][2][elem*numberoftriangles+i];
                             isinphysicalregion[2][subelem*numberofphysicalregions+physregindex] = true;
+                        }
                     }
                 }
             }
@@ -1329,13 +1335,15 @@ void elements::definedisjointregions(void)
         {
             for (int elem = 0; elem < subelementsinelements[typenum][3].size()/numberofquadrangles; elem++)
             {
-                for (int i = 0; i < numberofquadrangles; i++)
+                for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
                 {
-                    int subelem = subelementsinelements[typenum][3][elem*numberofquadrangles+i];
-                    for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
+                    if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
                     {
-                        if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
+                        for (int i = 0; i < numberofquadrangles; i++)
+                        {
+                            int subelem = subelementsinelements[typenum][3][elem*numberofquadrangles+i];
                             isinphysicalregion[3][subelem*numberofphysicalregions+physregindex] = true;
+                        }
                     }
                 }
             }
