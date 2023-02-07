@@ -8,7 +8,7 @@
 #define GPLINE_H
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "gausspoints.h"
 

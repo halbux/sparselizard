@@ -5,7 +5,7 @@
 #include "lagrangeformfunction.h"
 #include "slmpi.h"
 
-#if defined(__linux__)
+#if defined(__linux__) && !defined(_LIBCPP_VERSION)
 #include <parallel/algorithm>
 #endif
 
@@ -21,7 +21,7 @@ void gentools::stablecoordinatesort(std::vector<double> noisethreshold, std::vec
     std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
     // Sort 'reorderingvector' according to 'coordinates' with x > y > z priority order:
     // The < operator is overloaded by a lambda function.
-    #if defined(__linux__)
+    #if defined(__linux__) && !defined(_LIBCPP_VERSION)
     __gnu_parallel::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
     #else
     std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
@@ -276,7 +276,7 @@ void gentools::stablesort(std::vector<int>& tosort, std::vector<int>& reordering
     std::iota(reorderingvector.begin(), reorderingvector.end(), 0);
     // Sort 'reorderingvector' according to 'tosort':
     // The < operator is overloaded by a lambda function.
-    #if defined(__linux__)
+    #if defined(__linux__) && !defined(_LIBCPP_VERSION)
     __gnu_parallel::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
     #else
     std::sort(reorderingvector.begin(), reorderingvector.end(), [&](int elem1, int elem2)
@@ -352,7 +352,7 @@ bool sortfun(const std::tuple<int,int,double>& elem1, const std::tuple<int,int,d
 void gentools::tuple3sort(std::vector<std::tuple<int,int,double>>& tosort)
 {
     // Parallel sort on Linux only for now:
-    #if defined(__linux__)
+    #if defined(__linux__) && !defined(_LIBCPP_VERSION)
     __gnu_parallel::sort(tosort.begin(), tosort.end(), sortfun);
     #else
     std::sort(tosort.begin(), tosort.end(), sortfun);
