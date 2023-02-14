@@ -55,7 +55,7 @@ hierarchicalformfunctioncontainer h1point::evalat(int maxorder)
     if (targetdim != -1)
         type = "h1d"+std::to_string(targetdim);
 
-    element point("point");
+    element point( element::CURVE_TYPE::POINT );
     hierarchicalformfunctioncontainer val(type, point.gettypenumber());
 
     polynomial formfunc;

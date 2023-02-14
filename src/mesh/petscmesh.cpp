@@ -159,7 +159,7 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
                         numnodesinelem++;
                 }
                 // Deduce the element type:
-                int elemtypenum = myelem.deducetypenumber(dim, numnodesinelem);
+                int elemtypenum = static_cast<int>( myelem.deducetype(dim, numnodesinelem) );
                 // Put the nodes in a vector:
                 std::vector<int> nodesinelem(numnodesinelem);
                 int index = 0;

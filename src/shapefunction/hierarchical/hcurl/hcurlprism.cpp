@@ -54,7 +54,7 @@ int hcurlprism::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlprism::evalat(int maxorder) 
 {    
-    element prism("prism");
+    element prism( element::CURVE_TYPE::PRISM );
     hierarchicalformfunctioncontainer val("hcurl", prism.gettypenumber());
 
     // Get the node list in every edge and face:

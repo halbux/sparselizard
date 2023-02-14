@@ -55,7 +55,7 @@ hierarchicalformfunctioncontainer h1triangle::evalat(int maxorder)
     if (targetdim != -1)
         type = "h1d"+std::to_string(targetdim);
         
-    element triangle("triangle");
+    element triangle( element::CURVE_TYPE::TRIANGLE );
     hierarchicalformfunctioncontainer val(type, triangle.gettypenumber());
 
     // Get the node list in every edge and face:

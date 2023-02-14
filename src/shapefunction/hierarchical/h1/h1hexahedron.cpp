@@ -55,7 +55,7 @@ hierarchicalformfunctioncontainer h1hexahedron::evalat(int maxorder)
     if (targetdim != -1)
         type = "h1d"+std::to_string(targetdim);
         
-    element hexahedron("hexahedron");
+    element hexahedron( element::CURVE_TYPE::HEXAHEDRON );
     hierarchicalformfunctioncontainer val(type, hexahedron.gettypenumber());
 
     // Get the node list in every edge and face:

@@ -52,7 +52,7 @@ int hcurltriangle::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurltriangle::evalat(int maxorder) 
 {    
-    element triangle("triangle");
+    element triangle( element::CURVE_TYPE::TRIANGLE );
     hierarchicalformfunctioncontainer val("hcurl", triangle.gettypenumber());
 
     // Get the node list in every edge and face:

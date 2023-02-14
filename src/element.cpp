@@ -5,67 +5,89 @@
 
 namespace sl {
 
-element::element(std::string elementname)
+// 0  --> Point
+// 1  --> Line        order 1
+// 2  --> Triangle    order 1
+// 3  --> Quadrangle  order 1
+// 4  --> Tetrahedron order 1
+// 5  --> Hexahedron  order 1
+// 6  --> Prism       order 1
+// 7  --> Pyramid     order 1
+// 8  --> Line        order 2
+// 9  --> Triangle    order 2
+// 10 --> Quadrangle  order 2
+// 11 --> Tetrahedron order 2
+// 12 --> Hexahedron  order 2
+// 13 --> Prism       order 2
+// 14 --> Pyramid     order 2
+// 15 --> Line        order 3
+element::CURVE_TYPE element::curveTypeFromInt( int aValue )
 {
-    curvedtypenumber = -1;
+    if ( aValue < 0 )
+    {
+        std::cout << "Invalid element type number: " << aValue << std::endl;
+        return element::CURVE_TYPE::END;
+    }
+
+    if ( aValue == 0 )
+        return element::CURVE_TYPE::POINT;
+
+    switch ( 1 + ( ( aValue - 1 ) % 7 ) )
+    {
+        case 1:
+            return element::CURVE_TYPE::LINE;
+        case 2:
+            return element::CURVE_TYPE::TRIANGLE;
+        case 3:
+            return element::CURVE_TYPE::QUADRANGLE;
+        case 4:
+            return element::CURVE_TYPE::TETRAHEDRON;
+        case 5:
+            return element::CURVE_TYPE::HEXAHEDRON;
+        case 6:
+            return element::CURVE_TYPE::PRISM;
+        case 7:
+            return element::CURVE_TYPE::PYRAMID;
+        default:
+            std::cout << "Internal error in curveTypeFromInt: " << aValue << std::endl;
+            return element::CURVE_TYPE::END;
+    }
+}
+
+element::CURVE_TYPE element::curveTypeFromString( std::string aString )
+{
     // 'switch' does not work on std::string:
-    if (elementname == "point")
-        curvedtypenumber = 0;
-    if (elementname == "line")
-        curvedtypenumber = 1;
-    if (elementname == "triangle")
-        curvedtypenumber = 2;
-    if (elementname == "quadrangle")
-        curvedtypenumber = 3;
-    if (elementname == "tetrahedron")
-        curvedtypenumber = 4;
-    if (elementname == "hexahedron")
-        curvedtypenumber = 5;
-    if (elementname == "prism")
-        curvedtypenumber = 6;
-    if (elementname == "pyramid")
-        curvedtypenumber = 7;
-    if (curvedtypenumber == -1)
-    {
-        std::cout << "Error in 'element' object: trying to use undefined element name: " << elementname << std::endl << "Make sure everything is lower case" << std::endl;
-        abort();
-    }
+    if (aString == "point")
+        return element::CURVE_TYPE::POINT;
+    if (aString == "line")
+        return element::CURVE_TYPE::LINE;
+    if (aString == "triangle")
+        return element::CURVE_TYPE::TRIANGLE;
+    if (aString == "quadrangle")
+        return element::CURVE_TYPE::QUADRANGLE;
+    if (aString == "tetrahedron")
+        return element::CURVE_TYPE::TETRAHEDRON;
+    if (aString == "hexahedron")
+        return element::CURVE_TYPE::HEXAHEDRON;
+    if (aString == "prism")
+        return element::CURVE_TYPE::PRISM;
+    if (aString == "pyramid")
+        return element::CURVE_TYPE::PYRAMID;
+
+    std::cout << "Error in 'element' object: trying to use undefined element name: " << aString << std::endl << "Make sure everything is lower case" << std::endl;
+    return element::CURVE_TYPE::END;
 }
 
-element::element(int number)
-{
-    if (number < 0)
-    {
-        std::cout << "Error in 'element' object: cannot define negative element type number " << number << std::endl;
-        abort();
-    }
-    curvedtypenumber = number;
-}
 
-element::element(int number, int curvatureorder)
+element::element( element::CURVE_TYPE aType, int aOrder):
+    curveType( aType ),
+    curvatureorder( aOrder )
 {
-    if (number < 0)
-    {
-        std::cout << "Error in 'element' object: can not define a negative element type number" << std::endl;
-        std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
-        abort();
-    }
-    if (curvatureorder <= 0)
-    {
-        std::cout << "Error in 'element' object: can not define a negative or 0 curvature order" << std::endl;
-        std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
-        abort();
-    }
-    // The point element can only have number 0:
-    if (number == 0)
-        curvedtypenumber = 0;
-    else
-        curvedtypenumber = 7*(curvatureorder-1)+number;
 }
 
 void element::setnodes(std::vector<int>& nodelist)
 {
-    if (curvedtypenumber == -1)
+    if ( curveType >= element::CURVE_TYPE::END )
     {
         std::cout << "Error: element type has not been defined yet" << std::endl;
         abort();
@@ -85,23 +107,23 @@ std::vector<int> element::getnodes(void)
 
 std::string element::gettypename(void)
 {
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        case 0:
+        case CURVE_TYPE::POINT :
             return "point";
-        case 1:
+        case CURVE_TYPE::LINE:
             return "line";
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return "triangle";
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return "quadrangle";
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return "tetrahedron";
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return "hexahedron";
-        case 6:
+        case CURVE_TYPE::PRISM:
             return "prism";
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             return "pyramid";
     }
     
@@ -114,23 +136,23 @@ std::string element::gettypenameconjugation(int numberofelements)
         return gettypename();
     else
     {
-        switch (gettypenumber())
+        switch ( getCurveType() )
         {
-            case 0:
+            case CURVE_TYPE::POINT :
                 return "points";
-            case 1:
+            case CURVE_TYPE::LINE :
                 return "lines";
-            case 2:
+            case CURVE_TYPE::TRIANGLE:
                 return "triangles";
-            case 3:
+            case CURVE_TYPE::QUADRANGLE:
                 return "quadrangles";
-            case 4:
+            case CURVE_TYPE::TETRAHEDRON:
                 return "tetrahedra";
-            case 5:
+            case CURVE_TYPE::HEXAHEDRON:
                 return "hexahedra";
-            case 6:
+            case CURVE_TYPE::PRISM:
                 return "prisms";
-            case 7:
+            case CURVE_TYPE::PYRAMID:
                 return "pyramids";
         }
     }
@@ -140,65 +162,59 @@ std::string element::gettypenameconjugation(int numberofelements)
 
 bool element::iscurved(void)
 {
-    return (curvedtypenumber > 7);
+    return curvatureorder > 1;
 }
 
 int element::getcurvatureorder(void)
 {
-    if (curvedtypenumber%7 == 0 && curvedtypenumber != 0)
-        return curvedtypenumber/7;
-    else
-        return (curvedtypenumber - curvedtypenumber%7)/7 + 1;        
+    return curvatureorder;      
+}
+
+element::CURVE_TYPE element::getCurveType(void)
+{
+    return curveType;
 }
 
 int element::gettypenumber(void)
 {
-    return (curvedtypenumber - 7*(getcurvatureorder() - 1));
+    return static_cast<int>( getCurveType() );
 }
 
 int element::getcurvedtypenumber(void)
 {
-    return curvedtypenumber;
+    return gettypenumber() + getcurvatureorder() * 7 ;
 }
 
 int element::countcurvednodes(void)
 {
     int order = getcurvatureorder();
-    int curvednumberofnodes;
+    int curvednumberofnodes = 0;
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             curvednumberofnodes = 1;
             break;
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             curvednumberofnodes = order + 1;
             break;
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             // (#on quad + #on diagonal) / 2:
             curvednumberofnodes = ( std::pow(order+1,2) + (order+1) )/2;
             break;
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             curvednumberofnodes = std::pow(order + 1,2);
             break;
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             curvednumberofnodes = ( (order+1)*(order+2)*(order+3) )/6;
             break;
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             curvednumberofnodes = std::pow(order + 1,3);
             break;
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             curvednumberofnodes = ( (order + 1)*( std::pow(order+1,2) + (order+1) ) )/2;
             break;
-        // Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             // sum of all parallel quadrangles:
             curvednumberofnodes = 0;
             for (int i = 0; i < order + 1; i++)
@@ -211,184 +227,137 @@ int element::countcurvednodes(void)
 
 int element::getelementdimension(void)
 {
-    int straighttypenumber = gettypenumber();
-    
-    if (straighttypenumber == 0)
-        return 0;
-    if (straighttypenumber == 1)
-        return 1;
-    if (straighttypenumber == 2 || straighttypenumber == 3)
-        return 2;
-    if (straighttypenumber > 3)
-        return 3;
-        
-    abort(); // fix return warning
+    switch( getCurveType() )
+    {
+        case CURVE_TYPE::POINT: return 0;
+        case CURVE_TYPE::LINE: return 1;
+        case CURVE_TYPE::TRIANGLE: return 2;
+        case CURVE_TYPE::QUADRANGLE: return 2;
+        case CURVE_TYPE::TETRAHEDRON: return 3;
+        case CURVE_TYPE::HEXAHEDRON: return 3;
+        case CURVE_TYPE::PRISM: return 3;
+        case CURVE_TYPE::PYRAMID:   return 3;
+        default: abort();
+
+    }
 }
 
 
 int element::counttype(int typenum)
 {
-    switch (typenum)
+    CURVE_TYPE selfType = getCurveType();
+
+    switch ( curveTypeFromInt( typenum ) )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
         {
-            switch (gettypenumber())
+            switch ( selfType )
             {
-                // Point:
-                case 0:
+                case CURVE_TYPE::POINT:
                     return 1;
-                // Line:
-                case 1:
+                case CURVE_TYPE::LINE:
                     return 2;
-                // Triangle:
-                case 2:
+                case CURVE_TYPE::TRIANGLE:
                     return 3;
-                // Quadrangle:
-                case 3:
+                case CURVE_TYPE::QUADRANGLE:
                     return 4;
-                // Tetrahedron:
-                case 4:
+                case CURVE_TYPE::TETRAHEDRON:
                     return 4;
-                // Hexahedron:
-                case 5:
+                case CURVE_TYPE::HEXAHEDRON:
                     return 8;
-                // Prism:
-                case 6:
+                case CURVE_TYPE::PRISM:
                     return 6;
-                // Pyramid:
-                case 7:
+                case CURVE_TYPE::PYRAMID:
                     return 5;
+                default:
+                    abort();
             }
         }
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
         {
-            switch (gettypenumber())
+            switch ( selfType )
             {
-                // Point:
-                case 0:
+                case CURVE_TYPE::POINT:
                     return 0;
-                // Line:
-                case 1:
+                case CURVE_TYPE::LINE:
                     return 1;
-                // Triangle:
-                case 2:
+                case CURVE_TYPE::TRIANGLE:
                     return 3;
-                // Quadrangle:
-                case 3:
+                case CURVE_TYPE::QUADRANGLE:
                     return 4;
-                // Tetrahedron:
-                case 4:
+                case CURVE_TYPE::TETRAHEDRON:
                     return 6;
-                // Hexahedron:
-                case 5:
+                case CURVE_TYPE::HEXAHEDRON:
                     return 12;
-                // Prism:
-                case 6:
+                case CURVE_TYPE::PRISM:
                     return 9;
-                // Pyramid:
-                case 7:
+                case CURVE_TYPE::PYRAMID:
                     return 8;
+                default:
+                    abort();
             }
         }
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
         {
-            switch (gettypenumber())
+            switch ( selfType )
             {
-                // Point:
-                case 0:
+                case CURVE_TYPE::POINT:
                     return 0;
-                // Line:
-                case 1:
+                case CURVE_TYPE::LINE:
                     return 0;
-                // Triangle:
-                case 2:
+                case CURVE_TYPE::TRIANGLE:
                     return 1;
-                // Quadrangle:
-                case 3:
+                case CURVE_TYPE::QUADRANGLE:
                     return 0;
-                // Tetrahedron:
-                case 4:
+                case CURVE_TYPE::TETRAHEDRON:
                     return 4;
-                // Hexahedron:
-                case 5:
+                case CURVE_TYPE::HEXAHEDRON:
                     return 0;
-                // Prism:
-                case 6:
+                case CURVE_TYPE::PRISM:
                     return 2;
-                // Pyramid:
-                case 7:
+                case CURVE_TYPE::PYRAMID:
                     return 4;
+                default:
+                    abort();
             }
         }
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
         {
-            switch (gettypenumber())
+            switch ( selfType )
             {
-                // Point:
-                case 0:
+                case CURVE_TYPE::POINT:
                     return 0;
-                // Line:
-                case 1:
+                case CURVE_TYPE::LINE:
                     return 0;
-                // Triangle:
-                case 2:
+                case CURVE_TYPE::TRIANGLE:
                     return 0;
-                // Quadrangle:
-                case 3:
+                case CURVE_TYPE::QUADRANGLE:
                     return 1;
-                // Tetrahedron:
-                case 4:
+                case CURVE_TYPE::TETRAHEDRON:
                     return 0;
-                // Hexahedron:
-                case 5:
+                case CURVE_TYPE::HEXAHEDRON:
                     return 6;
-                // Prism:
-                case 6:
+                case CURVE_TYPE::PRISM:
                     return 3;
-                // Pyramid:
-                case 7:
+                case CURVE_TYPE::PYRAMID:
                     return 1;
+                default:
+                    abort();
             }
         }
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
+        case CURVE_TYPE::HEXAHEDRON:
+        case CURVE_TYPE::PRISM:
+        case CURVE_TYPE::PYRAMID:
         {
-            if (gettypenumber() == 4)
+            if ( selfType == curveTypeFromInt( typenum ) )
                 return 1;
             else
                 return 0;
         }
-        // Hexahedron:
-        case 5:
-        {
-            if (gettypenumber() == 5)
-                return 1;
-            else
-                return 0;
-        }
-        // Prism:
-        case 6:
-        {
-            if (gettypenumber() == 6)
-                return 1;
-            else
-                return 0;
-        }
-        // Pyramid:
-        case 7:
-        {
-            if (gettypenumber() == 7)
-                return 1;
-            else
-                return 0;
-        }
+        default:
+            abort();
     }
-    
-    abort(); // fix return warning
 }
 
 int element::countdim(int dim)
@@ -443,35 +412,27 @@ bool element::isinsideelement(double ki, double eta, double phi)
 {
     double roundoffnoise = 1e-10;
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             return (std::abs(ki) < roundoffnoise && std::abs(eta) < roundoffnoise && std::abs(phi) < roundoffnoise);
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             return (std::abs(ki) < 1+roundoffnoise && std::abs(eta) < roundoffnoise && std::abs(phi) < roundoffnoise);
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return (ki+eta < 1+roundoffnoise && ki > -roundoffnoise && eta > -roundoffnoise && std::abs(phi) < roundoffnoise);
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return (std::abs(ki) < 1+roundoffnoise && std::abs(eta) < 1+roundoffnoise && std::abs(phi) < roundoffnoise);
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return (ki+eta+phi < 1+roundoffnoise && ki > -roundoffnoise && eta > -roundoffnoise && phi > -roundoffnoise);
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return (std::abs(ki) < 1+roundoffnoise && std::abs(eta) < 1+roundoffnoise && std::abs(phi) < 1+roundoffnoise);
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             return (ki+eta < 1+roundoffnoise && ki > -roundoffnoise && eta > -roundoffnoise && std::abs(phi) < 1+roundoffnoise);
-        // Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             return (std::abs(ki) < 1-phi+roundoffnoise && std::abs(eta) < 1-phi+roundoffnoise && phi > -roundoffnoise && phi < 1+roundoffnoise);
+        default:
+            abort();
     }
-    
-    abort(); // fix return warning
 }
 
 void element::isinsideelement(std::vector<double>& coords, std::vector<double>& cc, std::vector<bool>& isinside, double roundoffnoise)
@@ -590,9 +551,9 @@ void element::atnode(std::vector<double>& refcoords, std::vector<int>& nodenums,
     int numrefs = refcoords.size()/3;
     nodenums = std::vector<int>(numrefs, -1);
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        case 1:
+        case CURVE_TYPE::LINE:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -603,7 +564,7 @@ void element::atnode(std::vector<double>& refcoords, std::vector<int>& nodenums,
             }
             break;
         }
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -616,7 +577,7 @@ void element::atnode(std::vector<double>& refcoords, std::vector<int>& nodenums,
             }
             break;
         }
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -631,7 +592,7 @@ void element::atnode(std::vector<double>& refcoords, std::vector<int>& nodenums,
             }
             break;
         }
-        case 4:
+        case CURVE_TYPE::HEXAHEDRON:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -646,6 +607,8 @@ void element::atnode(std::vector<double>& refcoords, std::vector<int>& nodenums,
             }
             break;
         }
+        default:
+            abort();
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
 }
@@ -655,9 +618,9 @@ void element::atedge(std::vector<double>& refcoords, std::vector<int>& edgenums,
     int numrefs = refcoords.size()/3;
     edgenums = std::vector<int>(numrefs, -1);
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -670,7 +633,7 @@ void element::atedge(std::vector<double>& refcoords, std::vector<int>& edgenums,
             }
             break;
         }
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -685,7 +648,7 @@ void element::atedge(std::vector<double>& refcoords, std::vector<int>& edgenums,
             }
             break;
         }
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -704,7 +667,9 @@ void element::atedge(std::vector<double>& refcoords, std::vector<int>& edgenums,
             }
             break;
         }
-        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+        default:
+            break;
+            // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
 }
 
@@ -713,9 +678,9 @@ void element::atface(std::vector<double>& refcoords, std::vector<int>& facenums,
     int numrefs = refcoords.size()/3;
     facenums = std::vector<int>(numrefs, -1);
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        case 4:
+        case CURVE_TYPE::QUADRANGLE:
         {
             for (int i = 0; i < numrefs; i++)
             {
@@ -730,127 +695,113 @@ void element::atface(std::vector<double>& refcoords, std::vector<int>& facenums,
             }
             break;
         }
-        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+        default:
+            break;
+            // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
 }
 
 std::vector<double> element::getedgebarycenter(std::vector<double>& nc)
 {
-    switch (curvedtypenumber)
+    switch ( getCurveType() )
     {
-        case 1:
+        case CURVE_TYPE::LINE:
             return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2])};
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2]),
                     0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2]),
                     0.5*(nc[3*2+0]+nc[3*0+0]), 0.5*(nc[3*2+1]+nc[3*0+1]), 0.5*(nc[3*2+2]+nc[3*0+2])};
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2]),
                     0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2]),
                     0.5*(nc[3*2+0]+nc[3*3+0]), 0.5*(nc[3*2+1]+nc[3*3+1]), 0.5*(nc[3*2+2]+nc[3*3+2]),
                     0.5*(nc[3*3+0]+nc[3*0+0]), 0.5*(nc[3*3+1]+nc[3*0+1]), 0.5*(nc[3*3+2]+nc[3*0+2])};
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return {0.5*(nc[3*0+0]+nc[3*1+0]), 0.5*(nc[3*0+1]+nc[3*1+1]), 0.5*(nc[3*0+2]+nc[3*1+2]),
                     0.5*(nc[3*1+0]+nc[3*2+0]), 0.5*(nc[3*1+1]+nc[3*2+1]), 0.5*(nc[3*1+2]+nc[3*2+2]),
                     0.5*(nc[3*2+0]+nc[3*0+0]), 0.5*(nc[3*2+1]+nc[3*0+1]), 0.5*(nc[3*2+2]+nc[3*0+2]),
                     0.5*(nc[3*3+0]+nc[3*0+0]), 0.5*(nc[3*3+1]+nc[3*0+1]), 0.5*(nc[3*3+2]+nc[3*0+2]),
                     0.5*(nc[3*3+0]+nc[3*2+0]), 0.5*(nc[3*3+1]+nc[3*2+1]), 0.5*(nc[3*3+2]+nc[3*2+2]),
                     0.5*(nc[3*3+0]+nc[3*1+0]), 0.5*(nc[3*3+1]+nc[3*1+1]), 0.5*(nc[3*3+2]+nc[3*1+2])};
+        default:
+            abort();
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
-    
-    abort(); // fix return warning
 }
 
 std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
 {
-    switch (curvedtypenumber)
+    switch ( getCurveType() )
     {
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return {(nc[3*0+0]+nc[3*1+0]+nc[3*2+0])/3.0, (nc[3*0+1]+nc[3*1+1]+nc[3*2+1])/3.0, (nc[3*0+2]+nc[3*1+2]+nc[3*2+2])/3.0};
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return {(nc[3*0+0]+nc[3*1+0]+nc[3*2+0]+nc[3*3+0])/4.0, (nc[3*0+1]+nc[3*1+1]+nc[3*2+1]+nc[3*3+1])/4.0, (nc[3*0+2]+nc[3*1+2]+nc[3*2+2]+nc[3*3+2])/4.0};
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return {(nc[3*0+0]+nc[3*2+0]+nc[3*1+0])/3.0, (nc[3*0+1]+nc[3*2+1]+nc[3*1+1])/3.0, (nc[3*0+2]+nc[3*2+2]+nc[3*1+2])/3.0,
                     (nc[3*0+0]+nc[3*1+0]+nc[3*3+0])/3.0, (nc[3*0+1]+nc[3*1+1]+nc[3*3+1])/3.0, (nc[3*0+2]+nc[3*1+2]+nc[3*3+2])/3.0,
                     (nc[3*0+0]+nc[3*3+0]+nc[3*2+0])/3.0, (nc[3*0+1]+nc[3*3+1]+nc[3*2+1])/3.0, (nc[3*0+2]+nc[3*3+2]+nc[3*2+2])/3.0,
                     (nc[3*3+0]+nc[3*1+0]+nc[3*2+0])/3.0, (nc[3*3+1]+nc[3*1+1]+nc[3*2+1])/3.0, (nc[3*3+2]+nc[3*1+2]+nc[3*2+2])/3.0};
-        // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
+        default:
+            abort();
+            // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
-    
-    abort(); // fix return warning
 }
 
 double element::measurereferenceelement(void)
 {
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             return 1.0;
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             return 2.0;
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return 0.5;
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return 4.0;
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return 1.0/6.0;
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return 8.0;
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             return 1.0;
-        // Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             return 4.0/3.0;
+        default:
+            abort();
     }
-    
-    abort(); // fix return warning
 }
 
 bool element::istriangularface(int facenum)
 {
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             return false;
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             return false;
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return true;
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return false;
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return true;
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return false;
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             if (facenum < 2)
                 return true;
             else
                 return false;
-        // Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             if (facenum < 4)
                 return true;
             else
                 return false;
+        default:
+            abort();
     }
-    
-    abort(); // fix return warning
 }
 
 bool element::ishorizontaledge(int edgenum)
@@ -992,108 +943,85 @@ std::vector<int> element::getnodesinsurface(int surfaceindex, bool faceistriangl
 
 std::vector<int> element::getedgesdefinitionsbasedonnodes(void)
 {
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             return {};
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             return {0,1};
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return {0,1,1,2,2,0};
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return {0,1,1,2,2,3,3,0};
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return {0,1,1,2,2,0,3,0,3,2,3,1};
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return {0,1,0,3,0,4,1,2,1,5,2,3,2,6,3,7,4,5,4,7,5,6,6,7};
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             return {0,1,0,2,0,3,1,2,1,4,2,5,3,4,3,5,4,5};
-        // Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             return {0,1,0,3,0,4,1,2,1,4,2,3,2,4,3,4};
+        default:
+            abort();
     }
-    
-    abort(); // fix return warning
 }
 
 std::vector<int> element::getfacesdefinitionsbasedonnodes(void)
 {
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             return {};
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             return {};
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return {0,1,2};
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return {0,1,2,3};
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return {0,2,1,0,1,3,0,3,2,3,1,2};
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return {0,3,2,1,0,1,5,4,0,4,7,3,1,2,6,5,2,3,7,6,4,5,6,7};
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             return {0,2,1,3,4,5,0,1,4,3,0,3,5,2,1,2,5,4};
-        // Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             return {0,1,4,3,0,4,1,2,4,2,3,4,0,3,2,1};
+        default:
+            abort();
     }
-    
-    abort(); // fix return warning
 }
 
 std::vector<int> element::getfacesdefinitionsbasedonedges(void)
 {
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             return {};
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             return {};
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return {1,2,3};
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return {1,2,3,4};
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             return {-3,-2,-1,1,-6,4,-4,5,3,6,2,-5};
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             return {2,-6,-4,-1,1,5,-9,-3,3,10,-8,-2,4,7,-11,-5,6,8,-12,-7,9,11,12,-10};
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             return {2,-4,-1,7,9,-8,1,5,-7,-3,3,8,-6,-2,4,6,-9,-5};
-        //Pyramid:
-        case 7:
-            return {1,5,-3,-2,3,-8,4,7,-5,6,8,-7,2,-6,-4,-1};
+        case CURVE_TYPE::PYRAMID:
+            return {1,5,-3,-2,3,-8,4,7,-5,6,8,-7,2,-6,-4,-1};       
     }
-    
-    abort(); // fix return warning
+    abort();
 }
 
 bool element::iselementedgeorface(void)
 {
-    int straighttypenumber = gettypenumber();
-    // Lines have number 1, triangles 2 and quadrangles 3:
-    return (straighttypenumber == 1 || straighttypenumber == 2 || straighttypenumber == 3);
+    CURVE_TYPE type = getCurveType();
+
+    return (type == CURVE_TYPE::LINE ||
+            type == CURVE_TYPE::TRIANGLE ||
+            type == CURVE_TYPE::QUADRANGLE);
 }
 
 std::vector<double> element::listnodecoordinates(void)
@@ -1104,19 +1032,16 @@ std::vector<double> element::listnodecoordinates(void)
  
      int index = 0;
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        // Point:
-        case 0:
+        case CURVE_TYPE::POINT:
             output = {0.0,0.0,0.0};
             break;
-        // Line:
-        case 1:
+        case CURVE_TYPE::LINE:
             for (int i = 0; i < numnodesinline; i++)
                 output[3*i+0] = -1.0+2.0/(numnodesinline-1)*i;
             break;
-        // Triangle:
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             for (int i = 0; i < numnodesinline; i++)
             {
                 for (int j = 0; j < numnodesinline-i; j++)
@@ -1127,8 +1052,7 @@ std::vector<double> element::listnodecoordinates(void)
                 }
             }
             break;
-        // Quadrangle:
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             for (int i = 0; i < numnodesinline; i++)
             {
                 for (int j = 0; j < numnodesinline; j++)
@@ -1139,8 +1063,7 @@ std::vector<double> element::listnodecoordinates(void)
                 }
             }
             break;
-        // Tetrahedron:
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
             for (int i = 0; i < numnodesinline; i++)
             {
                 for (int j = 0; j < numnodesinline-i; j++)
@@ -1155,8 +1078,7 @@ std::vector<double> element::listnodecoordinates(void)
                 }
             }
             break;
-        // Hexahedron:
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
             for (int i = 0; i < numnodesinline; i++)
             {
                 for (int j = 0; j < numnodesinline; j++)
@@ -1171,8 +1093,7 @@ std::vector<double> element::listnodecoordinates(void)
                 }
             }
             break;
-        // Prism:
-        case 6:
+        case CURVE_TYPE::PRISM:
             for (int i = 0; i < numnodesinline; i++)
             {
                 for (int j = 0; j < numnodesinline; j++)
@@ -1187,8 +1108,7 @@ std::vector<double> element::listnodecoordinates(void)
                 }
             }
             break;
-        //Pyramid:
-        case 7:
+        case CURVE_TYPE::PYRAMID:
             output = {-1.0, -1.0, 0, 1.0, -1.0, 0, -1.0, 1.0, 0.0, 1.0, 1.0, 0, 0.0, 0.0, 1.0};
             if (getcurvatureorder() > 1)
             {             
@@ -1201,37 +1121,30 @@ std::vector<double> element::listnodecoordinates(void)
     return output;
 }
 
-int element::deducetypenumber(int elemdim, int numnodes)
+element::CURVE_TYPE element::deducetype(int elemdim, int numnodes)
 {
     switch (numnodes)
     {
-        // Point:
         case 1:
-            return 0;
-        // Line:
+            return CURVE_TYPE::POINT;
         case 2:
-            return 1;
-        // Triangle:
+            return CURVE_TYPE::LINE;
         case 3:
-            return 2;
-        // Quadrangle or tetrahedron:
+            return CURVE_TYPE::TRIANGLE;
         case 4:
         {
             if (elemdim == 2)
-                return 3;
+                return CURVE_TYPE::QUADRANGLE;
             if (elemdim == 3)
-                return 4;
+                return CURVE_TYPE::TETRAHEDRON;
             break;
         }
-        // Pyramid:
         case 5:
-            return 7;
-        // Prism:
+            return CURVE_TYPE::PYRAMID;
         case 6:
-            return 6;
-        // Hexahedron:
+            return CURVE_TYPE::PRISM;
         case 8:
-            return 5;
+            return CURVE_TYPE::HEXAHEDRON;
     }
     
     abort(); // fix return warning
@@ -1242,7 +1155,9 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     // Need to be ultrafast for straight elements in mesh adaptivity
     if (returnnodecoords == false)
     {
-        if (curvedtypenumber == 1)
+        switch( curveType )
+        {
+        case CURVE_TYPE::LINE:
         {
             int numrefs = refcoords.size()/3;
             std::vector<double> outfast(3*numrefs);
@@ -1259,9 +1174,8 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
             }
             return outfast;
         }
-        
-        if (curvedtypenumber == 2)
-        {
+        case CURVE_TYPE::TRIANGLE:
+            {
             int numrefs = refcoords.size()/3;
             std::vector<double> outfast(3*numrefs);
             for (int i = 0; i < numrefs; i++)
@@ -1278,10 +1192,10 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
                 outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1 + nodecoords[fi+3*2+2]*ff2;
             }
             return outfast;
-        }
+            }
 
-        if (curvedtypenumber == 3)
-        {
+        case CURVE_TYPE::QUADRANGLE:
+            {
             int numrefs = refcoords.size()/3;
             std::vector<double> outfast(3*numrefs);
             for (int i = 0; i < numrefs; i++)
@@ -1299,10 +1213,10 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
                 outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1 + nodecoords[fi+3*2+2]*ff2 + nodecoords[fi+3*3+2]*ff3;
             }
             return outfast;
-        }
+            }
         
-        if (curvedtypenumber == 4)
-        {
+        case CURVE_TYPE::HEXAHEDRON:
+            {
             int numrefs = refcoords.size()/3;
             std::vector<double> outfast(3*numrefs);
             for (int i = 0; i < numrefs; i++)
@@ -1321,6 +1235,11 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
                 outfast[3*i+2] = nodecoords[fi+3*0+2]*ff0 + nodecoords[fi+3*1+2]*ff1 + nodecoords[fi+3*2+2]*ff2 + nodecoords[fi+3*3+2]*ff3;
             }
             return outfast;
+            }
+        default:
+            {
+            // do nothing
+            }
         }
     }
 
@@ -1358,7 +1277,7 @@ std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords
     }
     else
     {
-        lagrangeformfunction lff(gettypenumber(), getcurvatureorder(), {});
+        lagrangeformfunction lff( gettypenumber(), getcurvatureorder(), {});
         mypolynomials = polynomials(lff.getformfunctionpolynomials());
         return calculatecoordinates(refcoords, nodecoords, fi, returnnodecoords);
     }
@@ -1384,8 +1303,8 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
 {
     if (n == 0)
     {
-        splitcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
-        splitcoords[gettypenumber()] = unsplitcoords;
+        splitcoords = std::vector<std::vector<double>>( 8,std::vector<double>(0));
+        splitcoords[ gettypenumber() ] = unsplitcoords;
         return;
     }
     // Recursive call:
@@ -1393,9 +1312,9 @@ void element::fullsplit(int n, std::vector<std::vector<double>>& splitcoords, st
     {
         std::vector<std::vector<double>> cursplitcoords;
         fullsplit(1, cursplitcoords, unsplitcoords);
-        fullsplit(n-1, splitcoords, cursplitcoords[gettypenumber()]);
+        fullsplit(n-1, splitcoords, cursplitcoords[ gettypenumber() ]);
         // Treat the tetrahedra from the split pyramids:
-        if (gettypenumber() == 7)
+        if ( getCurveType() == CURVE_TYPE::PYRAMID)
         {
             element mytet(4,getcurvatureorder());
             std::vector<std::vector<double>> tetsplitcoords;
@@ -1508,29 +1427,29 @@ void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int t
 {
     cornerrefcoords = std::vector<std::vector<double>>(8,std::vector<double>(0));
 
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        case 0:
+        case CURVE_TYPE::POINT:
         {
             cornerrefcoords[0] = {0,0,0};
             break;
         }
-        case 1:
+        case CURVE_TYPE::LINE:
         {
             cornerrefcoords[1] = {-1,0,0,0,0,0, 0,0,0,1,0,0};
             break;
         }
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
         {
             cornerrefcoords[2] = {0,0,0,0.5,0,0,0,0.5,0, 0.5,0,0,0.5,0.5,0,0,0.5,0, 0.5,0,0,1,0,0,0.5,0.5,0, 0,0.5,0,0.5,0.5,0,0,1,0};
             break;
         }
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
         {
             cornerrefcoords[3] = {-1,-1,0,0,-1,0,0,0,0,-1,0,0, 0,-1,0,1,-1,0,1,0,0,0,0,0, -1,0,0,0,0,0,0,1,0,-1,1,0, 0,0,0,1,0,0,1,1,0,0,1,0};
             break;
         }
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
         {
             if (throughedgenum == 0)
                 cornerrefcoords[4] = {0.5,0,0,0,0.5,0.5,0,0,0.5,0.5,0,0.5, 0.5,0,0,0,0.5,0,0,0,0.5,0,0.5,0.5, 0.5,0,0,0.5,0.5,0,0,0.5,0.5,0.5,0,0.5, 0.5,0,0,0.5,0.5,0,0,0.5,0,0,0.5,0.5, 0,0,1,0,0,0.5,0,0.5,0.5,0.5,0,0.5, 0,1,0,0,0.5,0,0.5,0.5,0,0,0.5,0.5, 1,0,0,0.5,0.5,0,0.5,0,0,0.5,0,0.5, 0,0,0,0.5,0,0,0,0.5,0,0,0,0.5};
@@ -1540,17 +1459,17 @@ void element::fullsplit(std::vector<std::vector<double>>& cornerrefcoords, int t
                 cornerrefcoords[4] = {0,0.5,0,0,0.5,0.5,0,0,0.5,0.5,0,0.5, 0.5,0.5,0,0,0.5,0.5,0,0.5,0,0.5,0,0.5, 0.5,0,0,0,0.5,0,0,0,0.5,0.5,0,0.5, 0.5,0,0,0.5,0.5,0,0,0.5,0,0.5,0,0.5, 0,0,1,0,0,0.5,0,0.5,0.5,0.5,0,0.5, 0,1,0,0,0.5,0,0.5,0.5,0,0,0.5,0.5, 1,0,0,0.5,0.5,0,0.5,0,0,0.5,0,0.5, 0,0,0,0.5,0,0,0,0.5,0,0,0,0.5};
             break;
         }
-        case 5:
+        case CURVE_TYPE::HEXAHEDRON:
         {
             cornerrefcoords[5] = {-1,-1,-1,0,-1,-1,0,0,-1,-1,0,-1,-1,-1,0,0,-1,0,0,0,0,-1,0,0, 0,-1,-1,1,-1,-1,1,0,-1,0,0,-1,0,-1,0,1,-1,0,1,0,0,0,0,0, -1,0,-1,0,0,-1,0,1,-1,-1,1,-1,-1,0,0,0,0,0,0,1,0,-1,1,0, 0,0,-1,1,0,-1,1,1,-1,0,1,-1,0,0,0,1,0,0,1,1,0,0,1,0, -1,-1,0,0,-1,0,0,0,0,-1,0,0,-1,-1,1,0,-1,1,0,0,1,-1,0,1, 0,-1,0,1,-1,0,1,0,0,0,0,0,0,-1,1,1,-1,1,1,0,1,0,0,1, -1,0,0,0,0,0,0,1,0,-1,1,0,-1,0,1,0,0,1,0,1,1,-1,1,1, 0,0,0,1,0,0,1,1,0,0,1,0,0,0,1,1,0,1,1,1,1,0,1,1};
             break;
         }
-        case 6:
+        case CURVE_TYPE::PRISM:
         {
             cornerrefcoords[6] = {0,0,-1,0.5,0,-1,0,0.5,-1,0,0,0,0.5,0,0,0,0.5,0, 0.5,0,-1,0.5,0.5,-1,0,0.5,-1,0.5,0,0,0.5,0.5,0,0,0.5,0, 0.5,0,-1,1,0,-1,0.5,0.5,-1,0.5,0,0,1,0,0,0.5,0.5,0, 0,0.5,-1,0.5,0.5,-1,0,1,-1,0,0.5,0,0.5,0.5,0,0,1,0, 0,0,0,0.5,0,0,0,0.5,0,0,0,1,0.5,0,1,0,0.5,1, 0.5,0,0,0.5,0.5,0,0,0.5,0,0.5,0,1,0.5,0.5,1,0,0.5,1, 0.5,0,0,1,0,0,0.5,0.5,0,0.5,0,1,1,0,1,0.5,0.5,1, 0,0.5,0,0.5,0.5,0,0,1,0,0,0.5,1,0.5,0.5,1,0,1,1};
             break;
         }
-        case 7:
+        case CURVE_TYPE::PYRAMID:
         {
             cornerrefcoords[4] = {0,-1,0,-1.0,-1.0,0.5,1.0,-1.0,0.5,0,0,0, 1.0,-1.0,0.5,1.0,1.0,0.5,1,0,0,0,0,0, 1.0,1.0,0.5,-1.0,1.0,0.5,0,1,0,0,0,0, -1,0,0,-1.0,1.0,0.5,-1.0,-1.0,0.5,0,0,0};
             cornerrefcoords[7] = {-1.0,-1.0,0.5,1.0,-1.0,0.5,1.0,1.0,0.5,-1.0,1.0,0.5,0,0,1, -1.0,-1.0,0.5,-1.0,1.0,0.5,1.0,1.0,0.5,1.0,-1.0,0.5,0,0,0, -1,-1,0,0,-1,0,0,0,0,-1,0,0,-1.0,-1.0,0.5, -1,0,0,0,0,0,0,1,0,-1,1,0,-1.0,1.0,0.5, 0,-1,0,1,-1,0,1,0,0,0,0,0,1.0,-1.0,0.5, 0,0,0,1,0,0,1,1,0,0,1,0,1.0,1.0,0.5};
@@ -1583,23 +1502,17 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
 
 std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers)
 {
-    if (gettypenumber() > 4)
+    switch ( getCurveType() )
     {
-        std::cout << "Error in 'element' object: transition splits not defined yet for " << gettypenameconjugation(2) << std::endl;
-        abort();
-    }
-
-    switch (gettypenumber())
-    {
-        case 0:
+        case CURVE_TYPE::POINT:
             return {{0},{},{},{},{},{},{},{}};
-        case 1:
+        case CURVE_TYPE::LINE:
             return splitline(splitnum);
-        case 2:
+        case CURVE_TYPE::TRIANGLE:
             return splittriangle(splitnum, edgenumbers);
-        case 3:
+        case CURVE_TYPE::QUADRANGLE:
             return splitquadrangle(splitnum);
-        case 4:
+        case CURVE_TYPE::TETRAHEDRON:
         {
             // Too slow to be called each time. Compute and store.
             std::vector<std::vector<int>> splitdef;
@@ -1610,9 +1523,10 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
             universe::setsplitdefinition(splitdef, 4, splitnum, edgenumbers);
             return splitdef;
         }
+        default:
+            std::cout << "Error in 'element' object: transition splits not defined yet for " << gettypenameconjugation(2) << std::endl;
+            abort();
     }
-    
-    abort(); // fix return warning
 }
         
 std::vector<std::vector<int>> element::splitline(int splitnum)
@@ -1931,50 +1845,31 @@ void element::numstorefcoords(std::vector<int>& nums, std::vector<double>& refco
     if (nums.size() == 0)
         return;
         
-    std::vector<double> refs;
+    std::vector<double> refs = {};
     
-    switch (gettypenumber())
+    switch ( getCurveType() )
     {
-        case 0:
-        {
+        case CURVE_TYPE::POINT:
             refs = {0,0,0};
             break;
-        }
-        case 1:
-        {
+        case CURVE_TYPE::LINE:
             refs = {-1,0,0, 1,0,0, 0,0,0};
             break;
-        }
-        case 2:
-        {
+        case CURVE_TYPE::TRIANGLE:
             refs = {0,0,0, 1,0,0, 0,1,0, 0.5,0,0, 0.5,0.5,0, 0,0.5,0};
             break;
-        }
-        case 3:
-        {
+        case CURVE_TYPE::QUADRANGLE:
             refs = {-1,-1,0, 1,-1,0, 1,1,0, -1,1,0, 0,-1,0, 1,0,0, 0,1,0, -1,0,0, 0,0,0};
             break;
-        }
-        case 4:
-        {
+        case CURVE_TYPE::TETRAHEDRON:
             refs = {0,0,0, 1,0,0, 0,1,0, 0,0,1, 0.5,0,0, 0.5,0.5,0, 0,0.5,0, 0,0,0.5, 0,0.5,0.5, 0.5,0,0.5};
             break;
-        }
-        case 5:
-        {
-            refs = {};
+        case CURVE_TYPE::HEXAHEDRON:
+        case CURVE_TYPE::PRISM:
+        case CURVE_TYPE::PYRAMID:
+        default:
             break;
-        }
-        case 6:
-        {
-            refs = {};
-            break;
-        }
-        case 7:
-        {
-            refs = {};
-            break;
-        }
+
     }
         
     for (int i = 0; i < nums.size(); i++)

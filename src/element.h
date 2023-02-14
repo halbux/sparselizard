@@ -279,10 +279,25 @@ namespace sl {
 
 class element
 {
+    public:
+        // we keep the int type for legacy reasons.
+        enum class CURVE_TYPE : int
+        {
+            POINT = 0,
+            LINE,
+            TRIANGLE,
+            QUADRANGLE,
+            TETRAHEDRON,
+            HEXAHEDRON,
+            PRISM,
+            PYRAMID,
+            END
+        };
 
     private:
     
-        int curvedtypenumber = -1;
+        CURVE_TYPE curveType;
+        int curvatureorder;
         std::vector<int> curvednodelist = {};
         
         polynomials mypolynomials;
@@ -307,13 +322,13 @@ class element
         
     public:
     
+        // This is a function to convert legacy values to CURVE_TYPE
+        // @TODO This is a temporary fix, it should be removed when possible
+        CURVE_TYPE curveTypeFromInt( int aValue );
+        CURVE_TYPE curveTypeFromString( std::string aString );
+
         element(void) {};
-        // Set the element name:
-        element(std::string elementname);
-        // Set the curved type number:
-        element(int number);
-        // Set the type number and curvature order:
-        element(int number, int curvatureorder);
+        element( CURVE_TYPE aType, int curvatureorder = 1 );       
         
         void setnodes(std::vector<int>& nodelist);
         
@@ -322,9 +337,9 @@ class element
         // 'gettypenameconjugation' is singular for 0 or 1 as input, plural otherwise.
         std::string gettypenameconjugation(int numberofelements);                
         bool iscurved(void);                                        
+        CURVE_TYPE getCurveType();                                       
         int getcurvatureorder(void);                                
-        // Get the straight type number corresponding to the curved element:
-        int gettypenumber(void);                        
+
         int getcurvedtypenumber(void);                                    
         int countcurvednodes(void);            
         int getelementdimension(void);    
@@ -391,8 +406,8 @@ class element
         // of the phi then eta then ki coordinate-ordered nodes in the curved element.
         std::vector<double> listnodecoordinates(void);
         
-        // Get the straight element type number corresponding to a number of nodes and dimension:
-        int deducetypenumber(int elemdim, int numnodes);
+        // Get the element type corresponding to a number of nodes and dimension:
+        CURVE_TYPE deducetype(int elemdim, int numnodes);
         
         // Calculate the physical coordinates corresponding to a set of reference coordinates.
         // The coordinates in 'nodecoords' are taken from index 'firstindex' and following.
@@ -419,6 +434,17 @@ class element
         // Write to file multiple elements with provided coordinates for debug:
         void write(std::string filename, std::vector<double> coords);
         
+        [[deprecated("Use CURVE_TYPE deducetype() instead ")]]
+        int deducetypenumber(int elemdim, int numnodes);
+        [[deprecated("Use element( CURVE_TYPE aType, int curvatureorder ) instead ")]]
+        element(int number, int curvatureorder) : element( curveTypeFromInt( number ), curvatureorder ) {}; ;
+        [[deprecated("Use element( CURVE_TYPE aType, int curvatureorder ) instead ")]]
+        element(int number) : element( curveTypeFromInt( number ), ( number == 0 ? 1 : ( number - 1 ) / 7 + 1   ) ) {};
+        [[deprecated("Use element( CURVE_TYPE aType, int curvatureorder ) instead ")]]
+        element( std::string aString ) : element( curveTypeFromString( aString ), 1 ) {};
+        // Get the straight type number corresponding to the curved element:
+        [[deprecated("Use CURVE_TYPE::getCurveType() instead ")]]
+        int gettypenumber(void);              
 };
 
 }

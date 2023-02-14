@@ -43,7 +43,7 @@ int hcurlline::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurlline::evalat(int maxorder) 
 {    
-    element line("line");
+    element line( element::CURVE_TYPE::LINE );
     hierarchicalformfunctioncontainer val("hcurl", line.gettypenumber());
 
     // Get the node list in every edge:

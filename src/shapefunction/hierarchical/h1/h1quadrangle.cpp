@@ -55,7 +55,7 @@ hierarchicalformfunctioncontainer h1quadrangle::evalat(int maxorder)
     if (targetdim != -1)
         type = "h1d"+std::to_string(targetdim);
         
-    element quadrangle("quadrangle");
+    element quadrangle( element::CURVE_TYPE::QUADRANGLE );
     hierarchicalformfunctioncontainer val(type, quadrangle.gettypenumber());
 
     // Get the node list in every edge and face:

@@ -60,7 +60,7 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
     if (targetdim != -1)
         type = "h1d"+std::to_string(targetdim);
         
-    element prism("prism");
+    element prism( element::CURVE_TYPE::PRISM );
     hierarchicalformfunctioncontainer val(type, prism.gettypenumber());
 
     // Get the node list in every edge and face:

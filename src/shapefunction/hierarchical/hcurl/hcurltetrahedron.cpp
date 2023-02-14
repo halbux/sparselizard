@@ -52,7 +52,7 @@ int hcurltetrahedron::count(int order, int dim, int num)
 
 hierarchicalformfunctioncontainer hcurltetrahedron::evalat(int maxorder) 
 {    
-    element tetrahedron("tetrahedron");
+    element tetrahedron( element::CURVE_TYPE::TETRAHEDRON );
     hierarchicalformfunctioncontainer val("hcurl", tetrahedron.gettypenumber());
     
     // Get the node list in every edge and face:
