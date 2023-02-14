@@ -1,5 +1,6 @@
 #include "element.h"
 #include "geotools.h"
+#include "slexceptions.h"
 #include "lagrangeformfunction.h"
 
 
@@ -11,24 +12,24 @@ element::element(std::string elementname)
     // 'switch' does not work on std::string:
     if (elementname == "point")
         curvedtypenumber = 0;
-    if (elementname == "line")
+    else if (elementname == "line")
         curvedtypenumber = 1;
-    if (elementname == "triangle")
+    else if (elementname == "triangle")
         curvedtypenumber = 2;
-    if (elementname == "quadrangle")
+    else if (elementname == "quadrangle")
         curvedtypenumber = 3;
-    if (elementname == "tetrahedron")
+    else if (elementname == "tetrahedron")
         curvedtypenumber = 4;
-    if (elementname == "hexahedron")
+    else if (elementname == "hexahedron")
         curvedtypenumber = 5;
-    if (elementname == "prism")
+    else if (elementname == "prism")
         curvedtypenumber = 6;
-    if (elementname == "pyramid")
+    else if (elementname == "pyramid")
         curvedtypenumber = 7;
-    if (curvedtypenumber == -1)
+    else
     {
-        std::cout << "Error in 'element' object: trying to use undefined element name: " << elementname << std::endl << "Make sure everything is lower case" << std::endl;
-        abort();
+        std::string log = "Error in 'element' object: trying to use undefined element name: " + elementname;
+        throw slexception( log );
     }
 }
 
@@ -36,8 +37,8 @@ element::element(int number)
 {
     if (number < 0)
     {
-        std::cout << "Error in 'element' object: cannot define negative element type number " << number << std::endl;
-        abort();
+        std::string log = "Error in 'element' object: cannot define negative element type number " + number ;
+        throw slexception( log );
     }
     curvedtypenumber = number;
 }
@@ -46,15 +47,15 @@ element::element(int number, int curvatureorder)
 {
     if (number < 0)
     {
-        std::cout << "Error in 'element' object: can not define a negative element type number" << std::endl;
-        std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
-        abort();
+        std::string log = "Error in 'element' object: cannot define negative element type number.\n" ;
+        log += "Element type number is " + std::to_string( number ) + " with " + std::to_string( curvatureorder ) + " curvature order";
+        throw slexception( log );
     }
     if (curvatureorder <= 0)
     {
-        std::cout << "Error in 'element' object: can not define a negative or 0 curvature order" << std::endl;
-        std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
-        abort();
+        std::string log = "Error in 'element' object: can not define a negative or 0 curvature order.\n" ;
+        log += "Element type number is " + std::to_string( number ) + " with " + std::to_string( curvatureorder ) + " curvature order";
+        throw slexception( log );
     }
     // The point element can only have number 0:
     if (number == 0)
@@ -67,13 +68,13 @@ void element::setnodes(std::vector<int>& nodelist)
 {
     if (curvedtypenumber == -1)
     {
-        std::cout << "Error: element type has not been defined yet" << std::endl;
-        abort();
+        std::string log = "Error: element type has not been defined yet" ;
+        throw slexception( log );
     }
     if (nodelist.size() != countcurvednodes())
     {
-        std::cout << "Error: trying to define an order " << getcurvatureorder() << " " << gettypename() << " with " << nodelist.size() << " nodes. There should be " << countcurvednodes() << std::endl;
-        abort();
+        std::string log = "Error: trying to define an order " + std::to_string( getcurvatureorder() ) + " " + gettypename() + " with " + std::to_string( nodelist.size() ) + " nodes. There should be " + std::to_string( countcurvednodes() );
+        throw slexception( log );
     }
     curvednodelist = nodelist;
 }
@@ -105,7 +106,7 @@ std::string element::gettypename(void)
             return "pyramid";
     }
     
-    abort(); // fix return warning
+    throw slexception( "element: Invalid type name" );
 }
 
 std::string element::gettypenameconjugation(int numberofelements)
@@ -135,7 +136,7 @@ std::string element::gettypenameconjugation(int numberofelements)
         }
     }
     
-    abort(); // fix return warning
+    throw slexception( "element: Invalid type name" );
 }
 
 bool element::iscurved(void)
@@ -222,7 +223,7 @@ int element::getelementdimension(void)
     if (straighttypenumber > 3)
         return 3;
         
-    abort(); // fix return warning
+    throw slexception( "element: getelementdimension(): Invalid type number" );
 }
 
 
