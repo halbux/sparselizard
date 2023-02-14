@@ -1,5 +1,5 @@
 #include "rawfield.h"
-
+#include "slexceptions.h"
 
 void rawfield::synchronize(std::vector<int> physregsfororder, std::vector<int> disjregsfororder)
 {
@@ -650,8 +650,7 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
 {
     if (iscalledbyuser && ispadaptive)
     {
-        std::cout << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called on fields set to p-adaptivity" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called on fields set to p-adaptivity" );
     }
     
     // Interpolation order can only be set on highest dimension regions:
@@ -720,8 +719,7 @@ void rawfield::setorder(expression criterion, int loworder, int highorder, doubl
     
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one0" || mytypename == "one1" || mytypename == "one2" || mytypename == "one3")
     {
-        std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" );
     }
     
     // Set the interpolation order on the sub fields:
@@ -760,8 +758,7 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
     }
     if (mysubfields.size() > 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set ports to fields with multiple components (work with individual components instead)" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot set ports to fields with multiple components (work with individual components instead)" );
     }
     
     std::vector<int> fieldharms = getharmonics();
@@ -884,8 +881,7 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     
     if (mytypename != "h1d0" && mytypename != "h1d1" && mytypename != "h1d2" && mytypename != "h1d3")
     {
-        std::cout << "Error in 'rawfield' object: expected a 'h1d' type field to set the value at given gauss points" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: expected a 'h1d' type field to set the value at given gauss points" );
     }
 
     int numelems = elemselect.countinselection();
@@ -1096,8 +1092,7 @@ densemat rawfield::getnodalvalues(indexmat nodenumbers)
     
     if (mysubfields.size() != 0 || myharmonics.size() != 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot get nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot get nodal values for fields with subfields/harmonics (select a single component/harmonic)" );
     }
     
     for (int i = 0; i < numnodes; i++)
@@ -1234,8 +1229,7 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
     }
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
-        std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" );
     }
     if (valexpr.countcolumns() != 1 || valexpr.countrows() != countcomponents())
     {
@@ -1244,8 +1238,7 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
     }
     if (condexpr.countcolumns() != 1 || condexpr.countrows() != 1)
     {
-        std::cout << "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" );
     }
     
     // Set the conditional constraints on the subfields:
@@ -1262,8 +1255,7 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
     }
     if (myharmonics.size() != 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set conditional constraints for fields with harmonics (select a single harmonic)" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot set conditional constraints for fields with harmonics (select a single harmonic)" );
     }
     
     // Keep track of the calls to 'setconditionalconstraint':
@@ -1406,8 +1398,7 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
         // The raw fields must include the same harmonic numbers:
         if (getharmonics() != selectedrawfield->getharmonics())
         {
-            std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" << std::endl;
-            abort();
+            throw slexception( "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" );
         }
         
         // Get the data of every harmonic:
@@ -1496,14 +1487,12 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
     {
-        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data between fields of same type" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: .transferdata can only transfer data between fields of same type" );
     }
     // The raw fields must have a same number of subfields:
     if (mysubfields.size() != selectedrawfield->mysubfields.size())
     {
-        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same number of subfields" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: .transferdata can only transfer data from fields with same number of subfields" );
     }
     
     // Transfer the data of every subfield:
@@ -1590,8 +1579,7 @@ void rawfield::setcohomologysources(std::vector<int> cutphysregs, std::vector<do
     
     if (myharmonics.size() > 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set a cohomology source on a multiharmonic field (select harmonics one by one)" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot set a cohomology source on a multiharmonic field (select harmonics one by one)" );
     }
     
     elements* els = universe::getrawmesh()->getelements();
@@ -1660,8 +1648,7 @@ std::shared_ptr<rawfield> rawfield::comp(int component)
     
     if (countformfunctioncomponents() > 1)
     {
-        std::cout << "Error in 'rawfield' object: cannot get a component for vector fields with no subfields (e.g. hcurl)" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot get a component for vector fields with no subfields (e.g. hcurl)" );
     }
     if (component > mysubfields.size())
     {
@@ -1734,8 +1721,7 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
         return shared_from_this();
     else
     {
-        std::cout << "Error in 'rawfield' object: in .harmonic cannot get harmonic in constant field (does not exist)" << std::endl; 
-        abort();
+        throw slexception( "Error in 'rawfield' object: in .harmonic cannot get harmonic in constant field (does not exist)" );
     }
 }
 
@@ -1830,8 +1816,7 @@ int rawfield::getinterpolationorder(int disjreg)
     }
     else
     { 
-        std::cout << "Error in 'rawfield' object: cannot get the interpolation order of a field with subfields" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot get the interpolation order of a field with subfields" );
     }
 }
 
@@ -1866,8 +1851,7 @@ int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& el
         else
         {
             std::cout << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
-            std::cout << "Define it with field.setorder(region, order)" << std::endl;
-            abort();
+            throw slexception( "Define it with field.setorder(region, order)" );
         }
     }
     
@@ -1980,16 +1964,14 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
                     continue;
                 else
                 {
-                    std::cout << "Error in 'rawfield' object: the interpolation order must be the same for all harmonics" << std::endl;
-                    abort();
+                    throw slexception( "Error in 'rawfield' object: the interpolation order must be the same for all harmonics" );
                 }
             }
         }
     }
     else
     { 
-        std::cout << "Error in 'rawfield' object: cannot call 'errornotsameinterpolationorder' on a field with subfields" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawfield' object: cannot call 'errornotsameinterpolationorder' on a field with subfields" );
     }
 }
 

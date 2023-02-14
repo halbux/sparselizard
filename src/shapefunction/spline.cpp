@@ -3,6 +3,7 @@
 #include "mat.h"
 #include "vec.h"
 #include "gentools.h"
+#include "slexceptions.h"
 
 
 spline::spline(std::string filename, char delimiter)
@@ -38,14 +39,12 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     
     if (xin.size() != yin.size())
     {
-        std::cout << "Error in 'spline' object: x and y dataset sizes do not match" << std::endl;
-        abort();
+        throw slexception( "Error in 'spline' object: x and y dataset sizes do not match" );
     }   
     int len = xin.size();
     if (len < 2)
     {
-        std::cout << "Error in 'spline' object: expected at least two data points" << std::endl;
-        abort();
+        throw slexception( "Error in 'spline' object: expected at least two data points" );
     }   
     
     myx = densemat(len,1);

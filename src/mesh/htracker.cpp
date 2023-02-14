@@ -1,6 +1,7 @@
 #include "htracker.h"
 #include "gentools.h"
 #include "lagrangeformfunction.h"
+#include "slexceptions.h"
 
 
 htracker::htracker(std::shared_ptr<rawmesh> origmesh, int curvatureorder, std::vector<int> numelemspertype)
@@ -1020,8 +1021,7 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     {
         if (maporctorc[i] < 0)
         {
-            std::cout << "Error in 'htracker' object: mapping failed for at least one point" << std::endl;
-            abort();
+            throw slexception( "Error in 'htracker' object: mapping failed for at least one point" );
         }
     }
 }

@@ -1,4 +1,5 @@
 #include "pvinterface.h"
+#include "slexceptions.h"
 
 
 void pvinterface::writetovtkfile(std::string name, iodata datatowrite)
@@ -542,8 +543,7 @@ std::vector<int> pvinterface::getnodereordering(int ourtypenumber)
         }
     }
     
-    std::cout << "Error in 'pvinterface' namespace: trying to use a ParaView element that is undefined in this code." << std::endl;
-    abort();
+    throw slexception( "Error in 'pvinterface' namespace: trying to use a ParaView element that is undefined in this code." );
 }
 
 

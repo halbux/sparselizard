@@ -1,4 +1,5 @@
 #include "opdof.h"
+#include "slexceptions.h"
 
 
 opdof::opdof(std::shared_ptr<rawfield> fieldin, int physreg)
@@ -40,8 +41,7 @@ bool opdof::isharmonicone(std::vector<int> disjregs)
 
 bool opdof::isvalueorientationdependent(std::vector<int> disjregs)
 {
-    std::cout << "Error in 'opdof' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
-    abort();
+    throw slexception( "Error in 'opdof' object: 'isvalueorientationdependent' was called (this is not expected)" );
 }
 
 std::shared_ptr<operation> opdof::copy(void)

@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "slexceptions.h"
 
 
 void mesh::errorifloaded(void)
@@ -14,8 +15,7 @@ void mesh::errorifnotloaded(void)
 {
     if (not(isloaded))
     {
-        std::cout << "Error in 'mesh' object: cannot perform the requested operation (mesh is not loaded)" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: cannot perform the requested operation (mesh is not loaded)" );
     }
 }
 
@@ -130,16 +130,14 @@ void mesh::setadaptivity(expression criterion, int lownumsplits, int highnumspli
     
     if (not(criterion.isscalar()))
     {
-        std::cout << "Error in 'mesh' object: expected a scalar criterion for h-adaptivity" << std::endl;
-        abort();   
+        throw slexception( "Error in 'mesh' object: expected a scalar criterion for h-adaptivity" );   
     }
     // The criterion cannot be multiharmonic:
     std::vector<int> alldisjregs(universe::getrawmesh()->getdisjointregions()->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'mesh' object: cannot have a multiharmonic criterion for h-adaptivity" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: cannot have a multiharmonic criterion for h-adaptivity" );
     }
     
     if (lownumsplits < 0)
@@ -266,8 +264,7 @@ void mesh::selectskin(int newphysreg, int physregtoskin)
 {
     if (physregtoskin < 0)
     {
-        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: expected a positive physical region number" );
     }
 
     errorifloaded();
@@ -284,8 +281,7 @@ void mesh::selectbox(int newphysreg, int physregtobox, int selecteddim, std::vec
 {
     if (physregtobox < 0)
     {
-        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: expected a positive physical region number" );
     }
     
     errorifloaded();
@@ -302,8 +298,7 @@ void mesh::selectsphere(int newphysreg, int physregtosphere, int selecteddim, st
 {
     if (physregtosphere < 0)
     {
-        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: expected a positive physical region number" );
     }
     
     errorifloaded();
@@ -320,8 +315,7 @@ void mesh::selectlayer(int newphysreg, int physregtoselectfrom, int physregtosta
 {
     if (physregtoselectfrom < 0)
     {
-        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: expected a positive physical region number" );
     }
     
     errorifloaded();
@@ -338,8 +332,7 @@ void mesh::selectexclusion(int newphysreg, int physregtoexcludefrom, std::vector
 {
     if (physregtoexcludefrom < 0)
     {
-        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: expected a positive physical region number" );
     }
     
     errorifloaded();
@@ -356,8 +349,7 @@ void mesh::selectanynode(int newphysreg, int physregtoselectfrom)
 {
     if (physregtoselectfrom < 0)
     {
-        std::cout << "Error in 'mesh' object: expected a positive physical region number" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: expected a positive physical region number" );
     }
     
     errorifloaded();

@@ -1,4 +1,5 @@
 #include "rawarc.h"
+#include "slexceptions.h"
 
 
 rawarc::rawarc(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, int nummeshpoints)
@@ -130,8 +131,7 @@ void rawarc::mesh(void)
 
     if (radius1 == 0.0 || std::abs((radius1-radius2)/radius1) > 1e-10)
     {
-        std::cout << "Error in 'rawarc' object: rawpoints 1 and 2 provided for arc should be on a circle with center rawpoint 3" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawarc' object: rawpoints 1 and 2 provided for arc should be on a circle with center rawpoint 3" );
     }
     double radius = radius1;
 

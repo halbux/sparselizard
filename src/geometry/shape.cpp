@@ -10,6 +10,7 @@
 #include "rawextrusion.h"
 #include "rawvolume.h"
 #include "rawunion.h"
+#include "slexceptions.h"
 
 
 void shape::errornullpointer(void)
@@ -18,8 +19,7 @@ void shape::errornullpointer(void)
         return;
     else
     {
-        std::cout << "Error in 'shape' object: cannot perform operation (shape is undefined)" << std::endl;
-        abort();
+        throw slexception( "Error in 'shape' object: cannot perform operation (shape is undefined)" );
     }
 }
 
@@ -254,8 +254,7 @@ std::vector<shape> shape::extrude(std::vector<int> physreg, std::vector<double> 
 {
     if (physreg.size() != height.size() || physreg.size() != numlayers.size())
     {
-        std::cout << "Error in 'shape' object: extrude vector arguments should have the same size" << std::endl;
-        abort();
+        throw slexception( "Error in 'shape' object: extrude vector arguments should have the same size" );
     }
  
     gentools::normvector(extrudedirection);

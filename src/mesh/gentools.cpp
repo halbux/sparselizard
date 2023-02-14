@@ -4,6 +4,7 @@
 #include "disjointregions.h"
 #include "lagrangeformfunction.h"
 #include "slmpi.h"
+#include "slexceptions.h"
 
 #if defined(__linux__)
 #include <parallel/algorithm>
@@ -2166,8 +2167,7 @@ void gentools::inoutorient(int startnode, std::vector<int>& edgestatus, bool iso
 
                 if (isoutward != isedgeoutward)
                 {
-                    std::cout << "Error in 'gentools' namespace: reorienting the edges to have them all pointing either inwards or outwards at every node is impossible on the requested physical region for the mesh provided" << std::endl;
-                    abort();
+                    throw slexception( "Error in 'gentools' namespace: reorienting the edges to have them all pointing either inwards or outwards at every node is impossible on the requested physical region for the mesh provided" );
                 }
             }
         }

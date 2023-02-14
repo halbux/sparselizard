@@ -1,4 +1,5 @@
 #include "oplog.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> oplog::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> oplog::interpolate(elementselector& elemselec
         return argmat;
     }
 
-    std::cout << "Error in 'oplog' object: without FFT log() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    throw slexception( "Error in 'oplog' object: without FFT log() can only be computed for constant (harmonic 1) operations" );
 }
 
 densemat oplog::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

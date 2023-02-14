@@ -1,4 +1,5 @@
 #include "iointerface.h"
+#include "slexceptions.h"
 
 
 void iointerface::writetofile(std::string filename, iodata datatowrite, std::string appendtofilename)
@@ -30,8 +31,7 @@ void iointerface::writetofile(std::string filename, iodata datatowrite, std::str
     }
     
     std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
-    abort();
+    throw slexception( "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." );
 }
 
 bool iointerface::isonlyisoparametric(std::string filename)
@@ -50,8 +50,7 @@ bool iointerface::isonlyisoparametric(std::string filename)
     }
         
     std::cout << "Error in 'iointerface' namespace: cannot handle file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
-    abort();
+    throw slexception( "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." );
 }
 
 void iointerface::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
@@ -60,14 +59,12 @@ void iointerface::grouptimesteps(std::string filename, std::vector<std::string> 
     
     if (numsteps != filestogroup.size())
     {
-        std::cout << "Error in 'iointerface': number of files to group does not match the number of time values provided" << std::endl;
-        abort();
+        throw slexception( "Error in 'iointerface': number of files to group does not match the number of time values provided" );
     }
     
     if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pvd")
     {
-        std::cout << "Error in 'iointerface': expected .pvd file extension to group the timesteps" << std::endl;
-        abort();
+        throw slexception( "Error in 'iointerface': expected .pvd file extension to group the timesteps" );
     }
         
     // Check that all file names end with .vtu:
@@ -76,8 +73,7 @@ void iointerface::grouptimesteps(std::string filename, std::vector<std::string> 
         std::string curfile = filestogroup[i];
         if (curfile.size() < 5 || curfile.substr(curfile.size()-4,4) != ".vtu")
         {
-            std::cout << "Error in 'iointerface': can only group .vtu files into the .pvd file" << std::endl;
-            abort();
+            throw slexception( "Error in 'iointerface': can only group .vtu files into the .pvd file" );
         }
     }
     

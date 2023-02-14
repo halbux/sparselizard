@@ -1,5 +1,5 @@
 #include "field.h"
-
+#include "slexceptions.h"
 
 void field::errorifpointerisnull(void)
 {
@@ -26,8 +26,7 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
         rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
     else
     {
-        std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
-        abort();
+        throw slexception( "Error in 'field' object: provided an empty harmonic number list" );
     } 
 }
 field::field(std::string fieldtypename, spanningtree spantree)
@@ -92,16 +91,14 @@ void field::setorder(expression criterion, int loworder, int highorder)
     
     if (not(criterion.isscalar()))
     {
-        std::cout << "Error in 'field' object: expected a scalar criterion for p-adaptivity" << std::endl;
-        abort();   
+        throw slexception( "Error in 'field' object: expected a scalar criterion for p-adaptivity" );   
     }
     // The criterion cannot be multiharmonic:
     std::vector<int> alldisjregs((universe::getrawmesh()->getdisjointregions())->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'field' object: cannot have a multiharmonic criterion for p-adaptivity" << std::endl;
-        abort();
+        throw slexception( "Error in 'field' object: cannot have a multiharmonic criterion for p-adaptivity" );
     }
     
     if (loworder < 0)
@@ -400,8 +397,7 @@ void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<doubl
         int prdim = universe::getrawmesh()->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
         if (prdim != -1 && prdim != 1) // -1 for empty is ok
         {
-            std::cout << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
-            abort();
+            throw slexception( "Error in 'field' object: expected 1D cohomology regions" );
         }
     }
 

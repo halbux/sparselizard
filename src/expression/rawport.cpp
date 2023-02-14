@@ -1,4 +1,5 @@
 #include "rawport.h"
+#include "slexceptions.h"
 
 rawport::rawport(std::vector<int> harmonicnumbers, bool ismultiharm)
 {
@@ -130,8 +131,7 @@ std::shared_ptr<rawport> rawport::harmonic(std::vector<int> harmonicnumbers)
         return shared_from_this();
     else
     {
-        std::cout << "Error in 'rawport' object: in .harmonic cannot get harmonic in constant port (does not exist)" << std::endl; 
-        abort();
+        throw slexception( "Error in 'rawport' object: in .harmonic cannot get harmonic in constant port (does not exist)" );
     }
 }
         
@@ -160,8 +160,7 @@ std::shared_ptr<rawport> rawport::getprimal(void)
 {
     if (mybrother.expired())
     {
-        std::cout << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawport' object: the associated rawport is needed but it was destroyed" );
     }
     
     if (myisprimal)
@@ -174,8 +173,7 @@ std::shared_ptr<rawport> rawport::getdual(void)
 {
     if (mybrother.expired())
     {
-        std::cout << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawport' object: the associated rawport is needed but it was destroyed" );
     }
     
     if (myisprimal)

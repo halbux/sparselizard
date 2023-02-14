@@ -1,4 +1,5 @@
 #include "opcustom.h"
+#include "slexceptions.h"
 
 
 opcustom::opcustom(int outindex, std::vector<densemat> fct(std::vector<densemat>), std::vector<std::shared_ptr<operation>> args)
@@ -34,8 +35,7 @@ std::vector<std::vector<densemat>> opcustom::interpolate(elementselector& elemse
         std::vector<std::vector<densemat>> argmat = myargs[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
         if (argmat.size() != 2 || argmat[1].size() != 1)
         {
-            std::cout << "Error in 'opcustom' object: without FFT the custom operation can only be computed for constant (harmonic 1) operations" << std::endl;
-            abort();
+            throw slexception( "Error in 'opcustom' object: without FFT the custom operation can only be computed for constant (harmonic 1) operations" );
         }
         fctargs[i] = argmat[1][0];
     }
@@ -132,8 +132,7 @@ densemat opcustom::multiharmonicinterpolate(int numtimeevals, elementselector& e
     {
         if (output[i].isdefined() == false)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
-            abort();
+            throw slexception( "Error in 'opcustom' object: custom function returned an undefined densemat object" );
         }
         if (output[i].countrows() != numtimeevals || output[i].countcolumns() != numels*numevalpts)
         {

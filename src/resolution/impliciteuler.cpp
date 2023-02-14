@@ -1,4 +1,5 @@
 #include "impliciteuler.h"
+#include "slexceptions.h"
 
 impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std::vector<bool> isrhskcconstant)
 {
@@ -16,8 +17,7 @@ impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std
     
     if (isconstant.size() != 3)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a length 3 vector as fourth argument" << std::endl;
-        abort();  
+        throw slexception( "Error in 'impliciteuler' object: expected a length 3 vector as fourth argument" );  
     }
 }
 
@@ -30,8 +30,7 @@ void impliciteuler::setadaptivity(double tol, double mints, double maxts, double
 {
     if (tol < 0 || mints < 0 || maxts < 0 || reffact < 0 || coarfact < 0 || coarthres < 0)
     {
-        std::cout << "Error in 'impliciteuler' object: expected positive arguments for adaptivity" << std::endl;
-        abort();  
+        throw slexception( "Error in 'impliciteuler' object: expected positive arguments for adaptivity" );  
     }
     if (mints > maxts)
     {
@@ -40,8 +39,7 @@ void impliciteuler::setadaptivity(double tol, double mints, double maxts, double
     }
     if (reffact > 1)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a refinement factor lower than one for adaptivity" << std::endl;
-        abort();      
+        throw slexception( "Error in 'impliciteuler' object: expected a refinement factor lower than one for adaptivity" );      
     }
     if (coarfact < 1)
     {
@@ -50,8 +48,7 @@ void impliciteuler::setadaptivity(double tol, double mints, double maxts, double
     }
     if (coarthres > 1)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
-        abort();        
+        throw slexception( "Error in 'impliciteuler' object: expected a coarsening threshold lower than one for adaptivity" );        
     }
 
     mindt = mints; maxdt = maxts; tatol = tol; rfact = reffact; cfact = coarfact; cthres = coarthres;
@@ -74,8 +71,7 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
 {
     if (timestep < 0 && mindt == -1)
     {
-        std::cout << "Error in 'impliciteuler' object: requested an adaptive timestep but adaptivity settings have not been defined" << std::endl;
-        abort();
+        throw slexception( "Error in 'impliciteuler' object: requested an adaptive timestep but adaptivity settings have not been defined" );
     }
 
     double inittime = universe::currenttimestep;

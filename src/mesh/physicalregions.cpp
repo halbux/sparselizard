@@ -1,5 +1,6 @@
 #include "physicalregions.h"
 #include "universe.h"
+#include "slexceptions.h"
 
 
 physicalregions::physicalregions(disjointregions& inputdisjointregions)
@@ -312,8 +313,7 @@ void physicalregions::errornotsamedim(std::vector<int> physregs)
         int curdim = get(physregs[i])->getelementdimension();
         if (dim != curdim)
         {
-            std::cout << "Error in 'physicalregions' object: expected physical regions of same dimension" << std::endl;
-            abort();
+            throw slexception( "Error in 'physicalregions' object: expected physical regions of same dimension" );
         }
     }
 }

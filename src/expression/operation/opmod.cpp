@@ -1,4 +1,5 @@
 #include "opmod.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> opmod::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> opmod::interpolate(elementselector& elemselec
         return argmat;
     }
 
-    std::cout << "Error in 'opmod' object: without FFT a modulo can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    throw slexception( "Error in 'opmod' object: without FFT a modulo can only be computed for constant (harmonic 1) operations" );
 }
 
 densemat opmod::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

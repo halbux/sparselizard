@@ -1,4 +1,5 @@
 #include "optan.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> optan::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> optan::interpolate(elementselector& elemselec
         return argmat;
     }
 
-    std::cout << "Error in 'optan' object: without FFT tan() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    throw slexception( "Error in 'optan' object: without FFT tan() can only be computed for constant (harmonic 1) operations" );
 }
 
 densemat optan::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

@@ -1,4 +1,5 @@
 #include "opfield.h"
+#include "slexceptions.h"
 
 
 void opfield::setspacederivative(int whichderivative)
@@ -6,8 +7,7 @@ void opfield::setspacederivative(int whichderivative)
     // Make sure a single space derivative is applied.
     if (spacederivative != 0 || kietaphiderivative != 0)
     {
-        std::cout << "Error in 'opfield' object: cannot apply more than one space derivative to a field" << std::endl;
-        abort();
+        throw slexception( "Error in 'opfield' object: cannot apply more than one space derivative to a field" );
     }
     spacederivative = whichderivative;
 }

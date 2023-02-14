@@ -1,4 +1,5 @@
 #include "optf.h"
+#include "slexceptions.h"
 
 
 void optf::setspacederivative(int whichderivative)
@@ -6,16 +7,14 @@ void optf::setspacederivative(int whichderivative)
     // Make sure a single space derivative is applied.
     if (spacederivative != 0)
     {
-        std::cout << "Error in 'optf' object: cannot apply more than one space derivative to the test function" << std::endl;
-        abort();
+        throw slexception( "Error in 'optf' object: cannot apply more than one space derivative to the test function" );
     }
     spacederivative = whichderivative; 
 }
 
 void optf::increasetimederivativeorder(int amount)
 {    
-    std::cout << "Error in 'optf' object: cannot apply a time derivative to the test function" << std::endl;
-    abort();
+    throw slexception( "Error in 'optf' object: cannot apply a time derivative to the test function" );
 }
 
 bool optf::isharmonicone(std::vector<int> disjregs) 
@@ -26,8 +25,7 @@ bool optf::isharmonicone(std::vector<int> disjregs)
 
 bool optf::isvalueorientationdependent(std::vector<int> disjregs)
 {
-    std::cout << "Error in 'optf' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
-    abort();
+    throw slexception( "Error in 'optf' object: 'isvalueorientationdependent' was called (this is not expected)" );
 }
 
 std::shared_ptr<operation> optf::copy(void)

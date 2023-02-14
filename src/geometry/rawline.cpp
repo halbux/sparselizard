@@ -1,4 +1,5 @@
 #include "rawline.h"
+#include "slexceptions.h"
 
 
 rawline::rawline(int physreg, std::vector<double> allcoords)
@@ -10,8 +11,7 @@ rawline::rawline(int physreg, std::vector<double> allcoords)
 
     if (mynummeshpoints < 2)
     {
-        std::cout << "Error in 'rawline' object: expected at least two mesh nodes in the line" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawline' object: expected at least two mesh nodes in the line" );
     }
 
     // First and last coordinates correspond to the two corner points:

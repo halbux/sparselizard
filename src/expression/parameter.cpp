@@ -1,4 +1,5 @@
 #include "parameter.h"
+#include "slexceptions.h"
 
 
 parameter::parameter(void)
@@ -16,8 +17,7 @@ parameter::parameter(int numrows, int numcols)
 { 
     if (universe::myrawmesh == NULL)
     {
-        std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
-        abort();
+        throw slexception( "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" );
     }
     
     rawparamptr = std::shared_ptr<rawparameter>(new rawparameter(numrows,numcols));

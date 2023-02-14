@@ -1,6 +1,7 @@
 #include "rawparameter.h"
 #include "disjointregions.h"
 #include "disjointregionselector.h"
+#include "slexceptions.h"
 
 
 void rawparameter::synchronize(void)
@@ -32,8 +33,7 @@ void rawparameter::errorifundefined(std::vector<int> disjregs)
     {
         if (myoperations[disjregs[i]].size() == 0 || myoperations[disjregs[i]][0] == NULL)
         {
-            std::cout << "Error in 'parameter' object: the parameter has not been defined on the requested region" << std::endl;
-            abort();
+            throw slexception( "Error in 'parameter' object: the parameter has not been defined on the requested region" );
         }
     }
 }

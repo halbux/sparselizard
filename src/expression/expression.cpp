@@ -1,5 +1,6 @@
 #include "expression.h"
 #include "oncontext.h"
+#include "slexceptions.h"
 
 
 expression::expression(field input)
@@ -116,8 +117,7 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
             myoperations[i] = input[i].myoperations[0];
         else
         {
-            std::cout << "Error in 'expression' object: expressions provided in vector must all be scalar" << std::endl;
-            abort();
+            throw slexception( "Error in 'expression' object: expressions provided in vector must all be scalar" );
         }
     }
 }
@@ -140,8 +140,7 @@ expression::expression(const std::vector<std::vector<expression>> input)
         {
             if (input[0][i].mynumcols != numcols)
             {
-                std::cout << "Error in 'expression' object: expression dimension mismatch in concatenation" << std::endl;
-                abort();
+                throw slexception( "Error in 'expression' object: expression dimension mismatch in concatenation" );
             }
             numrows += input[0][i].mynumrows;
         }
@@ -218,8 +217,7 @@ expression::expression(spline spl, expression arg)
 {
     if (arg.isscalar() == false)
     {
-        std::cout << "Error in 'expression' object: expected a scalar expression as argument for the spline interpolation" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: expected a scalar expression as argument for the spline interpolation" );
     }
     if (arg.myoperations[0]->isdofincluded() || arg.myoperations[0]->istfincluded())
     {
@@ -240,8 +238,7 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
     }
     if (tocompare.isscalar() == false)
     {
-        std::cout << "Error in 'expression' object: expected a scalar expression as interval variable" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: expected a scalar expression as interval variable" );
     }
     if (tocompare.myoperations[0]->isdofincluded() || tocompare.myoperations[0]->istfincluded())
     {
@@ -384,8 +381,7 @@ void expression::reorderrows(std::vector<int> neworder)
 {
     if (mynumrows != neworder.size())
     {
-        std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" );
     }
 
     int minval = *min_element(neworder.begin(), neworder.end());
@@ -410,8 +406,7 @@ void expression::reordercolumns(std::vector<int> neworder)
 {
     if (mynumcols != neworder.size())
     {
-        std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" );
     }
 
     int minval = *min_element(neworder.begin(), neworder.end());
@@ -498,8 +493,7 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
     }
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" );
     }
     
     universe::allowestimatorupdate(true);
@@ -576,8 +570,7 @@ std::vector<double> expression::interpolate(int physreg, const std::vector<doubl
 
     if (xyz.size() != 3)
     {
-        std::cout << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: interpolate expected a coordinate vector of length 3" );
     }
 
     std::vector<double> interpolated = {};
@@ -622,8 +615,7 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(disjregs)))
     {
-        std::cout << "Error in 'expression' object: cannot interpolate a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: cannot interpolate a multiharmonic expression (only constant harmonic 1)" );
     }
     if (xyzcoord.size()%3 != 0)
     {
@@ -780,8 +772,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
     // deformation expression has the right size.
     if (not(isscalar()))
     {
-        std::cout << "Error in 'expression' object: cannot integrate a nonscalar expression" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: cannot integrate a nonscalar expression" );
     }
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
@@ -796,8 +787,7 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: cannot integrate a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: cannot integrate a multiharmonic expression (only constant harmonic 1)" );
     }
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
     {
@@ -910,8 +900,7 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Make sure the 'meshdeform' expression is constant in time:
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" );
     }
 
     // Get the geometry interpolation order (1 if the element is not curved):
@@ -1078,8 +1067,7 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 
     if (startcoords.size()%3 != 0)
     {
-        std::cout << "Error in 'expression' object: expected a vector with a length multiple of 3 for the stream line starting coordinates" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: expected a vector with a length multiple of 3 for the stream line starting coordinates" );
     }
 
     int numnodes = startcoords.size()/3;
@@ -1248,8 +1236,7 @@ vec expression::atbarycenter(int physreg, field onefield)
     std::string ft = onefield.getpointer()->gettypename();
     if (ft != "one0" && ft != "one1" && ft != "one2" && ft != "one3")
     {
-        std::cout << "Error in 'expression' object: atbarycenter requires a 'one' type field" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: atbarycenter requires a 'one' type field" );
     }
     if (countcolumns() != 1 || onefield.countcomponents() != countrows())
     {
@@ -1312,8 +1299,7 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
     }
     if (rightop != "" && rightop != "R" && rightop != "RT" && rightop != "R-1" && rightop != "R-T" && rightop != "K" && rightop != "KT" && rightop != "K-1" && rightop != "K-T")
     {
-        std::cout << "Error in 'expression' object: in 'rotate' right product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: in 'rotate' right product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" );
     }
 	
     // Define the rotation matrices needed:
@@ -1402,8 +1388,7 @@ double expression::evaluate(void)
         return myoperations[0]->evaluate();
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" );
     }
 }
 
@@ -1422,14 +1407,12 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
         }
         else
         {
-            std::cout << "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" << std::endl;
-            abort();
+            throw slexception( "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" );
         }
     }
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" );
     }
 }
 
@@ -1456,8 +1439,7 @@ expression expression::spacederivative(int whichderivative)
 {
     if (mynumrows > 3 || mynumcols != 1)
     {
-        std::cout << "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" << std::endl;
-        abort();
+        throw slexception( "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" );
     }
 
     int problemdimension = universe::getrawmesh()->getmeshdimension();
@@ -1726,8 +1708,7 @@ expression expression::tf(int physreg)
         {
             if (tftag.myoperations[i]->getspacederivative() != 0 || tftag.myoperations[i]->getkietaphiderivative() != 0 || tftag.myoperations[i]->gettimederivative() != 0)
             {
-                std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the tf() field argument" << std::endl;
-                abort();
+                throw slexception( "Error in 'expression' object: cannot apply space or time derivatives to the tf() field argument" );
             }
             std::shared_ptr<optf> op(new optf(tftag.myoperations[i]->getfieldpointer(), physreg));
             op->selectformfunctioncomponent(tftag.myoperations[i]->getformfunctioncomponent());
@@ -1736,8 +1717,7 @@ expression expression::tf(int physreg)
         }
         else
         {
-            std::cout << "Error in 'expression' object: the argument of tf() must be a field or a field expression (constant 0 is allowed)" << std::endl;
-            abort();
+            throw slexception( "Error in 'expression' object: the argument of tf() must be a field or a field expression (constant 0 is allowed)" );
         }
     }
 

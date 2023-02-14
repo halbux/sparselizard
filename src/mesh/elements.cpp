@@ -1,5 +1,6 @@
 #include "elements.h"
 #include "geotools.h"
+#include "slexceptions.h"
 
 
 elements::elements(nodes& inputnodes, physicalregions& inputphysicalregions, disjointregions& inputdisjointregions)
@@ -68,8 +69,7 @@ int elements::getdisjointregion(int elementtypenumber, int elementnumber, bool e
     else
     {
         std::cout << "Error in 'elements' object: returned a negative disjoint region number" << std::endl;
-        std::cout << "Possible reason: too bad quality elements obtained when h-adapting a curved mesh (some identical edges might not have been merged and therefore AMR has failed)" << std::endl;
-        abort();
+        throw slexception( "Possible reason: too bad quality elements obtained when h-adapting a curved mesh (some identical edges might not have been merged and therefore AMR has failed)" );
     }
 }
 

@@ -1,11 +1,11 @@
 #include "slmpi.h"
 #include "wallclock.h"
+#include "slexceptions.h"
 
 
 void slmpi::errornompi(void)
 {
-    std::cout << "Error in 'slmpi' namespace: MPI is not available" << std::endl;
-    abort();
+    throw slexception( "Error in 'slmpi' namespace: MPI is not available" );
 }
 
 

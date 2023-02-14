@@ -1,15 +1,14 @@
 #include "gppyramid.h"
+#include "slexceptions.h"
 
 int gppyramid::count(int integrationorder)
 {
-    std::cout << "Error in 'gppyramid' namespace: Gauss points have not been defined yet for pyramids" << std::endl;
-    abort();
+    throw slexception( "Error in 'gppyramid' namespace: Gauss points have not been defined yet for pyramids" );
 }
 
 void gppyramid::set(int integrationorder, std::vector<double>& coordinates, std::vector<double>& weights)
 {
-    std::cout << "Error in 'gppyramid' namespace: Gauss points have not been defined yet for pyramids" << std::endl;
-    abort();
+    throw slexception( "Error in 'gppyramid' namespace: Gauss points have not been defined yet for pyramids" );
 }
 
 

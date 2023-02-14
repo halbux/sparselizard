@@ -1,4 +1,5 @@
 #include "rawunion.h"
+#include "slexceptions.h"
 
 
 rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
@@ -16,8 +17,7 @@ rawunion::rawunion(int physreg, std::vector<std::shared_ptr<rawshape>> input)
     {
         if (input[i]->getdimension() != mydimension)
         {
-            std::cout << "Error in 'rawunion' object: all shapes must have the same dimension" << std::endl;
-            abort();
+            throw slexception( "Error in 'rawunion' object: all shapes must have the same dimension" );
         }
     }
 

@@ -1,5 +1,5 @@
 #include "dofmanager.h"
-
+#include "slexceptions.h"
 
 void dofmanager::synchronize(void)
 {
@@ -68,8 +68,7 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         {
             std::cout << "Error in 'dofmanager' object: ";
             fieldtoadd->print();
-            std::cout << " order was changed and does not match dof structure anymore" << std::endl;
-            abort();
+            throw slexception( " order was changed and does not match dof structure anymore" );
         }
     }
     
@@ -244,8 +243,7 @@ void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
     {
         std::cout << "Error in 'dofmanager' object: ";
         myfields[selectedfieldnumber]->print();
-        std::cout << " order was changed and does not match dof structure anymore" << std::endl;
-        abort();
+        throw slexception( " order was changed and does not match dof structure anymore" );
     }
 }
 

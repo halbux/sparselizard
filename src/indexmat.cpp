@@ -1,13 +1,13 @@
 #include "indexmat.h"
 #include "gentools.h"
+#include "slexceptions.h"
 
 
 void indexmat::errorifempty(void)
 {
     if (numrows*numcols == 0)
     {
-        std::cout << "Error in 'indexmat' object: cannot perform operation on empty matrix" << std::endl;
-        abort();
+        throw slexception( "Error in 'indexmat' object: cannot perform operation on empty matrix" );
     }
 }
 

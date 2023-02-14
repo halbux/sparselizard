@@ -1,4 +1,5 @@
 #include "optime.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> optime::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -56,8 +57,7 @@ double optime::evaluate(void)
         return universe::currenttimestep;
     else
     {
-        std::cout << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
-        abort();
+        throw slexception( "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" );
     }
 }
 

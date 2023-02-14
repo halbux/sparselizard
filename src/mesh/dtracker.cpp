@@ -2,6 +2,7 @@
 #include "nodes.h"
 #include "elements.h"
 #include "physicalregions.h"
+#include "slexceptions.h"
 
 
 bool dtracker::isdefined(void)
@@ -22,8 +23,7 @@ dtracker::dtracker(std::shared_ptr<rawmesh> rm, int globalgeometryskin, int numo
 {
     if (rm == NULL)
     {
-        std::cout << "Error in 'dtracker' object: cannot provide a NULL rawmesh pointer" << std::endl;
-        abort();
+        throw slexception( "Error in 'dtracker' object: cannot provide a NULL rawmesh pointer" );
     }
     
     physicalregions* prs = rm->getphysicalregions();
@@ -610,8 +610,7 @@ void dtracker::exchangeoverlaps(void)
     {
         if (reclens[11*n+10] != curvatureorder)
         {
-            std::cout << "Error in 'dtracker' object: expected the same curvature order on all mesh parts" << std::endl;
-            abort();
+            throw slexception( "Error in 'dtracker' object: expected the same curvature order on all mesh parts" );
         }
     }
 
@@ -1956,8 +1955,7 @@ int dtracker::getinneroverlapinterface(int neighbour, int elementdimension)
         return myinneroverlapinterfaces[3*neighbour+elementdimension];
     else
     {
-        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap interface region" << std::endl;
-        abort();
+        throw slexception( "Error in 'dtracker' object: cannot provide the requested inner overlap interface region" );
     }
 }
 
@@ -1978,8 +1976,7 @@ int dtracker::getinneroverlap(int neighbour)
         return myinneroverlaps[neighbour];
     else
     {
-        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap region" << std::endl;
-        abort();
+        throw slexception( "Error in 'dtracker' object: cannot provide the requested inner overlap region" );
     }
 }
 
@@ -2000,8 +1997,7 @@ int dtracker::getinneroverlapskin(int neighbour)
         return myinneroverlapskins[neighbour];
     else
     {
-        std::cout << "Error in 'dtracker' object: cannot provide the requested inner overlap skin region" << std::endl;
-        abort();
+        throw slexception( "Error in 'dtracker' object: cannot provide the requested inner overlap skin region" );
     }
 }
 
@@ -2292,7 +2288,6 @@ void dtracker::writeinterfaces(std::string filename)
     }
     
     std::cout << "Error in 'dtracker' object: cannot write to file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
-    abort();
+    throw slexception( "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." );
 }
 

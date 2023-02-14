@@ -1,5 +1,6 @@
 #include "gmshinterface.h"
 #include "universe.h"
+#include "slexceptions.h"
 
 
 #ifndef HAVE_GMSH
@@ -28,8 +29,7 @@ void gmshinterface::readfromapi(nodes& mynodes, elements& myelements, physicalre
 
     if (nodeTags.size() == 0)
     {
-        std::cout << "Error in 'gmshinterface' namespace: no mesh node found in mesh loaded from gmsh api" << std::endl;
-        abort();
+        throw slexception( "Error in 'gmshinterface' namespace: no mesh node found in mesh loaded from gmsh api" );
     }
 
     int numberofnodes = 0;
@@ -796,8 +796,7 @@ int gmshinterface::converttogmshelementtypenumber(int ourtypenumber)
                 return 90;
                 
             default:
-                std::cout << "Error in 'gmshinterface' namespace: trying to use a GMSH element that is undefined in this code." << std::endl;
-                abort();
+                throw slexception( "Error in 'gmshinterface' namespace: trying to use a GMSH element that is undefined in this code." );
         }
     }
 }

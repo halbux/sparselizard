@@ -1,5 +1,6 @@
 #include "rawmesh.h"
 #include "geotools.h"
+#include "slexceptions.h"
 
 
 void rawmesh::splitmesh(void)
@@ -428,8 +429,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
 
     if (inputshapes.size() == 0)
     {
-        std::cout << "Error in 'mesh' object: provided an empty vector of shapes" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: provided an empty vector of shapes" );
     }
 
     // Make sure all shapes have a valid physical region number:
@@ -532,8 +532,7 @@ void rawmesh::load(std::vector<shape> inputshapes, int globalgeometryskin, int n
     // Make sure axisymmetry is valid for this mesh:    
     if (universe::isaxisymmetric && getmeshdimension() != 2)
     {
-        std::cout << "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: axisymmetry is only allowed for 2D problems" );
     }
     
     mynumber = 0;
@@ -600,8 +599,7 @@ void rawmesh::split(int n)
 {
     if (n < 0)
     {
-        std::cout << "Error in 'mesh' object: number of splits cannot be negative" << std::endl;
-        abort();
+        throw slexception( "Error in 'mesh' object: number of splits cannot be negative" );
     }
     mynumsplitrequested += n;
 }

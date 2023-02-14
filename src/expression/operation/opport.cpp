@@ -1,4 +1,5 @@
 #include "opport.h"
+#include "slexceptions.h"
 
 
 opport::opport(std::shared_ptr<rawport> portin)
@@ -12,8 +13,7 @@ void opport::increasetimederivativeorder(int amount)
 
     if (timederivativeorder > 2)
     {
-        std::cout << "Error in 'opport' object: time derivative order cannot exceed 2" << std::endl;
-        abort();
+        throw slexception( "Error in 'opport' object: time derivative order cannot exceed 2" );
     }
 }
 

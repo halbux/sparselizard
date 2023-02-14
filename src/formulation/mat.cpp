@@ -1,4 +1,5 @@
 #include "mat.h"
+#include "slexceptions.h"
 
 
 void mat::errorifpointerisnull(void)
@@ -14,8 +15,7 @@ void mat::errorifinvalidated(void)
 {
     if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::getrawmesh()->getmeshnumber())
     {
-        std::cout << "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" << std::endl;
-        abort();
+        throw slexception( "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" );
     }
 }
 

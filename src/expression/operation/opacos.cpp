@@ -1,4 +1,5 @@
 #include "opacos.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> opacos::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> opacos::interpolate(elementselector& elemsele
         return argmat;
     }
 
-    std::cout << "Error in 'opacos' object: without FFT acos() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    throw slexception( "Error in 'opacos' object: without FFT acos() can only be computed for constant (harmonic 1) operations" );
 }
 
 densemat opacos::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

@@ -1,4 +1,5 @@
 #include "port.h"
+#include "slexceptions.h"
 
 port::port(void)
 {
@@ -20,8 +21,7 @@ port::port(std::vector<int> harmonicnumbers)
         rawportptr = std::shared_ptr<rawport>(new rawport(harmonicnumbers, true));
     else
     {
-        std::cout << "Error in 'port' object: provided an empty harmonic number list" << std::endl;
-        abort();
+        throw slexception( "Error in 'port' object: provided an empty harmonic number list" );
     }
 }
 
@@ -52,8 +52,7 @@ port port::harmonic(std::vector<int> harmonicnumbers)
 {
     if (harmonicnumbers.size() == 0)
     {
-        std::cout << "Error in 'port' object: no harmonics provided to the .harmonic function" << std::endl;
-        abort();
+        throw slexception( "Error in 'port' object: no harmonics provided to the .harmonic function" );
     }    
     // Make sure all harmonic numbers are positive and non zero:
     for (int i = 0; i < harmonicnumbers.size(); i++)

@@ -1,4 +1,5 @@
 #include "opfieldorder.h"
+#include "slexceptions.h"
 
 
 opfieldorder::opfieldorder(std::vector<std::shared_ptr<rawfield>> fieldsin, double alpha, double absthres)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> opfieldorder::interpolate(elementselector& el
     {
         if (myfields[i]->getinterpolationorders() != myfields[0]->getinterpolationorders())
         {
-            std::cout << "Error in 'opfieldorder' object: this object expects the same interpolation order for all subfields" << std::endl;
-            abort();
+            throw slexception( "Error in 'opfieldorder' object: this object expects the same interpolation order for all subfields" );
         }
     }
     

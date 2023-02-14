@@ -1,13 +1,13 @@
 #include "spanningtree.h"
 #include "universe.h"
+#include "slexceptions.h"
 
 
 spanningtree::spanningtree(std::vector<int> physregs)
 {
     if (universe::myrawmesh == NULL)
     {
-        std::cout << "Error in 'spanningtree' object: cannot define a spanning tree before the mesh is loaded" << std::endl;
-        abort();
+        throw slexception( "Error in 'spanningtree' object: cannot define a spanning tree before the mesh is loaded" );
     }
     
     universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);

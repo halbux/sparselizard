@@ -1,4 +1,5 @@
 #include "integration.h"
+#include "slexceptions.h"
 
 
 integration::integration(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
@@ -16,8 +17,7 @@ integration::integration(int physreg, expression meshdeform, expression tointegr
 
     if (not(meshdeform.isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" );
     }
 
     myexpression = {tointegrate};

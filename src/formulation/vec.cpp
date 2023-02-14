@@ -1,4 +1,5 @@
 #include "vec.h"
+#include "slexceptions.h"
 
 
 vec::vec(formulation formul) { rawvecptr = std::shared_ptr<rawvec>(new rawvec(formul.getdofmanager())); }
@@ -24,8 +25,7 @@ void vec::permute(indexmat rowpermute, bool invertit)
 {
     if (rowpermute.count() != size())
     {
-        std::cout << "Error in 'vec' object: unexpected argument size for permutation" << std::endl;
-        abort();
+        throw slexception( "Error in 'vec' object: unexpected argument size for permutation" );
     }
 
     IS rowpermutis;
@@ -100,8 +100,7 @@ void vec::setvalue(port prt, double value, std::string op)
     }
     else
     {
-        std::cout << "Error in 'vec' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'vec' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" );
     }
 }
 
@@ -116,8 +115,7 @@ double vec::getvalue(port prt)
     }
     else
     {
-        std::cout << "Error in 'vec' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
-        abort();
+        throw slexception( "Error in 'vec' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" );
     }
 }
 

@@ -1,4 +1,5 @@
 #include "opcos.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> opcos::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> opcos::interpolate(elementselector& elemselec
         return argmat;
     }
 
-    std::cout << "Error in 'opcos' object: without FFT cos() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    throw slexception( "Error in 'opcos' object: without FFT cos() can only be computed for constant (harmonic 1) operations" );
 }
 
 densemat opcos::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

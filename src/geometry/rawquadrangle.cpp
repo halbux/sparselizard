@@ -1,4 +1,5 @@
 #include "rawquadrangle.h"
+#include "slexceptions.h"
 
 
 rawquadrangle::rawquadrangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, std::vector<int> nummeshpoints)
@@ -32,8 +33,7 @@ rawquadrangle::rawquadrangle(int physreg, std::vector<std::shared_ptr<rawshape>>
 {
     if (inputlines.size() != 4 || inputlines[0]->getdimension() != 1 || inputlines[1]->getdimension() != 1 || inputlines[2]->getdimension() != 1 || inputlines[3]->getdimension() != 1)
     {
-        std::cout << "Error in 'rawquadrangle' object: expected four lines in the quadrangle definition" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawquadrangle' object: expected four lines in the quadrangle definition" );
     }
 
     myphysicalregion = physreg;
@@ -134,8 +134,7 @@ void rawquadrangle::mesh(void)
     // Give an error if lines facing each other do not have the same number of mesh nodes:
     if (nummeshpts[0] != nummeshpts[2] || nummeshpts[1] != nummeshpts[3])
     {
-        std::cout << "Error in 'rawquadrangle' object: the number of nodes on edges facing each other should be equal" << std::endl;
-        abort(); 
+        throw slexception( "Error in 'rawquadrangle' object: the number of nodes on edges facing each other should be equal" ); 
     }
 
     // Preallocate the coords and elems containers:

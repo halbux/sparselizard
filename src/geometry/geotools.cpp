@@ -1,4 +1,5 @@
 #include "geotools.h"
+#include "slexceptions.h"
 
 
 double geotools::acos(double arg)
@@ -216,8 +217,7 @@ std::vector< std::shared_ptr<rawshape> > geotools::getrawshapes(std::vector<shap
             rawshapes[i] = currentrawshapeptr;
         else
         {
-            std::cout << "Error in 'geotools' namespace: encountered an undefined shape (NULL rawshape pointer)" << std::endl;
-            abort();
+            throw slexception( "Error in 'geotools' namespace: encountered an undefined shape (NULL rawshape pointer)" );
         }
     }
     
@@ -386,8 +386,7 @@ int geotools::getcurvatureorder(std::vector< std::shared_ptr<rawshape> > rawshap
         int curco = rawshapes[i]->getcurvatureorder();
         if (curco != co)
         {
-            std::cout << "Error in 'geotools' namespace: expected a unique curvature order for all shapes provided" << std::endl;
-            abort();
+            throw slexception( "Error in 'geotools' namespace: expected a unique curvature order for all shapes provided" );
         }
     }
     

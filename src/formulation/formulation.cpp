@@ -1,4 +1,5 @@
 #include "formulation.h"
+#include "slexceptions.h"
 
 
 formulation::formulation(void)
@@ -16,8 +17,7 @@ formulation& formulation::operator+=(expression expr)
 {
     if (isstructurelocked)
     {
-        std::cout << "Error in 'formulation' object: cannot add port relations after a generation step" << std::endl;
-        abort();
+        throw slexception( "Error in 'formulation' object: cannot add port relations after a generation step" );
     }
     if (mycontributions[0].size() != 0 || mycontributions[1].size() != 0 || mycontributions[2].size() != 0 || mycontributions[3].size() != 0)
     {
@@ -506,8 +506,7 @@ std::vector<double> formulation::allsolve(double relrestol, int maxnumit, std::s
     
     if (universe::getrawmesh()->getdtracker()->isoverlap() == false)
     {
-        std::cout << "Error in 'formulation' object: cannot solve using Dirichlet interface conditions for no-overlap DDM (does not converge)" << std::endl;
-        abort();  
+        throw slexception( "Error in 'formulation' object: cannot solve using Dirichlet interface conditions for no-overlap DDM (does not converge)" );  
     }
     
     universe::ddmformuls = {*this};
@@ -658,8 +657,7 @@ std::vector<double> formulation::allsolve(std::vector<int> formulterms, std::vec
     // Make sure the problem is of the form Ax = b:
     if (isdampingmatrixdefined() || ismassmatrixdefined())
     {
-        std::cout << "Error in 'formulation' object: cannot solve with a damping/mass matrix (use a time resolution algorithm)" << std::endl;
-        abort();  
+        throw slexception( "Error in 'formulation' object: cannot solve with a damping/mass matrix (use a time resolution algorithm)" );  
     }
     
     wallclock clktot;

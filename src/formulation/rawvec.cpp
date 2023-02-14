@@ -1,4 +1,5 @@
 #include "rawvec.h"
+#include "slexceptions.h"
 
 
 void rawvec::synchronize(void)
@@ -404,8 +405,7 @@ void rawvec::write(std::string filename)
     }
     
     std::cout << "Error in 'rawvec' object: cannot write vec data to file '" << filename << "'." << std::endl;
-    std::cout << "Supported formats are .txt (ASCII) and .bin (binary)." << std::endl;
-    abort();
+    throw slexception( "Supported formats are .txt (ASCII) and .bin (binary)." );
 }
 
 void rawvec::load(std::string filename)
@@ -414,8 +414,7 @@ void rawvec::load(std::string filename)
     
     if (mydofmanager == NULL)
     {
-        std::cout << "Error in 'rawvec' object: cannot load vec (structure is not defined)" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawvec' object: cannot load vec (structure is not defined)" );
     }
     
     if (filename.size() >= 5)

@@ -1,4 +1,5 @@
 #include "opestimator.h"
+#include "slexceptions.h"
 
 
 opestimator::opestimator(std::string estimatortype, std::shared_ptr<operation> arg)
@@ -58,8 +59,7 @@ std::vector<std::vector<densemat>> opestimator::interpolate(elementselector& ele
 
 densemat opestimator::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
 {
-    std::cout << "Error in 'opestimator' object: cannot perform a multiharmonic interpolation on the estimator" << std::endl;
-    abort();
+    throw slexception( "Error in 'opestimator' object: cannot perform a multiharmonic interpolation on the estimator" );
 }
 
 std::shared_ptr<operation> opestimator::simplify(std::vector<int> disjregs)

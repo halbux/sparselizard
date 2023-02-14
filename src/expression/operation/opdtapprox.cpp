@@ -1,4 +1,5 @@
 #include "opdtapprox.h"
+#include "slexceptions.h"
 
 
 opdtapprox::opdtapprox(int dtorder, std::shared_ptr<operation> arg, double initdtx, double initdtdtx)
@@ -60,8 +61,7 @@ void opdtapprox::nextimpliciteuler(double tinit, double dt)
 {
     if (mydtorder == 2)
     {
-        std::cout << "Error in 'opdtapprox' object: cannot approximate a second order time derivative with implicit Euler" << std::endl;
-        abort();
+        throw slexception( "Error in 'opdtapprox' object: cannot approximate a second order time derivative with implicit Euler" );
     }
 
     mydtx = (myarg->evaluateattime(tinit+dt) - myarg->evaluateattime(tinit))/dt;

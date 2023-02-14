@@ -1,4 +1,5 @@
 #include "opinversion.h"
+#include "slexceptions.h"
 
 
 std::vector<std::vector<densemat>> opinversion::interpolate(elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)
@@ -22,8 +23,7 @@ std::vector<std::vector<densemat>> opinversion::interpolate(elementselector& ele
         return argmat;
     }
 
-    std::cout << "Error in 'opinversion' object: without FFT divisions can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    throw slexception( "Error in 'opinversion' object: without FFT divisions can only be computed for constant (harmonic 1) operations" );
 }
 
 densemat opinversion::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

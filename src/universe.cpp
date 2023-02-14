@@ -2,6 +2,7 @@
 #include "slepc.h"
 #include <thread>
 #include <omp.h>
+#include "slexceptions.h"
 
 
 wallclock universe::globalclock = wallclock();
@@ -14,8 +15,7 @@ void universe::addtorawmeshcounter(int val)
 {
     if (mynumrawmeshes+val < 0)
     {
-        std::cout << "Error in 'universe' namespace: unexpected negative value for rawmesh counter" << std::endl;
-        abort();
+        throw slexception( "Error in 'universe' namespace: unexpected negative value for rawmesh counter" );
     }
 
     PetscBool ispetscinitialized;
@@ -66,8 +66,7 @@ std::shared_ptr<rawmesh> universe::getrawmesh(void)
         return myrawmesh;
     else
     {
-        std::cout << "Error in 'universe' namespace: an operation tried to access the mesh object but it is not available" << std::endl;
-        abort();
+        throw slexception( "Error in 'universe' namespace: an operation tried to access the mesh object but it is not available" );
     }
 }
 
@@ -82,8 +81,7 @@ double universe::getfundamentalfrequency(void)
         return fundamentalfrequency;
     else
     {
-        std::cout << "Error in 'universe' namespace: the fundamental frequency cannot be negative or 0 (make sure it was set)" << std::endl;
-        abort();
+        throw slexception( "Error in 'universe' namespace: the fundamental frequency cannot be negative or 0 (make sure it was set)" );
     }
 }
 

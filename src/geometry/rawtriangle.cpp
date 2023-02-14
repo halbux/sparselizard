@@ -1,4 +1,5 @@
 #include "rawtriangle.h"
+#include "slexceptions.h"
 
 
 rawtriangle::rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inputpoints, std::vector<int> nummeshpoints)
@@ -32,8 +33,7 @@ rawtriangle::rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inp
 {
     if (inputlines.size() != 3 || inputlines[0]->getdimension() != 1 || inputlines[1]->getdimension() != 1 || inputlines[2]->getdimension() != 1)
     {
-        std::cout << "Error in 'rawtriangle' object: expected three lines in the triangle definition" << std::endl;
-        abort();
+        throw slexception( "Error in 'rawtriangle' object: expected three lines in the triangle definition" );
     }
 
     myphysicalregion = physreg;
@@ -134,8 +134,7 @@ void rawtriangle::mesh(void)
     // Give an error if the edges do not have the same number of mesh nodes:
     if (nummeshpts[0] != nummeshpts[1] || nummeshpts[0] != nummeshpts[2])
     {
-        std::cout << "Error in 'rawtriangle' object: the number of nodes on all edges should be equal" << std::endl;
-        abort(); 
+        throw slexception( "Error in 'rawtriangle' object: the number of nodes on all edges should be equal" ); 
     }
 
     int n = nummeshpts[0];
