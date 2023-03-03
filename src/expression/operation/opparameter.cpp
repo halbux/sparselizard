@@ -33,6 +33,16 @@ densemat opparameter::multiharmonicinterpolate(int numtimeevals, elementselector
     return output;
 }
 
+bool opparameter::isparameterincluded(std::vector<int> disjregs, rawparameter* rp)
+{
+    for (int i = 0; i < disjregs.size(); i++)
+    {
+        if ( (myparameter->isdefined(disjregs[i]) && myparameter->get(disjregs[i], myrow, mycolumn)->isparameterincluded({disjregs[i]}, rp)) )
+            return true;
+    }
+    return (myparameter.get() == rp);   
+}
+
 bool opparameter::isharmonicone(std::vector<int> disjregs) 
 { 
     for (int i = 0; i < disjregs.size(); i++)

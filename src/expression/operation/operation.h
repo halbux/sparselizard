@@ -76,6 +76,8 @@ class operation : public std::enable_shared_from_this<operation>
         
         virtual bool isportincluded(void);
         
+        virtual bool isparameterincluded(std::vector<int> disjregs, rawparameter* rp);
+        
         // True if the operation only includes harmonic 1:
         virtual bool isharmonicone(std::vector<int> disjregs);
         

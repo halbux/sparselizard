@@ -38,6 +38,8 @@ class opparameter: public operation
         int getselectedrow(void) { return myrow; };
         int getselectedcol(void) { return mycolumn; };
         
+        bool isparameterincluded(std::vector<int> disjregs, rawparameter* rp);
+        
         bool isharmonicone(std::vector<int> disjregs);
         
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);

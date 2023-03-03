@@ -86,6 +86,12 @@ void rawparameter::set(int physreg, expression input)
                 std::cout << "Error in 'parameter' object: cannot set an expression containing a dof or a tf" << std::endl;
                 abort();
             }
+            // Make sure there is no recursion:
+            if (op->isparameterincluded(selecteddisjregs, this))
+            {
+                std::cout << "Error in 'parameter' object: cannot set an expression including the parameter itself" << std::endl;
+                abort();
+            }
             
             for (int i = 0; i < selecteddisjregs.size(); i++)
             {
@@ -94,6 +100,13 @@ void rawparameter::set(int physreg, expression input)
             }
         }
     }
+}
+
+bool rawparameter::isdefined(int disjreg)
+{
+    synchronize();
+    
+    return (myoperations[disjreg].size() > 0 && myoperations[disjreg][0] != NULL);
 }
 
 std::shared_ptr<operation> rawparameter::get(int disjreg, int row, int col)

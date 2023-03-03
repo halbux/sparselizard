@@ -66,6 +66,18 @@ bool operation::isportincluded(void)
     return isport();
 }
 
+bool operation::isparameterincluded(std::vector<int> disjregs, rawparameter* rp)
+{
+    std::vector<std::shared_ptr<operation>> arguments = getarguments();
+
+    for (int i = 0; i < arguments.size(); i++)
+    {
+        if (arguments[i]->isparameterincluded(disjregs, rp))
+            return true;
+    }
+    return false;
+}
+
 bool operation::isharmonicone(std::vector<int> disjregs)
 {
     std::vector<std::shared_ptr<operation>> arguments = getarguments();
