@@ -262,7 +262,7 @@ void gmshinterface::readfromfile(std::string name, nodes& mynodes, elements& mye
             // Get the physical region object associated to 'currentphysicalregionnumber':
             physicalregion* currentphysicalregion = myphysicalregions.get(universe::physregshift*(elemdim+1) + currentphysicalregionnumber);
             // Read now the node number list in the element. The number of nodes depends on the element:
-            std::vector<int>  nodesincurrentelement(elementobject.countcurvednodes());
+            std::vector<int> nodesincurrentelement(elementobject.countcurvednodes());
             for (int j = 0; j < elementobject.countcurvednodes(); j++)
                 nodesincurrentelement[j] = std::stoi(stringobject.getstringtonextwhitespace()) - 1; // -1 to start numbering nodes at 0
             
