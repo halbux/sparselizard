@@ -221,7 +221,7 @@ int gentools::removeduplicates(std::vector<int> toremove, std::vector<int>& renu
         
         for (int j = 0; j < numdata; j++)
         {
-            if (i+j > 0)
+            if (adsatval[i]+j > 0)
             {
                 if (std::equal(data+(j-1)*blocklen, data+j*blocklen, data+j*blocklen))
                     sameblockas[adsatval[i]+j] = adsatval[i]+j-1;
