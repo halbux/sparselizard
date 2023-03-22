@@ -219,13 +219,10 @@ int gentools::removeduplicates(std::vector<int> toremove, std::vector<int>& renu
         for (int j = 0; j < numdata; j++)
             inverserenum[adsatval[i]+j] = invrenumbkp[subreordervec[j]];
         
-        for (int j = 0; j < numdata; j++)
+        for (int j = 1; j < numdata; j++)
         {
-            if (adsatval[i]+j > 0)
-            {
-                if (std::equal(data+(j-1)*blocklen, data+j*blocklen, data+j*blocklen))
-                    sameblockas[adsatval[i]+j] = adsatval[i]+j-1;
-            }
+            if (std::equal(data+(j-1)*blocklen, data+j*blocklen, data+j*blocklen))
+                sameblockas[adsatval[i]+j] = adsatval[i]+j-1;
         }   
     }
     
