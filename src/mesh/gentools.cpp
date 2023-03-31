@@ -1461,7 +1461,7 @@ std::vector<double> gentools::arnoldi(densemat (*mymatmult)(densemat), densemat 
         abort();
     }
     
-    // Standard Gramm-Schmidt orthogonalization:
+    // Standard Gram-Schmidt orthogonalization:
     densemat h = Q.getresized(k+1,n).multiply(q);
     h = h.getresized(1,k+1);
     
