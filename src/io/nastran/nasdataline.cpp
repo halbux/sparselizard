@@ -16,9 +16,12 @@ std::vector<int> nasdataline::translateelementname(std::string elemname)
     if (elemname == "CPENTA")
         return {6,6};
         
-    std::cout << "Error in 'nasdataline': unknown or unsupported Nastran element type '" << elemname << "'." << std::endl;
-    std::cout << "Curved elements not supported in .nas reader (save as linear elements in .nas or use GMSH 2 ASCII .msh format for curved elements)." << std::endl;
-    abort(); 
+    logs log;
+    log.msg() << "Error in 'nasdataline': unknown or unsupported Nastran element type '" << elemname << "'." << std::endl;
+    log.msg() << "Curved elements not supported in .nas reader (save as linear elements in .nas or use GMSH 2 ASCII .msh format for curved elements)." << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 bool nasdataline::addline(std::string linetoadd)

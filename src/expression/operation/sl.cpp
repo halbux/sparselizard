@@ -31,8 +31,9 @@ void sl::setmaxnumthreads(int mnt)
 {
     if (mnt <= 0)
     {
-        std::cout << "Error in 'sl' namespace: cannot set a negative or zero max num threads" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot set a negative or zero max num threads" << std::endl;
+        log.error();
     }
 
     universe::setmaxnumthreads(mnt);
@@ -207,8 +208,9 @@ void sl::writevector(std::string filename, std::vector<double> towrite, char del
     }
     else
     {
-        std::cout << "Unable to write vector to file " << filename << " or file not found" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Unable to write vector to file " << filename << " or file not found" << std::endl;
+        log.error();
     }
 }
 
@@ -245,8 +247,9 @@ std::vector<double> sl::loadvector(std::string filename, char delimiter, bool si
     }
     else
     {
-        std::cout << "Unable to load vector from file " << filename << " or file not found" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Unable to load vector from file " << filename << " or file not found" << std::endl;
+        log.error();
     }
 
     return output;
@@ -258,8 +261,9 @@ std::string sl::allpartition(std::string meshfile)
     if (slmpi::count() == 1)
         return meshfile;
     
-    std::cout << "Error in 'sl' namespace: GMSH API is required to partition the mesh" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'sl' namespace: GMSH API is required to partition the mesh" << std::endl;
+    log.error();
 }
 #endif
 #ifdef HAVE_GMSH
@@ -332,8 +336,9 @@ expression sl::getnormal(int physreg)
         int elementdimension = universe::getrawmesh()->getphysicalregions()->get(physreg)->getelementdimension();
         if (elementdimension >= 0 && elementdimension != problemdimension)
         {
-            std::cout << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: normal cannot point outward of the " << elementdimension << "D region provided (should be " << problemdimension << "D)" << std::endl;
+            log.error();
         }
     }
     
@@ -394,7 +399,7 @@ expression sl::tangent(void)
         return array3x1(expr.jac(0,0), expr.jac(0,1), expr.jac(0,2))/mynorm;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 void sl::scatterwrite(std::string filename, std::vector<double> xcoords, std::vector<double> ycoords, std::vector<double> zcoords, std::vector<double> compxevals, std::vector<double> compyevals, std::vector<double> compzevals)
@@ -416,8 +421,9 @@ void sl::scatterwrite(std::string filename, std::vector<double> xcoords, std::ve
 
     if (xcoords.size() != n || ycoords.size() != n || zcoords.size() != n || compxevals.size() != n || (isscalar == false && (compyevals.size() != n || compzevals.size() != n)))
     {
-        std::cout << "Error in 'sl' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: size of 'scatterwrite' arguments do not match" << std::endl;
+        log.error();
     }
 
     iodata datatowrite(1, 1, isscalar, {});
@@ -436,8 +442,9 @@ void sl::setaxisymmetry(void)
     // Make sure the call is done before loading the mesh:
     if (universe::myrawmesh != NULL)
     {
-        std::cout << "Error in 'sl' namespace: 'setaxisymmetry' must be called before loading the mesh" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: 'setaxisymmetry' must be called before loading the mesh" << std::endl;
+        log.error();
     }
     universe::isaxisymmetric = true;
 }
@@ -458,8 +465,9 @@ expression sl::fieldorder(field input, double alpha, double absthres)
     
     if (rf->gettypename() != "h1" && rf->gettypename() != "hcurl" && rf->gettypename() != "h1d0" && rf->gettypename() != "h1d1" && rf->gettypename() != "h1d2" && rf->gettypename() != "h1d3")
     {
-        std::cout << "Error in 'sl' namespace: field provided to 'fieldorder' must be of type 'h1', 'h1d' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: field provided to 'fieldorder' must be of type 'h1', 'h1d' or 'hcurl' (was '" << rf->gettypename() << "')" << std::endl;
+        log.error();
     }
     
     std::shared_ptr<opfieldorder> op(new opfieldorder(rf->getsons(), alpha, absthres));
@@ -471,8 +479,9 @@ expression sl::getharmonic(int harmnum, expression input, int numfftharms)
 {
     if (harmnum <= 0)
     {
-        std::cout << "Error in 'sl' namespace: in 'getharmonic' cannot have a negative or zero harmonic" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'getharmonic' cannot have a negative or zero harmonic" << std::endl;
+        log.error();
     }
     
     if (input.iszero())
@@ -485,13 +494,15 @@ expression sl::makeharmonic(std::vector<int> harms, std::vector<expression> expr
 {
     if (harms.size() == 0)
     {
-        std::cout << "Error in 'sl' namespace: in 'makeharmonic' expected at least one harmonic as argument" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'makeharmonic' expected at least one harmonic as argument" << std::endl;
+        log.error();
     }
     if (harms.size() != exprs.size())
     {
-        std::cout << "Error in 'sl' namespace: in 'makeharmonic' the number of harmonics and expressions do not match" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'makeharmonic' the number of harmonics and expressions do not match" << std::endl;
+        log.error();
     }
     
     int m = exprs[0].countrows();
@@ -504,18 +515,21 @@ expression sl::makeharmonic(std::vector<int> harms, std::vector<expression> expr
     {
         if (harms[i] <= 0)
         {
-            std::cout << "Error in 'sl' namespace: in 'makeharmonic' cannot have a negative or zero harmonic" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: in 'makeharmonic' cannot have a negative or zero harmonic" << std::endl;
+            log.error();
         }
         if (exprs[i].countrows() != m || exprs[i].countcolumns() != n)
         {
-            std::cout << "Error in 'sl' namespace: in 'makeharmonic' all expressions should have the same dimension" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: in 'makeharmonic' all expressions should have the same dimension" << std::endl;
+            log.error();
         }
         if (not(exprs[i].isharmonicone(alldisjregs)))
         {
-            std::cout << "Error in 'sl' namespace: in 'makeharmonic' cannot have multiharmonic expressions as argument (only constant harmonic 1)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: in 'makeharmonic' cannot have multiharmonic expressions as argument (only constant harmonic 1)" << std::endl;
+            log.error();
         }
     }
     
@@ -542,20 +556,23 @@ expression sl::moveharmonic(std::vector<int> origharms, std::vector<int> desthar
 {
     if (origharms.size() == 0)
     {
-        std::cout << "Error in 'sl' namespace: in 'moveharmonic' expected at least one harmonic as argument" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'moveharmonic' expected at least one harmonic as argument" << std::endl;
+        log.error();
     }
     if (origharms.size() != destharms.size())
     {
-        std::cout << "Error in 'sl' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'moveharmonic' the number of origin and destination harmonics do not match" << std::endl;
+        log.error();
     }
     for (int i = 0; i < origharms.size(); i++)
     {
         if (origharms[i] <= 0 || destharms[i] <= 0)
         {
-            std::cout << "Error in 'sl' namespace: in 'moveharmonic' cannot have a negative or zero harmonic" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: in 'moveharmonic' cannot have a negative or zero harmonic" << std::endl;
+            log.error();
         }
     }
     
@@ -571,8 +588,9 @@ expression sl::moveharmonic(std::vector<int> origharms, std::vector<int> desthar
             
             if (opin->isdofincluded() || opin->istfincluded())
             {
-                std::cout << "Error in 'sl' namespace: in 'moveharmonic' expected an argument expression without dof or tf" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'sl' namespace: in 'moveharmonic' expected an argument expression without dof or tf" << std::endl;
+                log.error();
             }
 
             std::shared_ptr<opharmonic> op(new opharmonic(origharms, destharms, opin, numfftharms));
@@ -589,8 +607,9 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(EorH.isharmonicone(alldisjregs)) || not(epsilonormu.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'sl' namespace: cannot have a multiharmonic argument in the total force calculation" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot have a multiharmonic argument in the total force calculation" << std::endl;
+        log.error();
     }
     
     int wholedomain = universe::getrawmesh()->getphysicalregions()->createunionofall();
@@ -600,8 +619,9 @@ std::vector<double> sl::gettotalforce(int physreg, expression* meshdeform, expre
         numcomps++;
     if (numcomps == 1)
     {
-        std::cout << "Error in 'sl' namespace: force calculation formula is undefined in 1D" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: force calculation formula is undefined in 1D" << std::endl;
+        log.error();
     }
         
     std::vector<std::string> tn = {"","h1","h1xy","h1xyz"};
@@ -687,13 +707,15 @@ void sl::writeshapefunctions(std::string filename, std::string sftypename, int e
 {
     if (elementtypenumber == 7)
     {
-        std::cout << "Error in 'sl' namespace: cannot write shape functions for pyramids (non-polynomial)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot write shape functions for pyramids (non-polynomial)" << std::endl;
+        log.error();
     }
     if (elementtypenumber > 7)
     {
-        std::cout << "Error in 'sl' namespace: element type number must be between 0 and 7" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: element type number must be between 0 and 7" << std::endl;
+        log.error();
     }
     
     element myelement(elementtypenumber);
@@ -942,8 +964,9 @@ expression sl::andpositive(std::vector<expression> exprs)
 {
     if (exprs.size() == 0)
     {
-        std::cout << "Error in 'sl' namespace: cannot call andpositive on an empty vector of expressions" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot call andpositive on an empty vector of expressions" << std::endl;
+        log.error();
     }
 
     expression output(exprs[exprs.size()-1], 1, -1);
@@ -958,8 +981,9 @@ expression sl::orpositive(std::vector<expression> exprs)
 {
     if (exprs.size() == 0)
     {
-        std::cout << "Error in 'sl' namespace: cannot call orpositive on an empty vector of expressions" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot call orpositive on an empty vector of expressions" << std::endl;
+        log.error();
     }
 
     expression output(exprs[exprs.size()-1], 1, -1);
@@ -1043,8 +1067,9 @@ expression sl::eye(int size)
 {
     if (size < 0)
     {
-        std::cout << "Error in 'sl' namespace: cannot create a " << size << "x" << size << " identity matrix" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot create a " << size << "x" << size << " identity matrix" << std::endl;
+        log.error();
     }
 
     std::vector<expression> exprs(size);
@@ -1064,8 +1089,9 @@ expression sl::grad(expression input)
 {
     if (input.countcolumns() != 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'sl' namespace: can only take the gradient of a scalar or an up to length 3 column vector" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only take the gradient of a scalar or an up to length 3 column vector" << std::endl;
+        log.error();
     }
 
     // Cylindrical transformation of the gradient of a vector (different than of a scalar):
@@ -1105,8 +1131,9 @@ expression sl::div(expression input)
 {
     if (input.countcolumns() != 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'sl' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only take the divergence of an up to length 3 column vector" << std::endl;
+        log.error();
     }
 
     if (universe::isaxisymmetric)
@@ -1134,7 +1161,7 @@ expression sl::div(expression input)
             return compx(dx(input))+compy(dy(input))+compz(dz(input));
     }
 
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression sl::curl(expression input)
@@ -1149,8 +1176,9 @@ expression sl::curl(expression input)
 
     if (input.countcolumns() > 1 || input.countrows() > 3)
     {
-        std::cout << "Error in 'sl' namespace: can only take the curl of an up to length 3 column vector" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only take the curl of an up to length 3 column vector" << std::endl;
+        log.error();
     }
 
     // The curl of a hcurl type field is computed in a special way:
@@ -1194,15 +1222,16 @@ expression sl::curl(expression input)
         return expr;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression sl::crossproduct(expression a, expression b)
 {
     if (a.countcolumns() != 1 || b.countcolumns() != 1 || a.countrows() > 3 || b.countrows() > 3)
     {
-        std::cout << "Error in 'sl' namespace: can only take the cross product of up to length 3 column vectors" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only take the cross product of up to length 3 column vectors" << std::endl;
+        log.error();
     }
 
     a = a.resize(3,1);
@@ -1220,8 +1249,9 @@ expression sl::doubledotproduct(expression a, expression b)
 {
     if (a.countcolumns() != b.countcolumns() || a.countrows() != b.countrows())
     {
-        std::cout << "Error in 'sl' namespace: dimension mismatch for double dot product" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: dimension mismatch for double dot product" << std::endl;
+        log.error();
     }
 
     expression output;
@@ -1243,8 +1273,9 @@ expression sl::elementwiseproduct(expression a, expression b)
 {
     if (a.countrows() != b.countrows() || a.countcolumns() != b.countcolumns())
     {
-        std::cout << "Error in 'sl' namespace: element-wise product requires arguments of same dimensions" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: element-wise product requires arguments of same dimensions" << std::endl;
+        log.error();
     }
     
     std::vector<expression> axb(a.countrows() * a.countcolumns());
@@ -1262,8 +1293,9 @@ expression sl::trace(expression a)
 {
     if (a.countcolumns() != a.countrows())
     {
-        std::cout << "Error in 'sl' namespace: can only get the trace of a square matrix" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only get the trace of a square matrix" << std::endl;
+        log.error();
     }
 
     expression output;
@@ -1364,8 +1396,11 @@ std::vector<expression> sl::rotation(double alphax, double alphay, double alphaz
         return std::vector<expression>{Kexpr, invKexpr};
     }
     
-    std::cout << "Error in 'sl' namespace: rotation expected a type '' or 'voigt'" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'sl' namespace: rotation expected a type '' or 'voigt'" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 integration sl::integral(int physreg, expression tointegrate, int integrationorderdelta, int blocknumber)
@@ -1436,8 +1471,9 @@ bool sl::adapt(int verbosity)
 {
     if (universe::getrawmesh()->getdtracker()->isdefined() && slmpi::count() > 1)
     {
-        std::cout << "Error in 'sl' namespace: call 'alladapt' instead of 'adapt' for multi-rank DDM" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: call 'alladapt' instead of 'adapt' for multi-rank DDM" << std::endl;
+        log.error();
     }
     
     return universe::getrawmesh()->adapthp(verbosity);
@@ -1454,8 +1490,9 @@ expression sl::zienkiewiczzhu(expression input)
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(input.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'sl' namespace: in 'zienkiewiczzhu' cannot have a multiharmonic expression as argument" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'zienkiewiczzhu' cannot have a multiharmonic expression as argument" << std::endl;
+        log.error();
     }
 
     int m = input.countrows();
@@ -1529,19 +1566,22 @@ vec sl::solve(mat A, vec b, std::string soltype, bool diagscaling)
 {
     if (soltype != "lu" && soltype != "cholesky")
     {
-        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
+        log.error();
     }
     if (A.countrows() != b.size())
     {
-        std::cout << "Error in 'sl' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: direct solve of Ax = b failed (size of A and b do not match)" << std::endl;
+        log.error();
     }
 
     if (A.getpointer() == NULL || b.getpointer() == NULL)
     {
-        std::cout << "Error in 'sl' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: direct solve of Ax = b failed (A or b is undefined)" << std::endl;
+        log.error();
     }
     
     vec breduced = A.eliminate(b);
@@ -1590,20 +1630,23 @@ std::vector<vec> sl::solve(mat A, std::vector<vec> b, std::string soltype)
 {
     if (soltype != "lu" && soltype != "cholesky")
     {
-        std::cout << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unknown direct solver type '" << soltype << "' (use 'lu' or 'cholesky')" << std::endl;
+        log.error();
     }
     for (int i = 0; i < b.size(); i++)
     {
         if (A.countrows() != b[i].size())
         {
-            std::cout << "Error in 'sl' namespace: multi-rhs direct solve of Ax = b failed (size of A and at least one rhs do not match)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: multi-rhs direct solve of Ax = b failed (size of A and at least one rhs do not match)" << std::endl;
+            log.error();
         }
         if (A.getpointer() == NULL || b[i].getpointer() == NULL)
         {
-            std::cout << "Error in 'sl' namespace: multi-rhs direct solve of Ax = b failed (A or at least one rhs is undefined)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: multi-rhs direct solve of Ax = b failed (A or at least one rhs is undefined)" << std::endl;
+            log.error();
         }
     }
     
@@ -1711,29 +1754,34 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
 {
     if (soltype != "gmres" && soltype != "bicgstab")
     {
-        std::cout << "Error in 'sl' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unknown iterative solver type '" << soltype << "' (use 'gmres' or 'bicgstab')" << std::endl;
+        log.error();
     }
     if (precondtype != "ilu" && precondtype != "sor" && precondtype != "gamg")
     {
-        std::cout << "Error in 'sl' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu', 'sor' or 'gamg')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unknown preconditioner type '" << precondtype << "' (use 'ilu', 'sor' or 'gamg')" << std::endl;
+        log.error();
     }
     if (A.countrows() != b.size())
     {
-        std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (size of A and b do not match)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: iterative solve of Ax = b failed (size of A and b do not match)" << std::endl;
+        log.error();
     }
     if (A.countrows() != sol.size())
     {
-        std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (size of A and x do not match)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: iterative solve of Ax = b failed (size of A and x do not match)" << std::endl;
+        log.error();
     }
 
     if (A.getpointer() == NULL || b.getpointer() == NULL || sol.getpointer() == NULL)
     {
-        std::cout << "Error in 'sl' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: iterative solve of Ax = b failed (A, x or b is undefined)" << std::endl;
+        log.error();
     }
     
     vec breduced = A.eliminate(b);
@@ -1817,8 +1865,9 @@ std::vector<double> sl::gmres(densemat (*mymatmult)(densemat), densemat b, dense
 {   
     if (b.countrows() != x.countrows() || b.countcolumns() != 1 || x.countcolumns() != 1)
     {
-        std::cout << "Error in 'sl' namespace: in function gmres expected a column vector of same size for b and x" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in function gmres expected a column vector of same size for b and x" << std::endl;
+        log.error();
     }
 
     // Fragment size:
@@ -1840,8 +1889,9 @@ std::vector<double> sl::gmres(densemat (*mymatmult)(densemat), densemat b, dense
     
     if (r.countrows() != n || r.countcolumns() != 1)
     {
-        std::cout << "Error in 'sl' namespace: in function gmres the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in function gmres the matrix product function call returned a densemat of wrong size on rank " << slmpi::getrank() << std::endl;
+        log.error();
     }
     
     for (int i = 0; i < n; i++)
@@ -2104,9 +2154,10 @@ void sl::mapdofs(std::shared_ptr<dofmanager> dm, std::vector<std::shared_ptr<raw
         }
         if (numdofsexpected != numdofsrecv)
         {
-            std::cout << "Error in 'sl' namespace: DDM interface data size does not match for at least one field between ranks " << rank << " and " << dt->getneighbour(n) << std::endl;
-            std::cout << "Make sure that the fields are provided in the same order to the dof manager and that the interpolation orders match on the DDM interfaces" << std::endl; 
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: DDM interface data size does not match for at least one field between ranks " << rank << " and " << dt->getneighbour(n) << std::endl;
+            log.msg() << "Make sure that the fields are provided in the same order to the dof manager and that the interpolation orders match on the DDM interfaces" << std::endl; 
+            log.error();
         }
     }
 
@@ -2165,8 +2216,9 @@ std::vector<double> sl::linspace(double a, double b, int num)
 {
     if (num < 0)
     {
-        std::cout << "Error in 'sl' namespace: cannot call 'linspace' for " << num << " points" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot call 'linspace' for " << num << " points" << std::endl;
+        log.error();
     }
     if (num == 0)
         return {};
@@ -2186,8 +2238,9 @@ std::vector<double> sl::logspace(double a, double b, int num, double basis)
 {
     if (num < 0)
     {
-        std::cout << "Error in 'sl' namespace: cannot call 'logspace' for " << num << " points" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: cannot call 'logspace' for " << num << " points" << std::endl;
+        log.error();
     }
     if (num == 0)
         return {};
@@ -2232,8 +2285,9 @@ expression sl::strain(expression input)
 {
     if ((input.countrows() != 2 && input.countrows() != 3) || (input.countcolumns() != 1 && input.countrows() != input.countcolumns()))
     {
-        std::cout << "Error in 'sl' namespace: can only compute the strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only compute the strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
+        log.error();
     }
 
     expression gradu = input;
@@ -2245,15 +2299,16 @@ expression sl::strain(expression input)
     if (input.countrows() == 3)
         return expression(6,1,{gradu.at(0,0), gradu.at(1,1), gradu.at(2,2), gradu.at(2,1) + gradu.at(1,2), gradu.at(0,2) + gradu.at(2,0), gradu.at(0,1) + gradu.at(1,0)});
         
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression sl::greenlagrangestrain(expression input)
 {
     if ((input.countrows() != 2 && input.countrows() != 3) || (input.countcolumns() != 1 && input.countrows() != input.countcolumns()))
     {
-        std::cout << "Error in 'sl' namespace: can only compute the green-lagrange strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: can only compute the green-lagrange strains of a 2x1 or 3x1 column vector or its gradient" << std::endl;
+        log.error();
     }
 
     expression gradu = input;
@@ -2292,15 +2347,16 @@ expression sl::greenlagrangestrain(expression input)
         return output;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression sl::vonmises(expression stress)
 {
     if (stress.countcolumns() != 1 || stress.countrows() != 6)
     {
-        std::cout << "Error in 'sl' namespace: expected the 3D stress tensor in Voigt notation (6 rows, 1 column)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: expected the 3D stress tensor in Voigt notation (6 rows, 1 column)" << std::endl;
+        log.error();
     }
 
     expression s11 = stress.at(0,0), s22 = stress.at(1,0), s33 = stress.at(2,0), s23 = stress.at(3,0), s13 = stress.at(4,0), s12 = stress.at(5,0);
@@ -2352,8 +2408,9 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
     int gamma2dim = universe::getrawmesh()->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
-        std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
+        log.error();
     }
     
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
@@ -2362,8 +2419,9 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
     {
-        std::cout << "Error in 'sl' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
+        log.error();
     }
     
     // Create the Lagrange multiplier field:
@@ -2391,8 +2449,9 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
     int gamma2dim = universe::getrawmesh()->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
-        std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'continuitycondition'" << std::endl;
+        log.error();
     }
 
     std::shared_ptr<rawfield> ptr1 = u1.getpointer();
@@ -2401,32 +2460,37 @@ std::vector<integration> sl::continuitycondition(int gamma1, int gamma2, field u
     // Make sure the fields are similar:
     if (ptr1->gettypename(false) != ptr2->gettypename(false) || ptr1->getharmonics() != ptr2->getharmonics())
     {
-        std::cout << "Error in 'sl' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'continuitycondition' expected two fields of same type and harmonic content" << std::endl;
+        log.error();
     }
     
     if (rotcent.size() != 3)
     {
-        std::cout << "Error in 'sl' namespace: in 'continuitycondition' expected a vector of length 3 as fifth argument" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'continuitycondition' expected a vector of length 3 as fifth argument" << std::endl;
+        log.error();
     }
     
     if (factor != -1 && factor != 1)
     {
-        std::cout << "Error in 'sl' namespace: in 'continuitycondition' the factor must be -1 or 1" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'continuitycondition' the factor must be -1 or 1" << std::endl;
+        log.error();
     }
 
     if (angzmod < 0.0 || angzmod > 180.0)
     {
-        std::cout << "Error in 'sl' namespace: in 'continuitycondition' the angular modulo should be in range [0,180]" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'continuitycondition' the angular modulo should be in range [0,180]" << std::endl;
+        log.error();
     }
 
     if (rotangz < 0.0 || rotangz > angzmod)
     {
-        std::cout << "Error in 'sl' namespace: in 'continuitycondition' the rotation angle should be in range [0,angzmod]" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'continuitycondition' the rotation angle should be in range [0,angzmod]" << std::endl;
+        log.error();
     }
     
     // Create the Lagrange multiplier field:
@@ -2510,19 +2574,22 @@ std::vector<integration> sl::periodicitycondition(int gamma1, int gamma2, field 
     int gamma2dim = universe::getrawmesh()->getphysicalregions()->get(gamma2)->getelementdimension();
     if (gamma1dim != gamma2dim || gamma1dim >= problemdimension)
     {
-        std::cout << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'periodicitycondition'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: expected boundary regions for gamma1 and gamma2 in 'periodicitycondition'" << std::endl;
+        log.error();
     }
     
     if (dat1.size() != 3)
     {
-        std::cout << "Error in 'sl' namespace: in 'periodicitycondition' expected a vector of length 3 as fourth argument" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'periodicitycondition' expected a vector of length 3 as fourth argument" << std::endl;
+        log.error();
     }
     if (dat2.size() != 1 && dat2.size() != 3)
     {
-        std::cout << "Error in 'sl' namespace: in 'periodicitycondition' expected a vector of length 1 or 3 as fifth argument" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: in 'periodicitycondition' expected a vector of length 1 or 3 as fifth argument" << std::endl;
+        log.error();
     }
 
     // Create the Lagrange multiplier field:
@@ -2616,8 +2683,9 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, expression 
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'sl' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
+        log.error();
     }
     if (dofu.countrows() == 2)
     {
@@ -2664,21 +2732,23 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, expression 
             return -( H *strain(dofu) )*strain(tfu);
 
         // If the option is not valid:
-        std::cout << "Error in 'sl' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
-        std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
+        log.msg() << "Available choices are: 'planestrain', 'planestress'" << std::endl;
+        log.error();
     }
     if (dofu.countrows() == 3)
     {
         if (myoption.length() > 0)
         {
-            std::cout << "Error in 'sl' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
+            log.error();
         }
         return -( H*strain(dofu) ) * strain(tfu);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression sl::predefinedelasticity(expression dofu, expression tfu, field u, expression E, expression nu, expression prestress, std::string myoption)
@@ -2695,15 +2765,17 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, field u, ex
 {
     if (dofu.countrows() != tfu.countrows() || dofu.countcolumns() != 1 || tfu.countcolumns() != 1 || dofu.countrows() == 1)
     {
-        std::cout << "Error in 'sl' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: first arguments in 'predefinedelasticity' must be either 2x1 or 3x1 vectors" << std::endl;
+        log.error();
     }
     if (dofu.countrows() == 2)
     {
         if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 3))
         {
-            std::cout << "Error in 'sl' namespace: expected a 3x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: expected a 3x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
+            log.error();
         }
 
         if (myoption == "planestrain")
@@ -2779,22 +2851,25 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, field u, ex
         }
 
         // If the option is not valid:
-        std::cout << "Error in 'sl' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
-        std::cout << "Available choices are: 'planestrain', 'planestress'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: invalid option or no option provided for the 2D problem in 'predefinedelasticity'" << std::endl;
+        log.msg() << "Available choices are: 'planestrain', 'planestress'" << std::endl;
+        log.error();
     }
     if (dofu.countrows() == 3)
     {
         if (prestress.iszero() == false && (prestress.countcolumns() != 1 || prestress.countrows() != 6))
         {
-            std::cout << "Error in 'sl' namespace: expected a 6x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: expected a 6x1 sized prestress vector (Voigt form) in 'predefinedelasticity' (set scalar 0.0 if no prestress)" << std::endl;
+            log.error();
         }
 
         if (myoption.length() > 0)
         {
-            std::cout << "Error in 'sl' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: for a 3D problem the last string argument must be empty in 'predefinedelasticity'" << std::endl;
+            log.error();
         }
 
         H.reuseit();
@@ -2828,7 +2903,7 @@ expression sl::predefinedelasticity(expression dofu, expression tfu, field u, ex
             return -(H*ei)*deltae - (Si+prestress)*deltaeta - (Si+prestress)*deltae;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression sl::predefinedelectrostaticforce(expression input, expression E, expression epsilon)
@@ -2839,23 +2914,27 @@ expression sl::predefinedelectrostaticforce(expression input, expression E, expr
        
     if (md <= 1)
     {
-        std::cout << "Error in 'sl' namespace: the force formula is not defined in 1D" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: the force formula is not defined in 1D" << std::endl;
+        log.error();
     }
     if (input.countrows() != md)
     {
-        std::cout << "Error in 'sl' namespace: the force formula expected a displacement field with " << md << " components" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: the force formula expected a displacement field with " << md << " components" << std::endl;
+        log.error();
     }
     if (E.countrows() < md || E.countcolumns() != 1)
     {
-        std::cout << "Error in 'sl' namespace: the force formula expected a " << md << "x1 E/H expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: the force formula expected a " << md << "x1 E/H expression" << std::endl;
+        log.error();
     }
     if (epsilon.isscalar() == false)
     {
-        std::cout << "Error in 'sl' namespace: the force formula is defined for a scalar epsilon/mu" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: the force formula is defined for a scalar epsilon/mu" << std::endl;
+        log.error();
     }
     E = E.resize(md,1);
     
@@ -2890,8 +2969,9 @@ expression sl::predefinedacousticwave(expression dofp, expression tfp, expressio
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticwave'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticwave'" << std::endl;
+        log.error();
     }
 
     if (alpha.iszero())
@@ -2900,8 +2980,9 @@ expression sl::predefinedacousticwave(expression dofp, expression tfp, expressio
     // Only valid for harmonic problems in case of nonzero attenuation:
     if (universe::fundamentalfrequency <= 0)
     {
-        std::cout << "Error in 'sl' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: acoustics with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        log.error();
     }
 
     return ( -grad(dofp)*grad(tfp) -1.0/pow(c,2.0)*dtdt(dofp)*tfp -2.0*alpha/c*dt(dofp)*tfp -pow(alpha,2.0)*dofp*tfp );
@@ -2913,8 +2994,9 @@ expression sl::predefinedacousticradiation(expression dofp, expression tfp, expr
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || not(c.isscalar()) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticradiation'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticradiation'" << std::endl;
+        log.error();
     }
 
     if (alpha.iszero())
@@ -2923,8 +3005,9 @@ expression sl::predefinedacousticradiation(expression dofp, expression tfp, expr
     // Only valid for harmonic problems in case of nonzero attenuation:
     if (universe::fundamentalfrequency <= 0)
     {
-        std::cout << "Error in 'sl' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: acoustic radiation condition with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        log.error();
     }
 
     return ( -1.0/c*dt(dofp)*tfp -alpha*dofp*tfp );
@@ -2940,8 +3023,9 @@ expression sl::predefinedacousticstructureinteraction(expression dofp, expressio
 
     if (not(dofp.isscalar()) || not(tfp.isscalar()) || (dofu.countcolumns() != 1 || dofu.countrows() < problemdimension) || (tfu.countcolumns() != 1 || tfu.countrows() < problemdimension) || not(c.isscalar()) || not(rho.isscalar()) || (n.countcolumns() != 1 || n.countrows() < problemdimension) || not(alpha.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticstructureinteraction'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedacousticstructureinteraction'" << std::endl;
+        log.error();
     }
 
     if (alpha.iszero())
@@ -2950,8 +3034,9 @@ expression sl::predefinedacousticstructureinteraction(expression dofp, expressio
     // Only valid for harmonic problems in case of nonzero attenuation:
     if (universe::fundamentalfrequency <= 0)
     {
-        std::cout << "Error in 'sl' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: acoustic structure interaction with nonzero attenuation is only valid for harmonic problems" << std::endl;
+        log.error();
     }
 
     return ( -dofp*tfu*n * scaling + rho*dtdt(dofu)*n*tfp * invscal +2.0*alpha*rho*c*dt(dofu)*n*tfp * invscal +rho*pow(alpha*c,2.0)*dofu*n*tfp * invscal );
@@ -2963,13 +3048,15 @@ expression sl::predefinedstokes(expression dofv, expression tfv, expression dofp
 
     if (problemdimension < 2)
     {
-        std::cout << "Error in 'sl' namespace: 'predefinedstokes' is only allowed on 2D and 3D geometries" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: 'predefinedstokes' is only allowed on 2D and 3D geometries" << std::endl;
+        log.error();
     }
     if (dofv.countcolumns() != 1 || dofv.countrows() < problemdimension || tfv.countcolumns() != 1 || tfv.countrows() < problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedstokes'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedstokes'" << std::endl;
+        log.error();
     }
 
     expression output = predefinedmassconservation(dofv, tfp, rho, dtrho, gradrho, includetimederivs, isdensityconstant);
@@ -2986,13 +3073,15 @@ expression sl::predefinednavierstokes(expression dofv, expression tfv, expressio
 
     if (problemdimension < 2)
     {
-        std::cout << "Error in 'sl' namespace: 'predefinednavierstokes' is only allowed on 2D and 3D geometries" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: 'predefinednavierstokes' is only allowed on 2D and 3D geometries" << std::endl;
+        log.error();
     }
     if (dofv.countcolumns() != 1 || dofv.countrows() < problemdimension || tfv.countcolumns() != 1 || tfv.countrows() < problemdimension || v.countcolumns() != 1 || v.countrows() < problemdimension || not(dofp.isscalar()) || not(tfp.isscalar()) || not(mu.isscalar()) || not(rho.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinednavierstokes'" << std::endl;
+        log.error();
     }
 
     expression output = predefinedmassconservation(dofv, tfp, rho, dtrho, gradrho, includetimederivs, isdensityconstant);
@@ -3012,8 +3101,9 @@ expression sl::predefinedadvectiondiffusion(expression doff, expression tff, exp
 
     if (not(doff.isscalar()) || not(tff.isscalar()) || not(isvsizevalid) || alpha.countrows() != alpha.countcolumns() || not(beta.isscalar()) || not(gamma.isscalar()))
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedadvectiondiffusion'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedadvectiondiffusion'" << std::endl;
+        log.error();
     }
 
     expression output = (alpha*grad(doff)) * grad(tff);
@@ -3053,14 +3143,16 @@ expression sl::predefinedstabilization(std::string stabtype, expression delta, e
     
     if (not(residual.isscalar()) || residual.getoperationinarray(0,0)->istfincluded())
     {
-        std::cout << "Error in 'sl' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: expected a scalar expression without test function for the residual in 'predefinedstabilization'" << std::endl;
+        log.error();
     }
      
     if (not(delta.isscalar()) || not(f.isscalar()) || v.countcolumns() != 1 || v.countrows() < problemdimension || diffusivity.countrows() != diffusivity.countcolumns())
     {
-        std::cout << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'sl' namespace: unexpected argument dimension in 'predefinedstabilization'" << std::endl;
+        log.error();
     }
      
     // Isotropic diffusion term:
@@ -3092,8 +3184,9 @@ expression sl::predefinedstabilization(std::string stabtype, expression delta, e
     {
         if (residual.getoperationinarray(0,0)->isdofincluded())
         {
-            std::cout << "Error in 'sl' namespace: the residual cannot include a dof for cws in 'predefinedstabilization'" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'sl' namespace: the residual cannot include a dof for cws in 'predefinedstabilization'" << std::endl;
+            log.error();
         }
     
         // Average diffusivity:
@@ -3138,7 +3231,10 @@ expression sl::predefinedstabilization(std::string stabtype, expression delta, e
         return ( ifpositive(del,1.0,0.0) * output );
     }
 
-    std::cout << "Error in 'sl' namespace: unknown stabilization method '" << stabtype << "' (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'sl' namespace: unknown stabilization method '" << stabtype << "' (use 'iso', 'aniso', 'cw', 'cws', 'spg', 'supg')"  << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 

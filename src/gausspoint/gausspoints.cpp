@@ -7,8 +7,9 @@ gausspoints::gausspoints(int elementtypenumber, int integrationorder)
     
     if (integrationorder < 0)
     {
-        std::cout << "Error in 'gausspoints' object: cannot get the Gauss points for negative integration order " << integrationorder << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'gausspoints' object: cannot get the Gauss points for negative integration order " << integrationorder << std::endl;
+        log.error();
     }
     
     switch (elementtypenumber)
@@ -46,8 +47,9 @@ gausspoints::gausspoints(int elementtypenumber, int integrationorder)
             gppyramid::set(integrationorder, mycoordinates, myweights);
             break; 
         default:
-            std::cout << "Error in 'gausspoints' object: unknown element type number " << elementtypenumber << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'gausspoints' object: unknown element type number " << elementtypenumber << std::endl;
+            log.error();
     }
 }
 
@@ -61,11 +63,12 @@ gausspoints::gausspoints(int elementtypenumber, std::vector<double>& gpcoords)
     {
         if (gpcoords.size() != 3)
         {
-            std::cout << "Error in 'gausspoints' object: could not match gauss coordinates of element type number 0 to the requested coordinates" << std::endl;
+            logs log;
+            log.msg() << "Error in 'gausspoints' object: could not match gauss coordinates of element type number 0 to the requested coordinates" << std::endl;
             for (int i = 0; i < gpcoords.size(); i++)
-                std::cout << gpcoords[i] << " ";
-            std::cout << std::endl;
-            abort();
+                log.msg() << gpcoords[i] << " ";
+            log.msg() << std::endl;
+            log.error();
         }
     
         gppoint::set(0, mycoordinates, myweights);
@@ -123,17 +126,19 @@ gausspoints::gausspoints(int elementtypenumber, std::vector<double>& gpcoords)
                     gppyramid::set(integrationorder, mycoordinates, myweights);
                 break; 
             default:
-                std::cout << "Error in 'gausspoints' object: unknown element type number " << elementtypenumber << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'gausspoints' object: unknown element type number " << elementtypenumber << std::endl;
+                log.error();
         }
         
         if (numgps == -1)
         {
-            std::cout << "Error in 'gausspoints' object: could not match gauss coordinates of element type number " << elementtypenumber << " to the requested coordinates" << std::endl;
+            logs log;
+            log.msg() << "Error in 'gausspoints' object: could not match gauss coordinates of element type number " << elementtypenumber << " to the requested coordinates" << std::endl;
             for (int i = 0; i < gpcoords.size(); i++)
-                std::cout << gpcoords[i] << " ";
-            std::cout << std::endl;
-            abort();
+                log.msg() << gpcoords[i] << " ";
+            log.msg() << std::endl;
+            log.error();
         }
         
         // Check if close enough to argument coordinates:

@@ -5,8 +5,9 @@ std::vector<std::vector<densemat>> optime::interpolate(elementselector& elemsele
 {
     if (universe::fundamentalfrequency > 0)
     {
-        std::cout << "Error in 'optime' object: the time variable 't' cannot be computed without FFT in harmonic domain" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'optime' object: the time variable 't' cannot be computed without FFT in harmonic domain" << std::endl;
+        log.error();
     }
 
     densemat output(elemselect.countinselection(), evaluationcoordinates.size()/3, universe::currenttimestep);
@@ -56,9 +57,12 @@ double optime::evaluate(void)
         return universe::currenttimestep;
     else
     {
-        std::cout << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<double> optime::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
@@ -67,9 +71,12 @@ std::vector<double> optime::evaluate(std::vector<double>& xcoords, std::vector<d
         return std::vector<double>(xcoords.size(), universe::currenttimestep);
     else
     {
-        std::cout << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 void optime::print(void)

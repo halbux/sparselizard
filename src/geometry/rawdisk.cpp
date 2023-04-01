@@ -5,20 +5,23 @@ rawdisk::rawdisk(int physreg, std::shared_ptr<rawshape> centerpoint, double radi
 {
     if (centerpoint->getdimension() != 0)
     {
-        std::cout << "Error in 'rawdisk' object: expected a point shape for the disk center" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawdisk' object: expected a point shape for the disk center" << std::endl;
+        log.error();
     }
 
     if (nummeshpts%4 != 0 || nummeshpts <= 0)
     {
-        std::cout << "Error in 'rawdisk' object: the structured disk meshing code requires a number of mesh nodes multiple of 4" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawdisk' object: the structured disk meshing code requires a number of mesh nodes multiple of 4" << std::endl;
+        log.error();
     }
 
     if (radius == 0)
     {
-        std::cout << "Error in 'rawdisk' object: disk radius cannot be zero" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawdisk' object: disk radius cannot be zero" << std::endl;
+        log.error();
     }
 
     myphysicalregion = physreg;

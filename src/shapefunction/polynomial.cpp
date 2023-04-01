@@ -359,7 +359,7 @@ polynomial polynomial::derivative(int whichderivative)
         }
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

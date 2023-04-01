@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "logs.h"
 #include "mystring.h"
 
 class nasdataline

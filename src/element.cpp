@@ -27,8 +27,9 @@ element::element(std::string elementname)
         curvedtypenumber = 7;
     if (curvedtypenumber == -1)
     {
-        std::cout << "Error in 'element' object: trying to use undefined element name: " << elementname << std::endl << "Make sure everything is lower case" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'element' object: trying to use undefined element name: " << elementname << std::endl << "Make sure everything is lower case" << std::endl;
+        log.error();
     }
 }
 
@@ -36,8 +37,9 @@ element::element(int number)
 {
     if (number < 0)
     {
-        std::cout << "Error in 'element' object: cannot define negative element type number " << number << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'element' object: cannot define negative element type number " << number << std::endl;
+        log.error();
     }
     curvedtypenumber = number;
 }
@@ -46,15 +48,17 @@ element::element(int number, int curvatureorder)
 {
     if (number < 0)
     {
-        std::cout << "Error in 'element' object: can not define a negative element type number" << std::endl;
-        std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'element' object: can not define a negative element type number" << std::endl;
+        log.msg() << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
+        log.error();
     }
     if (curvatureorder <= 0)
     {
-        std::cout << "Error in 'element' object: can not define a negative or 0 curvature order" << std::endl;
-        std::cout << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'element' object: can not define a negative or 0 curvature order" << std::endl;
+        log.msg() << "Element type number is " << number << " with " << curvatureorder << " curvature order" << std::endl;
+        log.error();
     }
     // The point element can only have number 0:
     if (number == 0)
@@ -67,13 +71,15 @@ void element::setnodes(std::vector<int>& nodelist)
 {
     if (curvedtypenumber == -1)
     {
-        std::cout << "Error: element type has not been defined yet" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error: element type has not been defined yet" << std::endl;
+        log.error();
     }
     if (nodelist.size() != countcurvednodes())
     {
-        std::cout << "Error: trying to define an order " << getcurvatureorder() << " " << gettypename() << " with " << nodelist.size() << " nodes. There should be " << countcurvednodes() << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error: trying to define an order " << getcurvatureorder() << " " << gettypename() << " with " << nodelist.size() << " nodes. There should be " << countcurvednodes() << std::endl;
+        log.error();
     }
     curvednodelist = nodelist;
 }
@@ -105,7 +111,7 @@ std::string element::gettypename(void)
             return "pyramid";
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::string element::gettypenameconjugation(int numberofelements)
@@ -135,7 +141,7 @@ std::string element::gettypenameconjugation(int numberofelements)
         }
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 bool element::iscurved(void)
@@ -222,7 +228,7 @@ int element::getelementdimension(void)
     if (straighttypenumber > 3)
         return 3;
         
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 
@@ -388,7 +394,7 @@ int element::counttype(int typenum)
         }
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 int element::countdim(int dim)
@@ -405,7 +411,7 @@ int element::countdim(int dim)
             return counttype(4)+counttype(5)+counttype(6)+counttype(7);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 int element::countnodes(void)
@@ -471,7 +477,7 @@ bool element::isinsideelement(double ki, double eta, double phi)
             return (std::abs(ki) < 1-phi+roundoffnoise && std::abs(eta) < 1-phi+roundoffnoise && phi > -roundoffnoise && phi < 1+roundoffnoise);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 void element::isinsideelement(std::vector<double>& coords, std::vector<double>& cc, std::vector<bool>& isinside, double roundoffnoise)
@@ -759,7 +765,7 @@ std::vector<double> element::getedgebarycenter(std::vector<double>& nc)
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
@@ -778,7 +784,7 @@ std::vector<double> element::getfacebarycenter(std::vector<double>& nc)
         // NOT DEFINED FOR HEXAHEDRA, PRISMS AND PYRAMIDS YET
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 double element::measurereferenceelement(void)
@@ -811,7 +817,7 @@ double element::measurereferenceelement(void)
             return 4.0/3.0;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 bool element::istriangularface(int facenum)
@@ -850,7 +856,7 @@ bool element::istriangularface(int facenum)
                 return false;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 bool element::ishorizontaledge(int edgenum)
@@ -1020,7 +1026,7 @@ std::vector<int> element::getedgesdefinitionsbasedonnodes(void)
             return {0,1,0,3,0,4,1,2,1,4,2,3,2,4,3,4};
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<int> element::getfacesdefinitionsbasedonnodes(void)
@@ -1053,7 +1059,7 @@ std::vector<int> element::getfacesdefinitionsbasedonnodes(void)
             return {0,1,4,3,0,4,1,2,4,2,3,4,0,3,2,1};
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<int> element::getfacesdefinitionsbasedonedges(void)
@@ -1086,7 +1092,7 @@ std::vector<int> element::getfacesdefinitionsbasedonedges(void)
             return {1,5,-3,-2,3,-8,4,7,-5,6,8,-7,2,-6,-4,-1};
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 bool element::iselementedgeorface(void)
@@ -1192,8 +1198,9 @@ std::vector<double> element::listnodecoordinates(void)
             output = {-1.0, -1.0, 0, 1.0, -1.0, 0, -1.0, 1.0, 0.0, 1.0, 1.0, 0, 0.0, 0.0, 1.0};
             if (getcurvatureorder() > 1)
             {             
-                std::cout << "Error in 'element' object: coordinates of order 2 and above not defined for pyramids" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'element' object: coordinates of order 2 and above not defined for pyramids" << std::endl;
+                log.error();
             }
             break;
     }
@@ -1234,7 +1241,7 @@ int element::deducetypenumber(int elemdim, int numnodes)
             return 5;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<double> element::calculatecoordinates(std::vector<double>& refcoords, std::vector<double>& nodecoords, int fi, bool returnnodecoords)
@@ -1578,15 +1585,16 @@ int element::choosethroughedge(std::vector<double>& nodecoords)
     if (l25 <= l04 && l25 <= l13)
         return 2;
         
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edgenumbers)
 {
     if (gettypenumber() > 4)
     {
-        std::cout << "Error in 'element' object: transition splits not defined yet for " << gettypenameconjugation(2) << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'element' object: transition splits not defined yet for " << gettypenameconjugation(2) << std::endl;
+        log.error();
     }
 
     switch (gettypenumber())
@@ -1612,7 +1620,7 @@ std::vector<std::vector<int>> element::split(int splitnum, std::vector<int>& edg
         }
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
         
 std::vector<std::vector<int>> element::splitline(int splitnum)
@@ -1660,7 +1668,7 @@ std::vector<std::vector<int>> element::splittriangle(int splitnum, std::vector<i
             return {{},{},{0,3,5, 3,1,4, 3,4,5, 5,4,2},{},{},{},{},{}};
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }    
 
 std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
@@ -1701,7 +1709,7 @@ std::vector<std::vector<int>> element::splitquadrangle(int splitnum)
             return {{},{},{},{0,4,8,7, 4,1,5,8, 7,8,6,3, 8,5,2,6},{},{},{},{}};
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<std::vector<int>> element::splittetrahedron(int splitnum, std::vector<int>& edgenumbers)

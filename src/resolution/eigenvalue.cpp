@@ -23,8 +23,9 @@ eigenvalue::eigenvalue(std::vector<mat> inmats)
 {
     if (inmats.size() == 0)
     {
-        std::cout << "Error in 'eigenvalue' object: expected at least one matrix in the mat vector" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'eigenvalue' object: expected at least one matrix in the mat vector" << std::endl;
+        log.error();
     }
 
     mymats = inmats;

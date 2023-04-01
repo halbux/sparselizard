@@ -45,7 +45,7 @@ int hcurltetrahedron::count(int order, int dim, int num)
             return 0.5*(order-2)*(order-1)*(order+1);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

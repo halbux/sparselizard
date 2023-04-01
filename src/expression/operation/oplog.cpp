@@ -22,8 +22,11 @@ std::vector<std::vector<densemat>> oplog::interpolate(elementselector& elemselec
         return argmat;
     }
 
-    std::cout << "Error in 'oplog' object: without FFT log() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'oplog' object: without FFT log() can only be computed for constant (harmonic 1) operations" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 densemat oplog::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

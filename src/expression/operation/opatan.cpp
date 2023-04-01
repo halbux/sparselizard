@@ -22,8 +22,11 @@ std::vector<std::vector<densemat>> opatan::interpolate(elementselector& elemsele
         return argmat;
     }
 
-    std::cout << "Error in 'opatan' object: without FFT atan() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'opatan' object: without FFT atan() can only be computed for constant (harmonic 1) operations" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 densemat opatan::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

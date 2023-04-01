@@ -183,8 +183,9 @@ void pvinterface::writetovtkfile(std::string name, iodata datatowrite, int times
     }
     else 
     {
-        std::cout << "Unable to write to file " << name << " or file not found" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Unable to write to file " << name << " or file not found" << std::endl;
+        log.error();
     }
 }
 
@@ -364,8 +365,9 @@ void pvinterface::writetovtufile(std::string name, iodata datatowrite, int times
     }
     else 
     {
-        std::cout << "Unable to write to file " << name << " or file not found" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Unable to write to file " << name << " or file not found" << std::endl;
+        log.error();
     }
 }
 
@@ -395,8 +397,9 @@ void pvinterface::grouptopvdfile(std::string filename, std::vector<std::string> 
             }
             else
             {
-                std::cout << "Error in 'pvinterface': could not find file '" << filestogroup[i] << "' during grouping" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'pvinterface': could not find file '" << filestogroup[i] << "' during grouping" << std::endl;
+                log.error();
             }
         }
     
@@ -407,8 +410,9 @@ void pvinterface::grouptopvdfile(std::string filename, std::vector<std::string> 
     }
     else 
     {
-        std::cout << "Unable to write to file " << filename << " or file not found" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Unable to write to file " << filename << " or file not found" << std::endl;
+        log.error();
     }
 }
 
@@ -542,8 +546,11 @@ std::vector<int> pvinterface::getnodereordering(int ourtypenumber)
         }
     }
     
-    std::cout << "Error in 'pvinterface' namespace: trying to use a ParaView element that is undefined in this code." << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'pvinterface' namespace: trying to use a ParaView element that is undefined in this code." << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 

@@ -5,14 +5,16 @@ rawtriangle::rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inp
 {
     if (inputpoints.size() != 3 || inputpoints[0]->getdimension() != 0 || inputpoints[1]->getdimension() != 0 || inputpoints[2]->getdimension() != 0)
     {
-        std::cout << "Error in 'rawtriangle' object: expected three points in the triangle definition" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawtriangle' object: expected three points in the triangle definition" << std::endl;
+        log.error();
     }
 
     if (nummeshpoints.size() != 3)
     {
-        std::cout << "Error in 'rawtriangle' object: expected a vector of length three to define the number of mesh nodes" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawtriangle' object: expected a vector of length three to define the number of mesh nodes" << std::endl;
+        log.error();
     }
 
     std::vector<std::shared_ptr<rawshape>> lns(3);
@@ -32,8 +34,9 @@ rawtriangle::rawtriangle(int physreg, std::vector<std::shared_ptr<rawshape>> inp
 {
     if (inputlines.size() != 3 || inputlines[0]->getdimension() != 1 || inputlines[1]->getdimension() != 1 || inputlines[2]->getdimension() != 1)
     {
-        std::cout << "Error in 'rawtriangle' object: expected three lines in the triangle definition" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawtriangle' object: expected three lines in the triangle definition" << std::endl;
+        log.error();
     }
 
     myphysicalregion = physreg;
@@ -134,8 +137,9 @@ void rawtriangle::mesh(void)
     // Give an error if the edges do not have the same number of mesh nodes:
     if (nummeshpts[0] != nummeshpts[1] || nummeshpts[0] != nummeshpts[2])
     {
-        std::cout << "Error in 'rawtriangle' object: the number of nodes on all edges should be equal" << std::endl;
-        abort(); 
+        logs log;
+        log.msg() << "Error in 'rawtriangle' object: the number of nodes on all edges should be equal" << std::endl;
+        log.error();
     }
 
     int n = nummeshpts[0];

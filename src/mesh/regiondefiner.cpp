@@ -21,8 +21,9 @@ void regiondefiner::defineskinregion(int regnum)
         
     if (physregdim == 0)
     {
-        std::cout << "Error in 'regiondefiner' object: cannot get the skin of point elements" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'regiondefiner' object: cannot get the skin of point elements" << std::endl;
+        log.error();
     }
 
     // The skin has a one lower dimension:
@@ -278,8 +279,9 @@ void regiondefiner::defineexclusionregion(int regnum)
         int curdim = myphysicalregions->get(toexclude[regnum][i])->getelementdimension();
         if (curdim != physregdim)
         {
-            std::cout << "Error in 'regiondefiner' object: cannot exclude a " << curdim << "D region form a " << physregdim << "D region (dimensions must be equal)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'regiondefiner' object: cannot exclude a " << curdim << "D region form a " << physregdim << "D region (dimensions must be equal)" << std::endl;
+            log.error();
         }
     }
     
@@ -505,13 +507,15 @@ void regiondefiner::regionbox(int newphysreg, int selecteddim, std::vector<doubl
     
     if (boxlimit.size() != 6)
     {
-        std::cout << "Error in 'regiondefiner' object: expected a vector of length 6 for the box limits {x1,x2,y1,y2,z1,z2}" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'regiondefiner' object: expected a vector of length 6 for the box limits {x1,x2,y1,y2,z1,z2}" << std::endl;
+        log.error();
     }
     if (selecteddim > 3 || selecteddim < 0)
     {
-        std::cout << "Error in 'regiondefiner' object: dimension of the elements to select cannot be " << selecteddim << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'regiondefiner' object: dimension of the elements to select cannot be " << selecteddim << std::endl;
+        log.error();
     }
 
     boxed.push_back(newphysreg);
@@ -529,13 +533,15 @@ void regiondefiner::regionsphere(int newphysreg, int selecteddim, std::vector<do
     
     if (centercoords.size() != 3)
     {
-        std::cout << "Error in 'regiondefiner' object: expected a vector of length 3 for the sphere center {xc,yc,zc}" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'regiondefiner' object: expected a vector of length 3 for the sphere center {xc,yc,zc}" << std::endl;
+        log.error();
     }
     if (selecteddim > 3 || selecteddim < 0)
     {
-        std::cout << "Error in 'regiondefiner' object: dimension of the elements to select cannot be " << selecteddim << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'regiondefiner' object: dimension of the elements to select cannot be " << selecteddim << std::endl;
+        log.error();
     }
 
     sphered.push_back(newphysreg);
@@ -565,8 +571,9 @@ void regiondefiner::regionlayer(int newphysreg, int physregtoselectfrom, int phy
     
     if (nl <= 0)
     {
-        std::cout << "Error in 'regiondefiner' object: expected at least one layer to select" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'regiondefiner' object: expected at least one layer to select" << std::endl;
+        log.error();
     }
 
     layered.push_back(newphysreg);

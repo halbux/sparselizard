@@ -44,7 +44,7 @@ int h1quadrangle::count(int order, int dim, int num)
             return 0;
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

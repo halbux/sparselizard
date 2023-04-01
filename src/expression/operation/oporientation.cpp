@@ -24,9 +24,10 @@ std::vector<std::vector<densemat>> oporientation::interpolate(elementselector& e
 
     if (elemdim != problemdimension-1)
     {
-        std::cout << "Error in 'oporientation' object: operation can only be evaluated on a region of one lower dimension than the geometry" << std::endl;
-        std::cout << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " region for a " << problemdimension << "D geometry?" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'oporientation' object: operation can only be evaluated on a region of one lower dimension than the geometry" << std::endl;
+        log.msg() << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " region for a " << problemdimension << "D geometry?" << std::endl;
+        log.error();
     }
     
     densemat output(numelems,1,1);
@@ -69,15 +70,17 @@ std::vector<std::vector<densemat>> oporientation::interpolate(elementselector& e
     
     if (isnotfound)
     {
-        std::cout << "Error in 'oporientation' object: found a " << geonames[elemdim] << " not in contact with the requested physical region" << std::endl;
-        std::cout << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " not touching the argument region?" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'oporientation' object: found a " << geonames[elemdim] << " not in contact with the requested physical region" << std::endl;
+        log.msg() << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " not touching the argument region?" << std::endl;
+        log.error();
     }
     if (ismultifound)
     {
-        std::cout << "Error in 'oporientation' object: found a " << geonames[elemdim] << " surrounded on both sides by a " << geonames[elemdim+1] << std::endl;
-        std::cout << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " surrounded on both sides by the argument region?" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'oporientation' object: found a " << geonames[elemdim] << " surrounded on both sides by a " << geonames[elemdim+1] << std::endl;
+        log.msg() << "Did you try to compute normal(physreg) on a " << geonames[elemdim] << " surrounded on both sides by the argument region?" << std::endl;
+        log.error();
     }
     
     indexmat celltypmat(celltypes.size(), 1, celltypes);

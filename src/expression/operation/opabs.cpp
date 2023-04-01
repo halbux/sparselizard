@@ -22,8 +22,11 @@ std::vector<std::vector<densemat>> opabs::interpolate(elementselector& elemselec
         return argmat;
     }
 
-    std::cout << "Error in 'opabs' object: without FFT abs() can only be computed for constant (harmonic 1) operations" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'opabs' object: without FFT abs() can only be computed for constant (harmonic 1) operations" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 densemat opabs::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

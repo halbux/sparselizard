@@ -5,20 +5,29 @@ using namespace std;
 
 int hcurlpyramid::count(int order)
 {
-    std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
-    abort();  
+    logs log;
+    log.msg() << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 int hcurlpyramid::count(int order, int dim, int num)
 {
-    std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
-    abort();  
+    logs log;
+    log.msg() << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 
 
 hierarchicalformfunctioncontainer hcurlpyramid::evalat(int maxorder) 
 {    
-    std::cout << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
-    abort();  
+    logs log;
+    log.msg() << "Error in 'hcurlpyramid' object: shape functions not defined for pyramids" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }

@@ -11,8 +11,9 @@ rawpoint::rawpoint(int physreg, std::vector<double> coords)
         return;
     else
     {
-        std::cout << "Error in 'rawpoint' object: expected a vector with 3 coordinates" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawpoint' object: expected a vector with 3 coordinates" << std::endl;
+        log.error();
     }
 }
 

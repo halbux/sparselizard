@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include "logs.h"
 #include "rawmesh.h"
 #include "field.h"
 #include "jacobian.h"

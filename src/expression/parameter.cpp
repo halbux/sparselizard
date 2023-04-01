@@ -5,8 +5,9 @@ parameter::parameter(void)
 { 
     if (universe::myrawmesh == NULL)
     {
-        std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
+        log.error();
     }
 
     rawparamptr = std::shared_ptr<rawparameter>(new rawparameter(1,1));
@@ -16,8 +17,9 @@ parameter::parameter(int numrows, int numcols)
 { 
     if (universe::myrawmesh == NULL)
     {
-        std::cout << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'parameter' object: cannot define a parameter before the mesh is loaded" << std::endl;
+        log.error();
     }
     
     rawparamptr = std::shared_ptr<rawparameter>(new rawparameter(numrows,numcols));

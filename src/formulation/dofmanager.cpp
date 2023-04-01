@@ -66,10 +66,9 @@ void dofmanager::addtostructure(std::shared_ptr<rawfield> fieldtoadd, std::vecto
         // Make sure the field order has not changed between two calls:
         if (fieldtoadd->getinterpolationorders() != myfieldorders[fieldindex])
         {
-            std::cout << "Error in 'dofmanager' object: ";
-            fieldtoadd->print();
-            std::cout << " order was changed and does not match dof structure anymore" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'dofmanager' object: field order was changed and does not match dof structure anymore" << std::endl;
+            log.error();
         }
     }
     
@@ -183,10 +182,9 @@ void dofmanager::addtostructure(std::shared_ptr<rawport> porttoadd)
             // Make sure the field order has not changed between two calls:
             if (associatedfield->getinterpolationorders() != myfieldorders[fieldindex])
             {
-                std::cout << "Error in 'dofmanager' object: ";
-                associatedfield->print();
-                std::cout << " order was changed and does not match dof structure anymore" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'dofmanager' object: field order was changed and does not match dof structure anymore" << std::endl;
+                log.error();
             }
         }
 
@@ -237,15 +235,15 @@ void dofmanager::selectfield(std::shared_ptr<rawfield> selectedfield)
     }
     if (selectedfieldnumber == -1)
     {
-        std::cout << "Error in 'dofmanager' object: selected field is not defined in the dof manager" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'dofmanager' object: selected field is not defined in the dof manager" << std::endl;
+        log.error();
     }
     if (not(issynchronizing) && myfields[selectedfieldnumber]->getinterpolationorders() != myfieldorders[selectedfieldnumber])
     {
-        std::cout << "Error in 'dofmanager' object: ";
-        myfields[selectedfieldnumber]->print();
-        std::cout << " order was changed and does not match dof structure anymore" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'dofmanager' object: field order was changed and does not match dof structure anymore" << std::endl;
+        log.error();
     }
 }
 
@@ -294,9 +292,12 @@ int dofmanager::getaddress(rawport* prt)
         std::string pn = prt->getname();
         if (pn.size() > 0)
             pn = "'"+pn+"' ";
-        std::cout << "Error in 'dofmanager' object: requested port " << pn << "could not be found in the dof structure" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'dofmanager' object: requested port " << pn << "could not be found in the dof structure" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 void dofmanager::getportsinds(std::vector<rawport*>& rps, indexmat& inds)

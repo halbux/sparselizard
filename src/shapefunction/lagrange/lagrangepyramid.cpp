@@ -8,10 +8,13 @@ std::vector<double> lagrangepyramid::getnodecoordinates(int order)
           case 1:
                return std::vector<double> {-1.0, -1.0, 0, 1.0, -1.0, 0, 1.0, 1.0, 0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0};
          default:
-               std::cout << "Error in 'lagrangepyramid' namespace: coordinates of order 2 and above not defined" << std::endl;
-               abort();
+               logs log;
+               log.msg() << "Error in 'lagrangepyramid' namespace: coordinates of order 2 and above not defined" << std::endl;
+               log.error();
                break;
      }
+     
+     throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<polynomial> lagrangepyramid::getformfunctionpolynomials(int order)
@@ -36,8 +39,9 @@ std::vector<polynomial> lagrangepyramid::getformfunctionpolynomials(int order)
                 break;
           }
           default:
-               std::cout << "Error in 'lagrangepyramid' namespace: Lagrange form functions of order 2 and above not defined" << std::endl;
-               abort();
+               logs log;
+               log.msg() << "Error in 'lagrangepyramid' namespace: Lagrange form functions of order 2 and above not defined" << std::endl;
+               log.error();
                break;
      }
 

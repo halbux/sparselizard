@@ -23,8 +23,9 @@ void rawport::setvalue(double portval)
             myharmonics[1][0]->setvalue(portval);
         else
         {
-            std::cout << "Error in 'rawport' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawport' object: cannot set the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+            log.error();
         }
     }
 }
@@ -39,10 +40,13 @@ double rawport::getvalue(void)
             return myharmonics[1][0]->getvalue();
         else
         {
-            std::cout << "Error in 'rawport' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawport' object: cannot get the value of a multiharmonic port (only constant harmonic 1)" << std::endl;
+            log.error();
         }
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 void rawport::setname(std::string name)
@@ -97,8 +101,9 @@ std::shared_ptr<rawport> rawport::harmonic(std::vector<int> harmonicnumbers)
                 return myharmonics[harmonicnumbers[0]][0];
             else
             {
-                std::cout << "Error in 'rawport' object: in .harmonic cannot get harmonic " << harmonicnumbers[0] << " (does not exist)" << std::endl; 
-                abort();
+                logs log;
+                log.msg() << "Error in 'rawport' object: in .harmonic cannot get harmonic " << harmonicnumbers[0] << " (does not exist)" << std::endl; 
+                log.error();
             }
         }
         
@@ -118,8 +123,9 @@ std::shared_ptr<rawport> rawport::harmonic(std::vector<int> harmonicnumbers)
                 harmsrawport->myharmonics[harmonicnumbers[i]] = {myharmonics[harmonicnumbers[i]][0]};
             else
             {
-                std::cout << "Error in 'rawport' object: in .harmonic cannot get harmonic " << harmonicnumbers[i] << " (does not exist)" << std::endl; 
-                abort();
+                logs log;
+                log.msg() << "Error in 'rawport' object: in .harmonic cannot get harmonic " << harmonicnumbers[i] << " (does not exist)" << std::endl; 
+                log.error();
             }
         }
         return harmsrawport;
@@ -130,9 +136,12 @@ std::shared_ptr<rawport> rawport::harmonic(std::vector<int> harmonicnumbers)
         return shared_from_this();
     else
     {
-        std::cout << "Error in 'rawport' object: in .harmonic cannot get harmonic in constant port (does not exist)" << std::endl; 
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawport' object: in .harmonic cannot get harmonic in constant port (does not exist)" << std::endl; 
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
         
 bool rawport::isprimal(void)
@@ -149,8 +158,9 @@ std::shared_ptr<rawfield> rawport::getrawfield(void)
 {
     if (myrawfield.expired())
     {
-        std::cout << "Error in 'rawport' object: the associated rawfield is needed but it was destroyed" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawport' object: the associated rawfield is needed but it was destroyed" << std::endl;
+        log.error();
     }
     
     return myrawfield.lock();
@@ -160,8 +170,9 @@ std::shared_ptr<rawport> rawport::getprimal(void)
 {
     if (mybrother.expired())
     {
-        std::cout << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
+        log.error();
     }
     
     if (myisprimal)
@@ -174,8 +185,9 @@ std::shared_ptr<rawport> rawport::getdual(void)
 {
     if (mybrother.expired())
     {
-        std::cout << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawport' object: the associated rawport is needed but it was destroyed" << std::endl;
+        log.error();
     }
     
     if (myisprimal)

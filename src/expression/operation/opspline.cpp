@@ -27,8 +27,11 @@ std::vector<std::vector<densemat>> opspline::interpolate(elementselector& elemse
         return argmat;
     }
 
-    std::cout << "Error in 'opspline' object: without FFT a spline can only be interpolated for constant (harmonic 1) operations" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'opspline' object: without FFT a spline can only be interpolated for constant (harmonic 1) operations" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 densemat opspline::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

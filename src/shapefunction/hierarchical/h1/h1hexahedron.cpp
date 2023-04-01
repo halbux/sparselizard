@@ -44,7 +44,7 @@ int h1hexahedron::count(int order, int dim, int num)
             return pow(order-1,3);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

@@ -344,8 +344,9 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
         // A coordinate field can only be constant (i.e. on harmonic 1). 
         if (harmonicnumbers.size() != 1 || harmonicnumbers[0] != 1)
         {
-            std::cout << "Error in 'rawfield' object: rawfield type " << fieldtypename << " cannot be multiharmonic (must be constant)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: rawfield type " << fieldtypename << " cannot be multiharmonic (must be constant)" << std::endl;
+            log.error();
         }
         return;
     }
@@ -353,8 +354,9 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     // Make sure the mesh has been loaded before defining non-coordinate fields:
     if (universe::myrawmesh == NULL)
     {
-        std::cout << "Error in 'rawfield' object: first load mesh before defining a field that is not the x, y or z coordinate" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: first load mesh before defining a field that is not the x, y or z coordinate" << std::endl;
+        log.error();
     }
 
     // If the field type name ends with xy (or xyz) there are 2 (or 3) dof components.
@@ -380,8 +382,9 @@ rawfield::rawfield(std::string fieldtypename, const std::vector<int> harmonicnum
     std::shared_ptr<hierarchicalformfunction> myformfunction = selector::select(0, mytypename);
     if (numberofsubfields > 1 && myformfunction->countcomponents() != 1)
     {
-        std::cout << "Error in 'rawfield' object: " << fieldtypename << " is not a valid field type. Only scalar form functions can have a trailing 'xy' or 'xyz'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: " << fieldtypename << " is not a valid field type. Only scalar form functions can have a trailing 'xy' or 'xyz'" << std::endl;
+        log.error();
     }
 
     // For fields with subfields:
@@ -524,7 +527,7 @@ int rawfield::getfirstharmonic(void)
     else
         return mysubfields[0][0]->getfirstharmonic();
         
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 bool rawfield::isharmonicincluded(int harmonic)
@@ -650,8 +653,9 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
 {
     if (iscalledbyuser && ispadaptive)
     {
-        std::cout << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called on fields set to p-adaptivity" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: .setorder(physreg, interpolorder) cannot be called on fields set to p-adaptivity" << std::endl;
+        log.error();
     }
     
     // Interpolation order can only be set on highest dimension regions:
@@ -659,14 +663,16 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
     int regdim = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getelementdimension();
     if (iscalledbyuser && regdim >= 0 && problemdimension != regdim)
     {
-        std::cout << "Error in 'rawfield' object: cannot set the interpolation order on a " << regdim << "D region in a " << problemdimension << "D problem (must be " << problemdimension << "D)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set the interpolation order on a " << regdim << "D region in a " << problemdimension << "D problem (must be " << problemdimension << "D)" << std::endl;
+        log.error();
     }
     // Interpolation orders must be provided in decreasing order by the user to guarantee field continuity at the interfaces:
     if (iscalledbyuser && myordertracker.size() > 0 && myordertracker[myordertracker.size()-1].second < interpolorder)
     {
-        std::cout << "Error in 'rawfield' object: interpolation orders must be set descendingly to guarantee field continuity at the region interfaces" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: interpolation orders must be set descendingly to guarantee field continuity at the region interfaces" << std::endl;
+        log.error();
     }
 
     synchronize();
@@ -677,8 +683,9 @@ void rawfield::setorder(int physreg, int interpolorder, bool iscalledbyuser)
         
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one0" || mytypename == "one1" || mytypename == "one2" || mytypename == "one3")
     {
-        std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
+        log.error();
     }
         
     // Set the interpolation order on the sub fields:
@@ -720,8 +727,9 @@ void rawfield::setorder(expression criterion, int loworder, int highorder, doubl
     
     if (mytypename == "x" || mytypename == "y" || mytypename == "z" || mytypename == "one0" || mytypename == "one1" || mytypename == "one2" || mytypename == "one3")
     {
-        std::cout << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot choose the interpolation order for the x, y, z coordinate or for 'one' type fields" << std::endl;
+        log.error();
     }
     
     // Set the interpolation order on the sub fields:
@@ -749,26 +757,30 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
  
     if (sl::isempty(physreg))
     {
-        std::cout << "Error in 'rawfield' object: cannot set a port to empty physical region " << physreg << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set a port to empty physical region " << physreg << std::endl;
+        log.error();
     }
     
     if (mytypename != "h1" && mytypename != "hcurl")
     {
-        std::cout << "Error in 'rawfield' object: cannot set ports to '" << mytypename << "' type fields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set ports to '" << mytypename << "' type fields" << std::endl;
+        log.error();
     }
     if (mysubfields.size() > 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set ports to fields with multiple components (work with individual components instead)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set ports to fields with multiple components (work with individual components instead)" << std::endl;
+        log.error();
     }
     
     std::vector<int> fieldharms = getharmonics();
     if (fieldharms != primal->getharmonics() || fieldharms != dual->getharmonics())
     {
-        std::cout << "Error in 'rawfield' object: cannot set a port with a harmonic content that does not match the field" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set a port with a harmonic content that does not match the field" << std::endl;
+        log.error();
     }
     
     hierarchicalformfunction myhff;
@@ -785,8 +797,9 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
     
         if (issynchronizing == false && (ph->isassociated() || dh->isassociated()))
         {
-            std::cout << "Error in 'rawfield' object: at least one port to set is already associated to a field" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: at least one port to set is already associated to a field" << std::endl;
+            log.error();
         }
 
         ph->associate(true, dh, physreg, fh);
@@ -799,8 +812,9 @@ void rawfield::setport(int physreg, std::shared_ptr<rawport> primal, std::shared
             
             if (isddmdisjreg[cdr])
             {
-                std::cout << "Error in 'rawfield' object: trying to set a port on a DDM interface (ports must be confined inside a DDM domain)" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'rawfield' object: trying to set a port on a DDM interface (ports must be confined inside a DDM domain)" << std::endl;
+                log.error();
             }
 
             // Set lowest order:
@@ -825,13 +839,15 @@ void rawfield::setvalue(int physreg, int numfftharms, expression* meshdeform, ex
     
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
-        std::cout << "Error in 'rawfield' object: cannot set the value for the x, y or z coordinate" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set the value for the x, y or z coordinate" << std::endl;
+        log.error();
     }
     if (input.countcolumns() != 1 || input.countrows() != countcomponents())
     {
-        std::cout << "Error in 'rawfield' object: the rawfield value must be set with a " << countcomponents() << "x1 expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: the rawfield value must be set with a " << countcomponents() << "x1 expression" << std::endl;
+        log.error();
     }
 
     // Set the values on the subfields:
@@ -884,8 +900,9 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     
     if (mytypename != "h1d0" && mytypename != "h1d1" && mytypename != "h1d2" && mytypename != "h1d3")
     {
-        std::cout << "Error in 'rawfield' object: expected a 'h1d' type field to set the value at given gauss points" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: expected a 'h1d' type field to set the value at given gauss points" << std::endl;
+        log.error();
     }
 
     int numelems = elemselect.countinselection();
@@ -895,8 +912,9 @@ void rawfield::setvalue(elementselector& elemselect, std::vector<double>& gpcoor
     // Needs to be monoharmonic without FFT (the field cannot store the time vals).
     if (values.countrows() != numelems || 3*values.countcolumns() != gpcoordsin.size())
     {
-        std::cout << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densemat (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: in 'setvalue' received a " << values.countrows() << "x" << values.countcolumns() << " densemat (expected " << numelems << "x" << gpcoordsin.size()/3 << ")" << std::endl;
+        log.error();
     }
     
     gausspoints gp(elementtypenumber, gpcoordsin);
@@ -1043,14 +1061,16 @@ void rawfield::setnodalvalues(indexmat nodenumbers, densemat values)
     // Only for 'h1' type fields:
     if (mytypename != "h1")
     {
-        std::cout << "Error in 'rawfield' object: cannot set nodal values for '" << mytypename << "' type fields (only 'h1' type)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set nodal values for '" << mytypename << "' type fields (only 'h1' type)" << std::endl;
+        log.error();
     }
     
     if (mysubfields.size() != 0 || myharmonics.size() != 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
+        log.error();
     }
     
     for (int i = 0; i < numnodes; i++)
@@ -1065,8 +1085,9 @@ void rawfield::setnodalvalues(indexmat nodenumbers, densemat values)
         }
         else
         {
-            std::cout << "Error in 'rawfield' object: cannot set value for node number " << curnode << " (is not an element corner node)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: cannot set value for node number " << curnode << " (is not an element corner node)" << std::endl;
+            log.error();
         }
     }
 }
@@ -1090,14 +1111,16 @@ densemat rawfield::getnodalvalues(indexmat nodenumbers)
     // Only for 'h1' type fields:
     if (mytypename != "h1")
     {
-        std::cout << "Error in 'rawfield' object: cannot get nodal values for '" << mytypename << "' type fields (only 'h1' type)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot get nodal values for '" << mytypename << "' type fields (only 'h1' type)" << std::endl;
+        log.error();
     }
     
     if (mysubfields.size() != 0 || myharmonics.size() != 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot get nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot get nodal values for fields with subfields/harmonics (select a single component/harmonic)" << std::endl;
+        log.error();
     }
     
     for (int i = 0; i < numnodes; i++)
@@ -1112,8 +1135,9 @@ densemat rawfield::getnodalvalues(indexmat nodenumbers)
         }
         else
         {
-            std::cout << "Error in 'rawfield' object: cannot get value for node number " << curnode << " (is not an element corner node)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: cannot get value for node number " << curnode << " (is not an element corner node)" << std::endl;
+            log.error();
         }
     }
 
@@ -1145,13 +1169,15 @@ void rawfield::setdisjregconstraint(int physreg, int numfftharms, expression* me
     
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
-        std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
+        log.error();
     }
     if (input.countcolumns() != 1 || input.countrows() != countcomponents())
     {
-        std::cout << "Error in 'rawfield' object: the rawfield must be constrained using a " << countcomponents() << "x1 expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: the rawfield must be constrained using a " << countcomponents() << "x1 expression" << std::endl;
+        log.error();
     }
         
     // Set the constraints on the subfields:
@@ -1229,23 +1255,27 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
     std::vector<int> prdisjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
     if (not(condexpr.isharmonicone(prdisjregs)) || not(valexpr.isharmonicone(prdisjregs)))
     {
-        std::cout << "Error in 'rawfield' object: cannot set a conditional constraint with multiharmonic arguments" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set a conditional constraint with multiharmonic arguments" << std::endl;
+        log.error();
     }
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
-        std::cout << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot constrain the x, y or z coordinate" << std::endl;
+        log.error();
     }
     if (valexpr.countcolumns() != 1 || valexpr.countrows() != countcomponents())
     {
-        std::cout << "Error in 'rawfield' object: the rawfield must be constrained using a " << countcomponents() << "x1 expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: the rawfield must be constrained using a " << countcomponents() << "x1 expression" << std::endl;
+        log.error();
     }
     if (condexpr.countcolumns() != 1 || condexpr.countrows() != 1)
     {
-        std::cout << "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: expected a scalar condition for the conditional constraint" << std::endl;
+        log.error();
     }
     
     // Set the conditional constraints on the subfields:
@@ -1262,8 +1292,9 @@ void rawfield::setconditionalconstraint(int physreg, expression condexpr, expres
     }
     if (myharmonics.size() != 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set conditional constraints for fields with harmonics (select a single harmonic)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set conditional constraints for fields with harmonics (select a single harmonic)" << std::endl;
+        log.error();
     }
     
     // Keep track of the calls to 'setconditionalconstraint':
@@ -1339,9 +1370,12 @@ std::shared_ptr<rawspanningtree> rawfield::getspanningtree(void)
         return myspanningtree;
     else
     {
-        std::cout << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: spanning tree was not provided to rawfield" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::shared_ptr<rawfield> rawfield::getpointer(void)
@@ -1385,14 +1419,16 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
     {
-        std::cout << "Error in 'rawfield' object: .setdata can only transfer data between fields of same type" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: .setdata can only transfer data between fields of same type" << std::endl;
+        log.error();
     }
     // The raw fields must have a same number of subfields:
     if (mysubfields.size() != selectedrawfield->mysubfields.size())
     {
-        std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same number of subfields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: .setdata can only transfer data from fields with same number of subfields" << std::endl;
+        log.error();
     }
     
     // Get the data of every subfield:
@@ -1406,8 +1442,9 @@ void rawfield::setdata(int physreg, vectorfieldselect myvec, std::string op)
         // The raw fields must include the same harmonic numbers:
         if (getharmonics() != selectedrawfield->getharmonics())
         {
-            std::cout << "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: .setdata can only transfer data from fields with same harmonic numbers" << std::endl;
+            log.error();
         }
         
         // Get the data of every harmonic:
@@ -1496,14 +1533,16 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     // The raw fields must be of the same type:
     if (mytypename != selectedrawfield->mytypename)
     {
-        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data between fields of same type" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: .transferdata can only transfer data between fields of same type" << std::endl;
+        log.error();
     }
     // The raw fields must have a same number of subfields:
     if (mysubfields.size() != selectedrawfield->mysubfields.size())
     {
-        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same number of subfields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same number of subfields" << std::endl;
+        log.error();
     }
     
     // Transfer the data of every subfield:
@@ -1517,8 +1556,9 @@ void rawfield::transferdata(int physreg, vectorfieldselect myvec, std::string op
     // The raw fields must include the same harmonic numbers:
     if (getharmonics() != selectedrawfield->getharmonics())
     {
-        std::cout << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same harmonic numbers" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: .transferdata can only transfer data from fields with same harmonic numbers" << std::endl;
+        log.error();
     }
     
     // Transfer the data of every harmonic:
@@ -1590,8 +1630,9 @@ void rawfield::setcohomologysources(std::vector<int> cutphysregs, std::vector<do
     
     if (myharmonics.size() > 0)
     {
-        std::cout << "Error in 'rawfield' object: cannot set a cohomology source on a multiharmonic field (select harmonics one by one)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot set a cohomology source on a multiharmonic field (select harmonics one by one)" << std::endl;
+        log.error();
     }
     
     elements* els = universe::getrawmesh()->getelements();
@@ -1660,13 +1701,15 @@ std::shared_ptr<rawfield> rawfield::comp(int component)
     
     if (countformfunctioncomponents() > 1)
     {
-        std::cout << "Error in 'rawfield' object: cannot get a component for vector fields with no subfields (e.g. hcurl)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot get a component for vector fields with no subfields (e.g. hcurl)" << std::endl;
+        log.error();
     }
     if (component > mysubfields.size())
     {
-        std::cout << "Error in 'rawfield' object: cannot get component " << component << " from a " << mysubfields.size() << " components field" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot get component " << component << " from a " << mysubfields.size() << " components field" << std::endl;
+        log.error();
     }
         
     return mysubfields[component][0];
@@ -1701,8 +1744,9 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
                 return myharmonics[harmonicnumbers[0]][0];
             else
             {
-                std::cout << "Error in 'rawfield' object: in .harmonic cannot get harmonic " << harmonicnumbers[0] << " (does not exist)" << std::endl; 
-                abort();
+                logs log;
+                log.msg() << "Error in 'rawfield' object: in .harmonic cannot get harmonic " << harmonicnumbers[0] << " (does not exist)" << std::endl; 
+                log.error();
             }
         }
         
@@ -1722,8 +1766,9 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
                 harmsrawfield->myharmonics[harmonicnumbers[i]] = {myharmonics[harmonicnumbers[i]][0]};
             else
             {
-                std::cout << "Error in 'rawfield' object: in .harmonic cannot get harmonic " << harmonicnumbers[i] << " (does not exist)" << std::endl; 
-                abort();
+                logs log;
+                log.msg() << "Error in 'rawfield' object: in .harmonic cannot get harmonic " << harmonicnumbers[i] << " (does not exist)" << std::endl; 
+                log.error();
             }
         }
         return harmsrawfield;
@@ -1734,9 +1779,12 @@ std::shared_ptr<rawfield> rawfield::harmonic(const std::vector<int> harmonicnumb
         return shared_from_this();
     else
     {
-        std::cout << "Error in 'rawfield' object: in .harmonic cannot get harmonic in constant field (does not exist)" << std::endl; 
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: in .harmonic cannot get harmonic in constant field (does not exist)" << std::endl; 
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<std::shared_ptr<rawfield>> rawfield::getsons(void)
@@ -1822,17 +1870,21 @@ int rawfield::getinterpolationorder(int disjreg)
         }
         if (toreturn == -1)
         {
-            std::cout << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
-            std::cout << "Define it with field.setorder(region, order)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
+            log.msg() << "Define it with field.setorder(region, order)" << std::endl;
+            log.error();
         }
         return toreturn;
     }
     else
     { 
-        std::cout << "Error in 'rawfield' object: cannot get the interpolation order of a field with subfields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot get the interpolation order of a field with subfields" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<int> rawfield::getinterpolationorders(void)
@@ -1865,9 +1917,10 @@ int rawfield::getinterpolationorders(int elementtypenumber, std::vector<int>& el
             fieldorders[i] = curorder;
         else
         {
-            std::cout << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
-            std::cout << "Define it with field.setorder(region, order)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'rawfield' object: interpolation order is undefined on the region" << std::endl;
+            log.msg() << "Define it with field.setorder(region, order)" << std::endl;
+            log.error();
         }
     }
     
@@ -1980,16 +2033,18 @@ void rawfield::errornotsameinterpolationorder(int disjreg)
                     continue;
                 else
                 {
-                    std::cout << "Error in 'rawfield' object: the interpolation order must be the same for all harmonics" << std::endl;
-                    abort();
+                    logs log;
+                    log.msg() << "Error in 'rawfield' object: the interpolation order must be the same for all harmonics" << std::endl;
+                    log.error();
                 }
             }
         }
     }
     else
     { 
-        std::cout << "Error in 'rawfield' object: cannot call 'errornotsameinterpolationorder' on a field with subfields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot call 'errornotsameinterpolationorder' on a field with subfields" << std::endl;
+        log.error();
     }
 }
 
@@ -2086,8 +2141,9 @@ void rawfield::writeraw(int physreg, std::string filename, bool isbinary, std::v
     
     if (mytypename == "x" || mytypename == "y" || mytypename == "z")
     {
-        std::cout << "Error in 'rawfield' object: cannot write field type '" << mytypename << "' to raw format" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: cannot write field type '" << mytypename << "' to raw format" << std::endl;
+        log.error();
     }
     
     int numsubfields = countsubfields();
@@ -2243,8 +2299,9 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 
     if (mytypename != fieldtypename)
     {
-        std::cout << "Error in 'rawfield' object: trying to load a '" << fieldtypename << "' type field from file '" << filename << "' to a '" << mytypename << "' type" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: trying to load a '" << fieldtypename << "' type field from file '" << filename << "' to a '" << mytypename << "' type" << std::endl;
+        log.error();
     }
     
     
@@ -2252,8 +2309,9 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     int numsubfields = intdata[2];
     if (numsubfields != countsubfields())
     {
-        std::cout << "Error in 'rawfield' object: trying to load a field with " << numsubfields << " subfields from file '" << filename << "' to one with " << countsubfields() << " subfields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: trying to load a field with " << numsubfields << " subfields from file '" << filename << "' to one with " << countsubfields() << " subfields" << std::endl;
+        log.error();
     }
     
     
@@ -2270,18 +2328,19 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
 
     if (harmoniclist != harmsinthisfield)
     {
-        std::cout << "Error in 'rawfield' object: harmonic list in field loaded from file '" << filename << "' does not match current field." << std::endl << std::endl;
+        logs log;
+        log.msg() << "Error in 'rawfield' object: harmonic list in field loaded from file '" << filename << "' does not match current field." << std::endl << std::endl;
 
-        std::cout << "Harmonics in loaded field (" << harmoniclist.size() << "): ";
+        log.msg() << "Harmonics in loaded field (" << harmoniclist.size() << "): ";
         for (int i = 0; i < harmoniclist.size(); i++)
-            std::cout << harmoniclist[i] << " ";
-        std::cout << std::endl;
+            log.msg() << harmoniclist[i] << " ";
+        log.msg() << std::endl;
         
-        std::cout << "Harmonics in current field (" << harmsinthisfield.size() << "): ";
+        log.msg() << "Harmonics in current field (" << harmsinthisfield.size() << "): ";
         for (int i = 0; i < harmsinthisfield.size(); i++)
-            std::cout << harmsinthisfield[i] << " ";
-        std::cout << std::endl << std::endl;
-        abort();
+            log.msg() << harmsinthisfield[i] << " ";
+        log.msg() << std::endl << std::endl;
+        log.error();
     }
     
     
@@ -2317,8 +2376,9 @@ std::vector<double> rawfield::loadraw(std::string filename, bool isbinary)
     }
     if (issamemesh == false)
     {
-        std::cout << "Error in 'rawfield' object: the mesh used to write file '" << filename << "' is not the same as the current one" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'rawfield' object: the mesh used to write file '" << filename << "' is not the same as the current one" << std::endl;
+        log.error();
     }
     
     

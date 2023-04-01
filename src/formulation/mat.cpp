@@ -5,8 +5,9 @@ void mat::errorifpointerisnull(void)
 {
     if (rawmatptr == NULL)
     {
-        std::cout << "Error in 'mat' object: cannot perform the operation (matrix is undefined)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'mat' object: cannot perform the operation (matrix is undefined)" << std::endl;
+        log.error();
     }
 }
 
@@ -14,8 +15,9 @@ void mat::errorifinvalidated(void)
 {
     if (rawmatptr != NULL && rawmatptr->getdofmanager()->ismanaged() && rawmatptr->getmeshnumber() != universe::getrawmesh()->getmeshnumber())
     {
-        std::cout << "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'mat' object: matrix cannot be used anymore (invalidated by hp-adaptivity)" << std::endl;
+        log.error();
     }
 }
 

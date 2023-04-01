@@ -11,8 +11,9 @@ portrelation::portrelation(expression prtrel)
     int numports = prts.size();
     if (numports == 0)
     {
-        std::cout << "Error in 'portrelation' object: could not find any port in the port relation provided" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'portrelation' object: could not find any port in the port relation provided" << std::endl;
+        log.error();
     }
     
     double pi = sl::getpi();

@@ -26,10 +26,13 @@ std::vector<double> lagrangeline::getnodecoordinates(int order)
           case 10:
                return std::vector<double> {-1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -0.8, 0.0, 0.0, -0.6, 0.0, 0.0, -0.4, 0.0, 0.0, -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0, 0.0, 0.4, 0.0, 0.0, 0.6, 0.0, 0.0, 0.8, 0.0, 0.0};
           default:
-               std::cout << "Error in 'lagrangeline' namespace: coordinates of order 11 and above not defined" << std::endl;
-               abort();
+               logs log;
+               log.msg() << "Error in 'lagrangeline' namespace: coordinates of order 11 and above not defined" << std::endl;
+               log.error();
                break;
      }
+     
+     throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<polynomial> lagrangeline::getformfunctionpolynomials(int order)
@@ -125,8 +128,9 @@ std::vector<polynomial> lagrangeline::getformfunctionpolynomials(int order)
                formfunctionpoly[10].set({{{0.0}}, {{-0.049603174603174767602}}, {{-0.062003968253968154357}}, {{1.7374889770723164736}}, {{2.1718612213403842257}}, {{-13.744212962963018365}}, {{-17.180266203703671862}}, {{33.585482804232935499}}, {{41.981853505290927192}}, {{-21.529155643739058841}}, {{-26.911444554673671401}}});
                break;
           default:
-               std::cout << "Error in 'lagrangeline' namespace: Lagrange form functions of order 11 and above not defined" << std::endl;
-               abort();
+               logs log;
+               log.msg() << "Error in 'lagrangeline' namespace: Lagrange form functions of order 11 and above not defined" << std::endl;
+               log.error();
                break;
      }
 

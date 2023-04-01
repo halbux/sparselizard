@@ -15,8 +15,9 @@ void opdof::setspacederivative(int whichderivative)
     // Make sure a single space derivative is applied.
     if (spacederivative != 0)
     {
-        std::cout << "Error in 'opdof' object: cannot apply more than one space derivative to the dof" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opdof' object: cannot apply more than one space derivative to the dof" << std::endl;
+        log.error();
     }
     spacederivative = whichderivative;
 }
@@ -27,8 +28,9 @@ void opdof::increasetimederivativeorder(int amount)
 
     if (not(myfield->ismultiharmonic()) && timederivativeorder > 2)
     {
-        std::cout << "Error in 'opdof' object: time derivative order can exceed 2 only for multiharmonic fields" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opdof' object: time derivative order can exceed 2 only for multiharmonic fields" << std::endl;
+        log.error();
     }
 }
 
@@ -40,8 +42,11 @@ bool opdof::isharmonicone(std::vector<int> disjregs)
 
 bool opdof::isvalueorientationdependent(std::vector<int> disjregs)
 {
-    std::cout << "Error in 'opdof' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'opdof' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::shared_ptr<operation> opdof::copy(void)
@@ -89,8 +94,9 @@ void opdof::setoncontext(oncontext& cntxt)
 {
     if (myphysicalregion != -1 && cntxt.isdefined())
     {
-        std::cout << "Error in 'opdof' object: restricting the dof to a region is not allowed in the 'on' context" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opdof' object: restricting the dof to a region is not allowed in the 'on' context" << std::endl;
+        log.error();
     }
 
     myoncontext = {cntxt};

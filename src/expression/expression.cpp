@@ -105,8 +105,9 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
 
     if (mynumrows*mynumcols != input.size())
     {
-        std::cout << "Error in 'expression' object: a vector of length " << mynumrows*mynumcols << " is required" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: a vector of length " << mynumrows*mynumcols << " is required" << std::endl;
+        log.error();
     }
 
     myoperations.resize(mynumrows*mynumcols);
@@ -116,8 +117,9 @@ expression::expression(int numrows, int numcols, std::vector<expression> input)
             myoperations[i] = input[i].myoperations[0];
         else
         {
-            std::cout << "Error in 'expression' object: expressions provided in vector must all be scalar" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'expression' object: expressions provided in vector must all be scalar" << std::endl;
+            log.error();
         }
     }
 }
@@ -140,8 +142,9 @@ expression::expression(const std::vector<std::vector<expression>> input)
         {
             if (input[0][i].mynumcols != numcols)
             {
-                std::cout << "Error in 'expression' object: expression dimension mismatch in concatenation" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'expression' object: expression dimension mismatch in concatenation" << std::endl;
+                log.error();
             }
             numrows += input[0][i].mynumrows;
         }
@@ -183,20 +186,23 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
     // Make sure the conditional expression is a scalar:
     if (condexpr.countrows() != 1 || condexpr.countcolumns() != 1)
     {
-        std::cout << "Error in 'expression' object: expected a scalar condition expression (first argument)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected a scalar condition expression (first argument)" << std::endl;
+        log.error();
     }
     // Make sure the two other expressions have the same size:
     if (exprtrue.countrows() != exprfalse.countrows() || exprtrue.countcolumns() != exprfalse.countcolumns())
     {
-        std::cout << "Error in 'expression' object: expected same sized expressions in last two arguments" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected same sized expressions in last two arguments" << std::endl;
+        log.error();
     }
 
     if (condexpr.myoperations[0]->isdofincluded() || condexpr.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression' object: conditional expression arguments cannot include a dof() or tf()" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: conditional expression arguments cannot include a dof() or tf()" << std::endl;
+        log.error();
     }
 
     // Break into scalars:
@@ -207,8 +213,9 @@ expression::expression(expression condexpr, expression exprtrue, expression expr
     {
         if (exprtrue.myoperations[i]->isdofincluded() || exprtrue.myoperations[i]->istfincluded() || exprfalse.myoperations[i]->isdofincluded() || exprfalse.myoperations[i]->istfincluded())
         {
-            std::cout << "Error in 'expression' object: conditional expression arguments cannot include a dof() or tf()" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'expression' object: conditional expression arguments cannot include a dof() or tf()" << std::endl;
+            log.error();
         }
         myoperations[i] = std::shared_ptr<opcondition>(new opcondition(condexpr.myoperations[0], exprtrue.myoperations[i], exprfalse.myoperations[i]));
     }
@@ -218,13 +225,15 @@ expression::expression(spline spl, expression arg)
 {
     if (arg.isscalar() == false)
     {
-        std::cout << "Error in 'expression' object: expected a scalar expression as argument for the spline interpolation" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected a scalar expression as argument for the spline interpolation" << std::endl;
+        log.error();
     }
     if (arg.myoperations[0]->isdofincluded() || arg.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression' object: spline argument cannot include a dof() or tf()" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: spline argument cannot include a dof() or tf()" << std::endl;
+        log.error();
     }
     mynumrows = 1; mynumcols = 1;
     myoperations = {std::shared_ptr<opspline>(new opspline(spl,arg.myoperations[0]))};
@@ -235,26 +244,30 @@ expression::expression(std::vector<double> pos, std::vector<expression> exprs, e
     int numintervals = pos.size()+1;
     if (numintervals != exprs.size())
     {
-        std::cout << "Error in 'expression' object: expected " << numintervals << " expressions to define the " << numintervals << " intervals from -infinity to +infinity" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected " << numintervals << " expressions to define the " << numintervals << " intervals from -infinity to +infinity" << std::endl;
+        log.error();
     }
     if (tocompare.isscalar() == false)
     {
-        std::cout << "Error in 'expression' object: expected a scalar expression as interval variable" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected a scalar expression as interval variable" << std::endl;
+        log.error();
     }
     if (tocompare.myoperations[0]->isdofincluded() || tocompare.myoperations[0]->istfincluded())
     {
-        std::cout << "Error in 'expression' object: interval variable cannot include a dof() or tf()" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: interval variable cannot include a dof() or tf()" << std::endl;
+        log.error();
     }
     // Make sure the positions are sorted ascendingly:
     for (int i = 1; i < pos.size(); i++)
     {
         if (pos[i] <= pos[i-1])
         {
-            std::cout << "Error in 'expression' object: positions for intervals must be sorted ascendingly" << std::endl;
-            abort(); 
+            logs log;
+            log.msg() << "Error in 'expression' object: positions for intervals must be sorted ascendingly" << std::endl;
+            log.error(); 
         }
     }
     
@@ -281,8 +294,9 @@ expression::expression(int m, int n, std::vector<densemat> customfct(std::vector
 
     if (m <= 0 || n <= 0)
     {
-        std::cout << "Error in 'expression' object: custom expression size cannot be zero or negative" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: custom expression size cannot be zero or negative" << std::endl;
+        log.error();
     }
     
     // Get all argument operations:
@@ -293,8 +307,9 @@ expression::expression(int m, int n, std::vector<densemat> customfct(std::vector
         {
             if (exprs[i].myoperations[j]->isdofincluded() || exprs[i].myoperations[j]->istfincluded())
             {
-                std::cout << "Error in 'expression' object: custom expression argument cannot include a dof or tf" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'expression' object: custom expression argument cannot include a dof or tf" << std::endl;
+                log.error();
             }
             argops.push_back(exprs[i].myoperations[j]);
         }
@@ -346,8 +361,9 @@ expression expression::getrow(int rownum)
 {
     if (rownum < 0 || rownum >= mynumrows)
     {
-        std::cout << "Error in 'expression' object: cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot get row " << rownum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+        log.error();
     }
 
     expression output;
@@ -365,8 +381,9 @@ expression expression::getcolumn(int colnum)
 {
     if (colnum < 0 || colnum >= mynumcols)
     {
-        std::cout << "Error in 'expression' object: cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot get column " << colnum << " in a " << mynumrows << "x" << mynumcols << " expression" << std::endl;
+        log.error();
     }
 
     expression output;
@@ -384,8 +401,9 @@ void expression::reorderrows(std::vector<int> neworder)
 {
     if (mynumrows != neworder.size())
     {
-        std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot reorder rows with the vector provided (incorrect vector size)" << std::endl;
+        log.error();
     }
 
     int minval = *min_element(neworder.begin(), neworder.end());
@@ -393,8 +411,9 @@ void expression::reorderrows(std::vector<int> neworder)
 
     if (minval < 0 || maxval >= neworder.size())
     {
-        std::cout << "Error in 'expression' object: cannot reorder rows with the vector provided (out of range integers)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot reorder rows with the vector provided (out of range integers)" << std::endl;
+        log.error();
     }
 
     std::vector<std::shared_ptr<operation>> ops = myoperations;
@@ -410,8 +429,9 @@ void expression::reordercolumns(std::vector<int> neworder)
 {
     if (mynumcols != neworder.size())
     {
-        std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot reorder columns with the vector provided (incorrect vector size)" << std::endl;
+        log.error();
     }
 
     int minval = *min_element(neworder.begin(), neworder.end());
@@ -419,8 +439,9 @@ void expression::reordercolumns(std::vector<int> neworder)
 
     if (minval < 0 || maxval >= neworder.size())
     {
-        std::cout << "Error in 'expression' object: cannot reorder columns with the vector provided (out of range integers)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot reorder columns with the vector provided (out of range integers)" << std::endl;
+        log.error();
     }
 
     std::vector<std::shared_ptr<operation>> ops = myoperations;
@@ -477,14 +498,16 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
     // deformation expression has the right size.
     if (not(isscalar()))
     {
-        std::cout << "Error in 'expression' object: cannot get the max/min of a nonscalar expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot get the max/min of a nonscalar expression" << std::endl;
+        log.error();
     }
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
-        std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        log.error();
     }
 
     // Get only the disjoint regions with highest dimension elements:
@@ -493,13 +516,15 @@ std::vector<double> expression::max(int physreg, expression* meshdeform, int ref
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: cannot get the max/min of a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot get the max/min of a multiharmonic expression (only constant harmonic 1)" << std::endl;
+        log.error();
     }
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        log.error();
     }
     
     universe::allowestimatorupdate(true);
@@ -576,8 +601,9 @@ std::vector<double> expression::interpolate(int physreg, const std::vector<doubl
 
     if (xyz.size() != 3)
     {
-        std::cout << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
+        log.error();
     }
 
     std::vector<double> interpolated = {};
@@ -599,8 +625,9 @@ std::vector<double> expression::interpolate(int physreg, expression meshdeform, 
 
     if (xyz.size() != 3)
     {
-        std::cout << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: interpolate expected a coordinate vector of length 3" << std::endl;
+        log.error();
     }
 
     std::vector<double> interpolated = {};
@@ -622,13 +649,15 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(disjregs)))
     {
-        std::cout << "Error in 'expression' object: cannot interpolate a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot interpolate a multiharmonic expression (only constant harmonic 1)" << std::endl;
+        log.error();
     }
     if (xyzcoord.size()%3 != 0)
     {
-        std::cout << "Error in 'expression' object: the interpolation coordinates vector should have a length that is a multiple of 3" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: the interpolation coordinates vector should have a length that is a multiple of 3" << std::endl;
+        log.error();
     }
 
     int numcoords = xyzcoord.size()/3;
@@ -653,16 +682,18 @@ void expression::interpolate(int physreg, expression* meshdeform, std::vector<do
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
-        std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        log.error();
     }
 
     // Get only the disjoint regions with highest dimension elements:
     std::vector<int> disjregs = ((universe::getrawmesh()->getphysicalregions())->get(physreg))->getdisjointregions();
     if (meshdeform != NULL && not(meshdeform->isharmonicone(disjregs)))
     {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        log.error();
     }
 
 
@@ -780,14 +811,16 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
     // deformation expression has the right size.
     if (not(isscalar()))
     {
-        std::cout << "Error in 'expression' object: cannot integrate a nonscalar expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot integrate a nonscalar expression" << std::endl;
+        log.error();
     }
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
-        std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        log.error();
     }
 
     // Get only the disjoint regions with highest dimension elements:
@@ -796,13 +829,15 @@ double expression::integrate(int physreg, expression* meshdeform, int integratio
     // Multiharmonic expressions are not allowed.
     if (not(isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: cannot integrate a multiharmonic expression (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot integrate a multiharmonic expression (only constant harmonic 1)" << std::endl;
+        log.error();
     }
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        log.error();
     }
     
     universe::allowestimatorupdate(true);
@@ -884,14 +919,16 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // mesh deformation expression has the right size.
     if (mynumrows > 3 || mynumcols != 1)
     {
-        std::cout << "Error in 'expression' object: can not write a " << mynumrows << "x" << mynumcols << " expression to file (only scalars or 2x1 or 3x1 column vectors)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: can not write a " << mynumrows << "x" << mynumcols << " expression to file (only scalars or 2x1 or 3x1 column vectors)" << std::endl;
+        log.error();
     }
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (meshdeform != NULL && (meshdeform->countcolumns() != 1 || meshdeform->countrows() < problemdimension))
     {
-        std::cout << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: mesh deformation expression has size " << meshdeform->countrows() << "x" << meshdeform->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        log.error();
     }
     
     if (universe::getrawmesh()->getphysicalregions()->get(physreg)->countelements() == 0)
@@ -910,8 +947,9 @@ void expression::write(int physreg, int numfftharms, expression* meshdeform, std
     // Make sure the 'meshdeform' expression is constant in time:
     if (meshdeform != NULL && not(meshdeform->isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        log.error();
     }
 
     // Get the geometry interpolation order (1 if the element is not curved):
@@ -1053,16 +1091,18 @@ void expression::streamline(int physreg, std::string filename, const std::vector
     // This can happen with int divisions:
     if (stepsize == 0)
     {
-        std::cout << "Error in 'expression' object: step size for streamline cannot be zero" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: step size for streamline cannot be zero" << std::endl;
+        log.error();
     }
 
     // Stream lines can only be obtained for expressions with at least as many components as the geometry dimension:
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (mynumrows < problemdimension || mynumrows > 3 || mynumcols != 1)
     {
-        std::cout << "Error in 'expression' object: expected a column vector expression with " << problemdimension << " to 3 components to get the stream lines" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected a column vector expression with " << problemdimension << " to 3 components to get the stream lines" << std::endl;
+        log.error();
     }
     // For simplicity the code below is written only for 3x1 expressions:
     if (mynumrows == 1)
@@ -1078,8 +1118,9 @@ void expression::streamline(int physreg, std::string filename, const std::vector
 
     if (startcoords.size()%3 != 0)
     {
-        std::cout << "Error in 'expression' object: expected a vector with a length multiple of 3 for the stream line starting coordinates" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expected a vector with a length multiple of 3 for the stream line starting coordinates" << std::endl;
+        log.error();
     }
 
     int numnodes = startcoords.size()/3;
@@ -1248,13 +1289,15 @@ vec expression::atbarycenter(int physreg, field onefield)
     std::string ft = onefield.getpointer()->gettypename();
     if (ft != "one0" && ft != "one1" && ft != "one2" && ft != "one3")
     {
-        std::cout << "Error in 'expression' object: atbarycenter requires a 'one' type field" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: atbarycenter requires a 'one' type field" << std::endl;
+        log.error();
     }
     if (countcolumns() != 1 || onefield.countcomponents() != countrows())
     {
-        std::cout << "Error in 'expression' object: in atbarycenter the size of the expression and of the argument field must match" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: in atbarycenter the size of the expression and of the argument field must match" << std::endl;
+        log.error();
     }
 
     // Compute the expression at the barycenter:
@@ -1289,8 +1332,9 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
 {
     if (isscalar())
     {
-        std::cout << "Error in 'expression' object: cannot rotate a scalar expression" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot rotate a scalar expression" << std::endl;
+        log.error();
     }
 	
     // Correctly transform a 3x3 and 3x1 by default:
@@ -1307,13 +1351,15 @@ void expression::rotate(double ax, double ay, double az, std::string leftop, std
 
     if (leftop != "" && leftop != "R" && leftop != "RT" && leftop != "R-1" && leftop != "R-T" && leftop != "K" && leftop != "KT" && leftop != "K-1" && leftop != "K-T")
     {
-        std::cout << "Error in 'expression' object: in 'rotate' left product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: in 'rotate' left product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
+        log.error();
     }
     if (rightop != "" && rightop != "R" && rightop != "RT" && rightop != "R-1" && rightop != "R-T" && rightop != "K" && rightop != "KT" && rightop != "K-1" && rightop != "K-T")
     {
-        std::cout << "Error in 'expression' object: in 'rotate' right product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: in 'rotate' right product can only be '', 'R', 'RT', 'R-1', 'R-T', 'K', 'KT', 'K-1', 'K-T'" << std::endl;
+        log.error();
     }
 	
     // Define the rotation matrices needed:
@@ -1384,8 +1430,9 @@ expression expression::at(int row, int col)
 
     if (mynumrows < row+1 || mynumcols < col+1)
     {
-        std::cout << "Error in 'expression' object: trying to get entry (" << row << ", " << col << ") in a " << mynumrows << " by " << mynumcols << " expression array" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: trying to get entry (" << row << ", " << col << ") in a " << mynumrows << " by " << mynumcols << " expression array" << std::endl;
+        log.error();
     }
     arrayentry.mynumrows = 1;
     arrayentry.mynumcols = 1;
@@ -1402,9 +1449,12 @@ double expression::evaluate(void)
         return myoperations[0]->evaluate();
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
@@ -1422,15 +1472,19 @@ std::vector<double> expression::evaluate(std::vector<double>& xcoords, std::vect
         }
         else
         {
-            std::cout << "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'expression' object: expected vectors of same length as arguments in 'evaluate'" << std::endl;
+            log.error();
         }
     }
     else
     {
-        std::cout << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: 'evaluate' can only be called on scalar expressions" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression expression::resize(int numrows, int numcols)
@@ -1456,8 +1510,9 @@ expression expression::spacederivative(int whichderivative)
 {
     if (mynumrows > 3 || mynumcols != 1)
     {
-        std::cout << "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: can only take space derivatives of column vectors with up to 3 components" << std::endl;
+        log.error();
     }
 
     int problemdimension = universe::getrawmesh()->getmeshdimension();
@@ -1581,8 +1636,9 @@ expression expression::determinant(void)
 
     if (mynumrows != mynumcols)
     {
-        std::cout << "Error in 'expression' object: cannot get the determinant of a non-square matrix" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot get the determinant of a non-square matrix" << std::endl;
+        log.error();
     }
 
     std::shared_ptr<opsum> determ(new opsum());
@@ -1631,8 +1687,9 @@ expression expression::invert(void)
 
     if (mynumrows != mynumcols)
     {
-        std::cout << "Error in 'expression' object: cannot invert a non-square matrix" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot invert a non-square matrix" << std::endl;
+        log.error();
     }
 
     expression invdet = 1/determinant();
@@ -1649,8 +1706,9 @@ expression expression::pow(expression input)
     // The base and exponent expressions must be scalar:
     if (not(isscalar()) || not(input.isscalar()))
     {
-        std::cout << "Error in 'expression' object: cannot have non scalar arguments in a power" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: cannot have non scalar arguments in a power" << std::endl;
+        log.error();
     }
 
     std::shared_ptr<operation> myexponent = input.myoperations[0];
@@ -1687,8 +1745,9 @@ expression expression::dof(int physreg)
         {
             if (doftag.myoperations[i]->getspacederivative() != 0 || doftag.myoperations[i]->getkietaphiderivative() != 0 || doftag.myoperations[i]->gettimederivative() != 0)
             {
-                std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the dof() field argument" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'expression' object: cannot apply space or time derivatives to the dof() field argument" << std::endl;
+                log.error();
             }
             std::shared_ptr<opdof> op(new opdof(doftag.myoperations[i]->getfieldpointer(), physreg));
             op->selectformfunctioncomponent(doftag.myoperations[i]->getformfunctioncomponent());
@@ -1697,8 +1756,9 @@ expression expression::dof(int physreg)
         }
         else
         {
-            std::cout << "Error in 'expression' object: the argument of dof() must be a field or a field expression (constant 0 is allowed)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'expression' object: the argument of dof() must be a field or a field expression (constant 0 is allowed)" << std::endl;
+            log.error();
         }
     }
 
@@ -1726,8 +1786,9 @@ expression expression::tf(int physreg)
         {
             if (tftag.myoperations[i]->getspacederivative() != 0 || tftag.myoperations[i]->getkietaphiderivative() != 0 || tftag.myoperations[i]->gettimederivative() != 0)
             {
-                std::cout << "Error in 'expression' object: cannot apply space or time derivatives to the tf() field argument" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'expression' object: cannot apply space or time derivatives to the tf() field argument" << std::endl;
+                log.error();
             }
             std::shared_ptr<optf> op(new optf(tftag.myoperations[i]->getfieldpointer(), physreg));
             op->selectformfunctioncomponent(tftag.myoperations[i]->getformfunctioncomponent());
@@ -1736,8 +1797,9 @@ expression expression::tf(int physreg)
         }
         else
         {
-            std::cout << "Error in 'expression' object: the argument of tf() must be a field or a field expression (constant 0 is allowed)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'expression' object: the argument of tf() must be a field or a field expression (constant 0 is allowed)" << std::endl;
+            log.error();
         }
     }
 
@@ -1845,8 +1907,9 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
     int problemdimension = universe::getrawmesh()->getmeshdimension();
     if (coordshift != NULL && (coordshift->countcolumns() != 1 || coordshift->countrows() < problemdimension))
     {
-        std::cout << "Error in 'expression' object: coordinate shift argument in 'on' has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: coordinate shift argument in 'on' has size " << coordshift->countrows() << "x" << coordshift->countcolumns() << " (expected " << problemdimension << "x1)" << std::endl;
+        log.error();
     }
 
     expression onexpr = this->getcopy();
@@ -1855,8 +1918,9 @@ expression expression::on(int physreg, expression* coordshift, bool errorifnotfo
     {
         if (myoperations[i]->istfincluded())
         {
-            std::cout << "Error in 'expression' object: argument of 'on' cannot include a test function tf()" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'expression' object: argument of 'on' cannot include a test function tf()" << std::endl;
+            log.error();
         }
         if (myoperations[i]->isdofincluded() == false)
             onexpr.myoperations[i] = std::shared_ptr<opon>(new opon(physreg, coordshift, onexpr.myoperations[i], errorifnotfound));
@@ -1964,7 +2028,7 @@ expression expression::invjac(void)
             return expression(3,3,{invjac(0,0),invjac(0,1),invjac(0,2),   invjac(1,0),invjac(1,1),invjac(1,2),   invjac(2,0),invjac(2,1),invjac(2,2)});
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression expression::jac(void)
@@ -1985,7 +2049,7 @@ expression expression::jac(void)
             return expression(3,3,{jac(0,0),jac(0,1),jac(0,2),   jac(1,0),jac(1,1),jac(1,2),   jac(2,0),jac(2,1),jac(2,2)});
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression expression::getcopy(void)
@@ -2000,8 +2064,9 @@ std::shared_ptr<operation> expression::getoperationinarray(int row, int col)
 {
     if (mynumrows < row+1 || mynumcols < col+1)
     {
-        std::cout << "Error in 'expression' object: trying to get entry (" << row << ", " << col << ") in a " << mynumrows << " by " << mynumcols << " expression array" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: trying to get entry (" << row << ", " << col << ") in a " << mynumrows << " by " << mynumcols << " expression array" << std::endl;
+        log.error();
     }
     return myoperations[row*mynumcols+col];
 }
@@ -2012,9 +2077,10 @@ void expression::expand(void)
         myoperations[0] = myoperations[0]->expand();
     else
     {
-        std::cout << "Error in 'expression' object: expand is only defined for scalar expressions" << std::endl;
-        std::cout << "Did you try to define a nonscalar formulation term?" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: expand is only defined for scalar expressions" << std::endl;
+        log.msg() << "Did you try to define a nonscalar formulation term?" << std::endl;
+        log.error();
     }
 }
 
@@ -2091,11 +2157,9 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
                 isformatok = false;
             if (currenttf->getfieldpointer() == NULL)
             {
-                std::cout << "Error in 'expression' object: malformed expression provided to the formulation (the test function is missing)" << std::endl;
-                std::cout << "Expression was:" << std::endl;
-                myoperations[0]->print();
-                std::cout << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'expression' object: malformed expression provided to the formulation (the test function is missing)" << std::endl;
+                log.error();
             }
 
             // Know which slice (i.e. dof field-tf field combination) we are at.
@@ -2204,12 +2268,10 @@ std::vector< std::vector<std::vector<std::shared_ptr<operation>>> > expression::
 
     if (not(isformatok))
     {
-        std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
-        std::cout << "The expression should be rewritable into a sum of products of the form coef*dof*tf (derivatives allowed)" << std::endl;
-        std::cout << "Expression was:" << std::endl;
-        myoperations[0]->print();
-        std::cout << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
+        log.msg() << "The expression should be rewritable into a sum of products of the form coef*dof*tf (derivatives allowed)" << std::endl;
+        log.error();
     }
 
     return {coeffs, dofs, tfs};
@@ -2288,12 +2350,10 @@ void expression::extractport(std::vector<port>& ports, std::vector<int>& dtorder
 
     if (not(isformatok))
     {
-        std::cout << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
-        std::cout << "The expression should be rewritable into a sum of products of the form coef*port (time derivatives allowed)" << std::endl;
-        std::cout << "Expression was:" << std::endl;
-        myoperations[0]->print();
-        std::cout << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: don't know what to do with the expression provided to the formulation" << std::endl;
+        log.msg() << "The expression should be rewritable into a sum of products of the form coef*port (time derivatives allowed)" << std::endl;
+        log.error();
     }
 }
 
@@ -2307,8 +2367,9 @@ expression expression::operator+(expression input)
 
     if (mynumrows != input.mynumrows || mynumcols != input.mynumcols)
     {
-        std::cout << "Error in 'expression' object: trying to add a " << mynumrows << "x" << mynumcols << " expression to a " << input.mynumrows << "x" << input.mynumcols << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: trying to add a " << mynumrows << "x" << mynumcols << " expression to a " << input.mynumrows << "x" << input.mynumcols << std::endl;
+        log.error();
     }
     for (int i = 0; i < mynumrows*mynumcols; i++)
         output.myoperations[i] = std::shared_ptr<opsum>(new opsum( {myoperations[i], input.myoperations[i]} ));
@@ -2354,8 +2415,9 @@ expression expression::operator*(expression input)
     // For all other products sizes must match.
     if (mynumcols != input.mynumrows)
     {
-        std::cout << "Error in 'expression' object: trying to multiply a " << mynumrows << "x" << mynumcols << " expression by a " << input.mynumrows << "x" << input.mynumcols << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: trying to multiply a " << mynumrows << "x" << mynumcols << " expression by a " << input.mynumrows << "x" << input.mynumcols << std::endl;
+        log.error();
     }
 
     output.mynumrows = mynumrows;
@@ -2397,9 +2459,12 @@ expression expression::operator/(expression input)
     }
     else
     {
-        std::cout << "Error in 'expression' object: only divisions by scalars are allowed" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'expression' object: only divisions by scalars are allowed" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 expression expression::operator+(field inputfield) { return this->getcopy() + (expression)inputfield; }

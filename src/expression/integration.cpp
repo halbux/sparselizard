@@ -16,8 +16,9 @@ integration::integration(int physreg, expression meshdeform, expression tointegr
 
     if (not(meshdeform.isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        log.error();
     }
 
     myexpression = {tointegrate};
@@ -43,8 +44,9 @@ integration::integration(int physreg, int numcoefharms, expression meshdeform, e
 
     if (not(meshdeform.isharmonicone(selecteddisjregs)))
     {
-        std::cout << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'integration' object: the mesh deformation expression cannot be multiharmonic (only constant harmonic 1)" << std::endl;
+        log.error();
     }
 
     myexpression = {tointegrate};

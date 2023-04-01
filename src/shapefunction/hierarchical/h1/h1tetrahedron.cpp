@@ -44,7 +44,7 @@ int h1tetrahedron::count(int order, int dim, int num)
             return 1.0/6.0*(order-3)*(order-2)*(order-1);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

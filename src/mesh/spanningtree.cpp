@@ -6,8 +6,9 @@ spanningtree::spanningtree(std::vector<int> physregs)
 {
     if (universe::myrawmesh == NULL)
     {
-        std::cout << "Error in 'spanningtree' object: cannot define a spanning tree before the mesh is loaded" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'spanningtree' object: cannot define a spanning tree before the mesh is loaded" << std::endl;
+        log.error();
     }
     
     universe::getrawmesh()->getphysicalregions()->errorundefined(physregs);

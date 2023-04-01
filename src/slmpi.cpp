@@ -4,8 +4,9 @@
 
 void slmpi::errornompi(void)
 {
-    std::cout << "Error in 'slmpi' namespace: MPI is not available" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'slmpi' namespace: MPI is not available" << std::endl;
+    log.error();
 }
 
 
@@ -53,7 +54,7 @@ void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<int>>
 void slmpi::exchange(std::vector<int> targetranks, std::vector<std::vector<double>>& sends, std::vector<std::vector<double>>& receives) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<int*> sendbuffers, std::vector<int> receivelens, std::vector<int*> receivebuffers) { errornompi(); }
 void slmpi::exchange(std::vector<int> targetranks, std::vector<int> sendlens, std::vector<double*> sendbuffers, std::vector<int> receivelens, std::vector<double*> receivebuffers) { errornompi(); }
-std::vector<double> slmpi::ping(int messagesize, int verbosity) { errornompi(); abort(); }
+std::vector<double> slmpi::ping(int messagesize, int verbosity) { errornompi(); throw std::runtime_error(""); }
 #endif
 
 

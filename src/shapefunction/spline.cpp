@@ -11,8 +11,9 @@ spline::spline(std::string filename, char delimiter)
     
     if (data.size()%2 != 0)
     {
-        std::cout << "Error in 'spline' object: expected a vector length multiple of 2 in '" << filename << "' (format {x1,y1,x2,y2,...})" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'spline' object: expected a vector length multiple of 2 in '" << filename << "' (format {x1,y1,x2,y2,...})" << std::endl;
+        log.error();
     }
     
     std::vector<double> xin(data.size()/2);
@@ -38,14 +39,16 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     
     if (xin.size() != yin.size())
     {
-        std::cout << "Error in 'spline' object: x and y dataset sizes do not match" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'spline' object: x and y dataset sizes do not match" << std::endl;
+        log.error();
     }   
     int len = xin.size();
     if (len < 2)
     {
-        std::cout << "Error in 'spline' object: expected at least two data points" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'spline' object: expected at least two data points" << std::endl;
+        log.error();
     }   
     
     myx = densemat(len,1);
@@ -68,8 +71,9 @@ void spline::set(std::vector<double>& xin, std::vector<double>& yin)
     {
         if (xvals[i]-xvals[i-1] < absnoise)
         {
-            std::cout << "Error in 'spline' object: distance between two samples is " << (xvals[i]-xvals[i-1]) << " (below noise level " << absnoise << ")" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'spline' object: distance between two samples is " << (xvals[i]-xvals[i-1]) << " (below noise level " << absnoise << ")" << std::endl;
+            log.error();
         }
     }
     
@@ -225,8 +229,9 @@ void spline::write(std::string filename, int numsplits, char delimiter)
 {
     if (numsplits < 0)
     {
-        std::cout << "Error in 'spline' object: cannot write with " << numsplits << " splits" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'spline' object: cannot write with " << numsplits << " splits" << std::endl;
+        log.error();
     }
 
     // Get the x positions:

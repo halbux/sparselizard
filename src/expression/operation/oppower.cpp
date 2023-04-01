@@ -23,8 +23,11 @@ std::vector<std::vector<densemat>> oppower::interpolate(elementselector& elemsel
         return computedbase;
     }
 
-    std::cout << "Error in 'oppower' object: without FFT a power can only be computed for constant (harmonic 1) operations. Use an FFT call or rewrite as a product if possible." << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'oppower' object: without FFT a power can only be computed for constant (harmonic 1) operations. Use an FFT call or rewrite as a product if possible." << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 densemat oppower::multiharmonicinterpolate(int numtimeevals, elementselector& elemselect, std::vector<double>& evaluationcoordinates, expression* meshdeform)

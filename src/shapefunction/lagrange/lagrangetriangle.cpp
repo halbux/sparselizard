@@ -26,10 +26,13 @@ std::vector<double> lagrangetriangle::getnodecoordinates(int order)
           case 10:
                return std::vector<double> {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.1, 0.0, 0.0, 0.2, 0.0, 0.0, 0.3, 0.0, 0.0, 0.4, 0.0, 0.0, 0.5, 0.0, 0.0, 0.6, 0.0, 0.0, 0.7, 0.0, 0.0, 0.8, 0.0, 0.0, 0.9, 0.0, 0.0, 0.9, 0.1, 0.0, 0.8, 0.2, 0.0, 0.7, 0.3, 0.0, 0.6, 0.4, 0.0, 0.5, 0.5, 0.0, 0.4, 0.6, 0.0, 0.3, 0.7, 0.0, 0.2, 0.8, 0.0, 0.1, 0.9, 0.0, 0.0, 0.9, 0.0, 0.0, 0.8, 0.0, 0.0, 0.7, 0.0, 0.0, 0.6, 0.0, 0.0, 0.5, 0.0, 0.0, 0.4, 0.0, 0.0, 0.3, 0.0, 0.0, 0.2, 0.0, 0.0, 0.1, 0.0, 0.1, 0.1, 0.0, 0.8, 0.1, 0.0, 0.1, 0.8, 0.0, 0.2, 0.1, 0.0, 0.3, 0.1, 0.0, 0.4, 0.1, 0.0, 0.5, 0.1, 0.0, 0.6, 0.1, 0.0, 0.7, 0.1, 0.0, 0.7, 0.2, 0.0, 0.6, 0.3, 0.0, 0.5, 0.4, 0.0, 0.4, 0.5, 0.0, 0.3, 0.6, 0.0, 0.2, 0.7, 0.0, 0.1, 0.7, 0.0, 0.1, 0.6, 0.0, 0.1, 0.5, 0.0, 0.1, 0.4, 0.0, 0.1, 0.3, 0.0, 0.1, 0.2, 0.0, 0.2, 0.2, 0.0, 0.6, 0.2, 0.0, 0.2, 0.6, 0.0, 0.3, 0.2, 0.0, 0.4, 0.2, 0.0, 0.5, 0.2, 0.0, 0.5, 0.3, 0.0, 0.4, 0.4, 0.0, 0.3, 0.5, 0.0, 0.2, 0.5, 0.0, 0.2, 0.4, 0.0, 0.2, 0.3, 0.0, 0.3, 0.3, 0.0, 0.4, 0.3, 0.0, 0.3, 0.4, 0.0};
           default:
-               std::cout << "Error in 'lagrangetriangle' namespace: coordinates of order 11 and above not defined" << std::endl;
-               abort();
+               logs log;
+               log.msg() << "Error in 'lagrangetriangle' namespace: coordinates of order 11 and above not defined" << std::endl;
+               log.error();
                break;
      }
+     
+     throw std::runtime_error(""); // fix return warning
 }
 
 std::vector<polynomial> lagrangetriangle::getformfunctionpolynomials(int order)
@@ -105,8 +108,9 @@ std::vector<polynomial> lagrangetriangle::getformfunctionpolynomials(int order)
                formfunctionpoly[20].set({{{0.0}, {0.0}, {0.0}, {0.0}, {0.0}, {0.0}}, {{0.0}, {-125.0}, {906.25}, {-1562.5}, {781.25}}, {{0.0}, {281.25}, {-1718.75}, {1562.5}}, {{0.0}, {-156.25}, {781.25}}, {{0.0}, {0.0}}, {{0.0}}});
                break;
           default:
-               std::cout << "Error in 'lagrangetriangle' namespace: Lagrange form functions of order 6 and above not defined" << std::endl;
-               abort();
+               logs log;
+               log.msg() << "Error in 'lagrangetriangle' namespace: Lagrange form functions of order 6 and above not defined" << std::endl;
+               log.error();
                break;
      }
 

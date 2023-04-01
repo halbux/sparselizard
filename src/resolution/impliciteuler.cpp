@@ -7,8 +7,9 @@ impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std
     myformulation = formul;
     if (myformulation.ismassmatrixdefined())
     {
-        std::cout << "Error in 'impliciteuler' object: formulation provided cannot have a mass matrix (use another time resolution algorithm)" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: formulation provided cannot have a mass matrix (use another time resolution algorithm)" << std::endl;
+        log.error();  
     }
     
     dtx = dtxinit;
@@ -16,8 +17,9 @@ impliciteuler::impliciteuler(formulation formul, vec dtxinit, int verbosity, std
     
     if (isconstant.size() != 3)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a length 3 vector as fourth argument" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: expected a length 3 vector as fourth argument" << std::endl;
+        log.error();  
     }
 }
 
@@ -30,28 +32,33 @@ void impliciteuler::setadaptivity(double tol, double mints, double maxts, double
 {
     if (tol < 0 || mints < 0 || maxts < 0 || reffact < 0 || coarfact < 0 || coarthres < 0)
     {
-        std::cout << "Error in 'impliciteuler' object: expected positive arguments for adaptivity" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: expected positive arguments for adaptivity" << std::endl;
+        log.error();  
     }
     if (mints > maxts)
     {
-        std::cout << "Error in 'impliciteuler' object: min timestep cannot be larger than max for adaptivity" << std::endl;
-        abort();      
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: min timestep cannot be larger than max for adaptivity" << std::endl;
+        log.error();      
     }
     if (reffact > 1)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a refinement factor lower than one for adaptivity" << std::endl;
-        abort();      
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: expected a refinement factor lower than one for adaptivity" << std::endl;
+        log.error();      
     }
     if (coarfact < 1)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a coarsening factor larger than one for adaptivity" << std::endl;
-        abort();        
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: expected a coarsening factor larger than one for adaptivity" << std::endl;
+        log.error();        
     }
     if (coarthres > 1)
     {
-        std::cout << "Error in 'impliciteuler' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
-        abort();        
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
+        log.error();        
     }
 
     mindt = mints; maxdt = maxts; tatol = tol; rfact = reffact; cfact = coarfact; cthres = coarthres;
@@ -74,8 +81,9 @@ int impliciteuler::run(bool islinear, double timestep, int maxnumnlit)
 {
     if (timestep < 0 && mindt == -1)
     {
-        std::cout << "Error in 'impliciteuler' object: requested an adaptive timestep but adaptivity settings have not been defined" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'impliciteuler' object: requested an adaptive timestep but adaptivity settings have not been defined" << std::endl;
+        log.error();
     }
 
     double inittime = universe::currenttimestep;

@@ -12,8 +12,9 @@ genalpha::genalpha(formulation formul, vec initspeed, vec initacceleration, int 
         
     if (isconstant.size() != 4)
     {
-        std::cout << "Error in 'genalpha' object: expected a length 4 vector as fifth argument" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'genalpha' object: expected a length 4 vector as fifth argument" << std::endl;
+        log.error();  
     }
 }
 
@@ -21,13 +22,15 @@ void genalpha::setparameter(double rinf)
 {
     if (rinf < -1e-8)
     {
-        std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be negative" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be negative" << std::endl;
+        log.error();  
     }
     if (rinf > 1+1e-8)
     {
-        std::cout << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be larger than one" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'genalpha' object: high-frequency dissipation value provided to .setparameter cannot be larger than one" << std::endl;
+        log.error();  
     }
     
     alphaf = rinf/(rinf+1.0);
@@ -40,8 +43,9 @@ void genalpha::settimederivative(std::vector<vec> sol)
 {
     if (sol.size() != 2)
     {
-        std::cout << "Error in 'genalpha' object: expected a vector of length two to set the time derivatives" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'genalpha' object: expected a vector of length two to set the time derivatives" << std::endl;
+        log.error();  
     }
     v = sol[0]; a = sol[1];
 }
@@ -50,28 +54,33 @@ void genalpha::setadaptivity(double tol, double mints, double maxts, double reff
 {
     if (tol < 0 || mints < 0 || maxts < 0 || reffact < 0 || coarfact < 0 || coarthres < 0)
     {
-        std::cout << "Error in 'genalpha' object: expected positive arguments for adaptivity" << std::endl;
-        abort();  
+        logs log;
+        log.msg() << "Error in 'genalpha' object: expected positive arguments for adaptivity" << std::endl;
+        log.error();  
     }
     if (mints > maxts)
     {
-        std::cout << "Error in 'genalpha' object: min timestep cannot be larger than max for adaptivity" << std::endl;
-        abort();      
+        logs log;
+        log.msg() << "Error in 'genalpha' object: min timestep cannot be larger than max for adaptivity" << std::endl;
+        log.error();      
     }
     if (reffact > 1)
     {
-        std::cout << "Error in 'genalpha' object: expected a refinement factor lower than one for adaptivity" << std::endl;
-        abort();      
+        logs log;
+        log.msg() << "Error in 'genalpha' object: expected a refinement factor lower than one for adaptivity" << std::endl;
+        log.error();      
     }
     if (coarfact < 1)
     {
-        std::cout << "Error in 'genalpha' object: expected a coarsening factor larger than one for adaptivity" << std::endl;
-        abort();        
+        logs log;
+        log.msg() << "Error in 'genalpha' object: expected a coarsening factor larger than one for adaptivity" << std::endl;
+        log.error();        
     }
     if (coarthres > 1)
     {
-        std::cout << "Error in 'genalpha' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
-        abort();        
+        logs log;
+        log.msg() << "Error in 'genalpha' object: expected a coarsening threshold lower than one for adaptivity" << std::endl;
+        log.error();        
     }
 
     mindt = mints; maxdt = maxts; tatol = tol; rfact = reffact; cfact = coarfact; cthres = coarthres;
@@ -94,8 +103,9 @@ int genalpha::run(bool islinear, double timestep, int maxnumnlit)
 {
     if (timestep < 0 && mindt == -1)
     {
-        std::cout << "Error in 'genalpha' object: requested an adaptive timestep but adaptivity settings have not been defined" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'genalpha' object: requested an adaptive timestep but adaptivity settings have not been defined" << std::endl;
+        log.error();
     }
 
     double inittime = universe::currenttimestep;

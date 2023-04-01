@@ -6,16 +6,18 @@ void optf::setspacederivative(int whichderivative)
     // Make sure a single space derivative is applied.
     if (spacederivative != 0)
     {
-        std::cout << "Error in 'optf' object: cannot apply more than one space derivative to the test function" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'optf' object: cannot apply more than one space derivative to the test function" << std::endl;
+        log.error();
     }
     spacederivative = whichderivative; 
 }
 
 void optf::increasetimederivativeorder(int amount)
 {    
-    std::cout << "Error in 'optf' object: cannot apply a time derivative to the test function" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'optf' object: cannot apply a time derivative to the test function" << std::endl;
+    log.error();
 }
 
 bool optf::isharmonicone(std::vector<int> disjregs) 
@@ -26,8 +28,11 @@ bool optf::isharmonicone(std::vector<int> disjregs)
 
 bool optf::isvalueorientationdependent(std::vector<int> disjregs)
 {
-    std::cout << "Error in 'optf' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'optf' object: 'isvalueorientationdependent' was called (this is not expected)" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 std::shared_ptr<operation> optf::copy(void)

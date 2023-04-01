@@ -15,8 +15,9 @@ std::vector<std::vector<densemat>> opdtapprox::interpolate(elementselector& elem
 {
     if (universe::fundamentalfrequency > 0)
     {
-        std::cout << "Error in 'opdtapprox' object: this object cannot be used in the frequency domain" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opdtapprox' object: this object cannot be used in the frequency domain" << std::endl;
+        log.error();
     }
 
     densemat output(elemselect.countinselection(), evaluationcoordinates.size()/3, evaluate());
@@ -60,8 +61,9 @@ void opdtapprox::nextimpliciteuler(double tinit, double dt)
 {
     if (mydtorder == 2)
     {
-        std::cout << "Error in 'opdtapprox' object: cannot approximate a second order time derivative with implicit Euler" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opdtapprox' object: cannot approximate a second order time derivative with implicit Euler" << std::endl;
+        log.error();
     }
 
     mydtx = (myarg->evaluateattime(tinit+dt) - myarg->evaluateattime(tinit))/dt;

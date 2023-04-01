@@ -103,8 +103,9 @@ void nodes::fixifaxisymmetric(void)
                 mycoordinates[3*i+0] = 0.0;
             else
             {
-                std::cout << "Error in 'nodes' object: expected only positive x node coordinates with axisymmetry (found a node at x = " << curx << " which is out of noise range)" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'nodes' object: expected only positive x node coordinates with axisymmetry (found a node at x = " << curx << " which is out of noise range)" << std::endl;
+                log.error();
             }
         }
     }

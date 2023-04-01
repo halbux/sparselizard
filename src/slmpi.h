@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include "logs.h"
 
 namespace slmpi
 {

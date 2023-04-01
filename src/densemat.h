@@ -15,6 +15,7 @@
 #include <vector>
 #include <cmath>
 #include <memory>
+#include "logs.h"
 #include "petscmat.h"
 #include "indexmat.h"
 

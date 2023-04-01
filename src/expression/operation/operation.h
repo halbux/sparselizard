@@ -82,14 +82,14 @@ class operation : public std::enable_shared_from_this<operation>
         virtual bool isharmonicone(std::vector<int> disjregs);
         
         // Get the value of a constant expression:
-        virtual double getvalue(void) { abort(); }; // fix return warning
+        virtual double getvalue(void) { throw std::runtime_error(""); }; // fix return warning
         
         // Get the rawparameter of a parameter operation:
         virtual std::shared_ptr<rawparameter> getparameterpointer(void);
         
         // Get the selected row/column of a parameter operation:
-        virtual int getselectedrow(void) { abort(); }; // fix return warning
-        virtual int getselectedcol(void) { abort(); }; // fix return warning
+        virtual int getselectedrow(void) { throw std::runtime_error(""); }; // fix return warning
+        virtual int getselectedcol(void) { throw std::runtime_error(""); }; // fix return warning
         
         // Get the rawport of a port operation:
         virtual std::shared_ptr<rawport> getportpointer(void);
@@ -100,7 +100,7 @@ class operation : public std::enable_shared_from_this<operation>
         // Remove the term of a sum or product:
         virtual void removeterm(int whichterm) {};
         // Count the number of sum or product terms:
-        virtual int count(void) { abort(); }; // fix return warning
+        virtual int count(void) { throw std::runtime_error(""); }; // fix return warning
         
         // Set a flag on this operation so that when an operation 
         // 'op' including at least once this operation is 
@@ -115,20 +115,20 @@ class operation : public std::enable_shared_from_this<operation>
         virtual void increasetimederivativeorder(int derivativeorder);
         
         // Get info for fields, dofs and tfs:
-        virtual int getphysicalregion(void) { abort(); }; // fix return warning
-        virtual int getspacederivative(void) { abort(); }; // fix return warning
-        virtual int gettimederivative(void) { abort(); }; // fix return warning
-        virtual int getkietaphiderivative(void) { abort(); }; // fix return warning
+        virtual int getphysicalregion(void) { throw std::runtime_error(""); }; // fix return warning
+        virtual int getspacederivative(void) { throw std::runtime_error(""); }; // fix return warning
+        virtual int gettimederivative(void) { throw std::runtime_error(""); }; // fix return warning
+        virtual int getkietaphiderivative(void) { throw std::runtime_error(""); }; // fix return warning
         
         // Get the 'argnum'th argument:
-        virtual std::shared_ptr<operation> getargument(int argnum) { abort(); }; // fix return warning
+        virtual std::shared_ptr<operation> getargument(int argnum) { throw std::runtime_error(""); }; // fix return warning
         // Replace the 'argnum'th argument:
         virtual void replaceargument(int argnum, std::shared_ptr<operation> newarg) {};
         
         // Get the form function component number used in the field, dof or tf:
-        virtual int getformfunctioncomponent(void) { abort(); }; // fix return warning
+        virtual int getformfunctioncomponent(void) { throw std::runtime_error(""); }; // fix return warning
         // Know which subfield of the original field it was:
-        virtual int getfieldcomponent(void) { abort(); }; // fix return warning
+        virtual int getfieldcomponent(void) { throw std::runtime_error(""); }; // fix return warning
 
         // True if the operation can be interpolated on all elements in 
         // the disjoint regions, no matter their total orientation number:
@@ -155,9 +155,9 @@ class operation : public std::enable_shared_from_this<operation>
         virtual double evaluateattime(double tm);
         
         // For dof interpolation:
-        virtual bool ison(void) { abort(); }; // fix return warning
+        virtual bool ison(void) { throw std::runtime_error(""); }; // fix return warning
         virtual void setoncontext(oncontext& cntxt) {};
-        virtual oncontext* getoncontext(void) { abort(); }; // fix return warning
+        virtual oncontext* getoncontext(void) { throw std::runtime_error(""); }; // fix return warning
         
         virtual void nextimpliciteuler(double tinit, double dt) {};
         virtual void nextgenalpha(double beta, double gamma, double alphaf, double alpham, double tinit, double dt) {};

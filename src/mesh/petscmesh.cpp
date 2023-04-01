@@ -46,12 +46,13 @@ petscmesh::petscmesh(std::string filename)
         return;
     }
     
-    std::cout << "Error in 'petscmesh' object: cannot load mesh file '" << filename << "'." << std::endl;
-    std::cout << "Supported mesh formats are ";
+    logs log;
+    log.msg() << "Error in 'petscmesh' object: cannot load mesh file '" << filename << "'." << std::endl;
+    log.msg() << "Supported mesh formats are ";
     for (int i = 0; i < supportedextensions.size()-1; i++)
-        std::cout << "'" << supportedextensions[i] << "', ";
-    std::cout << "'" << supportedextensions[supportedextensions.size()-1] << "'." << std::endl;
-    abort();
+        log.msg() << "'" << supportedextensions[i] << "', ";
+    log.msg() << "'" << supportedextensions[supportedextensions.size()-1] << "'." << std::endl;
+    log.error();
 }
 
 petscmesh::~petscmesh(void)

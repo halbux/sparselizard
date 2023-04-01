@@ -11,6 +11,7 @@
 #include <vector>
 #include <iomanip>
 
+#include "logs.h"
 #include "gppoint.h"
 #include "gpline.h"
 #include "gptriangle.h"

@@ -29,9 +29,10 @@ void iointerface::writetofile(std::string filename, iodata datatowrite, std::str
         }
     }
     
-    std::cout << "Error in 'iointerface' namespace: cannot write to file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'iointerface' namespace: cannot write to file '" << filename << "'." << std::endl;
+    log.msg() << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
+    log.error();
 }
 
 bool iointerface::isonlyisoparametric(std::string filename)
@@ -49,9 +50,12 @@ bool iointerface::isonlyisoparametric(std::string filename)
             return true;
     }
         
-    std::cout << "Error in 'iointerface' namespace: cannot handle file '" << filename << "'." << std::endl;
-    std::cout << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'iointerface' namespace: cannot handle file '" << filename << "'." << std::endl;
+    log.msg() << "Supported output formats are .vtk (ParaView), .vtu (ParaView) and .pos (GMSH)." << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 void iointerface::grouptimesteps(std::string filename, std::vector<std::string> filestogroup, std::vector<double> timevals)
@@ -60,14 +64,16 @@ void iointerface::grouptimesteps(std::string filename, std::vector<std::string> 
     
     if (numsteps != filestogroup.size())
     {
-        std::cout << "Error in 'iointerface': number of files to group does not match the number of time values provided" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'iointerface': number of files to group does not match the number of time values provided" << std::endl;
+        log.error();
     }
     
     if (filename.size() < 5 || filename.substr(filename.size()-4,4) != ".pvd")
     {
-        std::cout << "Error in 'iointerface': expected .pvd file extension to group the timesteps" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'iointerface': expected .pvd file extension to group the timesteps" << std::endl;
+        log.error();
     }
         
     // Check that all file names end with .vtu:
@@ -76,8 +82,9 @@ void iointerface::grouptimesteps(std::string filename, std::vector<std::string> 
         std::string curfile = filestogroup[i];
         if (curfile.size() < 5 || curfile.substr(curfile.size()-4,4) != ".vtu")
         {
-            std::cout << "Error in 'iointerface': can only group .vtu files into the .pvd file" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'iointerface': can only group .vtu files into the .pvd file" << std::endl;
+            log.error();
         }
     }
     
@@ -114,8 +121,9 @@ void iointerface::write(std::string filename, std::vector<int>& intdata, std::ve
         }
         else 
         {
-            std::cout << "Unable to write data to file " << filename << " or file not found" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Unable to write data to file " << filename << " or file not found" << std::endl;
+            log.error();
         } 
     }
     else
@@ -193,8 +201,9 @@ void iointerface::load(std::string filename, std::vector<int>& intdata, std::vec
         }
         else 
         {
-            std::cout << "Unable to load data from file " << filename << " or file not found" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Unable to load data from file " << filename << " or file not found" << std::endl;
+            log.error();
         }
     }
     else

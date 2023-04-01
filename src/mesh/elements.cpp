@@ -37,8 +37,9 @@ int elements::add(int elementtypenumber, int curvatureorder, std::vector<int>& n
     }
     if (mycurvatureorder != curvatureorder)
     {
-        std::cout << "Error in 'elements' object: the mesh can contain only a single curvature order." << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'elements' object: the mesh can contain only a single curvature order." << std::endl;
+        log.error();
     }
         
     subelementsinelements[elementtypenumber][0].insert(subelementsinelements[elementtypenumber][0].end(), nodelist.begin(), nodelist.end());
@@ -67,10 +68,13 @@ int elements::getdisjointregion(int elementtypenumber, int elementnumber, bool e
         return output;
     else
     {
-        std::cout << "Error in 'elements' object: returned a negative disjoint region number" << std::endl;
-        std::cout << "Possible reason: too bad quality elements obtained when h-adapting a curved mesh (some identical edges might not have been merged and therefore AMR has failed)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'elements' object: returned a negative disjoint region number" << std::endl;
+        log.msg() << "Possible reason: too bad quality elements obtained when h-adapting a curved mesh (some identical edges might not have been merged and therefore AMR has failed)" << std::endl;
+        log.error();
     }
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 int elements::gettotalorientation(int elementtypenumber, int elementnumber)
@@ -124,8 +128,9 @@ std::vector<bool> elements::isflipped(int subelementtypenumber, std::vector<int>
         }
         if (subindex == -1)
         {
-            std::cout << "Error in 'elements' object: in 'isflipped' could not find " << sub.gettypename() <<  " " << cursub << " in " << parent.gettypename() << " " << curparent << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'elements' object: in 'isflipped' could not find " << sub.gettypename() <<  " " << cursub << " in " << parent.gettypename() << " " << curparent << std::endl;
+            log.error();
         }
         
         // Extract the corner nodes of the sub:

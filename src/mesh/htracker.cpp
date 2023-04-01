@@ -81,8 +81,9 @@ std::shared_ptr<rawmesh> htracker::getoriginalmesh(void)
 {
     if (myoriginalmesh.expired())
     {
-        std::cout << "Error in 'htracker' object: the original mesh is needed but it was destroyed" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'htracker' object: the original mesh is needed but it was destroyed" << std::endl;
+        log.error();
     }
     return myoriginalmesh.lock();
 }
@@ -991,8 +992,9 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
                             }
                             else
                             {
-                                std::cout << "Error in 'htracker' object: root finding algorithm for mesh adaptivity failed to converge for a " << myelems[i].gettypename() << " element" << std::endl;
-                                abort();
+                                logs log;
+                                log.msg() << "Error in 'htracker' object: root finding algorithm for mesh adaptivity failed to converge for a " << myelems[i].gettypename() << " element" << std::endl;
+                                log.error();
                             }
                         }
                     }
@@ -1020,8 +1022,9 @@ void htracker::fromoriginal(std::vector<int>& oad, std::vector<double>& orc, std
     {
         if (maporctorc[i] < 0)
         {
-            std::cout << "Error in 'htracker' object: mapping failed for at least one point" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'htracker' object: mapping failed for at least one point" << std::endl;
+            log.error();
         }
     }
 }

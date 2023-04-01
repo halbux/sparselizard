@@ -5,8 +5,9 @@ void field::errorifpointerisnull(void)
 {
     if (rawfieldptr == NULL)
     {
-        std::cout << "Error in 'field' object: cannot perform the operation (field is undefined)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: cannot perform the operation (field is undefined)" << std::endl;
+        log.error();
     }
 }
 
@@ -18,16 +19,18 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers)
     {
         if (harmonicnumbers[i] <= 0)
         {
-            std::cout << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
+            log.error();
         }
     }
     if (harmonicnumbers.size() > 0)
         rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
     else
     {
-        std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
+        log.error();
     } 
 }
 field::field(std::string fieldtypename, spanningtree spantree)
@@ -43,16 +46,18 @@ field::field(std::string fieldtypename, const std::vector<int> harmonicnumbers, 
     {
         if (harmonicnumbers[i] <= 0)
         {
-            std::cout << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
+            log.error();
         }
     }
     if (harmonicnumbers.size() > 0)
         rawfieldptr = std::shared_ptr<rawfield>(new rawfield(fieldtypename, harmonicnumbers, true)); 
     else
     {
-        std::cout << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: provided an empty harmonic number list" << std::endl;
+        log.error();
     } 
     rawfieldptr->setspanningtree(spantree.getpointer());
 }
@@ -72,14 +77,16 @@ void field::setorder(int physreg, int interpolorder)
     
     if (interpolorder < 0)
     {
-        std::cout << "Error in 'field' object: cannot use negative interpolation order " << interpolorder << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: cannot use negative interpolation order " << interpolorder << std::endl;
+        log.error();
     }
     hierarchicalformfunction hff;
     if (interpolorder < hff.getminorder(rawfieldptr->gettypename()))
     {
-        std::cout << "Error in 'field' object: cannot use interpolation order " << interpolorder << " for shape function " << rawfieldptr->gettypename() << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: cannot use interpolation order " << interpolorder << " for shape function " << rawfieldptr->gettypename() << std::endl;
+        log.error();
     }
     rawfieldptr->setorder(physreg, interpolorder); 
 }
@@ -92,33 +99,38 @@ void field::setorder(expression criterion, int loworder, int highorder)
     
     if (not(criterion.isscalar()))
     {
-        std::cout << "Error in 'field' object: expected a scalar criterion for p-adaptivity" << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: expected a scalar criterion for p-adaptivity" << std::endl;
+        log.error();
     }
     // The criterion cannot be multiharmonic:
     std::vector<int> alldisjregs((universe::getrawmesh()->getdisjointregions())->count());
     std::iota(alldisjregs.begin(), alldisjregs.end(), 0);
     if (not(criterion.isharmonicone(alldisjregs)))
     {
-        std::cout << "Error in 'field' object: cannot have a multiharmonic criterion for p-adaptivity" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: cannot have a multiharmonic criterion for p-adaptivity" << std::endl;
+        log.error();
     }
     
     if (loworder < 0)
     {
-        std::cout << "Error in 'field' object: in 'setorder' cannot use negative minimum interpolation order " << loworder << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: in 'setorder' cannot use negative minimum interpolation order " << loworder << std::endl;
+        log.error();   
     }
     hierarchicalformfunction hff;
     if (loworder < hff.getminorder(tn))
     {
-        std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order " << loworder << " for shape function " << tn << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: in 'setorder' cannot use interpolation order " << loworder << " for shape function " << tn << std::endl;
+        log.error();   
     }
     if (highorder < loworder)
     {
-        std::cout << "Error in 'field' object: in 'setorder' the lowest order cannot be larger than the highest order" << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: in 'setorder' the lowest order cannot be larger than the highest order" << std::endl;
+        log.error();   
     }
 
     rawfieldptr->setorder(criterion, loworder, highorder, -1); 
@@ -132,19 +144,22 @@ void field::setorder(double targeterror, int loworder, int highorder, double abs
     
     if (loworder < 0)
     {
-        std::cout << "Error in 'field' object: in 'setorder' cannot use negative minimum interpolation order " << loworder << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: in 'setorder' cannot use negative minimum interpolation order " << loworder << std::endl;
+        log.error();   
     }
     hierarchicalformfunction hff;
     if (loworder < hff.getminorder(tn))
     {
-        std::cout << "Error in 'field' object: in 'setorder' cannot use interpolation order " << loworder << " for shape function " << tn << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: in 'setorder' cannot use interpolation order " << loworder << " for shape function " << tn << std::endl;
+        log.error();   
     }
     if (highorder < loworder)
     {
-        std::cout << "Error in 'field' object: in 'setorder' the lowest order cannot be larger than the highest order" << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: in 'setorder' the lowest order cannot be larger than the highest order" << std::endl;
+        log.error();   
     }
     
     expression crit = sl::fieldorder(field(getpointer()), 1.0-targeterror, absthres) + 1.0;
@@ -161,8 +176,9 @@ void field::setport(int physreg, port primal, port dual)
  
     if (primal.getpointer() == dual.getpointer())
     {
-        std::cout << "Error in 'field' object: cannot use the same port for the primal and the dual" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: cannot use the same port for the primal and the dual" << std::endl;
+        log.error();
     }
     
     rawfieldptr->setport(physreg, primal.getpointer(), dual.getpointer());
@@ -209,8 +225,9 @@ void field::setnodalvalues(indexmat nodenumbers, densemat values)
     
     if (nodenumbers.count() != values.count())
     {
-        std::cout << "Error in 'field' object: argument size mismatch in 'setnodalvalues'" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: argument size mismatch in 'setnodalvalues'" << std::endl;
+        log.error();
     }
     
     if (nodenumbers.count() > 0)
@@ -219,13 +236,15 @@ void field::setnodalvalues(indexmat nodenumbers, densemat values)
         std::vector<int> minmax = nodenumbers.minmax();
         if (minmax[0] < 0)
         {
-            std::cout << "Error in 'field' object: trying to set value of node number " << minmax[0] << " (must be positive)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: trying to set value of node number " << minmax[0] << " (must be positive)" << std::endl;
+            log.error();
         }
         if (minmax[1] >= numnodes)
         {
-            std::cout << "Error in 'field' object: trying to set value of node number " << minmax[1] << " (highest node number in mesh is " << numnodes-1 << ")" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: trying to set value of node number " << minmax[1] << " (highest node number in mesh is " << numnodes-1 << ")" << std::endl;
+            log.error();
         }
     }
     
@@ -242,13 +261,15 @@ densemat field::getnodalvalues(indexmat nodenumbers)
         std::vector<int> minmax = nodenumbers.minmax();
         if (minmax[0] < 0)
         {
-            std::cout << "Error in 'field' object: trying to get value of node number " << minmax[0] << " (must be positive)" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: trying to get value of node number " << minmax[0] << " (must be positive)" << std::endl;
+            log.error();
         }
         if (minmax[1] >= numnodes)
         {
-            std::cout << "Error in 'field' object: trying to get value of node number " << minmax[1] << " (highest node number in mesh is " << numnodes-1 << ")" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: trying to get value of node number " << minmax[1] << " (highest node number in mesh is " << numnodes-1 << ")" << std::endl;
+            log.error();
         }
     }
     
@@ -277,16 +298,18 @@ void field::setconstraint(int physreg, std::vector<expression> input, int extrai
     std::vector<int> harms = rawfieldptr->getharmonics();
     if (input.size() != harms.size())
     {
-        std::cout << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
-        abort(); 
+        logs log;
+        log.msg() << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
+        log.error(); 
     }
 
     for (int i = 0; i < harms.size(); i++)
     {
         if (input[i].isharmonicone({}) == false)
         {
-            std::cout << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
+            log.error();
         }
     
         rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, NULL, input[i], extraintegrationdegree);
@@ -301,16 +324,18 @@ void field::setconstraint(int physreg, expression meshdeform, std::vector<expres
     std::vector<int> harms = rawfieldptr->getharmonics();
     if (input.size() != harms.size())
     {
-        std::cout << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
-        abort(); 
+        logs log;
+        log.msg() << "Error in 'field' object: expected an expression vector of length " << harms.size() << " to set the field constraint" << std::endl;
+        log.error(); 
     }
 
     for (int i = 0; i < harms.size(); i++)
     {
         if (input[i].isharmonicone({}) == false)
         {
-            std::cout << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: cannot provide a multiharmonic expression as harmonic constraint value" << std::endl;
+            log.error();
         }
         
         rawfieldptr->harmonic(harms[i])->setdisjregconstraint(physreg, -1, &meshdeform, input[i], extraintegrationdegree);
@@ -352,8 +377,9 @@ void field::setgauge(int physreg)
     
     if (rawfieldptr->gettypename() != "hcurl")
     {
-        std::cout << "Error in 'field' object: cannot gauge shape function " << rawfieldptr->gettypename() << " (only hcurl)" << std::endl;
-        abort();   
+        logs log;
+        log.msg() << "Error in 'field' object: cannot gauge shape function " << rawfieldptr->gettypename() << " (only hcurl)" << std::endl;
+        log.error();   
     }
 
     rawfieldptr->setgauge(physreg);
@@ -366,8 +392,9 @@ void field::setdata(int physreg, vectorfieldselect myvec, std::string op)
     
     if (op != "set" && op != "add")
     {
-        std::cout << "Error in 'field' object: operation " << op << " is unknown in .setdata (use 'set' or 'add')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: operation " << op << " is unknown in .setdata (use 'set' or 'add')" << std::endl;
+        log.error();
     }
 
     rawfieldptr->setdata(physreg, myvec, op);
@@ -386,22 +413,25 @@ void field::setcohomologysources(std::vector<int> cutphysregs, std::vector<doubl
 
     if (cutphysregs.size() != cutvalues.size())
     {
-        std::cout << "Error in 'field' object: provided " << cutvalues.size() << " values for " << cutphysregs.size() << " cohomology regions" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: provided " << cutvalues.size() << " values for " << cutphysregs.size() << " cohomology regions" << std::endl;
+        log.error();
     }
     
     if (rawfieldptr->gettypename() != "hcurl")
     {
-        std::cout << "Error in 'field' object: cannot set a cohomology source to '" << rawfieldptr->gettypename() << "' type fields (use 'hcurl')" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: cannot set a cohomology source to '" << rawfieldptr->gettypename() << "' type fields (use 'hcurl')" << std::endl;
+        log.error();
     }
     for (int i = 0; i < cutphysregs.size(); i++)
     {
         int prdim = universe::getrawmesh()->getphysicalregions()->get(cutphysregs[i])->getelementdimension();
         if (prdim != -1 && prdim != 1) // -1 for empty is ok
         {
-            std::cout << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: expected 1D cohomology regions" << std::endl;
+            log.error();
         }
     }
 
@@ -433,8 +463,9 @@ field field::comp(int component)
     
     if (component < 0 || component > 2)
     {
-        std::cout << "Error in 'field' object: cannot use component number " << component << " (only 0, 1 and 2 are allowed)" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: cannot use component number " << component << " (only 0, 1 and 2 are allowed)" << std::endl;
+        log.error();
     }
     return field(rawfieldptr->comp(component)); 
 }
@@ -445,16 +476,18 @@ field field::harmonic(const std::vector<int> harmonicnumbers)
     
     if (harmonicnumbers.size() == 0)
     {
-        std::cout << "Error in 'field' object: no harmonics provided to the .harmonic function" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'field' object: no harmonics provided to the .harmonic function" << std::endl;
+        log.error();
     }    
     // Make sure all harmonic numbers are positive and non zero:
     for (int i = 0; i < harmonicnumbers.size(); i++)
     {
         if (harmonicnumbers[i] <= 0)
         {
-            std::cout << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'field' object: cannot use negative or zero harmonic number " << harmonicnumbers[i] << std::endl;
+            log.error();
         }
     }
     return field(rawfieldptr->harmonic(harmonicnumbers));
@@ -509,8 +542,9 @@ void field::writeraw(int physreg, std::string filename, bool isbinary, std::vect
         return;
     }
     
-    std::cout << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to write raw field data" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to write raw field data" << std::endl;
+    log.error();
 }
 
 std::vector<double> field::loadraw(std::string filename, bool isbinary)
@@ -523,8 +557,11 @@ std::vector<double> field::loadraw(std::string filename, bool isbinary)
     if (isbinary == false && (filename.size() >= 5 && filename.substr(filename.size()-4,4) == ".slz"))
         return rawfieldptr->loadraw(filename, isbinary);
     
-    std::cout << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to load raw field data" << std::endl;
-    abort();
+    logs log;
+    log.msg() << "Error in 'field' object: expected .slz file extension (or .slz.gz for binary format) to load raw field data" << std::endl;
+    log.error();
+    
+    throw std::runtime_error(""); // fix return warning
 }
 
 

@@ -36,7 +36,7 @@ int hcurlhexahedron::count(int order, int dim, int num)
             return 3*order*order*(order+1);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

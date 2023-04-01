@@ -6,8 +6,9 @@ void densemat::errorifempty(void)
 {
     if (numrows*numcols == 0)
     {
-        std::cout << "Error in 'densemat' object: cannot perform operation on empty matrix" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'densemat' object: cannot perform operation on empty matrix" << std::endl;
+        log.error();
     }
 }
 
@@ -34,8 +35,9 @@ densemat::densemat(long long int numberofrows, long long int numberofcolumns, st
 {
     if (numberofrows*numberofcolumns != valvec.size())
     {
-        std::cout << "Error in 'densemat' object: expected a value vector of size " << numberofrows*numberofcolumns << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'densemat' object: expected a value vector of size " << numberofrows*numberofcolumns << std::endl;
+        log.error();
     }
     
     numrows = numberofrows;
@@ -73,8 +75,9 @@ densemat::densemat(std::vector<densemat> input)
         numrows += input[i].countrows();
         if (input[i].countcolumns() != numcols)
         {
-            std::cout << "Error in 'densemat' object: dimension mismatch in concatenation" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'densemat' object: dimension mismatch in concatenation" << std::endl;
+            log.error();
         }
     }
     double* myvaluesptr = new double[numrows*numcols];
@@ -249,8 +252,9 @@ densemat densemat::multiply(densemat B)
     
     if (numcolsA != numrowsB)
     {
-        std::cout << "Error in 'densemat' object: trying to multiply a " << numrowsA << "x" << numcolsA << " matrix by a "  << numrowsB << "x" << numcolsB << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'densemat' object: trying to multiply a " << numrowsA << "x" << numcolsA << " matrix by a "  << numrowsB << "x" << numcolsB << std::endl;
+        log.error();
     }
     
     densemat C(numrowsA, numcolsB);
@@ -375,8 +379,9 @@ densemat densemat::getinverse(void)
     int n = numrows;
     if (numrows != numcols)
     {
-        std::cout << "Error in 'densemat' object: can only invert a square densemat" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'densemat' object: can only invert a square densemat" << std::endl;
+        log.error();
     }
     
     if (n == 0)

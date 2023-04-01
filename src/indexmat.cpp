@@ -6,8 +6,9 @@ void indexmat::errorifempty(void)
 {
     if (numrows*numcols == 0)
     {
-        std::cout << "Error in 'indexmat' object: cannot perform operation on empty matrix" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'indexmat' object: cannot perform operation on empty matrix" << std::endl;
+        log.error();
     }
 }
 
@@ -34,8 +35,9 @@ indexmat::indexmat(long long int numberofrows, long long int numberofcolumns, st
 {
     if (numberofrows*numberofcolumns != valvec.size())
     {
-        std::cout << "Error in 'indexmat' object: expected a value vector of size " << numberofrows*numberofcolumns << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'indexmat' object: expected a value vector of size " << numberofrows*numberofcolumns << std::endl;
+        log.error();
     }
     
     numrows = numberofrows;
@@ -73,8 +75,9 @@ indexmat::indexmat(std::vector<indexmat> input)
         numrows += input[i].countrows();
         if (input[i].countcolumns() != numcols)
         {
-            std::cout << "Error in 'indexmat' object: dimension mismatch in concatenation" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'indexmat' object: dimension mismatch in concatenation" << std::endl;
+            log.error();
         }
     }
     int* myvaluesptr = new int[numrows*numcols];

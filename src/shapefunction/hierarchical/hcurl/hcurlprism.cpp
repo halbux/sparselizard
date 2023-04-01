@@ -47,7 +47,7 @@ int hcurlprism::count(int order, int dim, int num)
             return 1.5*(order+1)*order*(order-1);
     }
     
-    abort(); // fix return warning
+    throw std::runtime_error(""); // fix return warning
 }
 
 

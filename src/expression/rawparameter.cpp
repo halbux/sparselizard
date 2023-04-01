@@ -32,8 +32,9 @@ void rawparameter::errorifundefined(std::vector<int> disjregs)
     {
         if (myoperations[disjregs[i]].size() == 0 || myoperations[disjregs[i]][0] == NULL)
         {
-            std::cout << "Error in 'parameter' object: the parameter has not been defined on the requested region" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'parameter' object: the parameter has not been defined on the requested region" << std::endl;
+            log.error();
         }
     }
 }
@@ -66,8 +67,9 @@ void rawparameter::set(int physreg, expression input)
         
     if (mynumrows != input.countrows() || mynumcols != input.countcolumns())
     {
-        std::cout << "Error in 'parameter' object: trying to set the " << mynumrows << "x" << mynumcols << " sized parameter to a size " << input.countrows() << "x" << input.countcolumns() << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'parameter' object: trying to set the " << mynumrows << "x" << mynumcols << " sized parameter to a size " << input.countrows() << "x" << input.countcolumns() << std::endl;
+        log.error();
     }
     
     maxopnum++;
@@ -83,14 +85,16 @@ void rawparameter::set(int physreg, expression input)
             // Make sure there is no dof or tf in the operation:
             if (op->isdofincluded() || op->istfincluded())
             {
-                std::cout << "Error in 'parameter' object: cannot set an expression containing a dof or a tf" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'parameter' object: cannot set an expression containing a dof or a tf" << std::endl;
+                log.error();
             }
             // Make sure there is no recursion:
             if (op->isparameterincluded(selecteddisjregs, this))
             {
-                std::cout << "Error in 'parameter' object: cannot set an expression including the parameter itself" << std::endl;
-                abort();
+                logs log;
+                log.msg() << "Error in 'parameter' object: cannot set an expression including the parameter itself" << std::endl;
+                log.error();
             }
             
             for (int i = 0; i < selecteddisjregs.size(); i++)

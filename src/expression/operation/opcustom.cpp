@@ -34,8 +34,9 @@ std::vector<std::vector<densemat>> opcustom::interpolate(elementselector& elemse
         std::vector<std::vector<densemat>> argmat = myargs[i]->interpolate(elemselect, evaluationcoordinates, meshdeform);
         if (argmat.size() != 2 || argmat[1].size() != 1)
         {
-            std::cout << "Error in 'opcustom' object: without FFT the custom operation can only be computed for constant (harmonic 1) operations" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'opcustom' object: without FFT the custom operation can only be computed for constant (harmonic 1) operations" << std::endl;
+            log.error();
         }
         fctargs[i] = argmat[1][0];
     }
@@ -60,20 +61,23 @@ std::vector<std::vector<densemat>> opcustom::interpolate(elementselector& elemse
     // Make sure the user provided function returns something valid:
     if (output.size() != myfamily.size())
     {
-        std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densemat objects (expected " << myfamily.size() <<  ")" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opcustom' object: custom function returned " << output.size() << " densemat objects (expected " << myfamily.size() <<  ")" << std::endl;
+        log.error();
     }
     for (int i = 0; i < output.size(); i++)
     {
         if (output[i].isdefined() == false)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
+            log.error();
         }
         if (output[i].countrows() != numels || output[i].countcolumns() != numevalpts)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densemat (expected " << numels << "x" << numevalpts << ")" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densemat (expected " << numels << "x" << numevalpts << ")" << std::endl;
+            log.error();
         }
     }
     
@@ -125,20 +129,23 @@ densemat opcustom::multiharmonicinterpolate(int numtimeevals, elementselector& e
     // Make sure the user provided function returns something valid:
     if (output.size() != myfamily.size())
     {
-        std::cout << "Error in 'opcustom' object: custom function returned " << output.size() << " densemat objects (expected " << myfamily.size() <<  ")" << std::endl;
-        abort();
+        logs log;
+        log.msg() << "Error in 'opcustom' object: custom function returned " << output.size() << " densemat objects (expected " << myfamily.size() <<  ")" << std::endl;
+        log.error();
     }
     for (int i = 0; i < output.size(); i++)
     {
         if (output[i].isdefined() == false)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'opcustom' object: custom function returned an undefined densemat object" << std::endl;
+            log.error();
         }
         if (output[i].countrows() != numtimeevals || output[i].countcolumns() != numels*numevalpts)
         {
-            std::cout << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densemat (expected " << numtimeevals << "x" << numels*numevalpts << ")" << std::endl;
-            abort();
+            logs log;
+            log.msg() << "Error in 'opcustom' object: custom function returned a " << output[i].countrows() << "x" << output[i].countcolumns() << " densemat (expected " << numtimeevals << "x" << numels*numevalpts << ")" << std::endl;
+            log.error();
         }
     }
     

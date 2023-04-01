@@ -12403,9 +12403,10 @@ void gptetrahedron::set(int integrationorder, std::vector<double>& coordinates, 
             break;
 
         default:
-            
-            std::cout << "Error in 'gptetrahedron' namespace: trying to get Gauss points to integrate order " << integrationorder << " which is undefined (too high)" << std::endl;
-            abort();
+        
+            logs log;
+            log.msg() << "Error in 'gptetrahedron' namespace: trying to get Gauss points to integrate order " << integrationorder << " which is undefined (too high)" << std::endl;
+            log.error();
     }
 }
 
