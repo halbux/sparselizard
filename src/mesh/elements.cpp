@@ -1258,103 +1258,41 @@ void elements::definedisjointregions(void)
 {
     long long int numberofphysicalregions = myphysicalregions->count();
     
-    // Define 'isinphysicalregion[elementtypenumber]' to hold a vector
-    // whose (elem*numphysreg+i)th entry is true if the element 'elem' 
-    // is included in the ith physical region.
     std::vector<std::vector<bool>> isinphysicalregion(8);
-    for (int typenum = 0; typenum <= 7; typenum++)
-        isinphysicalregion[typenum] = std::vector<bool>(count(typenum)*numberofphysicalregions);
-    
-    // Write the physical regions to the elements. 
-    for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
+    for (int subtypenum = 0; subtypenum <= 7; subtypenum++)
     {
-        physicalregion* currentphysicalregion = myphysicalregions->getatindex(physregindex);
-        std::vector<std::vector<int>>* elementsinphysicalregion = currentphysicalregion->getelementlist();
+        isinphysicalregion[subtypenum] = std::vector<bool>(count(subtypenum)*numberofphysicalregions, false);
         
-        for (int typenum = 0; typenum <= 7; typenum++)
+        for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
         {
-            // Iterate on all elements of the given type:
-            for (int i = 0; i < (*elementsinphysicalregion)[typenum].size(); i++)
-                isinphysicalregion[typenum][(*elementsinphysicalregion)[typenum][i] * numberofphysicalregions + physregindex] = true;
-        }
-    }
-        
-    
-    // Propagate the physical region memberships from elements to the subelements.
-    for (int typenum = 1; typenum <= 7; typenum++)
-    {
-        int numberofcurvednodes = numberofsubelementsineveryelement[typenum][0];
-        int numberoflines = numberofsubelementsineveryelement[typenum][1];
-        int numberoftriangles = numberofsubelementsineveryelement[typenum][2];
-        int numberofquadrangles = numberofsubelementsineveryelement[typenum][3];
-
-        for (int elem = 0; elem < subelementsinelements[typenum][0].size()/numberofcurvednodes; elem++)
-        {
-            for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
+            physicalregion* currentphysicalregion = myphysicalregions->getatindex(physregindex);
+            std::vector<std::vector<int>>* elementsinphysicalregion = currentphysicalregion->getelementlist();
+            
+            for (int t = 0; t <= 7; t++)
             {
-                if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
+                element el(t, mycurvatureorder);
+            
+                int numsubelems = el.counttype(subtypenum);
+                if (subtypenum == 0)
+                    numsubelems = el.countcurvednodes();
+                    
+                // Iterate on all elements of the given type:
+                for (int i = 0; i < elementsinphysicalregion->at(t).size(); i++)
                 {
-                    for (int i = 0; i < numberofcurvednodes; i++)
+                    int elem = elementsinphysicalregion->at(t)[i];
+                    
+                    for (int s = 0; s < numsubelems; s++)
                     {
-                        int subelem = subelementsinelements[typenum][0][elem*numberofcurvednodes+i];
-                        isinphysicalregion[0][subelem*numberofphysicalregions+physregindex] = true;
-                    }
-                }
-            }
-        }
-        
-        for (int elem = 0; elem < subelementsinelements[typenum][1].size()/numberoflines; elem++)
-        {
-            for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
-            {
-                if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
-                {
-                    for (int i = 0; i < numberoflines; i++)
-                    {
-                        int subelem = subelementsinelements[typenum][1][elem*numberoflines+i];
-                        isinphysicalregion[1][subelem*numberofphysicalregions+physregindex] = true;
-                    }
-                }
-            }
-        }
-
-        if (numberoftriangles != 0)
-        {
-            for (int elem = 0; elem < subelementsinelements[typenum][2].size()/numberoftriangles; elem++)
-            {
-                for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
-                {
-                    if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
-                    {
-                        for (int i = 0; i < numberoftriangles; i++)
-                        {
-                            int subelem = subelementsinelements[typenum][2][elem*numberoftriangles+i];
-                            isinphysicalregion[2][subelem*numberofphysicalregions+physregindex] = true;
-                        }
-                    }
-                }
-            }
-        }
-        
-        if (numberofquadrangles != 0)
-        {
-            for (int elem = 0; elem < subelementsinelements[typenum][3].size()/numberofquadrangles; elem++)
-            {
-                for (int physregindex = 0; physregindex < numberofphysicalregions; physregindex++)
-                {
-                    if (isinphysicalregion[typenum][elem*numberofphysicalregions+physregindex])
-                    {
-                        for (int i = 0; i < numberofquadrangles; i++)
-                        {
-                            int subelem = subelementsinelements[typenum][3][elem*numberofquadrangles+i];
-                            isinphysicalregion[3][subelem*numberofphysicalregions+physregindex] = true;
-                        }
+                        int subelem = elem;
+                        if (subtypenum != t) // the container is empty for the elements themselves
+                            subelem = subelementsinelements[t][subtypenum][elem*numsubelems+s];
+                    
+                        isinphysicalregion[subtypenum][subelem*numberofphysicalregions+physregindex] = true;
                     }
                 }
             }
         }
     }
-        
 
     // Now define the disjoint regions based on 'isinphysicalregion':
     indisjointregion.resize(8);
