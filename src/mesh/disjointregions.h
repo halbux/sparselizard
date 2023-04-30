@@ -31,11 +31,11 @@ class disjointregions
         int count(void);
         int countelements(int disjointregionnumber);
         
-        // Add the disjoint region including elements of a given type number
+        // Append the disjoint region including elements of a given type number
         // and defined by 'physicalregionsincludingit'. 'physicalregionsincludingit[i]'
         // is true if the ith physical region geometrically covers the disjoint region.
         // The output is the assigned disjoint region number.
-        int add(int elementtypenumber, std::vector<bool>& physicalregionsincludingit);
+        int append(int elementtypenumber, std::vector<bool>& physicalregionsincludingit);
         
         void setrangebegin(int disjointregionnumber, int startrange);
         void setrangeend(int disjointregionnumber, int endrange);

@@ -1293,30 +1293,43 @@ void elements::definedisjointregions(void)
             }
         }
     }
-
+    
     // Now define the disjoint regions based on 'isinphysicalregion':
     indisjointregion.resize(8);
     for (int typenum = 0; typenum <= 7; typenum++)
         indisjointregion[typenum].resize(count(typenum));
+        
     // We need to know if a node is a corner node or not:
     std::vector<bool> isnodeacornernode = iscornernode();
+    
     // Define the disjoint regions and fill in 'indisjointregion':
+    std::vector<bool> temp(numberofphysicalregions);
     for (int typenum = 0; typenum <= 7; typenum++)
     {
         if (count(typenum) == 0)
             continue;
 
-        std::vector<bool> temp(numberofphysicalregions);    
+        std::unordered_map<std::vector<bool>, int> disjregmap;
 
         for (int elem = 0; elem < count(typenum); elem++)
         {   
-            // Only corner nodes matter for the disjoint regions 
-            // (no dof will ever be associated to curvature nodes).
+            // Only corner nodes matter (dofs are not associated to curvature nodes):
             if (typenum != 0 || isnodeacornernode[elem])
             {
                 for (int i = 0; i < numberofphysicalregions; i++)
                     temp[i] = isinphysicalregion[typenum][elem*numberofphysicalregions+i];
-                indisjointregion[typenum][elem] = mydisjointregions->add(typenum, temp);
+
+                auto search = disjregmap.find(temp);
+
+                bool isdisjregnothere = (search == disjregmap.end());
+
+                if (isdisjregnothere)
+                {
+                    indisjointregion[typenum][elem] = mydisjointregions->append(typenum, temp);
+                    disjregmap[temp] = indisjointregion[typenum][elem];
+                }
+                else
+                    indisjointregion[typenum][elem] = search->second;
             }
             else
                 indisjointregion[typenum][elem] = -1;
