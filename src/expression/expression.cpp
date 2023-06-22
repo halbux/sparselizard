@@ -1443,10 +1443,28 @@ expression expression::at(int row, int col)
 
 double expression::evaluate(void)
 {
-    // The set of operations that can be evaluated makes it impossible to get a multiharmonic expression! No need to check it.
-    
     if (isscalar())
-        return myoperations[0]->evaluate();
+    {
+        // Take an arbitrary node in the geometry:
+        int nodedisjreg = universe::getrawmesh()->getdisjointregions()->getindim(0)[0];
+        std::vector<int> firstnodeindisjreg = {universe::getrawmesh()->getdisjointregions()->getrangebegin(nodedisjreg)};
+        elementselector elemselect({nodedisjreg}, firstnodeindisjreg, false);
+        std::vector<double> evalcoords = {0,0,0};
+    
+        std::vector<std::vector<densemat>> evaled = myoperations[0]->interpolate(elemselect, evalcoords, NULL);
+
+        if (evaled.size() > 2)
+        {
+            logs log;
+            log.msg() << "Error in 'expression' object: 'evaluate' cannot return multiharmonic values" << std::endl;
+            log.error();
+        }
+        
+        if (evaled[1].size() > 0)
+            return evaled[1][0].getvalue(0,0);
+        else
+            return 0;
+    }
     else
     {
         logs log;
