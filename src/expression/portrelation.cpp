@@ -132,7 +132,7 @@ bool portrelation::hasnoportterm(void)
 
 double portrelation::evalnoportterm(void)
 {
-    return mynoportterm[0].getoperationinarray(0,0)->evaluate();
+    return mynoportterm[0].evaluate();
 }
 
 void portrelation::evalrelations(int KCM, std::vector<std::shared_ptr<rawport>>& rps, std::vector<int>& relinds, std::vector<double>& relvals)
@@ -159,7 +159,7 @@ void portrelation::evalrelations(int KCM, std::vector<std::shared_ptr<rawport>>&
     // Calculate all coefficients:
     std::vector<double> coefvals(mycoefs.size());
     for (int i = 0; i < mycoefs.size(); i++)
-        coefvals[i] = mycoefs[i].getoperationinarray(0,0)->evaluate();
+        coefvals[i] = mycoefs[i].evaluate();
 
     // Populate:
     int ri = 0;

@@ -47,7 +47,6 @@ class opsum: public operation
         void reuseit(bool istobereused) { reuse = istobereused; };
         bool isreused(void) { return reuse; };
         
-        double evaluate(void);
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);

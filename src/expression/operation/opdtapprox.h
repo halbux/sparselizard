@@ -33,10 +33,7 @@ class opdtapprox: public operation
         std::shared_ptr<operation> simplify(std::vector<int> disjregs);
         
         std::shared_ptr<operation> copy(void);
-
-        double evaluate(void);
-        std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
-
+        
         void nextimpliciteuler(double tinit, double dt);
         void nextgenalpha(double beta, double gamma, double alphaf, double alpham, double tinit, double dt);
 

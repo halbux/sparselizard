@@ -65,11 +65,6 @@ std::shared_ptr<operation> opinversion::copy(void)
     return op;
 }
 
-double opinversion::evaluate(void)
-{
-    return 1.0/myarg->evaluate();
-}
-
 std::vector<double> opinversion::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);

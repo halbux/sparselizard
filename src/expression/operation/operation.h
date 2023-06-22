@@ -146,9 +146,7 @@ class operation : public std::enable_shared_from_this<operation>
         virtual void group(void) {};
         // Simplify the operation as it is on the disjoint regions:
         virtual std::shared_ptr<operation> simplify(std::vector<int> disjregs) { return shared_from_this(); };
-     
-        // Evaluate a space-independent scalar operation:
-        virtual double evaluate(void);
+        
         // Same but allow x, y and/or z fields without derivatives:
         virtual std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
         

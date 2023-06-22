@@ -65,11 +65,6 @@ std::shared_ptr<operation> opsin::copy(void)
     return op;
 }
 
-double opsin::evaluate(void)
-{
-    return std::sin(myarg->evaluate());
-}
-
 std::vector<double> opsin::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);

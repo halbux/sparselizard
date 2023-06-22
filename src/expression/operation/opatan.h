@@ -31,7 +31,6 @@ class opatan: public operation
         
         void reuseit(bool istobereused) { reuse = istobereused; };
         
-        double evaluate(void);
         std::vector<double> evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords);
 
         void print(void);

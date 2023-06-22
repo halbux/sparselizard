@@ -65,11 +65,6 @@ std::shared_ptr<operation> opabs::copy(void)
     return op;
 }
 
-double opabs::evaluate(void)
-{
-    return std::abs(myarg->evaluate());
-}
-
 std::vector<double> opabs::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);

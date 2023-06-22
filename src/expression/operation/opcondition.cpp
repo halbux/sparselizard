@@ -96,14 +96,6 @@ std::shared_ptr<operation> opcondition::copy(void)
     return op;
 }
 
-double opcondition::evaluate(void)
-{
-    if (mycond->evaluate() < 0)
-        return myfalse->evaluate();
-    else
-        return mytrue->evaluate();
-}
-
 std::vector<double> opcondition::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaldcond = mycond->evaluate(xcoords, ycoords, zcoords);

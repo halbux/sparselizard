@@ -65,11 +65,6 @@ std::shared_ptr<operation> opmod::copy(void)
     return op;
 }
 
-double opmod::evaluate(void)
-{
-    return std::fmod(myarg->evaluate(), mymodval);
-}
-
 std::vector<double> opmod::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);

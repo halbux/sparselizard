@@ -171,16 +171,6 @@ std::shared_ptr<operation> operation::copy(void)
     throw std::runtime_error(""); // fix return warning
 }
 
-double operation::evaluate(void)
-{
-    logs log;
-    log.msg() << "Error in 'operation' object: cannot evaluate the operation to a double" << std::endl;
-    log.msg() << "Did you try to evaluate a space-dependent operation?" << std::endl;
-    log.error();
-    
-    throw std::runtime_error(""); // fix return warning
-}
-
 std::vector<double> operation::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     logs log;
@@ -196,7 +186,7 @@ double operation::evaluateattime(double tm)
     double tmbkp = universe::currenttimestep;
     
     universe::currenttimestep = tm;
-    double evaled = evaluate();
+    double evaled = expression(shared_from_this()).evaluate();
     universe::currenttimestep = tmbkp;
     
     return evaled;    

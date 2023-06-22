@@ -65,11 +65,6 @@ std::shared_ptr<operation> opacos::copy(void)
     return op;
 }
 
-double opacos::evaluate(void)
-{
-    return std::acos(myarg->evaluate());
-}
-
 std::vector<double> opacos::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     std::vector<double> evaluated = myarg->evaluate(xcoords, ycoords, zcoords);

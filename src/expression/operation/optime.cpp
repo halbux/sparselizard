@@ -51,20 +51,6 @@ std::shared_ptr<operation> optime::copy(void)
     return op;
 }
 
-double optime::evaluate(void)
-{
-    if (universe::fundamentalfrequency <= 0)
-        return universe::currenttimestep;
-    else
-    {
-        logs log;
-        log.msg() << "Error in 'optime' object: the time variable 't' cannot be evaluated in harmonic domain" << std::endl;
-        log.error();
-    }
-    
-    throw std::runtime_error(""); // fix return warning
-}
-
 std::vector<double> optime::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
 {
     if (universe::fundamentalfrequency <= 0)

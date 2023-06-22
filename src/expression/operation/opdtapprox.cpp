@@ -20,8 +20,13 @@ std::vector<std::vector<densemat>> opdtapprox::interpolate(elementselector& elem
         log.error();
     }
 
-    densemat output(elemselect.countinselection(), evaluationcoordinates.size()/3, evaluate());
-    
+    densemat output;
+
+    if (mydtorder == 1)
+        output = densemat(elemselect.countinselection(), evaluationcoordinates.size()/3, mydtx);
+    else
+        output = densemat(elemselect.countinselection(), evaluationcoordinates.size()/3, mydtdtx);
+        
     // The constant is on the cos0 harmonic:
     return {{},{output}};
 }
@@ -41,20 +46,6 @@ std::shared_ptr<operation> opdtapprox::copy(void)
     universe::opdtapproxes.push_back(op);
             
     return op;
-}
-
-double opdtapprox::evaluate(void)
-{
-    if (mydtorder == 1)
-        return mydtx;
-    else
-        return mydtdtx;
-}
-
-std::vector<double> opdtapprox::evaluate(std::vector<double>& xcoords, std::vector<double>& ycoords, std::vector<double>& zcoords)
-{
-    std::vector<double> evaluated(xcoords.size(), evaluate());
-    return evaluated;
 }
 
 void opdtapprox::nextimpliciteuler(double tinit, double dt)
