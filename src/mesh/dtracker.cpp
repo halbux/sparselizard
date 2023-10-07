@@ -102,7 +102,7 @@ std::vector<int> dtracker::discoversomeneighbours(int numtrialelements, std::vec
     
     std::vector<double> allisalive = gentools::extract(alltrialbarys, 3*numtrialelements+1, 3*numtrialelements);
     
-    // Remove the barycenters of this rank and ranks that are no alive anymore (to avoid removing duplicates with arbitrary all 0 coordinates):
+    // Remove the barycenters of this rank and ranks that are not alive anymore (to avoid removing duplicates with arbitrary all 0 coordinates):
     int numalive = 0;
     for (int r = 0; r < numranks; r++)
     {
