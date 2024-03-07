@@ -10,7 +10,7 @@ coefmanager::coefmanager(std::string fieldtypename, disjointregions* drs)
         logs log;
         log.msg() << "Error in 'coefmanager' object: x, y and z coordinate fields are not supported here" << std::endl;
         log.error();
-    };
+    }
         
     // Preallocate 'coefs' for the number of disjoint regions:
     coefs.resize(mydisjointregions.count());
