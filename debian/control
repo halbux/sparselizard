@@ -1,0 +1,26 @@
+Source: sparselizard
+Section: libs
+Priority: optional
+Maintainer: Jean-Samuel Reynaud <js.reynaud@gmail.com>
+Build-Depends: debhelper (>= 10.0.0), cmake, libopenmpi-dev, libblas-dev, libmetis-dev,libpetsc-real-dev| libpetsc3.7.7-dev,
+ libslepc-real3.12-dev | libslepc-real3.10-dev |libslepc3.7.4-dev, libmumps-dev
+Standards-Version: 3.6.1.1
+
+
+Package: libsparselizard0
+Architecture: any
+Depends: ${shlibs:Depends}, ${dist:Depends}
+Description: C++ FEM library shared libraries
+  Sparselizard is a high-performance, multiphysics, hp-adaptive, open source C++ finite element
+ library running on Linux, Mac and Windows. It is used to design next generation microdevices
+ (ultrasound transducers, micromirrors, microvalves, comb drives,...) and it is carefully
+ validated against analytical solutions, third party software and measurements of the fabricated devices
+
+Package: libsparselizard-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${dist:Depends}
+Description: C++ FEM library development files
+  Sparselizard is a high-performance, multiphysics, hp-adaptive, open source C++ finite element
+ library running on Linux, Mac and Windows. It is used to design next generation microdevices
+ (ultrasound transducers, micromirrors, microvalves, comb drives,...) and it is carefully
+ validated against analytical solutions, third party software and measurements of the fabricated devices
