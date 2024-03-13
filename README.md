@@ -1,4 +1,27 @@
-# Build instructions
+## Release status
+
+[![latest released version(s)](https://repology.org/badge/latest-versions/sparselizard.svg)](https://repology.org/project/sparselizard/versions)
+[![Release status](https://repology.org/badge/tiny-repos/sparselizard.svg)](https://repology.org/metapackage/sparselizard/versions)
+
+
+# Installation 
+
+## Linux 
+
+### Arch Linux
+
+Sparselizard is available in the AUR: (https://aur.archlinux.org/packages/sparselizard/).
+
+### Ubuntu
+
+Sparselizard is packaged in a PPA.
+```bash
+sudo add-apt-repository ppa:js-reynaud/sparselizard-v0
+sudo apt-get update
+sudo apt-get install sparselizard
+```
+
+### Build instructions
 
 Run the scripts in the 'install_external_libs' folder then configure and build:
 ```bash
