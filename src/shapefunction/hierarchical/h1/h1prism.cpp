@@ -288,7 +288,7 @@ hierarchicalformfunctioncontainer h1prism::evalat(int maxorder)
         int ffindex = 0;
         for (int i = 0; i <= order-3; i++)
         {
-            for (int j = 0; j <= order-3; j++)
+            for (int j = 0; j <= order-3-i; j++)
             {
                 for (int k = 0; k <= order-2; k++)
                 {
