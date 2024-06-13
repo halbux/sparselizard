@@ -657,7 +657,7 @@ void gentools::getreferencecoordinates(coordinategroup& coordgroup, int disjreg,
     // Loop on all elements in the disjoint region:
     for (int e = 0; e < numelems; e++)
     {
-        double curelem = rangebegin+e;
+        int curelem = rangebegin+e;
         
         polynomials syspolys;
         std::vector<int> coordranking = {};
