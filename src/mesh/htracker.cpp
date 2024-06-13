@@ -149,6 +149,10 @@ int htracker::next(void)
             {
                 parenttypes[0]++;
                 origindexintype = 0;
+                
+                // An exit 'next' is allowed if the data is not used:
+                if (parenttypes[0] > 7)
+                    return -1;
             }
             if (isrefcalc)
                 parentrefcoords[0] = {straightrefcoords[parenttypes[0]]};
