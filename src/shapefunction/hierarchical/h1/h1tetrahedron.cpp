@@ -8,7 +8,7 @@ int h1tetrahedron::count(int order)
     if (order <= 0 || targetdim != -1 && targetdim != 3)
         return 0;
     
-    return 1.0/6.0*(order+1)*(order+2)*(order+3);
+    return (order+1)*(order+2)*(order+3)/6;
 }
 
 int h1tetrahedron::count(int order, int dim, int num)
@@ -41,7 +41,7 @@ int h1tetrahedron::count(int order, int dim, int num)
             return 0.5*(order-2)*(order-1);
         // Volume based form functions:
         case 3:
-            return 1.0/6.0*(order-3)*(order-2)*(order-1);
+            return (order-3)*(order-2)*(order-1)/6;
     }
     
     throw std::runtime_error(""); // fix return warning
