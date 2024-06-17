@@ -1302,6 +1302,10 @@ void elements::definedisjointregions(void)
     // We need to know if a node is a corner node or not:
     std::vector<bool> isnodeacornernode = iscornernode();
     
+    // Clear the disjoint regions object in case it was already populated. Clear only now because the
+    // 'getelementlist' call might require disjoint region access for runtime defined physical regions.
+    mydisjointregions->clear();
+    
     // Define the disjoint regions and fill in 'indisjointregion':
     std::vector<bool> temp(numberofphysicalregions);
     for (int typenum = 0; typenum <= 7; typenum++)

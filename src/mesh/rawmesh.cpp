@@ -1231,8 +1231,6 @@ bool rawmesh::adaptp(std::vector<std::vector<std::vector<int>>>& neworders, int 
     *newptracker = *myptracker;
     myptracker = newptracker;
     
-    mydisjointregions.clear();
-    
     myelements.definedisjointregions();
 
     std::vector<std::vector<int>> renumvec;
