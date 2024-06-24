@@ -68,6 +68,12 @@ class mat
 
         indexmat getainds(void);
         indexmat getdinds(void);
+        indexmat getarows(void);
+        indexmat getdrows(void);
+        indexmat getacols(void);
+        indexmat getdcols(void);
+        densemat getavals(void);
+        densemat getdvals(void);
 
         Mat getapetsc(void);
         Mat getdpetsc(void);
