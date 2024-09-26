@@ -36,3 +36,15 @@ build/
 
 # CCLS cache
 .ccls-cache/
+
+# Debian build
+obj-x86_64-linux-gnu
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.debhelper.log
+debian/*.substvars
+debian/libsparselizard-dev/
+debian/libsparselizard0/
+debian/substvars
+debian/tmp/
