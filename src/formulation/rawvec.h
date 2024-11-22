@@ -31,7 +31,7 @@ class rawvec : public std::enable_shared_from_this<rawvec>
 {
     private:
 
-        Vec myvec = PETSC_NULL;
+        Vec myvec = PETSC_NULLPTR;
         std::shared_ptr<dofmanager> mydofmanager = NULL;
         
 

@@ -120,7 +120,7 @@ rawvec::~rawvec(void)
     PetscBool ispetscinitialized;
     PetscInitialized(&ispetscinitialized);
 
-    if (ispetscinitialized == PETSC_TRUE && myvec != PETSC_NULL)
+    if (ispetscinitialized == PETSC_TRUE && myvec != PETSC_NULLPTR)
         VecDestroy(&myvec);
 }
 

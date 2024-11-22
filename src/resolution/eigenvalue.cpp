@@ -150,7 +150,7 @@ void eigenvalue::compute(int numeigenvaluestocompute, double targeteigenvaluemag
         PCSetType(pc, PCLU);
 
         PEPSTOARSetDetectZeros(pep,PETSC_TRUE);
-        PEPSetScale(pep, PEP_SCALE_SCALAR, PETSC_DECIDE, PETSC_NULL, PETSC_NULL, PETSC_DECIDE, PETSC_DECIDE);
+        PEPSetScale(pep, PEP_SCALE_SCALAR, PETSC_DECIDE, PETSC_NULLPTR, PETSC_NULLPTR, PETSC_DECIDE, PETSC_DECIDE);
 
         PCFactorSetMatSolverType(pc, universe::solvertype);
         PEPSetFromOptions(pep);
