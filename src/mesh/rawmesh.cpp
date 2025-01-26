@@ -123,7 +123,8 @@ void rawmesh::readfromfile(std::string tool, std::string source)
     }
     if (tool == "native")
     {
-        if (source.length() >= 5 && source.compare(source.size()-4,4,".msh") == 0)
+        if (source.length() >= 5 && source.compare(source.size()-4,4,".msh") == 0 ||
+            source.length() >= 6 && source.compare(source.size()-5,5,".msh2") == 0)
         {
             gmshinterface::readfromfile(source, mynodes, myelements, myphysicalregions);
             return;    
