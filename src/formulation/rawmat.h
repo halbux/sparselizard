@@ -40,10 +40,10 @@ class rawmat
         // Ainds[i] is the index in Atotal of the ith index in A:
         indexmat Ainds, Dinds;
         
-        Mat Amat = PETSC_NULL, Dmat = PETSC_NULL;
+        Mat Amat = PETSC_NULLPTR, Dmat = PETSC_NULLPTR;
         
         // 'myksp' will store the factorization if it is to be reused:
-        KSP myksp = PETSC_NULL;
+        KSP myksp = PETSC_NULLPTR;
         bool factorizationreuse = false;
         bool isitfactored = false;
         

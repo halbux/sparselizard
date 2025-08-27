@@ -29,9 +29,9 @@ rawmat::~rawmat(void)
 
     if (ispetscinitialized == PETSC_TRUE)
     {
-        if (Amat != PETSC_NULL)
+        if (Amat != PETSC_NULLPTR)
             MatDestroy(&Amat);
-        if (Dmat != PETSC_NULL)
+        if (Dmat != PETSC_NULLPTR)
             MatDestroy(&Dmat);
         if (isitfactored) 
             KSPDestroy(&myksp);

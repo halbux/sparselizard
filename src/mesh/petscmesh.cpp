@@ -64,7 +64,7 @@ void petscmesh::extract(nodes& mynodes, elements& myelements, physicalregions& m
 {
     ///// Extract the node coordinates:
     
-    Vec coordvec = PETSC_NULL;
+    Vec coordvec = PETSC_NULLPTR;
     DMGetCoordinates(mypetscmesh, &coordvec);
     
     int numberofnodes;

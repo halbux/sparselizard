@@ -1813,7 +1813,7 @@ void sl::solve(mat A, vec b, vec sol, double& relrestol, int& maxnumit, std::str
 
     // Request to print the iteration information to the console:
     if (verbosity > 0)
-        KSPMonitorSet(*ksp, mykspmonitor, PETSC_NULL, PETSC_NULL);
+        KSPMonitorSet(*ksp, mykspmonitor, PETSC_NULLPTR, PETSC_NULLPTR);
 
     KSPSetFromOptions(*ksp);
 
