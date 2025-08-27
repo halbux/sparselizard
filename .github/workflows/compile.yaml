@@ -1,0 +1,53 @@
+name: Sparselizard Compilation
+
+on: [push]
+
+jobs:
+  Compilation-Actions:
+    runs-on: ubuntu-22.04
+
+    env:
+      CCACHE_COMPRESS: "true"
+      CCACHE_MAXSIZE: 500M
+      CC: gcc-12
+      CXX: g++-12
+      OMPI_CC: gcc-12
+      OMPI_CXX: g++-12
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "The workflow is now ready to test the code on the runner."
+
+      - name: install ccache
+        run: sudo apt-get install ccache
+
+      - name: identify machine architecture
+        run: |
+          gcc -### -E -march=native - &> machine-type.txt
+          cat machine-type.txt
+
+      - name: restore cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.ccache
+          key: ccache-${{ hashFiles('machine-type.txt') }}-${{ github.sha }}
+          restore-keys: ccache-${{ hashFiles('machine-type.txt') }}-
+
+      - name: Install mandatory packages
+        run: sudo apt-get install -y libomp-dev ninja-build cmake libopenblas-dev libmetis-dev libopenmpi-dev libmumps-dev petsc-dev slepc-dev libgmsh-dev
+
+      - name: build
+        run: |
+          export PATH="/usr/lib/ccache:$PATH"
+          mkdir build
+          cmake -G Ninja -S . -B build
+          cmake --build build -- -j $(getconf _NPROCESSORS_ONLN)
+
+      - name: show ccache stats
+        run: |
+          ccache --show-stats
+          ccache --zero-stats
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
