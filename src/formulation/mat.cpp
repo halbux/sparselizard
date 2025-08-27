@@ -104,6 +104,12 @@ vec mat::eliminate(vec b)
         
 indexmat mat::getainds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getainds(); }
 indexmat mat::getdinds(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdinds(); }
+indexmat mat::getarows(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getarows(); }
+indexmat mat::getdrows(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdrows(); }
+indexmat mat::getacols(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getacols(); }
+indexmat mat::getdcols(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdcols(); }
+densemat mat::getavals(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getavals(); }
+densemat mat::getdvals(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdvals(); }
 
 Mat mat::getapetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getapetsc(); }
 Mat mat::getdpetsc(void) { errorifpointerisnull(); errorifinvalidated(); return rawmatptr->getdpetsc(); }
