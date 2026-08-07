@@ -14,8 +14,6 @@
 #include "polynomial.h"
 #include "orientation.h"
 
-using namespace std;
-
 class hierarchicalformfunctioncontainer
 {
 
@@ -39,10 +37,10 @@ class hierarchicalformfunctioncontainer
         // - for derivative ki if m is 1, eta 2, phi 3, none 0
         // - at component n (0 for x, 1 for y and 2 for z)
         // - evaluation point o
-        vector<vector<vector<vector<vector<vector<vector<vector<double>>>>>>>> val = {};
-        
+        std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>>>>> val = {};
+
         // The form function polynomials are stored in the same format but without [m] and [o]:
-        vector<vector<vector<vector<vector<vector<polynomial>>>>>> ffpoly = {};
+        std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<polynomial>>>>>> ffpoly = {};
 
     public:
 
